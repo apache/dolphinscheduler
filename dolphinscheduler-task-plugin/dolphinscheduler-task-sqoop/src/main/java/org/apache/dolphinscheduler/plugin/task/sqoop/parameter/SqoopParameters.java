@@ -35,7 +35,7 @@ import java.util.Objects;
 /**
  * sqoop parameters
  */
-public class SqoopParameters  extends AbstractParameters {
+public class SqoopParameters extends AbstractParameters {
 
     /**
      * sqoop job type:
@@ -210,12 +210,14 @@ public class SqoopParameters  extends AbstractParameters {
             return resources;
         }
 
-        SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
+        SourceMysqlParameter sourceMysqlParameter =
+                JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
         if (sourceMysqlParameter.getSrcDatasource() != 0) {
             resources.put(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
         }
 
-        TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
+        TargetMysqlParameter targetMysqlParameter =
+                JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
         if (targetMysqlParameter.getTargetDatasource() != 0) {
             resources.put(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
         }
@@ -230,11 +232,15 @@ public class SqoopParameters  extends AbstractParameters {
             return sqoopTaskExecutionContext;
         }
 
-        SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
-        TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
+        SourceMysqlParameter sourceMysqlParameter =
+                JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
+        TargetMysqlParameter targetMysqlParameter =
+                JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
 
-        DataSourceParameters dataSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
-        DataSourceParameters dataTarget = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
+        DataSourceParameters dataSource = (DataSourceParameters) parametersHelper
+                .getResourceParameters(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
+        DataSourceParameters dataTarget = (DataSourceParameters) parametersHelper
+                .getResourceParameters(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
 
         if (Objects.nonNull(dataSource)) {
             sqoopTaskExecutionContext.setDataSourceId(sourceMysqlParameter.getSrcDatasource());

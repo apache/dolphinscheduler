@@ -25,8 +25,9 @@ import java.util.Map;
 
 import lombok.NonNull;
 
-public class QueryStateTemplateMethodTransformer implements
-    TemplateMethodTransformer<LoopTaskYamlDefinition.LoopTaskQueryStateYamlDefinition, HttpLoopTaskQueryStatusMethodDefinition> {
+public class QueryStateTemplateMethodTransformer
+        implements
+            TemplateMethodTransformer<LoopTaskYamlDefinition.LoopTaskQueryStateYamlDefinition, HttpLoopTaskQueryStatusMethodDefinition> {
 
     @Override
     public @NonNull HttpLoopTaskQueryStatusMethodDefinition transform(@NonNull LoopTaskYamlDefinition.LoopTaskQueryStateYamlDefinition loopTaskAPIYamlDefinition) {
@@ -38,11 +39,11 @@ public class QueryStateTemplateMethodTransformer implements
         Map<String, Object> requestBody = loopTaskAPIYamlDefinition.getRequestBody();
         String taskInstanceFinishedJPath = loopTaskAPIYamlDefinition.getTaskInstanceFinishedJPath();
         return new HttpLoopTaskQueryStatusMethodDefinition(url,
-                                                           method,
-                                                           dataType,
-                                                           httpHeaders,
-                                                           requestParams,
-                                                           requestBody,
-                                                           taskInstanceFinishedJPath);
+                method,
+                dataType,
+                httpHeaders,
+                requestParams,
+                requestBody,
+                taskInstanceFinishedJPath);
     }
 }

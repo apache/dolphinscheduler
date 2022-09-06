@@ -309,7 +309,7 @@ public class TaskDefinition {
         if (taskParamMap == null && !Strings.isNullOrEmpty(taskParams)) {
             JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
 
-            //If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
+            // If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
             if (localParams != null && !localParams.isNull()) {
                 List<Property> propList = JSONUtils.toList(localParams.toString(), Property.class);
 
@@ -463,24 +463,24 @@ public class TaskDefinition {
         }
         TaskDefinition that = (TaskDefinition) o;
         return failRetryTimes == that.failRetryTimes
-            && failRetryInterval == that.failRetryInterval
-            && timeout == that.timeout
-            && delayTime == that.delayTime
-            && Objects.equals(name, that.name)
-            && Objects.equals(description, that.description)
-            && Objects.equals(taskType, that.taskType)
-            && Objects.equals(taskParams, that.taskParams)
-            && flag == that.flag
-            && taskPriority == that.taskPriority
-            && Objects.equals(workerGroup, that.workerGroup)
-            && timeoutFlag == that.timeoutFlag
-            && timeoutNotifyStrategy == that.timeoutNotifyStrategy
-            && (Objects.equals(resourceIds, that.resourceIds)
-            || ("".equals(resourceIds) && that.resourceIds == null)
-            || ("".equals(that.resourceIds) && resourceIds == null))
-            && environmentCode == that.environmentCode
-            && taskGroupId == that.taskGroupId
-            && taskGroupPriority == that.taskGroupPriority;
+                && failRetryInterval == that.failRetryInterval
+                && timeout == that.timeout
+                && delayTime == that.delayTime
+                && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description)
+                && Objects.equals(taskType, that.taskType)
+                && Objects.equals(taskParams, that.taskParams)
+                && flag == that.flag
+                && taskPriority == that.taskPriority
+                && Objects.equals(workerGroup, that.workerGroup)
+                && timeoutFlag == that.timeoutFlag
+                && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+                && (Objects.equals(resourceIds, that.resourceIds)
+                        || ("".equals(resourceIds) && that.resourceIds == null)
+                        || ("".equals(that.resourceIds) && resourceIds == null))
+                && environmentCode == that.environmentCode
+                && taskGroupId == that.taskGroupId
+                && taskGroupPriority == that.taskGroupPriority;
     }
 
     @Override

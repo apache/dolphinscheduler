@@ -33,8 +33,8 @@ public class MasterLogFilterTest {
     public void decide() {
         MasterLogFilter masterLogFilter = new MasterLogFilter();
 
-
         FilterReply filterReply = masterLogFilter.decide(new ILoggingEvent() {
+
             @Override
             public String getThreadName() {
                 return Constants.THREAD_NAME_MASTER_SERVER;
@@ -48,7 +48,7 @@ public class MasterLogFilterTest {
             @Override
             public String getMessage() {
                 return "master insert into queue success, task : shell2";
-//                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
+                // return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
             }
 
             @Override

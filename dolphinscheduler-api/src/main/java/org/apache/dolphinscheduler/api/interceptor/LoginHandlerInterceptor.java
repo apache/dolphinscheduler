@@ -40,6 +40,7 @@ import java.util.Date;
  * login interceptor, must log in first
  */
 public class LoginHandlerInterceptor implements HandlerInterceptor {
+
     private static final Logger logger = LoggerFactory.getLogger(LoginHandlerInterceptor.class);
 
     @Autowired
@@ -90,7 +91,8 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           ModelAndView modelAndView) throws Exception {
         ThreadLocalContext.getTimezoneThreadLocal().remove();
     }
 }

@@ -83,7 +83,6 @@ public interface SchedulerService {
                                        String workerGroup,
                                        Long environmentCode);
 
-
     /**
      * set schedule online or offline
      *
@@ -110,7 +109,7 @@ public interface SchedulerService {
      * @return schedule list page
      */
     Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
-                                      Integer pageNo, Integer pageSize);
+                         Integer pageNo, Integer pageSize);
 
     /**
      * query schedule list

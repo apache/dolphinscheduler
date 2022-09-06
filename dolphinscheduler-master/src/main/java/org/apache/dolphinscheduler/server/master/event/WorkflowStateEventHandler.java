@@ -35,20 +35,20 @@ public class WorkflowStateEventHandler implements StateEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowStateEventHandler.class);
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleException {
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) throws StateEventHandleException {
         measureProcessState(stateEvent);
         ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
 
         logger.info(
-            "Handle workflow instance state event, the current workflow instance state {} will be changed to {}",
-            processInstance.getState(), stateEvent.getExecutionStatus());
+                "Handle workflow instance state event, the current workflow instance state {} will be changed to {}",
+                processInstance.getState(), stateEvent.getExecutionStatus());
 
         if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
             // serial wait execution type needs to wake up the waiting process
             if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
-                                                                                            .typeIsSerialPriority()) {
+                    .typeIsSerialPriority()) {
                 workflowExecuteRunnable.endProcess();
                 return true;
             }

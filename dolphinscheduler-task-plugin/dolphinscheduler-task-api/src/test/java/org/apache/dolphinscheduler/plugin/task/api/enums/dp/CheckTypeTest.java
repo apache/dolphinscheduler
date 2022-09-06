@@ -36,7 +36,8 @@ public class CheckTypeTest {
         assertEquals("comparison_minus_statistics", CheckType.COMPARISON_MINUS_STATISTICS.getDescription());
         assertEquals("statistics_minus_comparison", CheckType.STATISTICS_MINUS_COMPARISON.getDescription());
         assertEquals("statistics_comparison_percentage", CheckType.STATISTICS_COMPARISON_PERCENTAGE.getDescription());
-        assertEquals("statistics_comparison_difference_comparison_percentage", CheckType.STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE.getDescription());
+        assertEquals("statistics_comparison_difference_comparison_percentage",
+                CheckType.STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE.getDescription());
     }
 
     @Test

@@ -50,17 +50,19 @@ public class TaskEventProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_FORCE_STATE_EVENT_REQUEST == command.getType()
-                || CommandType.TASK_WAKEUP_EVENT_REQUEST == command.getType()
-            , String.format("invalid command type: %s", command.getType()));
+                || CommandType.TASK_WAKEUP_EVENT_REQUEST == command.getType(),
+                String.format("invalid command type: %s", command.getType()));
 
-        TaskEventChangeCommand taskEventChangeCommand = JSONUtils.parseObject(command.getBody(), TaskEventChangeCommand.class);
+        TaskEventChangeCommand taskEventChangeCommand =
+                JSONUtils.parseObject(command.getBody(), TaskEventChangeCommand.class);
         StateEvent stateEvent = new StateEvent();
         stateEvent.setKey(taskEventChangeCommand.getKey());
         stateEvent.setProcessInstanceId(taskEventChangeCommand.getProcessInstanceId());
         stateEvent.setTaskInstanceId(taskEventChangeCommand.getTaskInstanceId());
         stateEvent.setType(StateEventType.WAIT_TASK_GROUP);
         try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                    stateEvent.getTaskInstanceId());
             logger.info("Received task event change command, event: {}", stateEvent);
             stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
         } finally {

@@ -43,48 +43,50 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * ui plugin controller test
  */
 public class UiPluginControllerTest extends AbstractControllerTest {
+
     private static final PluginType pluginType = PluginType.ALERT;
     private static final int pluginId = 1;
     private static final Result expectResponseContent = JSONUtils.parseObject(
-            "{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}"
-            , Result.class);
+            "{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}", Result.class);
     private static final ImmutableMap<String, Object> uiPluginServiceResult =
             ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
-    
+
     @MockBean(name = "uiPluginService")
     private UiPluginService uiPluginService;
-    
+
     @Test
     public void testQueryUiPluginsByType() throws Exception {
         when(uiPluginService.queryUiPluginsByType(any(PluginType.class)))
                 .thenReturn(uiPluginServiceResult);
-        
+
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginType", String.valueOf(pluginType));
-        
+
         final MvcResult mvcResult = mockMvc.perform(get("/ui-plugins/query-by-type")
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        
-        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        final Result actualResponseContent =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
-    
+
     @Test
     public void testQueryUiPluginDetailById() throws Exception {
         when(uiPluginService.queryUiPluginDetailById(anyInt()))
                 .thenReturn(uiPluginServiceResult);
-        
+
         final MvcResult mvcResult = mockMvc.perform(get("/ui-plugins/{id}", pluginId)
-                        .header(SESSION_ID, sessionId))
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        
-        final Result actualResponseContent = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        final Result actualResponseContent =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
     }
 }

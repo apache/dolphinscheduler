@@ -33,6 +33,7 @@ import java.util.Date;
  */
 @TableName("t_ds_dq_rule_input_entry")
 public class DqRuleInputEntry implements Serializable {
+
     /**
      * primary key
      */

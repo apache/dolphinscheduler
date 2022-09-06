@@ -52,7 +52,6 @@ public abstract class AbstractTask {
      */
     protected String appIds;
 
-
     /**
      * cancel
      */

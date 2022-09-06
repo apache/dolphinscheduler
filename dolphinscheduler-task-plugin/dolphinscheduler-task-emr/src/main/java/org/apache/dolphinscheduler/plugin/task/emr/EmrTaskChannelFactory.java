@@ -28,6 +28,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class EmrTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public String getName() {
         return "EMR";

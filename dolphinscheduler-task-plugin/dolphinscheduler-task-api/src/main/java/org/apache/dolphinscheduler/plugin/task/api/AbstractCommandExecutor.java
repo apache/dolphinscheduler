@@ -110,7 +110,7 @@ public abstract class AbstractCommandExecutor {
         // setting up user to run commands
         List<String> command = new LinkedList<>();
 
-        //init process builder
+        // init process builder
         ProcessBuilder processBuilder = new ProcessBuilder();
         // setting up a working directory
         processBuilder.directory(new File(taskRequest.getExecutePath()));
@@ -151,7 +151,7 @@ public abstract class AbstractCommandExecutor {
         // create command file if not exists
         createCommandFileIfNotExists(execCommand, commandFilePath);
 
-        //build process
+        // build process
         buildProcess(commandFilePath);
 
         // parse process output
@@ -163,7 +163,8 @@ public abstract class AbstractCommandExecutor {
 
         // cache processId
         taskRequest.setProcessId(processId);
-        boolean updateTaskExecutionContextStatus = TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
+        boolean updateTaskExecutionContextStatus =
+                TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
         if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
             ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_KILL);
@@ -194,7 +195,8 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
 
-        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+        logger.info(
+                "process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
                 taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
         return result;
 
@@ -420,7 +422,8 @@ public abstract class AbstractCommandExecutor {
         /*
          * when log buffer siz or flush time reach condition , then flush
          */
-        if (logBuffer.size() >= TaskConstants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL) {
+        if (logBuffer.size() >= TaskConstants.DEFAULT_LOG_ROWS_NUM
+                || now - lastFlushTime > TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL) {
             lastFlushTime = now;
             logHandler.accept(logBuffer);
 

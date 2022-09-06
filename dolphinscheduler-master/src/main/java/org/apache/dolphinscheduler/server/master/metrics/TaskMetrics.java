@@ -23,8 +23,8 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 
-
 public final class TaskMetrics {
+
     private TaskMetrics() {
         throw new UnsupportedOperationException("Utility class");
     }

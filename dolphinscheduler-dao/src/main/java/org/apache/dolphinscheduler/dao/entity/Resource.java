@@ -28,6 +28,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("t_ds_resources")
 public class Resource {
+
     /**
      * id
      */
@@ -95,7 +96,6 @@ public class Resource {
     @TableField(exist = false)
     private String userName;
 
-
     public Resource() {
     }
 
@@ -121,7 +121,8 @@ public class Resource {
         this.isDirectory = isDirectory;
     }
 
-    public Resource(int pid, String alias, String fullName, boolean isDirectory, String description, String fileName, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
+    public Resource(int pid, String alias, String fullName, boolean isDirectory, String description, String fileName,
+                    int userId, ResourceType type, long size, Date createTime, Date updateTime) {
         this.pid = pid;
         this.alias = alias;
         this.fullName = fullName;
@@ -199,7 +200,6 @@ public class Resource {
         this.userId = userId;
     }
 
-
     public ResourceType getType() {
         return type;
     }
@@ -243,20 +243,20 @@ public class Resource {
     @Override
     public String toString() {
         return "Resource{" +
-            "id=" + id +
-            ", pid=" + pid +
-            ", alias='" + alias + '\'' +
-            ", fullName='" + fullName + '\'' +
-            ", isDirectory=" + isDirectory +
-            ", description='" + description + '\'' +
-            ", fileName='" + fileName + '\'' +
-            ", userId=" + userId +
-            ", type=" + type +
-            ", size=" + size +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            ",userName=" + userName +
-            '}';
+                "id=" + id +
+                ", pid=" + pid +
+                ", alias='" + alias + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", isDirectory=" + isDirectory +
+                ", description='" + description + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", userId=" + userId +
+                ", type=" + type +
+                ", size=" + size +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ",userName=" + userName +
+                '}';
     }
 
     @Override

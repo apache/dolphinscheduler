@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
+
     @Autowired
     private UserMapper userMapper;
 
@@ -47,7 +48,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private ProcessDefinitionLog insertOne() {
-        //insertOne
+        // insertOne
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setName("def 1");
@@ -66,7 +67,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private ProcessDefinitionLog insertTwo() {
-        //insertOne
+        // insertOne
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setName("def 2");
@@ -140,7 +141,8 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryProcessDefinitionVersionsPaging() {
         insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
-        IPage<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L,1L);
+        IPage<ProcessDefinitionLog> processDefinitionLogs =
+                processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
         Assert.assertNotEquals(processDefinitionLogs.getTotal(), 0);
     }
 

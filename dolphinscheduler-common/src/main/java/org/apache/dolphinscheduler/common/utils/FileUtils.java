@@ -57,7 +57,8 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        String fileName = String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName =
+                String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
 
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
@@ -94,7 +95,8 @@ public class FileUtils {
      * @param taskInstanceId task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
+    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion,
+                                           int processInstanceId, int taskInstanceId) {
         String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
                 projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
         File file = new File(fileName);
@@ -119,7 +121,7 @@ public class FileUtils {
      * @throws IOException errors
      */
     public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        //if work dir exists, first delete
+        // if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
         if (execLocalPathFile.exists()) {
@@ -134,7 +136,7 @@ public class FileUtils {
             }
         }
 
-        //create work dir
+        // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
         logger.info(mkdirLog);
@@ -230,7 +232,7 @@ public class FileUtils {
      * @param filename String type of filename
      * @return whether file path could be traversal or not
      */
-    public static boolean directoryTraversal(String filename){
+    public static boolean directoryTraversal(String filename) {
         if (filename.contains(FOLDER_SEPARATOR)) {
             return true;
         }

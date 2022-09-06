@@ -46,26 +46,26 @@ public class HiveSourceGenerator implements ISourceGenerator {
         StringBuilder hiveSourceSb = new StringBuilder();
 
         try {
-            SourceHiveParameter sourceHiveParameter
-                = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHiveParameter.class);
+            SourceHiveParameter sourceHiveParameter =
+                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHiveParameter.class);
 
             if (null != sourceHiveParameter) {
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveDatabase())) {
                     hiveSourceSb.append(SPACE).append(HCATALOG_DATABASE)
-                        .append(SPACE).append(sourceHiveParameter.getHiveDatabase());
+                            .append(SPACE).append(sourceHiveParameter.getHiveDatabase());
                 }
 
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveTable())) {
                     hiveSourceSb.append(SPACE).append(HCATALOG_TABLE)
-                        .append(SPACE).append(sourceHiveParameter.getHiveTable());
+                            .append(SPACE).append(sourceHiveParameter.getHiveTable());
                 }
 
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())
-                    && StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
+                        && StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
                     hiveSourceSb.append(SPACE).append(HCATALOG_PARTITION_KEYS)
-                        .append(SPACE).append(sourceHiveParameter.getHivePartitionKey())
-                        .append(SPACE).append(HCATALOG_PARTITION_VALUES)
-                        .append(SPACE).append(sourceHiveParameter.getHivePartitionValue());
+                            .append(SPACE).append(sourceHiveParameter.getHivePartitionKey())
+                            .append(SPACE).append(HCATALOG_PARTITION_VALUES)
+                            .append(SPACE).append(sourceHiveParameter.getHivePartitionValue());
                 }
             }
         } catch (Exception e) {

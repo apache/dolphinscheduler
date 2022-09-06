@@ -21,10 +21,10 @@ package org.apache.dolphinscheduler.spi.enums;
  * data base types
  */
 public enum ResUploadType {
-  /**
-   * 0 hdfs
-   * 1 s3
-   * 2 none
-   */
-  HDFS,S3,NONE
+    /**
+     * 0 hdfs
+     * 1 s3
+     * 2 none
+     */
+    HDFS, S3, NONE
 }

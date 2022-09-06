@@ -22,7 +22,8 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.Set;
 
-public interface ResourcePermissionCheckService<T>{
+public interface ResourcePermissionCheckService<T> {
+
     /**
      * resourcePermissionCheck
      * @param authorizationType
@@ -51,7 +52,8 @@ public interface ResourcePermissionCheckService<T>{
      * @param logger
      * @return
      */
-    boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId, String permissionKey, Logger logger);
+    boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId,
+                                     String permissionKey, Logger logger);
 
     /**
      * functionDisabled

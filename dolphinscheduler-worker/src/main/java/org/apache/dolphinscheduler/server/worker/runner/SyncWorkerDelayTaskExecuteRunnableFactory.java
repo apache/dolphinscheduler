@@ -27,7 +27,9 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import javax.annotation.Nullable;
 
-public class SyncWorkerDelayTaskExecuteRunnableFactory extends WorkerDelayTaskExecuteRunnableFactory<SyncWorkerDelayTaskExecuteRunnable> {
+public class SyncWorkerDelayTaskExecuteRunnableFactory
+        extends
+            WorkerDelayTaskExecuteRunnableFactory<SyncWorkerDelayTaskExecuteRunnable> {
 
     protected SyncWorkerDelayTaskExecuteRunnableFactory(@NonNull TaskExecutionContext taskExecutionContext,
                                                         @NonNull WorkerConfig workerConfig,
@@ -36,7 +38,8 @@ public class SyncWorkerDelayTaskExecuteRunnableFactory extends WorkerDelayTaskEx
                                                         @NonNull AlertClientService alertClientService,
                                                         @NonNull TaskPluginManager taskPluginManager,
                                                         @Nullable StorageOperate storageOperate) {
-        super(taskExecutionContext, workerConfig, workflowMasterAddress, workerMessageSender, alertClientService, taskPluginManager, storageOperate);
+        super(taskExecutionContext, workerConfig, workflowMasterAddress, workerMessageSender, alertClientService,
+                taskPluginManager, storageOperate);
     }
 
     @Override

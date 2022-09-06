@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import lombok.NonNull;
 
 public final class ProcessUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     private ProcessUtils() {

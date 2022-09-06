@@ -85,8 +85,8 @@ public class JdbcReader implements BatchReader {
         Config jdbcConfig = ConfigUtils.extractSubConfig(config, JDBC + DOTS, false);
 
         if (!config.isEmpty()) {
-            Map<String,String> optionMap = new HashMap<>(16);
-            jdbcConfig.entrySet().forEach(x -> optionMap.put(x.getKey(),String.valueOf(x.getValue())));
+            Map<String, String> optionMap = new HashMap<>(16);
+            jdbcConfig.entrySet().forEach(x -> optionMap.put(x.getKey(), String.valueOf(x.getValue())));
             reader.options(optionMap);
         }
 

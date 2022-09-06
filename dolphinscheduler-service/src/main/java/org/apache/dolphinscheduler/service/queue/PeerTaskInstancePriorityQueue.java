@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
  * All the task instances are in the same process instance.
  */
 public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInstance> {
+
     /**
      * queue size
      */
@@ -90,7 +91,8 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      */
     @Override
     public TaskInstance poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException {
-        throw new TaskPriorityQueueException("This operation is not currently supported and suggest to use PriorityBlockingQueue if you want！");
+        throw new TaskPriorityQueueException(
+                "This operation is not currently supported and suggest to use PriorityBlockingQueue if you want！");
     }
 
     /**
@@ -165,8 +167,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
         return String.join(
                 String.valueOf(taskInstance.getProcessInstanceId()),
                 String.valueOf(taskInstance.getTaskCode()),
-                String.valueOf(taskInstance.getTaskDefinitionVersion())
-                , "-");
+                String.valueOf(taskInstance.getTaskDefinitionVersion()), "-");
     }
 
     /**
@@ -183,9 +184,9 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
          */
         @Override
         public int compare(TaskInstance o1, TaskInstance o2) {
-            if(o1.getTaskInstancePriority().equals(o2.getTaskInstancePriority())){
+            if (o1.getTaskInstancePriority().equals(o2.getTaskInstancePriority())) {
                 // larger number, higher priority
-                return Constants.OPPOSITE_VALUE * Integer.compare(o1.getTaskGroupPriority(),o2.getTaskGroupPriority());
+                return Constants.OPPOSITE_VALUE * Integer.compare(o1.getTaskGroupPriority(), o2.getTaskGroupPriority());
             }
             return o1.getTaskInstancePriority().compareTo(o2.getTaskInstancePriority());
         }

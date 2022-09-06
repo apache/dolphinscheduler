@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
  * parameter parse utils
  */
 public class ParameterUtils {
+
     private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\$\\]]+)]";
 
     private static final String DATE_START_PATTERN = "^[0-9]";
@@ -65,7 +66,7 @@ public class ParameterUtils {
             parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
         }
         if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
-            //Get current time, schedule execute time
+            // Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME, null);
         } else {

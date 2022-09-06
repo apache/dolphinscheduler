@@ -36,14 +36,15 @@ public class HiveConfUtils {
     }
 
     private static class HiveConfHandler {
+
         private static HiveConf singleton;
 
-        private static Map<String,Object> hiveConfVars;
+        private static Map<String, Object> hiveConfVars;
 
         static {
             singleton = new HiveConf();
             hiveConfVars = new HashMap<>();
-            Arrays.stream(ConfVars.values()).forEach(confVar -> hiveConfVars.put(confVar.varname,confVar));
+            Arrays.stream(ConfVars.values()).forEach(confVar -> hiveConfVars.put(confVar.varname, confVar));
         }
     }
 
@@ -59,7 +60,7 @@ public class HiveConfUtils {
      * get hive conf vars
      * @return
      */
-    public static Map<String,Object> getHiveConfVars() {
+    public static Map<String, Object> getHiveConfVars() {
         return HiveConfHandler.hiveConfVars;
     }
 
@@ -78,7 +79,8 @@ public class HiveConfUtils {
 
         // the security authorization hive conf var name
         HiveConf hiveConf = HiveConfUtils.getInstance();
-        String hiveAuthorizationSqlStdAuthConfigWhitelist = hiveConf.getVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_SQL_STD_AUTH_CONFIG_WHITELIST);
+        String hiveAuthorizationSqlStdAuthConfigWhitelist =
+                hiveConf.getVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_SQL_STD_AUTH_CONFIG_WHITELIST);
         Pattern modWhiteListPattern = Pattern.compile(hiveAuthorizationSqlStdAuthConfigWhitelist);
         Matcher matcher = modWhiteListPattern.matcher(confKey);
         return matcher.matches();

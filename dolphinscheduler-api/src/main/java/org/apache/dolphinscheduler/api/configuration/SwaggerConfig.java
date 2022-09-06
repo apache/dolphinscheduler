@@ -44,7 +44,8 @@ public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller")).paths(PathSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
+                .paths(PathSelectors.any())
                 .build();
     }
 
@@ -52,6 +53,5 @@ public class SwaggerConfig implements WebMvcConfigurer {
         return new ApiInfoBuilder().title("Dolphin Scheduler Api Docs").description("Dolphin Scheduler Api Docs")
                 .build();
     }
-
 
 }

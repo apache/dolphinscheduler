@@ -32,9 +32,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
 public class TaskTimeoutStateEventHandler implements StateEventHandler {
+
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleError {
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) throws StateEventHandleError {
         TaskMetrics.incTaskTimeout();
         workflowExecuteRunnable.checkTaskInstanceByStateEvent(stateEvent);
 
@@ -46,7 +47,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
         Map<Long, ITaskProcessor> activeTaskProcessMap = workflowExecuteRunnable.getActiveTaskProcessMap();
         if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy
-            || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) {
+                || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) {
             ITaskProcessor taskProcessor = activeTaskProcessMap.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.TIMEOUT);
         }

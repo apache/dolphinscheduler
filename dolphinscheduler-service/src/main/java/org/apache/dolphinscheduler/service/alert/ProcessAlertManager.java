@@ -196,7 +196,8 @@ public class ProcessAlertManager {
             alert.setContent(content);
             alert.setWarningType(WarningType.FAILURE);
             alert.setCreateTime(new Date());
-            alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
+            alert.setAlertGroupId(
+                    processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
             alertDao.addAlert(alert);
             logger.info("add alert to db , alert : {}", alert);
@@ -234,7 +235,8 @@ public class ProcessAlertManager {
         alert.setProjectCode(projectUser.getProjectCode());
         alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         alert.setProcessInstanceId(processInstance.getId());
-        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS : AlertType.PROCESS_INSTANCE_FAILURE);
+        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
+                : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -323,8 +325,9 @@ public class ProcessAlertManager {
         alert.setProjectCode(result.getProjectCode());
         alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         alert.setProcessInstanceId(processInstance.getId());
-        //might need to change to data quality status
-        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS : AlertType.PROCESS_INSTANCE_FAILURE);
+        // might need to change to data quality status
+        alert.setAlertType(processInstance.getState().typeIsSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
+                : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert);
     }
@@ -332,7 +335,7 @@ public class ProcessAlertManager {
     /**
      * send data quality task error alert
      */
-    public void sendTaskErrorAlert(TaskInstance taskInstance,ProcessInstance processInstance) {
+    public void sendTaskErrorAlert(TaskInstance taskInstance, ProcessInstance processInstance) {
         Alert alert = new Alert();
         alert.setTitle("Task [" + taskInstance.getName() + "] Failure Warning");
         String content = getTaskAlterContent(taskInstance);
@@ -400,7 +403,8 @@ public class ProcessAlertManager {
         return JSONUtils.toJsonString(content);
     }
 
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, ProjectUser projectUser) {
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance,
+                                     ProjectUser projectUser) {
         alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
     }
 
@@ -440,6 +444,6 @@ public class ProcessAlertManager {
         alert.setProcessInstanceId(processInstance.getId());
         alert.setAlertType(AlertType.PROCESS_INSTANCE_BLOCKED);
         alertDao.addAlert(alert);
-        logger.info("add alert to db, alert: {}",alert);
+        logger.info("add alert to db, alert: {}", alert);
     }
 }

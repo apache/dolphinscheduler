@@ -60,16 +60,16 @@ public class HostWeight {
     }
 
     public Host getHost() {
-        return (Host)hostWorker;
+        return (Host) hostWorker;
     }
 
     @Override
     public String toString() {
         return "HostWeight{"
-            + "hostWorker=" + hostWorker
-            + ", weight=" + weight
-            + ", currentWeight=" + currentWeight
-            + '}';
+                + "hostWorker=" + hostWorker
+                + ", weight=" + weight
+                + ", currentWeight=" + currentWeight
+                + '}';
     }
 
     private double calculateWeight(double cpu, double memory, double loadAverage, long startTime) {

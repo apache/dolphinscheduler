@@ -81,7 +81,8 @@ public class DataQualityTask extends AbstractYarnTask {
     public void init() {
         logger.info("data quality task params {}", dqTaskExecutionContext.getTaskParams());
 
-        dataQualityParameters = JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
+        dataQualityParameters =
+                JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
 
         if (null == dataQualityParameters) {
             logger.error("data quality params is null");
@@ -92,15 +93,15 @@ public class DataQualityTask extends AbstractYarnTask {
             throw new RuntimeException("data quality task params is not valid");
         }
 
-        Map<String,String> inputParameter = dataQualityParameters.getRuleInputParameter();
-        for (Map.Entry<String,String> entry: inputParameter.entrySet()) {
+        Map<String, String> inputParameter = dataQualityParameters.getRuleInputParameter();
+        for (Map.Entry<String, String> entry : inputParameter.entrySet()) {
             if (entry != null && entry.getValue() != null) {
                 entry.setValue(entry.getValue().trim());
             }
         }
 
-        DataQualityTaskExecutionContext dataQualityTaskExecutionContext
-                        = dqTaskExecutionContext.getDataQualityTaskExecutionContext();
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext =
+                dqTaskExecutionContext.getDataQualityTaskExecutionContext();
 
         operateInputParameter(inputParameter, dataQualityTaskExecutionContext);
 
@@ -114,7 +115,9 @@ public class DataQualityTask extends AbstractYarnTask {
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs("\""
-                        + StringUtils.replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
+                        + StringUtils.replaceDoubleBrackets(
+                                StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
+                        + "\"");
 
         dataQualityParameters
                 .getSparkParameters()
@@ -123,7 +126,8 @@ public class DataQualityTask extends AbstractYarnTask {
         setMainJarName();
     }
 
-    private void operateInputParameter(Map<String, String> inputParameter, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+    private void operateInputParameter(Map<String, String> inputParameter,
+                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS);
         LocalDateTime time = LocalDateTime.now();
         String now = df.format(time);
@@ -138,11 +142,12 @@ public class DataQualityTask extends AbstractYarnTask {
         inputParameter.put(TASK_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
 
         if (StringUtils.isEmpty(inputParameter.get(DATA_TIME))) {
-            inputParameter.put(DATA_TIME,ArgsUtils.wrapperSingleQuotes(now));
+            inputParameter.put(DATA_TIME, ArgsUtils.wrapperSingleQuotes(now));
         }
 
         if (StringUtils.isNotEmpty(inputParameter.get(REGEXP_PATTERN))) {
-            inputParameter.put(REGEXP_PATTERN,StringUtils.escapeJava(StringUtils.escapeJava(inputParameter.get(REGEXP_PATTERN))));
+            inputParameter.put(REGEXP_PATTERN,
+                    StringUtils.escapeJava(StringUtils.escapeJava(inputParameter.get(REGEXP_PATTERN))));
         }
 
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getHdfsPath())) {
@@ -152,7 +157,7 @@ public class DataQualityTask extends AbstractYarnTask {
                             + UNDERLINE + dqTaskExecutionContext.getProcessInstanceId()
                             + UNDERLINE + dqTaskExecutionContext.getTaskName());
         } else {
-            inputParameter.put(ERROR_OUTPUT_PATH,"");
+            inputParameter.put(ERROR_OUTPUT_PATH, "");
         }
     }
 
@@ -167,7 +172,8 @@ public class DataQualityTask extends AbstractYarnTask {
 
         // replace placeholder
         Map<String, Property> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        String command =
+                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
         logger.info("data quality task command: {}", command);
 
         return command;

@@ -6,8 +6,6 @@ import static org.junit.Assert.*;
 
 public class AbstractCommandExecutorTest {
 
-
-
     @Test
     public void getAppIds() {
     }

@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LdapAuthenticator extends AbstractAuthenticator {
+
     @Autowired
     private UsersService usersService;
     @Autowired
@@ -34,7 +35,7 @@ public class LdapAuthenticator extends AbstractAuthenticator {
         User user = null;
         String ldapEmail = ldapService.ldapLogin(userId, password);
         if (ldapEmail != null) {
-            //check if user exist
+            // check if user exist
             user = usersService.getUserByUserName(userId);
             if (user == null) {
                 user = usersService.createUser(ldapService.getUserType(userId), userId, ldapEmail);

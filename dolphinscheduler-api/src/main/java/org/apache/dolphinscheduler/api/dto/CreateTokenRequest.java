@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
-
 import io.swagger.annotations.ApiModelProperty;
 
 public class CreateTokenRequest {
+
     @ApiModelProperty(example = "1", required = true)
     Integer userId;
 

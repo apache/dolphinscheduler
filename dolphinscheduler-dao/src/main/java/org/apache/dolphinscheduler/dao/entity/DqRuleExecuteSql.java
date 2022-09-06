@@ -31,6 +31,7 @@ import java.util.Date;
  */
 @TableName("t_ds_dq_rule_execute_sql")
 public class DqRuleExecuteSql implements Serializable {
+
     /**
      * primary key
      */

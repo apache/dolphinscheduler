@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.os;
 
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +29,12 @@ import oshi.util.Util;
 
 import java.util.Arrays;
 
-
 /**
  * os information test
  */
 public class OshiTest {
 
     private static Logger logger = LoggerFactory.getLogger(OshiTest.class);
-
 
     @Test
     public void test() {
@@ -49,36 +46,32 @@ public class OshiTest {
         logger.info("Checking Memory...");
         printMemory(hal.getMemory());
 
-
         logger.info("Checking CPU...");
         printCpu(si);
 
     }
 
-
-
     private static void printMemory(GlobalMemory memory) {
 
-        logger.info("memory avail:{} MB" , memory.getAvailable() / 1024 / 1024 );//memory avail:6863 MB
-        logger.info("memory total:{} MB" , memory.getTotal() / 1024 / 1024 );//memory total:16384 MB
+        logger.info("memory avail:{} MB", memory.getAvailable() / 1024 / 1024);// memory avail:6863 MB
+        logger.info("memory total:{} MB", memory.getTotal() / 1024 / 1024);// memory total:16384 MB
     }
-
 
     private static void printCpu(SystemInfo si) {
         CentralProcessor processor = si.getHardware().getProcessor();
         long[] systemCpuLoadTicks = processor.getSystemCpuLoadTicks();
         Util.sleep(1000);
-        logger.info(String.format("CPU load: %.1f%% (OS MXBean)%n", processor.getSystemCpuLoadBetweenTicks(systemCpuLoadTicks) * 100));//CPU load: 24.9% (OS MXBean)
-        logger.info("CPU load averages : {}", processor.getSystemLoadAverage(1)[0]);//CPU load averages : 1.5234375
-
+        logger.info(String.format("CPU load: %.1f%% (OS MXBean)%n",
+                processor.getSystemCpuLoadBetweenTicks(systemCpuLoadTicks) * 100));// CPU load: 24.9% (OS MXBean)
+        logger.info("CPU load averages : {}", processor.getSystemLoadAverage(1)[0]);// CPU load averages : 1.5234375
 
         logger.info("Uptime: " + FormatUtil.formatElapsedSecs(si.getOperatingSystem().getSystemUptime()));
-        logger.info("Context Switches/Interrupts: " + processor.getContextSwitches() + " / " + processor.getInterrupts());
-
+        logger.info(
+                "Context Switches/Interrupts: " + processor.getContextSwitches() + " / " + processor.getInterrupts());
 
         long[] prevTicks = processor.getSystemCpuLoadTicks();
         logger.info("CPU, IOWait, and IRQ ticks @ 0 sec:" + Arrays.toString(prevTicks));
-        //Wait a second...
+        // Wait a second...
         Util.sleep(1000);
         long[] ticks = processor.getSystemCpuLoadTicks();
         logger.info("CPU, IOWait, and IRQ ticks @ 1 sec:" + Arrays.toString(ticks));
@@ -96,9 +89,8 @@ public class OshiTest {
                 "User: %.1f%% Nice: %.1f%% System: %.1f%% Idle: %.1f%% IOwait: %.1f%% IRQ: %.1f%% SoftIRQ: %.1f%% Steal: %.1f%%%n",
                 100d * user / totalCpu, 100d * nice / totalCpu, 100d * sys / totalCpu, 100d * idle / totalCpu,
                 100d * iowait / totalCpu, 100d * irq / totalCpu, 100d * softirq / totalCpu, 100d * steal / totalCpu));
-        logger.info(String.format("CPU load: %.1f%% (counting ticks)%n", processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100));
-
-
+        logger.info(String.format("CPU load: %.1f%% (counting ticks)%n",
+                processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100));
 
         double[] loadAverage = processor.getSystemLoadAverage(3);
         logger.info("CPU load averages:" + (loadAverage[0] < 0 ? " N/A" : String.format(" %.2f", loadAverage[0]))

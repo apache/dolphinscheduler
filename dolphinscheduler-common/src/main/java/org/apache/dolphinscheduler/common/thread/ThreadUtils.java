@@ -27,6 +27,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ThreadUtils {
+
     /**
      * Wrapper over newDaemonFixedThreadExecutor.
      *
@@ -36,9 +37,9 @@ public class ThreadUtils {
      */
     public static ExecutorService newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
-            .setDaemon(true)
-            .setNameFormat(threadName)
-            .build();
+                .setDaemon(true)
+                .setNameFormat(threadName)
+                .build();
         return Executors.newFixedThreadPool(threadsNum, threadFactory);
     }
 

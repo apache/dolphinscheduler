@@ -123,7 +123,6 @@ public class Schedule {
      */
     private int warningGroupId;
 
-
     /**
      * process instance priority
      */

@@ -312,7 +312,7 @@ public class TaskConstants {
     /**
      * resource storage type
      */
-   // public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
+    // public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
      * kerberos
@@ -344,7 +344,6 @@ public class TaskConstants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
-
     /**
      * hadoop.security.authentication
      */
@@ -353,7 +352,8 @@ public class TaskConstants {
     /**
      * hadoop.security.authentication
      */
-    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+            "hadoop.security.authentication.startup.state";
 
     /**
      * Task Logger Thread's name
@@ -390,13 +390,14 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
-    public static final List<String> COMPLEX_TASK_TYPES = Arrays.asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
+    public static final List<String> COMPLEX_TASK_TYPES = Arrays
+            .asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
 
     /**
      * aws config
      */
-    public static final String AWS_ACCESS_KEY_ID= "aws.access.key.id";
-    public static final String AWS_SECRET_ACCESS_KEY= "aws.secret.access.key";
+    public static final String AWS_ACCESS_KEY_ID = "aws.access.key.id";
+    public static final String AWS_SECRET_ACCESS_KEY = "aws.secret.access.key";
     public static final String AWS_REGION = "aws.region";
 
     // Loop task constants

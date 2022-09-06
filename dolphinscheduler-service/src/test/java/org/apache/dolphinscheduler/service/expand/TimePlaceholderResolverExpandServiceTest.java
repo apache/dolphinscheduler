@@ -45,7 +45,8 @@ public class TimePlaceholderResolverExpandServiceTest {
 
         boolean implCheckResult = timePlaceholderResolverExpandServiceImpl.timeFunctionNeedExpand(placeHolderName);
         Assert.assertFalse(implCheckResult);
-        String implResultString = timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
+        String implResultString =
+                timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
         Assert.assertTrue(StringUtils.isEmpty(implResultString));
     }
 }

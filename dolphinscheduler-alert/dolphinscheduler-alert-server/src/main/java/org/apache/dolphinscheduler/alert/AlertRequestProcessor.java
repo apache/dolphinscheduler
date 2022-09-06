@@ -34,6 +34,7 @@ import io.netty.channel.Channel;
 
 @Component
 public final class AlertRequestProcessor implements NettyRequestProcessor {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertRequestProcessor.class);
 
     private final AlertSenderService alertSenderService;
@@ -44,18 +45,19 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
 
     @Override
     public void process(Channel channel, Command command) {
-        checkArgument(CommandType.ALERT_SEND_REQUEST == command.getType(), "invalid command type: %s", command.getType());
+        checkArgument(CommandType.ALERT_SEND_REQUEST == command.getType(), "invalid command type: %s",
+                command.getType());
 
         AlertSendRequestCommand alertSendRequestCommand = JsonSerializer.deserialize(
-            command.getBody(), AlertSendRequestCommand.class);
+                command.getBody(), AlertSendRequestCommand.class);
 
         logger.info("Received command : {}", alertSendRequestCommand);
 
         AlertSendResponseCommand alertSendResponseCommand = alertSenderService.syncHandler(
-            alertSendRequestCommand.getGroupId(),
-            alertSendRequestCommand.getTitle(),
-            alertSendRequestCommand.getContent(),
-            alertSendRequestCommand.getWarnType());
+                alertSendRequestCommand.getGroupId(),
+                alertSendRequestCommand.getTitle(),
+                alertSendRequestCommand.getContent(),
+                alertSendRequestCommand.getWarnType());
         channel.writeAndFlush(alertSendResponseCommand.convert2Command(command.getOpaque()));
     }
 }

@@ -30,21 +30,21 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AlertPluginManagerTest extends TestCase {
-    
+
     @InjectMocks
     private AlertPluginManager alertPluginManager;
-    
+
     @Mock
     private PluginDao pluginDao;
-    
+
     @Test
     public void testAlertPluginManager() {
         Mockito.when(pluginDao.addOrUpdatePluginDefine(Mockito.any(PluginDefine.class))).thenReturn(0);
-        
+
         alertPluginManager.installPlugin(null);
-        
+
         Assert.assertEquals(1, alertPluginManager.size());
-        
+
         Assert.assertNotNull(alertPluginManager.getAlertChannel(0));
     }
 }

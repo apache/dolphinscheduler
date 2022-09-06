@@ -26,16 +26,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * form options source type
  */
 public enum OptionSourceType {
+
     /**
      * 0-default
      * 1-datasource_id
      * 2-datasource_type
      * 3-comparison_type
      */
-    DEFAULT(0,"default"),
-    DATASOURCE_ID(1,"datasource_id"),
-    DATASOURCE_TYPE(2,"datasource_type"),
-    COMPARISON_TYPE(3,"comparison_type");
+    DEFAULT(0, "default"),
+    DATASOURCE_ID(1, "datasource_id"),
+    DATASOURCE_TYPE(2, "datasource_type"),
+    COMPARISON_TYPE(3, "comparison_type");
 
     OptionSourceType(int code, String description) {
         this.code = code;
@@ -58,7 +59,7 @@ public enum OptionSourceType {
 
     static {
         for (OptionSourceType type : OptionSourceType.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

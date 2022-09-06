@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractAuthenticator implements Authenticator {
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractAuthenticator.class);
 
     @Autowired
@@ -92,7 +93,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
             logger.info("session info is null ");
             return null;
         }
-        //get user object from session
+        // get user object from session
         return userService.queryUser(session.getUserId());
     }
 

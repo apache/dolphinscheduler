@@ -64,7 +64,7 @@ public class CheckUtils {
         if (!emailValidator.isValid(email, null)) {
             return false;
         }
-        //Email is at least a second-level domain name
+        // Email is at least a second-level domain name
         int indexDomain = email.lastIndexOf("@");
         String domainString = email.substring(indexDomain);
         return domainString.contains(".");

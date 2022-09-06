@@ -43,7 +43,7 @@ public class K8sNameSpaceMapperTest extends BaseDaoTest {
      * @return K8sNamespace
      */
     private K8sNameSpace insertOne() {
-        //insertOne
+        // insertOne
         K8sNameSpace k8sNamespace = new K8sNameSpace();
         k8sNamespace.setNamespace("testNamespace");
         k8sNamespace.setK8s("ds_null_k8s");
@@ -77,10 +77,10 @@ public class K8sNameSpaceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         K8sNameSpace k8sNamespace = insertOne();
         k8sNamespace.setLimitsMemory(200);
-        //update
+        // update
         int update = k8sNamespaceMapper.updateById(k8sNamespace);
         Assert.assertEquals(update, 1);
     }
@@ -101,11 +101,10 @@ public class K8sNameSpaceMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         insertOne();
-        //query
+        // query
         List<K8sNameSpace> k8sNamespaces = k8sNamespaceMapper.selectList(null);
         Assert.assertEquals(k8sNamespaces.size(), 1);
     }
-
 
     /**
      * test query k8sNamespaces by id
@@ -114,9 +113,8 @@ public class K8sNameSpaceMapperTest extends BaseDaoTest {
     public void testQueryByK8sNamespaceId() {
         K8sNameSpace entity = insertOne();
         K8sNameSpace k8sNamespace = k8sNamespaceMapper.selectById(entity.getId());
-        Assert.assertEquals(entity.toString(),k8sNamespace.toString());
+        Assert.assertEquals(entity.toString(), k8sNamespace.toString());
     }
-
 
     /**
      * test query k8sNamespaces list paging
@@ -125,11 +123,11 @@ public class K8sNameSpaceMapperTest extends BaseDaoTest {
     public void testQueryK8sNamespaceListPaging() {
         K8sNameSpace entity = insertOne();
         Page<K8sNameSpace> page = new Page<>(1, 10);
-        IPage<K8sNameSpace> k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page,"");
+        IPage<K8sNameSpace> k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page, "");
         List<K8sNameSpace> k8sNamespaceList = k8sNamespaceIPage.getRecords();
         Assert.assertEquals(k8sNamespaceList.size(), 1);
 
-        k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page,"abc");
+        k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page, "abc");
         k8sNamespaceList = k8sNamespaceIPage.getRecords();
         Assert.assertEquals(k8sNamespaceList.size(), 0);
     }

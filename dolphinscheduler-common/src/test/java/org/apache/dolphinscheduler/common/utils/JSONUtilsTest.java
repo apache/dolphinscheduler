@@ -47,7 +47,8 @@ public class JSONUtilsTest {
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue("sssssss");
-        String str = "[{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
+        String str =
+                "[{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
         JsonNode jsonNode = JSONUtils.toJsonNode(property);
 
         ArrayNode arrayNode = JSONUtils.createArrayNode();
@@ -154,7 +155,8 @@ public class JSONUtilsTest {
         Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
         Assert.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
         Assert.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
-        Assert.assertEquals("{\"1\":\"2\",\"2\":3}", JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
+        Assert.assertEquals("{\"1\":\"2\",\"2\":3}",
+                JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
     }
 
     @Test

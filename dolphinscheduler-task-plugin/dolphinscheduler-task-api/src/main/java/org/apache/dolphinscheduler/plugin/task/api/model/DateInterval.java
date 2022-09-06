@@ -24,6 +24,7 @@ import java.util.Objects;
  * date interval class
  */
 public class DateInterval {
+
     private Date startTime;
     private Date endTime;
 

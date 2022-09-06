@@ -44,6 +44,7 @@ public class AuditSubscriberTest {
     @Test
     public void testExecute() {
         Mockito.when(logMapper.insert(Mockito.any(AuditLog.class))).thenReturn(1);
-        auditSubscriber.execute(new AuditMessage(new User(), new Date(), AuditResourceType.USER_MODULE, AuditOperationType.CREATE, 1));
+        auditSubscriber.execute(
+                new AuditMessage(new User(), new Date(), AuditResourceType.USER_MODULE, AuditOperationType.CREATE, 1));
     }
 }

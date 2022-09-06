@@ -32,6 +32,7 @@ import java.util.Objects;
 
 @TableName("t_ds_alert")
 public class Alert {
+
     /**
      * primary key
      */
@@ -258,13 +259,13 @@ public class Alert {
                 && Objects.equals(log, alert.log)
                 && Objects.equals(createTime, alert.createTime)
                 && Objects.equals(updateTime, alert.updateTime)
-                && Objects.equals(info, alert.info)
-                ;
+                && Objects.equals(info, alert.info);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, sign, title, content, alertStatus, warningType, log, alertGroupId, createTime, updateTime, info);
+        return Objects.hash(id, sign, title, content, alertStatus, warningType, log, alertGroupId, createTime,
+                updateTime, info);
     }
 
     @Override

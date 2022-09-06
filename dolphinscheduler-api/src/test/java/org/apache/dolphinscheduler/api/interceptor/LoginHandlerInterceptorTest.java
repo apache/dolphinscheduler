@@ -65,7 +65,7 @@ public class LoginHandlerInterceptorTest {
     @MockBean(name = "authenticator")
     private Authenticator authenticator;
     @MockBean(name = "userMapper")
-    private UserMapper    userMapper;
+    private UserMapper userMapper;
 
     @Test
     public void testPreHandle() {

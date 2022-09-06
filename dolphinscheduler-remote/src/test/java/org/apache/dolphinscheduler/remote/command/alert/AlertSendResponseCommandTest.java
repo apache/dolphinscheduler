@@ -38,11 +38,11 @@ public class AlertSendResponseCommandTest {
         responseResult1.setMessage("fail");
         responseResults.add(responseResult1);
 
-        AlertSendResponseResult responseResult2 = new AlertSendResponseResult(true,"success");
+        AlertSendResponseResult responseResult2 = new AlertSendResponseResult(true, "success");
         responseResults.add(responseResult2);
         alertSendResponseCommand.setResResults(responseResults);
 
         Command command = alertSendResponseCommand.convert2Command(1);
-        Assert.assertEquals(CommandType.ALERT_SEND_RESPONSE,command.getType());
+        Assert.assertEquals(CommandType.ALERT_SEND_RESPONSE, command.getType());
     }
 }

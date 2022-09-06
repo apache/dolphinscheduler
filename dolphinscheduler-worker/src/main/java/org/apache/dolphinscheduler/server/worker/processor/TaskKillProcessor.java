@@ -134,6 +134,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         taskKillResponseCommand.setHost(taskExecutionContext.getHost());
         taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
         channel.writeAndFlush(taskKillResponseCommand.convert2Command()).addListener(new ChannelFutureListener() {
+
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()) {
@@ -216,7 +217,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                                                     String executePath,
                                                     String tenantCode) {
         if (logPath == null || executePath == null || tenantCode == null) {
-            logger.error("Kill yarn job error, the input params is illegal, host: {}, logPath: {}, executePath: {}, tenantCode: {}",
+            logger.error(
+                    "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, executePath: {}, tenantCode: {}",
                     host, logPath, executePath, tenantCode);
             return Pair.of(false, Collections.emptyList());
         }
@@ -231,7 +233,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
             return Pair.of(true, appIds);
         } catch (Exception e) {
-            logger.error("Kill yarn job error, host: {}, logPath: {}, executePath: {}, tenantCode: {}", host, logPath, executePath, tenantCode, e);
+            logger.error("Kill yarn job error, host: {}, logPath: {}, executePath: {}, tenantCode: {}", host, logPath,
+                    executePath, tenantCode, e);
         }
         return Pair.of(false, Collections.emptyList());
     }

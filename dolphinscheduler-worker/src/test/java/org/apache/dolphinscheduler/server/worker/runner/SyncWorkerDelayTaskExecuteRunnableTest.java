@@ -7,7 +7,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class SyncWorkerDelayTaskExecuteRunnableTest {
 
-
     @Test
     public void executeTask() {
     }

@@ -68,10 +68,11 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
-            processInstance.getProcessDefinitionVersion(),
-            taskInstance.getProcessInstanceId(),
-            taskInstance.getId()));
+        taskInstance.setLogPath(
+                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion(),
+                        taskInstance.getProcessInstanceId(),
+                        taskInstance.getId()));
         this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         this.taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         this.taskInstance.setStartTime(new Date());
@@ -105,7 +106,8 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
         if (this.taskInstance == null) {
             return false;
         }
@@ -151,18 +153,19 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         }
         ExecutionStatus executionStatus = completeTaskList.get(item.getDepTaskCode());
         if (executionStatus != item.getStatus()) {
-            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(), item.getStatus(), executionStatus);
+            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(),
+                    item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
         logger.info("dependent item complete {} {},{}",
-            Constants.DEPENDENT_SPLIT, item.getDepTaskCode(), dependResult);
+                Constants.DEPENDENT_SPLIT, item.getDepTaskCode(), dependResult);
         return dependResult;
     }
 
     private void setConditionResult() {
 
         List<TaskInstance> taskInstances = processService
-            .findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
+                .findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }
@@ -173,7 +176,8 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
             for (DependentItem item : dependentTaskModel.getDependItemList()) {
                 itemDependResult.add(getDependResultForItem(item));
             }
-            DependResult tempResult = DependentUtils.getDependResultForRelation(dependentTaskModel.getRelation(), itemDependResult);
+            DependResult tempResult =
+                    DependentUtils.getDependResultForRelation(dependentTaskModel.getRelation(), itemDependResult);
             tempResultList.add(tempResult);
         }
         conditionResult = DependentUtils.getDependResultForRelation(dependentParameters.getRelation(), tempResultList);
@@ -183,8 +187,9 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     private void endTask() {
         ExecutionStatus status = ExecutionStatus.SUCCESS;
         DependResult expected = this.blockingParam.getBlockingOpportunity()
-            .equals(BlockingOpportunity.BLOCKING_ON_SUCCESS.getDesc())
-            ? DependResult.SUCCESS : DependResult.FAILED;
+                .equals(BlockingOpportunity.BLOCKING_ON_SUCCESS.getDesc())
+                        ? DependResult.SUCCESS
+                        : DependResult.FAILED;
         boolean isBlocked = (expected == this.conditionResult);
         logger.info("blocking opportunity: expected-->{}, actual-->{}", expected, this.conditionResult);
         processInstance.setBlocked(isBlocked);

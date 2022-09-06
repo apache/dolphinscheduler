@@ -101,7 +101,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
-
     /**
      * save schedule
      *
@@ -135,14 +134,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
 
         // check work flow define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        result = executorService.checkProcessDefinitionValid(projectCode,processDefinition, processDefineCode, processDefinition.getVersion());
+        result = executorService.checkProcessDefinitionValid(projectCode, processDefinition, processDefineCode,
+                processDefinition.getVersion());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -235,7 +235,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -254,10 +254,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
+        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
+                failureStrategy, processInstancePriority, workerGroup, environmentCode);
         return result;
     }
-
 
     /**
      * set schedule online or offline
@@ -278,7 +278,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -297,12 +297,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             putMsg(result, Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
             return result;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
+        ProcessDefinition processDefinition =
+                processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(scheduleObj.getProcessDefinitionCode()));
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
+        List<ProcessTaskRelation> processTaskRelations =
+                processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
         if (processTaskRelations.isEmpty()) {
             putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
             return result;
@@ -329,7 +331,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                         if (subProcessDefinition.getReleaseState() != ReleaseState.ONLINE) {
                             logger.info("not release process definition id: {} , name : {}",
                                     subProcessDefinition.getId(), subProcessDefinition.getName());
-                            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(subProcessDefinition.getId()));
+                            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE,
+                                    String.valueOf(subProcessDefinition.getId()));
                             return result;
                         }
                     }
@@ -353,11 +356,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         try {
             switch (scheduleStatus) {
                 case ONLINE:
-                    logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
+                    logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}",
+                            project.getId(), processDefinition.getId(), masterServers);
                     setSchedule(project.getId(), scheduleObj);
                     break;
                 case OFFLINE:
-                    logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
+                    logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}",
+                            project.getId(), processDefinition.getId(), masterServers);
                     deleteSchedule(project.getId(), id);
                     break;
                 default:
@@ -365,7 +370,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     return result;
             }
         } catch (Exception e) {
-            result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
+            result.put(Constants.MSG,
+                    scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
             throw new ServiceException(result.get(Constants.MSG).toString(), e);
         }
 
@@ -433,7 +439,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result,null);
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
         if (!hasProjectAndPerm) {
             return result;
         }
@@ -499,7 +505,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
 
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
         Status resultEnum = (Status) checkResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
@@ -551,7 +557,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Date startTime = DateUtils.transformTimezoneDate(scheduleParam.getStartTime(), scheduleParam.getTimezoneId());
         Date endTime = DateUtils.transformTimezoneDate(scheduleParam.getEndTime(), scheduleParam.getTimezoneId());
-        startTime =  now.after(startTime) ? now : startTime;
+        startTime = now.after(startTime) ? now : startTime;
 
         try {
             cronExpression = CronUtils.parse2CronExpression(scheduleParam.getCrontab());
@@ -560,9 +566,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
             return result;
         }
-        List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime, cronExpression, Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
+        List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime, cronExpression,
+                Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
         List<String> previewDateList = new ArrayList<>();
-        selfFireDateList.forEach(date -> previewDateList.add(DateUtils.dateToString(date, scheduleParam.getTimezoneId())));
+        selfFireDateList
+                .forEach(date -> previewDateList.add(DateUtils.dateToString(date, scheduleParam.getTimezoneId())));
         result.put(Constants.DATA_LIST, previewDateList);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -594,8 +602,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                                      String workerGroup,
                                                                      long environmentCode) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
+        // check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -612,7 +620,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
+        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
+                failureStrategy, processInstancePriority, workerGroup, environmentCode);
         return result;
     }
 
@@ -626,7 +635,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                 Priority processInstancePriority,
                                 String workerGroup,
                                 long environmentCode) {
-        if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE, Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
+        if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE,
+                Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
             return;
         }
 

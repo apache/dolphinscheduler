@@ -38,12 +38,14 @@ public class CommonUtil {
     public static boolean getKerberosStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-        Boolean kerberosStartupState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+        Boolean kerberosStartupState =
+                PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
         return resUploadType == ResUploadType.HDFS && kerberosStartupState;
     }
 
-    public static synchronized UserGroupInformation createUGI(Configuration configuration, String principal, String keyTab, String krb5File, String username)
-            throws IOException {
+    public static synchronized UserGroupInformation createUGI(Configuration configuration, String principal,
+                                                              String keyTab, String krb5File,
+                                                              String username) throws IOException {
         if (getKerberosStartupState()) {
             Objects.requireNonNull(keyTab);
             if (StringUtils.isNotBlank(krb5File)) {
@@ -54,8 +56,8 @@ public class CommonUtil {
         return UserGroupInformation.createRemoteUser(username);
     }
 
-    public static synchronized UserGroupInformation loginKerberos(final Configuration config, final String principal, final String keyTab)
-            throws IOException {
+    public static synchronized UserGroupInformation loginKerberos(final Configuration config, final String principal,
+                                                                  final String keyTab) throws IOException {
         config.set(Constants.HADOOP_SECURITY_AUTHENTICATION, Constants.KERBEROS);
         UserGroupInformation.setConfiguration(config);
         UserGroupInformation.loginUserFromKeytab(principal.trim(), keyTab.trim());

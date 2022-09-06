@@ -199,7 +199,7 @@ public interface TaskDefinitionService {
      * @return update result code
      */
     Map<String, Object> releaseTaskDefinition(User loginUser,
-                                             long projectCode,
-                                             long code,
-                                             ReleaseState releaseState);
+                                              long projectCode,
+                                              long code,
+                                              ReleaseState releaseState);
 }

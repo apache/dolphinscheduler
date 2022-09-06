@@ -27,6 +27,7 @@ import java.util.List;
 
 @AutoService(TaskChannelFactory.class)
 public class SwitchTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public TaskChannel create() {
         return new SwitchTaskChannel();

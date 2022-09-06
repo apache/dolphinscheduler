@@ -29,7 +29,6 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
 
-
 /**
  * choose the impl of storage by RESOURCE_STORAGE_TYPE
  */
@@ -49,6 +48,5 @@ public class StoreConfiguration {
                 return null;
         }
     }
-
 
 }

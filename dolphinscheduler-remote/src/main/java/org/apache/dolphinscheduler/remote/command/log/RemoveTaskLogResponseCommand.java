@@ -28,8 +28,8 @@ import java.io.Serializable;
  */
 public class RemoveTaskLogResponseCommand implements Serializable {
 
-    /*TaskPriorityQueueConsumer.*
-     *  log path
+    /*
+     * TaskPriorityQueueConsumer.* log path
      */
     private Boolean status;
 

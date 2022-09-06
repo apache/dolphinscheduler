@@ -94,7 +94,8 @@ public class TaskGroupQueueServiceTest {
         List<TaskGroupQueue> records = new ArrayList<>();
         records.add(getTaskGroupQueue());
         page.setRecords(records);
-        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class), Mockito.eq(10))).thenReturn(page);
+        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class), Mockito.eq(10)))
+                .thenReturn(page);
         Map<String, Object> result = taskGroupQueueService.doQuery(user, 1, 1, 10);
         PageInfo<TaskGroupQueue> pageInfo = (PageInfo<TaskGroupQueue>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));

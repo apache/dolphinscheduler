@@ -39,6 +39,7 @@ import io.netty.channel.Channel;
  */
 @RunWith(PowerMockRunner.class)
 public class CacheProcessorTest {
+
     @InjectMocks
     private CacheProcessor cacheProcessor = new CacheProcessor();
 

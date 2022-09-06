@@ -39,7 +39,8 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
                                              @NonNull AlertClientService alertClientService,
                                              @NonNull TaskPluginManager taskPluginManager,
                                              @Nullable StorageOperate storageOperate) {
-        super(taskExecutionContext, workerConfig, masterAddress, workerMessageSender, alertClientService, taskPluginManager, storageOperate);
+        super(taskExecutionContext, workerConfig, masterAddress, workerMessageSender, alertClientService,
+                taskPluginManager, storageOperate);
     }
 
     @Override
@@ -47,7 +48,8 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext();
         return unit.convert(
                 DateUtils.getRemainTime(
-                        taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
+                        taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L),
+                TimeUnit.SECONDS);
     }
 
     @Override

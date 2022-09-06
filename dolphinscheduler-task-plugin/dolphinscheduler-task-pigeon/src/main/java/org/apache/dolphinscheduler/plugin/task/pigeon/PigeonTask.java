@@ -90,9 +90,10 @@ public class PigeonTask extends AbstractTaskExecutor {
             ExecResult execState = null;
             int taskId;
             WebSocketClient webSocket = null;
-            try (CloseableHttpClient client = HttpClients.createDefault();
-                 // trigger to start PIGEON dataX task
-                 CloseableHttpResponse response = client.execute(post)) {
+            try (
+                    CloseableHttpClient client = HttpClients.createDefault();
+                    // trigger to start PIGEON dataX task
+                    CloseableHttpResponse response = client.execute(post)) {
                 triggerResult = processResponse(triggerUrl, response, BizResult.class);
                 if (!triggerResult.isSuccess()) {
                     List<String> errormsg = triggerResult.getErrormsg();
@@ -142,7 +143,8 @@ public class PigeonTask extends AbstractTaskExecutor {
             long costTime = System.currentTimeMillis() - startTime;
             logger.info("PIGEON task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
                     targetJobName, taskId, costTime, (execState == ExecResult.SUCCESS) ? "'success'" : "'failure'");
-            setExitStatusCode((execState == ExecResult.SUCCESS) ? TaskConstants.EXIT_CODE_SUCCESS : TaskConstants.EXIT_CODE_FAILURE);
+            setExitStatusCode((execState == ExecResult.SUCCESS) ? TaskConstants.EXIT_CODE_SUCCESS
+                    : TaskConstants.EXIT_CODE_FAILURE);
         } catch (Exception e) {
             logger.error("execute PIGEON dataX faild,PIGEON task name:" + targetJobName, e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
@@ -165,15 +167,17 @@ public class PigeonTask extends AbstractTaskExecutor {
         logger.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
         final String triggerUrl = getTriggerUrl();
 
-        StringEntity entity = new StringEntity(config.getJobCancelPostBody(triggerResult.getTaskId()), StandardCharsets.UTF_8);
+        StringEntity entity =
+                new StringEntity(config.getJobCancelPostBody(triggerResult.getTaskId()), StandardCharsets.UTF_8);
 
         CancelResult cancelResult = null;
         HttpPost post = new HttpPost(triggerUrl);
         addFormUrlencoded(post);
         post.setEntity(entity);
-        try (CloseableHttpClient client = HttpClients.createDefault();
-             // trigger to start TIS dataX task
-             CloseableHttpResponse response = client.execute(post)) {
+        try (
+                CloseableHttpClient client = HttpClients.createDefault();
+                // trigger to start TIS dataX task
+                CloseableHttpResponse response = client.execute(post)) {
             cancelResult = processResponse(triggerUrl, response, CancelResult.class);
             if (!cancelResult.isSuccess()) {
                 List<String> errormsg = triggerResult.getErrormsg();
@@ -203,6 +207,7 @@ public class PigeonTask extends AbstractTaskExecutor {
         final String applyURI = config.getJobLogsFetchUrl(tisHost, dataXName, taskId);
         logger.info("apply ws connection,uri:{}", applyURI);
         WebSocketClient webSocketClient = new WebSocketClient(new URI(applyURI)) {
+
             @Override
             public void onOpen(ServerHandshake handshakedata) {
                 logger.info("start to receive remote execute log");
@@ -228,7 +233,8 @@ public class PigeonTask extends AbstractTaskExecutor {
         return webSocketClient;
     }
 
-    private <T extends AjaxResult> T processResponse(String applyUrl, CloseableHttpResponse response, Class<T> clazz) throws Exception {
+    private <T extends AjaxResult> T processResponse(String applyUrl, CloseableHttpResponse response,
+                                                     Class<T> clazz) throws Exception {
         StatusLine resStatus = response.getStatusLine();
         if (HttpURLConnection.HTTP_OK != resStatus.getStatusCode()) {
             throw new IllegalStateException("request server " + applyUrl + " faild:" + resStatus.getReasonPhrase());
@@ -246,6 +252,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class CancelResult extends AjaxResult<Object> {
+
         private Object bizresult;
 
         @Override
@@ -259,6 +266,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class BizResult extends AjaxResult<TriggerBuildResult> {
+
         private TriggerBuildResult bizresult;
 
         @Override
@@ -276,6 +284,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class StatusResult extends AjaxResult<Map> {
+
         private Map bizresult;
 
         @Override
@@ -325,6 +334,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class TriggerBuildResult {
+
         private int taskid;
 
         public int getTaskid() {
@@ -361,6 +371,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class ExecLog {
+
         private String logType;
         private String msg;
         private int taskId;

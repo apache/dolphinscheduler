@@ -69,7 +69,7 @@ public class ParameterUtils {
             parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
         }
         if (parameterMap != null && null != parameterMap.get(PARAMETER_DATETIME)) {
-            //Get current time, schedule execute time
+            // Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, PARAMETER_FORMAT_TIME);
         } else {
@@ -94,7 +94,7 @@ public class ParameterUtils {
         if (StringUtils.isEmpty(parameterString)) {
             return parameterString;
         }
-        //Get current time, schedule execute time
+        // Get current time, schedule execute time
         String cronTimeStr = parameterMap.get(PARAMETER_SHECDULE_TIME);
         Date cronTime = null;
 
@@ -126,7 +126,8 @@ public class ParameterUtils {
      * @param value    value
      * @throws Exception errors
      */
-    public static void setInParameter(int index, PreparedStatement stmt, DataType dataType, String value) throws Exception {
+    public static void setInParameter(int index, PreparedStatement stmt, DataType dataType,
+                                      String value) throws Exception {
         if (dataType.equals(DataType.VARCHAR)) {
             stmt.setString(index, value);
         } else if (dataType.equals(DataType.INTEGER)) {
@@ -153,7 +154,7 @@ public class ParameterUtils {
      */
     public static String replaceScheduleTime(String text, Date scheduleTime) {
         Map<String, Property> paramsMap = new HashMap<>();
-        //if getScheduleTime null ,is current date
+        // if getScheduleTime null ,is current date
         if (null == scheduleTime) {
             scheduleTime = new Date();
         }

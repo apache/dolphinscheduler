@@ -32,7 +32,8 @@ import io.netty.handler.codec.MessageToByteEncoder;
 public class NettyEncoder extends MessageToByteEncoder<RpcProtocol<Object>> {
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, RpcProtocol<Object> msg, ByteBuf byteBuf) throws Exception {
+    protected void encode(ChannelHandlerContext channelHandlerContext, RpcProtocol<Object> msg,
+                          ByteBuf byteBuf) throws Exception {
         MessageHeader msgHeader = msg.getMsgHeader();
         byteBuf.writeShort(msgHeader.getMagic());
         byteBuf.writeByte(msgHeader.getEventType());

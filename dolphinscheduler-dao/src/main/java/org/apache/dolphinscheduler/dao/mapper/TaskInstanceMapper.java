@@ -94,8 +94,8 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
                                                     @Param("startTime") Date startTime,
-                                                    @Param("endTime") Date endTime
-    );
+                                                    @Param("endTime") Date endTime);
 
-    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId, @Param("status") int status);
+    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,
+                                             @Param("status") int status);
 }

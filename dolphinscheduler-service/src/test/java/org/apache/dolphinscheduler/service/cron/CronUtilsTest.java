@@ -69,10 +69,9 @@ public class CronUtilsTest {
         // Obtain the string expression
         String cronAsString = cron.asString();
 
-        // 0 */5 * * * ? *  Every five minutes(once every 5 minutes)
+        // 0 */5 * * * ? * Every five minutes(once every 5 minutes)
         Assert.assertEquals("0 */5 * * * ? *", cronAsString);
     }
-
 
     /**
      * cron parse test
@@ -139,7 +138,8 @@ public class CronUtilsTest {
                 .instance();
         // minute cycle
         String[] cronArayy = new String[]{"* * * * * ? *", "* 0 * * * ? *",
-                "* 5 * * 3/5 ? *", "0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *", "0 0 7 * 1,2 ? *"};
+                "* 5 * * 3/5 ? *", "0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *",
+                "0 0 7 * 1,2 ? *"};
         for (String minCrontab : cronArayy) {
             if (!org.quartz.CronExpression.isValidExpression(minCrontab)) {
                 throw new RuntimeException(minCrontab + " verify failure, cron expression not valid");
@@ -164,7 +164,8 @@ public class CronUtilsTest {
             logger.info("dayOfMonthField instanceof Every:" + (dayOfMonthField.getExpression() instanceof Every));
             logger.info("dayOfMonthField instanceof On:" + (dayOfMonthField.getExpression() instanceof On));
             logger.info("dayOfMonthField instanceof And:" + (dayOfMonthField.getExpression() instanceof And));
-            logger.info("dayOfMonthField instanceof QuestionMark:" + (dayOfMonthField.getExpression() instanceof QuestionMark));
+            logger.info("dayOfMonthField instanceof QuestionMark:"
+                    + (dayOfMonthField.getExpression() instanceof QuestionMark));
 
             CronField monthField = cron.retrieve(CronFieldName.MONTH);
             logger.info("monthField instanceof Between:" + (monthField.getExpression() instanceof Between));
@@ -180,7 +181,8 @@ public class CronUtilsTest {
             logger.info("dayOfWeekField instanceof Every:" + (dayOfWeekField.getExpression() instanceof Every));
             logger.info("dayOfWeekField instanceof On:" + (dayOfWeekField.getExpression() instanceof On));
             logger.info("dayOfWeekField instanceof And:" + (dayOfWeekField.getExpression() instanceof And));
-            logger.info("dayOfWeekField instanceof QuestionMark:" + (dayOfWeekField.getExpression() instanceof QuestionMark));
+            logger.info("dayOfWeekField instanceof QuestionMark:"
+                    + (dayOfWeekField.getExpression() instanceof QuestionMark));
 
             CronField yearField = cron.retrieve(CronFieldName.YEAR);
             logger.info("yearField instanceof Between:" + (yearField.getExpression() instanceof Between));
@@ -211,11 +213,15 @@ public class CronUtilsTest {
         // test cron
         Assert.assertEquals(29, CronUtils.getSelfFireDateList(from, to, "0 0 0 * * ? ").size());
         // test other
-        Assert.assertEquals(30, CronUtils.getFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? ")).size());
-        Assert.assertEquals(5, CronUtils.getSelfFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? "), 5).size());
+        Assert.assertEquals(30,
+                CronUtils.getFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? ")).size());
+        Assert.assertEquals(5,
+                CronUtils.getSelfFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? "), 5).size());
         from = DateUtils.stringToDate("2020-01-01 00:02:00");
         to = DateUtils.stringToDate("2020-01-01 00:02:00");
-        Assert.assertEquals(1, CronUtils.getFireDateList(new Date(from.getTime() - 1000), to, CronUtils.parse2CronExpression("0 * * * * ? ")).size());
+        Assert.assertEquals(1, CronUtils
+                .getFireDateList(new Date(from.getTime() - 1000), to, CronUtils.parse2CronExpression("0 * * * * ? "))
+                .size());
 
         from = DateUtils.stringToDate("2020-01-01 00:02:00");
         to = DateUtils.stringToDate("2020-01-01 00:04:00");

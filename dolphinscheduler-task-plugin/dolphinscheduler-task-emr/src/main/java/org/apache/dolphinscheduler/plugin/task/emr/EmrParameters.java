@@ -55,7 +55,7 @@ public class EmrParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "EmrParameters{"
-            + "jobFlowDefineJson='" + jobFlowDefineJson + '\''
-            + '}';
+                + "jobFlowDefineJson='" + jobFlowDefineJson + '\''
+                + '}';
     }
 }

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.enums;
 
 public enum NodeType {
+
     MASTER("master", "/nodes/master"),
     WORKER("worker", "/nodes/worker"),
     API_SERVER("apiServer", "/nodes/apiServer"),
@@ -39,6 +40,5 @@ public enum NodeType {
     public String getRegistryPath() {
         return registryPath;
     }
-
 
 }

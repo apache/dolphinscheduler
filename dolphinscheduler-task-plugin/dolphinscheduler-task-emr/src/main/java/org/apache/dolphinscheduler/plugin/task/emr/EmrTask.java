@@ -70,10 +70,9 @@ public class EmrTask extends AbstractTaskExecutor {
     private String clusterId;
 
     private final HashSet<String> waitingStateSet = Sets.newHashSet(
-        ClusterState.STARTING.toString(),
-        ClusterState.BOOTSTRAPPING.toString(),
-        ClusterState.RUNNING.toString()
-    );
+            ClusterState.STARTING.toString(),
+            ClusterState.BOOTSTRAPPING.toString(),
+            ClusterState.RUNNING.toString());
 
     /**
      * config ObjectMapper features and propertyNamingStrategy
@@ -81,12 +80,12 @@ public class EmrTask extends AbstractTaskExecutor {
      * @see PropertyNamingStrategy.UpperCamelCaseStrategy
      */
     private static final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-        .setTimeZone(TimeZone.getDefault())
-        .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .setTimeZone(TimeZone.getDefault())
+            .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
 
     /**
      * constructor
@@ -121,7 +120,8 @@ public class EmrTask extends AbstractTaskExecutor {
             RunJobFlowResult result = emrClient.runJobFlow(runJobFlowRequest);
 
             clusterId = result.getJobFlowId();
-            // TODO: Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
+            // TODO: Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn
+            // task type . Other task type, such as EMR task, k8s task not ready yet.
             setAppIds(clusterId);
 
             clusterStatus = getClusterStatus();
@@ -179,7 +179,8 @@ public class EmrTask extends AbstractTaskExecutor {
                 case TERMINATED:
                 case TERMINATING:
                     String code = stateChangeReason.getCode();
-                    if (code != null && code.equalsIgnoreCase(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED.toString())) {
+                    if (code != null
+                            && code.equalsIgnoreCase(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED.toString())) {
                         return TaskConstants.EXIT_CODE_SUCCESS;
                     } else {
                         return TaskConstants.EXIT_CODE_KILL;
@@ -222,15 +223,16 @@ public class EmrTask extends AbstractTaskExecutor {
         final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
         // create an EMR client
         return AmazonElasticMapReduceClientBuilder.standard()
-            .withCredentials(awsCredentialsProvider)
-            .withRegion(awsRegion)
-            .build();
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(awsRegion)
+                .build();
     }
 
     @Override
     public void cancelApplication(boolean status) throws Exception {
         super.cancelApplication(status);
-        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(), clusterId);
+        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(),
+                clusterId);
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
         logger.info("the result of terminate job flow is:{}", terminateJobFlowsResult);

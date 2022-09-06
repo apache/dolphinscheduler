@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  */
 @TableName("t_ds_k8s_namespace")
 public class K8sNameSpace {
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -210,18 +211,18 @@ public class K8sNameSpace {
     @Override
     public String toString() {
         return "K8sNamespace{" +
-            "id=" + id +
-            ", namespace=" + namespace +
-            ", limitsCpu=" + limitsCpu +
-            ", limitsMemory=" + limitsMemory +
-            ", userId=" + userId +
-            ", podRequestCpu=" + podRequestCpu +
-            ", podRequestMemory=" + podRequestMemory +
-            ", podReplicas=" + podReplicas +
-            ", k8s=" + k8s +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
+                "id=" + id +
+                ", namespace=" + namespace +
+                ", limitsCpu=" + limitsCpu +
+                ", limitsMemory=" + limitsMemory +
+                ", userId=" + userId +
+                ", podRequestCpu=" + podRequestCpu +
+                ", podRequestMemory=" + podRequestMemory +
+                ", podReplicas=" + podReplicas +
+                ", k8s=" + k8s +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 
     @Override
@@ -245,7 +246,7 @@ public class K8sNameSpace {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + (k8s+namespace).hashCode();
+        result = 31 * result + (k8s + namespace).hashCode();
         return result;
     }
 }

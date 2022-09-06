@@ -53,7 +53,7 @@ public class InputParam extends PluginParams {
             this.props = props;
             return this;
         }
-        
+
         public Builder setPlaceholder(String placeholder) {
             if (this.props == null) {
                 this.setProps(new InputParamProps());

@@ -38,7 +38,8 @@ public class MasterController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
     public Result<List<MasterWorkflowInstanceExecutingListingDto>> listingExecutingWorkflowsByMasterAddress(@PathVariable("masterAddress") String masterAddress) {
-        List<MasterWorkflowInstanceExecutingListingDto> masterWorkflowInstanceExecutingListingDtos = masterRestfulService.listingExecutingWorkflowsByMasterAddress(masterAddress);
+        List<MasterWorkflowInstanceExecutingListingDto> masterWorkflowInstanceExecutingListingDtos =
+                masterRestfulService.listingExecutingWorkflowsByMasterAddress(masterAddress);
         return Result.success(masterWorkflowInstanceExecutingListingDtos);
     }
 
@@ -50,7 +51,8 @@ public class MasterController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
     public Result<List<MasterTaskInstanceDispatchingDto>> listingTaskInstanceDispatchingDtoByMasterAddress(@PathVariable("masterAddress") String masterAddress) {
-        List<MasterTaskInstanceDispatchingDto> masterTaskInstanceDispatchingDtos = masterRestfulService.listingDispatchingTaskInstanceByMasterAddress(masterAddress);
+        List<MasterTaskInstanceDispatchingDto> masterTaskInstanceDispatchingDtos =
+                masterRestfulService.listingDispatchingTaskInstanceByMasterAddress(masterAddress);
         return Result.success(masterTaskInstanceDispatchingDtos);
     }
 

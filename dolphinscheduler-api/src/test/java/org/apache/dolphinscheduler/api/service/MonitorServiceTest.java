@@ -74,61 +74,63 @@ public class MonitorServiceTest {
     public static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Before
-    public void init () {
+    public void init() {
         user = new User();
         user.setUserType(UserType.ADMIN_USER);
         user.setId(1);
     }
 
     @Test
-    public  void testQueryDatabaseState() {
+    public void testQueryDatabaseState() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, true);
         Mockito.when(monitorDBDao.queryDatabaseState()).thenReturn(getList());
-        Map<String,Object> result = monitorService.queryDatabaseState();
+        Map<String, Object> result = monitorService.queryDatabaseState();
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<MonitorRecord> monitorRecordList = (List<MonitorRecord>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(monitorRecordList));
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, false);
-        Map<String,Object> noPermission = monitorService.queryDatabaseState();
-        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
+        Map<String, Object> noPermission = monitorService.queryDatabaseState();
+        Assert.assertEquals(Status.SUCCESS, noPermission.get(Constants.STATUS));
     }
 
     @Test
-    public  void testQueryMaster() {
+    public void testQueryMaster() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
         Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(getServerList());
         Map<String, Object> result = monitorService.queryMaster();
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, false);
-        Map<String,Object> noPermission = monitorService.queryMaster();
-        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
+        Map<String, Object> noPermission = monitorService.queryMaster();
+        Assert.assertEquals(Status.SUCCESS, noPermission.get(Constants.STATUS));
     }
 
     @Test
-    public  void testQueryWorker() {
+    public void testQueryWorker() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, true);
         Mockito.when(registryClient.getServerList(NodeType.WORKER)).thenReturn(getServerList());
         Map<String, Object> result = monitorService.queryWorker();
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, false);
-        Map<String,Object> noPermission = monitorService.queryWorker();
-        Assert.assertEquals(Status.SUCCESS,noPermission.get(Constants.STATUS));
+        Map<String, Object> noPermission = monitorService.queryWorker();
+        Assert.assertEquals(Status.SUCCESS, noPermission.get(Constants.STATUS));
     }
 
     @Test
-    public  void testGetServerListFromZK() {
-        //TODO need zk
-        /*List<Server> serverList = monitorService.getServerListFromZK(true);*/
-        /*logger.info(serverList.toString());*/
+    public void testGetServerListFromZK() {
+        // TODO need zk
+        /* List<Server> serverList = monitorService.getServerListFromZK(true); */
+        /* logger.info(serverList.toString()); */
     }
 
-    private void mockPermissionCheck(String permissionKey, boolean result){
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, null, 1, permissionKey, serviceLogger)).thenReturn(result);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0, serviceLogger)).thenReturn(true);
+    private void mockPermissionCheck(String permissionKey, boolean result) {
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, null, 1,
+                permissionKey, serviceLogger)).thenReturn(result);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0,
+                serviceLogger)).thenReturn(true);
     }
 
     private List<MonitorRecord> getList() {
@@ -138,7 +140,7 @@ public class MonitorServiceTest {
     }
 
     private MonitorRecord getEntity() {
-        MonitorRecord monitorRecord = new  MonitorRecord();
+        MonitorRecord monitorRecord = new MonitorRecord();
         monitorRecord.setDbType(DbType.MYSQL);
         return monitorRecord;
     }

@@ -59,7 +59,8 @@ public class WorkerTaskExecuteRunnableFactoryBuilder {
                         taskPluginManager,
                         storageOperate);
             default:
-                throw new IllegalArgumentException(String.format("The current taskExecuteType: %s is invalidated", taskChannel.getTaskExecuteType()));
+                throw new IllegalArgumentException(String.format("The current taskExecuteType: %s is invalidated",
+                        taskChannel.getTaskExecuteType()));
         }
     }
 

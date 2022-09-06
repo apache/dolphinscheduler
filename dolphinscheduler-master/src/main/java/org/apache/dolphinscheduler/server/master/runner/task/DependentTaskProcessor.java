@@ -58,9 +58,11 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     protected DependentParameters dependentParameters;
 
-    private final ProcessDefinitionMapper processDefinitionMapper = SpringApplicationContext.getBean(ProcessDefinitionMapper.class);
+    private final ProcessDefinitionMapper processDefinitionMapper =
+            SpringApplicationContext.getBean(ProcessDefinitionMapper.class);
 
-    private final TaskDefinitionMapper taskDefinitionMapper = SpringApplicationContext.getBean(TaskDefinitionMapper.class);
+    private final TaskDefinitionMapper taskDefinitionMapper =
+            SpringApplicationContext.getBean(TaskDefinitionMapper.class);
 
     private final ProjectMapper projectMapper = SpringApplicationContext.getBean(ProjectMapper.class);
 
@@ -86,7 +88,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public boolean submitTask() {
-        Optional<TaskInstance> taskInstanceOptional = submitTaskInstanceToDb(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        Optional<TaskInstance> taskInstanceOptional =
+                submitTaskInstanceToDb(processInstance, taskInstance, maxRetryTimes, commitInterval);
         if (!taskInstanceOptional.isPresent()) {
             logger.info("Submit Dependent task instance to DB failed, taskInstanceId: {}", taskInstance.getId());
             return false;
@@ -170,9 +173,12 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 taskDefinitionCodes.add(dependentItem.getDepTaskCode());
             });
         });
-        Map<Long, Project> projectCodeMap = projectMapper.queryByCodes(projectCodes).stream().collect(Collectors.toMap(Project::getCode, Function.identity()));
-        Map<Long, ProcessDefinition> processDefinitionMap = processDefinitionMapper.queryByCodes(processDefinitionCodes).stream().collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
-        Map<Long, TaskDefinition> taskDefinitionMap = taskDefinitionMapper.queryByCodeList(taskDefinitionCodes).stream().collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
+        Map<Long, Project> projectCodeMap = projectMapper.queryByCodes(projectCodes).stream()
+                .collect(Collectors.toMap(Project::getCode, Function.identity()));
+        Map<Long, ProcessDefinition> processDefinitionMap = processDefinitionMapper.queryByCodes(processDefinitionCodes)
+                .stream().collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
+        Map<Long, TaskDefinition> taskDefinitionMap = taskDefinitionMapper.queryByCodeList(taskDefinitionCodes).stream()
+                .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
 
         for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
             logger.info("Add sub dependent check tasks, dependent relation: {}", taskModel.getRelation());
@@ -180,24 +186,30 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 Project project = projectCodeMap.get(dependentItem.getProjectCode());
                 if (project == null) {
                     logger.error("The dependent task's project is not exist, dependentItem: {}", dependentItem);
-                    throw new RuntimeException("The dependent task's project is not exist, dependentItem: " + dependentItem);
+                    throw new RuntimeException(
+                            "The dependent task's project is not exist, dependentItem: " + dependentItem);
                 }
                 ProcessDefinition processDefinition = processDefinitionMap.get(dependentItem.getDefinitionCode());
                 if (processDefinition == null) {
                     logger.error("The dependent task's workflow is not exist, dependentItem: {}", dependentItem);
-                    throw new RuntimeException("The dependent task's workflow is not exist, dependentItem: " + dependentItem);
+                    throw new RuntimeException(
+                            "The dependent task's workflow is not exist, dependentItem: " + dependentItem);
                 }
                 if (dependentItem.getDepTaskCode() == DEPENDENT_ALL_TASK_CODE) {
-                    logger.info("Add dependent task: projectName: {}, workflowName: {}, taskName: ALL, dependentKey: {}",
+                    logger.info(
+                            "Add dependent task: projectName: {}, workflowName: {}, taskName: ALL, dependentKey: {}",
                             project.getName(), processDefinition.getName(), dependentItem.getKey());
                 } else {
                     TaskDefinition taskDefinition = taskDefinitionMap.get(dependentItem.getDepTaskCode());
                     if (dependentItem.getDepTaskCode() != DEPENDENT_ALL_TASK_CODE && taskDefinition == null) {
-                        logger.error("The dependent task's taskDefinition is not exist, dependentItem: {}", dependentItem);
-                        throw new RuntimeException("The dependent task's taskDefinition is not exist, dependentItem: " + dependentItem);
+                        logger.error("The dependent task's taskDefinition is not exist, dependentItem: {}",
+                                dependentItem);
+                        throw new RuntimeException(
+                                "The dependent task's taskDefinition is not exist, dependentItem: " + dependentItem);
                     }
                     logger.info("Add dependent task: projectName: {}, workflowName: {}, taskName: {}, dependentKey: {}",
-                            project.getName(), processDefinition.getName(), taskDefinition.getName(), dependentItem.getKey());
+                            project.getName(), processDefinition.getName(), taskDefinition.getName(),
+                            dependentItem.getKey());
                 }
             }
             this.dependentTaskList.add(new DependentExecute(taskModel));
@@ -232,7 +244,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 if (!dependResultMap.containsKey(entry.getKey())) {
                     dependResultMap.put(entry.getKey(), entry.getValue());
                     // save depend result to log
-                    logger.info("dependent item complete, dependentKey: {}, result: {}, dependentDate: {}", entry.getKey(), entry.getValue(), dependentDate);
+                    logger.info("dependent item complete, dependentKey: {}, result: {}, dependentDate: {}",
+                            entry.getKey(), entry.getValue(), dependentDate);
                 }
             }
             if (!dependentExecute.finish(dependentDate)) {

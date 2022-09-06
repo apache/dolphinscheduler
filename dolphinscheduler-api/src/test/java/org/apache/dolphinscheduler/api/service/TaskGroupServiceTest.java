@@ -98,8 +98,8 @@ public class TaskGroupServiceTest {
     }
 
     private TaskGroup getTaskGroup() {
-        TaskGroup taskGroup = new TaskGroup(taskGroupName,0, taskGroupDesc,
-            100, 1,1);
+        TaskGroup taskGroup = new TaskGroup(taskGroupName, 0, taskGroupDesc,
+                100, 1, 1);
         return taskGroup;
     }
 
@@ -113,7 +113,8 @@ public class TaskGroupServiceTest {
     public void forceStartTask() {
         User loginUser = getLoginUser();
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_GROUP, null,
-                loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START, serviceLogger)).thenReturn(false);
+                loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START, serviceLogger))
+                .thenReturn(false);
         Map<String, Object> objectMap = taskGroupService.forceStartTask(loginUser, 1);
         Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, objectMap.get(Constants.STATUS));
     }
@@ -122,7 +123,8 @@ public class TaskGroupServiceTest {
     public void modifyPriority() {
         User loginUser = getLoginUser();
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_GROUP, null,
-                loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY, serviceLogger)).thenReturn(false);
+                loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY, serviceLogger))
+                .thenReturn(false);
         Map<String, Object> objectMap = taskGroupService.modifyPriority(loginUser, 1, 1);
         Assert.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, objectMap.get(Constants.STATUS));
     }
@@ -135,7 +137,7 @@ public class TaskGroupServiceTest {
                 loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_CREATE, serviceLogger)).thenReturn(true);
         Mockito.when(taskGroupMapper.insert(taskGroup)).thenReturn(1);
         Mockito.when(taskGroupMapper.queryByName(loginUser.getId(), taskGroupName)).thenReturn(null);
-        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser,0L, taskGroupName, taskGroupDesc, 100);
+        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, 0L, taskGroupName, taskGroupDesc, 100);
         Assert.assertNotNull(result);
 
     }
@@ -160,10 +162,10 @@ public class TaskGroupServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_GROUP, null,
                 0, serviceLogger)).thenReturn(true);
         Mockito.when(taskGroupMapper.queryTaskGroupPaging(Mockito.any(Page.class), Mockito.anyList(),
-            Mockito.eq(null), Mockito.eq(0))).thenReturn(page);
+                Mockito.eq(null), Mockito.eq(0))).thenReturn(page);
 
         // query all
-        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, null, null,1,10);
+        Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, null, null, 1, 10);
         PageInfo<TaskGroup> pageInfo = (PageInfo<TaskGroup>) result.get(Constants.DATA_LIST);
         Assert.assertNotNull(pageInfo.getTotalList());
     }
@@ -195,7 +197,7 @@ public class TaskGroupServiceTest {
         TaskGroup taskGroup = getTaskGroup();
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
 
-        //close failed
+        // close failed
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_GROUP, null,
                 loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_CLOSE, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_GROUP, null,

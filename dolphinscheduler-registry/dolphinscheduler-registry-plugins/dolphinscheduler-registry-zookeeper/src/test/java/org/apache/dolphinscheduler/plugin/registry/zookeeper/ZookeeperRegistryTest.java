@@ -73,7 +73,8 @@ public class ZookeeperRegistryTest {
         new Thread(() -> {
             registry.acquireLock("/lock");
             preCountDownLatch.countDown();
-            logger.info(Thread.currentThread().getName() + " :I got the lock, but I don't want to work. I want to rest for a while");
+            logger.info(Thread.currentThread().getName()
+                    + " :I got the lock, but I don't want to work. I want to rest for a while");
             try {
                 Thread.sleep(1000);
                 logger.info(Thread.currentThread().getName() + " :I'm going to start working");
@@ -114,6 +115,7 @@ public class ZookeeperRegistryTest {
     }
 
     static class TestListener implements SubscribeListener {
+
         @Override
         public void notify(Event event) {
             logger.info("I'm test listener");

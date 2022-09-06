@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.spi.utils;
  * constants
  */
 public class Constants {
+
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
@@ -43,7 +44,6 @@ public class Constants {
     public static final String STRING_PLUGIN_PARAM_OPTIONS = "options";
     /**plugin param emit string **/
     public static final String STRING_PLUGIN_PARAM_EMIT = "emit";
-
 
     /** string true */
     public static final String STRING_TRUE = "true";
@@ -122,7 +122,8 @@ public class Constants {
     /**
      * hadoop.security.authentication
      */
-    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+            "hadoop.security.authentication.startup.state";
 
     /**
      * loginUserFromKeytab user
@@ -162,7 +163,6 @@ public class Constants {
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
     public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
-
 
     /**
      * validation Query
@@ -221,7 +221,6 @@ public class Constants {
      */
     public static final String COLON = ":";
 
-
     /**
      * AT SIGN @
      */
@@ -231,7 +230,6 @@ public class Constants {
      * SEMICOLON ;
      */
     public static final String SEMICOLON = ";";
-
 
     /**
      * EQUAL_SIGN =

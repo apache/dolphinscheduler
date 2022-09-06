@@ -58,4 +58,3 @@ public class NettyEncoder extends MessageToByteEncoder<Command> {
         out.writeBytes(headerBytes);
     }
 }
-

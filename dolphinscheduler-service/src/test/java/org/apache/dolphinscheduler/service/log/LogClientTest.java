@@ -73,7 +73,8 @@ public class LogClientTest {
 
         Command command = new Command();
         command.setBody(JSONUtils.toJsonString(new ViewLogResponseCommand("")).getBytes(StandardCharsets.UTF_8));
-        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+        PowerMockito
+                .when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
         LogClient logClient = new LogClient();
         String log = logClient.viewLog(localMachine, port, path);
@@ -97,7 +98,8 @@ public class LogClientTest {
 
         Command command = new Command();
         command.setBody(JSONUtils.toJsonByteArray(new RollViewLogResponseCommand("success")));
-        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+        PowerMockito
+                .when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
 
         LogClient logClient = new LogClient();
@@ -111,8 +113,10 @@ public class LogClientTest {
         PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
         Command command = new Command();
-        command.setBody(JSONUtils.toJsonByteArray(new GetLogBytesResponseCommand("log".getBytes(StandardCharsets.UTF_8))));
-        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+        command.setBody(
+                JSONUtils.toJsonByteArray(new GetLogBytesResponseCommand("log".getBytes(StandardCharsets.UTF_8))));
+        PowerMockito
+                .when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
 
         LogClient logClient = new LogClient();
@@ -127,7 +131,8 @@ public class LogClientTest {
 
         Command command = new Command();
         command.setBody(JSONUtils.toJsonByteArray(new RemoveTaskLogResponseCommand(true)));
-        PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+        PowerMockito
+                .when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
 
         LogClient logClient = new LogClient();

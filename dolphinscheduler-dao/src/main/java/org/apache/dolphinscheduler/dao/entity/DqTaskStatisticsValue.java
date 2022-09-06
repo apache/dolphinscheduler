@@ -27,6 +27,7 @@ import java.util.Date;
 
 @TableName("t_ds_dq_task_statistics_value")
 public class DqTaskStatisticsValue implements Serializable {
+
     /**
      * primary key
      */
@@ -41,7 +42,7 @@ public class DqTaskStatisticsValue implements Serializable {
      * process definition name
      */
     @TableField(exist = false)
-    private String  processDefinitionName;
+    private String processDefinitionName;
     /**
      * task instance id
      */

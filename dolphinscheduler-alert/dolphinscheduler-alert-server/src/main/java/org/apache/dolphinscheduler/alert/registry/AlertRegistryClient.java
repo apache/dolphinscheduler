@@ -28,7 +28,8 @@ public class AlertRegistryClient implements AutoCloseable {
     public synchronized void start() {
         try {
             registry();
-            // todo: we don't listen the connection state, since we will try to acquire the registry lock before loop the alert task from db.
+            // todo: we don't listen the connection state, since we will try to acquire the registry lock before loop
+            // the alert task from db.
         } catch (Exception ex) {
             throw new RegistryException("AlertRegistryClient start up error", ex);
         }
@@ -67,7 +68,6 @@ public class AlertRegistryClient implements AutoCloseable {
         alertHeartbeatTask.start();
         log.info("Alert server: {} registered to registry: {}", alertServerAddress, alertServerRegistryPath);
     }
-
 
     @Override
     public void close() throws Exception {

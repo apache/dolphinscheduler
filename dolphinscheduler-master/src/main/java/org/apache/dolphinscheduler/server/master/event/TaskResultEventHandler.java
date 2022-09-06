@@ -60,23 +60,23 @@ public class TaskResultEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable = this.processInstanceExecCacheManager.getByProcessInstanceId(
-            processInstanceId);
+                processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
-                "Handle task result event error, cannot find related workflow instance from cache, will discard this event");
+                    "Handle task result event error, cannot find related workflow instance from cache, will discard this event");
         }
         Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
         if (!taskInstanceOptional.isPresent()) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
-                "Handle task result event error, cannot find the taskInstance from cache, will discord this event");
+                    "Handle task result event error, cannot find the taskInstance from cache, will discord this event");
         }
         TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState().typeIsFinished()) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
-                "Handle task result event error, the task instance is already finished, will discord this event");
+                    "Handle task result event error, the task instance is already finished, will discord this event");
         }
         dataQualityResultOperator.operateDqExecuteResult(taskEvent, taskInstance);
 
@@ -111,10 +111,10 @@ public class TaskResultEventHandler implements TaskEventHandler {
     public void sendAckToWorker(TaskEvent taskEvent) {
         // we didn't set the receiver address, since the ack doen's need to retry
         TaskExecuteAckCommand taskExecuteAckMessage = new TaskExecuteAckCommand(ExecutionStatus.SUCCESS.getCode(),
-                                                                                taskEvent.getTaskInstanceId(),
-                                                                                masterConfig.getMasterAddress(),
-                                                                                taskEvent.getWorkerAddress(),
-                                                                                System.currentTimeMillis());
+                taskEvent.getTaskInstanceId(),
+                masterConfig.getMasterAddress(),
+                taskEvent.getWorkerAddress(),
+                System.currentTimeMillis());
         taskEvent.getChannel().writeAndFlush(taskExecuteAckMessage.convert2Command());
     }
 

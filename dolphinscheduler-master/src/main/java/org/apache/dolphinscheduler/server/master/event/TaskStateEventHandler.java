@@ -38,16 +38,16 @@ public class TaskStateEventHandler implements StateEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(TaskStateEventHandler.class);
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleException, StateEventHandleError {
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) throws StateEventHandleException, StateEventHandleError {
         measureTaskState(stateEvent);
         workflowExecuteRunnable.checkTaskInstanceByStateEvent(stateEvent);
 
         Optional<TaskInstance> taskInstanceOptional =
-            workflowExecuteRunnable.getTaskInstance(stateEvent.getTaskInstanceId());
+                workflowExecuteRunnable.getTaskInstance(stateEvent.getTaskInstanceId());
 
         TaskInstance task = taskInstanceOptional.orElseThrow(() -> new StateEventHandleError(
-            "Cannot find task instance from taskMap by task instance id: " + stateEvent.getTaskInstanceId()));
+                "Cannot find task instance from taskMap by task instance id: " + stateEvent.getTaskInstanceId()));
 
         if (task.getState() == null) {
             throw new StateEventHandleError("Task state event handle error due to task state is null");
@@ -57,7 +57,7 @@ public class TaskStateEventHandler implements StateEventHandler {
 
         if (task.getState().typeIsFinished()) {
             if (completeTaskMap.containsKey(task.getTaskCode())
-                && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
+                    && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
                 logger.warn("The task instance is already complete, stateEvent: {}", stateEvent);
                 return true;
             }

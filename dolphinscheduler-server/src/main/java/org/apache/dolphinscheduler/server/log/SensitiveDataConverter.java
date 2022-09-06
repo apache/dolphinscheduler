@@ -37,7 +37,6 @@ public class SensitiveDataConverter extends MessageConverter {
      */
     private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
 
-
     @Override
     public String convert(ILoggingEvent event) {
 
@@ -86,6 +85,5 @@ public class SensitiveDataConverter extends MessageConverter {
 
         return sb.toString();
     }
-
 
 }

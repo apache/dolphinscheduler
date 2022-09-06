@@ -86,11 +86,11 @@ public class MasterFailoverService {
     @Timed(value = "ds.master.scheduler.failover.check.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     public void checkMasterFailover() {
         List<String> needFailoverMasterHosts = processService.queryNeedFailoverProcessInstanceHost()
-            .stream()
-            // failover myself || dead server
-            .filter(host -> localAddress.equals(host) || !registryClient.checkNodeExists(host, NodeType.MASTER))
-            .distinct()
-            .collect(Collectors.toList());
+                .stream()
+                // failover myself || dead server
+                .filter(host -> localAddress.equals(host) || !registryClient.checkNodeExists(host, NodeType.MASTER))
+                .distinct()
+                .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(needFailoverMasterHosts)) {
             return;
         }
@@ -124,18 +124,18 @@ public class MasterFailoverService {
         StopWatch failoverTimeCost = StopWatch.createStarted();
 
         Optional<Date> masterStartupTimeOptional = getServerStartupTime(registryClient.getServerList(NodeType.MASTER),
-                                                                        masterHost);
+                masterHost);
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(
-            masterHost);
+                masterHost);
         if (CollectionUtils.isEmpty(needFailoverProcessInstanceList)) {
             return;
         }
 
         LOGGER.info(
-            "Master[{}] failover starting there are {} workflowInstance may need to failover, will do a deep check, workflowInstanceIds: {}",
-            masterHost,
-            needFailoverProcessInstanceList.size(),
-            needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
+                "Master[{}] failover starting there are {} workflowInstance may need to failover, will do a deep check, workflowInstanceIds: {}",
+                masterHost,
+                needFailoverProcessInstanceList.size(),
+                needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
 
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             try {
@@ -146,9 +146,9 @@ public class MasterFailoverService {
                     continue;
                 }
                 // todo: use batch query
-                ProcessDefinition processDefinition
-                    = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                                                           processInstance.getProcessDefinitionVersion());
+                ProcessDefinition processDefinition =
+                        processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                                processInstance.getProcessDefinitionVersion());
                 processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
                 List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstanceId);
@@ -168,7 +168,7 @@ public class MasterFailoverService {
                 }
 
                 ProcessInstanceMetrics.incProcessInstanceFailover();
-                //updateProcessInstance host is null to mark this processInstance has been failover
+                // updateProcessInstance host is null to mark this processInstance has been failover
                 // and insert a failover command
                 processInstance.setHost(Constants.NULL);
                 processService.processNeedFailoverProcessInstances(processInstance);
@@ -180,8 +180,8 @@ public class MasterFailoverService {
 
         failoverTimeCost.stop();
         LOGGER.info("Master[{}] failover finished, useTime:{}ms",
-            masterHost,
-            failoverTimeCost.getTime(TimeUnit.MILLISECONDS));
+                masterHost,
+                failoverTimeCost.getTime(TimeUnit.MILLISECONDS));
     }
 
     private Optional<Date> getServerStartupTime(List<Server> servers, String host) {
@@ -217,10 +217,10 @@ public class MasterFailoverService {
         if (!isMasterTask) {
             LOGGER.info("The failover taskInstance is not master task");
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildProcessInstanceRelatedInfo(processInstance)
-                .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
-                .create();
+                    .buildTaskInstanceRelatedInfo(taskInstance)
+                    .buildProcessInstanceRelatedInfo(processInstance)
+                    .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
+                    .create();
 
             if (masterConfig.isKillYarnJobWhenTaskFailover()) {
                 // only kill yarn job if exists , the local thread has exited
@@ -246,7 +246,8 @@ public class MasterFailoverService {
 
     private boolean checkProcessInstanceNeedFailover(Optional<Date> beFailoveredMasterStartupTimeOptional,
                                                      @NonNull ProcessInstance processInstance) {
-        // The process has already been failover, since when we do master failover we will hold a lock, so we can guarantee
+        // The process has already been failover, since when we do master failover we will hold a lock, so we can
+        // guarantee
         // the host will not be set concurrent.
         if (Constants.NULL.equals(processInstance.getHost())) {
             return false;
@@ -261,7 +262,8 @@ public class MasterFailoverService {
             // The processInstance is newly created
             return false;
         }
-        if (processInstance.getRestartTime() != null && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
+        if (processInstance.getRestartTime() != null
+                && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
             // the processInstance is already be failovered.
             return false;
         }

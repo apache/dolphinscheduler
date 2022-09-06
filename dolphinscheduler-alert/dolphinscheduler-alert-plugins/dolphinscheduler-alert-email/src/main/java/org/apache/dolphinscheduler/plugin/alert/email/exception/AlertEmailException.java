@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.email.exception;
 
 public class AlertEmailException extends RuntimeException {
+
     public AlertEmailException(String errMsg) {
         super(errMsg);
     }

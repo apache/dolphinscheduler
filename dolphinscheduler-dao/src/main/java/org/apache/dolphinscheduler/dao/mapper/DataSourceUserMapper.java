@@ -26,7 +26,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
 
-
     /**
      * delete datasource by userId
      * @param userId userId

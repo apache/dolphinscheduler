@@ -88,7 +88,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     @Transactional
-    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String workerGroupExtraParam) {
+    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description,
+                                               String workerGroupExtraParam) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -110,7 +111,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         workerGroup.setAddrList(addrList);
         workerGroup.setUpdateTime(now);
         workerGroup.setDescription(description);
-        workerGroup.setWorkerGroupExtraParam(JSONUtils.parseObject(workerGroupExtraParam, WorkerGroupDto.WorkerGroupExtraParam.class));
+        workerGroup.setWorkerGroupExtraParam(
+                JSONUtils.parseObject(workerGroupExtraParam, WorkerGroupDto.WorkerGroupExtraParam.class));
 
         if (checkWorkerGroupNameExists(workerGroup)) {
             putMsg(result, Status.NAME_EXIST, workerGroup.getName());
@@ -131,7 +133,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupDao.update(workerGroup);
         } else {
             workerGroupDao.insert(workerGroup);
-            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(), Collections.singletonList(workerGroup.getId()), logger);
+            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(),
+                    Collections.singletonList(workerGroup.getId()), logger);
         }
     }
 
@@ -204,7 +207,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             workerGroups = getWorkerGroups(true, null);
         } else {
-            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+            Set<Integer> ids = resourcePermissionCheckService
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
             workerGroups = getWorkerGroups(true, ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<WorkerGroupDto> resultDataList = new ArrayList<>();
@@ -253,7 +257,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             workerGroups = getWorkerGroups(false, null);
         } else {
-            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+            Set<Integer> ids = resourcePermissionCheckService
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
             workerGroups = getWorkerGroups(false, ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<String> availableWorkerGroupList = workerGroups.stream()
@@ -300,7 +305,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         Map<String, WorkerGroupDto> workerGroupsMap = null;
         if (workerGroups.size() != 0) {
             workerGroupsMap = workerGroups.stream()
-                    .collect(Collectors.toMap(WorkerGroupDto::getName, workerGroupItem -> workerGroupItem, (oldWorkerGroup, newWorkerGroup) -> oldWorkerGroup));
+                    .collect(Collectors.toMap(WorkerGroupDto::getName, workerGroupItem -> workerGroupItem,
+                            (oldWorkerGroup, newWorkerGroup) -> oldWorkerGroup));
         }
         for (String workerGroupName : workerGroupList) {
             String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroupName;
@@ -316,14 +322,17 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             WorkerGroupDto workerGroup = new WorkerGroupDto();
             workerGroup.setName(workerGroupName);
             if (isPaging) {
-                String registeredValue = registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(registeredValue, new TypeReference<WorkerHeartBeat>() {
-                });
+                String registeredValue =
+                        registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
+                WorkerHeartBeat workerHeartBeat =
+                        JSONUtils.parseObject(registeredValue, new TypeReference<WorkerHeartBeat>() {
+                        });
                 workerGroup.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
                 workerGroup.setUpdateTime(new Date(workerHeartBeat.getReportTime()));
                 workerGroup.setSystemDefault(true);
             }
-            handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes, workerGroups));
+            handleAddrList(new WorkerGroupHandleDto(workerGroup, workerGroupName, workerGroupsMap, childrenNodes,
+                    workerGroups));
             workerGroups.add(workerGroup);
         }
         return workerGroups;
@@ -351,7 +360,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
-        List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
+        List<ProcessInstance> processInstances = processInstanceMapper
+                .queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;

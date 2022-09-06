@@ -44,8 +44,9 @@ public class PrioritySPIFactory<T extends PrioritySPI> {
         T oldSPI = map.get(identify.getName());
 
         if (newSPI.compareTo(oldSPI.getIdentify().getPriority()) == 0) {
-            throw new IllegalArgumentException(String.format("These two spi plugins has conflict identify name with the same priority: %s, %s",
-                    oldSPI.getIdentify(), newSPI.getIdentify()));
+            throw new IllegalArgumentException(
+                    String.format("These two spi plugins has conflict identify name with the same priority: %s, %s",
+                            oldSPI.getIdentify(), newSPI.getIdentify()));
         } else if (newSPI.compareTo(oldSPI.getIdentify().getPriority()) > 0) {
             map.put(identify.getName(), newSPI);
         }

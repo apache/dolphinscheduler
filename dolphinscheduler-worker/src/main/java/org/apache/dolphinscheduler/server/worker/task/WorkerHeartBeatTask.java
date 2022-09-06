@@ -31,7 +31,6 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
-
     private final int processId;
     private final WorkerHeartBeat.WorkerConfigProperty workerConfigProperty;
 
@@ -69,7 +68,8 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .availablePhysicalMemorySize(availablePhysicalMemorySize)
                 .maxCpuloadAvg(maxCpuLoadAvg)
                 .reservedMemory(reservedMemory)
-                .serverStatus(getServerStatus(cpuUsage, maxCpuLoadAvg, availablePhysicalMemorySize, reservedMemory, execThreads, waitSubmitQueueSize))
+                .serverStatus(getServerStatus(cpuUsage, maxCpuLoadAvg, availablePhysicalMemorySize, reservedMemory,
+                        execThreads, waitSubmitQueueSize))
                 .workerHostWeight(workerConfig.getHostWeight())
                 .workerWaitingTaskCount(waitSubmitQueueSize)
                 .workerExecThreadCount(execThreads)
@@ -92,11 +92,13 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                                int workerExecThreadCount,
                                int workerWaitingTaskCount) {
         if (cpuUsage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
-            log.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
+            log.warn(
+                    "current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
                     cpuUsage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
             return Constants.ABNORMAL_NODE_STATUS;
         } else if (workerWaitingTaskCount > workerExecThreadCount) {
-            log.warn("current waiting task count {} is large than worker thread count {}, worker is busy", workerWaitingTaskCount, workerExecThreadCount);
+            log.warn("current waiting task count {} is large than worker thread count {}, worker is busy",
+                    workerWaitingTaskCount, workerExecThreadCount);
             return Constants.BUSY_NODE_STATUE;
         } else {
             return Constants.NORMAL_NODE_STATUS;

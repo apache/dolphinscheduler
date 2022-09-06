@@ -58,61 +58,54 @@ import com.amazonaws.services.elasticmapreduce.model.RunJobFlowResult;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
-    AmazonElasticMapReduceClientBuilder.class,
-    EmrTask.class,
-    AmazonElasticMapReduce.class,
-    JSONUtils.class
+        AmazonElasticMapReduceClientBuilder.class,
+        EmrTask.class,
+        AmazonElasticMapReduce.class,
+        JSONUtils.class
 })
 @PowerMockIgnore({"javax.*"})
 public class EmrTaskTest {
 
     private final ClusterStatus startingStatus =
-        new ClusterStatus().withState(ClusterState.STARTING)
-            .withStateChangeReason(new ClusterStateChangeReason());
+            new ClusterStatus().withState(ClusterState.STARTING)
+                    .withStateChangeReason(new ClusterStateChangeReason());
 
     private final ClusterStatus softwareConfigStatus =
-        new ClusterStatus().withState(ClusterState.STARTING)
-            .withStateChangeReason(
-                new ClusterStateChangeReason()
-                    .withMessage("Configuring cluster software")
-            );
+            new ClusterStatus().withState(ClusterState.STARTING)
+                    .withStateChangeReason(
+                            new ClusterStateChangeReason()
+                                    .withMessage("Configuring cluster software"));
 
     private final ClusterStatus runningStatus =
-        new ClusterStatus().withState(ClusterState.RUNNING)
-            .withStateChangeReason(
-                new ClusterStateChangeReason().withMessage("Running step")
-            );
+            new ClusterStatus().withState(ClusterState.RUNNING)
+                    .withStateChangeReason(
+                            new ClusterStateChangeReason().withMessage("Running step"));
 
     private final ClusterStatus terminatingStatus =
-        new ClusterStatus().withState(ClusterState.TERMINATING.toString())
-            .withStateChangeReason(
-                new ClusterStateChangeReason()
-                    .withCode(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED)
-                    .withMessage("Steps completed")
-            );
+            new ClusterStatus().withState(ClusterState.TERMINATING.toString())
+                    .withStateChangeReason(
+                            new ClusterStateChangeReason()
+                                    .withCode(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED)
+                                    .withMessage("Steps completed"));
 
     private final ClusterStatus waitingStatus =
-        new ClusterStatus().withState(ClusterState.WAITING)
-            .withStateChangeReason(
-                new ClusterStateChangeReason()
-                    .withMessage("Cluster ready after last step completed.")
-            );
+            new ClusterStatus().withState(ClusterState.WAITING)
+                    .withStateChangeReason(
+                            new ClusterStateChangeReason()
+                                    .withMessage("Cluster ready after last step completed."));
 
     private final ClusterStatus userRequestTerminateStatus =
-        new ClusterStatus().withState(ClusterState.TERMINATING)
-            .withStateChangeReason(
-                new ClusterStateChangeReason()
-                    .withCode(ClusterStateChangeReasonCode.USER_REQUEST)
-                    .withMessage("Terminated by user request")
-            );
-
+            new ClusterStatus().withState(ClusterState.TERMINATING)
+                    .withStateChangeReason(
+                            new ClusterStateChangeReason()
+                                    .withCode(ClusterStateChangeReasonCode.USER_REQUEST)
+                                    .withMessage("Terminated by user request"));
 
     private final ClusterStatus terminatedWithErrorsStatus =
-        new ClusterStatus().withState(ClusterState.TERMINATED_WITH_ERRORS)
-            .withStateChangeReason(
-                new ClusterStateChangeReason()
-                    .withCode(ClusterStateChangeReasonCode.STEP_FAILURE)
-            );
+            new ClusterStatus().withState(ClusterState.TERMINATED_WITH_ERRORS)
+                    .withStateChangeReason(
+                            new ClusterStateChangeReason()
+                                    .withCode(ClusterStateChangeReasonCode.STEP_FAILURE));
 
     private EmrTask emrTask;
     private AmazonElasticMapReduce emrClient;
@@ -169,7 +162,8 @@ public class EmrTaskTest {
 
     @Test
     public void testHandleTerminatedWithError() throws Exception {
-        when(cluster.getStatus()).thenReturn(startingStatus, softwareConfigStatus, runningStatus, terminatedWithErrorsStatus);
+        when(cluster.getStatus()).thenReturn(startingStatus, softwareConfigStatus, runningStatus,
+                terminatedWithErrorsStatus);
 
         emrTask.handle();
         Assert.assertEquals(EXIT_CODE_FAILURE, emrTask.getExitStatusCode());
@@ -178,7 +172,8 @@ public class EmrTaskTest {
     @Test
     public void testCanNotParseJson() throws Exception {
         mockStatic(JSONUtils.class);
-        when(emrTask, "createRunJobFlowRequest").thenThrow(new EmrTaskException("can not parse RunJobFlowRequest from json", new Exception("error")));
+        when(emrTask, "createRunJobFlowRequest")
+                .thenThrow(new EmrTaskException("can not parse RunJobFlowRequest from json", new Exception("error")));
         emrTask.handle();
         Assert.assertEquals(EXIT_CODE_FAILURE, emrTask.getExitStatusCode());
     }
@@ -195,7 +190,8 @@ public class EmrTaskTest {
     @Test
     public void testRunJobFlowError() throws Exception {
 
-        when(emrClient.runJobFlow(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
+        when(emrClient.runJobFlow(any())).thenThrow(new AmazonElasticMapReduceException("error"),
+                new EmrTaskException());
         emrTask.handle();
         Assert.assertEquals(EXIT_CODE_FAILURE, emrTask.getExitStatusCode());
         emrTask.handle();

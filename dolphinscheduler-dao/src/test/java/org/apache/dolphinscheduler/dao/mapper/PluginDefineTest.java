@@ -48,7 +48,8 @@ public class PluginDefineTest extends BaseDaoTest {
     @Test
     public void testQueryByNameAndType() {
         PluginDefine pluginDefine = createPluginDefine();
-        PluginDefine pluginDefineSaved = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+        PluginDefine pluginDefineSaved =
+                pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         Assert.assertNotNull(pluginDefineSaved);
         Assert.assertEquals(pluginDefineSaved.getPluginType(), pluginDefine.getPluginType());
         Assert.assertEquals(pluginDefineSaved.getPluginName(), pluginDefine.getPluginName());

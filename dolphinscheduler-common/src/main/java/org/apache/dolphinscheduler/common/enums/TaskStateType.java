@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
  * type of task state
  */
 public enum TaskStateType {
+
     /**
      * 0 waiting running
      * 1 running

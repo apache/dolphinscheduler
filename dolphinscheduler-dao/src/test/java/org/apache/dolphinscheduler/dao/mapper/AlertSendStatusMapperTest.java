@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThat;
  * AlertSendStatus mapper test
  */
 public class AlertSendStatusMapperTest extends BaseDaoTest {
+
     @Autowired
     private AlertSendStatusMapper alertSendStatusMapper;
 

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Objects;
 
 public class WorkFlowRelation {
+
     private long sourceWorkFlowCode;
     private long targetWorkFlowCode;
 
@@ -57,7 +58,7 @@ public class WorkFlowRelation {
         }
         WorkFlowRelation that = (WorkFlowRelation) o;
         return sourceWorkFlowCode == that.sourceWorkFlowCode
-            && targetWorkFlowCode == that.targetWorkFlowCode;
+                && targetWorkFlowCode == that.targetWorkFlowCode;
     }
 
     @Override

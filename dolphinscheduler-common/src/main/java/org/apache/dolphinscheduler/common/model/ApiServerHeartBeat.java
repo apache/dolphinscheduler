@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiServerHeartBeat implements HeartBeat {
+
     private int processId;
     private long startupTime;
     private long reportTime;
@@ -23,6 +24,7 @@ public class ApiServerHeartBeat implements HeartBeat {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ApiServerConfigProperty {
+
         private String databaseUrl;
         private String apiServerAddress;
         private String apiServerRegistryPath;

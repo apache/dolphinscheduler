@@ -51,12 +51,12 @@ public class NettyRemotingClientTest {
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
         server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+
             @Override
             public void process(Channel channel, Command command) {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
             }
         });
-
 
         server.start();
         //
@@ -77,11 +77,12 @@ public class NettyRemotingClientTest {
      *  test sned async
      */
     @Test
-    public void testSendAsync(){
+    public void testSendAsync() {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
         server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+
             @Override
             public void process(Channel channel, Command command) {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
@@ -95,13 +96,15 @@ public class NettyRemotingClientTest {
         Command commandPing = Ping.create();
         try {
             final AtomicLong opaque = new AtomicLong(0);
-            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000, new InvokeCallback() {
-                @Override
-                public void operationComplete(ResponseFuture responseFuture) {
-                    opaque.set(responseFuture.getOpaque());
-                    latch.countDown();
-                }
-            });
+            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000,
+                    new InvokeCallback() {
+
+                        @Override
+                        public void operationComplete(ResponseFuture responseFuture) {
+                            opaque.set(responseFuture.getOpaque());
+                            latch.countDown();
+                        }
+                    });
             latch.await();
             Assert.assertEquals(commandPing.getOpaque(), opaque.get());
         } catch (Exception e) {

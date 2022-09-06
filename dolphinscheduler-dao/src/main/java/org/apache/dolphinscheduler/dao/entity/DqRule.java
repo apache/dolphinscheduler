@@ -27,6 +27,7 @@ import java.util.Date;
 
 @TableName("t_ds_dq_rule")
 public class DqRule implements Serializable {
+
     /**
      * primary key
      */

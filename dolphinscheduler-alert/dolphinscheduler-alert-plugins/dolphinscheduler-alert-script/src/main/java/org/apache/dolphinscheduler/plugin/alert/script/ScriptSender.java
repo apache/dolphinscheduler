@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.Map;
 
 public final class ScriptSender {
+
     private static final Logger logger = LoggerFactory.getLogger(ScriptSender.class);
     private static final String ALERT_TITLE_OPTION = " -t ";
     private static final String ALERT_CONTENT_OPTION = " -c ";
@@ -54,22 +55,23 @@ public final class ScriptSender {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
-        //validate script path in case of injections
+        // validate script path in case of injections
         File shellScriptFile = new File(scriptPath);
-        //validate existence
+        // validate existence
         if (!shellScriptFile.exists()) {
             logger.error("shell script not exist : {}", scriptPath);
             alertResult.setMessage("shell script not exist : " + scriptPath);
             return alertResult;
         }
-        //validate is file
+        // validate is file
         if (!shellScriptFile.isFile()) {
             logger.error("shell script is not a file : {}", scriptPath);
             alertResult.setMessage("shell script is not a file : " + scriptPath);
             return alertResult;
         }
 
-        String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
+        String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION
+                + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
         int exitCode = ProcessUtils.executeScript(cmd);
 
         if (exitCode == 0) {

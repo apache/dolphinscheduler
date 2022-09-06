@@ -36,24 +36,24 @@ public class WeChatSenderTest {
     private static Map<String, String> weChatConfig = new HashMap<>();
 
     private String content = "[{\"id\":\"69\","
-        +
-        "\"name\":\"UserBehavior-0--1193959466\","
-        +
-        "\"Job name\":\"Start workflow\","
-        +
-        "\"State\":\"SUCCESS\","
-        +
-        "\"Recovery\":\"NO\","
-        +
-        "\"Run time\":\"1\","
-        +
-        "\"Start time\": \"2018-08-06 10:31:34.0\","
-        +
-        "\"End time\": \"2018-08-06 10:31:49.0\","
-        +
-        "\"Host\": \"192.168.xx.xx\","
-        +
-        "\"Notify group\" :\"4\"}]";
+            +
+            "\"name\":\"UserBehavior-0--1193959466\","
+            +
+            "\"Job name\":\"Start workflow\","
+            +
+            "\"State\":\"SUCCESS\","
+            +
+            "\"Recovery\":\"NO\","
+            +
+            "\"Run time\":\"1\","
+            +
+            "\"Start time\": \"2018-08-06 10:31:34.0\","
+            +
+            "\"End time\": \"2018-08-06 10:31:49.0\","
+            +
+            "\"Host\": \"192.168.xx.xx\","
+            +
+            "\"Notify group\" :\"4\"}]";
 
     @Before
     public void initDingTalkConfig() {

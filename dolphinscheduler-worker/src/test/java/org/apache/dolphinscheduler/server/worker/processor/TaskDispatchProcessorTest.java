@@ -42,7 +42,6 @@ import java.util.concurrent.ExecutorService;
 @Ignore
 public class TaskDispatchProcessorTest {
 
-
     public TaskExecutionContext getTaskExecutionContext() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setProcessId(12345);

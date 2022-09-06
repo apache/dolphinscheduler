@@ -49,10 +49,10 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT_ACK == command.getType(),
-                                    String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteAckCommand taskExecuteAckMessage = JSONUtils.parseObject(command.getBody(),
-                                                                            TaskExecuteAckCommand.class);
+                TaskExecuteAckCommand.class);
 
         if (taskExecuteAckMessage == null) {
             logger.error("task execute response ack command is null");
@@ -64,15 +64,15 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
             LoggerUtils.setTaskInstanceIdMDC(taskExecuteAckMessage.getTaskInstanceId());
             if (taskExecuteAckMessage.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
                 messageRetryRunner.removeRetryMessage(taskExecuteAckMessage.getTaskInstanceId(),
-                                                      CommandType.TASK_EXECUTE_RESULT);
+                        CommandType.TASK_EXECUTE_RESULT);
                 logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
             } else if (taskExecuteAckMessage.getStatus() == ExecutionStatus.FAILURE.getCode()) {
                 // master handle worker response error, will still retry
                 logger.error("Receive task execute result ack message, the message status is not success, message: {}",
-                             taskExecuteAckMessage);
+                        taskExecuteAckMessage);
             } else {
                 throw new IllegalArgumentException("Invalid task execute response ack status: "
-                                                       + taskExecuteAckMessage.getStatus());
+                        + taskExecuteAckMessage.getStatus());
             }
         } finally {
             LoggerUtils.removeTaskInstanceIdMDC();

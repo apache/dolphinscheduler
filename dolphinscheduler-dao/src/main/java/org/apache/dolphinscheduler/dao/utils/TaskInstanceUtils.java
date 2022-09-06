@@ -54,7 +54,8 @@ public class TaskInstanceUtils {
         target.setAppLink(source.getAppLink());
         target.setFlag(source.getFlag());
         target.setDependency(source.getDependency());
-        // todo: we need to cpoy the task params and then copy switchDependency, since the setSwitchDependency rely on task params, this is really a very bad practice.
+        // todo: we need to cpoy the task params and then copy switchDependency, since the setSwitchDependency rely on
+        // task params, this is really a very bad practice.
         target.setTaskParams(source.getTaskParams());
         target.setSwitchDependency(source.getSwitchDependency());
         target.setDuration(source.getDuration());

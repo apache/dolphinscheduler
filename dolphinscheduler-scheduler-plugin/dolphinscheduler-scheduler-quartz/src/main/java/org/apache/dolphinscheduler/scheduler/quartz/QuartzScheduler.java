@@ -82,7 +82,7 @@ public class QuartzScheduler implements SchedulerApi {
         try {
 
             JobDetail jobDetail;
-            //add a task (if this task already exists, return this task directly)
+            // add a task (if this task already exists, return this task directly)
             if (scheduler.checkExists(jobKey)) {
 
                 jobDetail = scheduler.getJobDetail(jobKey);
@@ -99,11 +99,9 @@ public class QuartzScheduler implements SchedulerApi {
 
             TriggerKey triggerKey = new TriggerKey(jobKey.getName(), jobKey.getGroup());
             /*
-             * Instructs the Scheduler that upon a mis-fire
-             * situation, the CronTrigger wants to have it's
-             * next-fire-time updated to the next time in the schedule after the
-             * current time (taking into account any associated Calendar),
-             * but it does not want to be fired now.
+             * Instructs the Scheduler that upon a mis-fire situation, the CronTrigger wants to have it's next-fire-time
+             * updated to the next time in the schedule after the current time (taking into account any associated
+             * Calendar), but it does not want to be fired now.
              */
             CronTrigger cronTrigger = newTrigger()
                     .withIdentity(triggerKey)
@@ -112,8 +110,7 @@ public class QuartzScheduler implements SchedulerApi {
                     .withSchedule(
                             cronSchedule(cronExpression)
                                     .withMisfireHandlingInstructionDoNothing()
-                                    .inTimeZone(DateUtils.getTimezone(timezoneId))
-                    )
+                                    .inTimeZone(DateUtils.getTimezone(timezoneId)))
                     .forJob(jobDetail).build();
 
             if (scheduler.checkExists(triggerKey)) {
@@ -124,12 +121,14 @@ public class QuartzScheduler implements SchedulerApi {
                 if (!StringUtils.equalsIgnoreCase(cronExpression, oldCronExpression)) {
                     // reschedule job trigger
                     scheduler.rescheduleJob(triggerKey, cronTrigger);
-                    logger.info("reschedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
+                    logger.info(
+                            "reschedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
                             triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
                 }
             } else {
                 scheduler.scheduleJob(cronTrigger);
-                logger.info("schedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
+                logger.info(
+                        "schedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
                         triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
             }
 

@@ -245,36 +245,37 @@ public class ProcessTaskRelation {
         }
         ProcessTaskRelation that = (ProcessTaskRelation) o;
         return processDefinitionVersion == that.processDefinitionVersion
-            && projectCode == that.projectCode
-            && processDefinitionCode == that.processDefinitionCode
-            && preTaskCode == that.preTaskCode
-            && preTaskVersion == that.preTaskVersion
-            && postTaskCode == that.postTaskCode
-            && postTaskVersion == that.postTaskVersion
-            && Objects.equals(name, that.name);
+                && projectCode == that.projectCode
+                && processDefinitionCode == that.processDefinitionCode
+                && preTaskCode == that.preTaskCode
+                && preTaskVersion == that.preTaskVersion
+                && postTaskCode == that.postTaskCode
+                && postTaskVersion == that.postTaskVersion
+                && Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, processDefinitionVersion, projectCode, processDefinitionCode, preTaskCode, preTaskVersion, postTaskCode, postTaskVersion);
+        return Objects.hash(name, processDefinitionVersion, projectCode, processDefinitionCode, preTaskCode,
+                preTaskVersion, postTaskCode, postTaskVersion);
     }
 
     @Override
     public String toString() {
         return "ProcessTaskRelation{"
-            + "id=" + id
-            + ", name='" + name + '\''
-            + ", processDefinitionVersion=" + processDefinitionVersion
-            + ", projectCode=" + projectCode
-            + ", processDefinitionCode=" + processDefinitionCode
-            + ", preTaskCode=" + preTaskCode
-            + ", preTaskVersion=" + preTaskVersion
-            + ", postTaskCode=" + postTaskCode
-            + ", postTaskVersion=" + postTaskVersion
-            + ", conditionType=" + conditionType
-            + ", conditionParams='" + conditionParams + '\''
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + '}';
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", processDefinitionVersion=" + processDefinitionVersion
+                + ", projectCode=" + projectCode
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", preTaskCode=" + preTaskCode
+                + ", preTaskVersion=" + preTaskVersion
+                + ", postTaskCode=" + postTaskCode
+                + ", postTaskVersion=" + postTaskVersion
+                + ", conditionType=" + conditionType
+                + ", conditionParams='" + conditionParams + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }

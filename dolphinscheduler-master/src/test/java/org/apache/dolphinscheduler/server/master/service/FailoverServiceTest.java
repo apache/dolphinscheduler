@@ -63,6 +63,7 @@ import static org.mockito.Mockito.doNothing;
 @PrepareForTest({RegistryClient.class})
 @PowerMockIgnore({"javax.management.*"})
 public class FailoverServiceTest {
+
     private FailoverService failoverService;
 
     @Mock
@@ -145,12 +146,16 @@ public class FailoverServiceTest {
         workerTaskInstance.setHost(testWorkerHost);
         workerTaskInstance.setTaskType(COMMON_TASK_TYPE);
 
-        given(processService.queryNeedFailoverTaskInstances(Mockito.anyString())).willReturn(Arrays.asList(masterTaskInstance, workerTaskInstance));
+        given(processService.queryNeedFailoverTaskInstances(Mockito.anyString()))
+                .willReturn(Arrays.asList(masterTaskInstance, workerTaskInstance));
         given(processService.queryNeedFailoverProcessInstanceHost()).willReturn(Lists.newArrayList(testMasterHost));
-        given(processService.queryNeedFailoverProcessInstances(Mockito.anyString())).willReturn(Arrays.asList(processInstance));
+        given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
+                .willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
-        given(processService.findValidTaskListByProcessId(Mockito.anyInt())).willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
-        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(Optional.ofNullable(processInstance));
+        given(processService.findValidTaskListByProcessId(Mockito.anyInt()))
+                .willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
+        given(processService.findProcessInstanceDetailById(Mockito.anyInt()))
+                .willReturn(Optional.ofNullable(processInstance));
 
         Thread.sleep(1000);
         Server masterServer = new Server();
@@ -198,7 +203,6 @@ public class FailoverServiceTest {
 
         Mockito.when(cacheManager.getAll()).thenReturn(Lists.newArrayList(workflowExecuteRunnable));
         Mockito.when(cacheManager.getByProcessInstanceId(Mockito.anyInt())).thenReturn(workflowExecuteRunnable);
-
 
         failoverService.failoverServerWhenDown(testWorkerHost, NodeType.WORKER);
         Assert.assertEquals(ExecutionStatus.NEED_FAULT_TOLERANCE, workerTaskInstance.getState());

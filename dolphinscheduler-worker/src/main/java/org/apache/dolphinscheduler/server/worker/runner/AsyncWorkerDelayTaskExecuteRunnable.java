@@ -42,9 +42,9 @@ public class AsyncWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecuteR
                                                @NonNull AlertClientService alertClientService,
                                                @NonNull TaskPluginManager taskPluginManager,
                                                @Nullable StorageOperate storageOperate) {
-        super(taskExecutionContext, workerConfig, workflowMasterAddress, workerMessageSender, alertClientService, taskPluginManager, storageOperate);
+        super(taskExecutionContext, workerConfig, workflowMasterAddress, workerMessageSender, alertClientService,
+                taskPluginManager, storageOperate);
     }
-
 
     @Override
     public void executeTask() throws TaskException {
@@ -57,8 +57,7 @@ public class AsyncWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecuteR
         asyncTaskExecutionContext = new AsyncTaskExecutionContext(
                 taskExecutionContext,
                 task.getAsyncTaskExecuteFunction(),
-                new AsyncTaskCallbackFunctionImpl(this)
-        );
+                new AsyncTaskCallbackFunctionImpl(this));
         AsyncTaskDelayQueue.addAsyncTask(asyncTaskExecutionContext);
     }
 
@@ -80,7 +79,6 @@ public class AsyncWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecuteR
     public static class AsyncTaskCallbackFunctionImpl implements AsyncTaskCallbackFunction {
 
         private final AsyncWorkerDelayTaskExecuteRunnable asyncWorkerDelayTaskExecuteRunnable;
-
 
         public AsyncTaskCallbackFunctionImpl(@NonNull AsyncWorkerDelayTaskExecuteRunnable asyncWorkerDelayTaskExecuteRunnable) {
             this.asyncWorkerDelayTaskExecuteRunnable = asyncWorkerDelayTaskExecuteRunnable;
@@ -114,7 +112,8 @@ public class AsyncWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecuteR
 
             asyncWorkerDelayTaskExecuteRunnable.sendTaskResult();
 
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(asyncWorkerDelayTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId());
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(
+                    asyncWorkerDelayTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId());
             asyncWorkerDelayTaskExecuteRunnable.clearTaskExecPathIfNeeded();
 
         }

@@ -44,41 +44,41 @@ public class CommonGenerator {
         StringBuilder commonSb = new StringBuilder();
 
         try {
-            //sqoop task model
+            // sqoop task model
             commonSb.append(SqoopConstants.SQOOP)
-                .append(SPACE)
-                .append(sqoopParameters.getModelType());
+                    .append(SPACE)
+                    .append(sqoopParameters.getModelType());
 
-            //sqoop map-reduce job name
+            // sqoop map-reduce job name
             commonSb.append(SPACE).append(D).append(SPACE)
-                .append(String.format("%s%s%s", SqoopConstants.SQOOP_MR_JOB_NAME,
-                    EQUAL_SIGN, sqoopParameters.getJobName()));
+                    .append(String.format("%s%s%s", SqoopConstants.SQOOP_MR_JOB_NAME,
+                            EQUAL_SIGN, sqoopParameters.getJobName()));
 
-            //hadoop custom param
+            // hadoop custom param
             List<Property> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
             if (CollectionUtils.isNotEmpty(hadoopCustomParams)) {
                 for (Property hadoopCustomParam : hadoopCustomParams) {
                     String hadoopCustomParamStr = String.format("%s%s%s", hadoopCustomParam.getProp(),
-                        EQUAL_SIGN, hadoopCustomParam.getValue());
+                            EQUAL_SIGN, hadoopCustomParam.getValue());
 
                     commonSb.append(SPACE).append(D)
-                        .append(SPACE).append(hadoopCustomParamStr);
+                            .append(SPACE).append(hadoopCustomParamStr);
                 }
             }
 
-            //sqoop custom params
+            // sqoop custom params
             List<Property> sqoopAdvancedParams = sqoopParameters.getSqoopAdvancedParams();
             if (CollectionUtils.isNotEmpty(sqoopAdvancedParams)) {
                 for (Property sqoopAdvancedParam : sqoopAdvancedParams) {
                     commonSb.append(SPACE).append(sqoopAdvancedParam.getProp())
-                        .append(SPACE).append(sqoopAdvancedParam.getValue());
+                            .append(SPACE).append(sqoopAdvancedParam.getValue());
                 }
             }
 
-            //sqoop parallelism
+            // sqoop parallelism
             if (sqoopParameters.getConcurrency() > 0) {
                 commonSb.append(SPACE).append(SqoopConstants.SQOOP_PARALLELISM)
-                    .append(SPACE).append(sqoopParameters.getConcurrency());
+                        .append(SPACE).append(sqoopParameters.getConcurrency());
             }
         } catch (Exception e) {
             logger.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));

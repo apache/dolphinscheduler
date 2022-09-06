@@ -116,8 +116,7 @@ public class ShellExecutor extends AbstractShell {
      * @return the output of the executed command.
      * @throws IOException errors
      */
-    public static String execCommand(Map<String, String> env, String... cmd)
-            throws IOException {
+    public static String execCommand(Map<String, String> env, String... cmd) throws IOException {
         return execCommand(env, cmd, 0L);
     }
 
@@ -153,7 +152,6 @@ public class ShellExecutor extends AbstractShell {
     public String getOutput() {
         return (output == null) ? "" : output.toString();
     }
-
 
     /**
      * Returns the commands of this instance.

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DataSourcePluginManager {
+
     private static final Logger logger = LoggerFactory.getLogger(DataSourcePluginManager.class);
 
     private final Map<String, DataSourceChannel> datasourceClientMap = new ConcurrentHashMap<>();

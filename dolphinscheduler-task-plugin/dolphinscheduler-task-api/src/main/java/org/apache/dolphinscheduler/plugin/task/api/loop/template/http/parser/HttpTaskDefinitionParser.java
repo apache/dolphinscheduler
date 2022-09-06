@@ -50,12 +50,12 @@ public class HttpTaskDefinitionParser implements TaskDefinitionParser<HttpLoopTa
 
         LoopTaskYamlDefinition.LoopTaskServiceYamlDefinition service = loopTaskYamlDefinition.getService();
         LoopTaskYamlDefinition.LoopTaskAPIYamlDefinition api = service.getApi();
-        HttpLoopTaskSubmitTaskMethodDefinition submitTaskMethod
-            = new SubmitTemplateMethodTransformer().transform(api.getSubmit());
-        HttpLoopTaskQueryStatusMethodDefinition queryTaskStateMethod
-            = new QueryStateTemplateMethodTransformer().transform(api.getQueryState());
-        HttpLoopTaskCancelTaskMethodDefinition cancelTaskMethod
-            = new CancelTemplateMethodTransformer().transform(api.getCancel());
+        HttpLoopTaskSubmitTaskMethodDefinition submitTaskMethod =
+                new SubmitTemplateMethodTransformer().transform(api.getSubmit());
+        HttpLoopTaskQueryStatusMethodDefinition queryTaskStateMethod =
+                new QueryStateTemplateMethodTransformer().transform(api.getQueryState());
+        HttpLoopTaskCancelTaskMethodDefinition cancelTaskMethod =
+                new CancelTemplateMethodTransformer().transform(api.getCancel());
         return new HttpLoopTaskDefinition(service.getName(), submitTaskMethod, queryTaskStateMethod, cancelTaskMethod);
     }
 

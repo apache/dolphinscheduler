@@ -31,7 +31,6 @@ import java.util.Map;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 
-
 /**
  * process definition service
  */
@@ -272,7 +271,8 @@ public interface ProcessDefinitionService {
      * @param processTaskRelationJson process task relation json
      * @return check result code
      */
-    Map<String, Object> checkProcessNodeList(String processTaskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs);
+    Map<String, Object> checkProcessNodeList(String processTaskRelationJson,
+                                             List<TaskDefinitionLog> taskDefinitionLogs);
 
     /**
      * get task node details based on process definition
@@ -331,7 +331,7 @@ public interface ProcessDefinitionService {
      * @param limit limit
      * @return tree view json data
      */
-    Map<String, Object> viewTree(User loginUser,long projectCode, long code, Integer limit);
+    Map<String, Object> viewTree(User loginUser, long projectCode, long code, Integer limit);
 
     /**
      * switch the defined process definition version
@@ -457,7 +457,8 @@ public interface ProcessDefinitionService {
      * @param result
      * @param otherParamsJson
      */
-    void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson);
+    void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result,
+                           String otherParamsJson);
 
     /**
      * get Json String
@@ -467,4 +468,3 @@ public interface ProcessDefinitionService {
      */
     String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition);
 }
-

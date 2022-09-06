@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class CodeGenerateUtilsTest {
+
     @Test
     public void testNoGenerateDuplicateCode() throws CodeGenerateUtils.CodeGenerateException {
         HashSet<Long> existsCode = new HashSet<>();

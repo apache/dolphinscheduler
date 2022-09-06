@@ -66,7 +66,8 @@ public class UiPluginServiceTest {
         Mockito.when(pluginDefineMapper.queryByPluginType(PluginType.ALERT.getDesc())).thenReturn(null);
         Assert.assertEquals(Status.QUERY_PLUGINS_RESULT_IS_NULL, result.get("status"));
 
-        Mockito.when(pluginDefineMapper.queryByPluginType(PluginType.ALERT.getDesc())).thenReturn(Collections.singletonList(pluginDefine));
+        Mockito.when(pluginDefineMapper.queryByPluginType(PluginType.ALERT.getDesc()))
+                .thenReturn(Collections.singletonList(pluginDefine));
         result = uiPluginService.queryUiPluginsByType(PluginType.ALERT);
         Assert.assertEquals(Status.SUCCESS, result.get("status"));
     }

@@ -35,22 +35,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * monitor controller test
  */
 public class MonitorControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(MonitorControllerTest.class);
 
     @Test
     public void testListMaster() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/monitor/masters")
-            .header(SESSION_ID, sessionId)
-           /* .param("type", ResourceType.FILE.name())*/)
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+        /* .param("type", ResourceType.FILE.name()) */)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -58,32 +59,32 @@ public class MonitorControllerTest extends AbstractControllerTest {
     public void testListWorker() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/monitor/workers")
-            .header(SESSION_ID, sessionId)
-           /* .param("type", ResourceType.FILE.name())*/)
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+        /* .param("type", ResourceType.FILE.name()) */)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryDatabaseState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/monitor/databases")
-            .header(SESSION_ID, sessionId)
-            /* .param("type", ResourceType.FILE.name())*/)
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+        /* .param("type", ResourceType.FILE.name()) */)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 

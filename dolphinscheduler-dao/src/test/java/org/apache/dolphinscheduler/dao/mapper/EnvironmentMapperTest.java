@@ -41,7 +41,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
      * @return Environment
      */
     private Environment insertOne() {
-        //insertOne
+        // insertOne
         Environment environment = new Environment();
         environment.setName("testEnv");
         environment.setCode(1L);
@@ -75,10 +75,10 @@ public class EnvironmentMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Environment environment = insertOne();
         environment.setDescription("new description info");
-        //update
+        // update
         int update = environmentMapper.updateById(environment);
         Assert.assertEquals(update, 1);
     }
@@ -99,7 +99,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         insertOne();
-        //query
+        // query
         List<Environment> environments = environmentMapper.selectList(null);
         Assert.assertEquals(environments.size(), 1);
     }
@@ -111,7 +111,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testQueryByEnvironmentName() {
         Environment entity = insertOne();
         Environment environment = environmentMapper.queryByEnvironmentName(entity.getName());
-        Assert.assertEquals(entity.toString(),environment.toString());
+        Assert.assertEquals(entity.toString(), environment.toString());
     }
 
     /**
@@ -121,7 +121,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testQueryByEnvironmentCode() {
         Environment entity = insertOne();
         Environment environment = environmentMapper.queryByEnvironmentCode(entity.getCode());
-        Assert.assertEquals(entity.toString(),environment.toString());
+        Assert.assertEquals(entity.toString(), environment.toString());
     }
 
     /**
@@ -132,7 +132,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
         Environment entity = insertOne();
         List<Environment> environments = environmentMapper.queryAllEnvironmentList();
         Assert.assertEquals(environments.size(), 1);
-        Assert.assertEquals(entity.toString(),environments.get(0).toString());
+        Assert.assertEquals(entity.toString(), environments.get(0).toString());
     }
 
     /**
@@ -142,11 +142,11 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testQueryEnvironmentListPaging() {
         Environment entity = insertOne();
         Page<Environment> page = new Page<>(1, 10);
-        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page,"");
+        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page, "");
         List<Environment> environmentList = environmentIPage.getRecords();
         Assert.assertEquals(environmentList.size(), 1);
 
-        environmentIPage = environmentMapper.queryEnvironmentListPaging(page,"abc");
+        environmentIPage = environmentMapper.queryEnvironmentListPaging(page, "abc");
         environmentList = environmentIPage.getRecords();
         Assert.assertEquals(environmentList.size(), 0);
     }

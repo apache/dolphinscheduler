@@ -71,10 +71,10 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "create", notes = "CREATE_TASK_GROUP_NOTE")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", type = "Long"),
-        @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
-        @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
+            @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", type = "Long"),
+            @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
+            @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
 
     })
     @PostMapping(value = "/create")
@@ -86,7 +86,8 @@ public class TaskGroupController extends BaseController {
                                   @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectcode,
                                   @RequestParam("description") String description,
                                   @RequestParam("groupSize") Integer groupSize) {
-        Map<String, Object> result = taskGroupService.createTaskGroup(loginUser, projectcode, name, description, groupSize);
+        Map<String, Object> result =
+                taskGroupService.createTaskGroup(loginUser, projectcode, name, description, groupSize);
         return returnDataList(result);
     }
 
@@ -102,10 +103,10 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "update", notes = "UPDATE_TASK_GROUP_NOTE")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "id", dataType = "Int"),
-        @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
-        @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
+            @ApiImplicitParam(name = "id", value = "id", dataType = "Int"),
+            @ApiImplicitParam(name = "name", value = "NAME", dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataType = "String"),
+            @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataType = "Int"),
 
     })
     @PostMapping(value = "/update")
@@ -131,9 +132,9 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "list-paging", notes = "QUERY_ALL_TASK_GROUP_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "name", value = "NAME", required = false, dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "name", value = "NAME", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -159,9 +160,9 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "queryTaskGroupByStatus", notes = "QUERY_TASK_GROUP_LIST_BY_STATUS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-        @ApiImplicitParam(name = "status", value = "status", required = true, dataType = "Int")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+            @ApiImplicitParam(name = "status", value = "status", required = true, dataType = "Int")
     })
     @GetMapping(value = "/query-list-by-status")
     @ResponseStatus(HttpStatus.OK)
@@ -186,9 +187,9 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "queryTaskGroupByName", notes = "QUERY_TASK_GROUP_LIST_BY_PROJECT_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "String")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataType = "String")
     })
     @GetMapping(value = "/query-list-by-projectCode")
     @ResponseStatus(HttpStatus.OK)
@@ -198,7 +199,8 @@ public class TaskGroupController extends BaseController {
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "projectCode", required = false) Long projectCode,
                                        @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupService.queryTaskGroupByProjectCode(loginUser, pageNo, pageSize, projectCode);
+        Map<String, Object> result =
+                taskGroupService.queryTaskGroupByProjectCode(loginUser, pageNo, pageSize, projectCode);
         return returnDataList(result);
     }
 
@@ -211,7 +213,7 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "closeTaskGroup", notes = "CLOSE_TASK_GROUP_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
+            @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
     })
     @PostMapping(value = "/close-task-group")
     @ResponseStatus(HttpStatus.CREATED)
@@ -233,7 +235,7 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "startTaskGroup", notes = "START_TASK_GROUP_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
+            @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int")
     })
     @PostMapping(value = "/start-task-group")
     @ResponseStatus(HttpStatus.CREATED)
@@ -254,7 +256,7 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "forceStart", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataType = "Int")
+            @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataType = "Int")
     })
     @PostMapping(value = "/forceStart")
     @ResponseStatus(HttpStatus.CREATED)
@@ -275,8 +277,8 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "modifyPriority", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataType = "Int"),
-        @ApiImplicitParam(name = "priority", value = "TASK_GROUP_QUEUE_PRIORITY", required = true, dataType = "Int")
+            @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "priority", value = "TASK_GROUP_QUEUE_PRIORITY", required = true, dataType = "Int")
     })
     @PostMapping(value = "/modifyPriority")
     @ResponseStatus(HttpStatus.CREATED)
@@ -285,7 +287,7 @@ public class TaskGroupController extends BaseController {
     public Result modifyPriority(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "queueId") Integer queueId,
                                  @RequestParam(value = "priority") Integer priority) {
-        Map<String, Object> result = taskGroupService.modifyPriority(loginUser, queueId,priority);
+        Map<String, Object> result = taskGroupService.modifyPriority(loginUser, queueId, priority);
         return returnDataList(result);
     }
 
@@ -306,12 +308,12 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "queryTasksByGroupId", notes = "QUERY_ALL_TASKS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = false, dataType = "Int", example = "1", defaultValue = "-1"),
-        @ApiImplicitParam(name = "taskInstanceName", value = "TASK_INSTANCE_NAME", required = false, dataType = "String", example = "taskName"),
-        @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataType = "String", example = "processName"),
-        @ApiImplicitParam(name = "status", value = "STATUS", required = false, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = false, dataType = "Int", example = "1", defaultValue = "-1"),
+            @ApiImplicitParam(name = "taskInstanceName", value = "TASK_INSTANCE_NAME", required = false, dataType = "String", example = "taskName"),
+            @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataType = "String", example = "processName"),
+            @ApiImplicitParam(name = "status", value = "STATUS", required = false, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/query-list-by-group-id")
     @ResponseStatus(HttpStatus.OK)
@@ -319,13 +321,13 @@ public class TaskGroupController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTasksByGroupId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
-                                      @RequestParam(value = "taskInstanceName",required = false) String taskName,
-                                      @RequestParam(value = "processInstanceName",required = false) String processName,
-                                      @RequestParam(value = "status",required = false) Integer status,
+                                      @RequestParam(value = "taskInstanceName", required = false) String taskName,
+                                      @RequestParam(value = "processInstanceName", required = false) String processName,
+                                      @RequestParam(value = "status", required = false) Integer status,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, taskName,processName,status,
-            groupId, pageNo, pageSize);
+        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, taskName, processName, status,
+                groupId, pageNo, pageSize);
         return returnDataList(result);
     }
 

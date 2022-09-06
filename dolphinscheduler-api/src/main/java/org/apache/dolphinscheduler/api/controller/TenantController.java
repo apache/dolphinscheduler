@@ -73,9 +73,9 @@ public class TenantController extends BaseController {
      */
     @ApiOperation(value = "createTenant", notes = "CREATE_TENANT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "description", value = "TENANT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "description", value = "TENANT_DESC", dataType = "String")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -101,9 +101,9 @@ public class TenantController extends BaseController {
      */
     @ApiOperation(value = "queryTenantlistPaging", notes = "QUERY_TENANT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -123,7 +123,6 @@ public class TenantController extends BaseController {
         return result;
     }
 
-
     /**
      * tenant list
      *
@@ -140,7 +139,6 @@ public class TenantController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * update tenant
      *
@@ -153,10 +151,10 @@ public class TenantController extends BaseController {
      */
     @ApiOperation(value = "updateTenant", notes = "UPDATE_TENANT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "description", value = "TENANT_DESC", type = "String")
+            @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "description", value = "TENANT_DESC", type = "String")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -181,7 +179,7 @@ public class TenantController extends BaseController {
      */
     @ApiOperation(value = "deleteTenantById", notes = "DELETE_TENANT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "TENANT_ID", required = true, dataType = "Int", example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -202,7 +200,7 @@ public class TenantController extends BaseController {
      */
     @ApiOperation(value = "verifyTenantCode", notes = "VERIFY_TENANT_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String")
+            @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String")
     })
     @GetMapping(value = "/verify-code")
     @ResponseStatus(HttpStatus.OK)

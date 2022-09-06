@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
  * resource process definition utils
  */
 public class ResourceProcessDefinitionUtils {
+
     /**
      * get resource process map key is resource id,value is the set of process definition code
      *
@@ -47,7 +48,8 @@ public class ResourceProcessDefinitionUtils {
                 String[] resourceIds = ((String) resourceMap.get("resource_ids"))
                         .split(",");
 
-                Set<Integer> resourceIdSet = Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());
+                Set<Integer> resourceIdSet =
+                        Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());
                 for (Integer resourceId : resourceIdSet) {
                     Set<Long> codeSet;
                     if (resourceResult.containsKey(resourceId)) {

@@ -43,6 +43,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 public class PasswordAuthenticatorTest extends AbstractControllerTest {
+
     private static Logger logger = LoggerFactory.getLogger(PasswordAuthenticatorTest.class);
 
     @Autowired

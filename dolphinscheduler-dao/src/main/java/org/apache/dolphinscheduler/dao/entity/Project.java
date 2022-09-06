@@ -226,6 +226,7 @@ public class Project {
     }
 
     public static final class Builder {
+
         private int id;
         private int userId;
         private String userName;

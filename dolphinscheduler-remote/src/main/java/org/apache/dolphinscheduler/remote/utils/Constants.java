@@ -49,7 +49,6 @@ public class Constants {
      */
     public static final int CPUS = Runtime.getRuntime().availableProcessors();
 
-
     public static final String LOCAL_ADDRESS = NetUtils.getHost();
 
     /**

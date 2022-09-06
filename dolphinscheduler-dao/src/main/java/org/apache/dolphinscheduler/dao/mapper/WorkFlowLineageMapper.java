@@ -34,7 +34,8 @@ public interface WorkFlowLineageMapper {
      * @param workFlowName workFlowName
      * @return WorkFlowLineage list
      */
-    List<WorkFlowLineage> queryWorkFlowLineageByName(@Param("projectCode") long projectCode, @Param("workFlowName") String workFlowName);
+    List<WorkFlowLineage> queryWorkFlowLineageByName(@Param("projectCode") long projectCode,
+                                                     @Param("workFlowName") String workFlowName);
 
     /**
      * queryWorkFlowLineageByCode
@@ -43,7 +44,8 @@ public interface WorkFlowLineageMapper {
      * @param workFlowCode workFlowCode
      * @return WorkFlowLineage
      */
-    WorkFlowLineage queryWorkFlowLineageByCode(@Param("projectCode") long projectCode, @Param("workFlowCode") long workFlowCode);
+    WorkFlowLineage queryWorkFlowLineageByCode(@Param("projectCode") long projectCode,
+                                               @Param("workFlowCode") long workFlowCode);
 
     /**
      * queryWorkFlowLineageByProcessDefinitionCodes
@@ -93,7 +95,6 @@ public interface WorkFlowLineageMapper {
      */
     List<WorkFlowLineage> queryDownstreamLineageByProcessDefinitionCode(@Param("code") long code,
                                                                         @Param("taskType") String taskType);
-
 
     /**
      * query upstream work flow dependent task params by process definition code

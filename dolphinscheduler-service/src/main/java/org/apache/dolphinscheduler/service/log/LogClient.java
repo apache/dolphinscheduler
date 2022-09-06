@@ -71,19 +71,22 @@ public class LogClient implements AutoCloseable {
      * @return log content
      */
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
-        logger.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
+        logger.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path,
+                skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
         final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
             Command response = client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(response.getBody(), RollViewLogResponseCommand.class);
+                RollViewLogResponseCommand rollReviewLog =
+                        JSONUtils.parseObject(response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
             return "Roll view log response is null";
         } catch (Exception e) {
-            logger.error("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error", host, port, path, skipLineNum, limit, e);
+            logger.error("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error", host, port,
+                    path, skipLineNum, limit, e);
             return "Roll view log error: " + e.getMessage();
         }
     }
@@ -107,7 +110,8 @@ public class LogClient implements AutoCloseable {
                 Command command = request.convert2Command();
                 Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
                 if (response != null) {
-                    ViewLogResponseCommand viewLog = JSONUtils.parseObject(response.getBody(), ViewLogResponseCommand.class);
+                    ViewLogResponseCommand viewLog =
+                            JSONUtils.parseObject(response.getBody(), ViewLogResponseCommand.class);
                     return viewLog.getMsg();
                 }
                 return "View log response is null";
@@ -134,7 +138,8 @@ public class LogClient implements AutoCloseable {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                GetLogBytesResponseCommand getLog = JSONUtils.parseObject(response.getBody(), GetLogBytesResponseCommand.class);
+                GetLogBytesResponseCommand getLog =
+                        JSONUtils.parseObject(response.getBody(), GetLogBytesResponseCommand.class);
                 return getLog.getData() == null ? ByteUtils.EMPTY_BYTE_ARRAY : getLog.getData();
             }
             return ByteUtils.EMPTY_BYTE_ARRAY;
@@ -160,7 +165,8 @@ public class LogClient implements AutoCloseable {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
+                RemoveTaskLogResponseCommand taskLogResponse =
+                        JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }
             return false;
@@ -170,7 +176,8 @@ public class LogClient implements AutoCloseable {
         }
     }
 
-    public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
+    public @Nullable List<String> getAppIds(@NonNull String host, int port,
+                                            @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
         logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}", host, port, taskLogFilePath);
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
@@ -180,7 +187,8 @@ public class LogClient implements AutoCloseable {
             final Command command = new GetAppIdRequestCommand(taskLogFilePath).convert2Command();
             Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                GetAppIdResponseCommand responseCommand = JSONUtils.parseObject(response.getBody(), GetAppIdResponseCommand.class);
+                GetAppIdResponseCommand responseCommand =
+                        JSONUtils.parseObject(response.getBody(), GetAppIdResponseCommand.class);
                 appIds = responseCommand.getAppIds();
             }
         }

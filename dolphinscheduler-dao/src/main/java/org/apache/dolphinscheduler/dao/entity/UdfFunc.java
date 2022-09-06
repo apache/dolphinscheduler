@@ -35,6 +35,7 @@ import java.util.Date;
  */
 @TableName("t_ds_udfs")
 public class UdfFunc {
+
     /**
      * id
      */
@@ -199,7 +200,6 @@ public class UdfFunc {
         this.createTime = createTime;
     }
 
-
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -246,7 +246,7 @@ public class UdfFunc {
         return JSONUtils.toJsonString(this);
     }
 
-    public static  class UdfFuncDeserializer extends KeyDeserializer {
+    public static class UdfFuncDeserializer extends KeyDeserializer {
 
         @Override
         public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {

@@ -47,7 +47,8 @@ public class WorkflowExecutionController {
     @GetMapping("/detail/{id}")
     @ResponseStatus(HttpStatus.OK)
     public WorkflowInstanceExecuteDetailDto queryExecuteData(@PathVariable("id") int processInstanceId) {
-        Optional<WorkflowInstanceExecuteDetailDto> workflowExecuteDtoOptional = executingService.queryWorkflowExecutingData(processInstanceId);
+        Optional<WorkflowInstanceExecuteDetailDto> workflowExecuteDtoOptional =
+                executingService.queryWorkflowExecutingData(processInstanceId);
         return workflowExecuteDtoOptional.orElse(null);
     }
 

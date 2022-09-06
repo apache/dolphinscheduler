@@ -106,7 +106,6 @@ public class TaskExecutionContext implements Serializable {
      */
     private int processInstanceId;
 
-
     /**
      * process instance schedule time
      */
@@ -117,18 +116,15 @@ public class TaskExecutionContext implements Serializable {
      */
     private String globalParams;
 
-
     /**
      * execute user id
      */
     private int executorId;
 
-
     /**
      * command type if complement
      */
     private int cmdTypeIfComplement;
-
 
     /**
      * tenant code
@@ -139,7 +135,6 @@ public class TaskExecutionContext implements Serializable {
      * task queue
      */
     private String queue;
-
 
     /**
      * process define id

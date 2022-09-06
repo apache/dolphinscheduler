@@ -30,15 +30,14 @@ import org.slf4j.Marker;
 
 import java.util.Map;
 
-
 public class TaskLogFilterTest {
 
     @Test
     public void decide() {
         TaskLogFilter taskLogFilter = new TaskLogFilter();
 
-
         FilterReply filterReply = taskLogFilter.decide(new ILoggingEvent() {
+
             @Override
             public String getThreadName() {
                 return TaskConstants.TASK_APPID_LOG_FORMAT;

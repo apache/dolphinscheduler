@@ -40,6 +40,7 @@ import com.google.common.base.Strings;
  * Metadata related common classes
  */
 public class SchemaUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
     private SchemaUtils() {
@@ -97,7 +98,8 @@ public class SchemaUtils {
             }
         }
 
-        // If the version and schema version is the same from 0 up to the arrlength-1 element,whoever has a larger arrLength has a larger version number
+        // If the version and schema version is the same from 0 up to the arrlength-1 element,whoever has a larger
+        // arrLength has a larger version number
         return schemaVersionArr.length > versionArr.length;
     }
 
@@ -114,7 +116,8 @@ public class SchemaUtils {
             softVersion = Strings.nullToEmpty(softVersion).replaceAll("\\s+|\r|\n", "");
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);
-            throw new RuntimeException("Failed to get the product version description file. The file could not be found", e);
+            throw new RuntimeException(
+                    "Failed to get the product version description file. The file could not be found", e);
         }
         return softVersion;
     }

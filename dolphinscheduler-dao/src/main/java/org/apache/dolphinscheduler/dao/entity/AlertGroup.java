@@ -26,6 +26,7 @@ import java.util.Date;
 
 @TableName("t_ds_alertgroup")
 public class AlertGroup {
+
     /**
      * primary key
      */
@@ -138,13 +139,15 @@ public class AlertGroup {
         if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
             return false;
         }
-        if (alertInstanceIds != null ? !alertInstanceIds.equals(that.alertInstanceIds) : that.alertInstanceIds != null) {
+        if (alertInstanceIds != null ? !alertInstanceIds.equals(that.alertInstanceIds)
+                : that.alertInstanceIds != null) {
             return false;
         }
         if (description != null ? !description.equals(that.description) : that.description != null) {
             return false;
         }
-        return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) && !(updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null);
+        return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null)
+                && !(updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null);
 
     }
 
@@ -163,12 +166,12 @@ public class AlertGroup {
     @Override
     public String toString() {
         return "AlertGroup{"
-            + "id=" + id
-            + "createUserId=" + createUserId
-            + ", groupName='" + groupName + '\''
-            + ", description='" + description + '\''
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + '}';
+                + "id=" + id
+                + "createUserId=" + createUserId
+                + ", groupName='" + groupName + '\''
+                + ", description='" + description + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }

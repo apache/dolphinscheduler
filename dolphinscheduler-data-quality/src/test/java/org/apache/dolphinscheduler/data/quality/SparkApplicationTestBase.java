@@ -34,12 +34,12 @@ public class SparkApplicationTestBase {
 
     @Before
     public void init() {
-        Map<String,Object> config = new HashMap<>();
-        config.put("spark.app.name","data quality test");
-        config.put("spark.sql.crossJoin.enabled","true");
-        config.put("spark.driver.bindAddress","127.0.0.1");
-        config.put("spark.ui.port",13000);
-        config.put("spark.master","local[4]");
+        Map<String, Object> config = new HashMap<>();
+        config.put("spark.app.name", "data quality test");
+        config.put("spark.sql.crossJoin.enabled", "true");
+        config.put("spark.driver.bindAddress", "127.0.0.1");
+        config.put("spark.ui.port", 13000);
+        config.put("spark.master", "local[4]");
 
         sparkRuntimeEnvironment = new SparkRuntimeEnvironment(new Config(config));
     }

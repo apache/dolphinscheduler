@@ -83,7 +83,8 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
     @PostConstruct
     public void init() {
         this.retryConsumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils
-                .newDaemonFixedThreadExecutor("TaskDispatchFailedQueueConsumerThread", masterConfig.getDispatchTaskNumber());
+                .newDaemonFixedThreadExecutor("TaskDispatchFailedQueueConsumerThread",
+                        masterConfig.getDispatchTaskNumber());
         super.start();
     }
 
@@ -105,13 +106,15 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
     private void dispatchFailedBackToTaskPriorityQueue(int fetchTaskNum) {
         for (int i = 0; i < fetchTaskNum; i++) {
             try {
-                TaskPriority dispatchFailedTaskPriority = taskDispatchFailedQueueImpl.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+                TaskPriority dispatchFailedTaskPriority =
+                        taskDispatchFailedQueueImpl.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
                 if (Objects.isNull(dispatchFailedTaskPriority)) {
                     continue;
                 }
                 retryConsumerThreadPoolExecutor.submit(() -> {
                     if (canRetry(dispatchFailedTaskPriority)) {
-                        dispatchFailedTaskPriority.setDispatchFailedRetryTimes(dispatchFailedTaskPriority.getDispatchFailedRetryTimes() + 1);
+                        dispatchFailedTaskPriority.setDispatchFailedRetryTimes(
+                                dispatchFailedTaskPriority.getDispatchFailedRetryTimes() + 1);
                         taskPriorityQueueImpl.put(dispatchFailedTaskPriority);
                     } else {
                         taskDispatchFailedQueueImpl.put(dispatchFailedTaskPriority);
@@ -131,11 +134,11 @@ public class TaskDispatchFailedQueueConsumer extends BaseDaemonThread {
     /**
      * the time interval is adjusted according to the number of retries
      */
-    private boolean canRetry (TaskPriority taskPriority){
+    private boolean canRetry(TaskPriority taskPriority) {
         int dispatchFailedRetryTimes = taskPriority.getDispatchFailedRetryTimes();
         long now = System.currentTimeMillis();
         // retry more than 100 times with 100 seconds delay each time
-        if (dispatchFailedRetryTimes >= Constants.DEFAULT_MAX_RETRY_COUNT){
+        if (dispatchFailedRetryTimes >= Constants.DEFAULT_MAX_RETRY_COUNT) {
             return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[Constants.DEFAULT_MAX_RETRY_COUNT - 1];
         }
         return now - taskPriority.getLastDispatchTime() >= TIME_DELAY[dispatchFailedRetryTimes];

@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 public interface Authenticator {
+
     /**
      * Verifying legality via username and password
      * @param username user name

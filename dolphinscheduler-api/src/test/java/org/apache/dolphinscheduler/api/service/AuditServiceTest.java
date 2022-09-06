@@ -67,8 +67,9 @@ public class AuditServiceTest {
         page.setTotal(1L);
         when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(),
                 Mockito.eq(""), eq(start), eq(end)))
-                .thenReturn(page);
-        Result result = auditService.queryLogListPaging(new User(), null, null, "2020-11-01 00:00:00", "2020-11-02 00:00:00", "", 1, 10);
+                        .thenReturn(page);
+        Result result = auditService.queryLogListPaging(new User(), null, null, "2020-11-01 00:00:00",
+                "2020-11-02 00:00:00", "", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }

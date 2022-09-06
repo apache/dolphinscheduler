@@ -90,13 +90,13 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "createUser", notes = "CREATE_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
-        @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
-        @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
-        @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
-        @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
+            @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -110,7 +110,8 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
-        Map<String, Object> result = usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone, queue, state);
+        Map<String, Object> result =
+                usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone, queue, state);
         return returnDataList(result);
     }
 
@@ -125,9 +126,9 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "queryUserList", notes = "QUERY_USER_LIST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -147,7 +148,6 @@ public class UsersController extends BaseController {
         return result;
     }
 
-
     /**
      * update user
      *
@@ -163,14 +163,14 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "updateUser", notes = "UPDATE_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
-        @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
-        @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
-        @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
-        @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "id", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
+            @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -186,7 +186,8 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state,
                              @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
-        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue, state, timeZone);
+        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId,
+                phone, queue, state, timeZone);
         return returnDataList(result);
     }
 
@@ -199,7 +200,7 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "delUserById", notes = "DELETE_USER_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "USER_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -221,8 +222,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "grantProject", notes = "GRANT_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS", required = true, type = "String")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS", required = true, type = "String")
     })
     @PostMapping(value = "/grant-project")
     @ResponseStatus(HttpStatus.OK)
@@ -245,16 +246,16 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "grantProjectByCode", notes = "GRANT_PROJECT_BY_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long")
     })
     @PostMapping(value = "/grant-project-by-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GRANT_PROJECT_ERROR)
     @AccessLogAnnotation
     public Result grantProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "userId") int userId,
-            @RequestParam(value = "projectCode") long projectCode) {
+                                     @RequestParam(value = "userId") int userId,
+                                     @RequestParam(value = "projectCode") long projectCode) {
         Map<String, Object> result = this.usersService.grantProjectByCode(loginUser, userId, projectCode);
         return this.returnDataList(result);
     }
@@ -269,16 +270,16 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "revokeProject", notes = "REVOKE_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long", example = "100")
     })
     @PostMapping(value = "/revoke-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(REVOKE_PROJECT_ERROR)
     @AccessLogAnnotation
     public Result revokeProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "userId") int userId,
-            @RequestParam(value = "projectCode") long projectCode) {
+                                @RequestParam(value = "userId") int userId,
+                                @RequestParam(value = "projectCode") long projectCode) {
         Map<String, Object> result = this.usersService.revokeProject(loginUser, userId, projectCode);
         return returnDataList(result);
     }
@@ -293,8 +294,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "grantResource", notes = "GRANT_RESOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "resourceIds", value = "RESOURCE_IDS", required = true, type = "String")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "resourceIds", value = "RESOURCE_IDS", required = true, type = "String")
     })
     @PostMapping(value = "/grant-file")
     @ResponseStatus(HttpStatus.OK)
@@ -307,7 +308,6 @@ public class UsersController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * grant udf function
      *
@@ -318,8 +318,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "grantUDFFunc", notes = "GRANT_UDF_FUNC_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "udfIds", value = "UDF_IDS", required = true, type = "String")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "udfIds", value = "UDF_IDS", required = true, type = "String")
     })
     @PostMapping(value = "/grant-udf-func")
     @ResponseStatus(HttpStatus.OK)
@@ -332,7 +332,6 @@ public class UsersController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * grant namespace
      *
@@ -343,8 +342,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "grantNamespace", notes = "GRANT_NAMESPACE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "namespaceIds", value = "NAMESPACE_IDS", required = true, type = "String")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "namespaceIds", value = "NAMESPACE_IDS", required = true, type = "String")
     })
     @PostMapping(value = "/grant-namespace")
     @ResponseStatus(HttpStatus.OK)
@@ -357,7 +356,6 @@ public class UsersController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * grant datasource
      *
@@ -368,8 +366,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "grantDataSource", notes = "GRANT_DATASOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "datasourceIds", value = "DATASOURCE_IDS", required = true, type = "String")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "datasourceIds", value = "DATASOURCE_IDS", required = true, type = "String")
     })
     @PostMapping(value = "/grant-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -381,7 +379,6 @@ public class UsersController extends BaseController {
         Map<String, Object> result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         return returnDataList(result);
     }
-
 
     /**
      * get user info
@@ -415,7 +412,6 @@ public class UsersController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * user list no paging
      *
@@ -431,7 +427,6 @@ public class UsersController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * verify username
      *
@@ -441,18 +436,16 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "verifyUserName", notes = "VERIFY_USER_NAME_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String")
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String")
     })
     @GetMapping(value = "/verify-user-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_USERNAME_ERROR)
     @AccessLogAnnotation
     public Result verifyUserName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                 @RequestParam(value = "userName") String userName
-    ) {
+                                 @RequestParam(value = "userName") String userName) {
         return usersService.verifyUserName(userName);
     }
-
 
     /**
      * unauthorized user
@@ -463,7 +456,7 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "unauthorizedUser", notes = "UNAUTHORIZED_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "alertgroupId", value = "ALERT_GROUP_ID", required = true, type = "String")
+            @ApiImplicitParam(name = "alertgroupId", value = "ALERT_GROUP_ID", required = true, type = "String")
     })
     @GetMapping(value = "/unauth-user")
     @ResponseStatus(HttpStatus.OK)
@@ -475,7 +468,6 @@ public class UsersController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * authorized user
      *
@@ -485,7 +477,7 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "authorizedUser", notes = "AUTHORIZED_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "alertgroupId", value = "ALERT_GROUP_ID", required = true, type = "String")
+            @ApiImplicitParam(name = "alertgroupId", value = "ALERT_GROUP_ID", required = true, type = "String")
     })
     @GetMapping(value = "/authed-user")
     @ResponseStatus(HttpStatus.OK)
@@ -512,10 +504,10 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "registerUser", notes = "REGISTER_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
-        @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
-        @ApiImplicitParam(name = "repeatPassword", value = "REPEAT_PASSWORD", required = true, type = "String"),
-        @ApiImplicitParam(name = "email", value = "EMAIL", required = true, type = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
+            @ApiImplicitParam(name = "repeatPassword", value = "REPEAT_PASSWORD", required = true, type = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", required = true, type = "String"),
     })
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.OK)
@@ -540,7 +532,7 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "activateUser", notes = "ACTIVATE_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
     })
     @PostMapping("/activate")
     @ResponseStatus(HttpStatus.OK)
@@ -560,7 +552,7 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "batchActivateUser", notes = "BATCH_ACTIVATE_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userNames", value = "USER_NAMES", required = true, type = "String"),
+            @ApiImplicitParam(name = "userNames", value = "USER_NAMES", required = true, type = "String"),
     })
     @PostMapping("/batch/activate")
     @ResponseStatus(HttpStatus.OK)
@@ -568,7 +560,8 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result<Object> batchActivateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestBody List<String> userNames) {
-        List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
+        List<String> formatUserNames =
+                userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
     }

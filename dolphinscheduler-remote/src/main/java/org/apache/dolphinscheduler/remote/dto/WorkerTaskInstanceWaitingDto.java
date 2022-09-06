@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkerTaskInstanceWaitingDto {
+
     private int taskInstanceId;
     private String taskInstanceName;
     private long WaitingTime;

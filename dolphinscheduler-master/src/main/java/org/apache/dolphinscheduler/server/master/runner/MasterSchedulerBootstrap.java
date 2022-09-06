@@ -119,7 +119,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
      */
     public void init() {
         this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils
-            .newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
+                .newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
     }
 
@@ -175,19 +175,19 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                         LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
                         if (processInstanceExecCacheManager.contains(processInstance.getId())) {
                             logger.error(
-                                "The workflow instance is already been cached, this case shouldn't be happened");
+                                    "The workflow instance is already been cached, this case shouldn't be happened");
                         }
                         WorkflowExecuteRunnable workflowRunnable = new WorkflowExecuteRunnable(processInstance,
-                            processService,
-                            processInstanceDao,
-                            nettyExecutorManager,
-                            processAlertManager,
-                            masterConfig,
-                            stateWheelExecuteThread,
-                            curingGlobalParamsService);
+                                processService,
+                                processInstanceDao,
+                                nettyExecutorManager,
+                                processAlertManager,
+                                masterConfig,
+                                stateWheelExecuteThread,
+                                curingGlobalParamsService);
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
-                            processInstance.getId()));
+                                processInstance.getId()));
                     } finally {
                         LoggerUtils.removeWorkflowInstanceIdMDC();
                     }
@@ -206,7 +206,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     private List<ProcessInstance> command2ProcessInstance(List<Command> commands) throws InterruptedException {
         long commandTransformStartTime = System.currentTimeMillis();
-        logger.info("Master schedule bootstrap transforming command to ProcessInstance, commandSize: {}", commands.size());
+        logger.info("Master schedule bootstrap transforming command to ProcessInstance, commandSize: {}",
+                commands.size());
         List<ProcessInstance> processInstances = Collections.synchronizedList(new ArrayList<>(commands.size()));
         CountDownLatch latch = new CountDownLatch(commands.size());
         for (final Command command : commands) {
@@ -216,13 +217,15 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     // slot check again
                     SlotCheckState slotCheckState = slotCheck(command);
                     if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
-                        logger.info("Master handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
+                        logger.info("Master handle command {} skip, slot check state: {}", command.getId(),
+                                slotCheckState);
                         return;
                     }
                     ProcessInstance processInstance = processService.handleCommand(masterAddress, command);
                     if (processInstance != null) {
                         processInstances.add(processInstance);
-                        logger.info("Master handle command {} end, create process instance {}", command.getId(), processInstance.getId());
+                        logger.info("Master handle command {} end, create process instance {}", command.getId(),
+                                processInstance.getId());
                         sendRpcCommand(processInstance);
                     }
                 } catch (Exception e) {
@@ -237,10 +240,10 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
         // make sure to finish handling command each time before next scan
         latch.await();
         logger.info(
-            "Master schedule bootstrap transformed command to ProcessInstance, commandSize: {}, processInstanceSize: {}",
-            commands.size(), processInstances.size());
+                "Master schedule bootstrap transformed command to ProcessInstance, commandSize: {}, processInstanceSize: {}",
+                commands.size(), processInstances.size());
         ProcessInstanceMetrics
-            .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
+                .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return processInstances;
     }
 
@@ -248,14 +251,16 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
         if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances =
-                processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
-                    processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion(), new int[] {ExecutionStatus.READY_STOP.getCode()},
-                    processInstance.getId());
+                    processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
+                            processInstance.getProcessDefinitionCode(),
+                            processInstance.getProcessDefinitionVersion(),
+                            new int[]{ExecutionStatus.READY_STOP.getCode()},
+                            processInstance.getId());
             for (ProcessInstance runningProcessInstance : runningProcessInstances) {
                 StateEventChangeCommand workflowStateEventChangeCommand =
-                    new StateEventChangeCommand(
-                        runningProcessInstance.getId(), 0, runningProcessInstance.getState(), runningProcessInstance.getId(), 0);
+                        new StateEventChangeCommand(
+                                runningProcessInstance.getId(), 0, runningProcessInstance.getState(),
+                                runningProcessInstance.getId(), 0);
                 Host host = new Host(runningProcessInstance.getHost());
                 stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
             }
@@ -274,11 +279,11 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
             int pageNumber = 0;
             int pageSize = masterConfig.getFetchCommandNum();
             final List<Command> result =
-                processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+                    processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
             if (CollectionUtils.isNotEmpty(result)) {
                 logger.info(
-                    "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
-                    result.size(), thisMasterSlot, masterCount);
+                        "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
+                        result.size(), thisMasterSlot, masterCount);
             }
             ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
             return result;

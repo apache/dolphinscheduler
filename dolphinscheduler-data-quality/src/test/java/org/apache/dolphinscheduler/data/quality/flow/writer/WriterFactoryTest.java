@@ -44,11 +44,11 @@ public class WriterFactoryTest {
 
         int flag = 0;
 
-        List<BatchWriter> writers = WriterFactory.getInstance().getWriters(null,writerConfigs);
+        List<BatchWriter> writers = WriterFactory.getInstance().getWriters(null, writerConfigs);
         if (writers != null && writers.size() >= 1) {
             flag = 1;
         }
 
-        Assert.assertEquals(1,flag);
+        Assert.assertEquals(1, flag);
     }
 }

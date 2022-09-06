@@ -46,8 +46,7 @@ public final class TaskMetrics {
                     Counter.builder("dolphinscheduler_task_execute_count")
                             .tag("task_type", taskChannelFactory.getName())
                             .description("task execute counter")
-                            .register(Metrics.globalRegistry)
-            );
+                            .register(Metrics.globalRegistry));
         }
     }
 

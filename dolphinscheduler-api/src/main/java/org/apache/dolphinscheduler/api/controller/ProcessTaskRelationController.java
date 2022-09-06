@@ -73,10 +73,10 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "save", notes = "CREATE_PROCESS_TASK_RELATION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "preTaskCode", value = "PRE_TASK_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "postTaskCode", value = "POST_TASK_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "preTaskCode", value = "PRE_TASK_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "postTaskCode", value = "POST_TASK_CODE", required = true, type = "Long")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -93,7 +93,8 @@ public class ProcessTaskRelationController extends BaseController {
         } else if (processDefinitionCode == 0L) {
             putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
         } else {
-            result = processTaskRelationService.createProcessTaskRelation(loginUser, projectCode, processDefinitionCode, preTaskCode, postTaskCode);
+            result = processTaskRelationService.createProcessTaskRelation(loginUser, projectCode, processDefinitionCode,
+                    preTaskCode, postTaskCode);
         }
         return returnDataList(result);
     }
@@ -109,9 +110,9 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "deleteRelation", notes = "DELETE_PROCESS_TASK_RELATION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
     @DeleteMapping(value = "/{taskCode}")
     @ResponseStatus(HttpStatus.OK)
@@ -121,7 +122,8 @@ public class ProcessTaskRelationController extends BaseController {
                                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
                                             @PathVariable("taskCode") long taskCode) {
-        return returnDataList(processTaskRelationService.deleteTaskProcessRelation(loginUser, projectCode, processDefinitionCode, taskCode));
+        return returnDataList(processTaskRelationService.deleteTaskProcessRelation(loginUser, projectCode,
+                processDefinitionCode, taskCode));
     }
 
     /**
@@ -135,9 +137,9 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "deleteUpstreamRelation", notes = "DELETE_UPSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "preTaskCodes", value = "PRE_TASK_CODES", required = true, type = "String", example = "1,2"),
-        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "preTaskCodes", value = "PRE_TASK_CODES", required = true, type = "String", example = "1,2"),
+            @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
     @DeleteMapping(value = "/{taskCode}/upstream")
     @ResponseStatus(HttpStatus.OK)
@@ -147,7 +149,8 @@ public class ProcessTaskRelationController extends BaseController {
                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @RequestParam(name = "preTaskCodes", required = true) String preTaskCodes,
                                          @PathVariable("taskCode") long taskCode) {
-        return returnDataList(processTaskRelationService.deleteUpstreamRelation(loginUser, projectCode, preTaskCodes, taskCode));
+        return returnDataList(
+                processTaskRelationService.deleteUpstreamRelation(loginUser, projectCode, preTaskCodes, taskCode));
     }
 
     /**
@@ -161,9 +164,9 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "deleteDownstreamRelation", notes = "DELETE_DOWNSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "postTaskCodes", value = "POST_TASK_CODES", required = true, type = "String", example = "1,2"),
-        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "postTaskCodes", value = "POST_TASK_CODES", required = true, type = "String", example = "1,2"),
+            @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
     @DeleteMapping(value = "/{taskCode}/downstream")
     @ResponseStatus(HttpStatus.OK)
@@ -173,7 +176,8 @@ public class ProcessTaskRelationController extends BaseController {
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @RequestParam(name = "postTaskCodes", required = true) String postTaskCodes,
                                            @PathVariable("taskCode") long taskCode) {
-        return returnDataList(processTaskRelationService.deleteDownstreamRelation(loginUser, projectCode, postTaskCodes, taskCode));
+        return returnDataList(
+                processTaskRelationService.deleteDownstreamRelation(loginUser, projectCode, postTaskCodes, taskCode));
     }
 
     /**
@@ -186,8 +190,8 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "queryUpstreamRelation", notes = "QUERY_UPSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
     @GetMapping(value = "/{taskCode}/upstream")
     @ResponseStatus(HttpStatus.OK)
@@ -209,8 +213,8 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "queryDownstreamRelation", notes = "QUERY_DOWNSTREAM_RELATION_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, type = "Long")
     })
     @GetMapping(value = "/{taskCode}/downstream")
     @ResponseStatus(HttpStatus.OK)
@@ -234,22 +238,22 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @ApiOperation(value = "deleteEdge", notes = "DELETE_EDGE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "preTaskCode", value = "PRE_TASK_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "postTaskCode", value = "POST_TASK_CODE", required = true, type = "Long")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "preTaskCode", value = "PRE_TASK_CODE", required = true, type = "Long"),
+            @ApiImplicitParam(name = "postTaskCode", value = "POST_TASK_CODE", required = true, type = "Long")
     })
     @DeleteMapping(value = "/{processDefinitionCode}/{preTaskCode}/{postTaskCode}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_EDGE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteEdge(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true)
-                             @PathVariable long projectCode,
+                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                              @PathVariable long processDefinitionCode,
                              @PathVariable long preTaskCode,
                              @PathVariable long postTaskCode) {
-        return returnDataList(processTaskRelationService.deleteEdge(loginUser, projectCode, processDefinitionCode, preTaskCode, postTaskCode));
+        return returnDataList(processTaskRelationService.deleteEdge(loginUser, projectCode, processDefinitionCode,
+                preTaskCode, postTaskCode));
     }
 
 }

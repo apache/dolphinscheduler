@@ -59,7 +59,6 @@ public class QueueController extends BaseController {
     @Autowired
     private QueueService queueService;
 
-
     /**
      * query queue list
      *
@@ -87,9 +86,9 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "queryQueueListPaging", notes = "QUERY_QUEUE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -119,8 +118,8 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "createQueue", notes = "CREATE_QUEUE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -144,9 +143,9 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "updateQueue", notes = "UPDATE_QUEUE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -170,8 +169,8 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "verifyQueue", notes = "VERIFY_QUEUE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
@@ -179,8 +178,7 @@ public class QueueController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName
-    ) {
+                              @RequestParam(value = "queueName") String queueName) {
 
         return queueService.verifyQueue(queue, queueName);
     }

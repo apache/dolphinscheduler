@@ -39,6 +39,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * job params related class
  */
 public abstract class AbstractParameters implements IParameters {
+
     @Override
     public abstract boolean checkParameters();
 
@@ -78,7 +79,7 @@ public abstract class AbstractParameters implements IParameters {
         Map<String, Property> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
             for (Property property : localParams) {
-                localParametersMaps.put(property.getProp(),property);
+                localParametersMaps.put(property.getProp(), property);
             }
         }
         return localParametersMaps;

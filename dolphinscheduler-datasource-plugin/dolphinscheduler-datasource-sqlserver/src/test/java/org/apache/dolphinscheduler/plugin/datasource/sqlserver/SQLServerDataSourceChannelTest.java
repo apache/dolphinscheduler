@@ -38,7 +38,8 @@ public class SQLServerDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         SQLServerDataSourceChannel sourceChannel = PowerMockito.mock(SQLServerDataSourceChannel.class);
         SQLServerDataSourceClient dataSourceClient = PowerMockito.mock(SQLServerDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new SQLServerConnectionParam(), DbType.SQLSERVER));
     }
 }

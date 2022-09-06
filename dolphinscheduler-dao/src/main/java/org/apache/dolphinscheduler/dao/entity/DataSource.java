@@ -27,6 +27,7 @@ import java.util.Date;
 
 @TableName("t_ds_datasource")
 public class DataSource {
+
     /**
      * id
      */

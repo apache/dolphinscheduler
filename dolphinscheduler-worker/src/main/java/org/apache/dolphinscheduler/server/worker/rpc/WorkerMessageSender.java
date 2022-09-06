@@ -54,7 +54,7 @@ public class WorkerMessageSender {
     public void init() {
         Map<String, MessageSender> messageSenders = applicationContext.getBeansOfType(MessageSender.class);
         messageSenders.values().forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
-                                                                              messageSender));
+                messageSender));
     }
 
     // todo: use message rather than context

@@ -43,7 +43,7 @@ public class DataQualityParameters extends AbstractParameters {
     /**
      * rule input entry value map
      */
-    private Map<String,String> ruleInputParameter;
+    private Map<String, String> ruleInputParameter;
     /**
      * spark parameters
      */

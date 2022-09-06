@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PostgreSQLUpgradeDao extends UpgradeDao {
+
     public static final Logger logger = LoggerFactory.getLogger(PostgreSQLUpgradeDao.class);
 
     private PostgreSQLUpgradeDao(DataSource dataSource) {
@@ -70,7 +71,6 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
         }
         return "";
     }
-
 
     /**
      * determines whether a table exists

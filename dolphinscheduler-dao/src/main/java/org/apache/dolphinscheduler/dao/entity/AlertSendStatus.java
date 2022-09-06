@@ -29,6 +29,7 @@ import java.util.StringJoiner;
 
 @TableName("t_ds_alert_send_status")
 public class AlertSendStatus {
+
     /**
      * primary key
      */
@@ -133,12 +134,12 @@ public class AlertSendStatus {
     @Override
     public String toString() {
         return new StringJoiner(", ", AlertSendStatus.class.getSimpleName() + "[", "]")
-            .add("id=" + id)
-            .add("alertId=" + alertId)
-            .add("alertPluginInstanceId=" + alertPluginInstanceId)
-            .add("sendStatus=" + sendStatus)
-            .add("log='" + log + "'")
-            .add("createTime=" + createTime)
-            .toString();
+                .add("id=" + id)
+                .add("alertId=" + alertId)
+                .add("alertPluginInstanceId=" + alertPluginInstanceId)
+                .add("sendStatus=" + sendStatus)
+                .add("log='" + log + "'")
+                .add("createTime=" + createTime)
+                .toString();
     }
 }

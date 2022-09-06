@@ -34,7 +34,8 @@ public class DqRuleUtils {
 
     public static List<DqRuleInputEntry> transformInputEntry(List<DqRuleInputEntry> ruleInputEntryList) {
         for (DqRuleInputEntry dqRuleInputEntry : ruleInputEntryList) {
-            Map<String,Object> valuesMap = JSONUtils.toMap(dqRuleInputEntry.getValuesMap(),String.class,Object.class);
+            Map<String, Object> valuesMap =
+                    JSONUtils.toMap(dqRuleInputEntry.getValuesMap(), String.class, Object.class);
             if (valuesMap != null) {
 
                 if (valuesMap.get(dqRuleInputEntry.getField()) != null) {

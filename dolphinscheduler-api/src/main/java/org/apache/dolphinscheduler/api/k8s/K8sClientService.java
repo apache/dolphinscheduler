@@ -62,7 +62,7 @@ public class K8sClientService {
 
         KubernetesClient client = k8sManager.getK8sClient(k8sNamespace.getK8s());
 
-        //创建资源
+        // 创建资源
         ResourceQuota queryExist = client.resourceQuotas()
                 .inNamespace(k8sNamespace.getNamespace())
                 .withName(k8sNamespace.getNamespace())
@@ -90,8 +90,7 @@ public class K8sClientService {
 
         Optional<Namespace> list =
                 listNamespace.getItems().stream()
-                        .filter((Namespace namespace) ->
-                                namespace.getMetadata().getName().equals(name))
+                        .filter((Namespace namespace) -> namespace.getMetadata().getName().equals(name))
                         .findFirst();
 
         return list;
@@ -99,7 +98,7 @@ public class K8sClientService {
 
     private Namespace upsertNamespaceToK8s(String name, String k8s) {
         Optional<Namespace> result = getNamespaceFromK8s(name, k8s);
-        //if not exist create
+        // if not exist create
         if (!result.isPresent()) {
             KubernetesClient client = k8sManager.getK8sClient(k8s);
             Namespace body = new Namespace();

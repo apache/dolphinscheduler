@@ -39,18 +39,20 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AlertRequestProcessorTest {
+
     @InjectMocks
     private AlertRequestProcessor alertRequestProcessor;
 
     @Mock
     private AlertSenderService alertSenderService;
 
-
     @Test
     public void testProcess() {
-        Mockito.when(alertSenderService.syncHandler(1, "title", "content", WarningType.FAILURE.getCode())).thenReturn(new AlertSendResponseCommand());
+        Mockito.when(alertSenderService.syncHandler(1, "title", "content", WarningType.FAILURE.getCode()))
+                .thenReturn(new AlertSendResponseCommand());
         Channel channel = mock(Channel.class);
-        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1, "title", "content", WarningType.FAILURE.getCode());
+        AlertSendRequestCommand alertSendRequestCommand =
+                new AlertSendRequestCommand(1, "title", "content", WarningType.FAILURE.getCode());
         Command reqCommand = alertSendRequestCommand.convert2Command();
         Assert.assertEquals(CommandType.ALERT_SEND_REQUEST, reqCommand.getType());
         alertRequestProcessor.process(channel, reqCommand);

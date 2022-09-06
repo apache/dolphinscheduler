@@ -39,6 +39,7 @@ public class WorkerHeartBeat implements HeartBeat {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class WorkerConfigProperty {
+
         private String databaseUrl;
         private int execThreads;
         private long heartbeatInterval;
@@ -60,6 +61,7 @@ public class WorkerHeartBeat implements HeartBeat {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class WorkerMetricsProperty {
+
         private int workerSyncRunningTaskNum;
         private long workerSyncWaitingTaskNum;
         private int workerAsyncRunningTaskNum;

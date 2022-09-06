@@ -26,6 +26,7 @@ import java.util.Date;
 
 @TableName("t_ds_relation_project_user")
 public class ProjectUser {
+
     /**
      * id
      */
@@ -142,15 +143,15 @@ public class ProjectUser {
     @Override
     public String toString() {
         return "ProjectUser{"
-               + "id=" + id
-               + ", userId=" + userId
-               + ", projectId=" + projectId
-               + ", projectCode=" + projectCode
-               + ", projectName='" + projectName + '\''
-               + ", userName='" + userName + '\''
-               + ", perm=" + perm
-               + ", createTime=" + createTime
-               + ", updateTime=" + updateTime
-               + '}';
+                + "id=" + id
+                + ", userId=" + userId
+                + ", projectId=" + projectId
+                + ", projectCode=" + projectCode
+                + ", projectName='" + projectName + '\''
+                + ", userName='" + userName + '\''
+                + ", perm=" + perm
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }

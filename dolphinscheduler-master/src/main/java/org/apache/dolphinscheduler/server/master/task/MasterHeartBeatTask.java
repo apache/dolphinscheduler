@@ -99,7 +99,8 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
                 .workflowEventQueueWaitingEventNum(workflowEventQueue.getWaitingEventNum())
                 .runningWorkflowNum(processInstanceExecCacheManager.getSize())
                 .workflowExecuteThreadPoolRunningThreadNum(workflowExecuteThreadPool.getActiveCount())
-                .workflowExecuteThreadPoolWaitingJobNum(workflowExecuteThreadPool.getThreadPoolExecutor().getQueue().size())
+                .workflowExecuteThreadPoolWaitingJobNum(
+                        workflowExecuteThreadPool.getThreadPoolExecutor().getQueue().size())
                 .taskExecuteThreadPoolRunningThreadNum(taskExecuteThreadPool.getActiveCount())
                 .taskExecuteThreadPoolWaitingJobNum(taskExecuteThreadPool.getThreadPoolExecutor().getQueue().size())
                 .build();

@@ -28,6 +28,7 @@ import java.util.List;
  * http parameter
  */
 public class HttpParameters extends AbstractParameters {
+
     /**
      * url
      */

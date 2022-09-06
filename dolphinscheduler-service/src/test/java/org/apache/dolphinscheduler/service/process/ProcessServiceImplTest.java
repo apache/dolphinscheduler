@@ -16,7 +16,6 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessServiceImplTest {
 
-
     @InjectMocks
     private ProcessServiceImpl processService;
 

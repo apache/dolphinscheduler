@@ -51,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * worker group controller test
  */
 public class WorkerGroupControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
 
     @MockBean(name = "workerGroupDao")
@@ -70,10 +71,10 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         PowerMockito.when(registryClient.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","cxc_work_group");
-        paramsMap.add("addrList","192.168.0.1,192.168.0.2");
-        paramsMap.add("description","");
-        paramsMap.add("otherParamsJson","");
+        paramsMap.add("name", "cxc_work_group");
+        paramsMap.add("addrList", "192.168.0.1,192.168.0.2");
+        paramsMap.add("description", "");
+        paramsMap.add("otherParamsJson", "");
         MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -88,9 +89,9 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryAllWorkerGroupsPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","2");
-        paramsMap.add("searchVal","cxc");
-        paramsMap.add("pageSize","2");
+        paramsMap.add("pageNo", "2");
+        paramsMap.add("searchVal", "cxc");
+        paramsMap.add("pageSize", "2");
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -119,7 +120,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void queryWorkerAddressList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
-                        .header("sessionId", sessionId))
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -134,7 +135,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         workerGroup.setId(12);
         workerGroup.setName("测试");
         Mockito.when(workerGroupDao.queryById(12)).thenReturn(Optional.of(workerGroup));
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", Constants.NOT_TERMINATED_STATES)).thenReturn(null);
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", Constants.NOT_TERMINATED_STATES))
+                .thenReturn(null);
         Mockito.when(workerGroupDao.deleteById(12)).thenReturn(1);
         Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
 

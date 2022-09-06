@@ -65,7 +65,7 @@ public class AlertSendRequestCommand implements Serializable {
         this.warnType = warnType;
     }
 
-    public AlertSendRequestCommand(){
+    public AlertSendRequestCommand() {
 
     }
 

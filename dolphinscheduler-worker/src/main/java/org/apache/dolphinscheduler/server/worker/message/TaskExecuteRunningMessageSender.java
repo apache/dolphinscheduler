@@ -46,10 +46,10 @@ public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecut
 
     public TaskExecuteRunningCommand buildMessage(@NonNull TaskExecutionContext taskExecutionContext,
                                                   @NonNull String messageReceiverAddress) {
-        TaskExecuteRunningCommand taskExecuteRunningMessage
-            = new TaskExecuteRunningCommand(workerConfig.getWorkerAddress(),
-                                            messageReceiverAddress,
-                                            System.currentTimeMillis());
+        TaskExecuteRunningCommand taskExecuteRunningMessage =
+                new TaskExecuteRunningCommand(workerConfig.getWorkerAddress(),
+                        messageReceiverAddress,
+                        System.currentTimeMillis());
         taskExecuteRunningMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecuteRunningMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());

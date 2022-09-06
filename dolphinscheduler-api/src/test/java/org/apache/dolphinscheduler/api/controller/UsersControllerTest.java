@@ -42,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * users controller test
  */
 public class UsersControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
 
     @Test
@@ -114,8 +115,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/users/grant-project-by-code")
-                .header(SESSION_ID, this.sessionId)
-                .params(paramsMap))
+                        .header(SESSION_ID, this.sessionId)
+                        .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

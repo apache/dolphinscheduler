@@ -116,6 +116,7 @@ public abstract class AbstractControllerTest {
 
     @Configuration
     public static class RegistryServer {
+
         @PostConstruct
         public void startEmbedRegistryServer() throws Exception {
             final TestingServer server = new TestingServer(true);

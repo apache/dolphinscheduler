@@ -107,8 +107,7 @@ public class ConditionsTaskTest {
 
         // for ConditionsTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = Stream.of(
-                getTaskInstanceForValidTaskList(expectResult)
-        ).collect(Collectors.toList());
+                getTaskInstanceForValidTaskList(expectResult)).collect(Collectors.toList());
         Mockito.when(processService
                 .findValidTaskListByProcessId(processInstance.getId()))
                 .thenReturn(conditions);
@@ -118,17 +117,17 @@ public class ConditionsTaskTest {
     @Test
     public void testBasicSuccess() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
-        //ConditionTaskProcessor taskExecThread = new onditionsTaskExecThread(taskInstance);
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        // ConditionTaskProcessor taskExecThread = new onditionsTaskExecThread(taskInstance);
+        // taskExecThread.call();
+        // Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
     }
 
     @Test
     public void testBasicFailure() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
-        //ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
+        // ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
+        // taskExecThread.call();
+        // Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
     }
 
     private TaskNode getTaskNode() {

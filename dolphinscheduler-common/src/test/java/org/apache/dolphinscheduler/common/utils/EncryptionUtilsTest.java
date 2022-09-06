@@ -24,7 +24,6 @@ import org.junit.Test;
  */
 public class EncryptionUtilsTest {
 
-
     @Test
     public void testGetMd5() {
         Assert.assertEquals(EncryptionUtils.getMd5(null), EncryptionUtils.getMd5(""));

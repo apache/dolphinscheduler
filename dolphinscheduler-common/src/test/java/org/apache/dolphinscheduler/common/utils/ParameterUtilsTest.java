@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParameterUtilsTest {
+
     public static final Logger logger = LoggerFactory.getLogger(ParameterUtilsTest.class);
 
     /**
@@ -53,9 +54,10 @@ public class ParameterUtilsTest {
 
         // parameterString、parameterMap is not null
         String parameterString = "test_parameter";
-        Assert.assertEquals(parameterString, ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap));
+        Assert.assertEquals(parameterString,
+                ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap));
 
-        //replace variable ${} form
+        // replace variable ${} form
         parameterMap.put("testParameter2", "${testParameter}");
         Assert.assertEquals(parameterString, PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
 
@@ -71,14 +73,15 @@ public class ParameterUtilsTest {
     @Test
     public void testConvertParameterPlaceholders2() {
         String parameterString =
-            "${user} is userName, '$[1]' '$[add_months(yyyyMMdd,12*2)]' '$[add_months(yyyyMMdd,-12*2)]' '$[add_months(yyyyMMdd,3)]' '$[add_months(yyyyMMdd,-4)]' "
-                + "'$[yyyyMMdd+7*2]' '$[yyyyMMdd-7*2]'  '$[yyyyMMdd+3]'  '$[0]' '$[yyyyMMdd-3]' '$[HHmmss+2/24]' '$[HHmmss-1/24]' '$[HHmmss+3/24/60]' '$[HHmmss-2/24/60]'  '$[3]'";
+                "${user} is userName, '$[1]' '$[add_months(yyyyMMdd,12*2)]' '$[add_months(yyyyMMdd,-12*2)]' '$[add_months(yyyyMMdd,3)]' '$[add_months(yyyyMMdd,-4)]' "
+                        + "'$[yyyyMMdd+7*2]' '$[yyyyMMdd-7*2]'  '$[yyyyMMdd+3]'  '$[0]' '$[yyyyMMdd-3]' '$[HHmmss+2/24]' '$[HHmmss-1/24]' '$[HHmmss+3/24/60]' '$[HHmmss-2/24/60]'  '$[3]'";
         Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put("user", "Kris");
         parameterMap.put(Constants.PARAMETER_DATETIME, "20201201123000");
         parameterString = ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap);
-        Assert.assertEquals("Kris is userName, '$[1]' '20221201' '20181201' '20210301' '20200801' '20201215' '20201117'  '20201204'  '$[0]' '20201128' '143000' '113000' '123300' '122800'  '$[3]'",
-            parameterString);
+        Assert.assertEquals(
+                "Kris is userName, '$[1]' '20221201' '20181201' '20210301' '20200801' '20201215' '20201117'  '20201204'  '$[0]' '20201128' '143000' '113000' '123300' '122800'  '$[3]'",
+                parameterString);
     }
 
     /**

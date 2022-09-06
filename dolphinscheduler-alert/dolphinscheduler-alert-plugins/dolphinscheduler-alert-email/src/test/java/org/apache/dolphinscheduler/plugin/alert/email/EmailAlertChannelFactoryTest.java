@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class EmailAlertChannelFactoryTest {
+
     @Test
     public void testGetParams() {
         EmailAlertChannelFactory emailAlertChannelFactory = new EmailAlertChannelFactory();

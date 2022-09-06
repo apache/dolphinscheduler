@@ -57,7 +57,8 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
                 || event.getLevel().isGreaterOrEqual(level)) {
             filterReply = FilterReply.ACCEPT;
         }
-        logger.debug("task log filter, thread name:{}, loggerName:{}, filterReply:{}, level:{}", event.getThreadName(), event.getLoggerName(), filterReply.name(), level);
+        logger.debug("task log filter, thread name:{}, loggerName:{}, filterReply:{}, level:{}", event.getThreadName(),
+                event.getLoggerName(), filterReply.name(), level);
         return filterReply;
     }
 }

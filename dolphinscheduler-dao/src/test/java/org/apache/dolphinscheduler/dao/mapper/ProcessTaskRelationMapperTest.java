@@ -38,7 +38,7 @@ public class ProcessTaskRelationMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private ProcessTaskRelation insertOne() {
-        //insertOne
+        // insertOne
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
         processTaskRelation.setName("def 1");
 

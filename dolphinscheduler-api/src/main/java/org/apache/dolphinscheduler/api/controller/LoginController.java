@@ -62,7 +62,6 @@ public class LoginController extends BaseController {
     @Autowired
     private Authenticator authenticator;
 
-
     /**
      * login
      *
@@ -74,8 +73,8 @@ public class LoginController extends BaseController {
      */
     @ApiOperation(value = "login", notes = "LOGIN_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType = "String")
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType = "String")
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)
@@ -84,10 +83,10 @@ public class LoginController extends BaseController {
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
                         HttpServletResponse response) {
-        //user name check
+        // user name check
         if (StringUtils.isEmpty(userName)) {
             return error(Status.USER_NAME_NULL.getCode(),
-                Status.USER_NAME_NULL.getMsg());
+                    Status.USER_NAME_NULL.getMsg());
         }
 
         // user ip check
@@ -128,7 +127,7 @@ public class LoginController extends BaseController {
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);
         sessionService.signOut(ip, loginUser);
-        //clear session
+        // clear session
         request.removeAttribute(Constants.SESSION_USER);
         return success();
     }

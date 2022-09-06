@@ -30,7 +30,6 @@ import java.util.List;
  */
 public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
-
     /**
      * alertgroup page
      * @param page page
@@ -39,7 +38,6 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      */
     IPage<AlertGroup> queryAlertGroupPage(Page page,
                                           @Param("groupName") String groupName);
-
 
     /**
      * query by group name
@@ -87,7 +85,8 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @param alertGroupsIds
      * @return
      */
-    <T> List<AlertGroup> listAuthorizedAlertGroupList (@Param("userId") int userId, @Param("alertGroupsIds")List<Integer> alertGroupsIds);
+    <T> List<AlertGroup> listAuthorizedAlertGroupList(@Param("userId") int userId,
+                                                      @Param("alertGroupsIds") List<Integer> alertGroupsIds);
 
     /**
      * queryAlertGroupPageByIds
@@ -96,5 +95,6 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @param searchVal
      * @return
      */
-    IPage<AlertGroup> queryAlertGroupPageByIds(Page<AlertGroup> page, @Param("ids") List<Integer> ids, @Param("searchVal") String searchVal);
+    IPage<AlertGroup> queryAlertGroupPageByIds(Page<AlertGroup> page, @Param("ids") List<Integer> ids,
+                                               @Param("searchVal") String searchVal);
 }

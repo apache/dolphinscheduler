@@ -105,14 +105,16 @@ public class RegistryClient {
                     server.setResInfo(workerHeartBeat);
                     break;
                 case ALERT_SERVER:
-                    AlertServerHeartBeat alertServerHeartBeat = JSONUtils.parseObject(heartBeatJson, AlertServerHeartBeat.class);
+                    AlertServerHeartBeat alertServerHeartBeat =
+                            JSONUtils.parseObject(heartBeatJson, AlertServerHeartBeat.class);
                     server.setCreateTime(new Date(alertServerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(alertServerHeartBeat.getReportTime()));
                     server.setId(alertServerHeartBeat.getProcessId());
                     server.setResInfo(alertServerHeartBeat);
                     break;
                 case API_SERVER:
-                    ApiServerHeartBeat apiServerHeartBeat = JSONUtils.parseObject(heartBeatJson, ApiServerHeartBeat.class);
+                    ApiServerHeartBeat apiServerHeartBeat =
+                            JSONUtils.parseObject(heartBeatJson, ApiServerHeartBeat.class);
                     server.setCreateTime(new Date(apiServerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(apiServerHeartBeat.getReportTime()));
                     server.setId(apiServerHeartBeat.getProcessId());
@@ -276,8 +278,8 @@ public class RegistryClient {
         }
         return serverList
                 .stream()
-                .flatMap(group ->
-                        getChildrenKeys(path + SINGLE_SLASH + group).stream().map(it -> group + SINGLE_SLASH + it))
+                .flatMap(group -> getChildrenKeys(path + SINGLE_SLASH + group).stream()
+                        .map(it -> group + SINGLE_SLASH + it))
                 .collect(Collectors.toList());
     }
 
