@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
   NInput,
@@ -121,12 +128,9 @@ const AlarmInstanceManage = defineComponent({
                     {t('security.alarm_instance.create_alarm_instance')}
                   </NButton>
                 )}
-                <NSpace
-                  justify='end'
-                  wrap={false}
-                >
+                <NSpace justify='end' wrap={false}>
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[this.searchVal, 'value']}
                     size='small'
                     placeholder={`${t(
@@ -145,7 +149,12 @@ const AlarmInstanceManage = defineComponent({
         </Card>
         <Card title={t('menu.alarm_instance_manage')}>
           <NSpace vertical>
-            <NDataTable columns={columns} data={list} loading={loading} striped />
+            <NDataTable
+              columns={columns}
+              data={list}
+              loading={loading}
+              striped
+            />
             <NSpace justify='center'>
               <NPagination
                 page={page}

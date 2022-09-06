@@ -30,9 +30,9 @@ import type {
   ResultListRes
 } from '@/service/modules/data-quality/types'
 import { parseTime } from '@/common/common'
-import ButtonLink from "@/components/button-link";
-import { NEllipsis, NTag } from "naive-ui";
-import { useRouter } from "vue-router";
+import ButtonLink from '@/components/button-link'
+import { NEllipsis, NTag } from 'naive-ui'
+import { useRouter } from 'vue-router'
 
 export function useTable() {
   const { t } = useI18n()
@@ -76,7 +76,10 @@ export function useTable() {
               onClick: () =>
                 void router.push({
                   name: 'workflow-instance-detail',
-                  params: { projectCode: row.projectCode, id: row.processInstanceId },
+                  params: {
+                    projectCode: row.projectCode,
+                    id: row.processInstanceId
+                  },
                   query: { code: row.processDefinitionCode }
                 })
             },
@@ -117,27 +120,27 @@ export function useTable() {
         render: (row: ResultItem) => {
           if (row.state === 0) {
             return h(
-                NTag,
-                { type: 'info', size: 'small' },
-                {
-                  default: () => t('data_quality.task_result.undone')
-                }
+              NTag,
+              { type: 'info', size: 'small' },
+              {
+                default: () => t('data_quality.task_result.undone')
+              }
             )
           } else if (row.state === 1) {
             return h(
-                NTag,
-                { type: 'success', size: 'small' },
-                {
-                  default: () => t('data_quality.task_result.success')
-                }
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('data_quality.task_result.success')
+              }
             )
           } else if (row.state === 2) {
             return h(
-                NTag,
-                { type: 'error', size: 'small' },
-                {
-                  default: () => t('data_quality.task_result.failure')
-                }
+              NTag,
+              { type: 'error', size: 'small' },
+              {
+                default: () => t('data_quality.task_result.failure')
+              }
             )
           } else {
             return '-'

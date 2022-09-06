@@ -50,9 +50,9 @@ export function useTable() {
       getTableData({
         pageSize: variables.pageSize,
         pageNo:
-            variables.tableData.length === 1 && variables.page > 1
-                ? variables.page - 1
-                : variables.page,
+          variables.tableData.length === 1 && variables.page > 1
+            ? variables.page - 1
+            : variables.page,
         searchVal: variables.searchVal
       })
     })
@@ -104,61 +104,61 @@ export function useTable() {
           return h(NSpace, null, {
             default: () => [
               h(
-                  NTooltip,
-                  {},
-                  {
-                    trigger: () =>
-                        h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        onClick: () => {
+                          handleEdit(row)
+                        }
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(EditOutlined) })
+                      }
+                    ),
+                  default: () => t('security.k8s_namespace.edit')
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => {
+                    handleDelete(row)
+                  }
+                },
+                {
+                  trigger: () =>
+                    h(
+                      NTooltip,
+                      {},
+                      {
+                        trigger: () =>
+                          h(
                             NButton,
                             {
                               circle: true,
-                              type: 'info',
-                              size: 'small',
-                              onClick: () => {
-                                handleEdit(row)
-                              }
+                              type: 'error',
+                              size: 'small'
                             },
                             {
                               icon: () =>
-                                  h(NIcon, null, { default: () => h(EditOutlined) })
+                                h(NIcon, null, {
+                                  default: () => h(DeleteOutlined)
+                                })
                             }
-                        ),
-                    default: () => t('security.k8s_namespace.edit')
-                  }
-              ),
-              h(
-                  NPopconfirm,
-                  {
-                    onPositiveClick: () => {
-                      handleDelete(row)
-                    }
-                  },
-                  {
-                    trigger: () =>
-                        h(
-                            NTooltip,
-                            {},
-                            {
-                              trigger: () =>
-                                  h(
-                                      NButton,
-                                      {
-                                        circle: true,
-                                        type: 'error',
-                                        size: 'small'
-                                      },
-                                      {
-                                        icon: () =>
-                                            h(NIcon, null, {
-                                              default: () => h(DeleteOutlined)
-                                            })
-                                      }
-                                  ),
-                              default: () => t('security.k8s_namespace.delete')
-                            }
-                        ),
-                    default: () => t('security.k8s_namespace.delete_confirm')
-                  }
+                          ),
+                        default: () => t('security.k8s_namespace.delete')
+                      }
+                    ),
+                  default: () => t('security.k8s_namespace.delete_confirm')
+                }
               )
             ]
           })
@@ -188,24 +188,24 @@ export function useTable() {
     if (variables.loadingRef) return
     variables.loadingRef = true
     const { state } = useAsyncState(
-        queryNamespaceListPaging({ ...params }).then((res: NamespaceListRes) => {
-          variables.tableData = res.totalList.map((item, unused) => {
-            item.createTime = format(
-                parseTime(item.createTime),
-                'yyyy-MM-dd HH:mm:ss'
-            )
-            item.updateTime = format(
-                parseTime(item.updateTime),
-                'yyyy-MM-dd HH:mm:ss'
-            )
-            return {
-              ...item
-            }
-          }) as any
-          variables.totalPage = res.totalPage
-          variables.loadingRef = false
-        }),
-        {}
+      queryNamespaceListPaging({ ...params }).then((res: NamespaceListRes) => {
+        variables.tableData = res.totalList.map((item, unused) => {
+          item.createTime = format(
+            parseTime(item.createTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          item.updateTime = format(
+            parseTime(item.updateTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          return {
+            ...item
+          }
+        }) as any
+        variables.totalPage = res.totalPage
+        variables.loadingRef = false
+      }),
+      {}
     )
 
     return state

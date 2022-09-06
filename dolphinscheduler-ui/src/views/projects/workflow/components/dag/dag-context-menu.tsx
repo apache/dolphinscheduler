@@ -133,8 +133,8 @@ export default defineComponent({
               onClick={this.startRunning}
             >
               {t('project.node.start')}
-            </NButton>)
-          }
+            </NButton>
+          )}
           {this.menuDisplay && (
             <>
               <NButton

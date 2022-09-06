@@ -31,3 +31,12 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.switch
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Switch.yaml
+   :start-after: # under the License.
+   :language: yaml
+
