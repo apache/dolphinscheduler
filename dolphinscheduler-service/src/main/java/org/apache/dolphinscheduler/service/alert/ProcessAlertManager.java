@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
