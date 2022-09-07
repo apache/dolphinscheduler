@@ -277,8 +277,7 @@ public class JavaTask extends AbstractTaskExecutor {
     protected void createJavaSourceFileIfNotExists(String sourceCode, String fileName) throws IOException {
         logger.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
         if (!Files.exists(Paths.get(fileName))) {
-            logger.info("generate java source file: {}", fileName);
-            logger.info("the java source code: {}", sourceCode);
+            logger.info("the java source code:{}, will be write to the file: {}", fileName,sourceCode);
             // write data to file
             FileUtils.writeStringToFile(new File(fileName),
                     sourceCode,
@@ -356,8 +355,8 @@ public class JavaTask extends AbstractTaskExecutor {
         if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
             paramsMap.putAll(taskRequest.getParamsMap());
         }
+        logger.info("The current java source code will begin to replace the placeholder: {}", rawJavaScript);
         rawJavaScript = ParameterUtils.convertParameterPlaceholders(rawJavaScript, ParamUtils.convert(paramsMap));
-        logger.info("raw java script : {}", javaParameters.getRawScript());
         return rawJavaScript;
     }
 

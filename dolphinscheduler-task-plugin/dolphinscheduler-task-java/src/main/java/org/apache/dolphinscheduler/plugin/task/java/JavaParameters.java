@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.java;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
 
@@ -68,7 +69,7 @@ public class JavaParameters extends AbstractParameters {
      */
     @Override
     public boolean checkParameters() {
-        return runType != null && (rawScript != null && !rawScript.isEmpty()) || mainJar != null;
+        return runType != null && (StringUtils.isNotBlank(rawScript) || mainJar != null);
     }
 
     /**
