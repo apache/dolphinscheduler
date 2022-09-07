@@ -322,12 +322,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.info("The task has not changed, so skip");
         }
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
-            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion == 0) {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
         }
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
@@ -337,7 +335,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
         } else {
-            putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
         }
         saveOtherRelation(loginUser, processDefinition, result, otherParamsJson);
@@ -713,7 +710,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.info("The task has not changed, so skip");
         }
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
-            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         boolean isChange = false;
@@ -742,7 +738,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             int insertVersion =
                     processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
             if (insertVersion <= 0) {
-                putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
 
@@ -753,7 +748,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 putMsg(result, Status.SUCCESS);
                 result.put(Constants.DATA_LIST, processDefinition);
             } else {
-                putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
             saveOtherRelation(loginUser, processDefinition, result, otherParamsJson);
@@ -865,18 +859,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
                 int delete = scheduleMapper.deleteById(scheduleObj.getId());
                 if (delete == 0) {
-                    putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
                     throw new ServiceException(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
                 }
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
-                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, scheduleObj.getId());
-                return result;
+                throw new ServiceException( Status.SCHEDULE_CRON_STATE_ONLINE, scheduleObj.getProcessDefinitionName());
             }
         }
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
-            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
             throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
         }
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
@@ -942,7 +933,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     schedule.setReleaseState(releaseState);
                     int updateSchedule = scheduleMapper.updateById(schedule);
                     if (updateSchedule == 0) {
-                        putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
                         throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
                     }
                     schedulerService.deleteSchedule(project.getId(), schedule.getId());
@@ -1336,7 +1326,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
-            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
 
@@ -1390,7 +1379,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             schedule.setUpdateTime(now);
             int scheduleInsert = scheduleMapper.insert(schedule);
             if (0 == scheduleInsert) {
-                putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
                 throw new ServiceException(Status.IMPORT_PROCESS_DEFINE_ERROR);
             }
         }
@@ -1944,7 +1932,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
                         taskDefinitionLog.setCode(taskCode);
                     } catch (CodeGenerateException e) {
-                        putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                         throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                     }
                     taskDefinitionLog.setProjectCode(targetProjectCode);
@@ -1964,7 +1951,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 try {
                     processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
                 } catch (CodeGenerateException e) {
-                    putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                     throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                 }
                 processDefinition.setId(0);
@@ -1992,7 +1978,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     scheduleObj.setUpdateTime(date);
                     int insertResult = scheduleMapper.insert(scheduleObj);
                     if (insertResult != 1) {
-                        putMsg(result, Status.CREATE_SCHEDULE_ERROR);
                         throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
                     }
                 }
@@ -2000,7 +1985,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs,
                             otherParamsJson));
                 } catch (Exception e) {
-                    putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);
                 }
             } else {
@@ -2008,7 +1992,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null,
                             Lists.newArrayList(), otherParamsJson));
                 } catch (Exception e) {
-                    putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.MOVE_PROCESS_DEFINITION_ERROR);
                 }
             }
@@ -2076,7 +2059,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         int switchVersion = processService.switchVersion(processDefinition, processDefinitionLog);
         if (switchVersion <= 0) {
-            putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
             throw new ServiceException(Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
         }
         putMsg(result, Status.SUCCESS);
@@ -2175,7 +2157,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             int deleteLog = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
             int deleteRelationLog = processTaskRelationLogMapper.deleteByCode(code, version);
             if (deleteLog == 0 || deleteRelationLog == 0) {
-                putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
             }
             deleteOtherRelation(project, result, processDefinition);
@@ -2259,7 +2240,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> scheduleResult = createDagSchedule(loginUser, processDefinition, scheduleJson);
         if (scheduleResult.get(Constants.STATUS) != Status.SUCCESS) {
             Status scheduleResultStatus = (Status) scheduleResult.get(Constants.STATUS);
-            putMsg(result, scheduleResultStatus);
             throw new ServiceException(scheduleResultStatus);
         }
         return result;
@@ -2269,7 +2249,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> result = new HashMap<>();
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion == 0) {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
         }
         putMsg(result, Status.SUCCESS);
@@ -2282,8 +2261,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> result = new HashMap<>();
         Schedule scheduleObj = JSONUtils.parseObject(scheduleJson, Schedule.class);
         if (scheduleObj == null) {
-            putMsg(result, Status.DATA_IS_NOT_VALID, scheduleJson);
-            throw new ServiceException(Status.DATA_IS_NOT_VALID);
+            throw new ServiceException(Status.DATA_IS_NOT_VALID,scheduleJson);
         }
         Date now = new Date();
         scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
@@ -2406,7 +2384,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> scheduleResult = updateDagSchedule(loginUser, projectCode, code, scheduleJson);
         if (scheduleResult.get(Constants.STATUS) != Status.SUCCESS) {
             Status scheduleResultStatus = (Status) scheduleResult.get(Constants.STATUS);
-            putMsg(result, scheduleResultStatus);
             throw new ServiceException(scheduleResultStatus);
         }
         return result;
@@ -2419,8 +2396,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> result = new HashMap<>();
         Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
         if (schedule == null) {
-            putMsg(result, Status.DATA_IS_NOT_VALID, scheduleJson);
-            throw new ServiceException(Status.DATA_IS_NOT_VALID);
+            throw new ServiceException(Status.DATA_IS_NOT_VALID,scheduleJson);
         }
         // set default value
         FailureStrategy failureStrategy =
@@ -2509,7 +2485,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     int updateSchedule = scheduleMapper.updateById(scheduleObj);
                     if (updateSchedule == 0) {
-                        putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
                         throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
                     }
                     schedulerService.deleteSchedule(project.getId(), scheduleObj.getId());
