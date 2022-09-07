@@ -38,5 +38,10 @@
             <artifactId>dolphinscheduler-registry-mysql</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-registry-etcd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

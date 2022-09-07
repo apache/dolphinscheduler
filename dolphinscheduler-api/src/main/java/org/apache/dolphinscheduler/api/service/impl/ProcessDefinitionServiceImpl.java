@@ -396,7 +396,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 if (CollectionUtils.isNotEmpty(codes)) {
                     logger.error("the task code is not exist");
                     putMsg(result, Status.TASK_DEFINE_NOT_EXIST,
-                            org.apache.commons.lang.StringUtils.join(codes, Constants.COMMA));
+                            StringUtils.join(codes, Constants.COMMA));
                     return result;
                 }
             }
@@ -963,7 +963,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public void batchExportProcessDefinitionByCodes(User loginUser, long projectCode, String codes,
                                                     HttpServletResponse response) {
-        if (org.apache.commons.lang.StringUtils.isEmpty(codes)) {
+        if (StringUtils.isEmpty(codes)) {
             return;
         }
         Project project = projectMapper.queryByCode(projectCode);
@@ -1891,7 +1891,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        if (org.apache.commons.lang.StringUtils.isEmpty(processDefinitionCodes)) {
+        if (StringUtils.isEmpty(processDefinitionCodes)) {
             putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY, processDefinitionCodes);
             return result;
         }

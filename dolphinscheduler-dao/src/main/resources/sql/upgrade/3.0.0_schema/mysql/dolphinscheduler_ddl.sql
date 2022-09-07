@@ -407,7 +407,7 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_NAME='t_ds_user'
         AND TABLE_SCHEMA=(SELECT DATABASE())
-        AND COLUMN_NAME='t_ds_user')
+        AND COLUMN_NAME='time_zone')
     THEN
 ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone';
 END IF;

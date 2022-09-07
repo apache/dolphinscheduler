@@ -35,7 +35,7 @@ class GitHub(ResourcePlugin):
 
     :param username: A string representing the user of the warehouse.
 
-    :param password: A string representing the user password.
+    :param password: A string representing the user password, it is equal to access_token.
 
 
     """
@@ -57,7 +57,7 @@ class GitHub(ResourcePlugin):
 
     # [end init_method]
 
-    req_api = "https://api.github.com/repos/{user}/{repo_name}/contents/{file_path}"
+    _req_api = "https://api.github.com/repos/{user}/{repo_name}/contents/{file_path}"
 
     def build_req_api(
         self,
@@ -104,11 +104,11 @@ class GitHub(ResourcePlugin):
         return file_info
 
     def get_req_url(self, file_info: dict):
-        """Build request URLs according to file information."""
+        """Build request URL according to file information."""
         user = file_info["user"]
         repo_name = file_info["repo_name"]
         file_path = file_info["file_path"]
-        url = self.build_req_api(user, repo_name, file_path, self.req_api)
+        url = self.build_req_api(user, repo_name, file_path, self._req_api)
         return url
 
     # [start read_file_method]

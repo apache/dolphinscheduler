@@ -66,6 +66,11 @@ public final class Constants {
     public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
     /**
+     * hdfs defaultFS property name. Should be consistent with the property name in hdfs-site.xml
+     */
+    public static final String HDFS_DEFAULT_FS = "fs.defaultFS";
+
+    /**
      * hadoop configuration
      */
     public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
