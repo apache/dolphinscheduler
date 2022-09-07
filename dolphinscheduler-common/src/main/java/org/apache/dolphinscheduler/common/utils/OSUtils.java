@@ -19,8 +19,13 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
-import org.apache.commons.lang.SystemUtils;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,11 +46,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
 
 /**
  * os utils
@@ -101,7 +101,7 @@ public class OSUtils {
      */
     public static double diskAvailable() {
         File file = new File(".");
-        long freeSpace = file.getFreeSpace(); //unallocated / free disk space in bytes.
+        long freeSpace = file.getFreeSpace(); // unallocated / free disk space in bytes.
 
         double diskAvailable = freeSpace / 1024.0 / 1024 / 1024;
 
@@ -160,7 +160,7 @@ public class OSUtils {
         long now = System.currentTimeMillis();
         if (now - prevTickTime > 950) {
             // Enough time has elapsed.
-            cpuUsage =  processor.getSystemCpuLoadBetweenTicks(prevTicks);
+            cpuUsage = processor.getSystemCpuLoadBetweenTicks(prevTicks);
             prevTickTime = System.currentTimeMillis();
             prevTicks = processor.getSystemCpuLoadTicks();
         }
@@ -198,8 +198,9 @@ public class OSUtils {
     private static List<String> getUserListFromLinux() throws IOException {
         List<String> userList = new ArrayList<>();
 
-        try (BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(new FileInputStream("/etc/passwd")))) {
+        try (
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(new FileInputStream("/etc/passwd")))) {
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -273,14 +274,14 @@ public class OSUtils {
      * @return boolean
      */
     public static boolean existTenantCodeInLinux(String tenantCode) {
-        try{
-            String result = exeCmd("id "+ tenantCode);
-            if (!StringUtils.isEmpty(result)){
+        try {
+            String result = exeCmd("id " + tenantCode);
+            if (!StringUtils.isEmpty(result)) {
                 return result.contains("uid=");
             }
-        }catch (Exception e){
-            //because ShellExecutor method throws exception to the linux return status is not 0
-            //not exist user return status is 1
+        } catch (Exception e) {
+            // because ShellExecutor method throws exception to the linux return status is not 0
+            // not exist user return status is 1
             logger.error(e.getMessage(), e);
         }
         return false;
@@ -472,8 +473,9 @@ public class OSUtils {
         // system available physical memory
         double availablePhysicalMemorySize = availablePhysicalMemorySize();
         if (loadAverage > maxCpuLoadAvg || availablePhysicalMemorySize < reservedMemory) {
-            logger.warn("Current cpu load average {} is too high or available memory {}G is too low, under max.cpuLoad.avg={} and reserved.memory={}G",
-                loadAverage, availablePhysicalMemorySize, maxCpuLoadAvg, reservedMemory);
+            logger.warn(
+                    "Current cpu load average {} is too high or available memory {}G is too low, under max.cpuLoad.avg={} and reserved.memory={}G",
+                    loadAverage, availablePhysicalMemorySize, maxCpuLoadAvg, reservedMemory);
             return true;
         }
         return false;
