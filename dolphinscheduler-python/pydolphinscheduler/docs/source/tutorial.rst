@@ -38,7 +38,7 @@ There are two types of tutorials: traditional and task decorator.
   supported. But it is helpful if your workflow is all built with Python or if you already have some Python
   workflow code and want to migrate them to pydolphinscheduler.
 - **YAML File**: We can use pydolphinscheduler CLI to create process using YAML file: :code:`pydolphinscheduler yaml -f tutorial.yaml`. 
-  We can find more YAML file examples in `examples/yaml_define <https://github.com/apache/dolphinscheduler/tree/py-yaml/dolphinscheduler-python/pydolphinscheduler/examples/yaml_define>`_
+  We can find more YAML file examples in `examples/yaml_define <https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-python/pydolphinscheduler/examples/yaml_define>`_
 
 .. tab:: Tradition
 
@@ -268,7 +268,7 @@ We can use pydolphinscheduler CLI to create process using YAML file
 
    pydolphinscheduler yaml -f Shell.yaml
 
-We can use the following three special grammars to define workflows more flexibly.
+We can use the following four special grammars to define workflows more flexibly.
 
 - :code:`$FILE{"file_name"}`: Read the file (:code:`file_name`) contents and replace them to that location.
 - :code:`$WORKFLOW{"other_workflow.yaml"}`: Refer to another process defined using YAML file (:code:`other_workflow.yaml`) and replace the process name in this location.
