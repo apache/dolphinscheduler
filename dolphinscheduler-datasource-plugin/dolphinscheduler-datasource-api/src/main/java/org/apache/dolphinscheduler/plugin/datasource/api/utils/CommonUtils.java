@@ -101,7 +101,7 @@ public class CommonUtils {
     public static String getDataQualityJarName() {
         String dqsJarName = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
 
-        if (org.apache.commons.lang.StringUtils.isEmpty(dqsJarName)) {
+        if (StringUtils.isEmpty(dqsJarName)) {
             return "dolphinscheduler-data-quality.jar";
         }
 

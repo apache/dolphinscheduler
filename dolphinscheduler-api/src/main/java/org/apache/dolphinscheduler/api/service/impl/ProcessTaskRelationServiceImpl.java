@@ -226,7 +226,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             }
         }
         if (CollectionUtils.isNotEmpty(downstreamList)) {
-            putMsg(result, Status.TASK_HAS_DOWNSTREAM, org.apache.commons.lang.StringUtils.join(downstreamList, ","));
+            putMsg(result, Status.TASK_HAS_DOWNSTREAM, StringUtils.join(downstreamList, ","));
             return result;
         }
         updateProcessDefiniteVersion(loginUser, result, processDefinition);
