@@ -70,7 +70,7 @@ import com.google.common.cache.LoadingCache;
 public class HadoopUtils implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
-    private String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
+    private String hdfsUser;
     public static final String RM_HA_IDS = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
     public static final String APP_ADDRESS = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
     public static final String JOB_HISTORY_ADDRESS = PropertyUtils.getString(Constants.YARN_JOB_HISTORY_STATUS_ADDRESS);
@@ -140,7 +140,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
             // the default is the local file system
             if (StringUtils.isNotBlank(defaultFS)) {
                 Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
-                configuration.set(Constants.FS_DEFAULT_FS, defaultFS);
+                configuration.set(Constants.HDFS_DEFAULT_FS, defaultFS);
                 fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
             } else {
                 logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
