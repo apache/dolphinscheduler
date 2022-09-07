@@ -874,8 +874,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
         if(ReleaseState.ONLINE == processDefinition.getReleaseState()){
-            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
-            return result;
+            throw new ServiceException(Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
         }
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
