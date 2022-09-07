@@ -24,7 +24,6 @@ import software.amazon.awssdk.services.datasync.model.StartTaskExecutionRequest;
 import software.amazon.awssdk.services.datasync.model.StartTaskExecutionResponse;
 import software.amazon.awssdk.services.datasync.model.TagListEntry;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,9 +40,13 @@ public class DatasyncHook {
     }
 
     protected DataSyncClient createClient() {
-        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
+        //final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
+        //final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+        final String awsAccessKeyId = "AKIAXTUKRINYVGPCDOBV";
+        final String awsSecretAccessKey = "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";
+
+        //final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
+        final String awsRegion = "ap-northeast-2";
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
@@ -162,7 +165,6 @@ public class DatasyncHook {
         public static final String RUNNING = "running";
         public static final String STOPPED = "stopped";
         public static final String SUCCESSFUL = "successful";
-        public static final String TESTING = "testing";
         public static final String FINISHED = "finished";
         public static final String RETRY = "retry";
         public static final String CANCELED = "canceled";

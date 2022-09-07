@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import lombok.Data;
@@ -35,17 +37,24 @@ import software.amazon.awssdk.services.datasync.model.TaskSchedule;
 @Setter
 @Getter
 @NoArgsConstructor
+@ToString
 public class DatasyncParameters extends AbstractParameters {
 
     private String cloudWatchLogGroupArn;
     private String destinationLocationArn;
     private String sourceLocationArn;
     private String name;
-    private Options options;
-    private TaskSchedule schedule;
-    private List<FilterRule> excludes;
-    private List<FilterRule> includes;
 
+    private String json;
+    @JsonIgnore
+    private Options options;
+    @JsonIgnore
+    private TaskSchedule schedule;
+    @JsonIgnore
+    private List<FilterRule> excludes;
+    @JsonIgnore
+    private List<FilterRule> includes;
+    @JsonIgnore
     private List<TagListEntry> tags;
 
     @Override

@@ -46,24 +46,24 @@ public class DatasyncTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws TaskException {
         try {
-            int exitStatusCode = runDmsReplicationTask();
+            int exitStatusCode = runDatasyncTask();
             setExitStatusCode(exitStatusCode);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new TaskException("DMS task error", e);
+            throw new TaskException("datasync task error", e);
         }
     }
 
-    public int runDmsReplicationTask() {
+    public int runDatasyncTask() {
         int exitStatusCode;
-        exitStatusCode = checkCreateReplicationTask();
+        exitStatusCode = checkCreateTask();
         if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
             exitStatusCode = startReplicationTask();
         }
         return exitStatusCode;
     }
 
-    public int checkCreateReplicationTask() {
+    public int checkCreateTask() {
 
         Boolean isCreateSuccessfully = hook.createDatasyncTask(parameters);
         if (!isCreateSuccessfully) {
