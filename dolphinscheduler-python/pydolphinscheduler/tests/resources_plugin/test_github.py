@@ -18,6 +18,7 @@
 """Test github resource plugin."""
 import pytest
 
+from pydolphinscheduler.exceptions import PyResPluginException
 from pydolphinscheduler.resources_plugin import GitHub
 
 
@@ -261,3 +262,58 @@ def test_github_req(attr, expected):
         prefix="prefix",
     )
     assert expected == github.req(attr)
+
+
+@pytest.mark.skip(
+    reason="Lack of test environment, need stable personal repository and access_token"
+)
+@pytest.mark.parametrize(
+    "attr, expected",
+    [
+        (
+            {
+                "prefix": "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main",
+                "username": "xdu-chenrj",
+                "password": "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",
+            },
+            "test github resource plugin\n",
+        ),
+        (
+            {
+                "prefix": "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main",
+                "access_token": "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",
+            },
+            "test github resource plugin\n",
+        ),
+    ],
+)
+def test_github_private_rep(attr, expected):
+    """Test private warehouse file content acquisition."""
+    github = GitHub(**attr)
+    assert expected == github.read_file("union.sh")
+
+
+def test_github_file_not_found():
+    """Test file does not exist."""
+    with pytest.raises(
+        PyResPluginException,
+        match=".* is not found",
+    ):
+        github = GitHub(prefix="https://github.com/apache/dolphinscheduler/blob/dev")
+        github.read_file("a.sh")
+
+
+@pytest.mark.skip(
+    reason="Lack of test environment, need stable personal repository and access_token"
+)
+def test_github_unauthorized():
+    """Test authentication exception of reading private warehouse file."""
+    with pytest.raises(
+        PyResPluginException,
+        match="unauthorized.",
+    ):
+        github = GitHub(
+            prefix="https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main",
+            access_token="test github resource plugin",
+        )
+        github.read_file("union.sh")
