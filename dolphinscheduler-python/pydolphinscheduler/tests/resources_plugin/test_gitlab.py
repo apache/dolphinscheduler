@@ -16,16 +16,12 @@
 # under the License.
 
 """Test github resource plugin."""
-from unittest import skip
-
 import pytest
 
 from pydolphinscheduler.exceptions import PyResPluginException
-from pydolphinscheduler.resources_plugin import GitHub
-from pydolphinscheduler.resources_plugin.gitlab_res_lugin import GitLab
+from pydolphinscheduler.resources_plugin.gitlab_res import GitLab
 
 
-# @skip(reason="This test needs gitlab service")
 @pytest.mark.parametrize(
     "attr, expected",
     [
@@ -37,7 +33,7 @@ from pydolphinscheduler.resources_plugin.gitlab_res_lugin import GitLab
                 "branch": "main",
                 "file_path": "union.sh",
                 "api_version": "v4",
-                "owner": "chenruijie"
+                "owner": "chenruijie",
             },
         ),
         (
@@ -48,28 +44,27 @@ from pydolphinscheduler.resources_plugin.gitlab_res_lugin import GitLab
                 "branch": "dev",
                 "file_path": "test/exc.sh",
                 "api_version": "v4",
-                "owner": "chenruijie"
+                "owner": "chenruijie",
             },
         ),
     ],
 )
 def test_gitlab_get_file_info(attr, expected):
-    """Test the build_req_api function of the gitlab resource plug-in."""
+    """Test the get_file_info function of the gitlab resource plug-in."""
     gitlab = GitLab(prefix="prefix")
     gitlab.get_file_info(attr)
     assert expected == gitlab._file_info
 
 
-# @skip(reason="This test needs gitlab service")
 @pytest.mark.parametrize(
     "attr",
     [
         "http://124.221.129.34:8088/chenruijie/ds-gitlab/-/blob/main",
-        "http://124.221.129.34:8088",
+        "http://124.221.129.34:8088/chenruijie/ds-gitlab/-/blob/",
     ],
 )
 def test_gitlab_get_file_info_exception(attr):
-    """Test the build_req_api function of the gitlab resource plug-in."""
+    """Test the get_file_info exception of the gitlab resource plug-in."""
     with pytest.raises(
         PyResPluginException,
         match="Incomplete path.",
@@ -77,3 +72,65 @@ def test_gitlab_get_file_info_exception(attr):
         gitlab = GitLab(prefix="prefix")
         gitlab.get_file_info(attr)
 
+
+@pytest.mark.skip(reason="This test needs gitlab service")
+@pytest.mark.parametrize(
+    "attr, expected",
+    [
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds-internal/-/blob/main",
+                    "oauth_token": "24518bd4cf5bfe9xx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds/-/blob/main",
+                    "private_token": "9TyTe2xx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenrj/ds-gitlab/-/blob/main",
+                    "username": "chenrj",
+                    "password": "4295xx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds-public/-/blob/main",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds-internal/-/blob/main",
+                    "username": "chenruijie",
+                    "password": "429xxx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+    ],
+)
+def test_gitlab_read_file(attr, expected):
+    """Test the read_file function of the gitlab resource plug-in."""
+    gitlab = GitLab(**attr.get("init"))
+    assert expected == gitlab.read_file(attr.get("file_path"))

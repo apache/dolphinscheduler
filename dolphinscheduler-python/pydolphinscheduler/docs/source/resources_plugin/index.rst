@@ -27,3 +27,4 @@ In this section
    resource-plugin
    local
    github
+   gitlab

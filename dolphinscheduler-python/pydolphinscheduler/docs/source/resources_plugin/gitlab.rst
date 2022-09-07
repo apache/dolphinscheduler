@@ -20,19 +20,27 @@ GitLab
 
 `GitLab` is a gitlab resource plugin for pydolphinscheduler.
 
-When using a github resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
-such as `resource_plugin=GitHub(prefix="https://github.com/xxx", access_token="ghpxx")`.
-The token parameter is optional. You need to add it when your warehouse is a private warehouse.
+When using a gitlab resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
+such as `resource_plugin=GitLab(prefix="xxx")`, if it is a public warehouse.
 
-Basic auth is also supported, using such as `resource_plugin=GitHub(prefix="https://github.com/xxx", username="user", password="pwd")`.
-However, in basic auth, `password` is equal to personal access token.
+If it is a private or Internal warehouse, you can use three ways to obtain authentication.
 
-You can view this `document <https://docs.github.com/cn/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token>`_
-when creating a token.
+The first is `Personal Access Tokens`, using `resource_plugin=GitLab(prefix="xxx", private_token="xxx")`.
+
+The second method is to obtain authentication through `username` and `password`:
+
+using `resource_plugin=GitLab(prefix="xxx", username="username", password="pwd")`.
+
+The third method is to obtain authentication through `OAuth Token`:
+
+using `resource_plugin=GitLab(prefix="xxx", oauth_token="xx")`.
+
+You can view this `document <https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token>`_
+when creating a `Personal Access Tokens`.
 
 For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
 
 Dive Into
 ---------
 
-.. automodule:: pydolphinscheduler.resources_plugin.github
+.. automodule:: pydolphinscheduler.resources_plugin.gitlab

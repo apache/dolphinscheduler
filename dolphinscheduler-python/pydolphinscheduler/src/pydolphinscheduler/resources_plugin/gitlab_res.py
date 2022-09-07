@@ -31,12 +31,13 @@ class GitLab(ResourcePlugin):
 
     :param prefix: A string representing the prefix of GitLab.
 
-    :param access_token: A string used for identity authentication of GitLab private warehouse.
+    :param private_token: A string used for identity authentication of GitLab private or Internal warehouse.
+
+    :param oauth_token: A string used for identity authentication of GitLab private or Internal warehouse.
 
     :param username: A string representing the user of the warehouse.
 
     :param password: A string representing the user password.
-
 
     """
 
@@ -100,7 +101,13 @@ class GitLab(ResourcePlugin):
                 )
                 break
 
-        if project_name is None or branch is None or file_path is None or file_path == "" or owner is None:
+        if (
+            project_name is None
+            or branch is None
+            or file_path is None
+            or file_path == ""
+            or owner is None
+        ):
             raise PyResPluginException("Incomplete path.")
 
         file_info = {
@@ -114,6 +121,7 @@ class GitLab(ResourcePlugin):
         self._file_info = file_info
 
     def authentication(self):
+        """Gitlab authentication."""
         host = self._file_info["host"]
         if self.private_token is not None:
             return gitlab.Gitlab(host, private_token=self.private_token)
@@ -122,8 +130,10 @@ class GitLab(ResourcePlugin):
         if self.username is not None and self.password is not None:
             oauth_token = self.OAuth_token()
             return gitlab.Gitlab(host, oauth_token=oauth_token)
+        return gitlab.Gitlab(host)
 
     def OAuth_token(self):
+        """Obtain OAuth Token."""
         data = {
             "grant_type": "password",
             "username": self.username,
@@ -136,7 +146,7 @@ class GitLab(ResourcePlugin):
 
     # [start read_file_method]
     def read_file(self, suf: str):
-        """Get the content of the file.a
+        """Get the content of the file.
 
         The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
@@ -144,7 +154,7 @@ class GitLab(ResourcePlugin):
         self.get_file_info(path)
         gl = self.authentication()
         project = gl.projects.get(
-            self._file_info["owner"] + "/" + self._file_info["project_name"]
+            "%s/%s" % (self._file_info["owner"], self._file_info["project_name"])
         )
         f = project.files.get(
             file_path=self._file_info["file_path"], ref=self._file_info["branch"]
