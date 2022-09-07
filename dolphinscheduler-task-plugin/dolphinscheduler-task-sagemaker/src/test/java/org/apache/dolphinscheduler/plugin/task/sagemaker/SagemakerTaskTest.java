@@ -58,6 +58,7 @@ import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
 public class SagemakerTaskTest {
 
     private final String pipelineExecutionArn = "test-pipeline-arn";
+    private final String clientRequestToken = "test-pipeline-token";
     private SagemakerTask sagemakerTask;
     private AmazonSageMaker client;
     private PipelineUtils pipelineUtils;
@@ -71,7 +72,7 @@ public class SagemakerTaskTest {
         sagemakerTask = new SagemakerTask(taskExecutionContext);
         sagemakerTask.init();
         client = mock(AmazonSageMaker.class);
-        pipelineUtils = new PipelineUtils(client);
+        pipelineUtils = new PipelineUtils();
 
         StartPipelineExecutionResult startPipelineExecutionResult = mock(StartPipelineExecutionResult.class);
         when(startPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
@@ -82,7 +83,8 @@ public class SagemakerTaskTest {
         DescribePipelineExecutionResult describePipelineExecutionResult = mock(DescribePipelineExecutionResult.class);
         when(describePipelineExecutionResult.getPipelineExecutionStatus()).thenReturn("Executing", "Succeeded");
 
-        ListPipelineExecutionStepsResult listPipelineExecutionStepsResult = mock(ListPipelineExecutionStepsResult.class);
+        ListPipelineExecutionStepsResult listPipelineExecutionStepsResult =
+                mock(ListPipelineExecutionStepsResult.class);
         PipelineExecutionStep pipelineExecutionStep = mock(PipelineExecutionStep.class);
         List<PipelineExecutionStep> pipelineExecutionSteps = new ArrayList<>();
         pipelineExecutionSteps.add(pipelineExecutionStep);
@@ -110,10 +112,11 @@ public class SagemakerTaskTest {
 
     @Test
     public void testPipelineExecution() throws Exception {
-        pipelineUtils.startPipelineExecution(sagemakerTask.createStartPipelineRequest());
-        Assert.assertEquals(pipelineExecutionArn, pipelineUtils.getPipelineExecutionArn());
-        Assert.assertEquals(0, pipelineUtils.checkPipelineExecutionStatus());
-        pipelineUtils.stopPipelineExecution();
+        PipelineUtils.PipelineId pipelineId =
+                pipelineUtils.startPipelineExecution(client, sagemakerTask.createStartPipelineRequest());
+        Assert.assertEquals(pipelineExecutionArn, pipelineId.getPipelineExecutionArn());
+        Assert.assertEquals(0, pipelineUtils.checkPipelineExecutionStatus(client, pipelineId));
+        pipelineUtils.stopPipelineExecution(client, pipelineId);
     }
 
     private String buildParameters() {

@@ -23,7 +23,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -32,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -52,23 +52,24 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 public class SagemakerTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
-        new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false).configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .configure(REQUIRE_SETTERS_FOR_GETTERS, true).setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
-    /**
-     * taskExecutionContext
-     */
-    private final TaskExecutionContext taskExecutionContext;
+            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
     /**
      * SageMaker parameters
      */
     private SagemakerParameters parameters;
+
+    private final AmazonSageMaker client;
+    private PipelineUtils.PipelineId pipelineId;
     private PipelineUtils utils;
 
     public SagemakerTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-
-        this.taskExecutionContext = taskExecutionContext;
-
+        client = createClient();
+        utils = new PipelineUtils();
     }
 
     @Override
@@ -78,10 +79,13 @@ public class SagemakerTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("Sagemaker task params {}", taskExecutionContext.getTaskParams());
+        logger.info("Sagemaker task params {}", taskRequest.getTaskParams());
 
-        parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SagemakerParameters.class);
+        parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
 
+        if (parameters == null) {
+            throw new SagemakerTaskException("Sagemaker task params is empty");
+        }
         if (!parameters.checkParameters()) {
             throw new SagemakerTaskException("Sagemaker task params is not valid");
         }
@@ -92,12 +96,12 @@ public class SagemakerTask extends AbstractRemoteTask {
     public void submitApplication() throws TaskException {
         try {
             StartPipelineExecutionRequest request = createStartPipelineRequest();
-            AmazonSageMaker client = createClient();
-            utils = new PipelineUtils(client);
-            setAppIds(utils.getPipelineExecutionArn());
 
             // Start pipeline
-            exitStatusCode = utils.startPipelineExecution(request);
+            pipelineId = utils.startPipelineExecution(client, request);
+
+            // set AppId
+            setAppIds(JSONUtils.toJsonString(pipelineId));
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("SageMaker task submit error", e);
@@ -106,14 +110,34 @@ public class SagemakerTask extends AbstractRemoteTask {
 
     @Override
     public void cancelApplication() {
-        // stop pipeline
-        utils.stopPipelineExecution();
+        initPipelineId();
+        try {
+            // stop pipeline
+            utils.stopPipelineExecution(client, pipelineId);
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     @Override
     public void trackApplicationStatus() throws TaskException {
+        initPipelineId();
         // Keep checking the health status
-        exitStatusCode = utils.checkPipelineExecutionStatus();
+        exitStatusCode = utils.checkPipelineExecutionStatus(client, pipelineId);
+    }
+
+    /**
+     * init sagemaker applicationId if null
+     */
+    private void initPipelineId() {
+        if (pipelineId == null) {
+            if (StringUtils.isNotEmpty(getAppIds())) {
+                pipelineId = JSONUtils.parseObject(getAppIds(), PipelineUtils.PipelineId.class);
+            }
+        }
+        if (pipelineId == null) {
+            throw new TaskException("sagemaker applicationID is null");
+        }
     }
 
     public StartPipelineExecutionRequest createStartPipelineRequest() throws SagemakerTaskException {
@@ -140,7 +164,7 @@ public class SagemakerTask extends AbstractRemoteTask {
 
     private String parseRequstJson(String requestJson) {
         // combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(requestJson, ParamUtils.convert(paramsMap));
     }
 
@@ -152,9 +176,9 @@ public class SagemakerTask extends AbstractRemoteTask {
         final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
         // create a SageMaker client
         return AmazonSageMakerClientBuilder.standard()
-            .withCredentials(awsCredentialsProvider)
-            .withRegion(awsRegion)
-            .build();
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(awsRegion)
+                .build();
     }
 
 }
