@@ -37,8 +37,6 @@ import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 
-import org.apache.directory.api.util.Strings;
-
 /**
  * task execute start processor, from api to master
  */
@@ -69,7 +67,7 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
         // response
         Command response = new Command(command.getOpaque());
         response.setType(CommandType.TASK_EXECUTE_START);
-        response.setBody(Strings.EMPTY_BYTES);
+        response.setBody(new byte[0]);
         channel.writeAndFlush(response);
     }
 
