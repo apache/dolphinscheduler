@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.dao.utils;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -29,10 +27,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * H2 MEMORY DB Performance Monitor
  */
-public class H2Performance extends BaseDBPerformance{
+public class H2Performance extends BaseDBPerformance {
 
     private static final Logger logger = LoggerFactory.getLogger(H2Performance.class);
 
@@ -49,29 +50,18 @@ public class H2Performance extends BaseDBPerformance{
         monitorRecord.setDbType(DbType.H2);
         monitorRecord.setState(Flag.YES);
 
-        Statement pstmt = null;
-
-        try {
-            pstmt = conn.createStatement();
-            try (ResultSet rs1 = pstmt.executeQuery("select count(*) as total from information_schema.sessions;")) {
+        try (Statement pstmt = conn.createStatement()) {
+            try (
+                    ResultSet rs1 = pstmt
+                            .executeQuery("select count(1) as total from information_schema.sessions;")) {
                 if (rs1.next()) {
                     monitorRecord.setThreadsConnections(rs1.getInt("total"));
                 }
             }
-
         } catch (SQLException e) {
             monitorRecord.setState(Flag.NO);
             logger.error("SQLException ", e);
-        }finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-            }catch (SQLException e) {
-                logger.error("SQLException ", e);
-            }
         }
         return monitorRecord;
     }
 }
-
