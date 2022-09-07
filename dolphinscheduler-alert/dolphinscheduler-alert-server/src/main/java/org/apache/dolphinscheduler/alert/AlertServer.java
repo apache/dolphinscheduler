@@ -63,14 +63,9 @@ public class AlertServer implements Closeable {
 
     private NettyRemotingServer nettyRemotingServer;
 
-    /**
-     * alert server startup, not use web service
-     *
-     * @param args arguments
-     */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
-        new SpringApplicationBuilder(AlertServer.class).web(WebApplicationType.NONE).run(args);
+        new SpringApplicationBuilder(AlertServer.class).run(args);
     }
 
     @EventListener
