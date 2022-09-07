@@ -33,7 +33,8 @@ from pydolphinscheduler.core.process_definition import (
     ProcessDefinitionContext,
 )
 from pydolphinscheduler.core.resource import Resource
-from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
+from pydolphinscheduler.exceptions import PyDSParamException, PyResPluginException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base
 
@@ -101,6 +102,9 @@ class Task(Base):
 
     _task_custom_attr: set = set()
 
+    ext: set = None
+    ext_attr: str = None
+
     DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
 
     def __init__(
@@ -124,6 +128,7 @@ class Task(Base):
         dependence: Optional[Dict] = None,
         wait_start_timeout: Optional[Dict] = None,
         condition_result: Optional[Dict] = None,
+        resource_plugin: Optional[ResourcePlugin] = None,
     ):
 
         super().__init__(name, description)
@@ -166,6 +171,8 @@ class Task(Base):
         self.dependence = dependence or {}
         self.wait_start_timeout = wait_start_timeout or {}
         self._condition_result = condition_result or self.DEFAULT_CONDITION_RESULT
+        self.resource_plugin = resource_plugin
+        self.get_content()
 
     @property
     def process_definition(self) -> Optional[ProcessDefinition]:
@@ -228,6 +235,44 @@ class Task(Base):
         }
         custom_attr |= self._task_custom_attr
         return self.get_define_custom(custom_attr=custom_attr)
+
+    def get_plugin(self):
+        """Return the resource plug-in.
+
+        according to parameter resource_plugin and parameter
+        process_definition.resource_plugin.
+        """
+        if self.resource_plugin is None:
+            if self.process_definition.resource_plugin is not None:
+                return self.process_definition.resource_plugin
+            else:
+                raise PyResPluginException(
+                    "The execution command of this task is a file, but the resource plugin is empty"
+                )
+        else:
+            return self.resource_plugin
+
+    def get_content(self):
+        """Get the file content according to the resource plugin."""
+        if self.ext_attr is None and self.ext is None:
+            return
+
+        _ext_attr = getattr(self, self.ext_attr)
+
+        if _ext_attr is not None:
+            if _ext_attr.endswith(tuple(self.ext)):
+                res = self.get_plugin()
+                content = res.read_file(_ext_attr)
+                setattr(self, self.ext_attr.lstrip("_"), content)
+            else:
+                index = _ext_attr.rfind(".")
+                if index != -1:
+                    raise ValueError(
+                        "This task does not support files with suffix {}, only supports {}".format(
+                            _ext_attr[index:], ",".join(str(suf) for suf in self.ext)
+                        )
+                    )
+                setattr(self, self.ext_attr.lstrip("_"), _ext_attr)
 
     def __hash__(self):
         return hash(self.code)

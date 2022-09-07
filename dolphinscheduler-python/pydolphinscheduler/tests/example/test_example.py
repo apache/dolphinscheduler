@@ -97,7 +97,11 @@ def test_example_basic():
         ), f"We expect all examples is python script, but get {ex.name}."
 
         # All except tutorial and __init__ is end with keyword "_example"
-        if ex.stem not in ("tutorial", "tutorial_decorator") and ex.stem != "__init__":
+        if (
+            ex.stem
+            not in ("tutorial", "tutorial_decorator", "tutorial_resource_plugin")
+            and ex.stem != "__init__"
+        ):
             assert ex.stem.endswith(
                 "_example"
             ), f"We expect all examples script end with keyword '_example', but get {ex.stem}."

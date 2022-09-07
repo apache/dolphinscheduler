@@ -15,32 +15,18 @@
    specific language governing permissions and limitations
    under the License.
 
-PyDolphinScheduler
-==================
+Local
+=====
 
-**PyDolphinScheduler** is Python API for `Apache DolphinScheduler <https://dolphinscheduler.apache.org>`_,
-which allow you definition your workflow by Python code, aka workflow-as-codes.
+`Local` is a local resource plugin for pydolphinscheduler.
 
-I could go and find how to :ref:`install <start:getting started>` the project. Or if you want to see simply example
-then go and see :doc:`tutorial` for more detail.
+When using a local resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
+such as `resource_plugin=Local("/tmp")`.
 
 
-.. toctree::
-   :maxdepth: 2
+For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
 
-   start
-   tutorial
-   concept
-   tasks/index
-   howto/index
-   cli
-   config
-   api
-   resources_plugin/index
+Dive Into
+---------
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: pydolphinscheduler.resources_plugin.local
