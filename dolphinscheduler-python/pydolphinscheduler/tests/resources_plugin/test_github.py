@@ -274,14 +274,14 @@ def test_github_req(attr, expected):
             {
                 "prefix": "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main",
                 "username": "xdu-chenrj",
-                "password": "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",
+                "password": "ghp_gxxx",
             },
             "test github resource plugin\n",
         ),
         (
             {
                 "prefix": "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main",
-                "access_token": "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",
+                "access_token": "ghp_gxxxg",
             },
             "test github resource plugin\n",
         ),
