@@ -40,3 +40,7 @@ class PyDSProcessDefinitionNotAssignException(PyDSBaseException):
 
 class PyDSConfException(PyDSBaseException):
     """Exception for pydolphinscheduler configuration error."""
+
+
+class PyResPluginException(PyDSBaseException):
+    """Exception for pydolphinscheduler resource plugin error."""
