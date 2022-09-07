@@ -21,20 +21,20 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
-import java.util.Set;
+import lombok.Builder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Builder;
-
 @Builder
 public class TaskCallbackImpl implements TaskCallBack {
 
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, TaskCallbackImpl.class));
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, TaskCallbackImpl.class));
 
     private final WorkerMessageSender workerMessageSender;
 
@@ -46,15 +46,17 @@ public class TaskCallbackImpl implements TaskCallBack {
     }
 
     @Override
-    public void updateRemoteApplicationInfo(int taskInstanceId, String appIds) {
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+    public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
+        TaskExecutionContext taskExecutionContext =
+                TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
-            logger.error("task execution context is empty, taskInstanceId: {}, appIds:{}", taskInstanceId, appIds);
+            logger.error("task execution context is empty, taskInstanceId: {}, applicationInfo:{}", taskInstanceId,
+                    applicationInfo);
             return;
         }
 
-        logger.info("send remote application info {}", appIds);
-        taskExecutionContext.setAppIds(appIds);
+        logger.info("send remote application info {}", applicationInfo);
+        taskExecutionContext.setAppIds(applicationInfo.getAppIds());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
     }
 }

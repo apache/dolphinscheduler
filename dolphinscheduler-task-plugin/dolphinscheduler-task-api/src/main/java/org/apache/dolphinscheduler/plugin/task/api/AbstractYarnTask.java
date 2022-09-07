@@ -19,16 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +29,7 @@ import java.util.regex.Pattern;
  * abstract yarn task
  */
 public abstract class AbstractYarnTask extends AbstractRemoteTask {
+
     /**
      * process task
      */
@@ -55,8 +48,8 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskRequest,
-            logger);
+                taskRequest,
+                logger);
     }
 
     // todo split handle to submit and track
@@ -114,30 +107,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      * @throws TaskException
      */
     public Set<String> getApplicationIds() throws TaskException {
-        Set<String> appIds = new HashSet<>();
-
-        File file = new File(taskRequest.getLogPath());
-        if (!file.exists()) {
-            return appIds;
-        }
-
-        /*
-         * analysis log? get submitted yarn application id
-         */
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String appId = findAppId(line);
-                if (StringUtils.isNotEmpty(appId)) {
-                    appIds.add(appId);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            throw new TaskException("get application id error, file not found, path:" + taskRequest.getLogPath());
-        } catch (IOException e) {
-            throw new TaskException("get application id error, path:" + taskRequest.getLogPath(), e);
-        }
-        return appIds;
+        return LogUtils.getAppIdsFromLogFile(taskRequest.getLogPath(), logger);
     }
 
     /**
@@ -178,8 +148,8 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
         }
 
         return mainJar.getId() == 0
-            ? mainJar.getRes()
-            // when update resource maybe has error
-            : mainJar.getResourceName().replaceFirst("/", "");
+                ? mainJar.getRes()
+                // when update resource maybe has error
+                : mainJar.getResourceName().replaceFirst("/", "");
     }
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Set;
@@ -62,7 +63,7 @@ public abstract class AbstractRemoteTask extends AbstractTask {
         if (StringUtils.isNotEmpty(getAppIds())) {
             taskRequest.setAppIds(getAppIds());
             // callback to update remote application info
-            taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(), getAppIds());
+            taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(), new ApplicationInfo(getAppIds()));
         }
 
         // keep tracking application status

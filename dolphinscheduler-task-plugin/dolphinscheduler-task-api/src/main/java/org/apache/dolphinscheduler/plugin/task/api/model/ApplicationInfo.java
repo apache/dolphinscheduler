@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface TaskCallBack {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ApplicationInfo {
 
-    public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo);
+    String appIds;
 }
