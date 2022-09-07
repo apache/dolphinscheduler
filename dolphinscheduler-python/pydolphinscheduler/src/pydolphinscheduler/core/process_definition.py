@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional, Set
 from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base, Project, Tenant, User
@@ -111,6 +112,7 @@ class ProcessDefinition(Base):
         timeout: Optional[int] = 0,
         release_state: Optional[str] = configuration.WORKFLOW_RELEASE_STATE,
         param: Optional[Dict] = None,
+        resource_plugin: Optional[ResourcePlugin] = None,
         resource_list: Optional[List[Resource]] = None,
     ):
         super().__init__(name, description)
@@ -134,6 +136,7 @@ class ProcessDefinition(Base):
         self._release_state = release_state
         self.param = param
         self.tasks: dict = {}
+        self.resource_plugin = resource_plugin
         # TODO how to fix circle import
         self._task_relations: set["TaskRelation"] = set()  # noqa: F821
         self._process_definition_code = None
