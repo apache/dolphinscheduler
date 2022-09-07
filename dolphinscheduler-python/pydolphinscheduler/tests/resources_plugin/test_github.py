@@ -297,7 +297,7 @@ def test_github_file_not_found():
     """Test file does not exist."""
     with pytest.raises(
         PyResPluginException,
-        match=".* is not found",
+        match=".* is not found.",
     ):
         github = GitHub(prefix="https://github.com/apache/dolphinscheduler/blob/dev")
         github.read_file("a.sh")
