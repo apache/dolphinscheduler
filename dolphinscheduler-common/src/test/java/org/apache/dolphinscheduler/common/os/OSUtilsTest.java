@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.common.os;
 
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
 import org.junit.Assert;
