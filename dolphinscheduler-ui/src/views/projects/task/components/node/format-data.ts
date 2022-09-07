@@ -427,6 +427,15 @@ export function formatParams(data: INodeData): {
     taskParams.hiveCliOptions = data.hiveCliOptions
   }
 
+  if (data.taskType === 'DATASYNC') {
+    taskParams.isJsonFormat = data.isJsonFormat
+    taskParams.json = data.json
+    taskParams.destinationLocationArn = data.destinationLocationArn
+    taskParams.sourceLocationArn = data.sourceLocationArn
+    taskParams.name = data.name
+    taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
+  }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {

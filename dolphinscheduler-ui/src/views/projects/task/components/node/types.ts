@@ -375,6 +375,11 @@ interface ITaskParams {
   pythonEnvTool?: string
   requirements?: string
   condaPythonVersion?: string
+  isJsonFormat?: boolean
+  destinationLocationArn?: string
+  sourceLocationArn?: string
+  name?: string
+  cloudWatchLogGroupArn?: string
 }
 
 interface INodeData

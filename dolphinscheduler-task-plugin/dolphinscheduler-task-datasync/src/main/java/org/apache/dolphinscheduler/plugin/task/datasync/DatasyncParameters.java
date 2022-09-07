@@ -40,11 +40,12 @@ import software.amazon.awssdk.services.datasync.model.TaskSchedule;
 @ToString
 public class DatasyncParameters extends AbstractParameters {
 
-    private String cloudWatchLogGroupArn;
     private String destinationLocationArn;
     private String sourceLocationArn;
     private String name;
+    private String cloudWatchLogGroupArn;
 
+    private boolean isJsonFormat;
     private String json;
     @JsonIgnore
     private Options options;
@@ -59,7 +60,11 @@ public class DatasyncParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(destinationLocationArn)&&StringUtils.isNotEmpty(sourceLocationArn)&&StringUtils.isNotEmpty(name);
+        if (isJsonFormat) {
+            return StringUtils.isNotEmpty(json);
+        } else {
+            return StringUtils.isNotEmpty(destinationLocationArn)&&StringUtils.isNotEmpty(sourceLocationArn)&&StringUtils.isNotEmpty(name);
+        }
     }
 
 }

@@ -189,6 +189,9 @@ $bgLight: #ffffff;
     &.icon-pytorch {
       background-image: url('/images/task-icons/pytorch.png');
     }
+    &.icon-datasync {
+      background-image: url('/images/task-icons/datasync.png');
+    }
   }
 
   &:hover {
@@ -280,6 +283,9 @@ $bgLight: #ffffff;
       }
       &.icon-pytorch {
         background-image: url('/images/task-icons/pytorch_hover.png');
+      }
+      &.icon-datasync {
+        background-image: url('/images/task-icons/datasync_hover.png');
       }
     }
   }
