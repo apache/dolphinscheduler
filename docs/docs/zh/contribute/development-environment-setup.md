@@ -1,6 +1,7 @@
 # DolphinScheduler 开发手册
 
 ## 软件要求
+
 在搭建 DolphinScheduler 开发环境之前请确保你已经安装以下软件:
 
 * [Git](https://git-scm.com/downloads)
@@ -27,7 +28,6 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
 
-
 ### 代码风格
 
 DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
@@ -45,6 +45,7 @@ DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像
 
 * 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean package \
@@ -54,9 +55,11 @@ cd dolphinscheduler
        -Ddocker.tag=<TAG> \
        -Pdocker,release
 ```
+
 当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
 
 * 如果你想基于源码进行改造，然后构建Docker镜像并推送到 <HUB_URL>，可以在代码改造完成后运行
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean deploy \
@@ -117,6 +120,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 ### 启动前端
 
 安装前端依赖并运行前端组件
+
 > 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
 
 ```shell
@@ -138,11 +142,10 @@ pnpm run dev
 * 在 ZooKeeper 的目录下新建 zkData、zkLog文件夹
 * 将 conf 目录下的 `zoo_sample.cfg` 文件，复制一份，重命名为 `zoo.cfg`，修改其中数据和日志的配置，如：
 
-    ```shell
-    dataDir=/data/zookeeper/data ## 此处使用绝对路径
-    dataLogDir=/data/zookeeper/datalog
-    ```
-
+  ```shell
+  dataDir=/data/zookeeper/data ## 此处使用绝对路径
+  dataLogDir=/data/zookeeper/datalog
+  ```
 * 运行 `./bin/zkServer.sh`
 
 #### 数据库
@@ -160,21 +163,22 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
 * 打开项目：使用开发工具打开项目，这里以 Intellij IDEA 为例，打开后需要一段时间，让 Intellij IDEA 完成以依赖的下载
 
 * 必要的修改
+
   * 如果使用 MySQL 作为元数据库，需要先修改 `dolphinscheduler/pom.xml`，将 `mysql-connector-java` 依赖的 `scope` 改为 `compile`，使用 PostgreSQL 则不需要
   * 修改 Master 数据库配置，修改 `dolphinscheduler-master/src/main/resources/application.yaml` 文件中的数据库配置
   * 修改 Worker 数据库配置，修改 `dolphinscheduler-worker/src/main/resources/application.yaml` 文件中的数据库配置
   * 修改 Api 数据库配置，修改 `dolphinscheduler-api/src/main/resources/application.yaml` 文件中的数据库配置
 
   本样例以 MySQL 为例，其中数据库名为 dolphinscheduler，账户名密码均为 dolphinscheduler
-  ```application.yaml
-   spring:
-     datasource:
-       driver-class-name: com.mysql.cj.jdbc.Driver
-       url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
-       username: dolphinscheduler
-       password: dolphinscheduler
-  ```
 
+  ```application.yaml
+  spring:
+    datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+      username: dolphinscheduler
+      password: dolphinscheduler
+  ```
 * 修改日志级别：为以下配置增加一行内容 `<appender-ref ref="STDOUT"/>` 使日志能在命令行中显示
 
   `dolphinscheduler-master/src/main/resources/logback-spring.xml`

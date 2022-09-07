@@ -123,7 +123,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Autowired(required = false)
     private StorageOperate storageOperate;
 
-
     /**
      * create directory
      *
@@ -144,8 +143,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                           int pid,
                                           String currentDir) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE : ApiFuncIdentificationConstant.UDF_FOLDER_ONLINE_CREATE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE
+                : ApiFuncIdentificationConstant.UDF_FOLDER_ONLINE_CREATE;
+        boolean canOperatorPermissions =
+                canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -160,7 +161,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        if(checkDescriptionLength(description)){
+        if (checkDescriptionLength(description)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -179,7 +180,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         Date now = new Date();
 
-        Resource resource = new Resource(pid, name, fullName, true, description, name, loginUser.getId(), type, 0, now, now);
+        Resource resource =
+                new Resource(pid, name, fullName, true, description, name, loginUser.getId(), type, 0, now, now);
 
         try {
             resourcesMapper.insert(resource);
@@ -200,13 +202,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             logger.error("resource already exists, can't recreate ", e);
             throw new ServiceException("resource already exists, can't recreate");
         }
-        //create directory in storage
+        // create directory in storage
         createDirectory(loginUser, fullName, type, result);
         return result;
     }
 
     private String getFullName(String currentDir, String name) {
-        return currentDir.equals(FOLDER_SEPARATOR) ? String.format(FORMAT_SS, currentDir, name) : String.format(FORMAT_S_S, currentDir, name);
+        return currentDir.equals(FOLDER_SEPARATOR) ? String.format(FORMAT_SS, currentDir, name)
+                : String.format(FORMAT_S_S, currentDir, name);
     }
 
     /**
@@ -231,8 +234,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          int pid,
                                          String currentDir) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPLOAD : ApiFuncIdentificationConstant.UDF_UPLOAD;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPLOAD
+                : ApiFuncIdentificationConstant.UDF_UPLOAD;
+        boolean canOperatorPermissions =
+                canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -246,7 +251,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -270,13 +275,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         if (fullName.length() > Constants.RESOURCE_FULL_NAME_MAX_LENGTH) {
-            logger.error("resource {}'s full name {}' is longer than the max length {}", RegexUtils.escapeNRT(name), fullName, Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
+            logger.error("resource {}'s full name {}' is longer than the max length {}", RegexUtils.escapeNRT(name),
+                    fullName, Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
             putMsg(result, Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
             return result;
         }
 
         Date now = new Date();
-        Resource resource = new Resource(pid, name, fullName, false, desc, file.getOriginalFilename(), loginUser.getId(), type, file.getSize(), now, now);
+        Resource resource = new Resource(pid, name, fullName, false, desc, file.getOriginalFilename(),
+                loginUser.getId(), type, file.getSize(), now, now);
 
         try {
             resourcesMapper.insert(resource);
@@ -297,9 +304,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // fail upload
         if (!upload(loginUser, fullName, file, type)) {
-            logger.error("upload resource: {} file: {} failed.", RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
+            logger.error("upload resource: {} file: {} failed.", RegexUtils.escapeNRT(name),
+                    RegexUtils.escapeNRT(file.getOriginalFilename()));
             putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
-            throw new ServiceException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
+            throw new ServiceException(
+                    String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
         }
         return result;
     }
@@ -316,7 +325,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             for (int i = 1; i < splits.length; i++) {
                 String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits, 0, i));
                 if (StringUtils.isNotBlank(parentFullName)) {
-                    List<Resource> resources = resourcesMapper.queryResource(parentFullName, resource.getType().ordinal());
+                    List<Resource> resources =
+                            resourcesMapper.queryResource(parentFullName, resource.getType().ordinal());
                     if (CollectionUtils.isNotEmpty(resources)) {
                         Resource parentResource = resources.get(0);
                         if (parentResource.getSize() + size >= 0) {
@@ -363,8 +373,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(type), funcPermissionKey);
+        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE
+                : ApiFuncIdentificationConstant.UDF_UPDATE;
+        boolean canOperatorPermissions =
+                canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(type), funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -379,7 +391,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -389,7 +401,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        if (resource.isDirectory() && storageOperate.returnStorageType().equals(ResUploadType.S3) && !resource.getFileName().equals(name)) {
+        if (resource.isDirectory() && storageOperate.returnStorageType().equals(ResUploadType.S3)
+                && !resource.getFileName().equals(name)) {
             putMsg(result, Status.S3_CANNOT_RENAME);
             return result;
         }
@@ -399,11 +412,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        //check resource already exists
+        // check resource already exists
         String originFullName = resource.getFullName();
         String originResourceName = resource.getAlias();
 
-        String fullName = String.format(FORMAT_SS, originFullName.substring(0, originFullName.lastIndexOf(FOLDER_SEPARATOR) + 1), name);
+        String fullName = String.format(FORMAT_SS,
+                originFullName.substring(0, originFullName.lastIndexOf(FOLDER_SEPARATOR) + 1), name);
         if (!originResourceName.equals(name) && checkResourceExists(fullName, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
@@ -435,7 +449,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         if (!resource.isDirectory()) {
-            //get the origin file suffix
+            // get the origin file suffix
             String originSuffix = Files.getFileExtension(originFullName);
             String suffix = Files.getFileExtension(fullName);
             boolean suffixIsChanged = false;
@@ -445,15 +459,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (StringUtils.isNotBlank(suffix) && !suffix.equals(originSuffix)) {
                 suffixIsChanged = true;
             }
-            //verify whether suffix is changed
+            // verify whether suffix is changed
             if (suffixIsChanged) {
-                //need verify whether this resource is authorized to other users
+                // need verify whether this resource is authorized to other users
                 Map<String, Object> columnMap = new HashMap<>();
                 columnMap.put("resources_id", resourceId);
 
                 List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
                 if (CollectionUtils.isNotEmpty(resourcesUsers)) {
-                    List<Integer> userIds = resourcesUsers.stream().map(ResourcesUser::getUserId).collect(Collectors.toList());
+                    List<Integer> userIds =
+                            resourcesUsers.stream().map(ResourcesUser::getUserId).collect(Collectors.toList());
                     List<User> users = userMapper.selectBatchIds(userIds);
                     String userNames = users.stream().map(User::getUserName).collect(Collectors.toList()).toString();
                     logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
@@ -538,9 +553,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (file != null) {
             // fail upload
             if (!upload(loginUser, fullName, file, type)) {
-                logger.error("upload resource: {} file: {} failed.", name, RegexUtils.escapeNRT(file.getOriginalFilename()));
+                logger.error("upload resource: {} file: {} failed.", name,
+                        RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.HDFS_OPERATION_ERROR);
-                throw new ServiceException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
+                throw new ServiceException(
+                        String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
             }
             if (!fullName.equals(originFullName)) {
                 try {
@@ -601,12 +618,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             // determine file suffix
             if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
                 // rename file suffix and original suffix must be consistent
-                logger.error("rename file suffix and original suffix must be consistent: {}", RegexUtils.escapeNRT(file.getOriginalFilename()));
+                logger.error("rename file suffix and original suffix must be consistent: {}",
+                        RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
                 return result;
             }
 
-            //If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
+            // If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
             if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(fileSuffix)) {
                 logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
                 putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
@@ -632,7 +650,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list page
      */
     @Override
-    public Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
+    public Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal,
+                                          Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
         Page<Resource> page = new Page<>(pageNo, pageSize);
         if (directoryId != -1) {
@@ -643,13 +662,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> resourcesIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
+        Set<Integer> resourcesIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
         if (resourcesIds.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(), searchVal, new ArrayList<>(resourcesIds));
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(),
+                searchVal, new ArrayList<>(resourcesIds));
         pageInfo.setTotal((int) resourceIPage.getTotal());
         pageInfo.setTotalList(resourceIPage.getRecords());
         result.setData(pageInfo);
@@ -756,7 +777,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
         Result<Object> result = new Result<>();
 
-        Set<Integer> resourceIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
+        Set<Integer> resourceIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
         if (resourceIds.isEmpty()) {
             result.setData(Collections.emptyList());
             putMsg(result, Status.SUCCESS);
@@ -801,8 +823,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(resultCheck, Status.RESOURCE_NOT_EXIST);
             return resultCheck;
         }
-        String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DELETE : ApiFuncIdentificationConstant.UDF_DELETE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(resource.getType()), funcPermissionKey);
+        String funcPermissionKey =
+                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DELETE
+                        : ApiFuncIdentificationConstant.UDF_DELETE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
+                checkResourceType(resource.getType()), funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(resultCheck, Status.NO_CURRENT_OPERATING_PERMISSION);
             return resultCheck;
@@ -824,21 +849,21 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // get all resource id of process definitions those is released
         List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+        Map<Integer, Set<Long>> resourceProcessMap =
+                ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource, true);
 
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
 
-
-        if (needDeleteResourceIdArray.length >= 2){
+        if (needDeleteResourceIdArray.length >= 2) {
             logger.error("can't be deleted,because There are files or folders in the current directory:{}", resource);
             putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
             return result;
         }
 
-        //if resource type is UDF,need check whether it is bound by UDF function
+        // if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
             List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
             if (CollectionUtils.isNotEmpty(udfFuncs)) {
@@ -847,8 +872,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
         }
-
-
 
         if (resourceIdSet.contains(resource.getPid())) {
             logger.error("can't be deleted,because it is used of process definition");
@@ -859,7 +882,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (CollectionUtils.isNotEmpty(resourceIdSet)) {
             logger.error("can't be deleted,because it is used of process definition");
             for (Integer resId : resourceIdSet) {
-                logger.error("resource id:{} is used of process definition {}",resId,resourceProcessMap.get(resId));
+                logger.error("resource id:{} is used of process definition {}", resId, resourceProcessMap.get(resId));
             }
             putMsg(result, Status.RESOURCE_IS_USED);
             return result;
@@ -867,16 +890,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // get hdfs file by type
         String storageFilename = storageOperate.getFileName(resource.getType(), tenantCode, resource.getFullName());
-        //delete data in database
+        // delete data in database
         resourcesMapper.selectBatchIds(Arrays.asList(needDeleteResourceIdArray)).forEach(item -> {
             updateParentResourceSize(item, item.getSize() * -1);
         });
         resourcesMapper.deleteIds(needDeleteResourceIdArray);
         resourceUserMapper.deleteResourceUserArray(0, needDeleteResourceIdArray);
 
-        //delete file on hdfs
+        // delete file on hdfs
 
-        //delete file on storage
+        // delete file on storage
         storageOperate.delete(tenantCode, storageFilename, true);
         putMsg(result, Status.SUCCESS);
 
@@ -894,15 +917,18 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_RENAME : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
+        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_RENAME
+                : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
+        boolean canOperatorPermissions =
+                canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         putMsg(result, Status.SUCCESS);
         if (checkResourceExists(fullName, type.ordinal())) {
-            logger.error("resource type:{} name:{} has exist, can't create again.", type, RegexUtils.escapeNRT(fullName));
+            logger.error("resource type:{} name:{} has exist, can't create again.", type,
+                    RegexUtils.escapeNRT(fullName));
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
             // query tenant
@@ -962,8 +988,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
         }
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resource.getId()}, checkResourceType(type), funcPermissionKey);
+        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW
+                : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resource.getId()},
+                checkResourceType(type), funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -986,8 +1014,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, checkResourceType(resource.getType()), funcPermissionKey);
+        String funcPermissionKey =
+                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW
+                        : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id},
+                checkResourceType(resource.getType()), funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1017,13 +1048,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(resource.getType()), funcPermissionKey);
+        String funcPermissionKey =
+                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW
+                        : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
+                checkResourceType(resource.getType()), funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        //check preview or not by file suffix
+        // check preview or not by file suffix
         String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixes = FileUtils.getResourceViewSuffixes();
         if (StringUtils.isNotEmpty(resourceViewSuffixes)) {
@@ -1080,9 +1114,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     @Transactional
-    public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content, int pid, String currentDir) {
+    public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
+                                               String desc, String content, int pid, String currentDir) {
         Result<Object> result = new Result<>();
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, ApiFuncIdentificationConstant.FILE_ONLINE_CREATE);
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID,
+                ApiFuncIdentificationConstant.FILE_ONLINE_CREATE);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1096,12 +1132,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
-        //check file suffix
+        // check file suffix
         String nameSuffix = fileSuffix.trim();
         String resourceViewSuffixes = FileUtils.getResourceViewSuffixes();
         if (StringUtils.isNotEmpty(resourceViewSuffixes)) {
@@ -1122,7 +1158,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // save data
         Date now = new Date();
-        Resource resource = new Resource(pid, name, fullName, false, desc, name, loginUser.getId(), type, content.getBytes().length, now, now);
+        Resource resource = new Resource(pid, name, fullName, false, desc, name, loginUser.getId(), type,
+                content.getBytes().length, now, now);
 
         resourcesMapper.insert(resource);
         updateParentResourceSize(resource, resource.getSize());
@@ -1158,7 +1195,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     @Transactional
-    public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content) {
+    public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc,
+                                                              String content) {
         if (checkResourceExists(fileFullName, ResourceType.FILE.ordinal())) {
             Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
             Result<Object> result = this.updateResourceContent(loginUser, resource.getId(), content);
@@ -1188,13 +1226,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 }
             }
             return this.onlineCreateResource(
-                    loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content, pid, currDirPath.toString());
+                    loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content, pid,
+                    currDirPath.toString());
         }
     }
 
     @Override
     @Transactional
-    public Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent) {
+    public Integer createOrUpdateResource(String userName, String fullName, String description,
+                                          String resourceContent) {
         User user = userMapper.queryByUserNameAccurately(userName);
         int suffixLabelIndex = fullName.indexOf(PERIOD);
         if (suffixLabelIndex == -1) {
@@ -1227,7 +1267,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     user, dirName, EMPTY_STRING, ResourceType.FILE, pid, currentDir);
             if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
                 Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
-                return (int) resultMap.get("id");
+                return resultMap.get("id") == null ? -1 : (Integer) resultMap.get("id");
             } else {
                 String msg = String.format("Can not create dir %s", dirFullName);
                 logger.error(msg);
@@ -1237,7 +1277,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
-        AuthorizationType authorizationType = resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+        AuthorizationType authorizationType =
+                resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID
+                        : AuthorizationType.UDF_FILE;
         permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resourceId), logger);
     }
 
@@ -1299,19 +1341,23 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(resource.getType()), funcPermissionKey);
+        String funcPermissionKey =
+                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE
+                        : ApiFuncIdentificationConstant.UDF_UPDATE;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
+                checkResourceType(resource.getType()), funcPermissionKey);
         if (!canOperatorPermissions) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-        //check can edit by file suffix
+        // check can edit by file suffix
         String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixes = FileUtils.getResourceViewSuffixes();
         if (StringUtils.isNotEmpty(resourceViewSuffixes)) {
             List<String> strList = Arrays.asList(resourceViewSuffixes.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.error("resource suffix {} not support updateProcessInstance,  resource id {}", nameSuffix, resourceId);
+                logger.error("resource suffix {} not support updateProcessInstance,  resource id {}", nameSuffix,
+                        resourceId);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
@@ -1341,7 +1387,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param content      content
      * @return result
      */
-    private Result<Object> uploadContentToStorage(User loginUser,String resourceName, String tenantCode, String content) {
+    private Result<Object> uploadContentToStorage(User loginUser, String resourceName, String tenantCode,
+                                                  String content) {
         Result<Object> result = new Result<>();
         String localFilename = "";
         String storageFileName = "";
@@ -1355,7 +1402,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
 
-            // get resource file  path
+            // get resource file path
             storageFileName = storageOperate.getResourceFileName(tenantCode, resourceName);
             String resourcePath = storageOperate.getResDir(tenantCode);
             logger.info("resource  path is {}, resource dir is {}", storageFileName, resourcePath);
@@ -1400,10 +1447,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return null;
         }
 
-        String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DOWNLOAD : ApiFuncIdentificationConstant.UDF_DOWNLOAD;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(resource.getType()), funcPermissionKey);
+        String funcPermissionKey =
+                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DOWNLOAD
+                        : ApiFuncIdentificationConstant.UDF_DOWNLOAD;
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
+                checkResourceType(resource.getType()), funcPermissionKey);
         if (!canOperatorPermissions) {
-            logger.error("{}: {}", Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(), PropertyUtils.getResUploadStartupState());
+            logger.error("{}: {}", Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(),
+                    PropertyUtils.getResUploadStartupState());
             throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg());
         }
         if (resource.isDirectory()) {
@@ -1421,7 +1472,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
             logger.error("tenant id {} not exists", user.getTenantId());
-            throw new ServiceException(String.format("The tenant id %d of resource owner not exist", user.getTenantId()));
+            throw new ServiceException(
+                    String.format("The tenant id %d of resource owner not exist", user.getTenantId()));
         }
 
         String tenantCode = tenant.getTenantCode();
@@ -1435,7 +1487,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             storageOperate.download(tenantCode, fileName, localFileName, false, true);
             return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
         } catch (IOException e) {
-            logger.error("download resource error, the path is {}, and local filename is {}, the error message is {}", fileName, localFileName, e.getMessage());
+            logger.error("download resource error, the path is {}, and local filename is {}, the error message is {}",
+                    fileName, localFileName, e.getMessage());
             throw new ServerException("download the resource file failed ,it may be related to your storage");
         }
     }
@@ -1598,7 +1651,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Visitor visitor = new ResourceTreeVisitor(authedResources);
         String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
-        String jsonTreeStr = JSONUtils.toJsonString(visitor.visit().getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        String jsonTreeStr =
+                JSONUtils.toJsonString(visitor.visit().getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(jsonTreeStr);
         result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result, Status.SUCCESS);
@@ -1652,7 +1706,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     List<Integer> listAllChildren(Resource resource, boolean containSelf) {
         List<Integer> childList = new ArrayList<>();
-        if (resource.getId() != -1 && containSelf) {
+        if (resource.getId() != null && containSelf) {
             childList.add(resource.getId());
         }
 
@@ -1684,7 +1738,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return all authored resource list
      */
     private List<Resource> queryAuthoredResourceList(User loginUser, ResourceType type) {
-        Set<Integer> resourceIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
+        Set<Integer> resourceIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
         if (resourceIds.isEmpty()) {
             return Collections.emptyList();
         }
