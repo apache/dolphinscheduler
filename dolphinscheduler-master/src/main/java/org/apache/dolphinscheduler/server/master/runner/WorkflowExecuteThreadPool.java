@@ -101,7 +101,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      * Handle the events belong to the given workflow.
      */
     public void executeEvent(final WorkflowExecuteRunnable workflowExecuteThread) {
-        if (!workflowExecuteThread.isStart() || workflowExecuteThread.eventSize() == 0) {
+        if (!workflowExecuteThread.isStart() || workflowExecuteThread.isHandingEvent()
+            || workflowExecuteThread.eventSize() == 0) {
             return;
         }
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
