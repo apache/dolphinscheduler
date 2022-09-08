@@ -2393,7 +2393,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                     long projectCode,
                                                     long processDefinitionCode,
                                                     String scheduleJson) {
-        Map<String, Object> result = new HashMap<>();
         Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
         if (schedule == null) {
             throw new ServiceException(Status.DATA_IS_NOT_VALID,scheduleJson);
