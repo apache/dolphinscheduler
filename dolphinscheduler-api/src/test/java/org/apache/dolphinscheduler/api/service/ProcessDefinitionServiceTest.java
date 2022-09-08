@@ -421,11 +421,13 @@ public class ProcessDefinitionServiceTest {
         //scheduler online
         Schedule schedule = getSchedule();
         schedule.setReleaseState(ReleaseState.ONLINE);
+        schedule.setProcessDefinitionName("processDefinitionName");
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(schedule);
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode())).thenReturn(Collections.emptySet());
-        Map<String, Object> schedulerOnlineRes = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L);
-        Assert.assertEquals(Status.SCHEDULE_CRON_STATE_ONLINE, schedulerOnlineRes.get(Constants.STATUS));
+        exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, 46L));
+        formatter= MessageFormat.format(Status.SCHEDULE_CRON_STATE_ONLINE.getMsg(), schedule.getProcessDefinitionName());
+        Assertions.assertEquals(formatter, exception.getMessage());
 
         //process used by other task, sub process
         loginUser.setUserType(UserType.ADMIN_USER);
