@@ -30,7 +30,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 public class K8sTask extends AbstractK8sTask {
 
@@ -54,6 +56,11 @@ public class K8sTask extends AbstractK8sTask {
         if (!k8sTaskParameters.checkParameters()) {
             throw new TaskException("K8S task params is not valid");
         }
+    }
+
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
