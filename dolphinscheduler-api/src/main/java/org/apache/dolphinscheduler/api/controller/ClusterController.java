@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * cluster controller
@@ -72,9 +73,9 @@ public class ClusterController extends BaseController {
      */
     @ApiOperation(value = "createCluster", notes = "CREATE_CLUSTER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "name", value = "CLUSTER_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "CLUSTER_DESC", dataType = "String")
+            @ApiImplicitParam(name = "name", value = "CLUSTER_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "description", value = "CLUSTER_DESC", dataTypeClass = String.class)
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -101,10 +102,10 @@ public class ClusterController extends BaseController {
      */
     @ApiOperation(value = "updateCluster", notes = "UPDATE_CLUSTER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "CLUSTER_CODE", required = true, dataType = "Long", example = "100"),
-        @ApiImplicitParam(name = "name", value = "CLUSTER_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "config", value = "CLUSTER_CONFIG", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "CLUSTER_DESC", dataType = "String"),
+            @ApiImplicitParam(name = "code", value = "CLUSTER_CODE", required = true, dataTypeClass = long.class, example = "100"),
+            @ApiImplicitParam(name = "name", value = "CLUSTER_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "config", value = "CLUSTER_CONFIG", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "description", value = "CLUSTER_DESC", dataTypeClass = String.class),
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -127,7 +128,7 @@ public class ClusterController extends BaseController {
      */
     @ApiOperation(value = "queryClusterByCode", notes = "QUERY_CLUSTER_BY_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "clusterCode", value = "CLUSTER_CODE", required = true, dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "clusterCode", value = "CLUSTER_CODE", required = true, dataTypeClass = long.class, example = "100")
     })
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
@@ -150,9 +151,9 @@ public class ClusterController extends BaseController {
      */
     @ApiOperation(value = "queryClusterListPaging", notes = "QUERY_CLUSTER_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -161,8 +162,7 @@ public class ClusterController extends BaseController {
     public Result queryClusterListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "searchVal", required = false) String searchVal,
                                          @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo
-    ) {
+                                         @RequestParam("pageNo") Integer pageNo) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
@@ -182,15 +182,14 @@ public class ClusterController extends BaseController {
      */
     @ApiOperation(value = "deleteClusterByCode", notes = "DELETE_CLUSTER_BY_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "clusterCode", value = "CLUSTER_CODE", required = true, dataType = "Long", example = "100")
+            @ApiImplicitParam(name = "clusterCode", value = "CLUSTER_CODE", required = true, dataTypeClass = long.class, example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_CLUSTER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteCluster(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("clusterCode") Long clusterCode
-    ) {
+                                @RequestParam("clusterCode") Long clusterCode) {
 
         Map<String, Object> result = clusterService.deleteClusterByCode(loginUser, clusterCode);
         return returnDataList(result);
@@ -221,15 +220,14 @@ public class ClusterController extends BaseController {
      */
     @ApiOperation(value = "verifyCluster", notes = "VERIFY_CLUSTER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "clusterName", value = "CLUSTER_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "clusterName", value = "CLUSTER_NAME", required = true, dataTypeClass = String.class)
     })
     @PostMapping(value = "/verify-cluster")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_CLUSTER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyCluster(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam(value = "clusterName") String clusterName
-    ) {
+                                @RequestParam(value = "clusterName") String clusterName) {
         Map<String, Object> result = clusterService.verifyCluster(clusterName);
         return returnDataList(result);
     }

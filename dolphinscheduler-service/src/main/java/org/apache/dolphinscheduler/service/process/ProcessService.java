@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.service.process;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -127,8 +126,6 @@ public interface ProcessService {
 
     TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance);
 
-    void saveProcessInstance(ProcessInstance processInstance);
-
     int saveCommand(Command command);
 
     boolean saveTaskInstance(TaskInstance taskInstance);
@@ -163,8 +160,6 @@ public interface ProcessService {
 
     ProcessInstance findParentProcessInstance(Integer subProcessId);
 
-    int updateProcessInstance(ProcessInstance processInstance);
-
     void changeOutParam(TaskInstance taskInstance);
 
     Schedule querySchedule(int id);
@@ -185,8 +180,6 @@ public interface ProcessService {
     List<TaskInstance> queryNeedFailoverTaskInstances(String host);
 
     DataSource findDataSourceById(int id);
-
-    int updateProcessInstanceState(Integer processInstanceId, WorkflowExecutionStatus executionStatus);
 
     ProcessInstance findProcessInstanceByTaskId(int taskId);
 

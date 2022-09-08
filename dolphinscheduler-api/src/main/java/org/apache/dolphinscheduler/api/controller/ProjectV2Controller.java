@@ -45,6 +45,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -63,7 +65,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * project controller
@@ -91,7 +92,7 @@ public class ProjectV2Controller extends BaseController {
     public ProjectCreateResponse createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestBody ProjectCreateRequest projectCreateRequest) {
         Result result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
-            projectCreateRequest.getDescription());
+                projectCreateRequest.getDescription());
         return new ProjectCreateResponse(result);
     }
 
@@ -112,7 +113,7 @@ public class ProjectV2Controller extends BaseController {
                                                @PathVariable("code") Long code,
                                                @RequestBody ProjectUpdateRequest projectUpdateReq) {
         Result result = projectService.update(loginUser, code, projectUpdateReq.getProjectName(),
-            projectUpdateReq.getDescription(), projectUpdateReq.getUserName());
+                projectUpdateReq.getDescription(), projectUpdateReq.getUserName());
         return new ProjectUpdateResponse(result);
     }
 
@@ -125,7 +126,7 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryProjectByCode", notes = "QUERY_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456", required = true)
+            @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataTypeClass = long.class, example = "123456", required = true)
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -146,9 +147,9 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryProjectListPaging", notes = "QUERY_PROJECT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String", example = "test"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class, example = "test"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "10"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1")
     })
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
@@ -162,7 +163,7 @@ public class ProjectV2Controller extends BaseController {
         }
         String searchVal = ParameterUtils.handleEscapes(projectQueryReq.getSearchVal());
         result = projectService.queryProjectListPaging(loginUser, projectQueryReq.getPageSize(),
-            projectQueryReq.getPageNo(), searchVal);
+                projectQueryReq.getPageNo(), searchVal);
         return new ProjectListPagingResponse(result);
     }
 
@@ -175,7 +176,7 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "delete", notes = "DELETE_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataType = "Long", example = "123456", required = true)
+            @ApiImplicitParam(name = "code", value = "PROJECT_CODE", dataTypeClass = long.class, example = "123456", required = true)
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -196,7 +197,7 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryUnauthorizedProject", notes = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100", required = true)
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataTypeClass = int.class, example = "100", required = true)
     })
     @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
@@ -217,7 +218,7 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryAuthorizedProject", notes = "QUERY_AUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100", required = true)
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataTypeClass = int.class, example = "100", required = true)
     })
     @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
@@ -238,7 +239,7 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryAuthorizedUser", notes = "QUERY_AUTHORIZED_USER_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100", required = true)
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100", required = true)
     })
     @GetMapping(value = "/authed-user")
     @ResponseStatus(HttpStatus.OK)
@@ -258,7 +259,7 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryProjectCreatedAndAuthorizedByUser", notes = "QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "loginUser", value = "LOGIN_USER", dataType = "Object", example = "\"{id:100}\"", required = true)
+            @ApiImplicitParam(name = "loginUser", value = "LOGIN_USER", dataTypeClass = Object.class, example = "\"{id:100}\"", required = true)
     })
     @GetMapping(value = "/created-and-authed")
     @ResponseStatus(HttpStatus.OK)
@@ -277,7 +278,7 @@ public class ProjectV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryAllProjectList", notes = "QUERY_ALL_PROJECT_LIST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "loginUser", value = "LOGIN_USER", dataType = "Object", example = "\"{id:100}\"", required = true)
+            @ApiImplicitParam(name = "loginUser", value = "LOGIN_USER", dataTypeClass = Object.class, example = "\"{id:100}\"", required = true)
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)

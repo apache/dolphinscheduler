@@ -93,18 +93,27 @@ export default defineComponent({
           <CrontabTime
             v-model:timeValue={this.secondRef}
             timeI18n={timeI18n.second}
+            timeSpecial={60}
+            timeMin={0}
+            timeMax={59}
           />
         </NTabPane>
         <NTabPane name='minute' tab={t('crontab.minute')}>
           <CrontabTime
             v-model:timeValue={this.minuteRef}
             timeI18n={timeI18n.minute}
+            timeSpecial={60}
+            timeMin={0}
+            timeMax={59}
           />
         </NTabPane>
         <NTabPane name='hour' tab={t('crontab.hour')}>
           <CrontabTime
             v-model:timeValue={this.hourRef}
             timeI18n={timeI18n.hour}
+            timeSpecial={24}
+            timeMin={0}
+            timeMax={23}
           />
         </NTabPane>
         <NTabPane name='day' tab={t('crontab.day')}>
@@ -117,12 +126,22 @@ export default defineComponent({
           <CrontabTime
             v-model:timeValue={this.monthRef}
             timeI18n={timeI18n.month}
+            timeSpecial={12}
+            timeMin={0}
+            timeMax={12}
           />
         </NTabPane>
         <NTabPane name='year' tab={t('crontab.year')}>
           <CrontabTime
             v-model:timeValue={this.yearRef}
             timeI18n={timeI18n.year}
+            timeSpecial={'year'}
+            timeMin={0}
+            timeMax={2030}
+            intervalPerform={1}
+            intervalStart={2019}
+            cycleStart={2019}
+            cycleEnd={2019}
           />
         </NTabPane>
       </NTabs>

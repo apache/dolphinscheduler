@@ -16,8 +16,6 @@
 #
 
 spring:
-  application:
-    name: standalone-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -71,6 +69,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
 registry:
   type: zookeeper

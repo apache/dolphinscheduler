@@ -140,7 +140,10 @@ const NodeDetailModal = defineComponent({
           action: () => {
             router.push({
               name: 'task-instance',
-              params: { processInstanceId: processInstance.id }
+              params: {
+                processInstanceId: processInstance.id,
+                taskName: props.data.name
+              }
             })
           },
           icon: renderIcon(HistoryOutlined)
