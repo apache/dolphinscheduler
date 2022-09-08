@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.procedure;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -47,7 +48,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 /**
  * procedure task
  */
-public class ProcedureTask extends AbstractTaskExecutor {
+public class ProcedureTask extends AbstractTask {
 
     /**
      * procedure parameters
@@ -84,7 +85,7 @@ public class ProcedureTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         logger.info("procedure type : {}, datasource : {}, method : {} , localParams : {}",
                 procedureParameters.getType(),
                 procedureParameters.getDatasource(),
@@ -127,6 +128,11 @@ public class ProcedureTask extends AbstractTaskExecutor {
         } finally {
             close(stmt, connection);
         }
+    }
+
+    @Override
+    public void cancel() throws TaskException {
+
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {

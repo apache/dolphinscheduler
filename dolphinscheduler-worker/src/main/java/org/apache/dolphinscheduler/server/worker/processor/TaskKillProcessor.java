@@ -178,7 +178,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             return;
         }
         try {
-            task.cancelApplication(true);
+            task.cancel();
         } catch (Exception e) {
             logger.error("kill task error", e);
         }
