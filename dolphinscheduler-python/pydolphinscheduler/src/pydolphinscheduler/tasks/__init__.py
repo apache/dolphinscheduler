@@ -35,6 +35,7 @@ from pydolphinscheduler.tasks.switch import Branch, Default, Switch, SwitchCondi
 __all__ = [
     "Condition",
     "DataX",
+    "CustomDataX",
     "Dependent",
     "Flink",
     "Http",

@@ -17,13 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
-import lombok.NonNull;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -47,15 +41,24 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 
 @Service
 public class MasterFailoverService {
@@ -241,7 +244,6 @@ public class MasterFailoverService {
         }
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
-        taskInstance.setFlag(Flag.NO);
         processService.saveTaskInstance(taskInstance);
     }
 
@@ -285,7 +287,8 @@ public class MasterFailoverService {
             // The processInstance is newly created
             return false;
         }
-        if (processInstance.getRestartTime() != null && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
+        if (processInstance.getRestartTime() != null
+                && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
             // the processInstance is already be failovered.
             return false;
         }

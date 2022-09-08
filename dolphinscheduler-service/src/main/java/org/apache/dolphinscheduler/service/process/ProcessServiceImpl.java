@@ -17,14 +17,21 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import io.micrometer.core.annotation.Counted;
-import org.apache.commons.collections.CollectionUtils;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -130,11 +137,8 @@ import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,20 +153,19 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toSet;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import io.micrometer.core.annotation.Counted;
 
 /**
  * process relative dao that some mappers in this.
@@ -317,8 +320,8 @@ public class ProcessServiceImpl implements ProcessService {
     protected void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         processInstance.setStateWithDesc(WorkflowExecutionStatus.SERIAL_WAIT, "wait by serial_wait strategy");
         processInstanceDao.upsertProcessInstance(processInstance);
-        //serial wait
-        //when we get the running instance(or waiting instance) only get the priority instance(by id)
+        // serial wait
+        // when we get the running instance(or waiting instance) only get the priority instance(by id)
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
             List<ProcessInstance> runningProcessInstances =
                     this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
@@ -326,7 +329,8 @@ public class ProcessServiceImpl implements ProcessService {
                             processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
-                processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS, "submit from serial_wait strategy");
+                processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                        "submit from serial_wait strategy");
                 processInstanceDao.upsertProcessInstance(processInstance);
             }
         } else if (processDefinition.getExecutionType().typeIsSerialDiscard()) {
@@ -340,7 +344,8 @@ public class ProcessServiceImpl implements ProcessService {
                 processInstanceDao.upsertProcessInstance(processInstance);
                 return;
             }
-            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS, "submit from serial_discard strategy");
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                    "submit from serial_discard strategy");
             processInstanceDao.upsertProcessInstance(processInstance);
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances =
@@ -366,7 +371,8 @@ public class ProcessServiceImpl implements ProcessService {
                     }
                 }
             }
-            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS, "submit by serial_priority strategy");
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                    "submit by serial_priority strategy");
             processInstanceDao.upsertProcessInstance(processInstance);
         }
     }
@@ -1025,7 +1031,7 @@ public class ProcessServiceImpl implements ProcessService {
                 break;
             case COMPLEMENT_DATA:
                 // delete all the valid tasks when complement data if id is not null
-                if (processInstance.getId() != 0) {
+                if (processInstance.getId() != null) {
                     List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag());
                     for (TaskInstance taskInstance : taskInstanceList) {
                         taskInstance.setFlag(Flag.NO);
@@ -1273,7 +1279,7 @@ public class ProcessServiceImpl implements ProcessService {
                 // submit task to db
                 // Only want to use transaction here
                 task = submitTask(processInstance, taskInstance);
-                if (task != null && task.getId() != 0) {
+                if (task != null && task.getId() != null) {
                     break;
                 }
                 logger.error(
@@ -1495,7 +1501,8 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);
-        int subProcessInstanceId = childInstance == null ? 0 : childInstance.getId();
+        int subProcessInstanceId =
+                childInstance == null ? 0 : (childInstance.getId() == null ? 0 : childInstance.getId());
         return new Command(
                 commandType,
                 TaskDependType.TASK_POST,
@@ -1659,7 +1666,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public int saveCommand(Command command) {
-        if (command.getId() != 0) {
+        if (command.getId() != null) {
             return commandMapper.updateById(command);
         } else {
             return commandMapper.insert(command);
@@ -1674,7 +1681,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public boolean saveTaskInstance(TaskInstance taskInstance) {
-        if (taskInstance.getId() != 0) {
+        if (taskInstance.getId() != null) {
             return updateTaskInstance(taskInstance);
         } else {
             return createTaskInstance(taskInstance);
@@ -1796,8 +1803,8 @@ public class ProcessServiceImpl implements ProcessService {
         ResourceInfo resourceInfo = null;
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {
-            int resourceId = res.getId();
-            if (resourceId <= 0) {
+            Integer resourceId = res.getId();
+            if (resourceId == null) {
                 logger.error("invalid resourceId, {}", resourceId);
                 return null;
             }
@@ -2473,7 +2480,7 @@ public class ProcessServiceImpl implements ProcessService {
 
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
             resourceIds = params.getResourceFilesList().stream()
-                    .filter(t -> t.getId() != 0)
+                    .filter(t -> t.getId() != null)
                     .map(ResourceInfo::getId)
                     .collect(toSet());
         }
@@ -2529,7 +2536,8 @@ public class ProcessServiceImpl implements ProcessService {
         int insertResult = 0;
         int updateResult = 0;
         if (!updateTaskDefinitionLogs.isEmpty()) {
-            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs.stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
+            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs
+                    .stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
             for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
                 TaskDefinition task = null;
                 for (TaskDefinition taskDefinition : taskDefinitions) {
@@ -2578,10 +2586,13 @@ public class ProcessServiceImpl implements ProcessService {
                         : ReleaseState.OFFLINE);
         processDefinitionLog.setOperator(operator.getId());
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
-        int insertLog = processDefineLogMapper.insert(processDefinitionLog);
+        int insertLog = processDefineLogMapper.updateById(processDefinitionLog);
+        if (insertLog == 0) {
+            insertLog = processDefineLogMapper.insert(processDefinitionLog);
+        }
         int result = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
-            if (0 == processDefinition.getId()) {
+            if (processDefinition.getId() == null) {
                 result = processDefineMapper.insert(processDefinitionLog);
             } else {
                 processDefinitionLog.setId(processDefinition.getId());
@@ -2978,13 +2989,15 @@ public class ProcessServiceImpl implements ProcessService {
                 taskGroupQueue.getId(),
                 TaskGroupQueueStatus.WAIT_QUEUE.getCode());
         if (affectedCount > 0) {
-            logger.info("Success rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(), taskGroupQueue.getId());
+            logger.info("Success rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(),
+                    taskGroupQueue.getId());
             taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
             this.taskGroupQueueMapper.updateById(taskGroupQueue);
             this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
             return true;
         }
-        logger.info("Failed to rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(), taskGroupQueue.getId());
+        logger.info("Failed to rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(),
+                taskGroupQueue.getId());
         return false;
     }
 
@@ -3022,9 +3035,9 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             } while (thisTaskGroupQueue.getForceStart() == Flag.NO.getCode()
                     && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(),
-                    taskGroup.getUseSize(),
-                    thisTaskGroupQueue.getId(),
-                    TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
+                            taskGroup.getUseSize(),
+                            thisTaskGroupQueue.getId(),
+                            TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
         } catch (Exception e) {
             logger.error("release the task group error", e);
             return null;
