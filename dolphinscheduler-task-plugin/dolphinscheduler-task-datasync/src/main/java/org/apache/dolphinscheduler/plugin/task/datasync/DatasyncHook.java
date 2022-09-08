@@ -14,8 +14,6 @@ import software.amazon.awssdk.services.datasync.model.CancelTaskExecutionRequest
 import software.amazon.awssdk.services.datasync.model.CancelTaskExecutionResponse;
 import software.amazon.awssdk.services.datasync.model.CreateTaskRequest;
 import software.amazon.awssdk.services.datasync.model.CreateTaskResponse;
-import software.amazon.awssdk.services.datasync.model.DeleteTaskRequest;
-import software.amazon.awssdk.services.datasync.model.DeleteTaskResponse;
 import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionRequest;
 import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionResponse;
 import software.amazon.awssdk.services.datasync.model.DescribeTaskRequest;

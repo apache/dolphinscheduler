@@ -24,8 +24,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
-import lombok.Data;
-
 import java.util.List;
 
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
