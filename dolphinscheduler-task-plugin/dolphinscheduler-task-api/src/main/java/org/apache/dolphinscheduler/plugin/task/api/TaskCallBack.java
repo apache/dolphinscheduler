@@ -15,20 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 
-public interface ProcessInstanceDao {
+public interface TaskCallBack {
 
-    public int insertProcessInstance(ProcessInstance processInstance);
-
-    public int updateProcessInstance(ProcessInstance processInstance);
-
-    /**
-     * insert or update work process instance to database
-     *
-     * @param processInstance processInstance
-     */
-    public int upsertProcessInstance(ProcessInstance processInstance);
+    public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo);
 }

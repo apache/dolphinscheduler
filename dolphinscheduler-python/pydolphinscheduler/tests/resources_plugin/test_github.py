@@ -196,6 +196,7 @@ def test_github_get_req_url(attr, expected):
     assert expected == github.get_req_url(attr)
 
 
+@pytest.mark.skip(reason="Lack of test environment, need stable repository")
 @pytest.mark.parametrize(
     "attr, expected",
     [
@@ -230,6 +231,7 @@ def test_github_read_file(attr, expected):
     assert expected == github.read_file(attr)
 
 
+@pytest.mark.skip(reason="Lack of test environment, need stable repository")
 @pytest.mark.parametrize(
     "attr, expected",
     [
@@ -293,6 +295,7 @@ def test_github_private_rep(attr, expected):
     assert expected == github.read_file("union.sh")
 
 
+@pytest.mark.skip(reason="Lack of test environment, need stable repository")
 def test_github_file_not_found():
     """Test file does not exist."""
     with pytest.raises(

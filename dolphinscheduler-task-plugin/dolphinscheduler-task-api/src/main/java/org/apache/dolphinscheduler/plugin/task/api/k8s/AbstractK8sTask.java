@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
-public abstract class AbstractK8sTask extends AbstractTaskExecutor {
+public abstract class AbstractK8sTask extends AbstractRemoteTask {
     /**
      * process task
      */
@@ -38,8 +40,9 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
         this.abstractK8sTaskExecutor = new K8sTaskExecutor(logger,taskRequest);
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             TaskResponse response = abstractK8sTaskExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
@@ -50,15 +53,25 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
         }
     }
 
+    // todo
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    // todo
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
+    }
+
     /**
      * cancel application
      *
-     * @param status status
      * @throws Exception exception
      */
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        cancel = true;
+    public void cancelApplication() throws TaskException {
         // cancel process
         abstractK8sTaskExecutor.cancelApplication(buildCommand());
     }
