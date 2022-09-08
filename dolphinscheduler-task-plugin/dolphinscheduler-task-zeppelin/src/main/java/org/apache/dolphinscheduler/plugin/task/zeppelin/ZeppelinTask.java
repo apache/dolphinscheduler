@@ -19,7 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.Unirest;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -32,11 +35,13 @@ import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class ZeppelinTask extends AbstractTaskExecutor {
+public class ZeppelinTask extends AbstractRemoteTask {
 
     /**
      * taskExecutionContext
@@ -74,8 +79,9 @@ public class ZeppelinTask extends AbstractTaskExecutor {
         this.zClient = getZeppelinClient();
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
@@ -142,6 +148,15 @@ public class ZeppelinTask extends AbstractTaskExecutor {
             logger.error("zeppelin task submit failed with error", e);
             throw new TaskException("Execute ZeppelinTask exception");
         }
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
 
     }
 
@@ -188,9 +203,8 @@ public class ZeppelinTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean status) throws Exception {
+    public void cancelApplication() throws TaskException {
         final String restEndpoint = this.zeppelinParameters.getRestEndpoint();
-        super.cancelApplication(status);
         final String noteId = this.zeppelinParameters.getNoteId();
         final String paragraphId = this.zeppelinParameters.getParagraphId();
         if (paragraphId == null) {
@@ -207,13 +221,22 @@ public class ZeppelinTask extends AbstractTaskExecutor {
                     this.taskExecutionContext.getTaskInstanceId(),
                     noteId,
                     paragraphId);
-            this.zClient.cancelParagraph(noteId, paragraphId);
+            try {
+                this.zClient.cancelParagraph(noteId, paragraphId);
+            } catch (Exception e) {
+                throw new TaskException("cancel paragraph error", e);
+            }
             logger.info("zeppelin task terminated, taskId: {}, noteId: {}, paragraphId: {}",
                     this.taskExecutionContext.getTaskInstanceId(),
                     noteId,
                     paragraphId);
         }
 
+    }
+
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
 }

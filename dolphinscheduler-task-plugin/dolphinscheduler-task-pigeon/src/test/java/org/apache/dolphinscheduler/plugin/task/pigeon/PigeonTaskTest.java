@@ -114,7 +114,7 @@ public class PigeonTaskTest {
                 file("src/test/resources/org/apache/dolphinscheduler/plugin/task/pigeon/PigeonTaskTest.json"));
 
         running(server, () -> {
-            pigeonTask.handle();
+            pigeonTask.handle(null);
 
             Assert.assertEquals("PIGEON execute be success", TaskExecutionStatus.SUCCESS, pigeonTask.getExitStatus());
         });

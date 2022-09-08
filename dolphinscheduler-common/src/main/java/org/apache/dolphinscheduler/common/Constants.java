@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Duration;
 import java.util.regex.Pattern;

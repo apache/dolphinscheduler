@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import com.google.common.collect.Lists;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
+import com.google.common.collect.Sets;
 
 public class LogUtilsTest {
 
@@ -30,7 +31,7 @@ public class LogUtilsTest {
 
     @Test
     public void getAppIdsFromLogFile() {
-        List<String> appIds = LogUtils.getAppIdsFromLogFile(APP_ID_FILE);
-        Assert.assertEquals(Lists.newArrayList("application_1548381669007_1234"), appIds);
+        Set<String> appIds = LogUtils.getAppIdsFromLogFile(APP_ID_FILE);
+        Assert.assertEquals(Sets.newHashSet("application_1548381669007_1234"), appIds);
     }
 }

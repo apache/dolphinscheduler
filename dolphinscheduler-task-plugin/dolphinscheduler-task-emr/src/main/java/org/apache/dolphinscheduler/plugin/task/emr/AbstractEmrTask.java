@@ -22,7 +22,8 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -44,7 +45,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
  *
  * @since v3.1.0
  */
-public abstract class AbstractEmrTask extends AbstractTaskExecutor {
+public abstract class AbstractEmrTask extends AbstractRemoteTask {
 
     final TaskExecutionContext taskExecutionContext;
     EmrParameters emrParameters;

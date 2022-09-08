@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -97,7 +98,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     }
 
     @Override
-    public void cancelApplication(boolean status) throws Exception {
+    public void cancelApplication() throws TaskException {
         Set<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
             logger.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
@@ -110,8 +111,11 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);
-        processBuilder.start();
-        super.cancelApplication(status);
+        try {
+            processBuilder.start();
+        } catch (IOException e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     @Override
