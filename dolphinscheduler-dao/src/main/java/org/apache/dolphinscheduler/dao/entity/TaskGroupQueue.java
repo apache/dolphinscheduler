@@ -22,21 +22,22 @@ import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * Task Group Queue
- */
+@Data
 @TableName("t_ds_task_group_queue")
 public class TaskGroupQueue implements Serializable {
+
     /**
      * key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * taskInstanceId
      */
@@ -99,139 +100,13 @@ public class TaskGroupQueue implements Serializable {
 
     }
 
-    public TaskGroupQueue(int taskId, String taskName, int groupId, int processId, int priority, TaskGroupQueueStatus status) {
+    public TaskGroupQueue(int taskId, String taskName, int groupId, int processId, int priority,
+                          TaskGroupQueueStatus status) {
         this.taskId = taskId;
         this.taskName = taskName;
         this.groupId = groupId;
         this.processId = processId;
         this.priority = priority;
         this.status = status;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public int getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(int processId) {
-        this.processId = processId;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskGroupQueue{"
-            + "id=" + id
-            + ", taskId=" + taskId
-            + ", taskName='" + taskName + '\''
-            + ", groupId=" + groupId
-            + ", processId=" + processId
-            + ", priority=" + priority
-            + ", status=" + status
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + '}';
-    }
-
-    public TaskGroupQueueStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TaskGroupQueueStatus status) {
-        this.status = status;
-    }
-
-    public int getForceStart() {
-        return forceStart;
-    }
-
-    public void setForceStart(int forceStart) {
-        this.forceStart = forceStart;
-    }
-
-    public int getInQueue() {
-        return inQueue;
-    }
-
-    public void setInQueue(int inQueue) {
-        this.inQueue = inQueue;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getProcessInstanceName() {
-        return processInstanceName;
-    }
-
-    public void setProcessInstanceName(String processInstanceName) {
-        this.processInstanceName = processInstanceName;
-    }
-
-    public String getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(String projectCode) {
-        this.projectCode = projectCode;
     }
 }

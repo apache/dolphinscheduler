@@ -32,8 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import springfox.documentation.annotations.ApiIgnore;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 
 import java.util.Map;
 
