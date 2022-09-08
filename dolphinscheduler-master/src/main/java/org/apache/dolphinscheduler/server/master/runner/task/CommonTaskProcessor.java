@@ -181,10 +181,9 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     /**
      * Check whether the test data source needs to be replaced
      */
-    public boolean checkAndReplaceTestDataSource(){
+    public void checkAndReplaceTestDataSource(){
         if (taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
             try {
-                if (TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType()).getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                     Map<String, Object> instanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
                     });
                     Integer onlineDataSourceId = (Integer) instanceParams.get("datasource");
@@ -193,16 +192,12 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                     taskInstance.setTaskParams(JSONUtils.toJsonString(instanceParams));
                     if (null == testDataSourceId) {
                         logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
-                        return false;
                     } else {
                         logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
-                        return true;
                     }
-                }
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
         }
-        return true;
     }
 }

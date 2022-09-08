@@ -183,8 +183,9 @@ export function useForm(id?: number) {
     const params = { type: state.detailForm.type, testFlag: 1 } as TypeReq
     const result = await queryDataSourceList(params)
     state.bindTestDataSourceExample = result
-        .filter((value: { label: string; value: number }) => {
-          if (state.detailForm.id && state.detailForm.id === value.value)
+        .filter((value: { label: string; value: string }) => {
+          // @ts-ignore
+          if (state.detailForm.id && state.detailForm.id === value.id)
             return false
           return true
         })

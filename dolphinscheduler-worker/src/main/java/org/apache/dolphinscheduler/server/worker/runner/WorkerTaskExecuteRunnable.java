@@ -50,10 +50,11 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
@@ -295,7 +296,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     public boolean checkTaskHaveDataSourceInstance(String taskType) {
-        List<String> testableTaskTypeList = Arrays.asList("PROCEDURE", "SQL", "DATAX", "SQOOP", "DATA_QUALITY");
+        List<String> testableTaskTypeList = Collections.singletonList("SQL");
         return testableTaskTypeList.contains(taskType);
     }
 

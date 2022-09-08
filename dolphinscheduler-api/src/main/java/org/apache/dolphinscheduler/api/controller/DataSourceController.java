@@ -165,8 +165,8 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDataSourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("type") DbType type,
-                                      @RequestParam("testFlag")int testFlag) {
-        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal(),testFlag);
+                                      @RequestParam("testFlag") int testFlag) {
+        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal(), testFlag);
         return returnDataList(result);
     }
 

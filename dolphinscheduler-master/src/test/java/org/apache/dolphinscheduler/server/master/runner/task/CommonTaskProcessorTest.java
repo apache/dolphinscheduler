@@ -22,7 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -52,15 +51,21 @@ public class CommonTaskProcessorTest {
     private ProcessService processService;
 
     private CommonTaskProcessor commonTaskProcessor;
+
     @Before
     public void setUp() {
+        // init spring context
         ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
-        springApplicationContext.setApplicationContext(applicationContext);
+
+        // mock process service
         processService = Mockito.mock(ProcessService.class);
-        Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
-                .thenReturn(processService);
+        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
+        Mockito.when(applicationContext.getBean(CommonTaskProcessor.class)).thenReturn(commonTaskProcessor);
+
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
@@ -68,6 +73,7 @@ public class CommonTaskProcessorTest {
         Mockito.when(processService.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
     }
+
     @Test
     public void testGetTaskExecutionContext() throws Exception {
 
@@ -95,9 +101,7 @@ public class CommonTaskProcessorTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskInstance.setTaskDefine(taskDefinition);
-        processService = Mockito.mock(ProcessService.class);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
-        commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         TaskExecutionContext taskExecutionContext = commonTaskProcessor.getTaskExecutionContext(taskInstance);
         Assert.assertNull(taskExecutionContext);
     }
@@ -116,11 +120,10 @@ public class CommonTaskProcessorTest {
         commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         Map<String, String> map = commonTaskProcessor.getResourceFullNames(taskInstance);
 
-        List<Resource> resourcesList = new ArrayList<Resource>();
+        List<Resource> resourcesList = new ArrayList<>();
         Resource resource = new Resource();
         resource.setFileName("fileName");
         resourcesList.add(resource);
-        processService = Mockito.mock(ProcessService.class);
         Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
         Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
         Assert.assertNotNull(map);
@@ -129,7 +132,6 @@ public class CommonTaskProcessorTest {
 
     @Test
     public void testVerifyTenantIsNull() {
-        commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         Tenant tenant = null;
 
         TaskInstance taskInstance = new TaskInstance();
@@ -157,38 +159,21 @@ public class CommonTaskProcessorTest {
     }
 
     @Test
-    public void testReplaceTestDatSource(){
-        commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
-        processService = Mockito.mock(ProcessService.class);
-
+    public void testReplaceTestDatSource() {
+        CommonTaskProcessor commonTaskProcessor1 = new CommonTaskProcessor();
+        commonTaskProcessor1.processService = processService;
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTestFlag(1);
         taskInstance.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
-        commonTaskProcessor.taskInstance = taskInstance;
+        commonTaskProcessor1.taskInstance = taskInstance;
 
         //The data source instance has no bound test data source
         Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
-        boolean result = commonTaskProcessor.checkAndReplaceTestDataSource();
-        Assert.assertFalse(result);
+        commonTaskProcessor1.checkAndReplaceTestDataSource();
 
         //The data source instance has  bound test data source
         Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(2);
-        result = commonTaskProcessor.checkAndReplaceTestDataSource();
-//        Assert.assertTrue(result);
+        commonTaskProcessor1.checkAndReplaceTestDataSource();
+//      Assert.assertTrue(result);
     }
-
-
-    /**
-     * get Mock Admin User
-     *
-     * @return admin user
-     */
-    private User getAdminUser() {
-        User loginUser = new User();
-        loginUser.setId(-1);
-        loginUser.setUserName("admin");
-        loginUser.setUserType(UserType.GENERAL_USER);
-        return loginUser;
-    }
-
 }
