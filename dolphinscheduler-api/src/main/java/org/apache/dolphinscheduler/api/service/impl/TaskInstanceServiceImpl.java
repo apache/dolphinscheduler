@@ -193,8 +193,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuth(result, loginUser, project, projectCode, FORCED_SUCCESS);
-        if (result.getCode() != Status.SUCCESS.getCode()) {
+        Map<String, Object> checkResult =
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
+        Status status = (Status) checkResult.get(Constants.STATUS);
+        if (status != Status.SUCCESS) {
+            putMsg(result, status);
             return result;
         }
 

@@ -17,18 +17,15 @@
 
 package org.apache.dolphinscheduler.api.dto.taskInstance;
 
-import lombok.Data;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Project;
+
+import lombok.Data;
 
 /**
  * task instance success response
  */
 @Data
 public class TaskInstanceSuccessResponse extends Result {
-
-    private PageInfo<Project> data;
 
     public TaskInstanceSuccessResponse(Result result) {
         super();

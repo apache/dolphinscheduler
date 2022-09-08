@@ -26,8 +26,6 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
 import java.util.List;
 import java.util.Map;
 

@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.dto.taskInstance;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+
+import lombok.Data;
 
 /**
  * task instance list paging response
@@ -28,7 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 @Data
 public class TaskInstanceListPagingResponse extends Result {
 
-    private PageInfo<Project> data;
+    private PageInfo<TaskInstance> data;
 
     public TaskInstanceListPagingResponse(Result result) {
         super();
