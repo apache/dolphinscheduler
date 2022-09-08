@@ -43,12 +43,9 @@ public class DatasyncHook {
     }
 
     protected DataSyncClient createClient() {
-        //final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        //final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        //final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
-        final String awsAccessKeyId = "AKIAXTUKRINYVGPCDOBV";
-        final String awsSecretAccessKey = "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";
-        final String awsRegion = "ap-northeast-3";
+        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
+        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
 
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
