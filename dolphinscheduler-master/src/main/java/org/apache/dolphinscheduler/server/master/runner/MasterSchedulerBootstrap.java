@@ -109,7 +109,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
      */
     public void init() {
         this.masterPrepareExecService = (ThreadPoolExecutor) ThreadUtils
-            .newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
+                .newDaemonFixedThreadExecutor("MasterPreExecThread", masterConfig.getPreExecThreads());
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
     }
 
@@ -140,7 +140,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 boolean isOverload =
-                    OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
+                        OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
                 if (isOverload) {
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -166,19 +166,19 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                         LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
                         if (processInstanceExecCacheManager.contains(processInstance.getId())) {
                             logger.error(
-                                "The workflow instance is already been cached, this case shouldn't be happened");
+                                    "The workflow instance is already been cached, this case shouldn't be happened");
                         }
                         WorkflowExecuteRunnable workflowRunnable = new WorkflowExecuteRunnable(processInstance,
-                            processService,
-                            processInstanceDao,
-                            nettyExecutorManager,
-                            processAlertManager,
-                            masterConfig,
-                            stateWheelExecuteThread,
-                            curingGlobalParamsService);
+                                processService,
+                                processInstanceDao,
+                                nettyExecutorManager,
+                                processAlertManager,
+                                masterConfig,
+                                stateWheelExecuteThread,
+                                curingGlobalParamsService);
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
-                            processInstance.getId()));
+                                processInstance.getId()));
                     } finally {
                         LoggerUtils.removeWorkflowInstanceIdMDC();
                     }
@@ -232,10 +232,10 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
         // make sure to finish handling command each time before next scan
         latch.await();
         logger.info(
-            "Master schedule bootstrap transformed command to ProcessInstance, commandSize: {}, processInstanceSize: {}",
-            commands.size(), processInstances.size());
+                "Master schedule bootstrap transformed command to ProcessInstance, commandSize: {}, processInstanceSize: {}",
+                commands.size(), processInstances.size());
         ProcessInstanceMetrics
-            .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
+                .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return processInstances;
     }
 
@@ -251,11 +251,11 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
             int pageNumber = 0;
             int pageSize = masterConfig.getFetchCommandNum();
             final List<Command> result =
-                processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+                    processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
             if (CollectionUtils.isNotEmpty(result)) {
                 logger.info(
-                    "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
-                    result.size(), thisMasterSlot, masterCount);
+                        "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
+                        result.size(), thisMasterSlot, masterCount);
             }
             ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
             return result;

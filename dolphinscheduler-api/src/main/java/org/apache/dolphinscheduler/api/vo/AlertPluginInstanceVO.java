@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.api.vo;
 
 import java.util.Date;
 
-/**
- * AlertPluginInstanceVO
- */
+import lombok.Data;
+
+@Data
 public class AlertPluginInstanceVO {
 
     /**
@@ -58,60 +58,4 @@ public class AlertPluginInstanceVO {
      * alert plugin name
      */
     private String alertPluginName;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getPluginDefineId() {
-        return pluginDefineId;
-    }
-
-    public void setPluginDefineId(int pluginDefineId) {
-        this.pluginDefineId = pluginDefineId;
-    }
-
-    public String getInstanceName() {
-        return instanceName;
-    }
-
-    public void setInstanceName(String instanceName) {
-        this.instanceName = instanceName;
-    }
-
-    public String getPluginInstanceParams() {
-        return pluginInstanceParams;
-    }
-
-    public void setPluginInstanceParams(String pluginInstanceParams) {
-        this.pluginInstanceParams = pluginInstanceParams;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getAlertPluginName() {
-        return alertPluginName;
-    }
-
-    public void setAlertPluginName(String alertPluginName) {
-        this.alertPluginName = alertPluginName;
-    }
 }
