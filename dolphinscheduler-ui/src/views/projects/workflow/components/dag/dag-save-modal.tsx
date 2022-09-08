@@ -15,15 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  ref,
-  computed,
-  onMounted,
-  watch,
-  getCurrentInstance
-} from 'vue'
+import { defineComponent, PropType, ref, computed, onMounted, watch } from 'vue'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import {
@@ -122,17 +114,14 @@ export default defineComponent({
       globalParams: {
         validator() {
           const props = new Set()
-
-          const keys = formValue.value.globalParams.map((item) => item.key)
-          const keysSet = new Set(keys)
-          if (keysSet.size !== keys.length) {
-            return new Error(t('project.dag.prop_repeat'))
-          }
-
           for (const param of formValue.value.globalParams) {
             const prop = param.value
             if (!prop) {
               return new Error(t('project.dag.prop_empty'))
+            }
+
+            if (props.has(prop)) {
+              return new Error(t('project.dag.prop_repeat'))
             }
 
             props.add(prop)
@@ -144,9 +133,8 @@ export default defineComponent({
       formRef.value.validate(async (valid: any) => {
         if (!valid) {
           const params = {
-            name: formValue.value.name,
-            code: props.definition?.processDefinition.code
-          } as { name: string; code?: number }
+            name: formValue.value.name
+          }
           if (
             props.definition?.processDefinition.name !== formValue.value.name
           ) {
@@ -181,8 +169,6 @@ export default defineComponent({
       }
     }
 
-    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-
     onMounted(() => updateModalData())
 
     watch(
@@ -200,15 +186,10 @@ export default defineComponent({
       >
         <NForm model={formValue.value} rules={rule} ref={formRef}>
           <NFormItem label={t('project.dag.workflow_name')} path='name'>
-            <NInput
-              allowInput={trim}
-              v-model:value={formValue.value.name}
-              class='input-name'
-            />
+            <NInput v-model:value={formValue.value.name} class='input-name' />
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
-              allowInput={trim}
               type='textarea'
               v-model:value={formValue.value.description}
               class='input-description'
@@ -225,7 +206,7 @@ export default defineComponent({
             <NSwitch v-model:value={formValue.value.timeoutFlag} />
           </NFormItem>
           {formValue.value.timeoutFlag && (
-            <NFormItem showLabel={false} path='timeout'>
+            <NFormItem label=' ' path='timeout'>
               <NInputNumber
                 v-model:value={formValue.value.timeout}
                 show-button={false}
@@ -271,14 +252,14 @@ export default defineComponent({
             />
           </NFormItem>
           {props.definition && !props.instance && (
-            <NFormItem path='timeoutFlag' showLabel={false}>
+            <NFormItem path='timeoutFlag'>
               <NCheckbox v-model:checked={formValue.value.release}>
                 {t('project.dag.online_directly')}
               </NCheckbox>
             </NFormItem>
           )}
           {props.instance && (
-            <NFormItem path='sync' showLabel={false}>
+            <NFormItem path='sync'>
               <NCheckbox v-model:checked={formValue.value.sync}>
                 {t('project.dag.update_directly')}
               </NCheckbox>

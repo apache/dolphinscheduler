@@ -47,9 +47,9 @@ export function createProcessDefinition(
   })
 }
 
-export function queryProcessDefinitionList(projectCode: number): any {
+export function queryAllByProjectCode(code: number): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/query-process-definition-list`,
+    url: `/projects/${code}/process-definition/all`,
     method: 'get'
   })
 }
@@ -137,12 +137,9 @@ export function querySimpleList(code: number): any {
   })
 }
 
-export function verifyName(
-  params: { name: string; workflowCode?: number },
-  projectCode: number
-): any {
+export function verifyName(params: NameReq, code: number): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/verify-name`,
+    url: `/projects/${code}/process-definition/verify-name`,
     method: 'get',
     params
   })
@@ -189,16 +186,13 @@ export function release(
   })
 }
 
-export function getTasksByDefinitionList(
-  projectCode: number,
+export function getTasksByDefinitionCode(
+  code: number,
   processCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/query-task-definition-list`,
-    method: 'get',
-    params: {
-      processDefinitionCode: processCode
-    }
+    url: `/projects/${code}/process-definition/${processCode}/tasks`,
+    method: 'get'
   })
 }
 

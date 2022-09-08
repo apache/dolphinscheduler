@@ -55,7 +55,7 @@
         <module>dolphinscheduler-worker</module>
         <module>dolphinscheduler-log-server</module>
         <module>dolphinscheduler-tools</module>
-        <module>dolphinscheduler-ui-next</module>
+        <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-scheduler-plugin</module>
     </modules>
     
@@ -283,7 +283,7 @@
             
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-ui-next</artifactId>
+                <artifactId>dolphinscheduler-ui</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
