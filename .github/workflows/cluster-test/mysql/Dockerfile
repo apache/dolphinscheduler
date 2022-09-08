@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM openjdk:8-jre-slim-buster
+FROM openjdk:8-jre-slim-bullseye
 
 RUN apt update ; \
     apt install -y curl wget default-mysql-client sudo openssh-server netcat-traditional ;
