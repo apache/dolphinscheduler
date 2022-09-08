@@ -22,14 +22,15 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * RuleExecuteSql
- */
+import lombok.Data;
+
+@Data
 public class DqRuleExecuteSql implements Serializable {
+
     /**
      * primary key
      */
-    private int id;
+    private Integer id;
     /**
      * index，ensure the execution order of sql
      */
@@ -58,82 +59,4 @@ public class DqRuleExecuteSql implements Serializable {
      * update_time
      */
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public String getTableAlias() {
-        return tableAlias;
-    }
-
-    public void setTableAlias(String tableAlias) {
-        this.tableAlias = tableAlias;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public boolean isErrorOutputSql() {
-        return isErrorOutputSql;
-    }
-
-    public void setErrorOutputSql(boolean errorOutputSql) {
-        isErrorOutputSql = errorOutputSql;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "DqRuleExecuteSql{"
-                + "id=" + id
-                + ", index=" + index
-                + ", sql='" + sql + '\''
-                + ", tableAlias='" + tableAlias + '\''
-                + ", type=" + type
-                + ", isErrorOutputSql=" + isErrorOutputSql
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
 }

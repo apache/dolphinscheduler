@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PluginDao {
+
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
 
@@ -49,9 +50,10 @@ public class PluginDao {
         requireNonNull(pluginDefine.getPluginName(), "pluginName is null");
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
-        PluginDefine currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+        PluginDefine currPluginDefine =
+                pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (currPluginDefine == null) {
-            if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() > 0) {
+            if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() != null) {
                 return pluginDefine.getId();
             }
             throw new IllegalStateException("Failed to insert plugin definition");

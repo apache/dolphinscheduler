@@ -39,7 +39,9 @@ public class ExecutionContextTestUtils {
     public static ExecutionContext getExecutionContext(int port) {
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
+        processDefinition.setId(0);
         ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(0);
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()

@@ -19,13 +19,13 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * data source user relation
- */
+@Data
 @TableName("t_ds_relation_datasource_user")
 public class DatasourceUser {
 
@@ -33,7 +33,7 @@ public class DatasourceUser {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * user id
@@ -58,64 +58,4 @@ public class DatasourceUser {
      * update time
      */
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getDatasourceId() {
-        return datasourceId;
-    }
-
-    public void setDatasourceId(int datasourceId) {
-        this.datasourceId = datasourceId;
-    }
-
-    public int getPerm() {
-        return perm;
-    }
-
-    public void setPerm(int perm) {
-        this.perm = perm;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "DatasourceUser{"
-                + "id=" + id
-                + ", userId=" + userId
-                + ", datasourceId=" + datasourceId
-                + ", perm=" + perm
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
 }

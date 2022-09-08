@@ -19,16 +19,17 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * k8s namespace
- */
+@Data
 @TableName("t_ds_k8s_namespace")
 public class K8sNamespace {
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -108,127 +109,6 @@ public class K8sNamespace {
     @TableField(exist = false)
     private String clusterName;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public Double getLimitsCpu() {
-        return limitsCpu;
-    }
-
-    public void setLimitsCpu(Double limitsCpu) {
-        this.limitsCpu = limitsCpu;
-    }
-
-    public Integer getLimitsMemory() {
-        return limitsMemory;
-    }
-
-    public void setLimitsMemory(Integer limitsMemory) {
-        this.limitsMemory = limitsMemory;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getPodRequestMemory() {
-        return podRequestMemory;
-    }
-
-    public void setPodRequestMemory(Integer podRequestMemory) {
-        this.podRequestMemory = podRequestMemory;
-    }
-
-    public Integer getPodReplicas() {
-        return podReplicas;
-    }
-
-    public void setPodReplicas(Integer podReplicas) {
-        this.podReplicas = podReplicas;
-    }
-
-    public Long getClusterCode() {
-        return clusterCode;
-    }
-
-    public void setClusterCode(Long clusterCode) {
-        this.clusterCode = clusterCode;
-    }
-
-    public String getClusterName() {
-        return clusterName;
-    }
-
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
-
-    public Double getPodRequestCpu() {
-        return podRequestCpu;
-    }
-
-    public void setPodRequestCpu(Double podRequestCpu) {
-        this.podRequestCpu = podRequestCpu;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    @Override
-    public String toString() {
-        return "K8sNamespace{" +
-            "id=" + id +
-            "code=" + code +
-            ", namespace=" + namespace +
-            ", limitsCpu=" + limitsCpu +
-            ", limitsMemory=" + limitsMemory +
-            ", podRequestCpu=" + podRequestCpu +
-            ", podRequestMemory=" + podRequestMemory +
-            ", podReplicas=" + podReplicas +
-            ", clusterCode=" + clusterCode +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -252,13 +132,5 @@ public class K8sNamespace {
         int result = id;
         result = 31 * result + (clusterName + namespace).hashCode();
         return result;
-    }
-
-    public Long getCode() {
-        return code;
-    }
-
-    public void setCode(Long code) {
-        this.code = code;
     }
 }

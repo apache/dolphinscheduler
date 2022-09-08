@@ -19,18 +19,18 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * Environment
- */
+@Data
 @TableName("t_ds_environment")
 public class Environment {
 
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * environment code
@@ -57,83 +57,4 @@ public class Environment {
     private Date createTime;
 
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getCode() {
-        return this.code;
-    }
-
-    public void setCode(Long code) {
-        this.code = code;
-    }
-
-    public String getConfig() {
-        return this.config;
-    }
-
-    public void setConfig(String config) {
-        this.config = config;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getOperator() {
-        return this.operator;
-    }
-
-    public void setOperator(Integer operator) {
-        this.operator = operator;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Environment{"
-                + "id= " + id
-                + ", code= " + code
-                + ", name= " + name
-                + ", config= " + config
-                + ", description= " + description
-                + ", operator= " + operator
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + "}";
-    }
-
 }

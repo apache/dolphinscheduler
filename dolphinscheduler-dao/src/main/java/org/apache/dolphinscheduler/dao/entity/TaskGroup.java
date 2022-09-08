@@ -20,15 +20,16 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * Task Group
- */
+@Data
 @TableName("t_ds_task_group")
 public class TaskGroup implements Serializable {
+
     /**
      * key
      */
@@ -69,7 +70,7 @@ public class TaskGroup implements Serializable {
      */
     private long projectCode;
 
-    public TaskGroup(String name,long projectCode, String description, int groupSize, int userId,int status) {
+    public TaskGroup(String name, long projectCode, String description, int groupSize, int userId, int status) {
         this.name = name;
         this.projectCode = projectCode;
         this.description = description;
@@ -87,100 +88,5 @@ public class TaskGroup implements Serializable {
     public void init() {
         this.status = 1;
         this.useSize = 0;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskGroup{"
-                + "id=" + id
-                + ", name='" + name + '\''
-                + ", description='" + description + '\''
-                + ", groupSize=" + groupSize
-                + ", useSize=" + useSize
-                + ", userId=" + userId
-                + ", status=" + status
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getGroupSize() {
-        return groupSize;
-    }
-
-    public void setGroupSize(int groupSize) {
-        this.groupSize = groupSize;
-    }
-
-    public int getUseSize() {
-        return useSize;
-    }
-
-    public void setUseSize(int useSize) {
-        this.useSize = useSize;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(long projectCode) {
-        this.projectCode = projectCode;
     }
 }

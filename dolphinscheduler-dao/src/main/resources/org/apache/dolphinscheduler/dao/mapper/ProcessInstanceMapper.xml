@@ -257,7 +257,9 @@
             </foreach>
         </if>
         and next_process_instance_id=0
-        and id <![CDATA[ < ]]> #{id}
+        <if test="id != null">
+            and id <![CDATA[ < ]]> #{id}
+        </if>
         order by id desc
     </select>
     <select id="loadNextProcess4Serial" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">

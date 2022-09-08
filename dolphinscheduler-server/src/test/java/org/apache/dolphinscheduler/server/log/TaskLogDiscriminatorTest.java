@@ -18,16 +18,12 @@ package org.apache.dolphinscheduler.server.log;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.LoggerContextVO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Marker;
 
-import java.util.Map;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.LoggingEvent;
 
 public class TaskLogDiscriminatorTest {
 
@@ -39,7 +35,7 @@ public class TaskLogDiscriminatorTest {
     TaskLogDiscriminator taskLogDiscriminator;
 
     @Before
-    public void before(){
+    public void before() {
         taskLogDiscriminator = new TaskLogDiscriminator();
         taskLogDiscriminator.setLogBase("logs");
         taskLogDiscriminator.setKey("123");
@@ -47,7 +43,8 @@ public class TaskLogDiscriminatorTest {
 
     @Test
     public void getDiscriminatingValue() {
-       String result = taskLogDiscriminator.getDiscriminatingValue(new ILoggingEvent() {
+        String result = taskLogDiscriminator.getDiscriminatingValue(new LoggingEvent() {
+
             @Override
             public String getThreadName() {
                 return "taskAppId=TASK-20220105-101-1-1001";
@@ -77,51 +74,6 @@ public class TaskLogDiscriminatorTest {
             public String getLoggerName() {
                 return TaskConstants.TASK_LOG_LOGGER_NAME;
             }
-
-            @Override
-            public LoggerContextVO getLoggerContextVO() {
-                return null;
-            }
-
-            @Override
-            public IThrowableProxy getThrowableProxy() {
-                return null;
-            }
-
-            @Override
-            public StackTraceElement[] getCallerData() {
-                return new StackTraceElement[0];
-            }
-
-            @Override
-            public boolean hasCallerData() {
-                return false;
-            }
-
-            @Override
-            public Marker getMarker() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getMDCPropertyMap() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getMdc() {
-                return null;
-            }
-
-            @Override
-            public long getTimeStamp() {
-                return 0;
-            }
-
-            @Override
-            public void prepareForDeferredProcessing() {
-
-            }
         });
         Assert.assertEquals("20220105/101-1-1001", result);
     }
@@ -150,6 +102,6 @@ public class TaskLogDiscriminatorTest {
 
     @Test
     public void setLogBase() {
-       taskLogDiscriminator.setLogBase("logs");
+        taskLogDiscriminator.setLogBase("logs");
     }
 }

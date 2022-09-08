@@ -28,13 +28,13 @@ Generally, projects and processes are created through pages, but considering the
 
 2. select a test API, the API selected for this test is `queryAllProjectList`
 
-    > projects/list
-                                                                                  >
+   > projects/list
+
 3. Open `Postman`, fill in the API address, enter the `Token` in `Headers`, and then send the request to view the result:
 
    ```
-    token: The Token just generated
-    ```
+   token: The Token just generated
+   ```
 
 ![api-test](../../../img/new_ui/dev/open-api/api_test.png)
 

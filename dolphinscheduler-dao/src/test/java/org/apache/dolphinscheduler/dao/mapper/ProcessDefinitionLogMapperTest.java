@@ -34,6 +34,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
+
     @Autowired
     private UserMapper userMapper;
 
@@ -49,7 +50,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private ProcessDefinitionLog insertOne() {
-        //insertOne
+        // insertOne
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setName("def 1");
@@ -68,7 +69,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private ProcessDefinitionLog insertTwo() {
-        //insertOne
+        // insertOne
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setName("def 2");
@@ -85,7 +86,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         ProcessDefinitionLog processDefinitionLog = insertOne();
-        Assert.assertNotEquals(processDefinitionLog.getId(), 0);
+        Assert.assertNotEquals(processDefinitionLog.getId().intValue(), 0);
     }
 
     @Test
@@ -107,7 +108,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
 
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
                 .queryByDefinitionName(1L, "def 1");
-        Assert.assertEquals(0, processDefinitionLogs.size());
+        Assert.assertEquals(1, processDefinitionLogs.size());
 
     }
 
@@ -142,7 +143,8 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryProcessDefinitionVersionsPaging() {
         insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
-        IPage<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L,1L);
+        IPage<ProcessDefinitionLog> processDefinitionLogs =
+                processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
         Assert.assertNotEquals(processDefinitionLogs.getTotal(), 0);
     }
 

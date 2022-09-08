@@ -20,18 +20,22 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+@Data
 @TableName("t_ds_dq_rule")
 public class DqRule implements Serializable {
+
     /**
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * name
      */
@@ -67,81 +71,4 @@ public class DqRule implements Serializable {
      */
     @TableField(value = "update_time")
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public String getRuleJson() {
-        return ruleJson;
-    }
-
-    public void setRuleJson(String ruleJson) {
-        this.ruleJson = ruleJson;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    @Override
-    public String toString() {
-        return "DqRule{"
-                + "id=" + id
-                + ", name='" + name + '\''
-                + ", type=" + type
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
 }
