@@ -32,9 +32,9 @@
 
 3. 打开 Postman，填写接口地址，并在 Headers 中填写 Token，发送请求后即可查看结果
 
-    ```
-    token: 刚刚生成的 Token
-    ```
+   ```
+   token: 刚刚生成的 Token
+   ```
 
 ![api-test](../../../img/new_ui/dev/open-api/api_test.png)
 
