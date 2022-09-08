@@ -92,6 +92,7 @@ public class AlertSenderServiceTest {
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
                 pluginDefineId, pluginInstanceParams, pluginInstanceName);
+        alertPluginInstance.setId(1);
         alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);
 

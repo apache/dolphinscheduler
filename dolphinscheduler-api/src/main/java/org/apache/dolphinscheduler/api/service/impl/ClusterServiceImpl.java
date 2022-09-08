@@ -248,7 +248,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             return result;
         }
 
-        Integer relatedNamespaceNumber = k8sNamespaceMapper
+        Long relatedNamespaceNumber = k8sNamespaceMapper
                 .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
 
         if (relatedNamespaceNumber > 0) {

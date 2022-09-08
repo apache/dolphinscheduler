@@ -147,7 +147,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
             throw new RuntimeException("The jar for the task is required.");
         }
 
-        return mainJar.getId() == 0
+        return mainJar.getId() == null
                 ? mainJar.getRes()
                 // when update resource maybe has error
                 : mainJar.getResourceName().replaceFirst("/", "");

@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 
 import java.util.Date;
-import java.util.StringJoiner;
+
+import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -28,13 +29,15 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.base.Objects;
 
+@Data
 @TableName("t_ds_alert_send_status")
 public class AlertSendStatus {
+
     /**
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * alert id
@@ -66,54 +69,6 @@ public class AlertSendStatus {
     @TableField("create_time")
     private Date createTime;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getAlertId() {
-        return alertId;
-    }
-
-    public void setAlertId(int alertId) {
-        this.alertId = alertId;
-    }
-
-    public int getAlertPluginInstanceId() {
-        return alertPluginInstanceId;
-    }
-
-    public void setAlertPluginInstanceId(int alertPluginInstanceId) {
-        this.alertPluginInstanceId = alertPluginInstanceId;
-    }
-
-    public AlertStatus getSendStatus() {
-        return sendStatus;
-    }
-
-    public void setSendStatus(AlertStatus sendStatus) {
-        this.sendStatus = sendStatus;
-    }
-
-    public String getLog() {
-        return log;
-    }
-
-    public void setLog(String log) {
-        this.log = log;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -129,17 +84,5 @@ public class AlertSendStatus {
     @Override
     public int hashCode() {
         return Objects.hashCode(alertId, alertPluginInstanceId);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", AlertSendStatus.class.getSimpleName() + "[", "]")
-            .add("id=" + id)
-            .add("alertId=" + alertId)
-            .add("alertPluginInstanceId=" + alertPluginInstanceId)
-            .add("sendStatus=" + sendStatus)
-            .add("log='" + log + "'")
-            .add("createTime=" + createTime)
-            .toString();
     }
 }

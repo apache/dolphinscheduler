@@ -1344,7 +1344,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 continue;
             }
 
-            if (task.getId() > 0 && completeTaskMap.containsKey(task.getTaskCode())) {
+            if (task.getId() != null && completeTaskMap.containsKey(task.getTaskCode())) {
                 logger.info("task {} has already run success", task.getName());
                 continue;
             }

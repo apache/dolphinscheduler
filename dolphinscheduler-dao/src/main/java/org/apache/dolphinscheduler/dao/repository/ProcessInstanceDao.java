@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 
-
 public interface ProcessInstanceDao {
 
     public int insertProcessInstance(ProcessInstance processInstance);
