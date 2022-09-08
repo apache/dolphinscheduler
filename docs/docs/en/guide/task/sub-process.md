@@ -36,7 +36,7 @@ Create a shell task to print "hello" and define the workflow as `test_dag01`.
 
 ## Create the Sub_process task
 
-To use the sub_process, you need to create the sub-node task, which is the workflow we created in the first step. After that, as shown in the diagram below, select the corresponding sub-node in position ⑤.
+To use the sub_process, you need to create the sub-node task, which is the workflow `test_dag01` we created in the first step. After that, as shown in the diagram below, select the corresponding sub-node in position ⑤.
 
 ![subprocess_task02](../../../../img/tasks/demo/subprocess_task02.png)
 
