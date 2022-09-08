@@ -17,14 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 
-public class DatasyncTask extends AbstractTaskExecutor {
+import java.util.Collections;
+import java.util.Set;
+
+public class DatasyncTask extends AbstractRemoteTask {
 
     private final TaskExecutionContext taskExecutionContext;
     private DatasyncParameters parameters;
@@ -33,7 +36,11 @@ public class DatasyncTask extends AbstractTaskExecutor {
     public DatasyncTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
+    }
 
+    @Override
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -41,17 +48,33 @@ public class DatasyncTask extends AbstractTaskExecutor {
         logger.info("Datasync task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatasyncParameters.class);
-        hook=new DatasyncHook();
+        hook = new DatasyncHook();
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void submitApplication() throws TaskException {
         try {
             int exitStatusCode = runDatasyncTask();
             setExitStatusCode(exitStatusCode);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("datasync task error", e);
+        }
+    }
+
+    @Override
+    public void cancelApplication() throws TaskException {
+        hook.cancelDatasyncTask();
+    }
+
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+        Boolean isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
+        if (!isFinishedSuccessfully) {
+            exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+        } else {
+            exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
         }
     }
 
@@ -80,7 +103,7 @@ public class DatasyncTask extends AbstractTaskExecutor {
             return TaskConstants.EXIT_CODE_FAILURE;
         }
         //started success, need time to exec
-        Boolean isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS,DatasyncHook.doneStatus);
+        Boolean isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
         if (!isFinishedSuccessfully) {
             return TaskConstants.EXIT_CODE_FAILURE;
         } else {
@@ -91,11 +114,6 @@ public class DatasyncTask extends AbstractTaskExecutor {
     @Override
     public DatasyncParameters getParameters() {
         return parameters;
-    }
-
-    @Override
-    public void cancelApplication(boolean cancelApplication) {
-        hook.cancelDatasyncTask();
     }
 
 }

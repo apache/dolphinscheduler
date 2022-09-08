@@ -61,7 +61,7 @@ public class DatasyncParameters extends AbstractParameters {
         if (isJsonFormat) {
             return StringUtils.isNotEmpty(json);
         } else {
-            return StringUtils.isNotEmpty(destinationLocationArn)&&StringUtils.isNotEmpty(sourceLocationArn)&&StringUtils.isNotEmpty(name);
+            return StringUtils.isNotEmpty(destinationLocationArn) && StringUtils.isNotEmpty(sourceLocationArn) && StringUtils.isNotEmpty(name);
         }
     }
 

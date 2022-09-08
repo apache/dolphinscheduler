@@ -31,22 +31,25 @@ import java.util.List;
 
 @Data
 public class DatasyncHook {
+    public static TaskExecutionStatus[] doneStatus = {TaskExecutionStatus.ERROR, TaskExecutionStatus.SUCCESS, TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
+    public static TaskStatus[] taskFinishFlags = {TaskStatus.UNAVAILABLE, TaskStatus.UNKNOWN_TO_SDK_VERSION};
     protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private DataSyncClient client;
     private String taskArn;
     private String taskExecArn;
 
-    public static TaskExecutionStatus[] doneStatus = {TaskExecutionStatus.ERROR,TaskExecutionStatus.SUCCESS,TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
-    public static TaskStatus[] taskFinishFlags = {TaskStatus.UNAVAILABLE,TaskStatus.UNKNOWN_TO_SDK_VERSION};
     public DatasyncHook() {
         client = createClient();
     }
 
     protected DataSyncClient createClient() {
-        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+        //final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
+        //final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+        //final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
+        final String awsAccessKeyId = "AKIAXTUKRINYVGPCDOBV";
+        final String awsSecretAccessKey = "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";
+        final String awsRegion = "ap-northeast-3";
 
-        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
@@ -69,21 +72,21 @@ public class DatasyncHook {
             builder.cloudWatchLogGroupArn(cloudWatchLogGroupArn);
         }
         List<TagListEntry> tag = parameters.getTags();
-        if (tag!=null&& tag.size()>0) {
+        if (tag != null && tag.size() > 0) {
             builder.tags(tag);
         }
-        if (parameters.getOptions()!=null) {
+        if (parameters.getOptions() != null) {
             builder.options(parameters.getOptions());
         }
         List<FilterRule> excludes = parameters.getExcludes();
-        if (excludes!=null&& excludes.size()>0) {
+        if (excludes != null && excludes.size() > 0) {
             builder.excludes(excludes);
         }
         List<FilterRule> includes = parameters.getIncludes();
-        if (includes!=null&& includes.size()>0) {
+        if (includes != null && includes.size() > 0) {
             builder.includes(includes);
         }
-        if (parameters.getSchedule()!=null) {
+        if (parameters.getSchedule() != null) {
             builder.schedule(parameters.getSchedule());
         }
 
@@ -100,7 +103,7 @@ public class DatasyncHook {
         StartTaskExecutionRequest start = StartTaskExecutionRequest.builder().taskArn(taskArn).build();
         StartTaskExecutionResponse response = client.startTaskExecution(start);
         if (response.sdkHttpResponse().isSuccessful()) {
-            taskExecArn=response.taskExecutionArn();
+            taskExecArn = response.taskExecutionArn();
         }
         return doubleCheckExecStatus(TaskExecutionStatus.LAUNCHING, doneStatus);
     }
@@ -119,7 +122,7 @@ public class DatasyncHook {
     public TaskStatus queryDatasyncTaskStatus() {
         logger.info("queryDatasyncTaskStatus ......");
 
-        DescribeTaskRequest request= DescribeTaskRequest.builder().taskArn(taskArn).build();
+        DescribeTaskRequest request = DescribeTaskRequest.builder().taskArn(taskArn).build();
         DescribeTaskResponse describe = client.describeTask(request);
 
         if (describe.sdkHttpResponse().isSuccessful()) {
@@ -131,7 +134,7 @@ public class DatasyncHook {
 
     public TaskExecutionStatus queryDatasyncTaskExecStatus() {
         logger.info("queryDatasyncTaskExecStatus ......");
-        DescribeTaskExecutionRequest request= DescribeTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
+        DescribeTaskExecutionRequest request = DescribeTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
         DescribeTaskExecutionResponse describe = client.describeTaskExecution(request);
 
         if (describe.sdkHttpResponse().isSuccessful()) {
@@ -145,10 +148,10 @@ public class DatasyncHook {
 
         List<TaskStatus> stopStatusSet = Arrays.asList(stopStatus);
         int maxRetry = 5;
-        while (maxRetry>0) {
+        while (maxRetry > 0) {
             TaskStatus status = queryDatasyncTaskStatus();
 
-            if (status==null) {
+            if (status == null) {
                 maxRetry--;
                 continue;
             }
@@ -168,10 +171,10 @@ public class DatasyncHook {
 
         List<TaskExecutionStatus> stopStatusSet = Arrays.asList(stopStatus);
         int maxRetry = 5;
-        while (maxRetry>0) {
+        while (maxRetry > 0) {
             TaskExecutionStatus status = queryDatasyncTaskExecStatus();
 
-            if (status==null) {
+            if (status == null) {
                 maxRetry--;
                 continue;
             }
@@ -193,7 +196,7 @@ public class DatasyncHook {
         while (true) {
             TaskExecutionStatus status = queryDatasyncTaskExecStatus();
 
-            if (status==null) {
+            if (status == null) {
                 continue;
             }
 
