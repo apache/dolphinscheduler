@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -167,8 +168,8 @@ public class SqlTask extends AbstractTask {
             executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
 
             // get appIds
-            List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
-            logger.info("task log path:[{}],yarn appIds:[{}]",taskExecutionContext.getLogPath(), appIds);
+            Set<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
+            logger.info("Resolve appIds: [{}] from task log: [{}]", appIds, taskExecutionContext.getLogPath());
             if (!appIds.isEmpty()) {
                 taskExecutionContext.setAppIds(String.join(",", appIds));
                 setAppIds(String.join(",", appIds));
@@ -366,11 +367,8 @@ public class SqlTask extends AbstractTask {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
             logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
 
-            if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
-                logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
-                HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
-                queryThread.start();
-            }
+            sqlLogListener(statement);
+
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
@@ -381,17 +379,28 @@ public class SqlTask extends AbstractTask {
         for (SqlBinds sqlBind : statementsBinds) {
             try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
 
-                if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
-                    logger.info("execute sql type is [{}]",DbType.HIVE.getDescp());
+                sqlLogListener(statement);
 
-                    HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
-                    queryThread.start();
-                }
                 result = statement.executeUpdate();
                 logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result, sqlBind.getSql());
             }
         }
         return String.valueOf(result);
+    }
+
+    /**
+     * sql log listener
+     *
+     * @param statement statement
+     * @throws SQLException sqlException
+     */
+    private void sqlLogListener(PreparedStatement statement) throws SQLException {
+        if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
+            logger.info("The current sql task type is [{}], will start a demon thread to resolve the appIds", DbType.HIVE);
+
+            HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
+            queryThread.start();
+        }
     }
 
     /**

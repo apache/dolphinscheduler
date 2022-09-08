@@ -38,6 +38,7 @@ public class HiveSqlLogThread extends Thread {
     private final TaskExecutionContext taskExecutionContext;
 
     public HiveSqlLogThread(PreparedStatement statement, Logger logger, TaskExecutionContext taskExecutionContext) throws SQLException {
+        super.setDaemon(true);
         this.statement = statement.unwrap(HivePreparedStatement.class);
         this.hiveMapReduceLogger = logger;
         this.taskExecutionContext = taskExecutionContext;
@@ -45,6 +46,9 @@ public class HiveSqlLogThread extends Thread {
 
     @Override
     public void run() {
+
+        Thread.currentThread().setName(taskExecutionContext.getTaskLogName());
+
         if (statement == null) {
             hiveMapReduceLogger.info("hive statement is null, end this log query!");
             return;
