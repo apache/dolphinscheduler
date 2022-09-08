@@ -21,8 +21,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_S
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -39,13 +40,11 @@ import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundExc
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +53,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 
-public class JavaTask extends AbstractTaskExecutor {
+public class JavaTask extends AbstractTask {
 
     /**
      * Contains various parameters for this task
@@ -123,7 +122,7 @@ public class JavaTask extends AbstractTaskExecutor {
      * @throws Exception
      */
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // Step 1: judge if is java or jar run type.
             // Step 2 case1: the jar run type builds the command directly, adding resource to the java -jar class when building the command
@@ -223,9 +222,13 @@ public class JavaTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException();
+        }
     }
 
     @Override
