@@ -91,9 +91,6 @@ public class DataSource {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     protected Integer bindTestId;
 
-    public DataSource() {
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
