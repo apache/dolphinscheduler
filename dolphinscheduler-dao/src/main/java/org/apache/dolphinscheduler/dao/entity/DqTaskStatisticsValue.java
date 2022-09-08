@@ -20,18 +20,22 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+@Data
 @TableName("t_ds_dq_task_statistics_value")
 public class DqTaskStatisticsValue implements Serializable {
+
     /**
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * process defined id
      */
@@ -41,7 +45,7 @@ public class DqTaskStatisticsValue implements Serializable {
      * process definition name
      */
     @TableField(exist = false)
-    private String  processDefinitionName;
+    private String processDefinitionName;
     /**
      * task instance id
      */
@@ -92,127 +96,4 @@ public class DqTaskStatisticsValue implements Serializable {
      */
     @TableField(value = "update_time")
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public long getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(long processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
-    public String getProcessDefinitionName() {
-        return processDefinitionName;
-    }
-
-    public void setProcessDefinitionName(String processDefinitionName) {
-        this.processDefinitionName = processDefinitionName;
-    }
-
-    public long getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(long taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public long getRuleId() {
-        return ruleId;
-    }
-
-    public void setRuleId(long ruleId) {
-        this.ruleId = ruleId;
-    }
-
-    public int getRuleType() {
-        return ruleType;
-    }
-
-    public void setRuleType(int ruleType) {
-        this.ruleType = ruleType;
-    }
-
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
-    }
-
-    public double getStatisticsValue() {
-        return statisticsValue;
-    }
-
-    public void setStatisticsValue(double statisticsValue) {
-        this.statisticsValue = statisticsValue;
-    }
-
-    public String getStatisticsName() {
-        return statisticsName;
-    }
-
-    public void setStatisticsName(String statisticsName) {
-        this.statisticsName = statisticsName;
-    }
-
-    public Date getDataTime() {
-        return dataTime;
-    }
-
-    public void setDataTime(Date dataTime) {
-        this.dataTime = dataTime;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "DqTaskStatisticsValue{"
-                + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
-                + ", processDefinitionName='" + processDefinitionName + '\''
-                + ", taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", ruleId=" + ruleId
-                + ", ruleType=" + ruleType
-                + ", ruleName='" + ruleName + '\''
-                + ", statisticsValue=" + statisticsValue
-                + ", statisticsName='" + statisticsName + '\''
-                + ", dataTime=" + dataTime
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
 }
