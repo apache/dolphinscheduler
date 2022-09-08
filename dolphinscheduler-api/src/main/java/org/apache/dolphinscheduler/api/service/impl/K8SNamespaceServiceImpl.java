@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -29,9 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,14 +58,14 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     private static final Logger logger = LoggerFactory.getLogger(K8SNamespaceServiceImpl.class);
 
     private static String resourceYaml = "apiVersion: v1\n"
-        + "kind: ResourceQuota\n"
-        + "metadata:\n"
-        + "  name: ${name}\n"
-        + "  namespace: ${namespace}\n"
-        + "spec:\n"
-        + "  hard:\n"
-        + "    ${limitCpu}\n"
-        + "    ${limitMemory}\n";
+            + "kind: ResourceQuota\n"
+            + "metadata:\n"
+            + "  name: ${name}\n"
+            + "  namespace: ${namespace}\n"
+            + "spec:\n"
+            + "  hard:\n"
+            + "    ${limitCpu}\n"
+            + "    ${limitMemory}\n";
 
     @Autowired
     private K8sNamespaceMapper k8sNamespaceMapper;
@@ -118,7 +118,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return
      */
     @Override
-    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode, Double limitsCpu, Integer limitsMemory) {
+    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode, Double limitsCpu,
+                                                  Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -209,7 +210,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return
      */
     @Override
-    public Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu, Integer limitsMemory) {
+    public Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu,
+                                                  Integer limitsMemory) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -331,7 +333,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return yaml file
      */
     private String genDefaultResourceYaml(K8sNamespace k8sNamespace) {
-        //resource use same name with namespace
+        // resource use same name with namespace
         String name = k8sNamespace.getNamespace();
         String namespace = k8sNamespace.getNamespace();
         String cpuStr = null;
@@ -345,7 +347,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         }
 
         String result = resourceYaml.replace("${name}", name)
-            .replace("${namespace}", namespace);
+                .replace("${namespace}", namespace);
         if (cpuStr == null) {
             result = result.replace("${limitCpu}", "");
         } else {
@@ -359,7 +361,6 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         }
         return result;
     }
-
 
     /**
      * query unauthorized namespace
@@ -432,7 +433,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @param authedNamespaceList authed namespace list
      * @return namespace list that authorization
      */
-    private List<K8sNamespace> getUnauthorizedNamespaces(Set<K8sNamespace> namespaceSet, List<K8sNamespace> authedNamespaceList) {
+    private List<K8sNamespace> getUnauthorizedNamespaces(Set<K8sNamespace> namespaceSet,
+                                                         List<K8sNamespace> authedNamespaceList) {
         List<K8sNamespace> resultList = new ArrayList<>();
         for (K8sNamespace k8sNamespace : namespaceSet) {
             boolean existAuth = false;

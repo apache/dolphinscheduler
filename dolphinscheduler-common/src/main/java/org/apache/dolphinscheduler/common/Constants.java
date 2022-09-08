@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Duration;
 import java.util.regex.Pattern;
@@ -64,6 +65,11 @@ public final class Constants {
      * resource.hdfs.fs.defaultFS
      */
     public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
+
+    /**
+     * hdfs defaultFS property name. Should be consistent with the property name in hdfs-site.xml
+     */
+    public static final String HDFS_DEFAULT_FS = "fs.defaultFS";
 
     /**
      * hadoop configuration
