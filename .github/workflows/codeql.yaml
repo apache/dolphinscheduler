@@ -50,7 +50,7 @@ jobs:
         ./mvnw -B clean install \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dcheckstyle.skip=true \
+          -Dspotless.skip=true \
           -Prelease
 
     - name: Perform CodeQL Analysis
