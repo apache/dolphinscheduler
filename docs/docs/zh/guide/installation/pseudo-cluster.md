@@ -150,7 +150,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 bash ./bin/install.sh
 ```
 
-> **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，次为非重要信息直接忽略即可
+> **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，此为非重要信息直接忽略即可
 
 ## 登录 DolphinScheduler
 

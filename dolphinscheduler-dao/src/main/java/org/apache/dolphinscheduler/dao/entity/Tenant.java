@@ -16,25 +16,25 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Date;
+import java.util.Objects;
+
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.util.Date;
-import java.util.Objects;
-
-/**
- * tenant
- */
+@Data
 @TableName("t_ds_tenant")
 public class Tenant {
 
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
-    private int id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
     /**
      * tenant code
@@ -92,83 +92,6 @@ public class Tenant {
         this.queueId = queueId;
         this.createTime = now;
         this.updateTime = now;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTenantCode() {
-        return tenantCode;
-    }
-
-    public void setTenantCode(String tenantCode) {
-        this.tenantCode = tenantCode;
-    }
-
-    public int getQueueId() {
-        return queueId;
-    }
-
-    public void setQueueId(int queueId) {
-        this.queueId = queueId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
-
-    public String getQueue() {
-        return queue;
-    }
-
-    public void setQueue(String queue) {
-        this.queue = queue;
-    }
-
-    @Override
-    public String toString() {
-        return "Tenant{" +
-                "id=" + id +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", queueId=" + queueId +
-                ", queueName='" + queueName + '\'' +
-                ", queue='" + queue + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @Override

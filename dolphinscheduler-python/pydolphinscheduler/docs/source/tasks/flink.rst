@@ -31,3 +31,10 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.flink
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Flink.yaml
+   :start-after: # under the License.
+   :language: yaml

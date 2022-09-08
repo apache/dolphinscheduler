@@ -31,3 +31,16 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.datax
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/DataX.yaml
+   :start-after: # under the License.
+   :language: yaml
+
+
+example_datax.json:
+
+.. literalinclude:: ../../../examples/yaml_define/example_datax.json
+   :language: json

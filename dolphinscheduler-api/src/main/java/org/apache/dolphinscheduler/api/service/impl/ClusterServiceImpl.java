@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -248,8 +248,8 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             return result;
         }
 
-        Integer relatedNamespaceNumber = k8sNamespaceMapper
-            .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
+        Long relatedNamespaceNumber = k8sNamespaceMapper
+                .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
 
         if (relatedNamespaceNumber > 0) {
             putMsg(result, Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS);
@@ -264,7 +264,6 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         }
         return result;
     }
-
 
     /**
      * update cluster
@@ -283,7 +282,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             return result;
         }
 
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -306,7 +305,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         }
 
         if (!Constants.K8S_LOCAL_TEST_CLUSTER_CODE.equals(clusterExist.getCode())
-            && !config.equals(ClusterConfUtils.getK8sConfig(clusterExist.getConfig()))) {
+                && !config.equals(ClusterConfUtils.getK8sConfig(clusterExist.getConfig()))) {
             try {
                 k8sManager.getAndUpdateK8sClient(code, true);
             } catch (RemotingException e) {
@@ -315,12 +314,12 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             }
         }
 
-        //update cluster
+        // update cluster
         clusterExist.setConfig(config);
         clusterExist.setName(name);
         clusterExist.setDescription(desc);
         clusterMapper.updateById(clusterExist);
-        //need not update relation
+        // need not update relation
 
         putMsg(result, Status.SUCCESS);
         return result;
@@ -366,4 +365,3 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     }
 
 }
-

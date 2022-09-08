@@ -23,7 +23,7 @@ metadata:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-common
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
-  {{- range $key, $value := (omit .Values.common.configmap "FS_S3A_SECRET_KEY") }}
+  {{- range $key, $value := .Values.common.configmap }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
 {{- end }}
