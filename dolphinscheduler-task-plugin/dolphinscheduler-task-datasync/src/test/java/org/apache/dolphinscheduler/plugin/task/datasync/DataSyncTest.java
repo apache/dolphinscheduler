@@ -33,7 +33,9 @@ import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionRespo
 import software.amazon.awssdk.services.datasync.model.FilterRule;
 import software.amazon.awssdk.services.datasync.model.Options;
 import software.amazon.awssdk.services.datasync.model.TagListEntry;
+import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 import software.amazon.awssdk.services.datasync.model.TaskSchedule;
+import software.amazon.awssdk.services.datasync.model.TaskStatus;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -53,12 +55,12 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 public class DataSyncTest {
 
-    private final String startingStatus = DatasyncHook.STATUS.AVAILABLE;
-    private final String runningStatus = DatasyncHook.STATUS.AVAILABLE;
-    private final String stopStatus = DatasyncHook.STATUS.AVAILABLE;
-    private final String canceledStatus = DatasyncHook.STATUS.AVAILABLE;
-    private final String successfulStatus = DatasyncHook.STATUS.AVAILABLE;
-    private final String finishedStatus = DatasyncHook.STATUS.AVAILABLE;
+    private final TaskStatus startingStatus = TaskStatus.AVAILABLE;
+    private final TaskExecutionStatus runningStatus = TaskExecutionStatus.SUCCESS;
+    private final TaskExecutionStatus stopStatus = TaskExecutionStatus.SUCCESS;
+    private final TaskExecutionStatus canceledStatus = TaskExecutionStatus.SUCCESS;
+    private final TaskExecutionStatus successfulStatus = TaskExecutionStatus.SUCCESS;
+    private final TaskExecutionStatus finishedStatus = TaskExecutionStatus.SUCCESS;
 
     private DatasyncTask datasyncTask;
     private DataSyncClient client;
