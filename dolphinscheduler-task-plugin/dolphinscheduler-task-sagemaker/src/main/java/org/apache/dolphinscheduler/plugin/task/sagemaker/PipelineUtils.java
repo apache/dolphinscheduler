@@ -23,6 +23,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,75 +43,57 @@ import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
 
 public class PipelineUtils {
 
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    private static final String EXECUTING = "Executing";
+    private static final String SUCCEEDED = "Succeeded";
 
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
-    private final AmazonSageMaker client;
-    private String pipelineExecutionArn;
-    private String clientRequestToken;
-    private String pipelineStatus;
+    public PipelineId startPipelineExecution(AmazonSageMaker client, StartPipelineExecutionRequest request) {
+        StartPipelineExecutionResult result = client.startPipelineExecution(request);
+        String pipelineExecutionArn = result.getPipelineExecutionArn();
+        String clientRequestToken = request.getClientRequestToken();
+        logger.info("Start success, pipeline: {}, token: {}", pipelineExecutionArn, clientRequestToken);
 
-    public PipelineUtils(AmazonSageMaker client) {
-        this.client = client;
+        return new PipelineId(pipelineExecutionArn, clientRequestToken);
     }
 
-    public int startPipelineExecution(StartPipelineExecutionRequest request) {
-        int exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
-        try {
-            StartPipelineExecutionResult result = client.startPipelineExecution(request);
-            pipelineExecutionArn = result.getPipelineExecutionArn();
-            clientRequestToken = request.getClientRequestToken();
-            exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
-            logger.info("Start pipeline: {} success", pipelineExecutionArn);
-        } catch (Exception e) {
-            logger.error("Start pipeline error: {}", e.getMessage());
-        }
-
-        return exitStatusCode;
-    }
-
-    public void stopPipelineExecution() {
+    public void stopPipelineExecution(AmazonSageMaker client, PipelineId pipelineId) {
         StopPipelineExecutionRequest request = new StopPipelineExecutionRequest();
-        request.setPipelineExecutionArn(pipelineExecutionArn);
-        request.setClientRequestToken(clientRequestToken);
+        request.setPipelineExecutionArn(pipelineId.getPipelineExecutionArn());
+        request.setClientRequestToken(pipelineId.getClientRequestToken());
 
-        try {
-            StopPipelineExecutionResult result = client.stopPipelineExecution(request);
-            logger.info("Stop pipeline: {} success", result.getPipelineExecutionArn());
-        } catch (Exception e) {
-            logger.error("Stop pipeline error: {}", e.getMessage());
-        }
-
+        StopPipelineExecutionResult result = client.stopPipelineExecution(request);
+        logger.info("Stop pipeline: {} success", result.getPipelineExecutionArn());
     }
 
-    public int checkPipelineExecutionStatus() {
-        describePipelineExecution();
-        while (pipelineStatus.equals("Executing")) {
+    public int checkPipelineExecutionStatus(AmazonSageMaker client, PipelineId pipelineId) {
+        String pipelineStatus = describePipelineExecution(client, pipelineId);
+        while (EXECUTING.equals(pipelineStatus)) {
             logger.info("check Pipeline Steps running");
-            listPipelineExecutionSteps();
+            listPipelineExecutionSteps(client, pipelineId);
             ThreadUtils.sleep(SagemakerConstants.CHECK_PIPELINE_EXECUTION_STATUS_INTERVAL);
-            describePipelineExecution();
+            describePipelineExecution(client, pipelineId);
         }
 
         int exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
-        if (pipelineStatus.equals("Succeeded")) {
+        if (SUCCEEDED.equals(pipelineStatus)) {
             exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
         }
-        logger.info("exit : {}", exitStatusCode);
-        logger.info("PipelineExecutionStatus : {}", pipelineStatus);
+        logger.info("PipelineExecutionStatus : {}, exitStatusCode: {}", pipelineStatus, exitStatusCode);
         return exitStatusCode;
     }
 
-    private void describePipelineExecution() {
+    private String describePipelineExecution(AmazonSageMaker client, PipelineId pipelineId) {
         DescribePipelineExecutionRequest request = new DescribePipelineExecutionRequest();
-        request.setPipelineExecutionArn(pipelineExecutionArn);
+        request.setPipelineExecutionArn(pipelineId.getPipelineExecutionArn());
         DescribePipelineExecutionResult result = client.describePipelineExecution(request);
-        pipelineStatus = result.getPipelineExecutionStatus();
-        logger.info("PipelineExecutionStatus: {}", pipelineStatus);
+        logger.info("PipelineExecutionStatus: {}", result.getPipelineExecutionStatus());
+        return result.getPipelineExecutionStatus();
     }
 
-    private void listPipelineExecutionSteps() {
+    private void listPipelineExecutionSteps(AmazonSageMaker client, PipelineId pipelineId) {
         ListPipelineExecutionStepsRequest request = new ListPipelineExecutionStepsRequest();
-        request.setPipelineExecutionArn(pipelineExecutionArn);
+        request.setPipelineExecutionArn(pipelineId.getPipelineExecutionArn());
         request.setMaxResults(SagemakerConstants.PIPELINE_MAX_RESULTS);
         ListPipelineExecutionStepsResult result = client.listPipelineExecutionSteps(request);
         List<PipelineExecutionStep> steps = result.getPipelineExecutionSteps();
@@ -119,7 +105,12 @@ public class PipelineUtils {
         }
     }
 
-    public String getPipelineExecutionArn() {
-        return pipelineExecutionArn;
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PipelineId {
+
+        private String pipelineExecutionArn;
+        private String clientRequestToken;
     }
 }
