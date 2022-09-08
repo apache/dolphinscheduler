@@ -251,7 +251,7 @@ public abstract class UpgradeDao {
 
                         List<ResourceInfo> resourceList = JSONUtils.toList(param.get("resourceList").toString(), ResourceInfo.class);
                         ResourceInfo mainJar = JSONUtils.parseObject(param.get("mainJar").toString(), ResourceInfo.class);
-                        if (mainJar != null && mainJar.getId() == 0) {
+                        if (mainJar != null && mainJar.getId() == null) {
                             String fullName = mainJar.getRes().startsWith("/") ? mainJar.getRes() : String.format("/%s", mainJar.getRes());
                             if (resourcesMap.containsKey(fullName)) {
                                 mainJar.setId(resourcesMap.get(fullName));
@@ -262,7 +262,7 @@ public abstract class UpgradeDao {
                         if (CollectionUtils.isNotEmpty(resourceList)) {
                             List<ResourceInfo> newResourceList = resourceList.stream().map(resInfo -> {
                                 String fullName = resInfo.getRes().startsWith("/") ? resInfo.getRes() : String.format("/%s", resInfo.getRes());
-                                if (resInfo.getId() == 0 && resourcesMap.containsKey(fullName)) {
+                                if (resInfo.getId() == null && resourcesMap.containsKey(fullName)) {
                                     resInfo.setId(resourcesMap.get(fullName));
                                 }
                                 return resInfo;
