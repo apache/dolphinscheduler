@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.stream;
+package org.apache.dolphinscheduler.plugin.task.api;
 
-public interface StreamTask {
-    public void savePoint() throws Exception;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+
+public interface TaskCallBack {
+
+    public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo);
 }

@@ -76,11 +76,11 @@ public class HttpTaskTest {
         HttpTask headHttpTask = generateHttpTask(HttpMethod.HEAD, HttpStatus.SC_OK);
         HttpTask putHttpTask = generateHttpTask(HttpMethod.PUT, HttpStatus.SC_OK);
         HttpTask deleteHttpTask = generateHttpTask(HttpMethod.DELETE, HttpStatus.SC_OK);
-        getHttpTask.handle();
-        postHttpTask.handle();
-        headHttpTask.handle();
-        putHttpTask.handle();
-        deleteHttpTask.handle();
+        getHttpTask.handle(null);
+        postHttpTask.handle(null);
+        headHttpTask.handle(null);
+        putHttpTask.handle(null);
+        deleteHttpTask.handle(null);
         Assert.assertEquals(EXIT_CODE_SUCCESS, getHttpTask.getExitStatusCode());
         Assert.assertEquals(EXIT_CODE_SUCCESS, postHttpTask.getExitStatusCode());
         Assert.assertEquals(EXIT_CODE_SUCCESS, headHttpTask.getExitStatusCode());
@@ -91,7 +91,7 @@ public class HttpTaskTest {
     @Test
     public void testHandleCheckCodeDefaultError() throws Exception {
         HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_BAD_REQUEST);
-        getHttpTask.handle();
+        getHttpTask.handle(null);
         Assert.assertEquals(EXIT_CODE_FAILURE, getHttpTask.getExitStatusCode());
     }
 
@@ -102,8 +102,8 @@ public class HttpTaskTest {
                 condition, HttpStatus.SC_CREATED, "");
         HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.STATUS_CODE_CUSTOM,
                 condition, HttpStatus.SC_OK, "");
-        httpTask.handle();
-        httpErrorTask.handle();
+        httpTask.handle(null);
+        httpErrorTask.handle(null);
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
         Assert.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
     }
@@ -114,8 +114,8 @@ public class HttpTaskTest {
                 "success", HttpStatus.SC_OK, "{\"status\": \"success\"}");
         HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_CONTAINS,
                 "success", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
-        httpTask.handle();
-        httpErrorTask.handle();
+        httpTask.handle(null);
+        httpErrorTask.handle(null);
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
         Assert.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
     }
@@ -126,8 +126,8 @@ public class HttpTaskTest {
                 "failed", HttpStatus.SC_OK, "{\"status\": \"success\"}");
         HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_NOT_CONTAINS,
                 "failed", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
-        httpTask.handle();
-        httpErrorTask.handle();
+        httpTask.handle(null);
+        httpErrorTask.handle(null);
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
         Assert.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
     }
@@ -148,7 +148,7 @@ public class HttpTaskTest {
         HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY, HttpMethod.POST,
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
                 HttpStatus.SC_OK, "");
-        httpTask.handle();
+        httpTask.handle(null);
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
@@ -168,7 +168,7 @@ public class HttpTaskTest {
         HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_PARAMS_TO_RES_BODY, HttpMethod.POST,
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
                 HttpStatus.SC_OK, "");
-        httpTask.handle();
+        httpTask.handle(null);
         Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 

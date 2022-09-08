@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
@@ -31,7 +27,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
-import org.slf4j.Logger;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -39,6 +39,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
 
 public class TaskExecutionCheckerUtils {
 
@@ -59,12 +61,14 @@ public class TaskExecutionCheckerUtils {
                 osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
             }
             if (!osUserExistFlag) {
-                throw new TaskException(String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
+                throw new TaskException(
+                        String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
             }
         } catch (TaskException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new TaskException(String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
+            throw new TaskException(
+                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
         }
     }
 
@@ -84,7 +88,8 @@ public class TaskExecutionCheckerUtils {
         }
     }
 
-    public static void downloadResourcesIfNeeded(StorageOperate storageOperate, TaskExecutionContext taskExecutionContext, Logger logger) {
+    public static void downloadResourcesIfNeeded(StorageOperate storageOperate,
+                                                 TaskExecutionContext taskExecutionContext, Logger logger) {
         String execLocalPath = taskExecutionContext.getExecutePath();
         Map<String, String> projectRes = taskExecutionContext.getResources();
         if (MapUtils.isEmpty(projectRes)) {
@@ -113,7 +118,8 @@ public class TaskExecutionCheckerUtils {
                     String resPath = storageOperate.getResourceFileName(tenantCode, fullName);
                     logger.info("get resource file from path:{}", resPath);
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false, true);
+                    storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false,
+                            true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(
