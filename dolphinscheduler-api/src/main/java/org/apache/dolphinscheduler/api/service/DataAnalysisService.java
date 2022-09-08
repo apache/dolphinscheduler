@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * data analysis service
@@ -39,7 +40,7 @@ public interface DataAnalysisService {
      * @param endDate     end date
      * @return task state count data
      */
-    Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate);
+    Result countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate);
 
     /**
      * statistical process instance status data
@@ -50,7 +51,7 @@ public interface DataAnalysisService {
      * @param endDate     end date
      * @return process instance state count data
      */
-    Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate);
+    Result countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate);
 
     /**
      * statistics the process definition quantities of a certain person
@@ -61,7 +62,7 @@ public interface DataAnalysisService {
      * @param projectCode project code
      * @return definition count data
      */
-    Map<String, Object> countDefinitionByUser(User loginUser, long projectCode);
+    Result countDefinitionByUser(User loginUser, long projectCode);
 
     /**
      * statistical command status data
@@ -69,7 +70,7 @@ public interface DataAnalysisService {
      * @param loginUser login user
      * @return command state count data
      */
-    Map<String, Object> countCommandState(User loginUser);
+    Result countCommandState(User loginUser);
 
     /**
      * count queue state
@@ -77,7 +78,7 @@ public interface DataAnalysisService {
      * @param loginUser login user
      * @return queue state count data
      */
-    Map<String, Object> countQueueState(User loginUser);
+    Result countQueueState(User loginUser);
 
     /**
      * Statistics task instance group by given project codes list

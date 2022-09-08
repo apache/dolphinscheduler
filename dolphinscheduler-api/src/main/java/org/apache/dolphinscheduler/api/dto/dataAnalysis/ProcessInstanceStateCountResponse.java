@@ -17,12 +17,8 @@
 
 package org.apache.dolphinscheduler.api.dto.dataAnalysis;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
-
-import java.util.Map;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,17 +31,6 @@ import lombok.NoArgsConstructor;
 public class ProcessInstanceStateCountResponse extends Result {
 
     private Project data;
-
-
-    public ProcessInstanceStateCountResponse(Map<String, Object> result) {
-        super();
-        Status status = (Status) result.get(Constants.STATUS);
-        if (null != status) {
-            this.setCode(status.getCode());
-        }
-        this.setMsg((String) result.get(Constants.MSG));
-        this.setData(result.get(Constants.DATA_LIST));
-    }
 
     public ProcessInstanceStateCountResponse(Result result) {
         super();

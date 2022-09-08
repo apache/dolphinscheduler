@@ -34,10 +34,9 @@ import org.apache.dolphinscheduler.api.dto.dataAnalysis.TaskStateCountRequest;
 import org.apache.dolphinscheduler.api.dto.dataAnalysis.TaskStateCountResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -78,15 +77,16 @@ public class DataAnalysisV2Controller extends BaseController {
             @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
             @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
     })
-    @GetMapping(value = "/task-state-count",consumes = {"application/json"})
+    @GetMapping(value = "/task-state-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_INSTANCE_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
 
     public TaskStateCountResponse countTaskState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                 @RequestBody TaskStateCountRequest taskStateCountReq) {
+                                                 @RequestBody TaskStateCountRequest taskStateCountReq) {
 
-        Map<String, Object> result = dataAnalysisService.countTaskStateByProject(loginUser, taskStateCountReq.getProjectCode(), taskStateCountReq.getStartDate(), taskStateCountReq.getEndDate());
+        Result result = dataAnalysisService.countTaskStateByProject(loginUser, taskStateCountReq.getProjectCode(),
+                taskStateCountReq.getStartDate(), taskStateCountReq.getEndDate());
         return new TaskStateCountResponse(result);
     }
 
@@ -103,15 +103,16 @@ public class DataAnalysisV2Controller extends BaseController {
             @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
             @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
     })
-    @GetMapping(value = "/process-state-count",consumes = {"application/json"})
+    @GetMapping(value = "/process-state-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_INSTANCE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProcessInstanceStateCountResponse countProcessInstanceState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestBody ProcessInstanceStateCountRequest processInstanceStateCountReq) {
+                                                                       @RequestBody ProcessInstanceStateCountRequest processInstanceStateCountReq) {
 
-        Map<String, Object> result =
-                dataAnalysisService.countProcessInstanceStateByProject(loginUser, processInstanceStateCountReq.getProjectCode(),processInstanceStateCountReq.getStartDate(),processInstanceStateCountReq.getEndDate());
+        Result result = dataAnalysisService.countProcessInstanceStateByProject(loginUser,
+                processInstanceStateCountReq.getProjectCode(), processInstanceStateCountReq.getStartDate(),
+                processInstanceStateCountReq.getEndDate());
         return new ProcessInstanceStateCountResponse(result);
     }
 
@@ -126,14 +127,15 @@ public class DataAnalysisV2Controller extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
     })
-    @GetMapping(value = "/define-user-count",consumes = {"application/json"})
+    @GetMapping(value = "/define-user-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ProcessDefinitionStateCountResponse countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestBody ProcessDefinitionStateCountRequest processDefinitionStateCountReq) {
+                                                                     @RequestBody ProcessDefinitionStateCountRequest processDefinitionStateCountReq) {
 
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, processDefinitionStateCountReq.getProjectCode());
+        Result result =
+                dataAnalysisService.countDefinitionByUser(loginUser, processDefinitionStateCountReq.getProjectCode());
         return new ProcessDefinitionStateCountResponse(result);
     }
 
@@ -144,13 +146,13 @@ public class DataAnalysisV2Controller extends BaseController {
      * @return command state of user projects
      */
     @ApiOperation(value = "countCommandState", notes = "COUNT_COMMAND_STATE_NOTES")
-    @GetMapping(value = "/command-state-count",consumes = {"application/json"})
+    @GetMapping(value = "/command-state-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COMMAND_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public CommandStateCountResponse countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = dataAnalysisService.countCommandState(loginUser);
+        Result result = dataAnalysisService.countCommandState(loginUser);
         return new CommandStateCountResponse(result);
     }
 
@@ -161,13 +163,13 @@ public class DataAnalysisV2Controller extends BaseController {
      * @return queue state count
      */
     @ApiOperation(value = "countQueueState", notes = "COUNT_QUEUE_STATE_NOTES")
-    @GetMapping(value = "/queue-count",consumes = {"application/json"})
+    @GetMapping(value = "/queue-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUEUE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public QueueStateCountResponse countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = dataAnalysisService.countQueueState(loginUser);
+        Result result = dataAnalysisService.countQueueState(loginUser);
         return new QueueStateCountResponse(result);
     }
 }

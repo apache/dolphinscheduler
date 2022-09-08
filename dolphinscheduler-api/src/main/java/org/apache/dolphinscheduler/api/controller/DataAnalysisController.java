@@ -30,10 +30,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +43,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * data analysis controller
@@ -83,9 +80,7 @@ public class DataAnalysisController extends BaseController {
                                  @RequestParam(value = "endDate", required = false) String endDate,
                                  @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
 
-        Map<String, Object> result =
-                dataAnalysisService.countTaskStateByProject(loginUser, projectCode, startDate, endDate);
-        return returnDataList(result);
+        return dataAnalysisService.countTaskStateByProject(loginUser, projectCode, startDate, endDate);
     }
 
     /**
@@ -112,9 +107,7 @@ public class DataAnalysisController extends BaseController {
                                             @RequestParam(value = "endDate", required = false) String endDate,
                                             @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
 
-        Map<String, Object> result =
-                dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectCode, startDate, endDate);
-        return returnDataList(result);
+        return dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectCode, startDate, endDate);
     }
 
     /**
@@ -135,8 +128,7 @@ public class DataAnalysisController extends BaseController {
     public Result countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
 
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectCode);
-        return returnDataList(result);
+        return dataAnalysisService.countDefinitionByUser(loginUser, projectCode);
     }
 
     /**
@@ -152,8 +144,7 @@ public class DataAnalysisController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = dataAnalysisService.countCommandState(loginUser);
-        return returnDataList(result);
+        return dataAnalysisService.countCommandState(loginUser);
     }
 
     /**
@@ -169,7 +160,6 @@ public class DataAnalysisController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = dataAnalysisService.countQueueState(loginUser);
-        return returnDataList(result);
+        return dataAnalysisService.countQueueState(loginUser);
     }
 }
