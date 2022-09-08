@@ -37,10 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
@@ -54,25 +52,23 @@ import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({JSONUtils.class, PropertyUtils.class,})
 @PowerMockIgnore({"javax.*"})
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
 public class SagemakerTaskTest {
 
     private final String pipelineExecutionArn = "test-pipeline-arn";
     private final String clientRequestToken = "test-pipeline-token";
     private SagemakerTask sagemakerTask;
     private AmazonSageMaker client;
-    private PipelineUtils pipelineUtils;
+    private PipelineUtils pipelineUtils = new PipelineUtils();
 
     @Before
     public void before() {
-        PowerMockito.mockStatic(PropertyUtils.class);
         String parameters = buildParameters();
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+
+        client = mock(AmazonSageMaker.class);
         sagemakerTask = new SagemakerTask(taskExecutionContext);
         sagemakerTask.init();
-        client = mock(AmazonSageMaker.class);
-        pipelineUtils = new PipelineUtils();
 
         StartPipelineExecutionResult startPipelineExecutionResult = mock(StartPipelineExecutionResult.class);
         when(startPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);

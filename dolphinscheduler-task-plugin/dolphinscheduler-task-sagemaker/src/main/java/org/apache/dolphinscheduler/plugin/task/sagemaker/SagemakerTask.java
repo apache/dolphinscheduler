@@ -63,8 +63,8 @@ public class SagemakerTask extends AbstractRemoteTask {
     private SagemakerParameters parameters;
 
     private final AmazonSageMaker client;
+    private final PipelineUtils utils;
     private PipelineUtils.PipelineId pipelineId;
-    private PipelineUtils utils;
 
     public SagemakerTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -168,7 +168,7 @@ public class SagemakerTask extends AbstractRemoteTask {
         return ParameterUtils.convertParameterPlaceholders(requestJson, ParamUtils.convert(paramsMap));
     }
 
-    private AmazonSageMaker createClient() {
+    protected AmazonSageMaker createClient() {
         final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
         final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
         final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
