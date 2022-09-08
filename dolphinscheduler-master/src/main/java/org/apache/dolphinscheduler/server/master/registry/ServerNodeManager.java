@@ -165,7 +165,6 @@ public class ServerNodeManager implements InitializingBean {
         // init executor service
         executorService =
                 Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
-
         executorService.scheduleWithFixedDelay(new WorkerNodeInfoAndGroupDbSyncTask(), 0, 10, TimeUnit.SECONDS);
 
         // init MasterNodeListener listener
@@ -228,8 +227,12 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
+<<<<<<< HEAD
     protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo,
                                                         WorkerGroup wg) {
+=======
+    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroup wg) {
+>>>>>>> 2e61c76c2 ([Improvement] Add remote task model (#11767))
         Set<String> nodes = new HashSet<>();
         String[] addrs = wg.getAddrList().split(Constants.COMMA);
         for (String addr : addrs) {
@@ -346,8 +349,13 @@ public class ServerNodeManager implements InitializingBean {
                 logger.warn("current addr:{} is not in active master list",
                         masterConfig.getMasterAddress());
             }
+<<<<<<< HEAD
             logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE,
                     MASTER_SLOT, masterConfig.getMasterAddress());
+=======
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT,
+                    masterConfig.getMasterAddress());
+>>>>>>> 2e61c76c2 ([Improvement] Add remote task model (#11767))
         } finally {
             masterLock.unlock();
         }
