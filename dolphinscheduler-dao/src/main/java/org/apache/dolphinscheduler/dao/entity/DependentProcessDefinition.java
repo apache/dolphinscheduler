@@ -42,6 +42,11 @@ public class DependentProcessDefinition {
     private String processDefinitionName;
 
     /**
+     * process definition version
+     **/
+    private int processDefinitionVersion;
+
+    /**
      * task definition name
      */
     private long taskDefinitionCode;
@@ -60,14 +65,14 @@ public class DependentProcessDefinition {
      * get dependent cycle
      * @return CycleEnum
      */
-    public CycleEnum getDependentCycle() {
+    public CycleEnum getDependentCycle(long upstreamProcessDefinitionCode) {
         DependentParameters dependentParameters = this.getDependentParameters();
         List<DependentTaskModel> dependentTaskModelList = dependentParameters.getDependTaskList();
 
         for (DependentTaskModel dependentTaskModel : dependentTaskModelList) {
             List<DependentItem> dependentItemList = dependentTaskModel.getDependItemList();
             for (DependentItem dependentItem : dependentItemList) {
-                if (this.getProcessDefinitionCode() == dependentItem.getDefinitionCode()) {
+                if (upstreamProcessDefinitionCode == dependentItem.getDefinitionCode()) {
                     return cycle2CycleEnum(dependentItem.getCycle());
                 }
             }
@@ -120,6 +125,14 @@ public class DependentProcessDefinition {
 
     public void setProcessDefinitionCode(long code) {
         this.processDefinitionCode = code;
+    }
+
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
+    }
+
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
     }
 
     public long getTaskDefinitionCode() {
