@@ -152,7 +152,6 @@ class GitHub(ResourcePlugin):
             content = base64.b64decode(json_response["content"])
             return content.decode("utf-8")
         else:
-            print("debug " + str(response.status_code))
             if response.status_code == requests.codes.not_found:
                 raise PyResPluginException("{} is not found.".format(path))
             if response.status_code == requests.codes.unauthorized:
