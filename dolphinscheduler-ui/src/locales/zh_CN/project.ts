@@ -396,7 +396,6 @@ export default {
     value_required_tips: 'value(必填)',
     pre_tasks: '前置任务',
     program_type: '程序类型',
-    spark_version: 'Spark版本',
     main_class: '主函数的Class',
     main_class_tips: '请填写主函数的Class',
     main_package: '主程序包',
