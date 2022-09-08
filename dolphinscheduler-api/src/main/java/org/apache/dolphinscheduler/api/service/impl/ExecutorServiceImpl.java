@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_START;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
@@ -165,13 +166,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
                                                    int dryRun, ComplementDependentMode complementDependentMode) {
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.hasProjectAndPerm(loginUser, projectCode, PROJECT_OVERVIEW);
+
+        Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
@@ -341,15 +339,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     public Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId,
                                        ExecuteType executeType) {
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
+        projectService.hasProjectAndPerm(loginUser, projectCode, ApiFuncIdentificationConstant.map.get(executeType));
 
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                ApiFuncIdentificationConstant.map.get(executeType));
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-
+        Map<String, Object> result = new HashMap<>();
         // check master exists
         if (!checkMasterExists(result)) {
             return result;
@@ -1029,14 +1022,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     public Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode, int taskDefinitionVersion,
                                                 int warningGroupId, String workerGroup, Long environmentCode, Map<String, String> startParams, int dryRun) {
-        Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.hasProjectAndPerm(loginUser, projectCode, WORKFLOW_START);
 
+        Map<String, Object> result = new HashMap<>();
         // check master exists
         if (!checkMasterExists(result)) {
             return result;

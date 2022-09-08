@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -46,6 +45,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -122,21 +122,15 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                                       Integer pageNo,
                                       Integer pageSize) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result, status);
-            return result;
-        }
+        projectService.hasProjectAndPerm(loginUser, projectCode, TASK_INSTANCE);
+
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.getCode()};
         }
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        status = (Status) checkAndParseDateResult.get(Constants.STATUS);
+        Status status = (Status) checkAndParseDateResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
             putMsg(result, status);
             return result;
@@ -150,11 +144,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without process instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
-                page, project.getCode(), processDefinitionName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
+                page, projectCode, processDefinitionName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
             );
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
+                page, projectCode, processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
             );
         }
         Set<String> exclusionSet = new HashSet<>();
@@ -190,14 +184,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Transactional
     @Override
     public Map<String, Object> forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.hasProjectAndPerm(loginUser, projectCode, FORCED_SUCCESS);
 
+        Map<String, Object> result = new HashMap<>();
         // check whether the task instance can be found
         TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
         if (task == null) {
@@ -233,14 +223,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     public Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId) {
         Result result = new Result();
 
-        Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,FORCED_SUCCESS);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result,status);
-            return result;
-        }
+        projectService.hasProjectAndPerm(loginUser, projectCode, FORCED_SUCCESS);
 
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
         if (taskInstance == null) {
@@ -261,14 +245,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     public Result stopTask(User loginUser, long projectCode, Integer taskInstanceId) {
         Result result = new Result();
 
-        Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,FORCED_SUCCESS);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result,status);
-            return result;
-        }
+        projectService.hasProjectAndPerm(loginUser, projectCode, FORCED_SUCCESS);
 
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
         if (taskInstance == null) {

@@ -155,11 +155,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                                                     TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
         Map<String, Object> result = new HashMap<>();
         if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            projectService.hasProjectAndPerm(loginUser, projectCode, PROJECT_OVERVIEW);
         }
 
         Date start = null;
@@ -205,11 +201,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
         if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            projectService.hasProjectAndPerm(loginUser, projectCode, PROJECT_OVERVIEW);
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();

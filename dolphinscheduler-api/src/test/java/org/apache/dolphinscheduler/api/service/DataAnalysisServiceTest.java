@@ -119,7 +119,6 @@ public class DataAnalysisServiceTest {
         project.setName("test");
         resultMap = new HashMap<>();
         Mockito.when(projectMapper.selectById(1)).thenReturn(project);
-        Mockito.when(projectService.hasProjectAndPerm(user, project, resultMap, PROJECT_OVERVIEW)).thenReturn(true);
 
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(project);
     }
@@ -146,10 +145,6 @@ public class DataAnalysisServiceTest {
                 DateUtils.stringToDate(endDate),
                 new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
         Mockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(),
-                Mockito.any(),
-                (Map<String, Object>) Mockito.any(),
-                Mockito.any())).thenReturn(true);
 
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -255,10 +250,6 @@ public class DataAnalysisServiceTest {
         Mockito.when(processInstanceMapper.countInstanceStateByProjectCodes(DateUtils.stringToDate(startDate),
                 DateUtils.stringToDate(endDate),
                 new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(),
-                Mockito.any(),
-                (Map<String, Object>) Mockito.any(),
-                Mockito.any())).thenReturn(true);
 
         result = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

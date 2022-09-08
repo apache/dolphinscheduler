@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.permission;
 
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.slf4j.Logger;
 
 import java.util.List;
