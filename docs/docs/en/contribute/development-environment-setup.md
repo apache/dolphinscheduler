@@ -1,6 +1,7 @@
 # DolphinScheduler development
 
 ## Software Requirements
+
 Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
 * [Git](https://git-scm.com/downloads)
@@ -46,6 +47,7 @@ fix things for you.
 DolphinScheduler will release new Docker images after it released, you could find them in [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler).
 
 * If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean package \
@@ -59,6 +61,7 @@ cd dolphinscheduler
 When the command is finished you could find them by command `docker imaegs`.
 
 * If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can run when finished the modification
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean deploy \
@@ -92,7 +95,6 @@ RUN apt update ; \
 >
 > Have to use version after Docker 19.03, because after 19.03 docker contains buildx
 
-
 ## Notice
 
 There are two ways to configure the DolphinScheduler development environment, standalone mode and normal mode
@@ -122,6 +124,7 @@ Find the class `org.apache.dolphinscheduler.StandaloneServer` in Intellij IDEA a
 ### Start frontend server
 
 Install frontend dependencies and run it.
+
 > Note: You can see more detail about the frontend setting in [frontend development](./frontend-development.md).
 
 ```shell
@@ -143,12 +146,11 @@ Download [ZooKeeper](https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3
 * Create directory `zkData` and `zkLog`
 * Go to the zookeeper installation directory, copy configure file `zoo_sample.cfg` to `conf/zoo.cfg`, and change value of dataDir in conf/zoo.cfg to dataDir=./tmp/zookeeper
 
-    ```shell
-    # We use path /data/zookeeper/data and /data/zookeeper/datalog here as example
-    dataDir=/data/zookeeper/data
-    dataLogDir=/data/zookeeper/datalog
-    ```
-
+  ```shell
+  # We use path /data/zookeeper/data and /data/zookeeper/datalog here as example
+  dataDir=/data/zookeeper/data
+  dataLogDir=/data/zookeeper/datalog
+  ```
 * Run `./bin/zkServer.sh` in terminal by command `./bin/zkServer.sh start`.
 
 #### Database
@@ -166,21 +168,22 @@ Following steps will guide how to start the DolphinScheduler backend service
 * Open project: Use IDE open the project, here we use Intellij IDEA as an example, after opening it will take a while for Intellij IDEA to complete the dependent download
 
 * File change
+
   * If you use MySQL as your metadata database, you need to modify `dolphinscheduler/pom.xml` and change the `scope` of the `mysql-connector-java` dependency to `compile`. This step is not necessary to use PostgreSQL
   * Modify database configuration, modify the database configuration in the `dolphinscheduler-master/src/main/resources/application.yaml`
   * Modify database configuration, modify the database configuration in the `dolphinscheduler-worker/src/main/resources/application.yaml`
   * Modify database configuration, modify the database configuration in the `dolphinscheduler-api/src/main/resources/application.yaml`
 
-
 We here use MySQL with database, username, password named dolphinscheduler as an example
-  ```application.yaml
-   spring:
-     datasource:
-       driver-class-name: com.mysql.cj.jdbc.Driver
-       url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
-       username: dolphinscheduler
-       password: dolphinscheduler
-  ```
+
+```application.yaml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+    username: dolphinscheduler
+    password: dolphinscheduler
+```
 
 * Log level: add a line `<appender-ref ref="STDOUT"/>` to the following configuration to enable the log to be displayed on the command line
 

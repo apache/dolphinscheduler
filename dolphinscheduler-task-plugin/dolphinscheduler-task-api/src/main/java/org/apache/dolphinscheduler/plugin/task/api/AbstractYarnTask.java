@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
  * abstract yarn task
  */
 public abstract class AbstractYarnTask extends AbstractTaskExecutor {
+
     /**
      * process task
      */
@@ -44,8 +45,8 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskRequest,
-            logger);
+                taskRequest,
+                logger);
     }
 
     @Override
@@ -105,9 +106,9 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
             throw new RuntimeException("The jar for the task is required.");
         }
 
-        return mainJar.getId() == 0
-            ? mainJar.getRes()
-            // when update resource maybe has error
-            : mainJar.getResourceName().replaceFirst("/", "");
+        return mainJar.getId() == null
+                ? mainJar.getRes()
+                // when update resource maybe has error
+                : mainJar.getResourceName().replaceFirst("/", "");
     }
 }
