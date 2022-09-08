@@ -53,12 +53,12 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 public class DataSyncTest {
 
-    private final String startingStatus = DatasyncHook.STATUS.READY;
-    private final String runningStatus = DatasyncHook.STATUS.READY;
-    private final String stopStatus = DatasyncHook.STATUS.READY;
-    private final String canceledStatus = DatasyncHook.STATUS.READY;
-    private final String successfulStatus = DatasyncHook.STATUS.READY;
-    private final String finishedStatus = DatasyncHook.STATUS.READY;
+    private final String startingStatus = DatasyncHook.STATUS.AVAILABLE;
+    private final String runningStatus = DatasyncHook.STATUS.AVAILABLE;
+    private final String stopStatus = DatasyncHook.STATUS.AVAILABLE;
+    private final String canceledStatus = DatasyncHook.STATUS.AVAILABLE;
+    private final String successfulStatus = DatasyncHook.STATUS.AVAILABLE;
+    private final String finishedStatus = DatasyncHook.STATUS.AVAILABLE;
 
     private DatasyncTask datasyncTask;
     private DataSyncClient client;

@@ -18,7 +18,7 @@ public class DatasyncTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public String getName() {
-        return "Datasync";
+        return "DATASYNC";
     }
 
     @Override

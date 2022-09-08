@@ -1,9 +1,8 @@
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import com.google.common.collect.Lists;
 import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -19,10 +18,14 @@ import software.amazon.awssdk.services.datasync.model.DeleteTaskRequest;
 import software.amazon.awssdk.services.datasync.model.DeleteTaskResponse;
 import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionRequest;
 import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionResponse;
+import software.amazon.awssdk.services.datasync.model.DescribeTaskRequest;
+import software.amazon.awssdk.services.datasync.model.DescribeTaskResponse;
 import software.amazon.awssdk.services.datasync.model.FilterRule;
 import software.amazon.awssdk.services.datasync.model.StartTaskExecutionRequest;
 import software.amazon.awssdk.services.datasync.model.StartTaskExecutionResponse;
 import software.amazon.awssdk.services.datasync.model.TagListEntry;
+import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
+import software.amazon.awssdk.services.datasync.model.TaskStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +37,8 @@ public class DatasyncHook {
     private String taskArn;
     private String taskExecArn;
 
-    public static String[] doneStatus = {STATUS.DELETE,STATUS.CANCELED,STATUS.STOPPED,STATUS.FINISHED,STATUS.SUCCESSFUL};
+    public static TaskExecutionStatus[] doneStatus = {TaskExecutionStatus.ERROR,TaskExecutionStatus.SUCCESS,TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
+    public static TaskStatus[] taskFinishFlags = {TaskStatus.UNAVAILABLE,TaskStatus.UNKNOWN_TO_SDK_VERSION};
     public DatasyncHook() {
         client = createClient();
     }
@@ -46,7 +50,7 @@ public class DatasyncHook {
         final String awsSecretAccessKey = "+kk0VLgtfTcUgs10YUj9pbREbpO88aavfsBr51ek";
 
         //final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
-        final String awsRegion = "ap-northeast-2";
+        final String awsRegion = "ap-northeast-3";
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
@@ -64,6 +68,10 @@ public class DatasyncHook {
                 .sourceLocationArn(parameters.getSourceLocationArn())
                 .destinationLocationArn(parameters.getDestinationLocationArn());
 
+        String cloudWatchLogGroupArn = parameters.getCloudWatchLogGroupArn();
+        if (StringUtils.isNotEmpty(cloudWatchLogGroupArn)) {
+            builder.cloudWatchLogGroupArn(cloudWatchLogGroupArn);
+        }
         List<TagListEntry> tag = parameters.getTags();
         if (tag!=null&& tag.size()>0) {
             builder.tags(tag);
@@ -87,8 +95,8 @@ public class DatasyncHook {
         if (task.sdkHttpResponse().isSuccessful()) {
             taskArn = task.taskArn();
         }
-
-        return awaitReplicationTaskStatus(STATUS.READY);
+        logger.info("finished createDatasyncTask ......");
+        return doubleCheckTaskStatus(TaskStatus.AVAILABLE, taskFinishFlags);
     }
 
     public Boolean startDatasyncTask() {
@@ -98,7 +106,7 @@ public class DatasyncHook {
         if (response.sdkHttpResponse().isSuccessful()) {
             taskExecArn=response.taskExecutionArn();
         }
-        return awaitReplicationTaskStatus(STATUS.RUNNING);
+        return doubleCheckExecStatus(TaskExecutionStatus.LAUNCHING, doneStatus);
     }
 
 
@@ -107,72 +115,105 @@ public class DatasyncHook {
         CancelTaskExecutionRequest cancel = CancelTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
         CancelTaskExecutionResponse response = client.cancelTaskExecution(cancel);
         if (response.sdkHttpResponse().isSuccessful()) {
-            return awaitReplicationTaskStatus(STATUS.CANCELED);
+            return true;
         }
-        return awaitReplicationTaskStatus(STATUS.RUNNING);
+        return false;
     }
 
-    public Boolean deleteDatasyncTask() {
-        logger.info("deleteDatasyncTask ......");
-        DeleteTaskRequest delete = DeleteTaskRequest.builder().taskArn(taskArn).build();
-        DeleteTaskResponse response = client.deleteTask(delete);
-        if (response.sdkHttpResponse().isSuccessful()) {
-            return awaitReplicationTaskStatus(STATUS.DELETE);
+    public TaskStatus queryDatasyncTaskStatus() {
+        logger.info("queryDatasyncTaskStatus ......");
+
+        DescribeTaskRequest request= DescribeTaskRequest.builder().taskArn(taskArn).build();
+        DescribeTaskResponse describe = client.describeTask(request);
+
+        if (describe.sdkHttpResponse().isSuccessful()) {
+            logger.info("queryDatasyncTaskStatus ......{}", describe.statusAsString());
+            return describe.status();
         }
-        return awaitReplicationTaskStatus(STATUS.STOPPED);
+        return null;
     }
 
-    public String queryDatasyncTaskStatus() {
-        logger.info("queryDatasyncTask ......");
+    public TaskExecutionStatus queryDatasyncTaskExecStatus() {
+        logger.info("queryDatasyncTaskExecStatus ......");
         DescribeTaskExecutionRequest request= DescribeTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
         DescribeTaskExecutionResponse describe = client.describeTaskExecution(request);
 
         if (describe.sdkHttpResponse().isSuccessful()) {
-            return describe.statusAsString();
+            logger.info("queryDatasyncTaskExecStatus ......{}", describe.statusAsString());
+            return describe.status();
         }
-        return STATUS.RETRY;
+        return null;
     }
 
+    public Boolean doubleCheckTaskStatus(TaskStatus exceptStatus, TaskStatus[] stopStatus) {
 
-    public Boolean awaitReplicationTaskStatus(String exceptStatus, String... stopStatus) {
-
-        List<String> stopStatusSet = Arrays.asList(stopStatus);
+        List<TaskStatus> stopStatusSet = Arrays.asList(stopStatus);
         int maxRetry = 5;
         while (maxRetry>0) {
-            String status = queryDatasyncTaskStatus();
+            TaskStatus status = queryDatasyncTaskStatus();
 
-            if (status.equals(STATUS.RETRY)) {
+            if (status==null) {
                 maxRetry--;
                 continue;
             }
 
             if (exceptStatus.equals(status)) {
-                logger.info("success");
+                logger.info("double check success");
                 return true;
             } else if (stopStatusSet.contains(status)) {
                 break;
             }
         }
-        logger.info("error");
+        logger.warn("double check error");
         return false;
     }
 
+    public Boolean doubleCheckExecStatus(TaskExecutionStatus exceptStatus, TaskExecutionStatus[] stopStatus) {
 
+        List<TaskExecutionStatus> stopStatusSet = Arrays.asList(stopStatus);
+        int maxRetry = 5;
+        while (maxRetry>0) {
+            TaskExecutionStatus status = queryDatasyncTaskExecStatus();
 
-    public static class STATUS {
-        public static final String DELETE = "delete";
-        public static final String READY = "ready";
-        public static final String RUNNING = "running";
-        public static final String STOPPED = "stopped";
-        public static final String SUCCESSFUL = "successful";
-        public static final String FINISHED = "finished";
-        public static final String RETRY = "retry";
-        public static final String CANCELED = "canceled";
+            if (status==null) {
+                maxRetry--;
+                continue;
+            }
+
+            if (exceptStatus.equals(status)) {
+                logger.info("double check success");
+                return true;
+            } else if (stopStatusSet.contains(status)) {
+                break;
+            }
+        }
+        logger.warn("double check error");
+        return false;
     }
 
-    public static class AWS_KEY {
-        public static final String REPLICATION_TASK_ARN = "replication-task-arn";
-        public static final String REPLICATION_INSTANCE_ARN = "replication-instance-arn";
-        public static final String ENDPOINT_ARN = "endpoint-arn";
+    public Boolean doubleCheckFinishStatus(TaskExecutionStatus exceptStatus, TaskExecutionStatus[] stopStatus) {
+
+        List<TaskExecutionStatus> stopStatusSet = Arrays.asList(stopStatus);
+        while (true) {
+            TaskExecutionStatus status = queryDatasyncTaskExecStatus();
+
+            if (status==null) {
+                continue;
+            }
+
+            if (exceptStatus.equals(status)) {
+                logger.info("double check success");
+                return true;
+            } else if (stopStatusSet.contains(status)) {
+                break;
+            }
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        logger.warn("double check error");
+        return false;
     }
 }

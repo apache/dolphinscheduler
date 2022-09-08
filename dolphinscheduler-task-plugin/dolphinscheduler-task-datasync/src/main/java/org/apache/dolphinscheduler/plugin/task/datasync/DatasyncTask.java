@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 
 public class DatasyncTask extends AbstractTaskExecutor {
 
@@ -58,7 +59,7 @@ public class DatasyncTask extends AbstractTaskExecutor {
         int exitStatusCode;
         exitStatusCode = checkCreateTask();
         if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
-            exitStatusCode = startReplicationTask();
+            exitStatusCode = startDatasyncTask();
         }
         return exitStatusCode;
     }
@@ -73,13 +74,13 @@ public class DatasyncTask extends AbstractTaskExecutor {
         }
     }
 
-    public int startReplicationTask() {
+    public int startDatasyncTask() {
         Boolean isStartSuccessfully = hook.startDatasyncTask();
         if (!isStartSuccessfully) {
             return TaskConstants.EXIT_CODE_FAILURE;
         }
-
-        Boolean isFinishedSuccessfully = hook.awaitReplicationTaskStatus(DatasyncHook.STATUS.SUCCESSFUL,DatasyncHook.doneStatus);
+        //started success, need time to exec
+        Boolean isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS,DatasyncHook.doneStatus);
         if (!isFinishedSuccessfully) {
             return TaskConstants.EXIT_CODE_FAILURE;
         } else {
