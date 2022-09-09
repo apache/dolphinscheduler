@@ -23,18 +23,22 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PostgreSQLPerformance extends BaseDBPerformance {
+/**
+ * H2 MEMORY DB Performance Monitor
+ */
+public class H2Performance extends BaseDBPerformance {
 
-    private static final Logger logger = LoggerFactory.getLogger(PostgreSQLPerformance.class);
+    private static final Logger logger = LoggerFactory.getLogger(H2Performance.class);
 
     /**
-     * get monitor record
+     * return the current database performance
      *
      * @param conn connection
      * @return MonitorRecord
@@ -43,28 +47,18 @@ public class PostgreSQLPerformance extends BaseDBPerformance {
     public MonitorRecord getMonitorRecord(Connection conn) {
         MonitorRecord monitorRecord = new MonitorRecord();
         monitorRecord.setDate(new Date());
+        monitorRecord.setDbType(DbType.H2);
         monitorRecord.setState(Flag.YES);
-        monitorRecord.setDbType(DbType.POSTGRESQL);
 
         try (Statement pstmt = conn.createStatement()) {
-            try (ResultSet rs1 = pstmt.executeQuery("select count(*) from pg_stat_activity;")) {
+            try (
+                    ResultSet rs1 = pstmt
+                            .executeQuery("select count(1) as total from information_schema.sessions;")) {
                 if (rs1.next()) {
-                    monitorRecord.setThreadsConnections(rs1.getInt("count"));
+                    monitorRecord.setThreadsConnections(rs1.getInt("total"));
                 }
             }
-
-            try (ResultSet rs2 = pstmt.executeQuery("show max_connections")) {
-                if (rs2.next()) {
-                    monitorRecord.setMaxConnections(rs2.getInt("max_connections"));
-                }
-            }
-
-            try (ResultSet rs3 = pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';")) {
-                if (rs3.next()) {
-                    monitorRecord.setThreadsRunningConnections(rs3.getInt("count"));
-                }
-            }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             monitorRecord.setState(Flag.NO);
             logger.error("SQLException ", e);
         }
