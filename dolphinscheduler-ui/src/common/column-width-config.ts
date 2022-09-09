@@ -94,6 +94,9 @@ export const COLUMN_WIDTH_CONFIG = {
   },
   tag: {
     width: 160
+  },
+  copy: {
+    width: 50
   }
 }
 

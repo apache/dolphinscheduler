@@ -83,7 +83,8 @@ export function useTable() {
         title: t('project.workflow.workflow_name'),
         key: 'name',
         className: 'workflow-name',
-        width: 200,
+        ...COLUMN_WIDTH_CONFIG['name'],
+        titleColSpan: 2,
         render: (row) =>
           h(
             NSpace,
@@ -93,7 +94,7 @@ export function useTable() {
               class: styles['workflow-name']
             },
             {
-              default: () => [
+              default: () =>
                 h(
                   ButtonLink,
                   {
@@ -104,22 +105,32 @@ export function useTable() {
                       })
                   },
                   {
-                    default: () => h(NEllipsis, null, () => row.name)
+                    default: () =>
+                      h(
+                        NEllipsis,
+                        COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                        () => row.name
+                      )
                   }
-                ),
-                h(
-                  NButton,
-                  {
-                    quaternary: true,
-                    circle: true,
-                    type: 'info',
-                    size: 'tiny',
-                    onClick: () => void copy(row.name)
-                  },
-                  { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
                 )
-              ]
             }
+          )
+      },
+      {
+        title: 'Copy',
+        key: 'copy',
+        ...COLUMN_WIDTH_CONFIG['copy'],
+        render: (row) =>
+          h(
+            NButton,
+            {
+              quaternary: true,
+              circle: true,
+              type: 'info',
+              size: 'tiny',
+              onClick: () => void copy(row.name)
+            },
+            { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
           )
       },
       {
