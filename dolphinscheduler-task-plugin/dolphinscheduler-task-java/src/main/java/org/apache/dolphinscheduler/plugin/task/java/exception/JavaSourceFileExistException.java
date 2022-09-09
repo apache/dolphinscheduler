@@ -15,49 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.plugin.task.java.exception;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskRunStatus;
+public class JavaSourceFileExistException extends RuntimeException {
+    public JavaSourceFileExistException() {
+    }
 
-import lombok.Data;
+    public JavaSourceFileExistException(String message) {
+        super(message);
+    }
 
-@Data
-public class TaskResponse {
+    public JavaSourceFileExistException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    /**
-     * varPool string
-     */
-    private String varPool;
+    public JavaSourceFileExistException(Throwable cause) {
+        super(cause);
+    }
 
-    /**
-     * SHELL process pid
-     */
-    private int processId;
-
-    /**
-     * SHELL result string
-     */
-    private String resultString;
-
-    /**
-     * other resource manager appId , for example : YARN etc
-     */
-    private String appIds;
-
-    /**
-     * process
-     */
-    private Process process;
-
-    /**
-     * cancel
-     */
-    private volatile boolean cancel = false;
-
-    /**
-     * exit code
-     */
-    private volatile int exitStatusCode = -1;
-
-    private TaskRunStatus status;
+    public JavaSourceFileExistException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }
