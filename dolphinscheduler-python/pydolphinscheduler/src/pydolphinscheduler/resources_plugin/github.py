@@ -36,8 +36,6 @@ class GitHub(ResourcePlugin):
     :param username: A string representing the user of the warehouse.
 
     :param password: A string representing the user password, it is equal to access_token.
-
-
     """
 
     # [start init_method]
