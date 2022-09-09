@@ -194,7 +194,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public void hasProjectAndPerm(User loginUser, Project project, String permission) {
         if (project == null) {
-            throw new ServiceException(Status.PROJECT_NOT_FOUND, "");
+            throw new ServiceException(Status.PROJECT_NOT_FOUND);
         } else if (!canOperatorPermissions(loginUser, new Object[] {project.getId()}, AuthorizationType.PROJECTS, permission)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
         }
@@ -246,14 +246,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result deleteProject(User loginUser, Long projectCode) {
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
-
         hasProjectAndPerm(loginUser, project, PROJECT_DELETE);
-        if (result.getCode() != Status.SUCCESS.getCode()) {
-            return result;
-        }
 
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
-
         if (!processDefinitionList.isEmpty()) {
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;

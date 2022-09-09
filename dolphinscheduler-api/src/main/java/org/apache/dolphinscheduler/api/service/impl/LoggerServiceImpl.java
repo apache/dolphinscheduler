@@ -165,6 +165,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             return result;
         }
         String log = queryLog(task, skipLineNum, limit);
+        result.put(Constants.STATUS, Status.SUCCESS);
         result.put(Constants.DATA_LIST, log);
         return result;
     }
