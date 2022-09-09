@@ -131,7 +131,6 @@ export default {
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version',
-    run_type: 'Run Type',
     scheduling_time: 'Scheduling Time',
     duration: 'Duration',
     run_times: 'Run Times',
@@ -217,6 +216,7 @@ export default {
     workflow_state: 'Workflow State',
     version: 'Version',
     current_version: 'Current Version',
+    run_type: 'Run Type',
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     description: 'Description',
@@ -309,6 +309,10 @@ export default {
     online: 'Online'
   },
   node: {
+    jvm_args: 'Java VM Parameters',
+    jvm_args_tips: 'Please enter virtual machine parameters',
+    run_type: 'Run Type',
+    is_module_path: 'Use Module Path',
     return_back: 'Return',
     current_node_settings: 'Current node settings',
     instructions: 'Instructions',
