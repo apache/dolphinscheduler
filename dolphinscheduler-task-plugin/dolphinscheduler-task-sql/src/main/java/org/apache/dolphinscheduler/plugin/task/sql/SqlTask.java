@@ -88,6 +88,9 @@ public class SqlTask extends AbstractTask {
 
     public static final int TEST_FLAG_YES = 1;
 
+    @Nullable
+    private Connection connection;
+
     /**
      * Abstract Yarn Task
      *
@@ -167,7 +170,21 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-
+        String type = sqlParameters.getType();
+        if (DbType.HIVE == DbType.valueOf(type)) {
+            List<String> appIds = ProcessUtils.killYarnJob(taskExecutionContext);
+            logger.info("cancel task type is [{}],yarn appIds is {}", type, appIds);
+        } else {
+            if (connection == null) {
+                logger.info("Unable to get database connection information");
+            } else {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    throw new TaskException("database connection shutdown failed");
+                }
+            }
+        }
     }
 
     /**
@@ -296,6 +313,7 @@ public class SqlTask extends AbstractTask {
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
+            logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
