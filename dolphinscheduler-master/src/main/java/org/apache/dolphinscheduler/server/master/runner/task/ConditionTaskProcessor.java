@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
-
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
@@ -37,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 
 /**
  * condition task processor
@@ -59,18 +57,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
      * complete task map
      */
     private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
-
-    @Override
-    public boolean submitTask() {
-        this.taskInstance =
-                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
-        if (this.taskInstance == null) {
-            return false;
-        }
-        this.setTaskExecutionLogger();
-        logger.info("condition task submit success");
-        return true;
-    }
 
     @Override
     public boolean runTask() {
@@ -126,15 +112,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     }
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(
-                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion(),
-                        taskInstance.getProcessInstanceId(),
-                        taskInstance.getId()));
-        this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-        taskInstance.setStartTime(new Date());
-        this.processService.saveTaskInstance(taskInstance);
         this.dependentParameters = taskInstance.getDependency();
     }
 

@@ -21,6 +21,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.NonNull;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.thread.ThreadNameReplacer;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -35,8 +36,8 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -49,15 +50,16 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.AbstractResourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -69,7 +71,9 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +131,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected TaskInstanceDao taskInstanceDao;
 
-    protected String threadLoggerInfoName;
+    protected @Nullable String threadLoggerInfoName;
 
     @Override
     public void init(@NonNull TaskInstance taskInstance, @NonNull ProcessInstance processInstance) {
@@ -156,34 +160,20 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected abstract boolean killTask();
 
-    /**
-     * task timeout process
-     */
     protected abstract boolean taskTimeout();
 
-    /**
-     * submit task
-     */
-    protected abstract boolean submitTask();
-
-    /**
-     * run task
-     */
     protected abstract boolean runTask();
 
-    /**
-     * dispatch task
-     */
     protected abstract boolean dispatchTask();
 
+    /**
+     * This method is safe will not throw exception
+     */
     @Override
     public boolean action(TaskAction taskAction) {
-        String threadName = Thread.currentThread().getName();
-        if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
-            Thread.currentThread().setName(threadLoggerInfoName);
-        }
         boolean result = false;
-        try {
+        try (
+                ThreadNameReplacer threadNameReplacer = new ThreadNameReplacer(threadLoggerInfoName)) {
             switch (taskAction) {
                 case STOP:
                     result = stop();
@@ -206,16 +196,40 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 default:
                     logger.error("unknown task action: {}", taskAction);
             }
-            return result;
-        } finally {
-            // reset thread name
-            Thread.currentThread().setName(threadName);
-
+        } catch (Exception e) {
+            logger.error("Task action: {} failed", taskAction, e);
+            if (taskInstance != null) {
+                // set the task instance status to failure
+                taskInstance.setEndTime(new Date());
+                taskInstance.setState(ExecutionStatus.FAILURE);
+                taskInstanceDao.updateTaskInstanceSafely(taskInstance);
+            }
         }
+        return result;
     }
 
     protected boolean submit() {
-        return submitTask();
+        Optional<TaskInstance> taskInstanceOptional =
+                submitTaskInstanceToDb(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance = taskInstanceOptional.orElse(null);
+        if (taskInstance == null) {
+            return false;
+        }
+        if (Constants.COMMON_TASK_TYPE.equals(getType())) {
+            // the common task process doesn't need to do postSubmit
+            return true;
+        }
+        setTaskExecutionLogger();
+        try (ThreadNameReplacer threadNameReplacer = new ThreadNameReplacer(threadLoggerInfoName)) {
+            return postSubmit();
+        }
+    }
+
+    protected boolean postSubmit() {
+        // update status to running
+        logger.info("The current {} task begin to running", getType());
+        updateLogicTaskToRunning();
+        return true;
     }
 
     protected boolean run() {
@@ -252,7 +266,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public String getType() {
-        throw new UnsupportedOperationException("This abstract class doesn's has type");
+        throw new UnsupportedOperationException("This abstract class doesn't has type");
     }
 
     @Override
@@ -268,13 +282,20 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     /**
      * set master task running logger.
      */
-    public void setTaskExecutionLogger() {
+    private void setTaskExecutionLogger() {
         threadLoggerInfoName = LoggerUtils.buildTaskId(taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId());
-        Thread.currentThread().setName(threadLoggerInfoName);
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance, taskInstance));
+    }
+
+    private void updateLogicTaskToRunning() {
+        taskInstance.setHost(masterConfig.getMasterAddress());
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setStartTime(new Date());
+        processService.updateTaskInstance(taskInstance);
     }
 
     /**

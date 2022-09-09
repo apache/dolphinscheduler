@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
-
+import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.BlockingOpportunity;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 
 /**
  * blocking task processor
@@ -68,15 +67,6 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     private Map<Long, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(
-                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion(),
-                        taskInstance.getProcessInstanceId(),
-                        taskInstance.getId()));
-        this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        this.taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-        this.taskInstance.setStartTime(new Date());
-        this.processService.saveTaskInstance(taskInstance);
         this.dependentParameters = taskInstance.getDependency();
         this.blockingParam = JSONUtils.parseObject(taskInstance.getTaskParams(), BlockingParameters.class);
     }
@@ -101,18 +91,6 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean taskTimeout() {
-        return true;
-    }
-
-    @Override
-    protected boolean submitTask() {
-        this.taskInstance =
-                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
-        if (this.taskInstance == null) {
-            return false;
-        }
-        this.setTaskExecutionLogger();
-        logger.info("blocking task submit success");
         return true;
     }
 

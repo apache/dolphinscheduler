@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
-
+import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -30,9 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.google.auto.service.AutoService;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
 /**
  * switch task processor
@@ -57,30 +55,8 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     private DependResult conditionResult;
 
     @Override
-    public boolean submitTask() {
-        this.taskInstance =
-                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
-
-        if (this.taskInstance == null) {
-            return false;
-        }
-        this.setTaskExecutionLogger();
-        logger.info("switch task submit success");
-        return true;
-    }
-
-    @Override
     public boolean runTask() {
         logger.info("switch task starting");
-        taskInstance.setLogPath(
-                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion(),
-                        taskInstance.getProcessInstanceId(),
-                        taskInstance.getId()));
-        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-        taskInstance.setStartTime(new Date());
-        processService.updateTaskInstance(taskInstance);
 
         if (!this.taskInstance().getState().typeIsFinished()) {
             setSwitchResult();

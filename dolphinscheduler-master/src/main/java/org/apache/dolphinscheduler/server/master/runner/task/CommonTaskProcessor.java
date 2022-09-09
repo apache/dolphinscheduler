@@ -47,32 +47,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     private NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
 
     @Override
-    protected boolean submitTask() {
-        this.taskInstance =
-                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
-
-        return this.taskInstance != null;
-    }
-
-    @Override
-    public boolean runTask() {
-        return true;
-    }
-
-    @Override
-    protected boolean taskTimeout() {
-        return true;
-    }
-
-    /**
-     * common task cannot be paused
-     */
-    @Override
-    protected boolean pauseTask() {
-        return true;
-    }
-
-    @Override
     public String getType() {
         return Constants.COMMON_TASK_TYPE;
     }
@@ -124,6 +98,11 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     @Override
+    protected boolean pauseTask() {
+        return true;
+    }
+
+    @Override
     public boolean killTask() {
 
         try {
@@ -148,6 +127,16 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
         logger.info("master success kill taskInstance name: {} taskInstance id: {}",
                 taskInstance.getName(), taskInstance.getId());
+        return true;
+    }
+
+    @Override
+    protected boolean taskTimeout() {
+        return true;
+    }
+
+    @Override
+    protected boolean runTask() {
         return true;
     }
 

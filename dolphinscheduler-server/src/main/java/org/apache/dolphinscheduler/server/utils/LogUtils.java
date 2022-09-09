@@ -17,33 +17,38 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import ch.qos.logback.classic.sift.SiftingAppender;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.spi.AppenderAttachable;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Optional;
 
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.sift.SiftingAppender;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.spi.AppenderAttachable;
-
+@UtilityClass
 public class LogUtils {
 
     public static final String LOG_TAILFIX = ".log";
 
-    private LogUtils() throws IllegalStateException {
-        throw new IllegalStateException("Utility class");
+    public static String getTaskLogPath(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
+        return getTaskLogPath(
+                taskInstance.getFirstSubmitTime(),
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId());
     }
 
-    /**
-     * get task log path
-     */
     public static String getTaskLogPath(Date firstSubmitTime, Long processDefineCode, int processDefineVersion,
                                         int processInstanceId, int taskInstanceId) {
         // format /logs/YYYYMMDD/defintion-code_defintion_version-processInstanceId-taskInstanceId.log

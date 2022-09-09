@@ -122,7 +122,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
     private final ProcessService processService;
 
-    private ProcessInstanceDao processInstanceDao;
+    private final ProcessInstanceDao processInstanceDao;
 
     private final ProcessAlertManager processAlertManager;
 
@@ -930,6 +930,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
             taskProcessor.init(taskInstance, processInstance);
 
+            // the task is already running in worker, the task should already be killed, we can remove this line
             if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);

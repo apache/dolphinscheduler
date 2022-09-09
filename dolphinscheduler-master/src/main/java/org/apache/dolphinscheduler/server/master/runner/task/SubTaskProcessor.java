@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
@@ -59,21 +58,9 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     private StateEventCallbackService stateEventCallbackService =
             SpringApplicationContext.getBean(StateEventCallbackService.class);
 
-    @Override
-    public boolean submitTask() {
-        this.taskInstance =
-                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
-
-        if (this.taskInstance == null) {
-            return false;
-        }
-        this.setTaskExecutionLogger();
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
-                processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
-
+    protected boolean postSubmit() {
+        // Override the postSubmit method in BaseTaskProcessor, doesn't set the taskInstance status to running.
+        logger.info("The current Sub task begin to running");
         return true;
     }
 
