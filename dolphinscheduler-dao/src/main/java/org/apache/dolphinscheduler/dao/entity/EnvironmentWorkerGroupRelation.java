@@ -19,18 +19,18 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * EnvironmentWorkerGroupRelation
- */
+@Data
 @TableName("t_ds_environment_worker_group_relation")
 public class EnvironmentWorkerGroupRelation {
 
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * environment code
@@ -50,65 +50,4 @@ public class EnvironmentWorkerGroupRelation {
     private Date createTime;
 
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getWorkerGroup() {
-        return workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
-    }
-
-    public Long getEnvironmentCode() {
-        return this.environmentCode;
-    }
-
-    public void setEnvironmentCode(Long environmentCode) {
-        this.environmentCode = environmentCode;
-    }
-
-    public Integer getOperator() {
-        return this.operator;
-    }
-
-    public void setOperator(Integer operator) {
-        this.operator = operator;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "EnvironmentWorkerGroupRelation{"
-                + "id= " + id
-                + ", environmentCode= " + environmentCode
-                + ", workerGroup= " + workerGroup
-                + ", operator= " + operator
-                + ", createTime= " + createTime
-                + ", updateTime= " + updateTime
-                + "}";
-    }
-
 }

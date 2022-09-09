@@ -245,14 +245,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String taskDefinitionJson,
                                                        String otherParamsJson,
                                                        ProcessExecutionTypeEnum executionType) {
-        // check user access for project
-        projectService.hasProjectAndPerm(loginUser, projectCode, WORKFLOW_CREATE);
 
         Map<String, Object> result = new HashMap<>();
         if (checkDescriptionLength(description)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
+        // check user access for project
+        projectService.hasProjectAndPerm(loginUser, projectCode, WORKFLOW_CREATE);
+
         // check whether the new process define name exist
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(projectCode, name);
         if (definition != null) {
@@ -379,7 +380,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 Collection<Long> codes = CollectionUtils.subtract(postTaskCodes, taskNodeCodes);
                 if (CollectionUtils.isNotEmpty(codes)) {
                     logger.error("the task code is not exist");
-                    putMsg(result, Status.TASK_DEFINE_NOT_EXIST, StringUtils.join(codes, Constants.COMMA));
+                    putMsg(result, Status.TASK_DEFINE_NOT_EXIST,
+                            StringUtils.join(codes, Constants.COMMA));
                     return result;
                 }
             }
@@ -572,14 +574,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String taskDefinitionJson,
                                                        String otherParamsJson,
                                                        ProcessExecutionTypeEnum executionType) {
-        // check user access for project
-        projectService.hasProjectAndPerm(loginUser, projectCode, WORKFLOW_UPDATE);
-
         Map<String, Object> result = new HashMap<>();
         if (checkDescriptionLength(description)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
+
+        // check user access for project
+        projectService.hasProjectAndPerm(loginUser, projectCode, WORKFLOW_UPDATE);
+
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         Map<String, Object> checkTaskDefinitions = checkTaskDefinitionList(taskDefinitionLogs, taskDefinitionJson);
         if (checkTaskDefinitions.get(Constants.STATUS) != Status.SUCCESS) {
@@ -735,6 +738,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name,
                                                            long processDefinitionCode) {
+
         // check user access for project
         projectService.hasProjectAndPerm(loginUser, projectCode, WORKFLOW_CREATE);
 
@@ -2121,6 +2125,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                             String tenantCode,
                                                             String scheduleJson,
                                                             ProcessExecutionTypeEnum executionType) {
+
         Map<String, Object> result = new HashMap<>();
         if (checkDescriptionLength(description)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
@@ -2258,6 +2263,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                 String scheduleJson,
                                                                 String otherParamsJson,
                                                                 ProcessExecutionTypeEnum executionType) {
+
         Map<String, Object> result = new HashMap<>();
         if (checkDescriptionLength(description)) {
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);

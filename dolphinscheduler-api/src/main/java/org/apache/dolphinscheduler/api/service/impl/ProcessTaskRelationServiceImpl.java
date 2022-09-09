@@ -99,6 +99,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> createProcessTaskRelation(User loginUser, long projectCode, long processDefinitionCode,
                                                          long preTaskCode, long postTaskCode) {
+
         // check user access for project
         projectService.hasProjectAndPerm(loginUser, projectCode, null);
         Map<String, Object> result = new HashMap<>();
@@ -193,6 +194,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteTaskProcessRelation(User loginUser, long projectCode, long processDefinitionCode,
                                                          long taskCode) {
+
         Map<String, Object> result = new HashMap<>();
         if (taskCode == 0) {
             putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
@@ -228,7 +230,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             }
         }
         if (CollectionUtils.isNotEmpty(downstreamList)) {
-            putMsg(result, Status.TASK_HAS_DOWNSTREAM, org.apache.commons.lang.StringUtils.join(downstreamList, ","));
+            putMsg(result, Status.TASK_HAS_DOWNSTREAM, StringUtils.join(downstreamList, ","));
             return result;
         }
         updateProcessDefiniteVersion(loginUser, result, processDefinition);
@@ -275,6 +277,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteUpstreamRelation(User loginUser, long projectCode, String preTaskCodes,
                                                       long taskCode) {
+
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(preTaskCodes)) {
             putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
@@ -353,11 +356,13 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteDownstreamRelation(User loginUser, long projectCode, String postTaskCodes,
                                                         long taskCode) {
+
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(postTaskCodes)) {
             putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
             return result;
         }
+
         // check user access for project
         projectService.hasProjectAndPerm(loginUser, projectCode, null);
 
@@ -401,6 +406,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryUpstreamRelation(User loginUser, long projectCode, long taskCode) {
+
         // check user access for project
         projectService.hasProjectAndPerm(loginUser, projectCode, null);
 
@@ -436,6 +442,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryDownstreamRelation(User loginUser, long projectCode, long taskCode) {
+
         // check user access for project
         projectService.hasProjectAndPerm(loginUser, projectCode, null);
 
@@ -475,6 +482,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode,
                                           long preTaskCode, long postTaskCode) {
+
         // check user access for project
         projectService.hasProjectAndPerm(loginUser, projectCode, null);
 

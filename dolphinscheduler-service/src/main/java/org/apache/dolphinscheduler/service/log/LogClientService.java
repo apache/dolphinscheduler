@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.log;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -37,11 +36,16 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
-import java.util.List;
+
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * log client
@@ -92,7 +96,8 @@ public class LogClientService implements AutoCloseable {
      * @return log content
      */
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
-        logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
+        logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path,
+                skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
         String result = "";
         final Host address = new Host(host, port);
@@ -202,18 +207,20 @@ public class LogClientService implements AutoCloseable {
         return result;
     }
 
-    public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
+    public @Nullable List<String> getAppIds(@NonNull String host, int port,
+                                            @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
         logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}", host, port, taskLogFilePath);
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
         try {
             if (NetUtils.getHost().equals(host)) {
-                appIds = LogUtils.getAppIdsFromLogFile(taskLogFilePath);
+                appIds = new ArrayList<>(LogUtils.getAppIdsFromLogFile(taskLogFilePath));
             } else {
                 final Command command = new GetAppIdRequestCommand(taskLogFilePath).convert2Command();
                 Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
                 if (response != null) {
-                    GetAppIdResponseCommand responseCommand = JSONUtils.parseObject(response.getBody(), GetAppIdResponseCommand.class);
+                    GetAppIdResponseCommand responseCommand =
+                            JSONUtils.parseObject(response.getBody(), GetAppIdResponseCommand.class);
                     appIds = responseCommand.getAppIds();
                 }
             }
