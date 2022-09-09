@@ -15,49 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.plugin.task.java.exception;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskRunStatus;
+public class RunTypeNotFoundException extends RuntimeException {
 
-import lombok.Data;
+    public RunTypeNotFoundException() {
+        super();
+    }
 
-@Data
-public class TaskResponse {
+    public RunTypeNotFoundException(String s) {
+        super(s);
+    }
 
-    /**
-     * varPool string
-     */
-    private String varPool;
+    public RunTypeNotFoundException(String s, Throwable throwable) {
+        super(s, throwable);
+    }
 
-    /**
-     * SHELL process pid
-     */
-    private int processId;
+    public RunTypeNotFoundException(Throwable throwable) {
+        super(throwable);
+    }
 
-    /**
-     * SHELL result string
-     */
-    private String resultString;
-
-    /**
-     * other resource manager appId , for example : YARN etc
-     */
-    private String appIds;
-
-    /**
-     * process
-     */
-    private Process process;
-
-    /**
-     * cancel
-     */
-    private volatile boolean cancel = false;
-
-    /**
-     * exit code
-     */
-    private volatile int exitStatusCode = -1;
-
-    private TaskRunStatus status;
+    protected RunTypeNotFoundException(String s, Throwable throwable, boolean b, boolean b1) {
+        super(s, throwable, b, b1);
+    }
 }
