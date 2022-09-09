@@ -186,6 +186,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
                             {
+                                title: 'Java',
+                                link: '/en-us/docs/dev/user_doc/guide/task/java.html',
+                            },
+                            {
                                 title: 'SageMaker',
                                 link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
@@ -808,6 +812,10 @@ export default {
                             {
                                 title: 'Dinky',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'Java',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/java.html',
                             },
                             {
                                 title: 'SageMaker',
