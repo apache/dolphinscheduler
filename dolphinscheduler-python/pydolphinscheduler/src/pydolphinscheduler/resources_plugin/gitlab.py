@@ -24,21 +24,20 @@ import requests
 
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyResPluginException
+from pydolphinscheduler.resources_plugin.base.git import (
+    Git,
+    GitLabFileInfo,
+)
 
 
-class GitLab(ResourcePlugin):
+class GitLab(ResourcePlugin, Git):
     """GitLab object, declare GitLab resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of GitLab.
-
     :param private_token: A string used for identity authentication of GitLab private or Internal warehouse.
-
     :param oauth_token: A string used for identity authentication of GitLab private or Internal warehouse.
-
     :param username: A string representing the user of the warehouse.
-
     :param password: A string representing the user password.
-
     """
 
     # [start init_method]
@@ -60,65 +59,70 @@ class GitLab(ResourcePlugin):
 
     # [end init_method]
 
-    def get_index(self, s: str, x, n):
-        """Find the subscript of the nth occurrence of the X character in the string s."""
-        if n <= s.count(x):
-            all_index = [key for key, value in enumerate(s) if value == x]
-            return all_index[n - 1]
-        else:
-            return None
-
-    def url_join(self, prefix: str, suf: str):
-        """File url splicing."""
-        if prefix[-1] != "/":
-            prefix = prefix + "/"
-        if suf[0] == "/":
-            suf = suf[1:]
-        return urljoin(prefix + "/", suf)
-
-    def get_file_info(self, path: str):
+    def get_git_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
         elements = path.split("/")
         index = self.get_index(path, "/", 3)
-        if index is None:
-            raise PyResPluginException("Incomplete path.")
-
-        project_name = None
+        repo_name = None
         branch = None
         file_path = None
-        owner = None
+        user = None
         for i in range(0, len(elements)):
             if (
                 i + 3 < len(elements)
                 and elements[i + 1] == "-"
                 and elements[i + 2] == "blob"
             ):
-                project_name = elements[i]
-                owner = "/".join(str(elements[j]) for j in range(3, i))
+                repo_name = elements[i]
+                user = "/".join(str(elements[j]) for j in range(3, i))
                 branch = elements[i + 3]
                 file_path = "/".join(
                     str(elements[j]) for j in range(i + 4, len(elements))
                 )
                 break
-
         if (
-            project_name is None
+            repo_name is None
             or branch is None
             or file_path is None
             or file_path == ""
-            or owner is None
+            or user is None
         ):
             raise PyResPluginException("Incomplete path.")
 
+        self._git_file_info = GitLabFileInfo(
+            host=path[0:index],
+            repo_name=repo_name,
+            branch=branch,
+            file_path=file_path,
+            api_version="v4",
+            user=user,
+        )
+
+        """
+        user=elements[3],
+        repo_name=elements[4],
+        branch=elements[6],
+        file_path=path[index:],
+        
         file_info = {
             "host": path[0:index],
-            "project_name": project_name,
+            "repo_name": repo_name,
             "branch": branch,
             "file_path": file_path,
             "api_version": "v4",
-            "owner": owner,
+            "user": user,
         }
-        self._file_info = file_info
+        
+        file_info = {
+            "endpoint": endpoint,
+            "bucket_name": bucket_name,
+            "file_path": file_path,
+        }
+        
+        "bucket": bucket,
+        "key": key,
+        
+        """
 
     def authentication(self):
         """Gitlab authentication."""
@@ -150,11 +154,11 @@ class GitLab(ResourcePlugin):
 
         The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
-        path = self.url_join(self.prefix, suf)
-        self.get_file_info(path)
+        path = urljoin(self.prefix, suf)
+        self.get_git_file_info(path)
         gl = self.authentication()
         project = gl.projects.get(
-            "%s/%s" % (self._file_info["owner"], self._file_info["project_name"])
+            "%s/%s" % (self._file_info["user"], self._file_info["repo_name"])
         )
         f = project.files.get(
             file_path=self._file_info["file_path"], ref=self._file_info["branch"]

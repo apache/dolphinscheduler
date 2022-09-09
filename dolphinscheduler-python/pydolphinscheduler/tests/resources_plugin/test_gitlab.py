@@ -52,7 +52,7 @@ from pydolphinscheduler.resources_plugin.gitlab import GitLab
 def test_gitlab_get_file_info(attr, expected):
     """Test the get_file_info function of the gitlab resource plug-in."""
     gitlab = GitLab(prefix="prefix")
-    gitlab.get_file_info(attr)
+    gitlab.get_git_file_info(attr)
     assert expected == gitlab._file_info
 
 
@@ -70,7 +70,7 @@ def test_gitlab_get_file_info_exception(attr):
         match="Incomplete path.",
     ):
         gitlab = GitLab(prefix="prefix")
-        gitlab.get_file_info(attr)
+        gitlab.get_git_file_info(attr)
 
 
 @pytest.mark.skip(reason="This test needs gitlab service")

@@ -65,6 +65,76 @@ class GitFileInfo:
         return self._file_path
 
 
+class GitHubFileInfo(GitFileInfo):
+    """A class that defines the details of GIT files.
+
+    :param user: A string representing the user the git file belongs to.
+    :param repo_name: A string representing the repository to which the git file belongs.
+    :param branch: A string representing the branch to which the git file belongs.
+    :param file_path: A string representing the git file path.
+    """
+
+    def __init__(
+        self,
+        user: Optional[str] = None,
+        repo_name: Optional[str] = None,
+        branch: Optional[str] = None,
+        file_path: Optional[str] = None,
+        *args,
+        **kwargs
+    ):
+        super().__init__(
+            user=user,
+            repo_name=repo_name,
+            branch=branch,
+            file_path=file_path,
+            *args,
+            **kwargs
+        )
+
+
+class GitLabFileInfo(GitFileInfo):
+    """A class that defines the details of GIT files.
+
+    :param user: A string representing the user the git file belongs to.
+    :param repo_name: A string representing the repository to which the git file belongs.
+    :param branch: A string representing the branch to which the git file belongs.
+    :param file_path: A string representing the git file path.
+    """
+
+    def __init__(
+        self,
+        host: Optional[str] = None,
+        api_version: Optional[str] = None,
+        user: Optional[str] = None,
+        repo_name: Optional[str] = None,
+        branch: Optional[str] = None,
+        file_path: Optional[str] = None,
+        *args,
+        **kwargs
+    ):
+        super().__init__(
+            user=user,
+            repo_name=repo_name,
+            branch=branch,
+            file_path=file_path,
+            *args,
+            **kwargs
+        )
+        self._host = host
+        self._api_version = api_version
+
+    @property
+    def host(self) -> str:
+        """Get attribute branch."""
+        return self._host
+
+    @property
+    def api_version(self) -> str:
+        """Get attribute file_path."""
+        return self._api_version
+
+
 # [start Git]
 class Git(object, metaclass=ABCMeta):
     """An abstract class of online code warehouse based on git implementation."""
