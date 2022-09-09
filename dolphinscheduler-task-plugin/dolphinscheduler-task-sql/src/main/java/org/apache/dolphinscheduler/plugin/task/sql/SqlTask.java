@@ -92,6 +92,9 @@ public class SqlTask extends AbstractTask {
 
     public static final int TEST_FLAG_YES = 1;
 
+    @Nullable
+    private Connection connection;
+
     private static final String SQL_SEPARATOR = ";\n";
 
     /**
@@ -176,7 +179,21 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-
+        String type = sqlParameters.getType();
+        if (DbType.HIVE == DbType.valueOf(type)) {
+            List<String> appIds = ProcessUtils.killYarnJob(taskExecutionContext);
+            logger.info("cancel task type is [{}],yarn appIds is {}", type, appIds);
+        } else {
+            if (connection == null) {
+                logger.info("Unable to get database connection information");
+            } else {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    throw new TaskException("database connection shutdown failed");
+                }
+            }
+        }
     }
 
     /**
