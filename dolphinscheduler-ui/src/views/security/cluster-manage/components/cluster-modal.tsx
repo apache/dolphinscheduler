@@ -160,7 +160,6 @@ const ClusterModal = defineComponent({
                   path='k8s_config'
                 >
                   <NInput
-                    allowInput={this.trim}
                     class='input-cluster-config'
                     placeholder={envK8sConfigPlaceholder}
                     type='textarea'

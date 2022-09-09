@@ -208,7 +208,6 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('project.dag.description')} path='description'>
             <NInput
-              allowInput={trim}
               type='textarea'
               v-model:value={formValue.value.description}
               class='input-description'

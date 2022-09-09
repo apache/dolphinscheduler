@@ -137,7 +137,6 @@ const ProjectModal = defineComponent({
             path='description'
           >
             <NInput
-              allowInput={this.trim}
               v-model={[this.model.description, 'value']}
               type='textarea'
               placeholder={t('project.list.description_tips')}

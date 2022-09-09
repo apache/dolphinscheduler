@@ -186,7 +186,6 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 <NFormItem label={t('datasource.description')} path='note'>
                   <NInput
-                    allowInput={this.trim}
                     class='input-data-source-description'
                     v-model={[detailForm.note, 'value']}
                     type='textarea'
@@ -289,7 +288,6 @@ const DetailModal = defineComponent({
                   path='password'
                 >
                   <NInput
-                    allowInput={this.trim}
                     class='input-password'
                     v-model={[detailForm.password, 'value']}
                     type='password'

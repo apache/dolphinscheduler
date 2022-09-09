@@ -104,7 +104,6 @@ const login = defineComponent({
                 path='userPassword'
               >
                 <NInput
-                  allowInput={this.trim}
                   class='input-password'
                   type='password'
                   size='large'

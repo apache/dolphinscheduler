@@ -93,7 +93,6 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
-              allowInput={this.trim}
               type='textarea'
               v-model={[this.fileForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}

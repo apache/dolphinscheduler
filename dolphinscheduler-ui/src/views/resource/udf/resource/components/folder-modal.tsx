@@ -116,7 +116,6 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.udf.description')} path='description'>
             <NInput
-              allowInput={this.trim}
               type='textarea'
               v-model={[this.folderForm.description, 'value']}
               placeholder={t('resource.udf.enter_description_tips')}
