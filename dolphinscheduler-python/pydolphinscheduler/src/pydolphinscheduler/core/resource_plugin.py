@@ -58,4 +58,5 @@ class ResourcePlugin(object, metaclass=ABCMeta):
         else:
             raise PyResPluginException("Incomplete path.")
 
+
 # [end resource_plugin_definition]
