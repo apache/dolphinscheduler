@@ -30,7 +30,7 @@ However, in basic auth, `password` is equal to personal access token.
 You can view this `document <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token>`_
 when creating a token.
 
-For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
+For the specific use of resource plugins, you can see `How to use` in :doc:`resource-plugin`
 
 Dive Into
 ---------
