@@ -178,15 +178,7 @@ public class SqlTask extends AbstractTask {
             List<String> appIds = ProcessUtils.killYarnJob(taskExecutionContext);
             logger.info("cancel task type is [{}],yarn appIds is {}", type, appIds);
         } else {
-            if (connection == null) {
-                logger.info("Unable to get database connection information");
-            } else {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    throw new TaskException("database connection shutdown failed");
-                }
-            }
+            close(connection);
         }
     }
 
@@ -202,7 +194,6 @@ public class SqlTask extends AbstractTask {
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
-        Connection connection = null;
         try {
 
             // create connection
