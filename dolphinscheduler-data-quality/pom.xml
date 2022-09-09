@@ -33,7 +33,7 @@
         <scala.binary.version>2.12</scala.binary.version>
         <spark.version>3.2.2</spark.version>
         <jackson.version>2.13.0</jackson.version>
-        <jackson.databind.version>2.13.0</jackson.databind.version>
+        <jackson.databind.version>2.13.2.1</jackson.databind.version>
         <scope>provided</scope>
     </properties>
 
