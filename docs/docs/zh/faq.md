@@ -251,7 +251,7 @@ A： 将 hive pom
 <dependency>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive-jdbc</artifactId>
-    <version>2.3.3</version>
+    <version>2.3.9</version>
 </dependency>
 ```
 
