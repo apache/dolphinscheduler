@@ -31,7 +31,6 @@ class GitHub(ResourcePlugin, Git):
 
     :param prefix: A string representing the prefix of GitHub.
     :param access_token: A string used for identity authentication of GitHub private warehouse.
-
     :param username: A string representing the user of the warehouse.
 
     :param password: A string representing the user password, it is equal to access_token.
