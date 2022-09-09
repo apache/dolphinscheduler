@@ -28,9 +28,13 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @AutoService(StateEventHandler.class)
 public class TaskTimeoutStateEventHandler implements StateEventHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskTimeoutStateEventHandler.class);
 
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
@@ -58,6 +62,10 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
             if (activeTaskProcessMap.containsKey(taskInstance.getTaskCode())) {
                 ITaskProcessor taskProcessor = activeTaskProcessMap.get(taskInstance.getTaskCode());
                 taskProcessor.action(TaskAction.TIMEOUT);
+            } else {
+                logger.warn(
+                    "cannot find the task processor for task {}, so skip task processor action.",
+                    taskInstance.getTaskCode());
             }
         }
         if (TaskTimeoutStrategy.WARN == taskTimeoutStrategy

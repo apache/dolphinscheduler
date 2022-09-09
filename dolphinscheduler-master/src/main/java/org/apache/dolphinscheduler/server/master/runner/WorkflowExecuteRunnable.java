@@ -145,11 +145,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private boolean taskFailedSubmit = false;
 
     /**
-     * handing event flag
-     */
-    private boolean isHandingEvent = false;
-
-    /**
      * task instance hash map, taskId as key
      */
     private final Map<Integer, TaskInstance> taskInstanceMap = new ConcurrentHashMap<>();
@@ -254,14 +249,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     }
 
     /**
-     * the thread is handing event
-     * @return result
-     */
-    public boolean isHandingEvent() {
-        return isHandingEvent;
-    }
-
-    /**
      * handle event
      */
     public void handleEvents() {
@@ -274,7 +261,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         StateEvent stateEvent = null;
         while (!this.stateEvents.isEmpty()) {
             try {
-                isHandingEvent = true;
                 stateEvent = this.stateEvents.peek();
                 LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
                         stateEvent.getTaskInstanceId());
@@ -310,7 +296,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
-        isHandingEvent = false;
     }
 
     public String getKey() {
