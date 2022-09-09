@@ -55,7 +55,7 @@
         <protostuff.version>1.7.2</protostuff.version>
         <byte-buddy.version>1.9.16</byte-buddy.version>
         <logback.version>1.2.11</logback.version>
-        <hadoop.version>2.7.7</hadoop.version>
+        <hadoop.version>3.2.4</hadoop.version>
         <cron-utils.version>9.1.6</cron-utils.version>
         <h2.version>2.1.210</h2.version>
         <mysql-connector.version>8.0.16</mysql-connector.version>
