@@ -207,6 +207,7 @@ public class SqlTask extends AbstractTask {
                 continue;
             }
             segments.add(line);
+            close(connection);
         }
         return segments;
     }
