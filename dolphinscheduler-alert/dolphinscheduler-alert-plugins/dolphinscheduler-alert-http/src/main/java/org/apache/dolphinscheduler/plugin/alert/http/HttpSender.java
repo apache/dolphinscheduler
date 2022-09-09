@@ -26,6 +26,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -34,9 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,28 +110,13 @@ public final class HttpSender {
             setMsgInRequestBody(msg);
         } else if (REQUEST_TYPE_GET.equals(requestType)) {
             // GET request add param in url
-            setMsgInUrl(msg);
-            URL unencodeUrl = new URL(url);
-            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost(), unencodeUrl.getPath(),
-                    unencodeUrl.getQuery(), null);
-
-            httpRequest = new HttpGet(uri);
-            setHeader();
-        }
-    }
-
-    /**
-     * add msg param in url
-     */
-    private void setMsgInUrl(String msg) {
-
-        if (StringUtils.isNotBlank(contentField)) {
-            String type = "&";
-            // check splice char is & or ?
-            if (!url.contains(URL_SPLICE_CHAR)) {
-                type = URL_SPLICE_CHAR;
+            URIBuilder uriBuilder = new URIBuilder(url);
+            if (StringUtils.isNotBlank(contentField)) {
+                uriBuilder.addParameter(contentField, msg);
             }
-            url = String.format("%s%s%s=%s", url, type, contentField, msg);
+
+            httpRequest = new HttpGet(uriBuilder.build());
+            setHeader();
         }
     }
 

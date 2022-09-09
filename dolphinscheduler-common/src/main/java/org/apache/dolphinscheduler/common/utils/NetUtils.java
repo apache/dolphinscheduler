@@ -36,13 +36,13 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.net.util.IPAddressUtil;
 
 /**
  * NetUtils
  */
 public class NetUtils {
 
-    private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
     private static final String NETWORK_PRIORITY_DEFAULT = "default";
     private static final String NETWORK_PRIORITY_INNER = "inner";
     private static final String NETWORK_PRIORITY_OUTER = "outer";
@@ -183,7 +183,7 @@ public class NetUtils {
         }
         String name = address.getHostAddress();
         return (name != null
-                && IP_PATTERN.matcher(name).matches()
+                && IPAddressUtil.isIPv4LiteralAddress(name)
                 && !address.isAnyLocalAddress()
                 && !address.isLoopbackAddress());
     }
