@@ -99,25 +99,6 @@ public class TaskInstanceServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
-        // project auth fail
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        Result projectAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser,
-            projectCode,
-            0,
-            "",
-            "",
-            "",
-            "test_user",
-            "2019-02-26 19:48:00",
-            "2019-02-26 19:48:22",
-            "",
-            null,
-            "",
-            TaskExecuteType.BATCH,
-            1,
-            20);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) projectAuthFailRes.getCode());
-
         // data parameter check
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);

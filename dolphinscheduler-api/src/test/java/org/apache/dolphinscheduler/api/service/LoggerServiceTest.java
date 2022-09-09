@@ -139,8 +139,6 @@ public class LoggerServiceTest {
     @Test
     public void testQueryLogInSpecifiedProject() {
         long projectCode = 1L;
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Project project = getProject(projectCode);
 
         User loginUser = new User();
         loginUser.setId(-1);
