@@ -317,6 +317,10 @@ export default {
     online: '已上线'
   },
   node: {
+    is_module_path: '使用模块路径',
+    run_type: '运行类型',
+    jvm_args: '虚拟机参数',
+    jvm_args_tips: '请输入虚拟机参数',
     return_back: '返回上一节点',
     current_node_settings: '当前节点设置',
     instructions: '使用说明',

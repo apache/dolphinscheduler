@@ -910,6 +910,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
             dependentCommand.setProcessDefinitionCode(dependentProcessDefinition.getProcessDefinitionCode());
+            dependentCommand.setProcessDefinitionVersion(dependentProcessDefinition.getProcessDefinitionVersion());
             dependentCommand.setWorkerGroup(dependentProcessDefinition.getWorkerGroup());
             Map<String, String> cmdParam = JSONUtils.toMap(dependentCommand.getCommandParam());
             cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentProcessDefinition.getTaskDefinitionCode()));
@@ -930,7 +931,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
 
         return checkDependentProcessDefinitionValid(dependentProcessDefinitionList, processDefinitionCycle,
-                workerGroup);
+                workerGroup, processDefinitionCode);
     }
 
     /**
@@ -941,7 +942,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private List<DependentProcessDefinition> checkDependentProcessDefinitionValid(
                                                                                   List<DependentProcessDefinition> dependentProcessDefinitionList,
                                                                                   CycleEnum processDefinitionCycle,
-                                                                                  String workerGroup) {
+                                                                                  String workerGroup,
+                                                                                  long upstreamProcessDefinitionCode) {
         List<DependentProcessDefinition> validDependentProcessDefinitionList = new ArrayList<>();
 
         List<Long> processDefinitionCodeList =
@@ -952,7 +954,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 processService.queryWorkerGroupByProcessDefinitionCodes(processDefinitionCodeList);
 
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
-            if (dependentProcessDefinition.getDependentCycle() == processDefinitionCycle) {
+            if (dependentProcessDefinition.getDependentCycle(upstreamProcessDefinitionCode) == processDefinitionCycle) {
                 if (processDefinitionWorkerGroupMap
                         .get(dependentProcessDefinition.getProcessDefinitionCode()) == null) {
                     dependentProcessDefinition.setWorkerGroup(workerGroup);
