@@ -52,7 +52,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
-        checkAndReplaceTestDataSource();
         this.taskInstance =
                 processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
@@ -176,28 +175,5 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         executionContext.setHost(host);
 
         nettyExecutorManager.executeDirectly(executionContext);
-    }
-
-    /**
-     * Check whether the test data source needs to be replaced
-     */
-    public void checkAndReplaceTestDataSource(){
-        if (taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
-            try {
-                    Map<String, Object> instanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
-                    });
-                    Integer onlineDataSourceId = (Integer) instanceParams.get("datasource");
-                    Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
-                    instanceParams.put("datasource", testDataSourceId);
-                    taskInstance.setTaskParams(JSONUtils.toJsonString(instanceParams));
-                    if (null == testDataSourceId) {
-                        logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
-                    } else {
-                        logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
-                    }
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-        }
     }
 }

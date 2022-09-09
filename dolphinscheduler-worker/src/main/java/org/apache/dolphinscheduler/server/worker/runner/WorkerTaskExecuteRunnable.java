@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Strings;
 import lombok.NonNull;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -54,8 +52,6 @@ import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
 
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
@@ -151,23 +147,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
                 logger.info("The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
-            }
-
-            if (checkTaskHaveDataSourceInstance(taskExecutionContext.getTaskType()) && taskExecutionContext.getTestFlag() == Constants.TEST_FLAG_YES) {
-                Map<String, Object> params = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<Map<String, Object>>() {
-                });
-                Integer dataSourceId = (Integer) params.get("datasource");
-                if (null == dataSourceId) {
-                    taskExecutionContext.setEndTime(DateUtils.getCurrentDate());
-                    taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
-                    TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                    workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                            masterAddress,
-                            CommandType.TASK_EXECUTE_RESULT);
-                    logger.error("unbound test data source");
-                    cancelTask();
-                    return;
-                }
             }
 
             beforeExecute();

@@ -19,18 +19,26 @@ package org.apache.dolphinscheduler.server.master.builder;
 
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -39,9 +47,14 @@ import java.util.Map;
  */
 public class TaskExecutionContextBuilder {
 
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+
     public static TaskExecutionContextBuilder get() {
         return new TaskExecutionContextBuilder();
     }
+
+    protected ProcessService processService = new ProcessServiceImpl();
 
     private TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -83,7 +96,21 @@ public class TaskExecutionContextBuilder {
                         Math.min(taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT, Integer.MAX_VALUE));
             }
         }
-        taskExecutionContext.setTaskParams(taskInstance.getTaskParams());
+
+        if (taskInstance.getTestFlag() == Constants.TEST_FLAG_YES  && "SQL".equals(taskInstance.getTaskType())) {
+            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(taskDefinition.getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
+            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get("datasource");
+            Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
+            taskDefinitionParams.put("datasource", testDataSourceId);
+            taskDefinition.setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
+            if (null == testDataSourceId) {
+                logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
+            } else {
+                logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
+            }
+        }
+        taskExecutionContext.setTaskParams(taskDefinition.getTaskParams());
         return this;
     }
 

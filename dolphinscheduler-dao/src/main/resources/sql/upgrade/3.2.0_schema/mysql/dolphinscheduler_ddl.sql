@@ -24,7 +24,7 @@ BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_command'
            AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='modify_by')
+           AND COLUMN_NAME ='test_flag')
    THEN
 ALTER TABLE t_ds_command ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run';
 END IF;
@@ -44,7 +44,7 @@ BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_error_command'
            AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='modify_by')
+           AND COLUMN_NAME ='test_flag')
    THEN
 ALTER TABLE t_ds_error_command ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run';
 END IF;
@@ -64,7 +64,8 @@ BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_datasource'
            AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='modify_by')
+           AND COLUMN_NAME ='test_flag'
+           AND COLUMN_NAME ='bind_test_id')
    THEN
 ALTER TABLE t_ds_datasource ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 testDataSource',
 ALTER TABLE t_ds_datasource ADD `bind_test_id` int(11) DEFAULT null COMMENT 'bind testDataSource id';
@@ -85,7 +86,7 @@ BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_process_instance'
            AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='modify_by')
+           AND COLUMN_NAME ='test_flag')
    THEN
 ALTER TABLE t_ds_process_instance ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run';
 END IF;
@@ -105,7 +106,7 @@ BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_task_instance'
            AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='modify_by')
+           AND COLUMN_NAME ='test_flag')
    THEN
 ALTER TABLE t_ds_task_instance ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run';
 END IF;

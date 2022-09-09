@@ -27,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,7 +72,7 @@ public class SqlParametersTest {
         Assert.assertEquals(type, sqlParameters.getType());
         Assert.assertEquals(sql, sqlParameters.getSql());
         Assert.assertEquals(udfs, sqlParameters.getUdfs());
-        Assert.assertEquals(datasource, sqlParameters.getDatasource());
+        Assert.assertEquals(Optional.of(datasource), sqlParameters.getDatasource());
         Assert.assertEquals(sqlType, sqlParameters.getSqlType());
         Assert.assertEquals(sendEmail, sqlParameters.getSendEmail());
         Assert.assertEquals(displayRows, sqlParameters.getDisplayRows());

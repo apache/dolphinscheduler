@@ -54,7 +54,7 @@ public class SqlParameters extends AbstractParameters {
     /**
      * datasource id
      */
-    private int datasource;
+    private Integer datasource;
 
     /**
      * sql
@@ -139,11 +139,11 @@ public class SqlParameters extends AbstractParameters {
         this.type = type;
     }
 
-    public int getDatasource() {
+    public Integer getDatasource() {
         return datasource;
     }
 
-    public void setDatasource(int datasource) {
+    public void setDatasource(Integer datasource) {
         this.datasource = datasource;
     }
 

@@ -128,9 +128,11 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
     public void setTestFlag(int testFlag) {
         this.testFlag = testFlag;
     }
+
     public Integer getBindTestId() {
         return bindTestId;
     }
+
     public void setBindTestId(Integer bindTestId) {
         this.bindTestId = bindTestId;
     }
