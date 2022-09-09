@@ -75,7 +75,7 @@ public interface DataSourceService {
      * @param type      data source type
      * @return data source list page
      */
-    Map<String, Object> queryDataSourceList(User loginUser, Integer type,int testFlag);
+    Map<String, Object> queryDataSourceList(User loginUser, Integer type, int testFlag);
 
     /**
      * verify datasource exists

@@ -147,12 +147,12 @@ public class DependentTaskTest {
                 getProcessInstanceForFindLastRunningProcess(200, WorkflowExecutionStatus.FAILURE);
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
-                .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(),Mockito.anyInt()))
+                .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(dependentProcessInstance);
 
         // for DependentExecute.getDependTaskResult
         Mockito.when(processService
-                .findValidTaskListByProcessId(200,0))
+                .findValidTaskListByProcessId(200, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(2000, TaskExecutionStatus.SUCCESS, DEPEND_TASK_CODE_A,
                                 dependentProcessInstance),
@@ -169,12 +169,12 @@ public class DependentTaskTest {
                 getProcessInstanceForFindLastRunningProcess(200, WorkflowExecutionStatus.SUCCESS);
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
-                .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(),Mockito.anyInt()))
+                .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(dependentProcessInstance);
 
         // for DependentExecute.getDependTaskResult
         Mockito.when(processService
-                .findValidTaskListByProcessId(200,0))
+                .findValidTaskListByProcessId(200, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(2000, TaskExecutionStatus.FAILURE, DEPEND_TASK_CODE_A,
                                 dependentProcessInstance),
@@ -225,13 +225,13 @@ public class DependentTaskTest {
 
         // for DependentExecute.getDependTaskResult
         Mockito.when(processService
-                .findValidTaskListByProcessId(200,0))
+                .findValidTaskListByProcessId(200, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(2000, TaskExecutionStatus.FAILURE, DEPEND_TASK_CODE_A,
                                 processInstance200))
                         .collect(Collectors.toList()));
         Mockito.when(processService
-                .findValidTaskListByProcessId(300,0))
+                .findValidTaskListByProcessId(300, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(3000, TaskExecutionStatus.SUCCESS, DEPEND_TASK_CODE_B,
                                 processInstance300),
@@ -327,7 +327,7 @@ public class DependentTaskTest {
 
         // for DependentExecute.getDependTaskResult
         Mockito.when(processService
-                .findValidTaskListByProcessId(200,0))
+                .findValidTaskListByProcessId(200, 0))
                 .thenAnswer(i -> {
                     processInstance.setState(WorkflowExecutionStatus.READY_STOP);
                     return Stream.of(

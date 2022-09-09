@@ -412,15 +412,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         switch (executeType) {
             case REPEAT_RUNNING:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams,processInstance.getTestFlag());
+                        processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams, processInstance.getTestFlag());
                 break;
             case RECOVER_SUSPENDED_PROCESS:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams,processInstance.getTestFlag());
+                        processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams, processInstance.getTestFlag());
                 break;
             case START_FAILURE_TASK_PROCESS:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams,processInstance.getTestFlag());
+                        processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams, processInstance.getTestFlag());
                 break;
             case STOP:
                 if (processInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
@@ -594,7 +594,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode,
-                                              int processVersion, CommandType commandType, String startParams,int testFlag) {
+                                              int processVersion, CommandType commandType, String startParams, int testFlag) {
         Map<String, Object> result = new HashMap<>();
 
         // To add startParams only when repeat running is needed

@@ -769,7 +769,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                             Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES,processInstance.getTestFlag());
+                taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES, processInstance.getTestFlag());
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());

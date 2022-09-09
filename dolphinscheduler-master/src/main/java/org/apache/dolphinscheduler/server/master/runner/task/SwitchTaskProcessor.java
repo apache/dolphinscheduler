@@ -126,7 +126,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     private boolean setSwitchResult() {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId(),processInstance.getTestFlag());
+                taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
         Map<String, TaskExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());

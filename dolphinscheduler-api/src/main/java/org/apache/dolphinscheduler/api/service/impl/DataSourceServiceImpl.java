@@ -208,7 +208,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setUpdateTime(now);
-        if(dataSource.getTestFlag()==1 && dataSourceParam.getTestFlag()==0){
+        if(dataSource.getTestFlag() == 1 && dataSourceParam.getTestFlag() == 0){
             clearBindTestId(id);
         }
         dataSource.setTestFlag(dataSourceParam.getTestFlag());
@@ -326,7 +326,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         List<DataSource> datasourceList = null;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            datasourceList = dataSourceMapper.queryDataSourceByType(0, type,testFlag);
+            datasourceList = dataSourceMapper.queryDataSourceByType(0, type, testFlag);
         } else {
             Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
             if (ids.isEmpty()) {
@@ -334,7 +334,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 putMsg(result, Status.SUCCESS);
                 return result;
             }
-            datasourceList = dataSourceMapper.selectBatchIds(ids).stream().filter(dataSource -> dataSource.getType().getCode() == type).filter(dataSource -> dataSource.getTestFlag()==testFlag).collect(Collectors.toList());
+            datasourceList = dataSourceMapper.selectBatchIds(ids).stream().filter(dataSource -> dataSource.getType().getCode() == type).filter(dataSource -> dataSource.getTestFlag() == testFlag).collect(Collectors.toList());
 
         }
         result.put(Constants.DATA_LIST, datasourceList);
