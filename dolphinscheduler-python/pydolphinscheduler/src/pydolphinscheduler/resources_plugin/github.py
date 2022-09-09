@@ -30,7 +30,6 @@ class GitHub(ResourcePlugin):
     """GitHub object, declare GitHub resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of GitHub.
-
     :param access_token: A string used for identity authentication of GitHub private warehouse.
 
     :param username: A string representing the user of the warehouse.
