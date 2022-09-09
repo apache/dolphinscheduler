@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-import Card from '@/components/card'
 import { ArrowLeftOutlined } from '@vicons/antd'
-import { NButton, NDataTable, NIcon, NPagination } from 'naive-ui'
+import { NButton, NDataTable, NIcon, NPagination, NSpace } from 'naive-ui'
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
 import { useTable } from './use-table'
+import Card from '@/components/card'
 import TimingModal from '../components/timing-modal'
-import styles from '../index.module.scss'
+import type { Router } from 'vue-router'
 
 export default defineComponent({
   name: 'WorkflowDefinitionTiming',
@@ -76,38 +75,37 @@ export default defineComponent({
     const { loadingRef } = this
 
     return (
-      <div class={styles.content}>
-        <Card class={styles.card}>
-          <div class={styles.header}>
-            <NButton type='primary' onClick={() => router.go(-1)}>
-              <NIcon>
-                <ArrowLeftOutlined />
-              </NIcon>
-            </NButton>
-          </div>
+      <NSpace vertical>
+        <Card>
+          <NButton type='primary' size='small' onClick={() => router.go(-1)}>
+            <NIcon>
+              <ArrowLeftOutlined />
+            </NIcon>
+          </NButton>
         </Card>
         <Card title={t('project.workflow.cron_manage')}>
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            striped
-            size={'small'}
-            class={styles.table}
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              striped
+              size={'small'}
+              scrollX={this.tableWidth}
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={this.requestData}
+                onUpdatePageSize={this.handleChangePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <TimingModal
           type={'update'}
@@ -115,7 +113,7 @@ export default defineComponent({
           v-model:show={this.showRef}
           onUpdateList={this.handleUpdateList}
         />
-      </div>
+      </NSpace>
     )
   }
 })

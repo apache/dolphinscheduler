@@ -30,10 +30,10 @@
     <packaging>jar</packaging>
 
     <properties>
-        <scala.binary.version>2.11</scala.binary.version>
-        <spark.version>2.4.0</spark.version>
-        <jackson.version>2.9.10</jackson.version>
-        <jackson.databind.version>2.9.10.8</jackson.databind.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <spark.version>3.2.2</spark.version>
+        <jackson.version>2.13.0</jackson.version>
+        <jackson.databind.version>2.13.0</jackson.databind.version>
         <scope>provided</scope>
     </properties>
 

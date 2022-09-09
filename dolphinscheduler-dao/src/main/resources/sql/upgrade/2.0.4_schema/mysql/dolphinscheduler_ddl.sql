@@ -14,3 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
+ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_project_code` (`project_code`) USING BTREE;

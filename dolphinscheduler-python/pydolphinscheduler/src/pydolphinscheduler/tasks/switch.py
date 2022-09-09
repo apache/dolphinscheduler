@@ -99,23 +99,22 @@ class SwitchCondition(Base):
         result = []
         num_branch_default = 0
         for condition in self.args:
-            if isinstance(condition, SwitchBranch):
-                if num_branch_default < 1:
-                    if isinstance(condition, Default):
-                        self._DEFINE_ATTR.add("next_node")
-                        setattr(self, "next_node", condition.next_node)
-                        num_branch_default += 1
-                    elif isinstance(condition, Branch):
-                        result.append(condition.get_define())
-                else:
-                    raise PyDSParamException(
-                        "Task Switch's parameter only support exactly one default branch."
-                    )
-            else:
+            if not isinstance(condition, SwitchBranch):
                 raise PyDSParamException(
                     "Task Switch's parameter only support SwitchBranch but got %s.",
                     type(condition),
                 )
+            # Default number branch checker
+            if num_branch_default >= 1 and isinstance(condition, Default):
+                raise PyDSParamException(
+                    "Task Switch's parameter only support exactly one default branch."
+                )
+            if isinstance(condition, Default):
+                self._DEFINE_ATTR.add("next_node")
+                setattr(self, "next_node", condition.next_node)
+                num_branch_default += 1
+            elif isinstance(condition, Branch):
+                result.append(condition.get_define())
         # Handle switch default branch, default value is `""` if not provide.
         if num_branch_default == 0:
             self._DEFINE_ATTR.add("next_node")

@@ -116,9 +116,10 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 ### Alert Server指标
 
-- 目前我们尚未提供任何Alert Server指标
+- ds.alert.send.count: (counter) 已发送的告警数量，可由标签`status`切分
+- ds.alert.pending: (gauge) 等待发送的告警数量
 
-在每个server中都有一些系统层面（如数据库链接、JVM）的默认指标，为了您的检阅方便，我们也将它们列在了这里：
+**在每个server中都有一些系统层面（如数据库链接、JVM）的默认指标，为了您的检阅方便，我们也将它们列在了这里：**
 
 ### 数据库相关指标（默认）
 

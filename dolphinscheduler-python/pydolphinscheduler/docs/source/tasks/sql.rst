@@ -19,3 +19,17 @@ SQL
 ===
 
 .. automodule:: pydolphinscheduler.tasks.sql
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Sql.yaml
+   :start-after: # under the License.
+   :language: yaml
+
+example_sql.sql:
+
+.. literalinclude:: ../../../examples/yaml_define/example_sql.sql
+   :start-after: */
+   :language: sql

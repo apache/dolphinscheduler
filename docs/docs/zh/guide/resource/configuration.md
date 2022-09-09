@@ -1,21 +1,25 @@
 # 资源中心配置详情
 
-资源中心通常用于上传文件、 UDF 函数，以及任务组管理等操作。针对单机环境可以选择本地文件目录作为上传文件夹（此操作不需要部署 Hadoop）。当然也可以选择上传到 Hadoop or MinIO 集群上，此时则需要有 Hadoop（2.6+）或者 MinIOn 等相关环境。
+- 资源中心通常用于上传文件、UDF 函数，以及任务组管理等操作。
+- 资源中心可以对接分布式的文件存储系统，如[Hadoop](https://hadoop.apache.org/docs/r2.7.0/)（2.6+）或者[MinIO](https://github.com/minio/minio)集群，也可以对接远端的对象存储，如[AWS S3](https://aws.amazon.com/s3/)或者[阿里云 OSS](https://www.aliyun.com/product/oss)等。
+- 资源中心也可以直接对接本地文件系统。在单机模式下，您无需依赖`Hadoop`或`S3`一类的外部存储系统，可以方便地对接本地文件系统进行体验。
+- 除此之外，对于集群模式下的部署，您可以通过使用[S3FS-FUSE](https://github.com/s3fs-fuse/s3fs-fuse)将`S3`挂载到本地，或者使用[JINDO-FUSE](https://help.aliyun.com/document_detail/187410.html)将`OSS`挂载到本地等，再用资源中心对接本地文件系统方式来操作远端对象存储中的文件。
 
-## 本地资源配置
-
-在单机环境下，可以选择使用本地文件目录作为上传文件夹（无需部署Hadoop），此时需要进行如下配置：
+## 对接本地文件系统
 
 ### 配置 `common.properties` 文件
 
-对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
+如果您以 `集群` 模式或者 `伪集群` 模式部署DolphinScheduler，您需要对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`；
+若您以 `单机` 模式部署DolphinScheduler，您只需要配置 `standalone-server/conf/common.properties`，具体配置如下：
 
-- 将 `data.basedir.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`data.basedir.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
-- 修改下列两个参数，分别是 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///`。
+- 将 `resource.storage.upload.base.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`resource.storage.upload.base.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
+- 修改 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///`。
 
-## HDFS 资源配置
+> **注意**：如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
 
-当需要使用资源中心进行相关文件的创建或者上传操作时，所有的文件和资源都会被存储在 HDFS 上。所以需要进行以下配置：
+## 对接分布式或远端对象存储
+
+当需要使用资源中心进行相关文件的创建或者上传操作时，所有的文件和资源都会被存储在分布式文件系统`HDFS`或者远端的对象存储，如`S3`上。所以需要进行以下配置：
 
 ### 配置 common.properties 文件
 
@@ -129,8 +133,9 @@ development.state=false
 alert.rpc.port=50052
 ```
 
->    **注意**：
+> **注意**：
 >
->    * 如果只配置了 `api-server/conf/common.properties` 的文件，则只是开启了资源上传的操作，并不能满足正常使用。如果想要在工作流中执行相关文件则需要额外配置 `worker-server/conf/common.properties`。
->    * 如果用到资源上传的功能，那么[安装部署](../installation/standalone.md)中，部署用户需要有这部分的操作权限。
->    * 如果 Hadoop 集群的 NameNode 配置了 HA 的话，需要开启 HDFS 类型的资源上传，同时需要将 Hadoop 集群下的 `core-site.xml` 和 `hdfs-site.xml` 复制到 `worker-server/conf` 以及 `api-server/conf`，非 NameNode HA 跳过次步骤。
+> * 如果只配置了 `api-server/conf/common.properties` 的文件，则只是开启了资源上传的操作，并不能满足正常使用。如果想要在工作流中执行相关文件则需要额外配置 `worker-server/conf/common.properties`。
+> * 如果用到资源上传的功能，那么[安装部署](../installation/standalone.md)中，部署用户需要有这部分的操作权限。
+> * 如果 Hadoop 集群的 NameNode 配置了 HA 的话，需要开启 HDFS 类型的资源上传，同时需要将 Hadoop 集群下的 `core-site.xml` 和 `hdfs-site.xml` 复制到 `worker-server/conf` 以及 `api-server/conf`，非 NameNode HA 跳过次步骤。
+

@@ -25,14 +25,14 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * command
- */
+@Data
 @TableName("t_ds_command")
 public class Command {
 
@@ -40,7 +40,7 @@ public class Command {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * command type
@@ -146,22 +146,21 @@ public class Command {
     }
 
     public Command(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            long processDefinitionCode,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            String workerGroup,
-            Long environmentCode,
-            Priority processInstancePriority,
-            int dryRun,
-            int processInstanceId,
-            int processDefinitionVersion
-    ) {
+                   CommandType commandType,
+                   TaskDependType taskDependType,
+                   FailureStrategy failureStrategy,
+                   int executorId,
+                   long processDefinitionCode,
+                   String commandParam,
+                   WarningType warningType,
+                   int warningGroupId,
+                   Date scheduleTime,
+                   String workerGroup,
+                   Long environmentCode,
+                   Priority processInstancePriority,
+                   int dryRun,
+                   int processInstanceId,
+                   int processDefinitionVersion) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -178,150 +177,6 @@ public class Command {
         this.processInstancePriority = processInstancePriority;
         this.dryRun = dryRun;
         this.processInstanceId = processInstanceId;
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
-
-    public TaskDependType getTaskDependType() {
-        return taskDependType;
-    }
-
-    public void setTaskDependType(TaskDependType taskDependType) {
-        this.taskDependType = taskDependType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public CommandType getCommandType() {
-        return commandType;
-    }
-
-    public void setCommandType(CommandType commandType) {
-        this.commandType = commandType;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public FailureStrategy getFailureStrategy() {
-        return failureStrategy;
-    }
-
-    public void setFailureStrategy(FailureStrategy failureStrategy) {
-        this.failureStrategy = failureStrategy;
-    }
-
-    public void setCommandParam(String commandParam) {
-        this.commandParam = commandParam;
-    }
-
-    public String getCommandParam() {
-        return commandParam;
-    }
-
-    public WarningType getWarningType() {
-        return warningType;
-    }
-
-    public void setWarningType(WarningType warningType) {
-        this.warningType = warningType;
-    }
-
-    public Integer getWarningGroupId() {
-        return warningGroupId;
-    }
-
-    public void setWarningGroupId(Integer warningGroupId) {
-        this.warningGroupId = warningGroupId;
-    }
-
-    public Date getScheduleTime() {
-        return scheduleTime;
-    }
-
-    public void setScheduleTime(Date scheduleTime) {
-        this.scheduleTime = scheduleTime;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public int getExecutorId() {
-        return executorId;
-    }
-
-    public void setExecutorId(int executorId) {
-        this.executorId = executorId;
-    }
-
-    public Priority getProcessInstancePriority() {
-        return processInstancePriority;
-    }
-
-    public void setProcessInstancePriority(Priority processInstancePriority) {
-        this.processInstancePriority = processInstancePriority;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getWorkerGroup() {
-        return workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
-    }
-
-    public Long getEnvironmentCode() {
-        return this.environmentCode;
-    }
-
-    public void setEnvironmentCode(Long environmentCode) {
-        this.environmentCode = environmentCode;
-    }
-
-    public int getDryRun() {
-        return dryRun;
-    }
-
-    public void setDryRun(int dryRun) {
-        this.dryRun = dryRun;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
         this.processDefinitionVersion = processDefinitionVersion;
     }
 
@@ -349,7 +204,8 @@ public class Command {
             return false;
         }
 
-        if (environmentCode != null ? environmentCode.equals(command.environmentCode) : command.environmentCode == null) {
+        if (environmentCode != null ? environmentCode.equals(command.environmentCode)
+                : command.environmentCode == null) {
             return false;
         }
 
@@ -411,30 +267,4 @@ public class Command {
         result = 31 * result + processDefinitionVersion;
         return result;
     }
-
-    @Override
-    public String toString() {
-        return "Command{"
-                + "id=" + id
-                + ", commandType=" + commandType
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", executorId=" + executorId
-                + ", commandParam='" + commandParam + '\''
-                + ", taskDependType=" + taskDependType
-                + ", failureStrategy=" + failureStrategy
-                + ", warningType=" + warningType
-                + ", warningGroupId=" + warningGroupId
-                + ", scheduleTime=" + scheduleTime
-                + ", startTime=" + startTime
-                + ", processInstancePriority=" + processInstancePriority
-                + ", updateTime=" + updateTime
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + ", dryRun='" + dryRun + '\''
-                + ", processInstanceId='" + processInstanceId + '\''
-                + ", processDefinitionVersion='" + processDefinitionVersion + '\''
-                + '}';
-    }
-
 }
-

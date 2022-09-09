@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.event;
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
@@ -48,16 +48,16 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable =
-            this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             throw new TaskEventHandleError("Cannot find related workflow instance from cache");
         }
         TaskInstance taskInstance = workflowExecuteRunnable.getTaskInstance(taskInstanceId)
-            .orElseThrow(() -> new TaskEventHandleError("Cannot find related taskInstance from cache"));
-        if (taskInstance.getState() != ExecutionStatus.SUBMITTED_SUCCESS) {
+                .orElseThrow(() -> new TaskEventHandleError("Cannot find related taskInstance from cache"));
+        if (taskInstance.getState() != TaskExecutionStatus.SUBMITTED_SUCCESS) {
             logger.warn(
-                "The current taskInstance status is not SUBMITTED_SUCCESS, so the dispatch event will be discarded, the current is a delay event, event: {}",
-                taskEvent);
+                    "The current taskInstance status is not SUBMITTED_SUCCESS, so the dispatch event will be discarded, the current is a delay event, event: {}",
+                    taskEvent);
             return;
         }
 
@@ -65,7 +65,7 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
         TaskInstance oldTaskInstance = new TaskInstance();
         TaskInstanceUtils.copyTaskInstance(taskInstance, oldTaskInstance);
         // update the taskInstance status
-        taskInstance.setState(ExecutionStatus.DISPATCH);
+        taskInstance.setState(TaskExecutionStatus.DISPATCH);
         taskInstance.setHost(taskEvent.getWorkerAddress());
         try {
             if (!processService.updateTaskInstance(taskInstance)) {

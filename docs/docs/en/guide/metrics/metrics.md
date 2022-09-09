@@ -115,9 +115,10 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 ### Alert Server Related
 
-- Currently, we have not embedded any metrics in Alert Server.
+- ds.alert.send.count: (counter) the number of sent alerts, sliced by tag `status`
+- ds.alert.pending: (gauge) the number of alerts waiting to get fired
 
-In each server, there are some default system-level metrics related to `database connection`, `JVM`, etc. We list them below for your reference:
+**In each server, there are some default system-level metrics related to `database connection`, `JVM`, etc. We list them below for your reference:**
 
 ### Database Related Metrics (Default)
 

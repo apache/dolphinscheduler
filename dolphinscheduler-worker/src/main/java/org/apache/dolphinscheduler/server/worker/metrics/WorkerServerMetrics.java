@@ -30,36 +30,36 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class WorkerServerMetrics {
 
-    private static final Counter WORKER_OVERLOAD_COUNTER =
+    private final Counter workerOverloadCounter =
         Counter.builder("ds.worker.overload.count")
             .description("overloaded workers count")
             .register(Metrics.globalRegistry);
 
-    private static final Counter WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER =
+    private final Counter workerFullSubmitQueueCounter =
         Counter.builder("ds.worker.full.submit.queue.count")
             .description("full worker submit queues count")
             .register(Metrics.globalRegistry);
 
-    private static final Counter WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER =
+    private final Counter workerResourceDownloadSuccessCounter =
             Counter.builder("ds.worker.resource.download.count")
                     .tag("status", "success")
                     .description("worker resource download success count")
                     .register(Metrics.globalRegistry);
 
-    private static final Counter WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER =
+    private final Counter workerResourceDownloadFailCounter =
             Counter.builder("ds.worker.resource.download.count")
                     .tag("status", "fail")
                     .description("worker resource download failure count")
                     .register(Metrics.globalRegistry);
 
-    private static final Timer WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER =
+    private final Timer workerResourceDownloadDurationTimer =
             Timer.builder("ds.worker.resource.download.duration")
                     .publishPercentiles(0.5, 0.75, 0.95, 0.99)
                     .publishPercentileHistogram()
                     .description("time cost of resource download on workers")
                     .register(Metrics.globalRegistry);
 
-    private static final DistributionSummary WORKER_RESOURCE_DOWNLOAD_SIZE_DISTRIBUTION =
+    private final DistributionSummary workerResourceDownloadSizeDistribution =
             DistributionSummary.builder("ds.worker.resource.download.size")
             .baseUnit("bytes")
             .publishPercentiles(0.5, 0.75, 0.95, 0.99)
@@ -67,31 +67,31 @@ public class WorkerServerMetrics {
             .description("size of downloaded resource files on worker")
             .register(Metrics.globalRegistry);
 
-    public static void incWorkerOverloadCount() {
-        WORKER_OVERLOAD_COUNTER.increment();
+    public void incWorkerOverloadCount() {
+        workerOverloadCounter.increment();
     }
 
-    public static void incWorkerSubmitQueueIsFullCount() {
-        WORKER_SUBMIT_QUEUE_IS_FULL_COUNTER.increment();
+    public void incWorkerSubmitQueueIsFullCount() {
+        workerFullSubmitQueueCounter.increment();
     }
 
-    public static void incWorkerResourceDownloadSuccessCount() {
-        WORKER_RESOURCE_DOWNLOAD_SUCCESS_COUNTER.increment();
+    public void incWorkerResourceDownloadSuccessCount() {
+        workerResourceDownloadSuccessCounter.increment();
     }
 
-    public static void incWorkerResourceDownloadFailureCount() {
-        WORKER_RESOURCE_DOWNLOAD_FAILURE_COUNTER.increment();
+    public void incWorkerResourceDownloadFailureCount() {
+        workerResourceDownloadFailCounter.increment();
     }
 
-    public static void recordWorkerResourceDownloadTime(final long milliseconds) {
-        WORKER_RESOURCE_DOWNLOAD_DURATION_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
+    public void recordWorkerResourceDownloadTime(final long milliseconds) {
+        workerResourceDownloadDurationTimer.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static void recordWorkerResourceDownloadSize(final long size) {
-        WORKER_RESOURCE_DOWNLOAD_SIZE_DISTRIBUTION.record(size);
+    public void recordWorkerResourceDownloadSize(final long size) {
+        workerResourceDownloadSizeDistribution.record(size);
     }
 
-    public static void registerWorkerRunningTaskGauge(final Supplier<Number> supplier) {
+    public void registerWorkerRunningTaskGauge(final Supplier<Number> supplier) {
         Gauge.builder("ds.task.running", supplier)
             .description("number of running tasks on workers")
             .register(Metrics.globalRegistry);

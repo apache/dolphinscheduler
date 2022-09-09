@@ -59,7 +59,7 @@ export function useCellUpdate(options: Options) {
    */
   function addNode(
     id: string,
-    type: string,
+    type: TaskType,
     name: string,
     flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }

@@ -17,45 +17,23 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-/**
- * count execute state
- *
- */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExecuteStatusCount {
 
     /**
      * execution state
      */
-    private ExecutionStatus state;
+    private TaskExecutionStatus state;
 
     /**
      * count for state
      */
     private int count;
-
-    public ExecutionStatus getExecutionStatus() {
-        return state;
-    }
-
-    public void setExecutionStatus(ExecutionStatus executionStatus) {
-        this.state = executionStatus;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    @Override
-    public String toString() {
-        return "ExecuteStatusCount{"
-                + "state=" + state
-                + ", count=" + count
-                + '}';
-    }
 }

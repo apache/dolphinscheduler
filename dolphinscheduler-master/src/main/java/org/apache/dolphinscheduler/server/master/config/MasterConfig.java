@@ -17,26 +17,32 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-
-import java.time.Duration;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
-import lombok.Data;
+import java.time.Duration;
+
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 
 @Data
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = "master")
 public class MasterConfig implements Validator {
+
+    private Logger logger = LoggerFactory.getLogger(MasterConfig.class);
+
     /**
      * The master RPC server listen port.
      */
@@ -68,10 +74,6 @@ public class MasterConfig implements Validator {
      */
     private Duration heartbeatInterval = Duration.ofSeconds(10);
     /**
-     * Master heart beat task error threshold, if the continuous error count exceed this count, the master will close.
-     */
-    private int heartbeatErrorThreshold = 5;
-    /**
      * task submit max retry times.
      */
     private int taskCommitRetryTimes = 5;
@@ -87,10 +89,13 @@ public class MasterConfig implements Validator {
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killYarnJobWhenTaskFailover = true;
-    /**
-     * ip:listenPort
-     */
+    private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
+
+    // ip:listenPort
     private String masterAddress;
+
+    // /nodes/master/ip:listenPort
+    private String masterRegistryPath;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -133,9 +138,28 @@ public class MasterConfig implements Validator {
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        if (masterConfig.getHeartbeatErrorThreshold() <= 0) {
-            errors.rejectValue("heartbeat-error-threshold", null, "should be a positive value");
-        }
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
+        masterConfig.setMasterRegistryPath(REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterConfig.getMasterAddress());
+        printConfig();
+    }
+
+    private void printConfig() {
+        logger.info("Master config: listenPort -> {} ", listenPort);
+        logger.info("Master config: fetchCommandNum -> {} ", fetchCommandNum);
+        logger.info("Master config: preExecThreads -> {} ", preExecThreads);
+        logger.info("Master config: execThreads -> {} ", execThreads);
+        logger.info("Master config: dispatchTaskNumber -> {} ", dispatchTaskNumber);
+        logger.info("Master config: hostSelector -> {} ", hostSelector);
+        logger.info("Master config: heartbeatInterval -> {} ", heartbeatInterval);
+        logger.info("Master config: taskCommitRetryTimes -> {} ", taskCommitRetryTimes);
+        logger.info("Master config: taskCommitInterval -> {} ", taskCommitInterval);
+        logger.info("Master config: stateWheelInterval -> {} ", stateWheelInterval);
+        logger.info("Master config: maxCpuLoadAvg -> {} ", maxCpuLoadAvg);
+        logger.info("Master config: reservedMemory -> {} ", reservedMemory);
+        logger.info("Master config: failoverInterval -> {} ", failoverInterval);
+        logger.info("Master config: killYarnJobWhenTaskFailover -> {} ", killYarnJobWhenTaskFailover);
+        logger.info("Master config: registryDisconnectStrategy -> {} ", registryDisconnectStrategy);
+        logger.info("Master config: masterAddress -> {} ", masterAddress);
+        logger.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
     }
 }

@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -507,20 +508,20 @@ public class ProcessDefinitionServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.verifyProcessDefinitionName(loginUser,
-                projectCode, "test_pdf");
+                projectCode, "test_pdf", 0);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
 
         //project check auth success, process not exist
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(processDefineMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(null);
         Map<String, Object> processNotExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
-                projectCode, "test_pdf");
+                projectCode, "test_pdf", 0);
         Assert.assertEquals(Status.SUCCESS, processNotExistRes.get(Constants.STATUS));
 
         //process exist
         Mockito.when(processDefineMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(getProcessDefinition());
         Map<String, Object> processExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
-                projectCode, "test_pdf");
+                projectCode, "test_pdf", 0);
         Assert.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST, processExistRes.get(Constants.STATUS));
     }
 
@@ -759,6 +760,19 @@ public class ProcessDefinitionServiceTest {
         result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
 
         Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
+    }
+
+    @Test
+    public void testGetNewProcessName() {
+        String processName1 = "test_copy_" + DateUtils.getCurrentTimeStamp();
+        final String newName1 = processDefinitionService.getNewName(processName1, Constants.COPY_SUFFIX);
+        Assert.assertEquals(2, newName1.split(Constants.COPY_SUFFIX).length);
+        String processName2 = "wf_copy_all_ods_data_to_d";
+        final String newName2 = processDefinitionService.getNewName(processName2, Constants.COPY_SUFFIX);
+        Assert.assertEquals(3, newName2.split(Constants.COPY_SUFFIX).length);
+        String processName3 = "test_import_" + DateUtils.getCurrentTimeStamp();
+        final String newName3 = processDefinitionService.getNewName(processName3, Constants.IMPORT_SUFFIX);
+        Assert.assertEquals(2, newName3.split(Constants.IMPORT_SUFFIX).length);
     }
 
     /**

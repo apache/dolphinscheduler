@@ -24,10 +24,9 @@ It started after version 2.0.5 released
 
 ## dev
 
-* Change variable about where to keep pydolphinscheduler configuration from ``PYDOLPHINSCHEDULER_HOME`` to
-  ``PYDS_HOME`` which is same as other environment variable name.
+* Remove parameter ``task_location`` in process definition and Java Gateway service ([#11681](https://github.com/apache/dolphinscheduler/pull/11681))
 
-## 3.0.0a0
+## 3.0.0
 
 * Integrate Python gateway server into Dolphinscheduler API server, and you could start Python gateway service by command
   `./bin/dolphinscheduler-daemon.sh start api-server` instead of independent command
@@ -35,3 +34,5 @@ It started after version 2.0.5 released
 * Remove parameter `queue` from class `ProcessDefinition` to avoid confuse user when it change but not work
 * Change `yaml_parser.py` method `to_string` to magic method `__str__` make it more pythonic.
 * Use package ``ruamel.yaml`` replace ``pyyaml`` for write yaml file with comment.
+* Change variable about where to keep pydolphinscheduler configuration from ``PYDOLPHINSCHEDULER_HOME`` to
+  ``PYDS_HOME`` which is same as other environment variable name.

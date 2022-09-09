@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -76,8 +77,8 @@ public class FileUtils {
      * @return file content string
      */
     public static String file2String(MultipartFile file) {
-        try {
-            return IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8);
+        try (InputStream inputStream = file.getInputStream()) {
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.error("file convert to string failed: {}", file.getName());
         }

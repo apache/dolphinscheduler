@@ -96,13 +96,9 @@ You are very welcome to communicate with the developers and users of Dolphin Sch
 1. Join the Slack channel [Slack](https://asf-dolphinscheduler.slack.com/).
 2. Follow the [Twitter account of DolphinScheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
 
-### Contributor over time
-
-[![Contributor over time](https://contributor-graph-api.apiseven.com/contributors-svg?chart=contributorOverTime&repo=apache/dolphinscheduler)](https://www.apiseven.com/en/contributor-graph?chart=contributorOverTime&repo=apache/dolphinscheduler)
-
 ## How to Contribute
 
-The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html).
+The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](docs/docs/en/contribute/join/contribute.md).
 
 # Landscapes
 
