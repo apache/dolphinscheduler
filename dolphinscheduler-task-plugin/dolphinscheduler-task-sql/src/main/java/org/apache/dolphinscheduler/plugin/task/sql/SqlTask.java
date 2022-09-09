@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -60,6 +61,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 public class SqlTask extends AbstractTask {
 
@@ -90,6 +93,9 @@ public class SqlTask extends AbstractTask {
     private static final int QUERY_LIMIT = 10000;
 
     private SQLTaskExecutionContext sqlTaskExecutionContext;
+
+    @Nullable
+    private Connection connection;
 
     /**
      * Abstract Yarn Task
@@ -167,7 +173,21 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-
+        String type = sqlParameters.getType();
+        if (DbType.HIVE == DbType.valueOf(type)) {
+            List<String> appIds = ProcessUtils.killYarnJob(taskExecutionContext);
+            logger.info("cancel task type is [{}],yarn appIds is {}", type, appIds);
+        } else {
+            if (connection == null) {
+                logger.info("Unable to get database connection information");
+            } else {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    throw new TaskException("database connection shutdown failed");
+                }
+            }
+        }
     }
 
     /**
