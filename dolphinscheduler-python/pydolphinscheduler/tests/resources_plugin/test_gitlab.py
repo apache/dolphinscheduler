@@ -19,7 +19,7 @@
 import pytest
 
 from pydolphinscheduler.exceptions import PyResPluginException
-from pydolphinscheduler.resources_plugin.gitlab_res import GitLab
+from pydolphinscheduler.resources_plugin.gitlab import GitLab
 
 
 @pytest.mark.parametrize(
