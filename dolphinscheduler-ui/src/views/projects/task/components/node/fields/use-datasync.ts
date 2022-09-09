@@ -29,15 +29,15 @@ export function useDatasync(model: { [field: string]: any }): IJsonItem[] {
     const cloudWatchLogGroupArnSpan = ref(0)
 
     const resetSpan = () => {
-        jsonSpan.value = model.isJsonFormat ? 24 : 0
-        destinationLocationArnSpan.value = model.isJsonFormat ? 0 : 24
-        sourceLocationArnSpan.value = model.isJsonFormat ? 0 : 24
-        nameSpan.value = model.isJsonFormat ? 0 : 24
-        cloudWatchLogGroupArnSpan.value = model.isJsonFormat ? 0 : 24
+        jsonSpan.value = model.jsonFormat ? 24 : 0
+        destinationLocationArnSpan.value = model.jsonFormat ? 0 : 24
+        sourceLocationArnSpan.value = model.jsonFormat ? 0 : 24
+        nameSpan.value = model.jsonFormat ? 0 : 24
+        cloudWatchLogGroupArnSpan.value = model.jsonFormat ? 0 : 24
     }
 
     watch(
-        () => [model.isJsonFormat],
+        () => [model.jsonFormat],
         () => {
             resetSpan()
         }
@@ -48,8 +48,8 @@ export function useDatasync(model: { [field: string]: any }): IJsonItem[] {
     return [
         {
             type: 'switch',
-            field: 'isJsonFormat',
-            name: 'isJsonFormat',
+            field: 'jsonFormat',
+            name: 'jsonFormat',
             span: 12
         },
         {

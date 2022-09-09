@@ -1,8 +1,11 @@
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import lombok.Data;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,17 +23,33 @@ import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionRespo
 import software.amazon.awssdk.services.datasync.model.DescribeTaskRequest;
 import software.amazon.awssdk.services.datasync.model.DescribeTaskResponse;
 import software.amazon.awssdk.services.datasync.model.FilterRule;
+import software.amazon.awssdk.services.datasync.model.Options;
 import software.amazon.awssdk.services.datasync.model.StartTaskExecutionRequest;
 import software.amazon.awssdk.services.datasync.model.StartTaskExecutionResponse;
 import software.amazon.awssdk.services.datasync.model.TagListEntry;
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
+import software.amazon.awssdk.services.datasync.model.TaskSchedule;
 import software.amazon.awssdk.services.datasync.model.TaskStatus;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 @Data
 public class DatasyncHook {
+    private static final ObjectMapper objectMapper =
+            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+
     public static TaskExecutionStatus[] doneStatus = {TaskExecutionStatus.ERROR, TaskExecutionStatus.SUCCESS, TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
     public static TaskStatus[] taskFinishFlags = {TaskStatus.UNAVAILABLE, TaskStatus.UNKNOWN_TO_SDK_VERSION};
     protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
@@ -43,10 +62,13 @@ public class DatasyncHook {
     }
 
     protected DataSyncClient createClient() {
-        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
+        //final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
+        //final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+       // final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
 
+        final String awsAccessKeyId = "AKIAXTUKRINYVGPCDOBV";
+        final String awsSecretAccessKey = "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";
+        final String awsRegion = "ap-northeast-3";
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
@@ -59,6 +81,13 @@ public class DatasyncHook {
 
     public Boolean createDatasyncTask(DatasyncParameters parameters) {
         logger.info("createDatasyncTask ......");
+        if (parameters.isJsonFormat()) {
+            try {
+                parameters = objectMapper.readValue(parameters.getJson(), DatasyncParameters.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
         CreateTaskRequest.Builder builder = CreateTaskRequest.builder()
                 .name(parameters.getName())
                 .sourceLocationArn(parameters.getSourceLocationArn())
@@ -68,24 +97,7 @@ public class DatasyncHook {
         if (StringUtils.isNotEmpty(cloudWatchLogGroupArn)) {
             builder.cloudWatchLogGroupArn(cloudWatchLogGroupArn);
         }
-        List<TagListEntry> tag = parameters.getTags();
-        if (tag != null && tag.size() > 0) {
-            builder.tags(tag);
-        }
-        if (parameters.getOptions() != null) {
-            builder.options(parameters.getOptions());
-        }
-        List<FilterRule> excludes = parameters.getExcludes();
-        if (excludes != null && excludes.size() > 0) {
-            builder.excludes(excludes);
-        }
-        List<FilterRule> includes = parameters.getIncludes();
-        if (includes != null && includes.size() > 0) {
-            builder.includes(includes);
-        }
-        if (parameters.getSchedule() != null) {
-            builder.schedule(parameters.getSchedule());
-        }
+        castParamPropertyPackage(parameters, builder);
 
         CreateTaskResponse task = client.createTask(builder.build());
         if (task.sdkHttpResponse().isSuccessful()) {
@@ -211,5 +223,38 @@ public class DatasyncHook {
         }
         logger.warn("double check error");
         return false;
+    }
+
+    private static void castParamPropertyPackage(DatasyncParameters parameters, CreateTaskRequest.Builder builder){
+        List<com.amazonaws.services.datasync.model.TagListEntry> tags = parameters.getTags();
+        if (tags != null && tags.size() > 0) {
+            List<TagListEntry> collect = tags.stream().map(e -> TagListEntry.builder().key(e.getKey()).value(e.getValue()).build()).collect(Collectors.toList());
+            builder.tags(collect);
+        }
+        com.amazonaws.services.datasync.model.Options options = parameters.getOptions();
+        if (options != null) {
+            Options option = Options.builder().build();
+            try {
+                BeanUtils.copyProperties(option, options);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            builder.options(option);
+        }
+        List<com.amazonaws.services.datasync.model.FilterRule> excludes = parameters.getExcludes();
+        if (excludes != null && excludes.size() > 0) {
+            List<FilterRule> collect = excludes.stream().map(e->FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build()).collect(Collectors.toList());
+            builder.excludes(collect);
+        }
+        List<com.amazonaws.services.datasync.model.FilterRule> includes = parameters.getIncludes();
+        if (includes != null && includes.size() > 0) {
+            List<FilterRule> collect = includes.stream().map(e->FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build()).collect(Collectors.toList());
+            builder.excludes(collect);
+        }
+        if (parameters.getSchedule() != null) {
+            builder.schedule(TaskSchedule.builder().scheduleExpression(parameters.getSchedule().getScheduleExpression()).build());
+        }
     }
 }

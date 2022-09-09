@@ -375,7 +375,7 @@ interface ITaskParams {
   pythonEnvTool?: string
   requirements?: string
   condaPythonVersion?: string
-  isJsonFormat?: boolean
+  jsonFormat?: boolean
   destinationLocationArn?: string
   sourceLocationArn?: string
   name?: string

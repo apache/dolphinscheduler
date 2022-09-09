@@ -17,20 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.amazonaws.services.datasync.model.FilterRule;
+import com.amazonaws.services.datasync.model.Options;
+import com.amazonaws.services.datasync.model.TagListEntry;
+import com.amazonaws.services.datasync.model.TaskSchedule;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
-
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import software.amazon.awssdk.services.datasync.model.FilterRule;
-import software.amazon.awssdk.services.datasync.model.Options;
-import software.amazon.awssdk.services.datasync.model.TagListEntry;
-import software.amazon.awssdk.services.datasync.model.TaskSchedule;
 
 @Setter
 @Getter
@@ -38,27 +37,31 @@ import software.amazon.awssdk.services.datasync.model.TaskSchedule;
 @ToString
 public class DatasyncParameters extends AbstractParameters {
 
+    @JsonProperty("DestinationLocationArn")
     private String destinationLocationArn;
+    @JsonProperty("SourceLocationArn")
     private String sourceLocationArn;
+    @JsonProperty("Name")
     private String name;
+    @JsonProperty("CloudWatchLogGroupArn")
     private String cloudWatchLogGroupArn;
 
-    private boolean isJsonFormat;
+    private boolean jsonFormat;
     private String json;
-    @JsonIgnore
+    @JsonProperty("Options")
     private Options options;
-    @JsonIgnore
+    @JsonProperty("Schedule")
     private TaskSchedule schedule;
-    @JsonIgnore
+    @JsonProperty("Excludes")
     private List<FilterRule> excludes;
-    @JsonIgnore
+    @JsonProperty("Includes")
     private List<FilterRule> includes;
-    @JsonIgnore
+    @JsonProperty("Tags")
     private List<TagListEntry> tags;
 
     @Override
     public boolean checkParameters() {
-        if (isJsonFormat) {
+        if (jsonFormat) {
             return StringUtils.isNotEmpty(json);
         } else {
             return StringUtils.isNotEmpty(destinationLocationArn) && StringUtils.isNotEmpty(sourceLocationArn) && StringUtils.isNotEmpty(name);

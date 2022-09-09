@@ -428,7 +428,7 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DATASYNC') {
-    taskParams.isJsonFormat = data.isJsonFormat
+    taskParams.jsonFormat = data.jsonFormat
     taskParams.json = data.json
     taskParams.destinationLocationArn = data.destinationLocationArn
     taskParams.sourceLocationArn = data.sourceLocationArn
