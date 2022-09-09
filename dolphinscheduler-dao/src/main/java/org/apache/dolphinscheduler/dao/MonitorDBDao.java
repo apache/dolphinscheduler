@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+import org.apache.dolphinscheduler.dao.utils.H2Performance;
 import org.apache.dolphinscheduler.dao.utils.MySQLPerformance;
 import org.apache.dolphinscheduler.dao.utils.PostgreSQLPerformance;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -51,6 +52,8 @@ public class MonitorDBDao {
                 return new MySQLPerformance().getMonitorRecord(conn);
             } else if (driverClassName.contains(DbType.POSTGRESQL.toString().toLowerCase())) {
                 return new PostgreSQLPerformance().getMonitorRecord(conn);
+            } else if (driverClassName.contains(DbType.H2.toString().toLowerCase())) {
+                return new H2Performance().getMonitorRecord(conn);
             }
         } catch (Exception e) {
             logger.error("SQLException: {}", e.getMessage(), e);
