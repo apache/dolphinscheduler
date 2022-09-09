@@ -36,7 +36,7 @@ version = "dev"
 
 # Start package required
 prod = [
-    "gitlab>=3.9.0",
+    "python-gitlab>=3.9.0",
     "click>=8.0.0",
     "py4j~=0.10",
     "ruamel.yaml",
