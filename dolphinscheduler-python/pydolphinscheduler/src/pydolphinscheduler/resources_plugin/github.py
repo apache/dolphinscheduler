@@ -27,7 +27,7 @@ from pydolphinscheduler.resources_plugin.base.git import Git, GitFileInfo
 
 
 class GitHub(ResourcePlugin, Git):
-    """GitHub object, declare GitHub resource plugin for task and workflow to dolphinscheduler.
+    """GitHub resource plugin, a plugin for task and workflow to dolphinscheduler to read resource.
 
     :param prefix: A string representing the prefix of GitHub.
     :param access_token: A string used for identity authentication of GitHub private warehouse.
