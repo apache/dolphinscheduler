@@ -55,6 +55,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
@@ -91,8 +92,6 @@ public class SqlTask extends AbstractTask {
     private static final int QUERY_LIMIT = 10000;
 
     private SQLTaskExecutionContext sqlTaskExecutionContext;
-
-    public static final int TEST_FLAG_YES = 1;
 
     @Nullable
     private Connection connection;
@@ -434,7 +433,7 @@ public class SqlTask extends AbstractTask {
                     ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
                 }
             }
-            logger.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(), sqlBinds.getParamsMap());
+            logger.info("prepare statement replace sql : {} ", stmt);
             return stmt;
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);
