@@ -30,17 +30,14 @@ class GitHub(ResourcePlugin, Git):
     """GitHub resource plugin, a plugin for task and workflow to dolphinscheduler to read resource.
 
     :param prefix: A string representing the prefix of GitHub.
-    :param access_token: A string used for identity authentication of GitHub private warehouse.
+    :param access_token: A string used for identity authentication of GitHub private repository.
     """
 
-    # [start init_method]
     def __init__(
         self, prefix: str, access_token: Optional[str] = None, *args, **kwargs
     ):
         super().__init__(prefix, *args, **kwargs)
         self.access_token = access_token
-
-    # [end init_method]
 
     def build_req_api(
         self,
@@ -77,7 +74,6 @@ class GitHub(ResourcePlugin, Git):
             api="https://api.github.com/repos/{user}/{repo_name}/contents/{file_path}",
         )
 
-    # [start read_file_method]
     def read_file(self, suf: str):
         """Get the content of the file.
 
@@ -85,8 +81,6 @@ class GitHub(ResourcePlugin, Git):
         """
         path = urljoin(self.prefix, suf)
         return self.req(path)
-
-    # [end read_file_method]
 
     def req(self, path: str):
         """Send HTTP request, parse response data, and get file content."""

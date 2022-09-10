@@ -129,39 +129,35 @@ def test_github_get_req_url(m_git_file_info, attr, expected):
     assert expected == github.get_req_url()
 
 
-@pytest.mark.skip(reason="Lack of test environment, need stable repository")
 @pytest.mark.parametrize(
     "attr, expected",
     [
         (
-            "lombok.config",
-            "#\n"
-            "# Licensed to the Apache Software Foundation (ASF) under one or more\n"
-            "# contributor license agreements.  See the NOTICE file distributed with\n"
-            "# this work for additional information regarding copyright ownership.\n"
-            "# The ASF licenses this file to You under the Apache License, Version 2.0\n"
-            '# (the "License"); you may not use this file except in compliance with\n'
-            "# the License.  You may obtain a copy of the License at\n"
-            "#\n"
-            "#     http://www.apache.org/licenses/LICENSE-2.0\n"
-            "#\n"
-            "# Unless required by applicable law or agreed to in writing, software\n"
-            '# distributed under the License is distributed on an "AS IS" BASIS,\n'
-            "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
-            "# See the License for the specific language governing permissions and\n"
-            "# limitations under the License.\n"
-            "#\n"
-            "\n"
-            "lombok.addLombokGeneratedAnnotation = true\n",
+            {
+                "init": {"prefix": "prefix", "access_token": "access_token"},
+                "file_path": "github_resource_plugin.sh",
+                "file_content": "github resource plugin",
+            },
+            "github resource plugin",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "prefix",
+                },
+                "file_path": "github_resource_plugin.sh",
+                "file_content": "github resource plugin",
+            },
+            "github resource plugin",
         ),
     ],
 )
-def test_github_read_file(attr, expected):
+@patch("pydolphinscheduler.resources_plugin.github.GitHub.req")
+def test_github_read_file(m_req, attr, expected):
     """Test the read_file function of the github resource plug-in."""
-    github = GitHub(
-        prefix="https://github.com/apache/dolphinscheduler/blob/dev",
-    )
-    assert expected == github.read_file(attr)
+    github = GitHub(**attr.get("init"))
+    m_req.return_value = attr.get("file_content")
+    assert expected == github.read_file(attr.get("file_path"))
 
 
 @pytest.mark.skip(reason="Lack of test environment, need stable repository")
@@ -197,32 +193,3 @@ def test_github_req(attr, expected):
         prefix="prefix",
     )
     assert expected == github.req(attr)
-
-
-@pytest.mark.skip(
-    reason="Lack of test environment, need stable personal repository and access_token"
-)
-@pytest.mark.parametrize(
-    "attr, expected",
-    [
-        (
-            {
-                "prefix": "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main",
-                "username": "xdu-chenrj",
-                "password": "ghp_gxxx",
-            },
-            "test github resource plugin\n",
-        ),
-        (
-            {
-                "prefix": "https://github.com/xdu-chenrj/test-ds-res-plugin/blob/main",
-                "access_token": "ghp_gxxxg",
-            },
-            "test github resource plugin\n",
-        ),
-    ],
-)
-def test_github_private_rep(attr, expected):
-    """Test private warehouse file content acquisition."""
-    github = GitHub(**attr)
-    assert expected == github.read_file("union.sh")
