@@ -70,16 +70,12 @@ class GitHub(ResourcePlugin, Git):
 
     def get_req_url(self):
         """Build request URL according to file information."""
-        user = self._git_file_info.user
-        repo_name = self._git_file_info.repo_name
-        file_path = self._git_file_info.file_path
-        url = self.build_req_api(
-            user,
-            repo_name,
-            file_path,
-            "https://api.github.com/repos/{user}/{repo_name}/contents/{file_path}",
+        return self.build_req_api(
+            user=self._git_file_info.user,
+            repo_name=self._git_file_info.repo_name,
+            file_path=self._git_file_info.file_path,
+            api="https://api.github.com/repos/{user}/{repo_name}/contents/{file_path}",
         )
-        return url
 
     # [start read_file_method]
     def read_file(self, suf: str):
