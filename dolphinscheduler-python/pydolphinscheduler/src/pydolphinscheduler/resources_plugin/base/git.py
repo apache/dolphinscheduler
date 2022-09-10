@@ -65,6 +65,34 @@ class GitFileInfo:
         return self._file_path
 
 
+class GitHubFileInfo(GitFileInfo):
+    """A class that defines the details of GitHub files.
+
+    :param user: A string representing the user the GitHub file belongs to.
+    :param repo_name: A string representing the repository to which the GitHub file belongs.
+    :param branch: A string representing the branch to which the GitHub file belongs.
+    :param file_path: A string representing the GitHub file path.
+    """
+
+    def __init__(
+        self,
+        user: Optional[str] = None,
+        repo_name: Optional[str] = None,
+        branch: Optional[str] = None,
+        file_path: Optional[str] = None,
+        *args,
+        **kwargs
+    ):
+        super().__init__(
+            user=user,
+            repo_name=repo_name,
+            branch=branch,
+            file_path=file_path,
+            *args,
+            **kwargs
+        )
+
+
 # [start Git]
 class Git(object, metaclass=ABCMeta):
     """An abstract class of online code warehouse based on git implementation."""

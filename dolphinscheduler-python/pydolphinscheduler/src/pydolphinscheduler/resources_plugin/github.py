@@ -23,7 +23,7 @@ from urllib.parse import urljoin
 import requests
 
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
-from pydolphinscheduler.resources_plugin.base.git import Git, GitFileInfo
+from pydolphinscheduler.resources_plugin.base.git import Git, GitHubFileInfo
 
 
 class GitHub(ResourcePlugin, Git):
@@ -60,7 +60,7 @@ class GitHub(ResourcePlugin, Git):
         elements = path.split("/")
         index = self.get_index(path, "/", 7)
         index = index + 1
-        file_info = GitFileInfo(
+        file_info = GitHubFileInfo(
             user=elements[3],
             repo_name=elements[4],
             branch=elements[6],
