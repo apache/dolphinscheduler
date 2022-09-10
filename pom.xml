@@ -446,9 +446,13 @@
                             <phase>package</phase>
                             <configuration>
                                 <skip>${docker.build.skip}</skip>
+                                <environmentVariables>
+                                    <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
+                                </environmentVariables>
                                 <executable>docker</executable>
                                 <workingDirectory>${project.basedir}</workingDirectory>
                                 <arguments>
+                                    <argument>buildx</argument>
                                     <argument>build</argument>
                                     <argument>--load</argument>
                                     <argument>--no-cache</argument>
