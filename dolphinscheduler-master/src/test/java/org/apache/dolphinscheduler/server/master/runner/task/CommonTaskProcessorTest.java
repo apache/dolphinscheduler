@@ -158,22 +158,4 @@ public class CommonTaskProcessorTest {
 
     }
 
-    @Test
-    public void testReplaceTestDatSource() {
-        CommonTaskProcessor commonTaskProcessor1 = new CommonTaskProcessor();
-        commonTaskProcessor1.processService = processService;
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTestFlag(1);
-        taskInstance.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
-        commonTaskProcessor1.taskInstance = taskInstance;
-
-        //The data source instance has no bound test data source
-        Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
-        commonTaskProcessor1.checkAndReplaceTestDataSource();
-
-        //The data source instance has  bound test data source
-        Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(2);
-        commonTaskProcessor1.checkAndReplaceTestDataSource();
-//      Assert.assertTrue(result);
-    }
 }
