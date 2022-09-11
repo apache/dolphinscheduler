@@ -228,10 +228,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
             processDefinitionMapper.updateById(processDefinition);
-            logger.info("Create {} command complete, processDefinitionCode:{}, commandCount:{}.", commandType.getDescp(), processDefinition.getCode(), create);
+            logger.info("Create command complete, processDefinitionCode:{}, commandCount:{}.", processDefinition.getCode(), create);
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Start process instance failed because create {} command error, processDefinitionCode:{}.", commandType.getDescp(), processDefinition.getCode());
+            logger.error("Start process instance failed because create command error, processDefinitionCode:{}.", processDefinition.getCode());
             putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
         }
         return result;

@@ -306,6 +306,7 @@ public class UsersServiceTest {
 
             // success
             when(userMapper.selectById(1)).thenReturn(getUser());
+            when(userMapper.updateById(getUser())).thenReturn(1);
             result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
                     "13457864543", "queue", 1, "Asia/Shanghai");
             logger.info(result.toString());
@@ -322,8 +323,9 @@ public class UsersServiceTest {
         try {
             when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
             when(userMapper.selectById(1)).thenReturn(getUser());
-            when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(0);
-            // no operate
+            when(userMapper.deleteById(1)).thenReturn(1);
+            when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(1);
+            //no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
             Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));

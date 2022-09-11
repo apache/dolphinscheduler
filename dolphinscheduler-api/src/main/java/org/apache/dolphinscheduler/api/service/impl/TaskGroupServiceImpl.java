@@ -185,11 +185,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             taskGroup.setName(name);
         }
         int i = taskGroupMapper.updateById(taskGroup);
-        if (i > 0)
-            logger.info("Update task group complete, taskGroupId:{}.", taskGroup.getId());
-        else
-            logger.error("Update task group error, taskGroupId:{}.", taskGroup.getId());
-        putMsg(result, Status.SUCCESS);
+        if (i > 0) {
+            logger.info("Update task group complete, taskGroupId:{}.", id);
+            putMsg(result, Status.SUCCESS);
+        } else {
+            logger.error("Update task group error, taskGroupId:{}.", id);
+            putMsg(result, Status.UPDATE_TASK_GROUP_ERROR);
+        }
         return result;
     }
 
