@@ -175,8 +175,10 @@ public class PermissionCheck<T> {
                 List<T> unauthorizedList = processService.listUnauthorized(userId, needChecks, authorizationType);
                 // if exist unauthorized resource
                 if (CollectionUtils.isNotEmpty(unauthorizedList)) {
-                    logger.error("User does not have permission for {}: {}", user.getUserName(), authorizationType.getDescp(), unauthorizedList);
-                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
+                    logger.error("User does not have {} permission for {}, userName:{}.",
+                            authorizationType.getDescp(), unauthorizedList, user.getUserName());
+                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s",
+                            user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
                 }
             }
         }

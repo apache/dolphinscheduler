@@ -272,7 +272,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (cronMap.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
             String[] stringDates = cronMap.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(COMMA);
             if (stringDates.length > SCHEDULE_TIME_MAX_LENGTH) {
-                logger.warn("Parameter cornTime is bigger than {}, cornTime:{}.", SCHEDULE_TIME_MAX_LENGTH, cronTime);
+                logger.warn("Parameter cornTime is bigger than {}.", SCHEDULE_TIME_MAX_LENGTH);
                 return false;
             }
         }
@@ -758,14 +758,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         // determine whether to complement
         if (commandType == CommandType.COMPLEMENT_DATA) {
             if (schedule == null || StringUtils.isEmpty(schedule)) {
-                logger.error("Create {} type command error because parameter schedule is invalid.", commandType.getDescp());
+                logger.error("Create {} type command error because parameter schedule is invalid.", command.getCommandType().getDescp());
                 return 0;
             }
             if (!isValidateScheduleTime(schedule)) {
                 return 0;
             }
             try {
-                logger.info("Start to create {} command, processDefinitionCode:{}.", commandType.getDescp(), processDefineCode);
+                logger.info("Start to create {} command, processDefinitionCode:{}.", command.getCommandType().getDescp(), processDefineCode);
                 return createComplementCommandList(schedule, runMode, command, expectedParallelismNumber,
                         complementDependentMode);
             } catch (CronParseException cronParseException) {

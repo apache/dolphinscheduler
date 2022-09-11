@@ -95,7 +95,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
         if (clusterExistByName != null) {
-            logger.warn("Cluster with the same name already exists, name:{}.", name);
+            logger.warn("Cluster with the same name already exists, name:{}.", clusterExistByName.getName());
             putMsg(result, Status.CLUSTER_NAME_EXISTS, name);
             return result;
         }
@@ -120,11 +120,11 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         }
 
         if (clusterMapper.insert(cluster) > 0) {
-            logger.info("Cluster create complete, clusterName:{}.", name);
+            logger.info("Cluster create complete, clusterName:{}.", cluster.getName());
             result.put(Constants.DATA_LIST, cluster.getCode());
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Cluster create error, clusterName:{}.", name);
+            logger.error("Cluster create error, clusterName:{}.", cluster.getName());
             putMsg(result, Status.CREATE_CLUSTER_ERROR);
         }
         return result;
@@ -294,7 +294,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         }
 
         if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -306,7 +306,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
         if (clusterExistByName != null && !clusterExistByName.getCode().equals(code)) {
-            logger.warn("Cluster with the same name already exists, name:{}.", name);
+            logger.warn("Cluster with the same name already exists, name:{}.", clusterExistByName.getName());
             putMsg(result, Status.CLUSTER_NAME_EXISTS, name);
             return result;
         }
@@ -335,7 +335,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         clusterExist.setDescription(desc);
         clusterMapper.updateById(clusterExist);
         // need not update relation
-        logger.info("Cluster update complete, clusterName:{}.", name);
+        logger.info("Cluster update complete, clusterId:{}.", clusterExist.getId());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -358,7 +358,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster cluster = clusterMapper.queryByClusterName(clusterName);
         if (cluster != null) {
-            logger.warn("Cluster with the same name already exists, name:{}.", clusterName);
+            logger.warn("Cluster with the same name already exists, name:{}.", cluster.getName());
             putMsg(result, Status.CLUSTER_NAME_EXISTS, clusterName);
             return result;
         }

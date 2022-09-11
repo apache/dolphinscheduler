@@ -411,7 +411,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
             User tempUser = userMapper.queryByUserNameAccurately(userName);
             if (tempUser != null && tempUser.getId() != userId) {
-                logger.warn("User name already exists, userName:{}.", userName);
+                logger.warn("User name already exists, userName:{}.", tempUser.getUserName());
                 putMsg(result, Status.USER_NAME_EXIST);
                 return result;
             }
@@ -736,7 +736,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
 
-            // get all resource id of process definitions those is released
+            // get all resource id of process definitions those are released
             List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
             Map<Integer, Set<Long>> resourceProcessMap =
                     ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
@@ -785,7 +785,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         }
 
-        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", userId, resourceIds);
+        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(), needAuthorizeResIds);
 
         putMsg(result, Status.SUCCESS);
 
@@ -836,7 +836,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             udfUserMapper.insert(udfUser);
         }
 
-        logger.info("User is granted permission for UDF, userId:{}, udfIds:{}.", userId, udfIds);
+        logger.info("User is granted permission for UDF, userId:{}, udfIds:{}.", user.getId(), resourcesIdArr);
 
         putMsg(result, Status.SUCCESS);
 
@@ -889,7 +889,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
-        logger.info("User is granted permission for namespace, userId:{}, udfIds:{}.", userId, namespaceIds);
+        logger.info("User is granted permission for namespace, userId:{}.", tempUser.getId());
 
         putMsg(result, Status.SUCCESS);
 

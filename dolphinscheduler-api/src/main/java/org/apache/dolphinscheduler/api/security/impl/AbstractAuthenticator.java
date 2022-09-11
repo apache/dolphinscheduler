@@ -72,7 +72,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
 
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {
-            logger.error("The current user is deactivated, userName:{}.", userId);
+            logger.error("The current user is deactivated, userName:{}.", user.getUserName());
             result.setCode(Status.USER_DISABLED.getCode());
             result.setMsg(Status.USER_DISABLED.getMsg());
             return result;
@@ -81,7 +81,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
         // create session
         String sessionId = sessionService.createSession(user, extra);
         if (sessionId == null) {
-            logger.error("Failed to create session, userName:{}.", userId);
+            logger.error("Failed to create session, userName:{}.", user.getUserName());
             result.setCode(Status.LOGIN_SESSION_FAILED.getCode());
             result.setMsg(Status.LOGIN_SESSION_FAILED.getMsg());
             return result;

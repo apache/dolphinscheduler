@@ -91,7 +91,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         if (checkDescriptionLength(description)) {
-            logger.warn("Parameter description is too long, description:{}.", description);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -107,7 +107,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         TaskGroup taskGroup1 = taskGroupMapper.queryByName(loginUser.getId(), name);
         if (taskGroup1 != null) {
-            logger.warn("Task group with the same name already exists, taskGroupName:{}.", name);
+            logger.warn("Task group with the same name already exists, taskGroupName:{}.", taskGroup1.getName());
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
@@ -118,10 +118,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         taskGroup.setUpdateTime(new Date());
         if (taskGroupMapper.insert(taskGroup) > 0) {
             permissionPostHandle(AuthorizationType.TASK_GROUP, loginUser.getId(), Collections.singletonList(taskGroup.getId()),logger);
-            logger.info("Create task group complete, taskGroupName:{}.", name);
+            logger.info("Create task group complete, taskGroupName:{}.", taskGroup.getName());
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Create task group error, taskGroupName:{}.", name);
+            logger.error("Create task group error, taskGroupName:{}.", taskGroup.getName());
             putMsg(result, Status.CREATE_TASK_GROUP_ERROR);
             return result;
         }
@@ -148,7 +148,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         if (checkDescriptionLength(description)) {
-            logger.warn("Parameter description is too long, description:{}.", description);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

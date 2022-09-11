@@ -350,7 +350,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Result<Object> result = new Result<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
-            logger.warn("Datasource with the same name already exists, name:{}.", name);
+            logger.warn("Datasource with the same name already exists, name:{}.", dataSourceList.get(0).getName());
             putMsg(result, Status.DATASOURCE_EXIST);
         } else {
             putMsg(result, Status.SUCCESS);

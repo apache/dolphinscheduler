@@ -152,7 +152,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         }
 
         if (checkNamespaceExistInDb(namespace, clusterCode)) {
-            logger.warn("K8S namespace with the same name already exist, namespace:{}, clusterCode:{}.", namespace, clusterCode);
+            logger.warn("K8S namespace already exists, namespace:{}, clusterCode:{}.", namespace, clusterCode);
             putMsg(result, Status.K8S_NAMESPACE_EXIST, namespace, clusterCode);
             return result;
         }
@@ -291,7 +291,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         }
 
         if (checkNamespaceExistInDb(namespace, clusterCode)) {
-            logger.warn("K8S namespace with the same name already exist, namespace:{}, clusterCode:{}.", namespace, clusterCode);
+            logger.warn("K8S namespace already exists, namespace:{}, clusterCode:{}.", namespace, clusterCode);
             putMsg(result, Status.K8S_NAMESPACE_EXIST, namespace, clusterCode);
             return result;
         }

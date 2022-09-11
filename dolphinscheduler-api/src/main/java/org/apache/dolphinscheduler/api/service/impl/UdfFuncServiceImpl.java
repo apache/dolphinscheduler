@@ -94,7 +94,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             return result;
         }
         if(checkDescriptionLength(desc)){
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -140,7 +140,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         udf.setUpdateTime(now);
 
         udfFuncMapper.insert(udf);
-        logger.info("UDF function create complete, udfFuncName:{}.", funcName);
+        logger.info("UDF function create complete, udfFuncName:{}.", udf.getFuncName());
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(AuthorizationType.UDF, loginUser.getId(), Collections.singletonList(udf.getId()), logger);
         return result;
@@ -212,7 +212,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             return result;
         }
         if(checkDescriptionLength(desc)){
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

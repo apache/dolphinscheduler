@@ -111,7 +111,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         Project project = projectMapper.queryByName(name);
         if (project != null) {
-            logger.warn("Project {} already exists.", name);
+            logger.warn("Project {} already exists.", project.getName());
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, name);
             return result;
         }
@@ -130,7 +130,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                     .updateTime(now)
                     .build();
         } catch (CodeGenerateException e) {
-            logger.error("Project create error, project name:{}.", name, e);
+            logger.error("Project create error, projectName:{}.", project.getName(), e);
             putMsg(result, Status.CREATE_PROJECT_ERROR);
             return result;
         }
@@ -142,7 +142,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             permissionPostHandle(AuthorizationType.PROJECTS, loginUser.getId(),
                     Collections.singletonList(project.getId()), logger);
         } else {
-            logger.error("Project create error, project name:{}.", name);
+            logger.error("Project create error, projectName:{}.", project.getName());
             putMsg(result, Status.CREATE_PROJECT_ERROR);
         }
         return result;
@@ -156,7 +156,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     public static void checkDesc(Result result, String desc) {
         if (!StringUtils.isEmpty(desc) && desc.codePointCount(0, desc.length()) > 255) {
-            logger.warn("Parameter description check failed, description:{}.", desc);
+            logger.warn("Parameter description check failed.");
             result.setCode(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
             result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
         } else {
@@ -407,7 +407,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             result.setData(project);
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Project update error, project code:{}, project name:{}.", projectCode, projectName);
+            logger.error("Project update error, projectCode:{}, projectName:{}.", project.getCode(), project.getName());
             putMsg(result, Status.UPDATE_PROJECT_ERROR);
         }
         return result;
@@ -573,7 +573,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return Constants.READ_PERMISSION;
         }
 
-        if (project.getUserId() == user.getId()) {
+        if (Objects.equals(project.getUserId(), user.getId())) {
             return Constants.ALL_PERMISSIONS;
         }
 

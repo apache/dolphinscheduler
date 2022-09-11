@@ -148,7 +148,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         if(checkDescriptionLength(desc)){
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -217,7 +217,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         if(checkDescriptionLength(desc)){
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

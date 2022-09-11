@@ -102,7 +102,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             return result;
         }
         if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -113,7 +113,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         Environment environment = environmentMapper.queryByEnvironmentName(name);
         if (environment != null) {
-            logger.warn("Environment with the same name already exist, name:{}.", name);
+            logger.warn("Environment with the same name already exist, name:{}.", environment.getName());
             putMsg(result, Status.ENVIRONMENT_NAME_EXISTS, name);
             return result;
         }
@@ -370,14 +370,14 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             return checkResult;
         }
         if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
         Environment environment = environmentMapper.queryByEnvironmentName(name);
         if (environment != null && !environment.getCode().equals(code)) {
-            logger.warn("Environment with the same name already exist, name:{}.", name);
+            logger.warn("Environment with the same name already exist, name:{}.", environment.getName());
             putMsg(result, Status.ENVIRONMENT_NAME_EXISTS, name);
             return result;
         }
@@ -435,10 +435,10 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                     relationMapper.insert(relation);
                 }
             });
-            logger.info("Environment and relations update complete, environmentName:{}.", name);
+            logger.info("Environment and relations update complete, environmentId:{}.", env.getId());
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Environment update error, environmentName:{}.", name);
+            logger.error("Environment update error, environmentId:{}.", env.getId());
             putMsg(result, Status.UPDATE_ENVIRONMENT_ERROR, name);
         }
         return result;
@@ -462,7 +462,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         Environment environment = environmentMapper.queryByEnvironmentName(environmentName);
         if (environment != null) {
-            logger.warn("Environment with the same name already exist, name:{}.", environmentName);
+            logger.warn("Environment with the same name already exist, name:{}.", environment.getName());
             putMsg(result, Status.ENVIRONMENT_NAME_EXISTS, environmentName);
             return result;
         }
@@ -483,7 +483,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             if (Objects.nonNull(taskDefinitionList) && taskDefinitionList.size() != 0) {
                 Set<String> collect =
                         taskDefinitionList.stream().map(TaskDefinition::getName).collect(Collectors.toSet());
-                logger.warn("Environment {} and worker group {} is being used by task {}, so can not update.", environmentName, workerGroup, collect);
+                logger.warn("Environment {} and worker group {} is being used by task {}, so can not update.",
+                        taskDefinitionList.get(0).getEnvironmentCode(), taskDefinitionList.get(0).getWorkerGroup(),
+                        collect);
                 putMsg(result, Status.UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR, workerGroup, environmentName,
                         collect);
                 return result;

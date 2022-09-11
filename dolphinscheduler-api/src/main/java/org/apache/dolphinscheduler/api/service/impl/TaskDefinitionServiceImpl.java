@@ -571,7 +571,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             }
             updateDag(loginUser, result, taskRelation.getProcessDefinitionCode(), processTaskRelations, Lists.newArrayList(taskDefinitionToUpdate));
         }
-        logger.info("Update task with upstream tasks complete, projectCode:{}, taskDefinitionCode:{}, upstreamTaskCodes:{}.", projectCode, taskCode, upstreamCodes);
+        logger.info("Update task with upstream tasks complete, projectCode:{}, taskDefinitionCode:{}, upstreamTaskCodes:{}.",
+                projectCode, taskCode, upstreamCodes);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;

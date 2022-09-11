@@ -169,7 +169,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
         if(checkDescriptionLength(desc)){
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -222,7 +222,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
         if(checkDescriptionLength(desc)){
-            logger.warn("Parameter description is too long, description:{}.", desc);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

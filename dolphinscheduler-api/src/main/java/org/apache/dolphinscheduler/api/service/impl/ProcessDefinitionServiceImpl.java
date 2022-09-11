@@ -250,13 +250,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         if (checkDescriptionLength(description)) {
-            logger.warn("Parameter description is too long, description:{}.", description);
+            logger.warn("Parameter description is too long.");
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         // check whether the new process define name exist
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
         if (definition != null) {
-            logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.", name, definition.getCode());
+            logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                    definition.getName(), definition.getCode());
             throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, name);
         }
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
@@ -597,7 +598,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         if (checkDescriptionLength(description)) {
-            logger.warn("Parameter description is too long, description:{}.", description);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -779,7 +780,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.", name.trim(), processDefinition.getCode());
+        logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                processDefinition.getName(), processDefinition.getCode());
         putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
         return result;
     }
@@ -985,7 +987,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 .collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(defineCodeSet);
         if (CollectionUtils.isEmpty(processDefinitionList)) {
-            logger.error("Process definitions to be exported do not exist, processDefinitionCodes:{}.", codes);
+            logger.error("Process definitions to be exported do not exist, processDefinitionCodes:{}.", defineCodeSet);
             return;
         }
         // check processDefinition exist in project
@@ -994,7 +996,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<DagDataSchedule> dagDataSchedules =
                 processDefinitionListInProject.stream().map(this::exportProcessDagData).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(dagDataSchedules)) {
-            logger.info("Start download process definition file, projectCode:{}, processDefinitionCodes:{}.", projectCode, codes);
+            logger.info("Start download process definition file, processDefinitionCodes:{}.", defineCodeSet);
             downloadProcessDefinitionFile(response, dagDataSchedules);
         } else
             logger.error("There is no exported process dag data.");
@@ -1070,7 +1072,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         // check file content
         if (CollectionUtils.isEmpty(dagDataScheduleList)) {
-            logger.warn("Process definition file content is null, fileName:{}.", file.getOriginalFilename());
+            logger.warn("Process definition file content is empty.");
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
             return result;
         }
@@ -1213,7 +1215,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             }
         } catch (Exception e) {
-            logger.error("Import process definition error, projectCode:{}, fileName:{}.", projectCode, file.getOriginalFilename(), e);
+            logger.error("Import process definition error.", e);
             putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
             return result;
         }
@@ -1564,7 +1566,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 .collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(defineCodeSet);
         if (CollectionUtils.isEmpty(processDefinitionList)) {
-            logger.error("Process definitions do not exist, codes:{}.", codes);
+            logger.error("Process definitions do not exist, codes:{}.", defineCodeSet);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
@@ -1576,7 +1578,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream()
                 .filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(processDefinitionListInProject)) {
-            logger.error("Process definitions do not exist, codes:{}.", codes);
+            Set<Long> codesInProject = processDefinitionListInProject.stream()
+                    .map(ProcessDefinition::getCode).collect(Collectors.toSet());
+            logger.error("Process definitions do not exist in project, projectCode:{}, processDefinitionsCodes:{}.",
+                    processDefinitionListInProject.get(0).getProjectCode(), codesInProject);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
@@ -2248,14 +2253,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         if (checkDescriptionLength(description)) {
-            logger.warn("Parameter description is too long, description:{}.", description);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         // check whether the new process define name exist
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
         if (definition != null) {
-            logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.", name, definition.getCode());
+            logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                    definition.getName(), definition.getCode());
             putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
             return result;
         }
@@ -2393,7 +2399,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         if (checkDescriptionLength(description)) {
-            logger.warn("Parameter description is too long, description:{}.", description);
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }

@@ -180,7 +180,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueMapper.insert(queueObj);
 
         result.setData(queueObj);
-        logger.info("Queue create complete, queueName:{}.", queueName);
+        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
         return result;
@@ -291,7 +291,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         Queue queueObj = new Queue(queueName, queue);
         createQueueValid(queueObj);
         queueMapper.insert(queueObj);
-        logger.info("Queue create complete, queueName:{}.", queueName);
+        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         return queueObj;
     }
 

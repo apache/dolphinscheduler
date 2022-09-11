@@ -97,19 +97,19 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             return result;
         }
         if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()) == Boolean.TRUE) {
-            logger.error("Plugin instance with the same name already exists, name:{}.", instanceName);
+            logger.error("Plugin instance with the same name already exists, name:{}.", alertPluginInstance.getInstanceName());
             putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXIT);
             return result;
         }
 
         int i = alertPluginInstanceMapper.insert(alertPluginInstance);
         if (i > 0) {
-            logger.info("Create alert plugin instance complete, name:{}", instanceName);
+            logger.info("Create alert plugin instance complete, name:{}", alertPluginInstance.getInstanceName());
             result.put(Constants.DATA_LIST, alertPluginInstance);
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        logger.error("Create alert plugin instance error, name:{}", instanceName);
+        logger.error("Create alert plugin instance error, name:{}", alertPluginInstance.getInstanceName());
         putMsg(result, Status.SAVE_ERROR);
         return result;
     }
@@ -137,11 +137,13 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         int i = alertPluginInstanceMapper.updateById(alertPluginInstance);
 
         if (i > 0) {
-            logger.info("Update alert plugin instance complete, instanceId:{}, name:{}", pluginInstanceId, instanceName);
+            logger.info("Update alert plugin instance complete, instanceId:{}, name:{}", alertPluginInstance.getId(),
+                    alertPluginInstance.getInstanceName());
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        logger.error("Update alert plugin instance error, instanceId:{}, name:{}", pluginInstanceId, instanceName);
+        logger.error("Update alert plugin instance error, instanceId:{}, name:{}", alertPluginInstance.getId(),
+                alertPluginInstance.getInstanceName());
         putMsg(result, Status.SAVE_ERROR);
         return result;
     }
