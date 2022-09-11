@@ -206,6 +206,12 @@
             <artifactId>dolphinscheduler-task-hivecli</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-chunjun</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
