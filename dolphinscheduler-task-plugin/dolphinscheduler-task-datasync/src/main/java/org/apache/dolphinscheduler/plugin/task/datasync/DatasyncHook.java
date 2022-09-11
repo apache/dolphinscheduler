@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +63,10 @@ public class DatasyncHook {
     }
 
     protected DataSyncClient createClient() {
-        //final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        //final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-       // final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
+        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
+        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
 
-        final String awsAccessKeyId = "AKIAXTUKRINYVGPCDOBV";
-        final String awsSecretAccessKey = "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";
-        final String awsRegion = "ap-northeast-3";
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
