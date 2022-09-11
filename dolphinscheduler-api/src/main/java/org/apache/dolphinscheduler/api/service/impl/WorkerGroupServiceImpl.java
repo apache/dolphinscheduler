@@ -372,9 +372,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         List<ProcessInstance> processInstances = processInstanceMapper
                 .queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
-        List<Integer> processInstanceIds = processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            logger.warn("Delete worker group failed because there are {} processInstances are uising it, processInstanceIds:{}.",
+            List<Integer> processInstanceIds = processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
+            logger.warn("Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
                     processInstances.size(), processInstanceIds);
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;

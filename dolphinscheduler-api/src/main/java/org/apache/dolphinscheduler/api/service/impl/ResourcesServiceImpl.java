@@ -1496,7 +1496,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg());
         }
         if (resource.isDirectory()) {
-            logger.warn("Resource {} is a directory so can not download it, resourceId:{}.", resourceId);
+            logger.warn("Resource is a directory so can not download it, resourceId:{}.", resourceId);
             throw new ServiceException("can't download directory");
         }
 
@@ -1574,7 +1574,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.queryByUserNameAccurately(userName);
         Result<Object> resourceResponse = this.queryResource(user, fullName, null, ResourceType.FILE);
         if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
-            String msg = String.format("Query resource by fullName failed, userName:%s, fullName:%s", fullName);
+            String msg = String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fullName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
