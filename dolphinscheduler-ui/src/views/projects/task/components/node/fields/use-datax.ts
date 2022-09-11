@@ -126,7 +126,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       useResourcesSpan.value = 0
     }
   }
-  const supportedDatasourceType = [
+  const supportedDataSourceType = [
     'MYSQL',
     'POSTGRESQL',
     'ORACLE',
@@ -154,7 +154,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       typeField: 'dsType',
       sourceField: 'dataSource',
       span: datasourceSpan,
-      supportedDatasourceType
+      supportedDataSourceType
     }),
     {
       type: 'editor',
@@ -183,7 +183,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       typeField: 'dtType',
       sourceField: 'dataTarget',
       span: destinationDataSourceSpan,
-      supportedDatasourceType
+      supportedDataSourceType
     }),
     {
       type: 'input',
