@@ -138,10 +138,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
-        if (!String.valueOf(datasourceParam.getTestFlag()).equals("")) {
-            dataSource.setTestFlag(datasourceParam.getTestFlag());
-            dataSource.setBindTestId(datasourceParam.getBindTestId());
-        }
+        dataSource.setTestFlag(datasourceParam.getTestFlag());
+        dataSource.setBindTestId(datasourceParam.getBindTestId());
         try {
             dataSourceMapper.insert(dataSource);
             putMsg(result, Status.SUCCESS);

@@ -185,10 +185,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             });
             Map<String, Object> taskInstanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
             });
-            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get("datasource");
+            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(Constants.DATASOUCE);
             Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
-            taskDefinitionParams.put("datasource", testDataSourceId);
-            taskInstanceParams.put("datasource", testDataSourceId);
+            taskDefinitionParams.put(Constants.DATASOUCE, testDataSourceId);
+            taskInstanceParams.put(Constants.DATASOUCE, testDataSourceId);
             taskInstance.getTaskDefine().setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
             taskInstance.setTaskParams(JSONUtils.toJsonString(taskInstanceParams));
             if (null == testDataSourceId) {
