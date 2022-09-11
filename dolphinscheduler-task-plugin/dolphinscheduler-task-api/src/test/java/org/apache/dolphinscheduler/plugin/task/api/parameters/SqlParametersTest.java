@@ -27,7 +27,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class SqlParametersTest {
     private final String type = "MYSQL";
     private final String sql = "select * from t_ds_user";
     private final String udfs = "test-udfs-1.0.0-SNAPSHOT.jar";
-    private final Integer datasource = 1;
+    private final int datasource = 1;
     private final int sqlType = 0;
     private final Boolean sendEmail = true;
     private final int displayRows = 10;
@@ -72,7 +71,7 @@ public class SqlParametersTest {
         Assert.assertEquals(type, sqlParameters.getType());
         Assert.assertEquals(sql, sqlParameters.getSql());
         Assert.assertEquals(udfs, sqlParameters.getUdfs());
-        Assert.assertEquals(Optional.of(datasource), sqlParameters.getDatasource());
+        Assert.assertEquals(datasource, sqlParameters.getDatasource());
         Assert.assertEquals(sqlType, sqlParameters.getSqlType());
         Assert.assertEquals(sendEmail, sqlParameters.getSendEmail());
         Assert.assertEquals(displayRows, sqlParameters.getDisplayRows());
