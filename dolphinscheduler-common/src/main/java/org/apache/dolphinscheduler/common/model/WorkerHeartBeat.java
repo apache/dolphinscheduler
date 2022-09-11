@@ -36,6 +36,7 @@ public class WorkerHeartBeat implements HeartBeat {
     private double availablePhysicalMemorySize;
     private double maxCpuloadAvg;
     private double reservedMemory;
+    private double diskAvailable;
     private int serverStatus;
     private int processId;
 

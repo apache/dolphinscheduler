@@ -57,6 +57,8 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
                 .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
                 .maxCpuloadAvg(masterConfig.getMaxCpuLoadAvg())
                 .reservedMemory(masterConfig.getReservedMemory())
+                .memoryUsage(OSUtils.memoryUsage())
+                .diskAvailable(OSUtils.diskAvailable())
                 .processId(processId)
                 .build();
     }
