@@ -40,11 +40,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SparkTask extends AbstractYarnTask {
 
@@ -99,16 +95,19 @@ public class SparkTask extends AbstractYarnTask {
         List<String> args = new ArrayList<>();
 
         // spark version
-        String sparkCommand = SparkVersion.SPARK2.getCommand();
+        String sparkCommand = SparkCommand.SPARK2SUBMIT.getCommand();
 
         // If the programType is non-SQL, execute bin/spark-submit
-        if (SparkVersion.SPARK1.name().equals(sparkParameters.getSparkVersion())) {
-            sparkCommand = SparkVersion.SPARK1.getCommand();
+        if (SparkCommand.SPARK1SUBMIT.getSparkVersion().name().equals(sparkParameters.getSparkVersion())) {
+            sparkCommand = SparkCommand.SPARK1SUBMIT.getCommand();
         }
 
         // If the programType is SQL, execute bin/spark-sql
         if (sparkParameters.getProgramType() == ProgramType.SQL) {
-            sparkCommand = SparkVersion.SPARKSQL.getCommand();
+            sparkCommand = SparkCommand.SPARK2SQL.getCommand();
+            if (SparkCommand.SPARK1SQL.getSparkVersion().name().equals(sparkParameters.getSparkVersion())) {
+                sparkCommand = SparkCommand.SPARK1SQL.getCommand();
+            }
         }
 
         args.add(sparkCommand);
