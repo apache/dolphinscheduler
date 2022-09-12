@@ -39,30 +39,10 @@ class GitFileInfo:
         *args,
         **kwargs
     ):
-        self._user = user
-        self._repo_name = repo_name
-        self._branch = branch
-        self._file_path = file_path
-
-    @property
-    def user(self) -> str:
-        """Get attribute user."""
-        return self._user
-
-    @property
-    def repo_name(self) -> str:
-        """Get attribute repo_name."""
-        return self._repo_name
-
-    @property
-    def branch(self) -> str:
-        """Get attribute branch."""
-        return self._branch
-
-    @property
-    def file_path(self) -> str:
-        """Get attribute file_path."""
-        return self._file_path
+        self.user = user
+        self.repo_name = repo_name
+        self.branch = branch
+        self.file_path = file_path
 
 
 class GitHubFileInfo(GitFileInfo):
@@ -103,6 +83,7 @@ class Git(object, metaclass=ABCMeta):
     @abstractmethod
     def get_git_file_info(self, path: str):
         """Get the detailed information of GIT file according to the file URL."""
+        raise NotImplementedError
 
     # [end abstractmethod git_file_info]
 
