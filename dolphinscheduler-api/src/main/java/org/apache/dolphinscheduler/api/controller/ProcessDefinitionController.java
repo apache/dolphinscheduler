@@ -202,7 +202,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "verify-name", notes = "VERIFY_PROCESS_DEFINITION_NAME_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, dataTypeClass = String.class)
+            @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = false, dataTypeClass = Long.class),
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
@@ -210,8 +211,9 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyProcessDefinitionName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @RequestParam(value = "name", required = true) String name) {
-        Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, name);
+                                              @RequestParam(value = "name", required = true) String name,
+                                              @RequestParam(value = "code", required = false, defaultValue = "0") long processDefinitionCode) {
+        Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, name, processDefinitionCode);
         return returnDataList(result);
     }
 

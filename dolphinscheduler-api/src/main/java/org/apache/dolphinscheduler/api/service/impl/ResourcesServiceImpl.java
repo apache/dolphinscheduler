@@ -169,11 +169,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        // String fullName = getFullName(currentDir, name);
-        // result = verifyResource(loginUser, type, fullName, pid);
-        // if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-        // return result;
-        // }
+        if (checkDescriptionLength(description)) {
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
 
         int tenantId = loginUser.getTenantId();
         Tenant tenant = tenantMapper.queryById(tenantId);
@@ -1431,7 +1430,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     user, dirName, EMPTY_STRING, ResourceType.FILE, pid, currentDir);
             if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
                 Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
-                return (int) resultMap.get("id");
+                return resultMap.get("id") == null ? -1 : (Integer) resultMap.get("id");
             } else {
                 String msg = String.format("Can not create dir %s", dirFullName);
                 logger.error(msg);
@@ -1611,11 +1610,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException("hdfs not startup");
         }
 
-        // Resource resource = resourcesMapper.selectById(resourceId);
-        // if (resource == null) {
-        // logger.error("download file not exist, resource id {}", resourceId);
-        // return null;
-        // }
 
         // String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ?
         // ApiFuncIdentificationConstant.FILE_DOWNLOAD : ApiFuncIdentificationConstant.UDF_DOWNLOAD;
@@ -1858,7 +1852,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
         String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
-        String jsonTreeStr = JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        String jsonTreeStr =
+                JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(jsonTreeStr);
         result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
@@ -1912,7 +1907,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     List<Integer> listAllChildren(Resource resource, boolean containSelf) {
         List<Integer> childList = new ArrayList<>();
-        if (resource.getId() != -1 && containSelf) {
+        if (resource.getId() != null && containSelf) {
             childList.add(resource.getId());
         }
 

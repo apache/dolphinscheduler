@@ -95,7 +95,7 @@ public class MasterConfig implements Validator {
     private String masterAddress;
 
     // /nodes/master/ip:listenPort
-    private String masterRegistryNodePath;
+    private String masterRegistryPath;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -139,8 +139,7 @@ public class MasterConfig implements Validator {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
-        masterConfig
-                .setMasterRegistryNodePath(REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterConfig.getMasterAddress());
+        masterConfig.setMasterRegistryPath(REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterConfig.getMasterAddress());
         printConfig();
     }
 
@@ -161,6 +160,6 @@ public class MasterConfig implements Validator {
         logger.info("Master config: killYarnJobWhenTaskFailover -> {} ", killYarnJobWhenTaskFailover);
         logger.info("Master config: registryDisconnectStrategy -> {} ", registryDisconnectStrategy);
         logger.info("Master config: masterAddress -> {} ", masterAddress);
-        logger.info("Master config: masterRegistryNodePath -> {} ", masterRegistryNodePath);
+        logger.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
     }
 }

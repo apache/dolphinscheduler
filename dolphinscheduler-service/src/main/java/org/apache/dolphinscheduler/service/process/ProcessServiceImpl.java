@@ -114,6 +114,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -185,8 +186,12 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private ProcessDefinitionLogMapper processDefineLogMapper;
 
+    // todo replace with processInstanceDao
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    private ProcessInstanceDao processInstanceDao;
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
@@ -309,7 +314,7 @@ public class ProcessServiceImpl implements ProcessService {
                 return null;
             }
         } else {
-            saveProcessInstance(processInstance);
+            processInstanceDao.upsertProcessInstance(processInstance);
         }
         setSubProcessParam(processInstance);
         deleteCommandWithCheck(command.getId());
@@ -317,8 +322,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     protected void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
-        processInstance.setState(WorkflowExecutionStatus.SERIAL_WAIT);
-        saveProcessInstance(processInstance);
+        processInstance.setStateWithDesc(WorkflowExecutionStatus.SERIAL_WAIT, "wait by serial_wait strategy");
+        processInstanceDao.upsertProcessInstance(processInstance);
         // serial wait
         // when we get the running instance(or waiting instance) only get the priority instance(by id)
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
@@ -328,8 +333,9 @@ public class ProcessServiceImpl implements ProcessService {
                             processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
-                processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
-                saveProcessInstance(processInstance);
+                processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                        "submit from serial_wait strategy");
+                processInstanceDao.upsertProcessInstance(processInstance);
             }
         } else if (processDefinition.getExecutionType().typeIsSerialDiscard()) {
             List<ProcessInstance> runningProcessInstances =
@@ -338,12 +344,13 @@ public class ProcessServiceImpl implements ProcessService {
                             processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
-                processInstance.setState(WorkflowExecutionStatus.STOP);
-                saveProcessInstance(processInstance);
+                processInstance.setStateWithDesc(WorkflowExecutionStatus.STOP, "stop by serial_discard strategy");
+                processInstanceDao.upsertProcessInstance(processInstance);
                 return;
             }
-            processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
-            saveProcessInstance(processInstance);
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                    "submit from serial_discard strategy");
+            processInstanceDao.upsertProcessInstance(processInstance);
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances =
                     this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
@@ -353,8 +360,8 @@ public class ProcessServiceImpl implements ProcessService {
             for (ProcessInstance info : runningProcessInstances) {
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
-                info.setState(WorkflowExecutionStatus.READY_STOP);
-                int update = updateProcessInstance(info);
+                info.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, "ready stop by serial_priority strategy");
+                int update = processInstanceDao.updateProcessInstance(info);
                 // determine whether the process is normal
                 if (update > 0) {
                     WorkflowStateEventChangeCommand workflowStateEventChangeCommand =
@@ -368,8 +375,9 @@ public class ProcessServiceImpl implements ProcessService {
                     }
                 }
             }
-            processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
-            saveProcessInstance(processInstance);
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                    "submit by serial_priority strategy");
+            processInstanceDao.upsertProcessInstance(processInstance);
         }
     }
 
@@ -750,7 +758,7 @@ public class ProcessServiceImpl implements ProcessService {
         ProcessInstance processInstance = new ProcessInstance(processDefinition);
         processInstance.setProcessDefinitionCode(processDefinition.getCode());
         processInstance.setProcessDefinitionVersion(processDefinition.getVersion());
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, "init running");
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
         // the new process instance restart time is null.
@@ -1023,7 +1031,7 @@ public class ProcessServiceImpl implements ProcessService {
                 break;
             case COMPLEMENT_DATA:
                 // delete all the valid tasks when complement data if id is not null
-                if (processInstance.getId() != 0) {
+                if (processInstance.getId() != null) {
                     List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId());
                     for (TaskInstance taskInstance : taskInstanceList) {
                         taskInstance.setFlag(Flag.NO);
@@ -1054,7 +1062,7 @@ public class ProcessServiceImpl implements ProcessService {
             default:
                 break;
         }
-        processInstance.setState(runStatus);
+        processInstance.setStateWithDesc(runStatus, commandType.getDescp());
         return processInstance;
     }
 
@@ -1166,7 +1174,7 @@ public class ProcessServiceImpl implements ProcessService {
             paramMap.put(CMD_PARAM_SUB_PROCESS, String.valueOf(subProcessInstance.getId()));
             subProcessInstance.setCommandParam(JSONUtils.toJsonString(paramMap));
             subProcessInstance.setIsSubProcess(Flag.YES);
-            this.saveProcessInstance(subProcessInstance);
+            processInstanceDao.upsertProcessInstance(subProcessInstance);
         }
         // copy parent instance user def params to sub process..
         String parentInstanceId = paramMap.get(CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID);
@@ -1177,7 +1185,7 @@ public class ProcessServiceImpl implements ProcessService {
                         joinGlobalParams(parentInstance.getGlobalParams(), subProcessInstance.getGlobalParams()));
                 subProcessInstance
                         .setVarPool(joinVarPool(parentInstance.getVarPool(), subProcessInstance.getVarPool()));
-                this.saveProcessInstance(subProcessInstance);
+                processInstanceDao.upsertProcessInstance(subProcessInstance);
             } else {
                 logger.error("sub process command params error, cannot find parent instance: {} ", cmdParam);
             }
@@ -1271,7 +1279,7 @@ public class ProcessServiceImpl implements ProcessService {
                 // submit task to db
                 // Only want to use transaction here
                 task = submitTask(processInstance, taskInstance);
-                if (task != null && task.getId() != 0) {
+                if (task != null && task.getId() != null) {
                     break;
                 }
                 logger.error(
@@ -1493,7 +1501,8 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);
-        int subProcessInstanceId = childInstance == null ? 0 : childInstance.getId();
+        int subProcessInstanceId =
+                childInstance == null ? 0 : (childInstance.getId() == null ? 0 : childInstance.getId());
         return new Command(
                 commandType,
                 TaskDependType.TASK_POST,
@@ -1518,8 +1527,8 @@ public class ProcessServiceImpl implements ProcessService {
      */
     private void initSubInstanceState(ProcessInstance childInstance) {
         if (childInstance != null) {
-            childInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-            updateProcessInstance(childInstance);
+            childInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, "init sub workflow instance");
+            processInstanceDao.updateProcessInstance(childInstance);
         }
     }
 
@@ -1649,24 +1658,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * insert or update work process instance to data base
-     *
-     * @param processInstance processInstance
-     */
-    @Override
-    public void saveProcessInstance(ProcessInstance processInstance) {
-        if (processInstance == null) {
-            logger.error("save error, process instance is null!");
-            return;
-        }
-        if (processInstance.getId() != 0) {
-            processInstanceMapper.updateById(processInstance);
-        } else {
-            processInstanceMapper.insert(processInstance);
-        }
-    }
-
-    /**
      * insert or update command
      *
      * @param command command
@@ -1674,7 +1665,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public int saveCommand(Command command) {
-        if (command.getId() != 0) {
+        if (command.getId() != null) {
             return commandMapper.updateById(command);
         } else {
             return commandMapper.insert(command);
@@ -1689,7 +1680,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public boolean saveTaskInstance(TaskInstance taskInstance) {
-        if (taskInstance.getId() != 0) {
+        if (taskInstance.getId() != null) {
             return updateTaskInstance(taskInstance);
         } else {
             return createTaskInstance(taskInstance);
@@ -1957,17 +1948,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * update process instance
-     *
-     * @param processInstance processInstance
-     * @return update process instance result
-     */
-    @Override
-    public int updateProcessInstance(ProcessInstance processInstance) {
-        return processInstanceMapper.updateById(processInstance);
-    }
-
-    /**
      * for show in page of taskInstance
      */
     @Override
@@ -2135,20 +2115,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public DataSource findDataSourceById(int id) {
         return dataSourceMapper.selectById(id);
-    }
-
-    /**
-     * update process instance state by id
-     *
-     * @param processInstanceId processInstanceId
-     * @param executionStatus   executionStatus
-     * @return update process result
-     */
-    @Override
-    public int updateProcessInstanceState(Integer processInstanceId, WorkflowExecutionStatus executionStatus) {
-        ProcessInstance instance = processInstanceMapper.selectById(processInstanceId);
-        instance.setState(executionStatus);
-        return processInstanceMapper.updateById(instance);
     }
 
     /**
@@ -2514,7 +2480,7 @@ public class ProcessServiceImpl implements ProcessService {
 
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
             resourceIds = params.getResourceFilesList().stream()
-                    .filter(t -> t.getId() != 0)
+                    .filter(t -> t.getId() != null)
                     .map(ResourceInfo::getId)
                     .collect(toSet());
         }
@@ -2655,10 +2621,13 @@ public class ProcessServiceImpl implements ProcessService {
                         : ReleaseState.OFFLINE);
         processDefinitionLog.setOperator(operator.getId());
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
-        int insertLog = processDefineLogMapper.insert(processDefinitionLog);
+        int insertLog = processDefineLogMapper.updateById(processDefinitionLog);
+        if (insertLog == 0) {
+            insertLog = processDefineLogMapper.insert(processDefinitionLog);
+        }
         int result = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
-            if (0 == processDefinition.getId()) {
+            if (processDefinition.getId() == null) {
                 result = processDefineMapper.insert(processDefinitionLog);
             } else {
                 processDefinitionLog.setId(processDefinition.getId());
@@ -3258,8 +3227,8 @@ public class ProcessServiceImpl implements ProcessService {
                         .filter(instance -> instance.getState().isFailure() || instance.getState().isKill())
                         .map(TaskInstance::getId).collect(Collectors.toList());
                 if (failTaskList.size() == 1 && failTaskList.contains(taskInstanceId)) {
-                    processInstance.setState(WorkflowExecutionStatus.SUCCESS);
-                    updateProcessInstance(processInstance);
+                    processInstance.setStateWithDesc(WorkflowExecutionStatus.SUCCESS, "success by task force success");
+                    processInstanceDao.updateProcessInstance(processInstance);
                 }
             }
         }

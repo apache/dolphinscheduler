@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.pytorch;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PytorchTask extends AbstractTaskExecutor {
+public class PytorchTask extends AbstractTask {
 
     private final ShellCommandExecutor shellCommandExecutor;
     protected PytorchParameters pytorchParameters;
@@ -65,18 +66,27 @@ public class PytorchTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             String command = buildPythonExecuteCommand();
             TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
-            setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Pytorch task has been interrupted", e);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            throw new TaskException("The current Pytorch task has been interrupted", e);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("Pytorch task execute failed", e);
         }
+    }
+
+    @Override
+    public void cancel() throws TaskException {
+
     }
 
 

@@ -36,6 +36,7 @@ then go and see :doc:`tutorial` for more detail.
    cli
    config
    api
+   resources_plugin/index
 
 Indices and tables
 ==================

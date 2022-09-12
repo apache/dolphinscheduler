@@ -26,6 +26,7 @@ from pydolphinscheduler.configuration import (
     init_config_file,
     set_single_config,
 )
+from pydolphinscheduler.core.yaml_process_define import create_process_definition
 
 version_option_val = ["major", "minor", "micro"]
 
@@ -90,3 +91,16 @@ def config(getter, setter, init) -> None:
         for key, val in setter:
             set_single_config(key, val)
         click.echo("Set configuration done.")
+
+
+@cli.command()
+@click.option(
+    "--yaml_file",
+    "-f",
+    required=True,
+    help="YAML file path",
+    type=click.Path(exists=True),
+)
+def yaml(yaml_file) -> None:
+    """Create process definition using YAML file."""
+    create_process_definition(yaml_file)
