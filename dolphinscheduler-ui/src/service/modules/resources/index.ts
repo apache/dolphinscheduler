@@ -237,7 +237,7 @@ export function updateResourceContent(data: ContentReq & TenantCodeReq & FullNam
   })
 }
 
-export function viewResource(params: ViewResourceReq & FullNameReq, id: number): any {
+export function viewResource(params: ViewResourceReq & FullNameReq & TenantCodeReq, id: number): any {
   return axios({
     url: `/resources/${id}/view`,
     method: 'get',

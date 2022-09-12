@@ -26,6 +26,8 @@ import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.Constants.JAR;
 import static org.apache.dolphinscheduler.common.Constants.PERIOD;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
@@ -44,9 +46,11 @@ import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.storage.StorageEntity;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -54,10 +58,12 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.beanutils.BeanMap;
@@ -103,6 +109,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Autowired
     private ResourceTaskMapper resourceTaskMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
     private UdfFuncMapper udfFunctionMapper;
@@ -643,13 +652,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Result<Object> result = new Result<>();
 
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> resourcesIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
-        if (resourcesIds.isEmpty()) {
-            result.setData(pageInfo);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
+//        Set<Integer> resourcesIds = resourcePermissionCheckService
+//                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
+//        if (resourcesIds.isEmpty()) {
+//            result.setData(pageInfo);
+//            putMsg(result, Status.SUCCESS);
+//            return result;
+//        }
 
         int tenantId = loginUser.getTenantId();
         Tenant tenant = tenantMapper.queryById(tenantId);
@@ -694,7 +703,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             try {
-                resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
+                if ("".equals(fullName)){
+                    resourcesList = storageOperate.listFilesStatus(defaultPath, defaultPath, tenantCode, type);
+                } else {
+                    resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage() + " Resource path: {}", fullName, e);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -818,7 +831,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String tenantCode = tenant.getTenantCode();
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
-        // TODO: use private method getDefaultPath Here
+
         if ("".equals(fullName)) {
             if (isAdmin(loginUser)) {
                 List<User> userList = userMapper.selectList(null);
@@ -841,6 +854,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
                 resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
             }
+        } else {
+            defaultPath = storageOperate.getResDir(tenantCode);
+            if (type.equals(ResourceType.UDF)) {
+                defaultPath = storageOperate.getUdfDir(tenantCode);
+            }
+
+            resourcesList = storageOperate.listFilesStatusRecursively(fullName, defaultPath, tenantCode, type);
         }
 
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resourcesList);
@@ -883,10 +903,20 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
         List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
-        // TODO: Transform resources into storageEntity using stream
-//         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
-//         result.setData(resourceTreeVisitor.visit().getChildren());
-         putMsg(result, Status.SUCCESS);
+        // Transform into StorageEntity for compatibility
+        List<StorageEntity> transformedResourceList = resources.stream()
+                .map(resource -> new StorageEntity.Builder()
+                        .fullName(resource.getFullName())
+                        .pfullName(resourcesMapper.selectById(resource.getPid()).getFullName())
+                        .isDirectory(resource.isDirectory())
+                        .alias(resource.getAlias())
+                        .id(resource.getId())
+                        .type(resource.getType())
+                        .description(resource.getDescription())
+                        .build()).collect(Collectors.toList());
+        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        result.setData(visitor.visit("").getChildren());
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -926,11 +956,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return resultCheck;
         }
 
-        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
@@ -940,19 +965,23 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        // get all resource id_news of process definitions those is released
+        // get all resource id_news of process definitions those are released
         List<Map<String, Object>> list = processDefinitionMapper.listResources();
         Map<Integer, Set<Long>> resourceProcessMap =
-                ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+                ResourceProcessDefinitionUtils.getResourceObjectMap(list, "code", Long.class);
+        Map<Integer, Set<Integer>> resourceTaskMap =
+                ResourceProcessDefinitionUtils.getResourceObjectMap(list, "td_id", Integer.class);
         Set<Integer> resourceIdInUseSet = resourceProcessMap.keySet();
 
         // recursively delete a folder
         Set<Integer> resourcesIdNeedToDeleteSet = new HashSet<>();
-        List<String> allChildren = storageOperate.listAllChildrenPaths(fullName);
+        List<String> allChildren = storageOperate.listFilesStatusRecursively(fullName, defaultPath,
+                resTenantCode, ResourceType.FILE).stream().map(storageEntity -> storageEntity.getFullName()).collect(Collectors.toList());
 
-        String[] allChildrenIdArray = new String[allChildren.size()];
+
+        String[] allChildrenFullNameArray = allChildren.stream().toArray(String[]::new);
         resourcesIdNeedToDeleteSet.addAll(
-                resourceTaskMapper.selectBatchFullNames(allChildren.toArray(allChildrenIdArray), ResourceType.FILE));
+                resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray, ResourceType.FILE));
 
         // Integer[] arr = new Integer[resourcesIdSet.size()];
         // List<Map<String, Object>> resourceInUse =
@@ -960,18 +989,17 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         Integer[] needDeleteResourceIdArray =
                 resourcesIdNeedToDeleteSet.toArray(new Integer[resourcesIdNeedToDeleteSet.size()]);
-        // Integer[] needDeleteResourceIdArray = new Integer[resourcesIdNeedToDeleteSet.size()];
+
         // TODO: is this still correct?
-        if (needDeleteResourceIdArray.length >= 2) {
-            logger.error("can't be deleted,because There are files or folders in the current directory:{}", resource);
-            putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
-            return result;
-        }
+//        if (needDeleteResourceIdArray.length >= 2) {
+//            logger.error("can't be deleted,because There are files or folders in the current directory:{}", resource);
+//            putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
+//            return result;
+//        }
 
         // if resource type is UDF,need check whether it is bound by UDF function
-        // TODO: revise here
         if (resource.getType() == (ResourceType.UDF)) {
-            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
+            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceFullName(allChildrenFullNameArray);
             if (CollectionUtils.isNotEmpty(udfFuncs)) {
                 logger.error("can't be deleted,because it is bound by UDF functions:{}", udfFuncs);
                 putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
@@ -979,11 +1007,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
-        // if (resourceIdSet.contains(resource.getPid())) {
-        // logger.error("can't be deleted,because it is used of process definition");
-        // putMsg(result, Status.RESOURCE_IS_USED);
-        // return result;
-        // }
         resourceIdInUseSet.retainAll(resourcesIdNeedToDeleteSet);
         if (CollectionUtils.isNotEmpty(resourceIdInUseSet)) {
             logger.error("can't be deleted,because it is used of process definition");
@@ -994,27 +1017,72 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        // get hdfs file by type
-        // String storageFilename = storageOperate.getFileName(resource.getType(), tenantCode, resource.getFullName());
-        // delete data in database
         // update parent size
         // resourcesMapper.selectBatchIds(Arrays.asList(needDeleteResourceIdArray)).forEach(item -> {
         // updateParentResourceSize(item, item.getSize() * -1);
         // });
 
+        // delete data in database
         if (needDeleteResourceIdArray.length > 0) {
+            // update resource_ids_new, task_params in task definition
+            for (int resourceIdNeedToDelete : needDeleteResourceIdArray) {
+                String resourceFullNameToDelete = resourceTaskMapper.selectById(resourceIdNeedToDelete).getFullName();
+                // new method getResourceTaskMap in util
+                Set<Integer> taskSetContainsResId = resourceTaskMap.get(resourceIdNeedToDelete);
+                if (taskSetContainsResId != null) {
+                    for (Integer taskDefinitionId: taskSetContainsResId) {
+                        TaskDefinition td = taskDefinitionMapper.selectById(taskDefinitionId);
+                        td.setTaskParams(RemoveResourceFromResourceList(resourceFullNameToDelete, td.getTaskParams()));
+                        // IdsNew could be null, should be a res = idsNew == null ? "" : idsNew;
+                        td.setResourceIdsNew(RemoveResourceFromIdsNew(resourceIdNeedToDelete, td.getResourceIdsNew()));
+                        int isSuccessful = taskDefinitionMapper.updateById(td);
+                        if (isSuccessful != 1) {
+                            logger.error("delete task relation error while deleting {}", resourceFullNameToDelete);
+                            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+                            return result;
+                        }
+                    }
+                }
+            }
+
             resourceTaskMapper.deleteIds(needDeleteResourceIdArray);
         }
 
-        // resourceUserMapper.deleteResourceUserArray(0, needDeleteResourceIdArray);
-
         // delete file on hdfs,S3
-        storageOperate.delete(allChildren.stream().toArray(String[]::new), true);
-        // delete file on storage
+        storageOperate.delete(fullName, allChildren, true);
 
         putMsg(result, Status.SUCCESS);
 
         return result;
+    }
+
+    private String RemoveResourceFromResourceList(String stringToDelete, String taskParameter) {
+        Map<String, Object> taskParameters = JSONUtils.parseObject(
+                taskParameter,
+                new TypeReference<Map<String, Object>>() {
+                });
+        if (taskParameters.containsKey("resourceList")) {
+            String resourceListStr = JSONUtils.toJsonString(taskParameters.get("resourceList"));
+            List<ResourceInfo> resourceInfoList = JSONUtils.toList(resourceListStr, ResourceInfo.class);
+            List<ResourceInfo> updatedResourceInfoList = resourceInfoList.stream()
+                    .filter(Objects::nonNull)
+                    .filter(resourceInfo -> !resourceInfo.getResourceName().equals(stringToDelete))
+                    .collect(Collectors.toList());
+
+            taskParameters.put("resourceList", updatedResourceInfoList);
+            return JSONUtils.toJsonString(taskParameters);
+        }
+        return taskParameter;
+    }
+
+    private String RemoveResourceFromIdsNew(int idToDelete, String idNews) {
+
+        String[] resourceIds = idNews.split(",");
+        Set<Integer> resourceIdSet = Arrays.stream(resourceIds)
+                .map(Integer::parseInt)
+                .filter(integerId -> !integerId.equals(idToDelete))
+                .collect(Collectors.toSet());
+        return Joiner.on(",").join(resourceIdSet);
     }
 
     /**
@@ -1063,7 +1131,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        String tenantCode = getTenantCode(loginUser.getTenantId(), result);
+        String tenantCode = getTenantCode(loginUser.getId(), result);
 
         if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
@@ -1111,16 +1179,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             return null;
         }
-
-        // if (isAdmin(loginUser)) {
-        // defaultPath = storageOperate.RESOURCE_UPLOAD_PATH.replaceFirst(FOLDER_SEPARATOR, "")
-        // + FOLDER_SEPARATOR;
-        // } else {
-        // defaultPath = storageOperate.getResDir(tenantCode);
-        // if (type.equals(ResourceType.UDF)) {
-        // defaultPath = storageOperate.getUdfDir(tenantCode);
-        // }
-        // }
+        String tenantCode = tenant.getTenantCode();
+        // new permission check
+        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
 
         String defaultPath = storageOperate.getResDir(resTenantCode);
         if (type.equals(ResourceType.UDF)) {
@@ -1143,19 +1207,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         putMsg(result, Status.SUCCESS);
         result.setData(file);
         return result;
-
-        // TODO: is there still a permission?
-        // String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ?
-        // ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        // boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id},
-        // checkResourceType(resource.getType()), funcPermissionKey);
-        // if (!canOperatorPermissions){
-        // putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-        // return result;
-        // }
-        // putMsg(result, Status.SUCCESS);
-        // result.setData(resource);
-        // return result;
     }
 
     /**
@@ -1167,28 +1218,19 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource content
      */
     @Override
-    public Result<Object> readResource(User loginUser, String resourceId, String fullName, int skipLineNum, int limit) {
+    public Result<Object> readResource(User loginUser, String resourceId, String fullName, String resTenantCode,int skipLineNum, int limit) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        // TODO: add permission check here
-        // String funcPermissionKey = resource.getType().equals(ResourceType.FILE) ?
-        // ApiFuncIdentificationConstant.FILE_VIEW : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        // boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-        // checkResourceType(resource.getType()), funcPermissionKey);
-        // if (!canOperatorPermissions){
-        // putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-        // return result;
-        // }
+        String tenantCode = getTenantCode(loginUser.getId(), result);
 
         // new permission check
-//        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
-//            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-//            return result;
-//        }
-
+        if (!userIsValid(loginUser, tenantCode, resTenantCode)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
 
         // check preview or not by file suffix
         String nameSuffix = Files.getFileExtension(fullName);
@@ -1201,8 +1243,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
         }
-
-        String tenantCode = getTenantCode(loginUser.getId(), result);
 
         List<String> content = new ArrayList<>();
         try {
@@ -1297,24 +1337,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-
-        // save data
-        // Date now = new Date();
-        // Resource resource = new Resource(pid, name, fullName, false, desc, name, loginUser.getId(), type,
-        // content.getBytes().length, now, now);
-        //
-        // resourcesMapper.insert(resource);
-        // updateParentResourceSize(resource, resource.getSize());
-
-        // putMsg(result, Status.SUCCESS);
-        // permissionPostHandle(resource.getType(), loginUser, resource.getId());
-        // Map<String, Object> resultMap = new HashMap<>();
-        // for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-        // if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
-        // resultMap.put(entry.getKey().toString(), entry.getValue());
-        // }
-        // }
-        // result.setData(resultMap);
 
         result = uploadContentToStorage(loginUser, fullName, tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1669,10 +1691,19 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         List<ResourceComponent> list;
         if (CollectionUtils.isNotEmpty(resourceList)) {
-            // TODO: revise later, Transform into StorageEntity
-//             Visitor visitor = new ResourceTreeVisitor(resourceList);
-//             list = visitor.visit().getChildren();
-            list = new ArrayList<>(0);
+            // Transform into StorageEntity for compatibility
+            List<StorageEntity> transformedResourceList = resourceList.stream()
+                    .map(resource -> new StorageEntity.Builder()
+                            .fullName(resource.getFullName())
+                            .pfullName(resourcesMapper.selectById(resource.getPid()).getFullName())
+                            .isDirectory(resource.isDirectory())
+                            .alias(resource.getAlias())
+                            .id(resource.getId())
+                            .type(resource.getType())
+                            .description(resource.getDescription())
+                            .build()).collect(Collectors.toList());
+            Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+            list = visitor.visit("").getChildren();
         } else {
             list = new ArrayList<>(0);
         }
@@ -1722,10 +1753,20 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } else {
             list = new ArrayList<>(0);
         }
-        // TODO: revise later, transform into Storage Entity in a private method
-//         Visitor visitor = new ResourceTreeVisitor(list);
-//         result.put(Constants.DATA_LIST, visitor.visit().getChildren());
-         putMsg(result, Status.SUCCESS);
+        // Transform into StorageEntity for compatibility
+        List<StorageEntity> transformedResourceList = resourceList.stream()
+                .map(resource -> new StorageEntity.Builder()
+                        .fullName(resource.getFullName())
+                        .pfullName(resourcesMapper.selectById(resource.getPid()).getFullName())
+                        .isDirectory(resource.isDirectory())
+                        .alias(resource.getAlias())
+                        .id(resource.getId())
+                        .type(resource.getType())
+                        .description(resource.getDescription())
+                        .build()).collect(Collectors.toList());
+        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1803,15 +1844,24 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
-        // TODO: revise later
-        // Visitor visitor = new ResourceTreeVisitor(authedResources);
-        // String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-        // logger.info(visit);
-        // String jsonTreeStr = JSONUtils.toJsonString(visitor.visit().getChildren(),
-        // SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-        // logger.info(jsonTreeStr);
-        // result.put(Constants.DATA_LIST, visitor.visit().getChildren());
-        // putMsg(result, Status.SUCCESS);
+        // Transform into StorageEntity for compatibility
+        List<StorageEntity> transformedResourceList = authedResources.stream()
+                .map(resource -> new StorageEntity.Builder()
+                        .fullName(resource.getFullName())
+                        .pfullName(resourcesMapper.selectById(resource.getPid()).getFullName())
+                        .isDirectory(resource.isDirectory())
+                        .alias(resource.getAlias())
+                        .id(resource.getId())
+                        .type(resource.getType())
+                        .description(resource.getDescription())
+                        .build()).collect(Collectors.toList());
+        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        logger.info(visit);
+        String jsonTreeStr = JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        logger.info(jsonTreeStr);
+        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1931,13 +1981,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private boolean userIsValid(User loginUser, String tenantCode, String resTenantCode) {
         if (!isAdmin(loginUser)) {
             resTenantCode = resTenantCode == null ? "" : resTenantCode;
-            if (!resTenantCode.equals(tenantCode)){
-                // if request tenant does not equal to the login user, then he/she does not have read/write permission
-                return false;
-            }
-
             if (!"".equals(resTenantCode) && !resTenantCode.equals(tenantCode)) {
-                // if an ordinary user directly send a query API with a different tenantCode and fullName "", still he/she does not have read permission.
+                // if an ordinary user directly send a query API with a different tenantCode and fullName "",
+                // still he/she does not have read permission.
                 return false;
             }
         }

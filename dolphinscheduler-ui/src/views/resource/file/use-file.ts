@@ -70,10 +70,12 @@ export function useFileState(
     return state
   }
 
-  const getResourceView = (id: string) => {
+  const getResourceView = (fullName: string, tenantCode: string, id: string) => {
     const params = {
       skipLineNum: 0,
-      limit: 3000
+      limit: 3000,
+      fullName: fullName,
+      tenantCode: tenantCode
     }
     const { state } = useAsyncState(viewResource(params, id), {})
     return state

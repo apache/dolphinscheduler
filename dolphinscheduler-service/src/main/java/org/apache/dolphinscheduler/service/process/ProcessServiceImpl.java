@@ -1811,7 +1811,6 @@ public class ProcessServiceImpl implements ProcessService {
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {
             String resourceFullName = res.getResourceName();
-            // if (resourceId <= 0) {
             if ("".equals(resourceFullName)) {
                 logger.error("invalid resourceFullName, {}", resourceFullName);
                 return null;

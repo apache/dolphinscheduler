@@ -158,7 +158,7 @@ public interface ResourcesService {
      * @param fullName fullName
      * @return resource content
      */
-    Result<Object> readResource(User loginUser, String resourceId, String fullName, int skipLineNum, int limit);
+    Result<Object> readResource(User loginUser, String resourceId, String fullName, String tenantCode, int skipLineNum, int limit);
 
     /**
      * create resource file online

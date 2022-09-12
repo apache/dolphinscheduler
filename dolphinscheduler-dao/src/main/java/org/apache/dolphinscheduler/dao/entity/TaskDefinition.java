@@ -180,6 +180,7 @@ public class TaskDefinition {
     /**
      * new resource ids, fullName of the resource
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String resourceIdsNew;
 
     /**

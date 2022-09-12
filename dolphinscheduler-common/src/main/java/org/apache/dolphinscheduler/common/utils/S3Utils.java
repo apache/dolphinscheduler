@@ -212,20 +212,23 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean delete(String filePath, boolean recursive) throws IOException {
+    public boolean delete(String fullName, boolean recursive) throws IOException {
         try {
-            s3Client.deleteObject(BUCKET_NAME, filePath);
+            s3Client.deleteObject(BUCKET_NAME, fullName);
             return true;
         } catch (AmazonServiceException e) {
-            logger.error("delete the object error,the resource path is {}", filePath);
+            logger.error("delete the object error,the resource path is {}", fullName);
             return false;
         }
     }
 
     @Override
-    public boolean delete(String[] filePathArray, boolean recursive) throws IOException {
+    public boolean delete(String fullName, List<String> childrenPathList, boolean recursive) throws IOException {
+        // append the resource fullName to the list for deletion.
+        childrenPathList.add(fullName);
+
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(BUCKET_NAME)
-                .withKeys(filePathArray);
+                .withKeys(childrenPathList.stream().toArray(String[]::new));
         try {
             s3Client.deleteObjects(deleteObjectsRequest);
         }  catch (AmazonServiceException e) {
@@ -397,34 +400,6 @@ public class S3Utils implements Closeable, StorageOperate {
         return ResUploadType.S3;
     }
 
-
-    @Override
-    public List<String> listAllChildrenPaths(String path) {
-        List<String> childrenPaths = new ArrayList<>();
-
-        ListObjectsV2Request request = new ListObjectsV2Request();
-        request.setBucketName(BUCKET_NAME);
-        request.setPrefix(path);
-        ListObjectsV2Result v2Result;
-        do {
-            try {
-                v2Result = s3Client.listObjectsV2(request);
-            } catch (AmazonServiceException e) {
-                logger.error("Get S3 file list exception", e);
-                throw new AmazonServiceException("Get S3 file list exception", e);
-            }
-
-            List<S3ObjectSummary> summaries = v2Result.getObjectSummaries();
-            for (S3ObjectSummary summary: summaries) {
-                childrenPaths.add(summary.getKey());
-            }
-
-            request.setContinuationToken(v2Result.getContinuationToken());
-        } while (v2Result.isTruncated());
-
-        return childrenPaths;
-    }
-
     @Override
     public List<StorageEntity> listFilesStatusRecursively (String path, String defaultPath, String tenantCode, ResourceType type) {
         List<StorageEntity> storageEntityList = new ArrayList<>();
@@ -432,26 +407,28 @@ public class S3Utils implements Closeable, StorageOperate {
         LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
 
         do {
-            List<StorageEntity> tempList = new ArrayList<>();
+            String pathToExplore = "";
+            if (foldersToFetch.size() == 0) {
+                pathToExplore = path;
+            } else {
+                pathToExplore = foldersToFetch.pop().getFullName();
+            }
+
             try{
-                if (foldersToFetch.size() == 0) {
-                    tempList = listFilesStatus(path, defaultPath, tenantCode, type);
-                } else {
-                    StorageEntity folderToExplore = foldersToFetch.pop();
-                    tempList = listFilesStatus(folderToExplore.getFullName(), defaultPath, tenantCode, type);
+                List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
+
+                for (StorageEntity temp : tempList) {
+                    if (temp.isDirectory()) {
+                        foldersToFetch.add(temp);
+                    }
                 }
+
+                storageEntityList.addAll(tempList);
             } catch (AmazonServiceException e) {
-                logger.error("Get S3 file list exception recursively", e);
-                return new ArrayList<StorageEntity>();
+                logger.error(e.getMessage() + "Resource path:" + pathToExplore, e);
+                // return the resources fetched before error occurs.
+                return storageEntityList;
             }
-
-            for (StorageEntity temp : tempList) {
-                if (temp.isDirectory()) {
-                    foldersToFetch.add(temp);
-                }
-            }
-
-            storageEntityList.addAll(tempList);
 
         } while (foldersToFetch.size() != 0);
 
@@ -467,8 +444,6 @@ public class S3Utils implements Closeable, StorageOperate {
         ListObjectsV2Request request = new ListObjectsV2Request();
         request.setBucketName(BUCKET_NAME);
         request.setPrefix(path);
-//        request.setMaxKeys(4);
-//        request.setStartAfter("dolphinscheduler-test/tenant1/ds/resources/Sneww3.png");
         request.setDelimiter("/");
 
         ListObjectsV2Result v2Result;
@@ -476,15 +451,14 @@ public class S3Utils implements Closeable, StorageOperate {
             try {
                 v2Result = s3Client.listObjectsV2(request);
             } catch (AmazonServiceException e) {
-                logger.error("Get S3 file list exception", e);
-                throw new AmazonServiceException("Get S3 file list exception", e);
+                throw new AmazonServiceException("Get S3 file list exception, error type:" + e.getErrorType(), e);
             }
 
             List<S3ObjectSummary> summaries = v2Result.getObjectSummaries();
 
-            // file.getKey().endsWith("/") is a folder
             for (S3ObjectSummary summary: summaries) {
                 if (!summary.getKey().endsWith("/")) {
+                    // the path is a file
                     String[] aliasArr = summary.getKey().split("/");
                     String alias = aliasArr[aliasArr.length - 1];
 
@@ -495,9 +469,8 @@ public class S3Utils implements Closeable, StorageOperate {
                             .fullName(summary.getKey())
                             .isDirectory(false)
                             .description("")
-//                        .userId(userId)
                             .userName(tenantCode)
-                            .type(ResourceType.FILE)
+                            .type(type)
                             .size(summary.getSize())
                             .createTime(summary.getLastModified())
                             .updateTime(summary.getLastModified())
@@ -507,6 +480,7 @@ public class S3Utils implements Closeable, StorageOperate {
             }
 
             for (String commonPrefix: v2Result.getCommonPrefixes()) {
+                // the paths in commonPrefix are directories
                 String suffix = StringUtils.difference(path, commonPrefix);
                 String fileName = StringUtils.difference(defaultPath, commonPrefix);
 
@@ -516,7 +490,6 @@ public class S3Utils implements Closeable, StorageOperate {
                         .fullName(commonPrefix)
                         .isDirectory(true)
                         .description("")
-//                    .userId(userId)
                         .userName(tenantCode)
                         .type(type)
                         .size(0)
@@ -535,6 +508,10 @@ public class S3Utils implements Closeable, StorageOperate {
 
     @Override
     public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws AmazonServiceException, FileNotFoundException{
+        // Notice: we do not use getObject here because intermediate directories
+        // may not exist in S3, which can cause getObject to throw exception.
+        // Since we still want to access it on frontend, this is a workaround using listObjects.
+
         ListObjectsV2Request request = new ListObjectsV2Request();
         request.setBucketName(BUCKET_NAME);
         request.setPrefix(path);
@@ -544,13 +521,13 @@ public class S3Utils implements Closeable, StorageOperate {
         try {
             v2Result = s3Client.listObjectsV2(request);
         } catch (AmazonServiceException e) {
-            logger.error("Get S3 file list exception", e);
-            throw new AmazonServiceException("Get S3 file list exception", e);
+            throw new AmazonServiceException("Get S3 file list exception, error type:" + e.getErrorType(), e);
         }
 
         List<S3ObjectSummary> summaries = v2Result.getObjectSummaries();
 
         if (path.endsWith("/")) {
+            // the path is a directory that may or may not exist in S3
             String alias = findDirAlias(path);
             String fileName = StringUtils.difference(defaultPath, path);
             return new StorageEntity.Builder()
@@ -564,11 +541,11 @@ public class S3Utils implements Closeable, StorageOperate {
                     .size(0)
                     .build();
         } else {
+            // the path is a file
             if (summaries.size() > 0) {
                 S3ObjectSummary summary = summaries.get(0);
                 String[] aliasArr = summary.getKey().split("/");
                 String alias = aliasArr[aliasArr.length - 1];
-
                 String fileName = StringUtils.difference(defaultPath, summary.getKey());
                 return new StorageEntity.Builder()
                         .alias(alias)
@@ -592,15 +569,14 @@ public class S3Utils implements Closeable, StorageOperate {
      * find alias for directories, NOT for files
      * a directory is a path ending with "/"
      */
-    // Later will be moved to storageOperate class so that HDFSUtil can use it
     private String findDirAlias(String myStr) {
         if (!myStr.endsWith("/")) {
             // Make sure system won't crush down if someone accidentally misuse the function.
             return myStr;
         }
         int lastIndex = myStr.lastIndexOf("/");
-        String subedString = myStr.substring(0, lastIndex);
-        int secondLastIndex = subedString.lastIndexOf("/");
+        String subbedString = myStr.substring(0, lastIndex);
+        int secondLastIndex = subbedString.lastIndexOf("/");
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(myStr, secondLastIndex + 1, lastIndex + 1);
 

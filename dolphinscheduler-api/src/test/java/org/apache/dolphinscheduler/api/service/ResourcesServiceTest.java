@@ -604,7 +604,7 @@ public class ResourcesServiceTest {
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
         // HDFS_NOT_STARTUP
-        Result result = resourcesService.readResource(getUser(), "1", "", 1, 10);
+        Result result = resourcesService.readResource(getUser(), "1", "", "",1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
@@ -618,7 +618,7 @@ public class ResourcesServiceTest {
         PowerMockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID,
                 new Object[]{2},
                 1, serviceLogger)).thenReturn(true);
-        result = resourcesService.readResource(getUser(), "2", "", 1, 10);
+        result = resourcesService.readResource(getUser(), "2", "", "", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
@@ -632,20 +632,20 @@ public class ResourcesServiceTest {
                 1, serviceLogger)).thenReturn(true);
         PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        result = resourcesService.readResource(getUser(), "1", "", 1, 10);
+        result = resourcesService.readResource(getUser(), "1", "", "", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
 
         // USER_NOT_EXIST
         PowerMockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("jar");
         PowerMockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
-        result = resourcesService.readResource(getUser(), "1", "", 1, 10);
+        result = resourcesService.readResource(getUser(), "1", "", "", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), (int) result.getCode());
 
         // TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
-        result = resourcesService.readResource(getUser(), "1", "", 1, 10);
+        result = resourcesService.readResource(getUser(), "1", "", "", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
 
@@ -656,7 +656,7 @@ public class ResourcesServiceTest {
         } catch (IOException e) {
             logger.error("hadoop error", e);
         }
-        result = resourcesService.readResource(getUser(), "1", "", 1, 10);
+        result = resourcesService.readResource(getUser(), "1", "", "", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_FILE_NOT_EXIST.getCode(), (int) result.getCode());
 
@@ -667,7 +667,7 @@ public class ResourcesServiceTest {
         } catch (IOException e) {
             logger.error("storage error", e);
         }
-        result = resourcesService.readResource(getUser(), "1", "", 1, 10);
+        result = resourcesService.readResource(getUser(), "1", "", "", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
 

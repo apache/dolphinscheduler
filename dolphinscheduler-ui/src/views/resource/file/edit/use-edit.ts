@@ -28,11 +28,12 @@ export function useEdit(state: any) {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const getResourceView = (fullName: string,id: number) => {
+  const getResourceView = (fullName: string, tenantCode: string, id: number) => {
     const params = {
       skipLineNum: 0,
       limit: 3000,
       fullName: fullName,
+      tenantCode: tenantCode
     }
     return useAsyncState(viewResource(params, id), {
       alias: '',

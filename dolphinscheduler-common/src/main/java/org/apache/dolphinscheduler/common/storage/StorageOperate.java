@@ -96,7 +96,7 @@ public interface StorageOperate {
      */
     boolean delete(String filePath, boolean recursive) throws IOException;
 
-    boolean delete(String[] filePathArray, boolean recursive) throws IOException;
+    boolean delete(String filePath, List<String> childrenPathArray, boolean recursive) throws IOException;
 
     /**
      * copy the file from srcPath to dstPath
@@ -180,9 +180,4 @@ public interface StorageOperate {
      * return a file status
      * */
     public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws Exception;
-
-    /**
-     * return all fullname paths under the path parameter
-     * */
-    public List<String> listAllChildrenPaths(String path);
 }

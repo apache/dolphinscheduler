@@ -348,9 +348,9 @@ public class ResourcesController extends BaseController {
     @ApiException(RESOURCE_NOT_EXIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @PathVariable(value = "id", required = false) Integer id,
                                         @RequestParam(value = "fileName", required = false) String fileName,
                                         @RequestParam(value = "tenantCode", required = false) String tenantCode,
-                                        @PathVariable(value = "id", required = false) Integer id,
                                         @RequestParam(value = "type") ResourceType type) {
 
         return resourceService.queryResource(loginUser, fileName, id, type, tenantCode);
@@ -368,7 +368,8 @@ public class ResourcesController extends BaseController {
     @ApiOperation(value = "viewResource", notes = "VIEW_RESOURCE_BY_ID_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULLNAME", required = true, dataTypeClass = String.class, example = "tenant/1.png"),
+            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataTypeClass = String.class, example = "tenant/1.png"),
+            @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataTypeClass = int.class, example = "100")
     })
@@ -379,8 +380,9 @@ public class ResourcesController extends BaseController {
                                @PathVariable(value = "id") String resourceId,
                                @RequestParam(value = "skipLineNum") int skipLineNum,
                                @RequestParam(value = "limit") int limit,
-                               @RequestParam(value = "fullName") String fullName) {
-        return resourceService.readResource(loginUser, resourceId, fullName,skipLineNum, limit);
+                               @RequestParam(value = "fullName") String fullName,
+                               @RequestParam(value = "tenantCode") String tenantCode) {
+        return resourceService.readResource(loginUser, resourceId, fullName, tenantCode, skipLineNum, limit);
     }
 
     /**

@@ -47,7 +47,7 @@ export default defineComponent({
       router.go(-1)
     }
 
-    const resourceViewRef = getResourceView(fileId, 0)
+    const resourceViewRef = getResourceView(fileId, tenantCode, 0)
     watch(
       () => resourceViewRef.state.value.content,
       () => (state.fileForm.content = resourceViewRef.state.value.content)

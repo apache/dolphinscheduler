@@ -64,4 +64,32 @@ public class ResourceProcessDefinitionUtils {
 
         return resourceResult;
     }
+
+    public static <T> Map<Integer, Set<T>> getResourceObjectMap(List<Map<String, Object>> resourceList, String objectName, Class<T> clazz) {
+        // resourceId -> task ids or code depends on the objectName
+        Map<Integer, Set<T>> resourceResult = new HashMap<>();
+
+        if (CollectionUtils.isNotEmpty(resourceList)) {
+            for (Map<String, Object> resourceMap : resourceList) {
+                // get resName and resource_id_news, td_id
+                T taskId = (T) resourceMap.get(objectName);
+                String[] resourceIds = ((String) resourceMap.get("resource_ids_new"))
+                        .split(",");
+
+                Set<Integer> resourceIdSet = Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());
+                for (Integer resourceId : resourceIdSet) {
+                    Set<T> codeSet;
+                    if (resourceResult.containsKey(resourceId)) {
+                        codeSet = resourceResult.get(resourceId);
+                    } else {
+                        codeSet = new HashSet<>();
+                    }
+                    codeSet.add(taskId);
+                    resourceResult.put(resourceId, codeSet);
+                }
+            }
+        }
+
+        return resourceResult;
+    }
 }
