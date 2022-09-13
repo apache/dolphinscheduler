@@ -117,6 +117,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -824,15 +825,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         for (ProcessDefinition process : processDefinitionList) {
-            long code = process.getCode();
+            Map<String, Object> deleteResult;
             try {
-                Map<String, Object> deleteResult = this.deleteProcessDefinitionByCode(loginUser, projectCode, code);
-                if (deleteResult.get(Constants.STATUS) != Status.SUCCESS) {
-                    throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR,
-                            process.getName(), deleteResult.get(Constants.MSG));
-                }
-            } catch (Exception e){
-                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
+                deleteResult = this.deleteProcessDefinitionByCode(loginUser, projectCode, process.getCode());
+            } catch (Exception e) {
+                String formatter =
+                        MessageFormat.format(Status.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(), e.getMessage());
+                throw new ServiceException(formatter, e);
+            }
+            if (deleteResult.get(Constants.STATUS) != Status.SUCCESS) {
+                // throw exception to rollback
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR,
+                        process.getName(),
+                        deleteResult.get(Constants.MSG));
             }
         }
         putMsg(result, Status.SUCCESS);

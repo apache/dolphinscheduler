@@ -505,6 +505,76 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
+    public void batchDeleteProcessDefinitionByCodeTest() {
+        long projectCode = 1L;
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+
+        Project project = getProject(projectCode);
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        // process check exists
+        Set<Long> definitionCodes =
+                Arrays.stream("46,47".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
+        ProcessDefinition process = getProcessDefinition();
+        List<ProcessDefinition> processDefinitionList = new ArrayList<>();
+        processDefinitionList.add(process);
+        Mockito.when(processDefineMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
+        Map<String, Object> map = processDefinitionService.batchDeleteProcessDefinitionByCodes(loginUser, projectCode, "46,47");
+        Assert.assertEquals(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, map.get(Constants.STATUS));
+
+        // project check auth fail
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        definitionCodes = Arrays.stream("46".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
+        Mockito.when(processDefineMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION_DELETE))
+                .thenReturn(result);
+        Throwable exception = Assertions.assertThrows(ServiceException.class,
+                () -> processDefinitionService.batchDeleteProcessDefinitionByCodes(loginUser, projectCode, "46"));
+        String subFormatter =
+                MessageFormat.format(Status.PROJECT_NOT_FOUND.getMsg(), projectCode);
+        String formatter =
+                MessageFormat.format(Status.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(), subFormatter);
+        Assertions.assertEquals(formatter, exception.getMessage());
+
+        // project check auth success
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION_DELETE))
+                .thenReturn(result);
+
+        // process definition online
+        loginUser.setUserType(UserType.ADMIN_USER);
+        putMsg(result, Status.SUCCESS, projectCode);
+        process.setReleaseState(ReleaseState.ONLINE);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(process);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> processDefinitionService.batchDeleteProcessDefinitionByCodes(loginUser, projectCode, "46"));
+        subFormatter =
+                MessageFormat.format(Status.PROCESS_DEFINE_STATE_ONLINE.getMsg(), process.getName());
+        formatter =
+                MessageFormat.format(Status.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(), subFormatter);
+        Assertions.assertEquals(formatter, exception.getMessage());
+
+        // delete success
+        process.setReleaseState(ReleaseState.OFFLINE);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(process);
+        Schedule schedule = getSchedule();
+        Mockito.when(processDefineMapper.deleteById(46)).thenReturn(1);
+        Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
+        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), process.getCode()))
+                .thenReturn(1);
+        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
+        Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
+                .thenReturn(Collections.emptySet());
+        putMsg(result, Status.SUCCESS, projectCode);
+        Map<String, Object> deleteSuccess =
+                processDefinitionService.batchDeleteProcessDefinitionByCodes(loginUser, projectCode, "46");
+        Assert.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
+    }
+
+    @Test
     @Ignore
     public void testReleaseProcessDefinition() {
         long projectCode = 1L;
