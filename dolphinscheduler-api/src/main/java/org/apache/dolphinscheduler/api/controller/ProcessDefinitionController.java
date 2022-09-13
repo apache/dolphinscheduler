@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -213,7 +214,8 @@ public class ProcessDefinitionController extends BaseController {
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @RequestParam(value = "name", required = true) String name,
                                               @RequestParam(value = "code", required = false, defaultValue = "0") long processDefinitionCode) {
-        Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, name, processDefinitionCode);
+        Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectCode, name,
+                processDefinitionCode);
         return returnDataList(result);
     }
 
@@ -503,21 +505,25 @@ public class ProcessDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProcessDefinitionListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                   @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                   @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
-                                                   @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
-                                                   @RequestParam("pageNo") Integer pageNo,
-                                                   @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
+    public Result<PageInfo<ProcessDefinition>> queryProcessDefinitionListPaging(
+                                                                                @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                                @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
+                                                                                @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
+                                                                                @RequestParam("pageNo") Integer pageNo,
+                                                                                @RequestParam("pageSize") Integer pageSize) {
+
+        Result<PageInfo<ProcessDefinition>> result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
 
-        return processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, searchVal,
-                otherParamsJson, userId, pageNo, pageSize);
+        PageInfo<ProcessDefinition> pageInfo = processDefinitionService.queryProcessDefinitionListPaging(
+                loginUser, projectCode, searchVal, otherParamsJson, userId, pageNo, pageSize);
+        return Result.success(pageInfo);
+
     }
 
     /**
