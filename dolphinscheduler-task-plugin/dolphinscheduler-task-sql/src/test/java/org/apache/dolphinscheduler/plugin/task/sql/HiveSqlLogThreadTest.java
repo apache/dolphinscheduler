@@ -44,8 +44,6 @@ public class HiveSqlLogThreadTest {
         taskExecutionContext.setTaskType("hive");
         taskExecutionContext.setTaskLogName("1-1-1-1-1");
 
-        String sql = "select count(*) from test.table";
-
         List<String> mockLog = new ArrayList<>();
         mockLog.add("1start hive sql log\napplication_1231_2323");
         PreparedStatement statement = Mockito.mock(PreparedStatement.class);
