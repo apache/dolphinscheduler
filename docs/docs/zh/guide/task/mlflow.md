@@ -12,19 +12,14 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 目前 Mlflow 组件支持的和即将支持的内容如下中：
 
-- [x] MLflow Projects
-  - [x] BasicAlgorithm: 基础算法，包含LogisticRegression, svm, lightgbm, xgboost
-  - [x] AutoML: AutoML工具，包含autosklean, flaml
-  - [x] Custom projects: 支持运行自己的MLflow Projects项目
-- [ ] MLflow Models
-  - [x] MLFLOW: 直接使用 `mlflow models serve` 部署模型。
-  - [x] Docker: 打包 DOCKER 镜像后部署模型。
-  - [x] Docker Compose: 使用Docker Compose 部署模型，将会取代上面的Docker部署。
-  - [ ] Seldon core: 构建完镜像后，使用Seldon Core 部署到k8s集群上, 可以使用Seldon Core的生成模型管理能力。
-  - [ ] k8s: 构建完镜像后， 部署到k8s集群上。
-  - [ ] MLflow deployments: 内置的允许MLflow 部署模块, 如内置的部署到Sagemaker等。
-- [ ] Model Registry
-  - [ ] Register Model: 注册相关工件(模型以及相关的参数，指标)到模型中心
+- MLflow Projects
+  - BasicAlgorithm: 基础算法，包含LogisticRegression, svm, lightgbm, xgboost
+  - AutoML: AutoML工具，包含autosklean, flaml
+  - Custom projects: 支持运行自己的MLflow Projects项目
+- MLflow Models
+  - MLFLOW: 直接使用 `mlflow models serve` 部署模型。
+  - Docker: 打包 DOCKER 镜像后部署模型。
+  - Docker Compose: 使用Docker Compose 部署模型，将会取代上面的Docker部署。
 
 ## 创建任务
 

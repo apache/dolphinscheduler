@@ -13,19 +13,14 @@ MLflow task plugin used to execute MLflow tasks，Currently contains MLflow Proj
 
 The MLflow plugin currently supports and will support the following:
 
-- [x] MLflow Projects
-    - [x] BasicAlgorithm: contains LogisticRegression, svm, lightgbm, xgboost
-    - [x] AutoML: AutoML tool，contains autosklean, flaml
-    - [x] Custom projects: Support for running your own MLflow projects
-- [ ] MLflow Models
-    - [x] MLFLOW: Use `MLflow models serve` to deploy a model service
-    - [x] Docker: Run the container after packaging the docker image
-    - [x] Docker Compose: Use docker compose to run the container, it will replace the docker run above
-    - [ ] Seldon core: Use Selcon core to deploy model to k8s cluster
-    - [ ] k8s: Deploy containers directly to K8S
-    - [ ] MLflow deployments: Built-in deployment modules, such as built-in deployment to SageMaker, etc
-- [ ] Model Registry
-    - [ ] Register Model: Allows artifacts (Including model and related parameters, indicators) to be registered directly into the model center
+- MLflow Projects
+    - BasicAlgorithm: contains LogisticRegression, svm, lightgbm, xgboost
+    - AutoML: AutoML tool，contains autosklean, flaml
+    - Custom projects: Support for running your own MLflow projects
+- MLflow Models
+    - MLFLOW: Use `MLflow models serve` to deploy a model service
+    - Docker: Run the container after packaging the docker image
+    - Docker Compose: Use docker compose to run the container, it will replace the docker run above
 
 
 
