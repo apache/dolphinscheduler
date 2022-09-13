@@ -86,6 +86,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.model.PageListingResult;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -120,6 +122,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -147,6 +150,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+
+import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,6 +193,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private ProcessDefinitionDao processDefinitionDao;
 
     @Lazy
     @Autowired
@@ -488,39 +496,44 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return process definition page
      */
     @Override
-    public Result queryProcessDefinitionListPaging(User loginUser, long projectCode, String searchVal,
-                                                   String otherParamsJson, Integer userId, Integer pageNo,
-                                                   Integer pageSize) {
-        Result result = new Result();
+    public PageInfo<ProcessDefinition> queryProcessDefinitionListPaging(@NonNull User loginUser,
+                                                                        long projectCode,
+                                                                        String searchVal,
+                                                                        String otherParamsJson,
+                                                                        Integer userId,
+                                                                        Integer pageNo,
+                                                                        Integer pageSize) {
         Project project = projectMapper.queryByCode(projectCode);
+
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            putMsg(result, resultStatus);
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
-        Page<ProcessDefinition> page = new Page<>(pageNo, pageSize);
-        IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(
-                page, searchVal, userId, project.getCode(), isAdmin(loginUser));
+        PageListingResult<ProcessDefinition> processDefinitionsPageListingResult =
+                processDefinitionDao.listingProcessDefinition(
+                        pageNo, pageSize, searchVal, userId, projectCode);
+        List<ProcessDefinition> processDefinitions = processDefinitionsPageListingResult.getRecords();
 
-        List<ProcessDefinition> records = processDefinitionIPage.getRecords();
-        for (ProcessDefinition pd : records) {
+        List<Long> processDefinitionCodes =
+                processDefinitions.stream().map(ProcessDefinition::getCode).collect(Collectors.toList());
+        Map<Long, Schedule> scheduleMap = schedulerService.queryScheduleByProcessDefinitionCodes(processDefinitionCodes)
+                .stream()
+                .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
+
+        for (ProcessDefinition pd : processDefinitions) {
+            // todo: use batch query
             ProcessDefinitionLog processDefinitionLog =
                     processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
             User user = userMapper.selectById(processDefinitionLog.getOperator());
             pd.setModifyBy(user.getUserName());
+            Schedule schedule = scheduleMap.get(pd.getCode());
+            pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }
-        processDefinitionIPage.setRecords(records);
-        PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) processDefinitionIPage.getTotal());
-        pageInfo.setTotalList(processDefinitionIPage.getRecords());
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
 
-        return result;
+        PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) processDefinitionsPageListingResult.getTotalCount());
+        pageInfo.setTotalList(processDefinitions);
+
+        return pageInfo;
     }
 
     /**
