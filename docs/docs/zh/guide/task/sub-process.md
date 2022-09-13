@@ -34,7 +34,7 @@
 
 ### 创建 sub_process 任务
 
-在使用 sub_process 的过程中，需要创建所需的子结点任务，也就是我们第一步所创建的 shell 任务。然后如下图所示，在 ⑤ 的位置选择对应的子结点即可。
+在使用 sub_process 的过程中，需要创建所需的子结点任务，也就是我们第一步所创建的 test_dag01 工作流。然后如下图所示，在 ⑤ 的位置选择对应的子结点即可。
 
 ![subprocess_task02](../../../../img/tasks/demo/subprocess_task02.png)
 
