@@ -17,10 +17,9 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData } from '../types'
-import { ITaskData } from '../types'
+import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function usePython({
+export function useHiveCli({
   projectCode,
   from = 0,
   readonly,
@@ -33,7 +32,7 @@ export function usePython({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'PYTHON',
+    taskType: 'HIVECLI',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -43,8 +42,7 @@ export function usePython({
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
-    timeout: 30,
-    rawScript: ''
+    timeout: 30
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -74,7 +72,7 @@ export function usePython({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useHiveCli(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

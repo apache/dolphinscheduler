@@ -17,10 +17,9 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData } from '../types'
-import { ITaskData } from '../types'
+import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function usePython({
+export function usePytorch({
   projectCode,
   from = 0,
   readonly,
@@ -33,7 +32,7 @@ export function usePython({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'PYTHON',
+    taskType: 'PYTORCH',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -44,7 +43,12 @@ export function usePython({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    timeoutNotifyStrategy: ['WARN'],
+    pythonEnvTool: 'conda',
+    pythonCommand: '${PYTHON_HOME}',
+    condaPythonVersion: '3.7',
+    requirements: 'requirements.txt',
+    pythonPath: '.'
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -72,9 +76,10 @@ export function usePython({
       Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
+      ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.usePytorch(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

@@ -17,10 +17,9 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData } from '../types'
-import { ITaskData } from '../types'
+import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function usePython({
+export function useMlflow({
   projectCode,
   from = 0,
   readonly,
@@ -33,7 +32,7 @@ export function usePython({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'PYTHON',
+    taskType: 'MLFLOW',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -42,29 +41,26 @@ export function usePython({
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
+    algorithm: 'svm',
+    mlflowTrackingUri: 'http://127.0.0.1:5000',
+    mlflowTaskType: 'MLflow Projects',
+    deployType: 'MLFLOW',
+    deployPort: '7000',
+    mlflowJobType: 'CustomProject',
+    mlflowProjectVersion: 'master',
+    automlTool: 'flaml',
+    cpuLimit: '0.5',
+    memoryLimit: '500M',
+    mlflowCustomProjectParameters: [],
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
@@ -74,7 +70,7 @@ export function usePython({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useMlflow(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

@@ -20,7 +20,7 @@ import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
 import { ITaskData } from '../types'
 
-export function usePython({
+export function useK8s({
   projectCode,
   from = 0,
   readonly,
@@ -33,7 +33,7 @@ export function usePython({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'PYTHON',
+    taskType: 'K8S',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -44,27 +44,13 @@ export function usePython({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
-      Fields.useName(from),
-      ...extra,
+      Fields.useName(),
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
@@ -74,7 +60,7 @@ export function usePython({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useK8s(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

@@ -17,10 +17,9 @@
 
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
-import type { IJsonItem, INodeData } from '../types'
-import { ITaskData } from '../types'
+import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function usePython({
+export function useJupyter({
   projectCode,
   from = 0,
   readonly,
@@ -33,7 +32,7 @@ export function usePython({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'PYTHON',
+    taskType: 'JUPYTER',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -42,29 +41,17 @@ export function usePython({
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
+    cpuQuota: -1,
+    memoryMax: -1,
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
@@ -72,9 +59,10 @@ export function usePython({
       Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
+      ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useJupyter(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

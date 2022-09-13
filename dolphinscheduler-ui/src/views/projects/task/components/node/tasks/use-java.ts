@@ -20,7 +20,7 @@ import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
 import { ITaskData } from '../types'
 
-export function usePython({
+export function useJava({
   projectCode,
   from = 0,
   readonly,
@@ -33,19 +33,26 @@ export function usePython({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'PYTHON',
+    taskType: 'JAVA',
     flag: 'YES',
     description: '',
-    timeoutFlag: false,
     localParams: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
     delayTime: 0,
+    isModulePath: false,
+    rawScript: '',
+    timeoutFlag: false,
+    timeoutNotifyStrategy: ['WARN'],
     timeout: 30,
-    rawScript: ''
-  } as INodeData)
+    mainJar: undefined,
+    runType:'JAVA',
+    mainArgs:'',
+    jvmArgs:'',
+    programType: 'JAVA'
+  } as unknown as INodeData)
 
   let extra: IJsonItem[] = []
   if (from === 1) {
@@ -74,7 +81,7 @@ export function usePython({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useJava(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

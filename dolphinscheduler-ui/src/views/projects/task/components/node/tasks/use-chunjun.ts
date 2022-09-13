@@ -20,7 +20,7 @@ import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData } from '../types'
 import { ITaskData } from '../types'
 
-export function usePython({
+export function useChunjun({
   projectCode,
   from = 0,
   readonly,
@@ -33,9 +33,10 @@ export function usePython({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'PYTHON',
+    taskType: 'CHUNJUN',
     flag: 'YES',
     description: '',
+    deployMode: 'local',
     timeoutFlag: false,
     localParams: [],
     environmentCode: null,
@@ -44,27 +45,16 @@ export function usePython({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    rawScript: ''
+    customConfig: false,
+    preStatements: [],
+    postStatements: [],
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
@@ -74,7 +64,7 @@ export function usePython({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useShell(model),
+      ...Fields.useChunjun(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model
