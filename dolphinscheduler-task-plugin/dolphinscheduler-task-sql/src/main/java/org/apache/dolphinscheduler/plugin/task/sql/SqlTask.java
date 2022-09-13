@@ -171,8 +171,9 @@ public class SqlTask extends AbstractTask {
             Set<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
             logger.info("Resolve appIds: [{}] from task log: [{}]", appIds, taskExecutionContext.getLogPath());
             if (!appIds.isEmpty()) {
-                taskExecutionContext.setAppIds(String.join(",", appIds));
-                setAppIds(String.join(",", appIds));
+                String appIdString = String.join(",", appIds);
+                taskExecutionContext.setAppIds(appIdString);
+                setAppIds(appIdString);
             }
 
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
@@ -395,8 +396,8 @@ public class SqlTask extends AbstractTask {
      * @throws SQLException sqlException
      */
     private void sqlLogListener(PreparedStatement statement) throws SQLException {
-        if (DbType.HIVE == DbType.valueOf(sqlParameters.getType())) {
-            logger.info("The current sql task type is [{}], will start a demon thread to resolve the appIds", DbType.HIVE);
+        if (DbType.HIVE.name().equals(sqlParameters.getType())) {
+            logger.info("The current sql task type is HIVE, will start a demon thread to resolve the appIds");
 
             HiveSqlLogThread queryThread = new HiveSqlLogThread(statement, logger,taskExecutionContext);
             queryThread.start();
