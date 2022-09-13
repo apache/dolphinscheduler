@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.hive.jdbc.HivePreparedStatement;
 
@@ -61,14 +62,14 @@ public class HiveSqlLogThread extends Thread {
 
                     List<String> appIds = LogUtils.getAppIds(log, hiveMapReduceLogger);
                     //get sql task yarn's application_id
-                    if (!appIds.isEmpty()) {
+                    if (!appIds.isEmpty() && StringUtils.isBlank(taskExecutionContext.getAppIds())) {
                         hiveMapReduceLogger.info("yarn application_id is {}",appIds);
                         taskExecutionContext.setAppIds(String.join(",", appIds));
                     }
                 }
             }
         } catch (SQLException e) {
-            hiveMapReduceLogger.error("Failed to view hive log,exception:[{}]", e.getMessage());
+            hiveMapReduceLogger.error("Failed to view hive log");
         }
 
     }
