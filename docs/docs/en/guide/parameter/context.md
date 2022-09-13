@@ -79,11 +79,11 @@ But the output value 66 only shows in the Node_A, the reason is that the directi
 
 ### HTTP
 
-Step 1: Drag an HTTP task, fill IN body for KEY, select OUT for IN/OUT, select VARCHAR for output data type, always select VARCHAR, nothing else.
+Drag an HTTP task, fill IN body for KEY, select OUT for IN/OUT, select VARCHAR for output data type, always select VARCHAR, nothing else.
 
 ![httpParam-1](../../../../img/httpParam/httpParam-1.png)
 
-Step 2: After adding an HTTP task type node, accept the parameters passed upstream. This time just add it in the Request Parameters section,
+After adding an HTTP task type node, accept the parameters passed upstream. This time just add it in the Request Parameters section,
 
 ![httpParam-2](../../../../img/httpParam/httpParam-2.png)
 
@@ -91,6 +91,3 @@ It can be anything, it can be body, it can be anything, parameter,value, it must
 
 The configuration is complete
 ![httpParam-3](../../../../img/httpParam/httpParam-3.png)
-
-Step 3: You can write a test interface to test whether our parameters are passed successfully.
-![httpParam-4](../../../../img/httpParam/httpParam-4.png)

@@ -81,7 +81,7 @@ Node_mysql 运行结果如下：
 
 ### HTTP
 
-拖一个http类型的任务，在自定义参数中KEY的位置填写body，在IN/OUT的部分选择OUT，在输出数据类型部分选择VARCHAR，一定要选择VARCHAR，不要选择别的哈。
+拖一个http类型的任务，在自定义参数中KEY的位置填写body，在IN/OUT的部分选择OUT，在输出数据类型部分选择VARCHAR（只能选择VARCHAR）。
 
 ![httpParam-1](../../../../img/httpParam/httpParam-1.png)
 
