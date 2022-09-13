@@ -57,15 +57,7 @@ public class HiveSqlLogThread extends Thread {
         try {
             while (!statement.isClosed() && statement.hasMoreLogs()) {
                 for (String log : statement.getQueryLog(true, 500)) {
-
                     hiveMapReduceLogger.info(log);
-
-                    List<String> appIds = LogUtils.getAppIds(log, hiveMapReduceLogger);
-                    //get sql task yarn's application_id
-                    if (!appIds.isEmpty() && StringUtils.isBlank(taskExecutionContext.getAppIds())) {
-                        hiveMapReduceLogger.info("yarn application_id is {}",appIds);
-                        taskExecutionContext.setAppIds(String.join(",", appIds));
-                    }
                 }
             }
         } catch (SQLException e) {
