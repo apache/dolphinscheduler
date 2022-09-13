@@ -54,11 +54,12 @@ public class HiveSqlLogThreadTest {
         Mockito.when(hivePreparedStatement.isClosed()).thenReturn(false);
         Mockito.when(hivePreparedStatement.hasMoreLogs()).thenReturn(true);
         Mockito.when(hivePreparedStatement.getQueryLog(true, 500)).thenReturn(mockLog);
-
+        LOGGER.info("log thread starting");
         HiveSqlLogThread queryThread = Mockito.spy(new HiveSqlLogThread(statement, LOGGER, taskExecutionContext));
         queryThread.start();
 
-        Assert.assertTrue(true);
+
+        Assert.assertTrue(queryThread.isAlive());
 
     }
 }
