@@ -60,7 +60,7 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
-      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 20
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
   servlet:
     multipart:
       max-file-size: 1024MB
