@@ -516,11 +516,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // delete user
         userMapper.queryTenantCodeByUserId(id);
 
-        if (accessTokenMapper.deleteAccessTokenByUserId(id) <= 0) {
-            logger.error("Access token delete error, userId:{}.", id);
-            putMsg(result, Status.DELETE_ACCESS_TOKEN_ERROR);
-            return result;
-        }
+        accessTokenMapper.deleteAccessTokenByUserId(id);
 
         if (userMapper.deleteById(id) > 0) {
             logger.info("User is deleted and id is :{}.", id);

@@ -324,7 +324,6 @@ public class UsersServiceTest {
             when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
             when(userMapper.selectById(1)).thenReturn(getUser());
             when(userMapper.deleteById(1)).thenReturn(1);
-            when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(1);
             //no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
