@@ -5,7 +5,7 @@
 [MLflow](https://mlflow.org) is an excellent open source platform to manage the ML lifecycle, including experimentation,
 reproducibility, deployment, and a central model registry.
 
-MLflow task plugin used to execute MLflow tasks，Currently contains MLflow Projects and MLflow Models. (Model Registry will soon be rewarded for support)
+MLflow task plugin used to execute MLflow tasks, Currently contains MLflow Projects and MLflow Models. (Model Registry will soon be rewarded for support)
 
 - MLflow Projects: Package data science code in a format to reproduce runs on any platform.
 - MLflow Models: Deploy machine learning models in diverse serving environments.
@@ -13,19 +13,14 @@ MLflow task plugin used to execute MLflow tasks，Currently contains MLflow Proj
 
 The MLflow plugin currently supports and will support the following:
 
-- [x] MLflow Projects
-    - [x] BasicAlgorithm: contains LogisticRegression, svm, lightgbm, xgboost
-    - [x] AutoML: AutoML tool，contains autosklean, flaml
-    - [x] Custom projects: Support for running your own MLflow projects
-- [ ] MLflow Models
-    - [x] MLFLOW: Use `MLflow models serve` to deploy a model service
-    - [x] Docker: Run the container after packaging the docker image
-    - [x] Docker Compose: Use docker compose to run the container, it will replace the docker run above
-    - [ ] Seldon core: Use Selcon core to deploy model to k8s cluster
-    - [ ] k8s: Deploy containers directly to K8S
-    - [ ] MLflow deployments: Built-in deployment modules, such as built-in deployment to SageMaker, etc
-- [ ] Model Registry
-    - [ ] Register Model: Allows artifacts (Including model and related parameters, indicators) to be registered directly into the model center
+- MLflow Projects
+    - BasicAlgorithm: contains LogisticRegression, svm, lightgbm, xgboost
+    - AutoML: AutoML tool, contains autosklean, flaml
+    - Custom projects: Support for running your own MLflow projects
+- MLflow Models
+    - MLFLOW: Use `MLflow models serve` to deploy a model service
+    - Docker: Run the container after packaging the docker image
+    - Docker Compose: Use docker compose to run the container, it will replace the docker run above
 
 
 
@@ -64,9 +59,9 @@ The MLflow plugin currently supports and will support the following:
 | Register Model | Register the model or not. If register is selected, the following parameters are expanded. |
 | Model Name | The registered model name is added to the original model version and registered as Production. |
 | Data Path | The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder（In the suggested way, users should build their own test sets for model evaluation. |
-| Parameters | Parameter when initializing the algorithm/AutoML model, which can be empty. For example, parameters `"time_budget=30;estimator_list=['lgbm']"` for flaml 。The convention will be passed with '; ' shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. <ul><li>[Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression)</li><li>[SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html?highlight=svc#sklearn.svm.SVC)</li><li>[lightgbm](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm.LGBMClassifier)</li><li>[xgboost](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.XGBClassifier)</li></ul> |
+| Parameters | Parameter when initializing the algorithm/AutoML model, which can be empty. For example, parameters `"time_budget=30;estimator_list=['lgbm']"` for flaml. The convention will be passed with '; ' shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. <ul><li>[Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression)</li><li>[SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html?highlight=svc#sklearn.svm.SVC)</li><li>[lightgbm](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm.LGBMClassifier)</li><li>[xgboost](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.XGBClassifier)</li></ul> |
 | Algorithm |The selected algorithm currently supports `LR`, `SVM`, `LightGBM` and `XGboost` based on [scikit-learn](https://scikit-learn.org/) form. |
-| Parameter Search Space | Parameter search space when running the corresponding algorithm, which can be empty. For example, the parameter `max_depth=[5, 10];n_estimators=[100, 200]` for lightgbm 。The convention will be passed with '; 'shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. |
+| Parameter Search Space | Parameter search space when running the corresponding algorithm, which can be empty. For example, the parameter `max_depth=[5, 10];n_estimators=[100, 200]` for lightgbm. The convention will be passed with '; 'shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. |
 
 #### AutoML
 
@@ -89,8 +84,8 @@ The MLflow plugin currently supports and will support the following:
 | **Parameter** | **Description** |
 | ------- | ---------- |
 | parameters | `--param-list` in `mlflow run`. For example `-P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9`. |
-| Repository | Repository url of MLflow Project，Support git address and directory on worker. If it's in a subdirectory，We add `#` to support this (same as `mlflow run`) , for example `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`. |
-| Project Version | Version of the project，default master. |
+| Repository | Repository url of MLflow Project, Support git address and directory on worker. If it's in a subdirectory, We add `#` to support this (same as `mlflow run`) , for example `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`. |
+| Project Version | Version of the project, default master. |
 
 You can now use this feature to run all MLFlow projects on Github (For example [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) ). You can also create your own machine learning library to reuse your work, and then use DolphinScheduler to use your library with one click.
 
