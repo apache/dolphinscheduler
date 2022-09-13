@@ -50,6 +50,9 @@ public class PropertyUtils {
         for (String fileName : propertyFiles) {
             try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
                 properties.load(fis);
+                properties.forEach((k, v) -> {
+                    logger.info("Get property from {}: {} -> {}", fileName, k, v);
+                });
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 System.exit(1);
