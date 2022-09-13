@@ -95,7 +95,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
         if (clusterExistByName != null) {
-            logger.warn("Cluster with the same name already exists, name:{}.", clusterExistByName.getName());
+            logger.warn("Cluster with the same name already exists, clusterName:{}.", clusterExistByName.getName());
             putMsg(result, Status.CLUSTER_NAME_EXISTS, name);
             return result;
         }

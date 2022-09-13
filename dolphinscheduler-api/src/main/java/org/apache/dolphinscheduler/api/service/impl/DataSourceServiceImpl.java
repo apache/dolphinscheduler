@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -167,7 +168,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         // determine whether the data source exists
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
-            logger.error("Datasource does not exist, datasourceId:{}.", id);
+            logger.error("Datasource does not exist, id:{}.", id);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -238,7 +239,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Map<String, Object> result = new HashMap<>();
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
-            logger.error("Datasource does not exist, datasourceId:{}.", id);
+            logger.error("Datasource does not exist, id:{}.", id);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -350,7 +351,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Result<Object> result = new Result<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
-            logger.warn("Datasource with the same name already exists, name:{}.", dataSourceList.get(0).getName());
+            logger.warn("Datasource with the same name already exists, dataSourceName:{}.", dataSourceList.get(0).getName());
             putMsg(result, Status.DATASOURCE_EXIST);
         } else {
             putMsg(result, Status.SUCCESS);
@@ -435,7 +436,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
             logger.error("Delete datasource complete, datasourceId:{}.", datasourceId, e);
-            throw new RuntimeException("Delete datasource error");
+            throw new ServiceException(Status.DELETE_DATA_SOURCE_FAILURE);
         }
         return result;
     }

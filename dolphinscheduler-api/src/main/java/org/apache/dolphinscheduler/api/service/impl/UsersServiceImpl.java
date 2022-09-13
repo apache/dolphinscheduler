@@ -404,7 +404,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)) {
-                logger.warn("Parameter userName check failed, userName:{}.", userName);
+                logger.warn("Parameter userName check failed.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
                 return result;
             }
@@ -420,7 +420,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(userPassword)) {
             if (!CheckUtils.checkPasswordLength(userPassword)) {
-                logger.warn("Parameter userPassword check failed, password:{}.", userPassword);
+                logger.warn("Parameter userPassword check failed.");
                 putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
                 return result;
             }
@@ -429,7 +429,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(email)) {
             if (!CheckUtils.checkEmail(email)) {
-                logger.warn("Parameter email check failed, email:{}.", email);
+                logger.warn("Parameter email check failed.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, email);
                 return result;
             }
@@ -437,7 +437,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
-            logger.warn("Parameter phone check failed, phone:{}.", phone);
+            logger.warn("Parameter phone check failed.");
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
             return result;
         }
@@ -450,7 +450,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
-                logger.warn("time zone {} is illegal.", timeZone);
+                logger.warn("Time zone {} is illegal.", timeZone);
                 putMsg(result, Status.TIME_ZONE_ILLEGAL, timeZone);
                 return result;
             }
@@ -515,8 +515,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
         // delete user
         userMapper.queryTenantCodeByUserId(id);
-
-        accessTokenMapper.deleteAccessTokenByUserId(id);
 
         if (accessTokenMapper.deleteAccessTokenByUserId(id) <= 0) {
             logger.error("Access token delete error, userId:{}.", id);
@@ -1140,16 +1138,16 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         String msg = null;
         if (!CheckUtils.checkUserName(userName)) {
-            logger.warn("Parameter userName check failed, userName:{}.", userName);
+            logger.warn("Parameter userName check failed.");
             msg = userName;
         } else if (!CheckUtils.checkPassword(password)) {
-            logger.warn("Parameter password check failed, password:{}.", password);
+            logger.warn("Parameter password check failed.");
             msg = password;
         } else if (!CheckUtils.checkEmail(email)) {
-            logger.warn("Parameter email check failed, email:{}.", email);
+            logger.warn("Parameter email check failed.");
             msg = email;
         } else if (!CheckUtils.checkPhone(phone)) {
-            logger.warn("Parameter phone check failed, phone:{}.", phone);
+            logger.warn("Parameter phone check failed.");
             msg = phone;
         }
 

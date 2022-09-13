@@ -130,7 +130,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                     .updateTime(now)
                     .build();
         } catch (CodeGenerateException e) {
-            logger.error("Project create error, projectName:{}.", project.getName(), e);
+            logger.error("Generate process definition code error.", e);
             putMsg(result, Status.CREATE_PROJECT_ERROR);
             return result;
         }

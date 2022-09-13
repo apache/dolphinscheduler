@@ -113,7 +113,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         Environment environment = environmentMapper.queryByEnvironmentName(name);
         if (environment != null) {
-            logger.warn("Environment with the same name already exist, name:{}.", environment.getName());
+            logger.warn("Environment with the same name already exist, environmentName:{}.", environment.getName());
             putMsg(result, Status.ENVIRONMENT_NAME_EXISTS, name);
             return result;
         }
