@@ -17,17 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 
 import java.util.Collections;
 import java.util.Set;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+
 public class DatasyncTask extends AbstractRemoteTask {
+
+    private static final ObjectMapper objectMapper =
+            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
 
     private final TaskExecutionContext taskExecutionContext;
     private DatasyncParameters parameters;
@@ -48,7 +64,23 @@ public class DatasyncTask extends AbstractRemoteTask {
         logger.info("Datasync task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatasyncParameters.class);
+        initParams();
+
         hook = new DatasyncHook();
+    }
+
+    /**
+     * init datasync hook
+     */
+    public void initParams() throws TaskException {
+        if (parameters.isJsonFormat() && StringUtils.isNotEmpty(parameters.getJson())) {
+            try {
+                parameters = objectMapper.readValue(parameters.getJson(), DatasyncParameters.class);
+                logger.info("Datasync convert task params {}", parameters);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override

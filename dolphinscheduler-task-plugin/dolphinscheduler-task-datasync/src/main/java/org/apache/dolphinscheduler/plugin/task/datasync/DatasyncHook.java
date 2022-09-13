@@ -1,8 +1,5 @@
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import lombok.Data;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -44,12 +41,6 @@ import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_G
 
 @Data
 public class DatasyncHook {
-    private static final ObjectMapper objectMapper =
-            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
 
     public static TaskExecutionStatus[] doneStatus = {TaskExecutionStatus.ERROR, TaskExecutionStatus.SUCCESS, TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
     public static TaskStatus[] taskFinishFlags = {TaskStatus.UNAVAILABLE, TaskStatus.UNKNOWN_TO_SDK_VERSION};
@@ -62,7 +53,7 @@ public class DatasyncHook {
         client = createClient();
     }
 
-    protected DataSyncClient createClient() {
+    protected static DataSyncClient createClient() {
         final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
         final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
         final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
@@ -70,22 +61,12 @@ public class DatasyncHook {
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
-        logger.info(awsAccessKeyId);
-        logger.info(awsSecretAccessKey);
-        logger.info(awsRegion);
         // create a datasync client
         return DataSyncClient.builder().region(Region.of(awsRegion)).credentialsProvider(awsCredentialsProvider).build();
     }
 
     public Boolean createDatasyncTask(DatasyncParameters parameters) {
         logger.info("createDatasyncTask ......");
-        if (parameters.isJsonFormat()) {
-            try {
-                parameters = objectMapper.readValue(parameters.getJson(), DatasyncParameters.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
         CreateTaskRequest.Builder builder = CreateTaskRequest.builder()
                 .name(parameters.getName())
                 .sourceLocationArn(parameters.getSourceLocationArn())
