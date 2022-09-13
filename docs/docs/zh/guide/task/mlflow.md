@@ -66,7 +66,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
   - [lightgbm](https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm.LGBMClassifier)
   - [xgboost](https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.XGBClassifier)
 - **算法** ：选择的算法，目前基于 [scikit-learn](https://scikit-learn.org/) 形式支持 `lr`，`svm`，`lightgbm`，`xgboost`。
-- **参数搜索空间** : 运行对应算法的参数搜索空间，可为空。如针对lightgbm 的 `max_depth=[5，10];n_estimators=[100，200]` 则会进行对应搜索。约定传入后会以;切分各个参数，等号前的名字作为参数名，等号后的名字将以python eval执行得到对应的参数值
+- **参数搜索空间** : 运行对应算法的参数搜索空间，可为空。如针对lightgbm 的 `max_depth=[5, 10];n_estimators=[100, 200]` 则会进行对应搜索。约定传入后会以;切分各个参数，等号前的名字作为参数名，等号后的名字将以python eval执行得到对应的参数值
 
 #### AutoML
 
