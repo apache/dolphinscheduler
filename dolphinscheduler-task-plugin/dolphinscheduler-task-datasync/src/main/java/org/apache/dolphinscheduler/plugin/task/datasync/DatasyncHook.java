@@ -70,7 +70,7 @@ public class DatasyncHook {
         client = createClient();
     }
 
-    protected static DataSyncClient createClient() {
+    protected DataSyncClient createClient() {
         final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
         final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
         final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
