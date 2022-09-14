@@ -73,22 +73,27 @@ public final class AlertSenderService extends Thread {
 
     @Override
     public void run() {
-        logger.info("alert sender started");
+        logger.info("Alert sender thread started");
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 if (!alertRegistryClient.getAlertLock()) {
                     continue;
                 }
                 List<Alert> alerts = alertDao.listPendingAlerts();
+                if (CollectionUtils.isEmpty(alerts)) {
+                    logger.info("There is not waiting alerts");
+                    continue;
+                }
                 AlertServerMetrics.registerPendingAlertGauge(alerts::size);
                 this.send(alerts);
             } catch (Exception e) {
-                logger.error("alert sender thread error", e);
+                logger.error("Alert sender thread meet an exception", e);
             } finally {
                 alertRegistryClient.releaseAlertLock();
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
             }
         }
+        logger.info("Alert sender thread stopped");
     }
 
     public void send(List<Alert> alerts) {
