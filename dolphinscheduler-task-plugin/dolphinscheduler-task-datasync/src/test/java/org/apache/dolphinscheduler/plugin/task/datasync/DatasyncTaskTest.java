@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -38,6 +37,7 @@ import org.mockito.Mockito;
 
 import static org.mockito.Mockito.any;
 
+import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -66,24 +66,26 @@ public class DatasyncTaskTest {
 
     private static final String mockTaskArn = "arn:aws:datasync:ap-northeast-3:523202806641:task/task-071ca64ff4c2f0d4a";
 
-   // DatasyncTask datasyncTask;
+    DatasyncHook datasyncHook;
 
+    DatasyncTask datasyncTask;
+
+    @Mock
     DataSyncClient client;
-    //MockedStatic<DatasyncHook> datasyncHookMockedStatic;
-    @BeforeEach
-    public void before() {
-         //mockStatic(DatasyncHook.class);
-        DatasyncHook hook = spy(new DatasyncHook());
+    MockedStatic<DatasyncHook> datasyncHookMockedStatic;
+    @Before
+    public void before() throws IllegalAccessException {
         client = mock(DataSyncClient.class);
-        when(hook.createClient()).thenReturn(client);
+        datasyncHookMockedStatic = mockStatic(DatasyncHook.class);
+        when(DatasyncHook.createClient()).thenReturn(client);
 
-        //DatasyncParameters DatasyncParameters = new DatasyncParameters();
-        //datasyncTask = initTask(DatasyncParameters);
+        DatasyncParameters DatasyncParameters = new DatasyncParameters();
+        datasyncTask = initTask(DatasyncParameters);
+        MemberModifier.field(DatasyncTask.class, "hook").set(datasyncTask, datasyncHook);
     }
 
     @Test
     public void testCreateTaskJson() {
-        //datasyncHookMockedStatic.close();
         String jsonData = "{\n" +
                 "   \"CloudWatchLogGroupArn\": \"arn:aws:logs:ap-northeast-3:523202806641:log-group:/aws/datasync:*\",\n" +
                 "   \"DestinationLocationArn\": \"arn:aws:datasync:ap-northeast-3:523202806641:location/loc-01cf61e102e58e365\",\n" +
@@ -147,14 +149,12 @@ public class DatasyncTaskTest {
         Assert.assertEquals("* * * * * ?", datasyncParameters.getSchedule().getScheduleExpression());
         Assert.assertEquals("aTime", datasyncParameters.getOptions().getAtime());
         Assert.assertEquals(Long.valueOf(10), datasyncParameters.getOptions().getBytesPerSecond());
+        datasyncHookMockedStatic.close();
     }
 
     @Test
     public void testCheckCreateTask() {
-        //datasyncHookMockedStatic.close();
         DatasyncHook hook = spy(new DatasyncHook());
-        DatasyncParameters datasyncParameters = new DatasyncParameters();
-        client=hook.createClient();
         CreateTaskResponse response = mock(CreateTaskResponse.class);
         when(client.createTask((CreateTaskRequest) any())).thenReturn(response);
         SdkHttpResponse sdkMock = mock(SdkHttpResponse.class);
@@ -163,14 +163,13 @@ public class DatasyncTaskTest {
         when(response.taskArn()).thenReturn(mockTaskArn);
 
         doReturn(true).when(hook).doubleCheckTaskStatus(any(), any());
-        hook.createDatasyncTask(datasyncParameters);
+        hook.createDatasyncTask(datasyncTask.getParameters());
         Assert.assertEquals(mockTaskArn, hook.getTaskArn());
-        //datasyncHookMockedStatic.close();
+        datasyncHookMockedStatic.close();
     }
 
     @Test
     public void testStartTask() {
-        //datasyncHookMockedStatic.close();
         DatasyncHook hook = spy(new DatasyncHook());
         StartTaskExecutionResponse response = mock(StartTaskExecutionResponse.class);
         when(client.startTaskExecution((StartTaskExecutionRequest) any())).thenReturn(response);
@@ -181,12 +180,11 @@ public class DatasyncTaskTest {
         doReturn(true).when(hook).doubleCheckExecStatus(any(), any());
         hook.startDatasyncTask();
         Assert.assertEquals(mockExeArn, hook.getTaskExecArn());
-        //datasyncHookMockedStatic.close();
+        datasyncHookMockedStatic.close();
     }
 
     @Test
     public void testCancelTask() {
-        //datasyncHookMockedStatic.close();
         DatasyncHook hook = spy(new DatasyncHook());
         CancelTaskExecutionResponse response = mock(CancelTaskExecutionResponse.class);
         when(client.cancelTaskExecution((CancelTaskExecutionRequest) any())).thenReturn(response);
@@ -194,31 +192,29 @@ public class DatasyncTaskTest {
         when(response.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
         Assert.assertEquals(true, hook.cancelDatasyncTask());
-        //datasyncHookMockedStatic.close();
+        datasyncHookMockedStatic.close();
     }
 
     @Test
     public void testDescribeTask() {
-        //datasyncHookMockedStatic.close();
         DatasyncHook hook = spy(new DatasyncHook());
         doReturn(null).when(hook).queryDatasyncTaskStatus();
         Assert.assertEquals(false, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
 
         doReturn(TaskStatus.AVAILABLE).when(hook).queryDatasyncTaskStatus();
         Assert.assertEquals(true, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
-        //datasyncHookMockedStatic.close();
+        datasyncHookMockedStatic.close();
     }
 
     @Test
     public void testDescribeTaskExec() {
-        //datasyncHookMockedStatic.close();
         DatasyncHook hook = spy(new DatasyncHook());
         doReturn(null).when(hook).queryDatasyncTaskExecStatus();
         Assert.assertEquals(false, hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
 
         doReturn(TaskExecutionStatus.SUCCESS).when(hook).queryDatasyncTaskExecStatus();
         Assert.assertEquals(true, hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
-        //datasyncHookMockedStatic.close();
+        datasyncHookMockedStatic.close();
     }
 
     private DatasyncTask initTask(DatasyncParameters DatasyncParameters) {
