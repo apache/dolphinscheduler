@@ -21,17 +21,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
@@ -49,7 +40,8 @@ public abstract class AbstractTask {
 
     public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
 
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
@@ -226,7 +218,11 @@ public abstract class AbstractTask {
      * @param paramsPropsMap params props map
      */
     public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
-                                Map<String, Property> paramsPropsMap,int taskInstanceId) {
+                                Map<String, Property> paramsPropsMap, int taskInstanceId) {
+        if (paramsPropsMap == null) {
+            return;
+        }
+
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
         int index = 1;
@@ -236,12 +232,16 @@ public abstract class AbstractTask {
             Property prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {
-                logger.error("setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
-                    + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskInstanceId);
+                logger.error(
+                        "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
+                                + " with id: {}. So couldn't put Property in sqlParamsMap.",
+                        paramName, taskInstanceId);
             } else {
                 sqlParamsMap.put(index, prop);
                 index++;
-                logger.info("setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.", paramName, content);
+                logger.info(
+                        "setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.",
+                        paramName, content);
             }
 
         }
