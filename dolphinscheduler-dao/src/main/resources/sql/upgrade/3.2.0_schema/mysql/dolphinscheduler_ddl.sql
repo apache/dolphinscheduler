@@ -64,11 +64,14 @@ BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_datasource'
            AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='test_flag'
+           AND COLUMN_NAME ='test_flag')
+           and NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_datasource'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='bind_test_id')
    THEN
-ALTER TABLE t_ds_datasource ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 testDataSource',
-ALTER TABLE t_ds_datasource ADD `bind_test_id` int(11) DEFAULT null COMMENT 'bind testDataSource id';
+ALTER TABLE t_ds_datasource ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 testDataSource';
+ALTER TABLE t_ds_datasource ADD `bind_test_id` int DEFAULT null COMMENT 'bind testDataSource id';
 END IF;
 END;
 

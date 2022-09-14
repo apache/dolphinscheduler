@@ -276,9 +276,4 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         return task;
     }
 
-    public boolean checkTaskHaveDataSourceInstance(String taskType) {
-        List<String> testableTaskTypeList = Collections.singletonList("SQL");
-        return testableTaskTypeList.contains(taskType);
-    }
-
 }
