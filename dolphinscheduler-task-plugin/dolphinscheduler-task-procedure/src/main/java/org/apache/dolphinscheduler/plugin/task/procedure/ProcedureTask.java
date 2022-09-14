@@ -44,6 +44,8 @@ import java.util.Map;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
+import com.google.common.collect.Maps;
+
 /**
  * procedure task
  */
@@ -105,8 +107,15 @@ public class ProcedureTask extends AbstractTaskExecutor {
 
             // get jdbc connection
             connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
+
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
+                : taskExecutionContext.getPrepareParamsMap();
+            if (procedureParameters.getOutProperty() != null) {
+                // set out params before format sql
+                paramsMap.putAll(procedureParameters.getOutProperty());
+            }
+
             String proceduerSql = formatSql(sqlParamsMap, paramsMap);
             // call method
             stmt = connection.prepareCall(proceduerSql);
