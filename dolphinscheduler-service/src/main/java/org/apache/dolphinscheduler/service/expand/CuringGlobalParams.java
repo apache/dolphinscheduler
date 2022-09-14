@@ -142,6 +142,7 @@ public class CuringGlobalParams implements CuringParamsService {
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
 
         // stream pass params
+        parameters.setVarPool(taskInstance.getVarPool());
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
         if (globalParams.isEmpty() && localParams.isEmpty() && varParams.isEmpty()) {
