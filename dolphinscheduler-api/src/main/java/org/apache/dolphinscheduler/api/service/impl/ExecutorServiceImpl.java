@@ -1047,8 +1047,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                                                   String workerGroup,
                                                                                   boolean allLevelDependent) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
-            checkDependentProcessDefinitionValid(processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode), processDefinitionCycle, workerGroup,
-                processDefinitionCode);
+                checkDependentProcessDefinitionValid(
+                        processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode),
+                        processDefinitionCycle, workerGroup,
+                        processDefinitionCode);
 
         if (dependentProcessDefinitionList.isEmpty()) {
             return dependentProcessDefinitionList;
@@ -1058,13 +1060,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             List<DependentProcessDefinition> childList = new ArrayList<>(dependentProcessDefinitionList);
             while (true) {
                 List<DependentProcessDefinition> childDependentList = childList
-                    .stream()
-                    .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
-                        processService.queryDependentProcessDefinitionByProcessDefinitionCode(dependentProcessDefinition.getProcessDefinitionCode()),
-                        processDefinitionCycle,
-                        workerGroup,
-                        dependentProcessDefinition.getProcessDefinitionCode()).stream())
-                    .collect(Collectors.toList());
+                        .stream()
+                        .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
+                                processService.queryDependentProcessDefinitionByProcessDefinitionCode(
+                                        dependentProcessDefinition.getProcessDefinitionCode()),
+                                processDefinitionCycle,
+                                workerGroup,
+                                dependentProcessDefinition.getProcessDefinitionCode()).stream())
+                        .collect(Collectors.toList());
                 if (childDependentList.isEmpty()) {
                     break;
                 }
