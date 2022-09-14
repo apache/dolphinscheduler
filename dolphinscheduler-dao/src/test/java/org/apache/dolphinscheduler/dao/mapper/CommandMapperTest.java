@@ -186,8 +186,9 @@ public class CommandMapperTest extends BaseDaoTest {
     public void testClone() throws Exception {
         Command command1 = createCommand();
         Command command2 = createCommand();
-        Command cloneBean = (Command) BeanUtils.cloneBean(command1);
-        Assert.assertEquals(cloneBean.getId(), command1.getId());
+        Command cloneBean = (Command) BeanUtils.cloneBean(command2);
+        Assert.assertEquals(cloneBean.getId(), command2.getId());
+        Assert.assertTrue(cloneBean.getId() > command1.getId());
     }
 
     private boolean toTestQueryCommandPageBySlot(int masterCount, int thisMasterSlot) {
