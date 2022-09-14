@@ -15,26 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.dao.model;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class MasterHeartBeat implements HeartBeat {
-    private long startupTime;
-    private long reportTime;
-    private double cpuUsage;
-    private double memoryUsage;
-    private double loadAverage;
-    private double availablePhysicalMemorySize;
-    private double maxCpuloadAvg;
-    private double reservedMemory;
-    private double diskAvailable;
-    private int processId;
+public class PageListingResult<T> {
+
+    private List<T> records;
+
+    private long totalCount;
+
+    private int currentPage;
+
+    private int pageSize;
 }
