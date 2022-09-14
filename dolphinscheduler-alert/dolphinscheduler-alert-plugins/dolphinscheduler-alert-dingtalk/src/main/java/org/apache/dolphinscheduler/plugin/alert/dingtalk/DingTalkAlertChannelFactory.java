@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_YES;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
-import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -126,9 +125,10 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                         .setRequired(false)
                         .build())
                 .build();
-        PasswordParam passwordParam = PasswordParam
+        InputParam passwordParam = InputParam
                 .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD, DingTalkParamsConstants.DING_TALK_PASSWORD)
                 .setPlaceholder("if enable use authentication, you need input password")
+                .setType("password")
                 .build();
 
         return Arrays.asList(webHookParam, keywordParam, secretParam, msgTypeParam, atMobilesParam, atUserIdsParam, isAtAll, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
