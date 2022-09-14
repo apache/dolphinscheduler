@@ -20,7 +20,7 @@
 
 ## Remark
 
-- Prepare: Create a stored procedure in the database, such as:
+- Prepare: Create a stored procedure in the database, e.g.
 
   ```
   CREATE PROCEDURE dolphinscheduler.test(in in1 INT, out out1 INT)
@@ -28,3 +28,4 @@
   set out1=in1;
   END
   ```
+
