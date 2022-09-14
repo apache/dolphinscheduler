@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.amazonaws.SdkBaseException;
@@ -57,8 +57,8 @@ public class EmrJobFlowTask extends AbstractEmrTask {
     }
 
     @Override
-    public Set<String> getApplicationIds() throws TaskException {
-        return Collections.emptySet();
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
