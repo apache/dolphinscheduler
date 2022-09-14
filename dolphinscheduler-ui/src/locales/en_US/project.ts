@@ -250,6 +250,7 @@ export default {
     download_log: 'Download Log',
     refresh: 'Refresh',
     app_id: 'Application ID',
+    job_id: 'Job ID',
     execute: 'Execute',
     stop: 'Stop',
     batch_task: 'Batch Task',

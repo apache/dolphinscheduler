@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -27,14 +26,15 @@ import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTaskChannel;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 public class FlinkStreamTaskChannel implements StreamTaskChannel {
+
     @Override
     public void cancelApplication(boolean status) {
 
     }
 
     @Override
-    public FlinkStreamTask createTask(TaskExecutionContext taskRequest) {
-        return new FlinkStreamTask(taskRequest);
+    public AbstractTask createTask(TaskExecutionContext taskExecutionContext) {
+        return new FlinkStreamTask(taskExecutionContext);
     }
 
     @Override

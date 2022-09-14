@@ -251,6 +251,7 @@ export default {
     download_log: '下载日志',
     refresh: '刷新',
     app_id: 'Application ID',
+    job_id: 'Job ID',
     execute: '执行',
     stop: '停止',
     batch_task: '批量任务',

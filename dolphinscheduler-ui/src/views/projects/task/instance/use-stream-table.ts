@@ -114,7 +114,13 @@ export function useTable() {
         title: t('project.task.app_id'),
         key: 'applicationID',
         ...COLUMN_WIDTH_CONFIG['name'],
-        render: (row: any) => row.applicationID || '-'
+        render: (row: any) => JSON.parse(row.appLink).appId || '-'
+      },
+      {
+        title: t('project.task.job_id'),
+        key: 'jobID',
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: any) => JSON.parse(row.appLink).jobId || '-'
       },
       {
         title: t('project.task.dry_run_flag'),
