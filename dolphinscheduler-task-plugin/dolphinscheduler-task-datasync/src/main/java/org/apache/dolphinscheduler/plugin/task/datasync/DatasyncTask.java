@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -55,8 +55,8 @@ public class DatasyncTask extends AbstractRemoteTask {
     }
 
     @Override
-    public Set<String> getApplicationIds() throws TaskException {
-        return Collections.emptySet();
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
