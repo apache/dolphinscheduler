@@ -17,116 +17,89 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.enums.ClusterClient;
+import org.apache.dolphinscheduler.plugin.task.flink.enums.FlinkStreamDeployMode;
+
+import java.util.Properties;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FlinkArgsUtilsTest {
 
-    private String joinStringListWithSpace(List<String> stringList) {
-        return String.join(" ", stringList);
-    }
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
-    private FlinkStreamParameters buildTestFlinkParametersWithDeployMode(FlinkDeployMode flinkDeployMode) {
-        FlinkStreamParameters flinkParameters = new FlinkStreamParameters();
-        flinkParameters.setProgramType(ProgramType.SCALA);
-        flinkParameters.setDeployMode(flinkDeployMode);
-        flinkParameters.setParallelism(4);
-        ResourceInfo resourceInfo = new ResourceInfo();
-        resourceInfo.setId(1);
-        resourceInfo.setResourceName("job");
-        resourceInfo.setRes("/opt/job.jar");
-        flinkParameters.setMainJar(resourceInfo);
-        flinkParameters.setMainClass("org.example.Main");
-        flinkParameters.setSlot(4);
-        flinkParameters.setAppName("demo-app-name");
-        flinkParameters.setJobManagerMemory("1024m");
-        flinkParameters.setTaskManagerMemory("1024m");
+    @Test
+    public void testRunJarInYarnPerMode() throws Exception {
 
-        return flinkParameters;
-    }
-    private TaskExecutionContext buildTestTaskExecutionContext() {
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskAppId("app-id");
-        taskExecutionContext.setExecutePath("/tmp/execution");
-        return taskExecutionContext;
+        String runJarPath = "/usr/local/Cellar/apache-flink/1.15.1/libexec/examples/streaming/WindowJoin.jar";
+
+        String[] execArgs = new String[]{};
+
+        String jobName = "Flink Submit";
+
+        String flinkConfDir = "/usr/local/Cellar/apache-flink/1.15.1/libexec/conf";
+
+        String flinkJarPath = "/usr/local/Cellar/apache-flink/1.15.1/libexec/lib";
+
+        FlinkStreamDeployMode runMode = FlinkStreamDeployMode.YARN_PER_JOB;
+
+        String queue = "root.default";
+
+        String hadoopConfDir = "/usr/local/Cellar/hadoop/3.3.3/libexec/etc/hadoop";
+
+        Properties confProperties = new Properties();
+        confProperties.setProperty("parallelism.default", "1");
+        confProperties.setProperty("jobmanager.memory.process.size", "2G");
+        confProperties.setProperty("taskmanager.memory.process.size", "2G");
+        confProperties.setProperty("taskmanager.numberOfTaskSlots", "2");
+
+        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+                .setExecArgs(execArgs)
+                .setName(jobName)
+                .setRunJarPath(runJarPath)
+                .setFlinkConfDir(flinkConfDir)
+                .setConfProperties(confProperties)
+                .setFlinkJarPath(flinkJarPath)
+                .setHadoopConfDir(hadoopConfDir)
+                .setQueue(queue)
+                .setRunMode(runMode)
+                .build();
+
+        Assert.assertNotNull(jobParamsInfo);
     }
 
     @Test
-    public void testRunJarInApplicationMode() throws Exception {
-        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION);
-        List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+    public void testCancelJobInYarnMode() throws Exception {
 
-        Assert.assertEquals(
-                "flink run-application -t yarn-application -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
-                joinStringListWithSpace(commandLine));
+        String hadoopConfDir = "/usr/local/Cellar/hadoop/3.3.3/libexec/etc/hadoop";
+
+        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+                .setHadoopConfDir(hadoopConfDir)
+                .setFlinkJobId("job_id")
+                .setApplicationId("app_id")
+                .build();
+
+        Assert.assertNotNull(jobParamsInfo);
     }
 
     @Test
-    public void testRunJarInClusterMode() throws Exception {
-        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
-        flinkParameters.setFlinkVersion("1.11");
-        List<String> commandLine1 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+    public void testSavePointInYarnMode() throws Exception {
 
-        Assert.assertEquals(
-                "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
-                joinStringListWithSpace(commandLine1));
+        String hadoopConfDir = "/usr/local/Cellar/hadoop/3.3.3/libexec/etc/hadoop";
 
-        flinkParameters.setFlinkVersion("<1.10");
-        List<String> commandLine2 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+                .setHadoopConfDir(hadoopConfDir)
+                .setFlinkJobId("job_id")
+                .setApplicationId("app_id")
+                .build();
 
-        Assert.assertEquals(
-                "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
-                joinStringListWithSpace(commandLine2));
-
-        flinkParameters.setFlinkVersion(">=1.12");
-        List<String> commandLine3 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
-
-        Assert.assertEquals(
-                "flink run -t yarn-per-job -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
-                joinStringListWithSpace(commandLine3));
-    }
-
-    @Test
-    public void testRunJarInLocalMode() throws Exception {
-        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL);
-        List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
-
-        Assert.assertEquals(
-                "flink run -p 4 -sae -c org.example.Main /opt/job.jar",
-                joinStringListWithSpace(commandLine));
-    }
-
-    @Test
-    public void testRunSql() throws Exception {
-        FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
-        flinkParameters.setProgramType(ProgramType.SQL);
-        List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
-
-        Assert.assertEquals("sql-client.sh -i /tmp/execution/app-id_init.sql -f /tmp/execution/app-id_node.sql",
-                joinStringListWithSpace(commandLine));
-    }
-
-    @Test
-    public void testInitOptionsInClusterMode() throws Exception {
-        List<String> initOptions = FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
-        Assert.assertEquals(2, initOptions.size());
-        Assert.assertTrue(initOptions.contains("set execution.target=local"));
-        Assert.assertTrue(initOptions.contains("set parallelism.default=4"));
-    }
-
-    @Test
-    public void testInitOptionsInApplicationMode() throws Exception {
-        List<String> initOptions = FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION));
-        Assert.assertEquals(6, initOptions.size());
-        Assert.assertTrue(initOptions.contains("set execution.target=yarn-per-job"));
-        Assert.assertTrue(initOptions.contains("set taskmanager.numberOfTaskSlots=4"));
-        Assert.assertTrue(initOptions.contains("set yarn.application.name=demo-app-name"));
-        Assert.assertTrue(initOptions.contains("set jobmanager.memory.process.size=1024m"));
-        Assert.assertTrue(initOptions.contains("set taskmanager.memory.process.size=1024m"));
-        Assert.assertTrue(initOptions.contains("set parallelism.default=4"));
+        Assert.assertNotNull(jobParamsInfo);
     }
 }

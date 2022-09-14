@@ -43,11 +43,10 @@ export function useFlinkStream({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    programType: 'SCALA',
-    deployMode: 'cluster',
+    programType: 'JAVA',
+    deployMode: 'YARN_PER_JOB',
     initScript: '',
     rawScript: '',
-    flinkVersion: '<1.10',
     jobManagerMemory: '1G',
     taskManagerMemory: '2G',
     slot: 1,
@@ -66,7 +65,7 @@ export function useFlinkStream({
       Fields.useWorkerGroup(),
       Fields.useEnvironmentName(model, !data?.id),
       Fields.useDelayTime(model),
-      ...Fields.useFlink(model),
+      ...Fields.useFlinkStream(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model
