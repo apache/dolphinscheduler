@@ -46,6 +46,7 @@ public class BaseController {
      * @param pageSize page size
      * @return check result code
      */
+    // todo: directly throw exception
     public Result checkPageParams(int pageNo, int pageSize) {
         Result result = new Result();
         Status resultEnum = Status.SUCCESS;

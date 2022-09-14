@@ -39,6 +39,7 @@ export type TaskType =
   | 'MLFLOW'
   | 'OPENMLDB'
   | 'DVC'
+  | 'JAVA'
   | 'DINKY'
   | 'SAGEMAKER'
   | 'CHUNJUN'
@@ -50,6 +51,9 @@ export type TaskType =
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
 export const TASK_TYPES_MAP = {
+  JAVA: {
+    alias: 'JAVA'
+  },
   SHELL: {
     alias: 'SHELL'
   },
