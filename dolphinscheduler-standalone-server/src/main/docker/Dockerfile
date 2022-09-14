@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM openjdk:8-jre-slim-buster
+FROM openjdk:8-jre-slim-bullseye
 
 ENV DOCKER true
 ENV TZ Asia/Shanghai
