@@ -18,7 +18,6 @@
 import type { IJsonItem } from '../types'
 import { watch, ref } from 'vue'
 import { useCustomParams } from '.'
-import { cond } from 'lodash'
 
 export function useDatasync(model: { [field: string]: any }): IJsonItem[] {
 
