@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.procedure;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -41,8 +44,7 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+import com.google.common.collect.Maps;
 
 /**
  * procedure task
@@ -73,14 +75,16 @@ public class ProcedureTask extends AbstractTaskExecutor {
 
         logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
 
-        this.procedureParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
+        this.procedureParameters =
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
 
         // check parameters
         if (!procedureParameters.checkParameters()) {
             throw new RuntimeException("procedure task params is not valid");
         }
 
-        procedureTaskExecutionContext = procedureParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        procedureTaskExecutionContext =
+                procedureParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
     @Override
@@ -97,13 +101,22 @@ public class ProcedureTask extends AbstractTaskExecutor {
             // load class
             DbType dbType = DbType.valueOf(procedureParameters.getType());
             // get datasource
-            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
-                    procedureTaskExecutionContext.getConnectionParams());
+            ConnectionParam connectionParam =
+                    DataSourceUtils.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
+                            procedureTaskExecutionContext.getConnectionParams());
 
             // get jdbc connection
             connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
+
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
+                    : taskExecutionContext.getPrepareParamsMap();
+            if (procedureParameters.getOutProperty() != null) {
+                // set out params before format sql
+                paramsMap.putAll(procedureParameters.getOutProperty());
+            }
+
+            // format sql
             String proceduerSql = formatSql(sqlParamsMap, paramsMap);
             // call method
             stmt = connection.prepareCall(proceduerSql);
@@ -131,7 +144,8 @@ public class ProcedureTask extends AbstractTaskExecutor {
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
         // combining local and global parameters
-        setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
+        setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
+                taskExecutionContext.getTaskInstanceId());
         return procedureParameters.getMethod().replaceAll(rgex, "?");
     }
 
@@ -162,8 +176,8 @@ public class ProcedureTask extends AbstractTaskExecutor {
      * @return outParameterMap
      * @throws Exception Exception
      */
-    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<Integer, Property> paramsMap
-            , Map<String, Property> totalParamsMap) throws Exception {
+    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<Integer, Property> paramsMap,
+                                                      Map<String, Property> totalParamsMap) throws Exception {
         Map<Integer, Property> outParameterMap = new HashMap<>();
         if (procedureParameters.getLocalParametersMap() == null) {
             return outParameterMap;
@@ -174,7 +188,8 @@ public class ProcedureTask extends AbstractTaskExecutor {
             for (Map.Entry<Integer, Property> entry : paramsMap.entrySet()) {
                 Property property = entry.getValue();
                 if (property.getDirect().equals(Direct.IN)) {
-                    ParameterUtils.setInParameter(index, stmt, property.getType(), totalParamsMap.get(property.getProp()).getValue());
+                    ParameterUtils.setInParameter(index, stmt, property.getType(),
+                            totalParamsMap.get(property.getProp()).getValue());
                 } else if (property.getDirect().equals(Direct.OUT)) {
                     setOutParameter(index, stmt, property.getType(), totalParamsMap.get(property.getProp()).getValue());
                     outParameterMap.put(index, property);
@@ -231,7 +246,8 @@ public class ProcedureTask extends AbstractTaskExecutor {
      * @param dataType dataType
      * @throws SQLException SQLException
      */
-    private Object getOutputParameter(CallableStatement stmt, int index, String prop, DataType dataType) throws SQLException {
+    private Object getOutputParameter(CallableStatement stmt, int index, String prop,
+                                      DataType dataType) throws SQLException {
         Object value = null;
         switch (dataType) {
             case VARCHAR:

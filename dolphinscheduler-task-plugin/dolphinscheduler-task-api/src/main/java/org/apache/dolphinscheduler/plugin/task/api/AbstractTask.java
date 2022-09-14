@@ -103,7 +103,6 @@ public abstract class AbstractTask {
 
     public abstract void handle() throws TaskException;
 
-
     /**
      * cancel application
      *
@@ -130,7 +129,9 @@ public abstract class AbstractTask {
         /*
          * analysis log? get submitted yarn application id
          */
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
+        try (
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String appId = findAppId(line);
@@ -244,5 +245,4 @@ public abstract class AbstractTask {
         }
         return status;
     }
-
 }
