@@ -52,6 +52,11 @@
             <version>1.12.289</version>
         </dependency>
         <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-dms</artifactId>
+            <version>1.12.297</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
             <scope>provided</scope>
