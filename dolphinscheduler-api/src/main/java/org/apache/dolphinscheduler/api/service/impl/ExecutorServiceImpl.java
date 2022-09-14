@@ -903,7 +903,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 getComplementDependentDefinitionList(dependentCommand.getProcessDefinitionCode(),
                         CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup());
-
+        // If the id is Integer, the auto-increment id will be obtained and cloned, causing duplicate writes
+        dependentCommand.setId(null);
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
             dependentCommand.setProcessDefinitionCode(dependentProcessDefinition.getProcessDefinitionCode());

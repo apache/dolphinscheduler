@@ -39,11 +39,14 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -177,6 +180,14 @@ public class CommandMapperTest extends BaseDaoTest {
         toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
         toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
         toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+    }
+
+    @Test
+    public void testClone() throws Exception {
+        Command command1 = createCommand();
+        Command command2 = createCommand();
+        Command cloneBean = (Command) BeanUtils.cloneBean(command1);
+        Assert.assertEquals(cloneBean.getId(), command1.getId());
     }
 
     private boolean toTestQueryCommandPageBySlot(int masterCount, int thisMasterSlot) {
