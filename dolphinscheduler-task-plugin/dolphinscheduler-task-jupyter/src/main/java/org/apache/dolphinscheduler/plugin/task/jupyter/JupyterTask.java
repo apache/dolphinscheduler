@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -41,7 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JupyterTask extends AbstractRemoteTask {
 
@@ -66,8 +64,8 @@ public class JupyterTask extends AbstractRemoteTask {
     }
 
     @Override
-    public Set<String> getApplicationIds() throws TaskException {
-        return Collections.emptySet();
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override

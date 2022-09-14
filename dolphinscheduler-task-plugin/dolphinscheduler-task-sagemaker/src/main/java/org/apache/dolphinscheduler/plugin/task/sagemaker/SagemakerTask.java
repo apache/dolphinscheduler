@@ -34,8 +34,8 @@ import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -73,8 +73,8 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     @Override
-    public Set<String> getApplicationIds() throws TaskException {
-        return Collections.emptySet();
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override

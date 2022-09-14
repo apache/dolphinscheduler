@@ -203,7 +203,7 @@ public class ProcessDefinitionServiceTest {
                     .checkProjectAndAuthThrowException(loginUser, null, WORKFLOW_DEFINITION);
             processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, "", "", 1, 5, 0);
         } catch (ServiceException serviceException) {
-            Assert.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode().intValue());
+            Assert.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
         }
 
         Map<String, Object> result = new HashMap<>();
