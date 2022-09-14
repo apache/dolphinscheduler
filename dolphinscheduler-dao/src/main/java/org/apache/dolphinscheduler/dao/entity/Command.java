@@ -191,7 +191,7 @@ public class Command {
 
         Command command = (Command) o;
 
-        if (id != command.id) {
+        if (id.equals(command.id)) {
             return false;
         }
         if (processDefinitionCode != command.processDefinitionCode) {
