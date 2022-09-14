@@ -18,21 +18,8 @@
 # JAVA_HOME, will use it to start DolphinScheduler server
 export JAVA_HOME=${JAVA_HOME:-/usr/local/openjdk-8}
 
-# Database related configuration, set database type, username and password
-export DATABASE=${DATABASE:-mysql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL="jdbc:mysql://mysql:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
-export SPRING_DATASOURCE_USERNAME=root
-export SPRING_DATASOURCE_PASSWORD=123456
-
-# DolphinScheduler server related configuration
-export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
-export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
-export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
-
-# Registry center configuration, determines the type and link of the registry center
-export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
-export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-zoo1:2181,zoo2:2182,zoo3:2183}
+# Never put sensitive config such as database password here in your production environment,
+# this file will be sourced everytime a new task is started.
 
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
