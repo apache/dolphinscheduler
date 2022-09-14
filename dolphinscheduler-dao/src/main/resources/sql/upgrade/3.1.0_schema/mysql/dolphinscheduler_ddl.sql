@@ -340,7 +340,7 @@ drop PROCEDURE if EXISTS drop_t_ds_task_instance_key_foreign_key_instance_id;
 delimiter d//
 CREATE PROCEDURE drop_t_ds_task_instance_key_foreign_key_instance_id()
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
         WHERE TABLE_NAME='t_ds_task_instance'
         AND TABLE_SCHEMA=(SELECT DATABASE())
         AND INDEX_NAME='foreign_key_instance_id')
