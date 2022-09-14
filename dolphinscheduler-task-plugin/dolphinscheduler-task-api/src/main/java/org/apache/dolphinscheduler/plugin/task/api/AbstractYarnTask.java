@@ -21,8 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
-import java.util.Set;
-import java.util.regex.Matcher;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -106,22 +105,9 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      * @return
      * @throws TaskException
      */
-    public Set<String> getApplicationIds() throws TaskException {
+    @Override
+    public List<String> getApplicationIds() throws TaskException {
         return LogUtils.getAppIdsFromLogFile(taskRequest.getLogPath(), logger);
-    }
-
-    /**
-     * find app id
-     *
-     * @param line line
-     * @return appid
-     */
-    protected String findAppId(String line) {
-        Matcher matcher = YARN_APPLICATION_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group();
-        }
-        return null;
     }
 
     /**
