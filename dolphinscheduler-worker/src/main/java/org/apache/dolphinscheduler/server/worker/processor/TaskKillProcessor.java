@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -25,6 +26,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -42,12 +44,7 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
-import org.apache.dolphinscheduler.service.log.LogClientService;
-
-import org.apache.commons.collections.CollectionUtils;
-
-
-
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,14 +62,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
 
-    /**
-     * task execute manager
-     */
     @Autowired
     private WorkerManagerThread workerManager;
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
+
+    @Autowired
+    private LogClient logClient;
 
     /**
      * task kill process
@@ -92,12 +89,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         logger.info("task kill command : {}", killCommand);
 
         int taskInstanceId = killCommand.getTaskInstanceId();
-        TaskExecutionContext taskExecutionContext =
-            TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        if (taskExecutionContext == null) {
-            logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
-            return;
-        }
+        try {
+            LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
+            TaskExecutionContext taskExecutionContext =
+                    TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+            if (taskExecutionContext == null) {
+                logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
+                return;
+            }
 
         int processId = taskExecutionContext.getProcessId();
         if (processId == 0) {
@@ -110,19 +109,22 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             return;
         }
 
-        // if processId > 0, it should call cancelApplication to cancel remote application too.
-        this.cancelApplication(taskInstanceId);
-        Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
+            // if processId > 0, it should call cancelApplication to cancel remote application too.
+            this.cancelApplication(taskInstanceId);
+            Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
 
         taskExecutionContext.setCurrentExecutionStatus(
             result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
         sendTaskKillResponseCommand(channel, taskExecutionContext);
 
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+            messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
 
-        logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
+            logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
+        } finally {
+            LoggerUtils.removeTaskInstanceIdMDC();
+        }
     }
 
     private void sendTaskKillResponseCommand(Channel channel, TaskExecutionContext taskExecutionContext) {
@@ -228,10 +230,11 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 host, logPath, executePath, tenantCode);
             return Pair.of(false, Collections.emptyList());
         }
-        try (LogClientService logClient = new LogClientService()) {
+        try {
             logger.info("Get appIds from worker {}:{} taskLogPath: {}", host.getIp(), host.getPort(), logPath);
             List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), logPath);
             if (CollectionUtils.isEmpty(appIds)) {
+                logger.info("The appId is empty");
                 return Pair.of(true, Collections.emptyList());
             }
 
@@ -241,7 +244,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             Thread.currentThread().interrupt();
             logger.error("kill yarn job error, the current thread has been interrtpted", e);
         } catch (Exception e) {
-            logger.error("kill yarn job error", e);
+            logger.error("Kill yarn job error, host: {}, logPath: {}, executePath: {}, tenantCode: {}", host, logPath, executePath, tenantCode, e);
         }
         return Pair.of(false, Collections.emptyList());
     }

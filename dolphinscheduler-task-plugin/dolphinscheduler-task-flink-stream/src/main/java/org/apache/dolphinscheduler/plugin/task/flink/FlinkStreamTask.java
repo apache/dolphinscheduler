@@ -29,11 +29,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
@@ -99,7 +95,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-        Set<String> appIds = getApplicationIds();
+        List<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
             logger.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;
@@ -120,7 +116,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void savePoint() throws Exception {
-        Set<String> appIds = getApplicationIds();
+        List<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
             logger.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;

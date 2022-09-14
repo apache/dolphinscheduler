@@ -63,8 +63,7 @@ public class DataQualityResultOperator {
         if (TASK_TYPE_DATA_QUALITY.equals(taskInstance.getTaskType())) {
 
             ProcessInstance processInstance =
-                    processService.findProcessInstanceDetailById(
-                            Integer.parseInt(String.valueOf(taskInstance.getProcessInstanceId())));
+                    processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId()).orElse(null);
 
             // when the task is failure or cancel, will delete the execute result and statistics value
             if (taskResponseEvent.getState().isFailure()

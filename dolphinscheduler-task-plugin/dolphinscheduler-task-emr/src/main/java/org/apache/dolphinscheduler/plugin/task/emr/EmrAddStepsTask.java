@@ -17,6 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.emr;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import com.amazonaws.SdkBaseException;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsRequest;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsResult;
@@ -31,16 +40,6 @@ import com.amazonaws.services.elasticmapreduce.model.StepStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Sets;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 /**
  * AddJobFlowSteps task executor
  *
@@ -51,10 +50,9 @@ public class EmrAddStepsTask extends AbstractEmrTask {
     private String stepId;
 
     private final HashSet<String> waitingStateSet = Sets.newHashSet(
-        StepState.PENDING.toString(),
-        StepState.CANCEL_PENDING.toString(),
-        StepState.RUNNING.toString()
-    );
+            StepState.PENDING.toString(),
+            StepState.CANCEL_PENDING.toString(),
+            StepState.RUNNING.toString());
 
     /**
      * constructor
@@ -66,8 +64,8 @@ public class EmrAddStepsTask extends AbstractEmrTask {
     }
 
     @Override
-    public Set<String> getApplicationIds() throws TaskException {
-        return Collections.emptySet();
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
@@ -126,13 +124,16 @@ public class EmrAddStepsTask extends AbstractEmrTask {
 
         final AddJobFlowStepsRequest addJobFlowStepsRequest;
         try {
-            addJobFlowStepsRequest = objectMapper.readValue(emrParameters.getStepsDefineJson(), AddJobFlowStepsRequest.class);
+            addJobFlowStepsRequest =
+                    objectMapper.readValue(emrParameters.getStepsDefineJson(), AddJobFlowStepsRequest.class);
         } catch (JsonProcessingException e) {
             throw new EmrTaskException("can not parse AddJobFlowStepsRequest from json", e);
         }
 
-        // When a single task definition is associated with multiple steps, the state tracking will have high complexity.
-        // Therefore, A task definition only supports the association of a single step, which can better ensure the reliability of the task state.
+        // When a single task definition is associated with multiple steps, the state tracking will have high
+        // complexity.
+        // Therefore, A task definition only supports the association of a single step, which can better ensure the
+        // reliability of the task state.
         if (addJobFlowStepsRequest.getSteps().size() > 1) {
             throw new EmrTaskException("ds emr addJobFlowStepsTask only support one step");
         }
@@ -178,7 +179,8 @@ public class EmrAddStepsTask extends AbstractEmrTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-        logger.info("trying cancel emr step, taskId:{}, clusterId:{}, stepId:{}", this.taskExecutionContext.getTaskInstanceId(), clusterId, stepId);
+        logger.info("trying cancel emr step, taskId:{}, clusterId:{}, stepId:{}",
+                this.taskExecutionContext.getTaskInstanceId(), clusterId, stepId);
         CancelStepsRequest cancelStepsRequest = new CancelStepsRequest().withClusterId(clusterId).withStepIds(stepId);
         CancelStepsResult cancelStepsResult = emrClient.cancelSteps(cancelStepsRequest);
 
@@ -187,10 +189,10 @@ public class EmrAddStepsTask extends AbstractEmrTask {
         }
 
         CancelStepsInfo cancelEmrStepInfo = cancelStepsResult.getCancelStepsInfoList()
-            .stream()
-            .filter(cancelStepsInfo -> cancelStepsInfo.getStepId().equals(stepId))
-            .findFirst()
-            .orElseThrow(() -> new EmrTaskException("cancel emr step failed"));
+                .stream()
+                .filter(cancelStepsInfo -> cancelStepsInfo.getStepId().equals(stepId))
+                .findFirst()
+                .orElseThrow(() -> new EmrTaskException("cancel emr step failed"));
 
         if (CancelStepsRequestStatus.FAILED.toString().equals(cancelEmrStepInfo.getStatus())) {
             throw new EmrTaskException("cancel emr step failed, message:" + cancelEmrStepInfo.getReason());

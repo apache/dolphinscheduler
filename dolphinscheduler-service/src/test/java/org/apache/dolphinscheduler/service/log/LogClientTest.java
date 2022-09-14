@@ -40,8 +40,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({LogClientService.class, NetUtils.class, LoggerUtils.class, NettyRemotingClient.class})
-public class LogClientServiceTest {
+@PrepareForTest({LogClient.class, NetUtils.class, LoggerUtils.class, NettyRemotingClient.class})
+public class LogClientTest {
 
     @Test
     public void testViewLogFromLocal() {
@@ -54,8 +54,8 @@ public class LogClientServiceTest {
         PowerMockito.mockStatic(LoggerUtils.class);
         PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("application_xx_11");
 
-        LogClientService logClientService = new LogClientService();
-        String log = logClientService.viewLog(localMachine, port, path);
+        LogClient logClient = new LogClient();
+        String log = logClient.viewLog(localMachine, port, path);
         Assert.assertNotNull(log);
     }
 
@@ -75,8 +75,8 @@ public class LogClientServiceTest {
         command.setBody(JSONUtils.toJsonString(new ViewLogResponseCommand("")).getBytes(StandardCharsets.UTF_8));
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
-        LogClientService logClientService = new LogClientService();
-        String log = logClientService.viewLog(localMachine, port, path);
+        LogClient logClient = new LogClient();
+        String log = logClient.viewLog(localMachine, port, path);
         Assert.assertNotNull(log);
     }
 
@@ -86,8 +86,8 @@ public class LogClientServiceTest {
         PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
         PowerMockito.doNothing().when(remotingClient).close();
 
-        LogClientService logClientService = new LogClientService();
-        logClientService.close();
+        LogClient logClient = new LogClient();
+        logClient.close();
     }
 
     @Test
@@ -100,8 +100,8 @@ public class LogClientServiceTest {
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
 
-        LogClientService logClientService = new LogClientService();
-        String msg = logClientService.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
+        LogClient logClient = new LogClient();
+        String msg = logClient.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
         Assert.assertNotNull(msg);
     }
 
@@ -115,8 +115,8 @@ public class LogClientServiceTest {
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
 
-        LogClientService logClientService = new LogClientService();
-        byte[] logBytes = logClientService.getLogBytes("localhost", 1234, "/tmp/log");
+        LogClient logClient = new LogClient();
+        byte[] logBytes = logClient.getLogBytes("localhost", 1234, "/tmp/log");
         Assert.assertNotNull(logBytes);
     }
 
@@ -130,14 +130,9 @@ public class LogClientServiceTest {
         PowerMockito.when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
 
-        LogClientService logClientService = new LogClientService();
-        Boolean status = logClientService.removeTaskLog("localhost", 1234, "/log/path");
+        LogClient logClient = new LogClient();
+        Boolean status = logClient.removeTaskLog("localhost", 1234, "/log/path");
         Assert.assertTrue(status);
     }
 
-    @Test
-    public void testIsRunning() {
-        LogClientService logClientService = new LogClientService();
-        Assert.assertTrue(logClientService.isRunning());
-    }
 }

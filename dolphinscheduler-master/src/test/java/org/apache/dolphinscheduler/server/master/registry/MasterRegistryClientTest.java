@@ -25,8 +25,6 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -34,7 +32,7 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,25 +57,16 @@ public class MasterRegistryClientTest {
     private MasterRegistryClient masterRegistryClient;
 
     @Mock
-    private MasterConfig masterConfig;
-
-    @Mock
     private RegistryClient registryClient;
-
-    @Mock
-    private ScheduledExecutorService heartBeatExecutor;
 
     @Mock
     private ProcessService processService;
 
     @Mock
-    private MasterConnectStrategy masterConnectStrategy;
-
-    @Mock
     private MasterHeartBeatTask masterHeartBeatTask;
 
     @Mock
-    private ProcessInstanceExecCacheManagerImpl processInstanceExecCacheManager;
+    private MasterConfig masterConfig;
 
     @Before
     public void before() throws Exception {
@@ -105,7 +94,7 @@ public class MasterRegistryClientTest {
         taskInstance.setHost("127.0.0.1:8080");
         given(processService.queryNeedFailoverTaskInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(taskInstance));
-        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(processInstance);
+        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(Optional.of(processInstance));
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any())).willReturn(true);
         Server server = new Server();
         server.setHost("127.0.0.1");
