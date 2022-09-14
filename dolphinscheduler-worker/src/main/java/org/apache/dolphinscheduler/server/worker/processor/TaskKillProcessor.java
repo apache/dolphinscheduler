@@ -127,7 +127,6 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         if (taskExecutionContext.getAppIds() != null) {
             taskKillResponseCommand.setAppIds(Arrays.asList(taskExecutionContext.getAppIds().split(TaskConstants.COMMA)));
         }
-        taskKillResponseCommand.setAppIds(Arrays.asList(taskExecutionContext.getAppIds().split(TaskConstants.COMMA)));
         taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskKillResponseCommand.setHost(taskExecutionContext.getHost());
         taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
