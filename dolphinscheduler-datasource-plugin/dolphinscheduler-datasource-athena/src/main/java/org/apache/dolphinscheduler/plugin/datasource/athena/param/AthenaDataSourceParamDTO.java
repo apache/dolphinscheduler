@@ -20,31 +20,13 @@ package org.apache.dolphinscheduler.plugin.datasource.athena.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class AthenaDataSourceParamDTO extends BaseDataSourceParamDTO {
     protected String awsRegion;
-
-    public String getAwsRegion() {
-        return awsRegion;
-    }
-
-    public void setAwsRegion(String awsRegion) {
-        this.awsRegion = awsRegion;
-    }
-
-    @Override
-    public String toString() {
-        return "AthenaDataSourceParamDTO{"
-                + "name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
-                + ", other='" + other + '\''
-                + ", awsRegion='" + awsRegion + '\''
-                + '}';
-    }
 
     @Override
     public DbType getType() {
