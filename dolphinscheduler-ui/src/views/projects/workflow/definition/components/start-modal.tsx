@@ -389,10 +389,10 @@ export default defineComponent({
                       v-model:value={this.startForm.allLevelDependent}
                     >
                       <NSpace>
-                        <NRadio value={false}>
+                        <NRadio value={'false'}>
                           {t('project.workflow.close')}
                         </NRadio>
-                        <NRadio value={true}>
+                        <NRadio value={'true'}>
                           {t('project.workflow.open')}
                         </NRadio>
                       </NSpace>
