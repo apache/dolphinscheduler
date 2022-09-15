@@ -530,8 +530,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         if (!checkResult) {
-            logger.warn("Status of process instance is {}, so can not perform {} operation, processInstanceName:{}.",
-                    executionStatus, executeType, processInstance.getName());
             putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(),
                     executionStatus.toString(), executeType.toString());
         } else {

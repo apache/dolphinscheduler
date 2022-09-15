@@ -2412,7 +2412,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                logger.error("Tenant does not exist, tenantCode:{}.", tenantCode);
+                logger.error("Tenant does not exist.");
                 putMsg(result, Status.TENANT_NOT_EXIST);
                 return result;
             }

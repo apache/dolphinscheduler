@@ -50,14 +50,14 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
         Map<String, Object> result = new HashMap<>();
         if (!pluginType.getHasUi()) {
-            logger.warn("Plugin in {} type does not have UI.", pluginType);
+            logger.warn("Plugin does not have UI.");
             putMsg(result, Status.PLUGIN_NOT_A_UI_COMPONENT);
             return result;
         }
         List<PluginDefine> pluginDefines = pluginDefineMapper.queryByPluginType(pluginType.getDesc());
 
         if (CollectionUtils.isEmpty(pluginDefines)) {
-            logger.warn("Query plugins result is null, check status of plugins, pluginType:{}.", pluginType);
+            logger.warn("Query plugins result is null, check status of plugins.");
             putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL);
             return result;
         }
