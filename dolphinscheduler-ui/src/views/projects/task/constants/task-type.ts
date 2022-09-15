@@ -39,15 +39,20 @@ export type TaskType =
   | 'MLFLOW'
   | 'OPENMLDB'
   | 'DVC'
+  | 'JAVA'
   | 'DINKY'
   | 'SAGEMAKER'
   | 'CHUNJUN'
   | 'FLINK_STREAM'
   | 'PYTORCH'
+  | 'HIVECLI'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
 export const TASK_TYPES_MAP = {
+  JAVA: {
+    alias: 'JAVA'
+  },
   SHELL: {
     alias: 'SHELL'
   },
@@ -150,6 +155,10 @@ export const TASK_TYPES_MAP = {
   },
   PYTORCH: {
     alias: 'Pytorch',
+    helperLinkDisable: true
+  },
+  HIVECLI: {
+    alias: 'HIVECLI',
     helperLinkDisable: true
   }
 } as {

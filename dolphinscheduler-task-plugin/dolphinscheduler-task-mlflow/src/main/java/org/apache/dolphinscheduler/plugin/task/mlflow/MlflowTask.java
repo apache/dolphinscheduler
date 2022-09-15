@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.mlflow;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -36,10 +36,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+
 /**
  * shell task
  */
-public class MlflowTask extends AbstractTaskExecutor {
+public class MlflowTask extends AbstractTask {
 
     /**
      * shell parameters
@@ -80,7 +82,7 @@ public class MlflowTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // construct process
             String command = buildCommand();
@@ -92,20 +94,28 @@ public class MlflowTask extends AbstractTaskExecutor {
                 exitCode = commandExecuteResult.getExitStatusCode();
             }
             setExitStatusCode(exitCode);
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
-        } catch (Exception e) {
-            logger.error("shell task error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Mlflow task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("The current Mlflow task has been interrupted", e);
+        } catch (Exception e) {
+            logger.error("Mlflow task error", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("Execute Mlflow task failed", e);
         }
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     public String buildCommand() {

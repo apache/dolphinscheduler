@@ -155,6 +155,8 @@ export function useGraphAutoLayout(options: Options) {
         format(formValue.value)
         toggle(false)
       })
+    } else {
+      format({} as LayoutConfig)
     }
   }
 

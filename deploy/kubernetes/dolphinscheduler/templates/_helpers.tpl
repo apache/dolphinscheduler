@@ -183,19 +183,6 @@ Create a registry environment variables.
 {{- end -}}
 
 {{/*
-Create a common fs_s3a environment variables.
-*/}}
-{{- define "dolphinscheduler.fs_s3a.env_vars" -}}
-{{- if eq (default "HDFS" .Values.common.configmap.RESOURCE_STORAGE_TYPE) "S3" -}}
-- name: FS_S3A_SECRET_KEY
-  valueFrom:
-    secretKeyRef:
-      key: fs-s3a-secret-key
-      name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
-{{- end -}}
-{{- end -}}
-
-{{/*
 Create a sharedStoragePersistence volume.
 */}}
 {{- define "dolphinscheduler.sharedStorage.volume" -}}

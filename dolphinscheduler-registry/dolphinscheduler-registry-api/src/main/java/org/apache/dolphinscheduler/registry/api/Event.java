@@ -20,9 +20,13 @@
 package org.apache.dolphinscheduler.registry.api;
 
 public class Event {
+    // The prefix which is watched
     private String key;
+    // The full path where the event was generated
     private String path;
+    // The value corresponding to the path
     private String data;
+    // The event type {ADD, REMOVE, UPDATE}
     private Type type;
 
     public Event(String key, String path, String data, Type type) {

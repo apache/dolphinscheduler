@@ -18,12 +18,14 @@
 """Test Task class function."""
 import logging
 import re
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 import pytest
 
 from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task, TaskRelation
+from pydolphinscheduler.exceptions import PyResPluginException
+from pydolphinscheduler.resources_plugin import Local
 from tests.testing.task import Task as testTask
 from tests.testing.task import TaskWithCode
 
@@ -161,6 +163,7 @@ def test_task_get_define():
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
@@ -249,6 +252,118 @@ def test_add_duplicate(caplog):
                 re.findall("already in process definition", caplog.text),
             ]
         )
+
+
+@pytest.mark.parametrize(
+    "val, expected",
+    [
+        ("a.sh", "echo Test task attribute ext_attr"),
+        ("a.zsh", "echo Test task attribute ext_attr"),
+        ("echo Test task attribute ext_attr", "echo Test task attribute ext_attr"),
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.ext",
+    new_callable=PropertyMock,
+    return_value={".sh", ".zsh"},
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.ext_attr",
+    new_callable=PropertyMock,
+    return_value="_raw_script",
+)
+@patch(
+    "pydolphinscheduler.core.task.Task._raw_script",
+    create=True,
+    new_callable=PropertyMock,
+)
+@patch("pydolphinscheduler.core.task.Task.get_plugin")
+def test_task_ext_attr(
+    m_plugin, m_raw_script, m_ext_attr, m_ext, m_code_version, val, expected
+):
+    """Test task attribute ext_attr."""
+    m_plugin.return_value.read_file.return_value = expected
+    m_raw_script.return_value = val
+    task = Task("test_task_ext_attr", "test_task_ext_attr")
+    assert expected == getattr(task, "raw_script")
+
+
+@pytest.mark.parametrize(
+    "attr, expected",
+    [
+        (
+            {
+                "name": "test_task_abtain_res_plugin",
+                "task_type": "TaskType",
+                "resource_plugin": Local("prefix"),
+                "process_definition": ProcessDefinition(
+                    name="process_definition",
+                    resource_plugin=Local("prefix"),
+                ),
+            },
+            "Local",
+        ),
+        (
+            {
+                "name": "test_task_abtain_res_plugin",
+                "task_type": "TaskType",
+                "resource_plugin": Local("prefix"),
+            },
+            "Local",
+        ),
+        (
+            {
+                "name": "test_task_abtain_res_plugin",
+                "task_type": "TaskType",
+                "process_definition": ProcessDefinition(
+                    name="process_definition",
+                    resource_plugin=Local("prefix"),
+                ),
+            },
+            "Local",
+        ),
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+@patch("pydolphinscheduler.core.task.Task.get_content")
+def test_task_obtain_res_plugin(m_get_content, m_code_version, attr, expected):
+    """Test task obtaining resource plug-in."""
+    task = Task(**attr)
+    assert expected == task.get_plugin().__class__.__name__
+
+
+@pytest.mark.parametrize(
+    "attr",
+    [
+        {
+            "name": "test_task_abtain_res_plugin",
+            "task_type": "TaskType",
+            "process_definition": ProcessDefinition(
+                name="process_definition",
+            ),
+        },
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+@patch("pydolphinscheduler.core.task.Task.get_content")
+def test_task_obtain_res_plugin_exception(m_get_content, m_code_version, attr):
+    """Test task obtaining resource plug-in exception."""
+    with pytest.raises(
+        PyResPluginException,
+        match="The execution command of this task is a file, but the resource plugin is empty",
+    ):
+        task = Task(**attr)
+        task.get_plugin()
 
 
 @pytest.mark.parametrize(

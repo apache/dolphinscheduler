@@ -20,18 +20,22 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+@Data
 @TableName("t_ds_dq_comparison_type")
 public class DqComparisonType implements Serializable {
+
     /**
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * type
      */
@@ -67,82 +71,4 @@ public class DqComparisonType implements Serializable {
      */
     @TableField(value = "update_time")
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getExecuteSql() {
-        return executeSql;
-    }
-
-    public void setExecuteSql(String executeSql) {
-        this.executeSql = executeSql;
-    }
-
-    public String getOutputTable() {
-        return outputTable;
-    }
-
-    public void setOutputTable(String outputTable) {
-        this.outputTable = outputTable;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Boolean getInnerSource() {
-        return isInnerSource;
-    }
-
-    public void setInnerSource(Boolean innerSource) {
-        isInnerSource = innerSource;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "DqComparisonType{"
-                + "id=" + id
-                + ", type='" + type + '\''
-                + ", executeSql='" + executeSql + '\''
-                + ", outputTable='" + outputTable + '\''
-                + ", name='" + name + '\''
-                + ", isInnerSource='" + isInnerSource + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
 }
