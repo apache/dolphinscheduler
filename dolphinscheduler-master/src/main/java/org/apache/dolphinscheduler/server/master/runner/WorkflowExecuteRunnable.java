@@ -300,7 +300,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
-
         }
     }
 
