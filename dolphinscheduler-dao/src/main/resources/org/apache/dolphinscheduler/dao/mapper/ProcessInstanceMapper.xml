@@ -113,9 +113,9 @@
         instance.end_time, instance.run_times, instance.recovery, instance.host, instance.dry_run , instance.test_flag ,instance.next_process_instance_id,
         restart_time, instance.state_history
         from t_ds_process_instance instance
-        join t_ds_process_definition define ON instance.process_definition_code = define.code
+        left join t_ds_process_definition_log pdl ON instance.process_definition_code = pdl.code and instance.process_definition_version = pdl.version
         where instance.is_sub_process=0
-        and define.project_code = #{projectCode}
+        and pdl.project_code = #{projectCode}
         <if test="processDefinitionCode != 0">
             and instance.process_definition_code = #{processDefinitionCode}
         </if>
