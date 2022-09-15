@@ -20,10 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
@@ -32,12 +30,11 @@ import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.enums.ClusterClient;
 import org.apache.dolphinscheduler.plugin.task.flink.enums.YarnTaskStatus;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import java.util.*;
-
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 import static org.apache.dolphinscheduler.plugin.task.flink.FlinkStreamConstants.*;
@@ -57,9 +54,6 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
 
     private ResultInfo flinkStreamResultInfo;
-
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public FlinkStreamTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
