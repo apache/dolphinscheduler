@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,8 +28,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
-import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
 
 public class PropertyUtils {
 
@@ -48,7 +51,12 @@ public class PropertyUtils {
     public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
             try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
-                properties.load(fis);
+                Properties subProperties = new Properties();
+                subProperties.load(fis);
+                subProperties.forEach((k, v) -> {
+                    logger.debug("Get property {} -> {}", k, v);
+                });
+                properties.putAll(subProperties);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 System.exit(1);
@@ -68,7 +76,8 @@ public class PropertyUtils {
      */
     public static boolean getResUploadStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
-        ResUploadType resUploadType = ResUploadType.valueOf(Strings.isNullOrEmpty(resUploadStartupType) ? ResUploadType.NONE.name() : resUploadStartupType);
+        ResUploadType resUploadType = ResUploadType.valueOf(
+                Strings.isNullOrEmpty(resUploadStartupType) ? ResUploadType.NONE.name() : resUploadStartupType);
         return resUploadType != ResUploadType.NONE;
     }
 
