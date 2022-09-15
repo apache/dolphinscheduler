@@ -29,13 +29,14 @@ public class HttpSenderTest {
     @Test
     public void sendTest() {
         Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put(HttpAlertConstants.URL, "http://www.baidu.com");
+        paramsMap.put(HttpAlertConstants.URL, "https://httpbin.org/post");
         paramsMap.put(HttpAlertConstants.REQUEST_TYPE, "POST");
         paramsMap.put(HttpAlertConstants.HEADER_PARAMS, "{\"Content-Type\":\"application/json\"}");
         paramsMap.put(HttpAlertConstants.BODY_PARAMS, "{\"number\":\"13457654323\"}");
         paramsMap.put(HttpAlertConstants.CONTENT_FIELD, "content");
         HttpSender httpSender = new HttpSender(paramsMap);
         AlertResult alertResult = httpSender.send("Fault tolerance warning");
+        Assert.assertTrue(alertResult.getMessage().contains("\"content\": \"Fault tolerance warning\""));
         Assert.assertEquals("true", alertResult.getStatus());
     }
 }

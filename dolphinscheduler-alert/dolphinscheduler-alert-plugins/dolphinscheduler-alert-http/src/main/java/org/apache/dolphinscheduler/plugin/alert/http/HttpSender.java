@@ -143,7 +143,7 @@ public final class HttpSender {
         //set msg content field
         objectNode.put(contentField, msg);
         try {
-            StringEntity entity = new StringEntity(bodyParams, DEFAULT_CHARSET);
+            StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
             ((HttpPost) httpRequest).setEntity(entity);
         } catch (Exception e) {
             log.error("send http alert msg  exception : {}", e.getMessage());
