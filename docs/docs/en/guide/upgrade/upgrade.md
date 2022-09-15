@@ -23,10 +23,10 @@ Stop all services of dolphinscheduler according to your deployment method. If yo
 
 ### Upgrade Database
 
-Change configuration in `./bin/env/dolphinscheduler_env.sh` ({user} and {password} are changed to your database username and password), and then run the upgrade script.
+Set the following environment variables ({user} and {password} are changed to your database username and password), and then run the upgrade script.
 
 Using MySQL as an example, change the value if you use other databases. Please manually download the [mysql-connector-java driver jar](https://downloads.MySQL.com/archives/c-j/)
-jar package and add it to the `./tools/libs` directory, then change `./bin/ env/dolphinscheduler_env.sh` file
+jar package and add it to the `./tools/libs` directory, then export the following environment variables
 
     ```shell
     export DATABASE=${DATABASE:-mysql}
@@ -45,7 +45,7 @@ Execute database upgrade script: `sh ./tools/bin/upgrade-schema.sh`
 - If you deploy with Pseudo-Cluster deployment, change it according to [Pseudo-Cluster](../installation/pseudo-cluster.md) section "Modify Configuration".
 - If you deploy with Cluster deployment, change it according to [Cluster](../installation/cluster.md) section "Modify Configuration".
 
-And them run command `sh ./bin/start-all.sh` to start all services. 
+And them run command `sh ./bin/start-all.sh` to start all services.
 
 ## Notice
 
@@ -54,7 +54,7 @@ And them run command `sh ./bin/start-all.sh` to start all services.
 The architecture of worker group is different between version before version 1.3.1 until version 2.0.0
 
 - Before version 1.3.1(include itself) worker group can be created through UI interface.
-- Since version 1.3.1 and before version 2.0.0, worker group can be created by modifying the worker configuration. 
+- Since version 1.3.1 and before version 2.0.0, worker group can be created by modifying the worker configuration.
 
 #### How Can I Do When I Upgrade from 1.3.1 to version before 2.0.0
 
@@ -78,13 +78,13 @@ Assume bellow are the machine worker service to be deployed:
 To keep worker group config consistent with the previous version, we need to modify workers configuration as below:
 
 ```shell
-#worker service is deployed on which machine, and also specify which worker group this worker belongs to. 
+#worker service is deployed on which machine, and also specify which worker group this worker belongs to.
 workers="ds1:service1,ds2:service2,ds3:service2"
 ```
 
 #### The Worker Group has Been Enhanced in Version 1.3.2
 
-Workers in 1.3.1 can only belong to one worker group, but after version 1.3.2 and before version 2.0.0 worker support more than one worker group. 
+Workers in 1.3.1 can only belong to one worker group, but after version 1.3.2 and before version 2.0.0 worker support more than one worker group.
 
 ```sh
 workers="ds1:service1,ds1:service2"
