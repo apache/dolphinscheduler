@@ -101,7 +101,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
                     }
                 }
             } else {
-                sb.append("#!/bin/sh\n");
+                sb.append("#!/bin/bash\n");
                 sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
                 sb.append("cd $BASEDIR\n");
                 if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
