@@ -116,6 +116,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Workflow execute task, used to execute a workflow instance.
@@ -180,9 +181,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private final Map<Long, Integer> completeTaskMap = new ConcurrentHashMap<>();
 
     /**
-     * depend failed task map, taskCode as key, taskId as value
+     * depend failed task set
      */
-    private final Map<Long, Integer> dependFailedTaskMap = new ConcurrentHashMap<>();
+    private final Set<Long> dependFailedTaskSet = Sets.newConcurrentHashSet();
 
     /**
      * forbidden task map, code as key
@@ -804,7 +805,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         taskFailedSubmit = false;
         activeTaskProcessorMaps.clear();
-        dependFailedTaskMap.clear();
+        dependFailedTaskSet.clear();
         completeTaskMap.clear();
         errorTaskMap.clear();
 
@@ -904,8 +905,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 }
             }
         }
-        logger.info("Initialize task queue, dependFailedTaskMap: {}, completeTaskMap: {}, errorTaskMap: {}",
-                dependFailedTaskMap,
+        logger.info("Initialize task queue, dependFailedTaskSet: {}, completeTaskMap: {}, errorTaskMap: {}",
+                dependFailedTaskSet,
                 completeTaskMap,
                 errorTaskMap);
     }
@@ -1484,7 +1485,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (this.errorTaskMap.size() > 0) {
             return true;
         }
-        return this.dependFailedTaskMap.size() > 0;
+        return this.dependFailedTaskSet.size() > 0;
     }
 
     /**
@@ -1835,7 +1836,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 }
             } else if (DependResult.FAILED == dependResult) {
                 // if the dependency fails, the current node is not submitted and the state changes to failure.
-                dependFailedTaskMap.put(task.getTaskCode(), task.getId());
+                dependFailedTaskSet.add(task.getTaskCode());
                 removeTaskFromStandbyList(task);
                 logger.info("Task dependent result is failed, taskInstanceId:{} depend result : {}", task.getId(),
                         dependResult);
