@@ -48,19 +48,7 @@ public class CommonUtils {
      * @return get the path of system environment variables
      */
     public static String getSystemEnvPath() {
-        String envPath = PropertyUtils.getString(Constants.DOLPHINSCHEDULER_ENV_PATH);
-        if (StringUtils.isEmpty(envPath)) {
-            URL envDefaultPath = CommonUtils.class.getClassLoader().getResource(Constants.ENV_PATH);
-
-            if (envDefaultPath != null) {
-                envPath = envDefaultPath.getPath();
-                logger.debug("env path :{}", envPath);
-            } else {
-                envPath = "/etc/profile";
-            }
-        }
-
-        return envPath;
+        return org.apache.dolphinscheduler.plugin.task.api.utils.CommonUtils.getSystemEnvPath();
     }
 
     /**
