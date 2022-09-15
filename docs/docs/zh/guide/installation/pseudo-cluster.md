@@ -100,8 +100,6 @@ deployUser="dolphinscheduler"
 
 * DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库](#初始化数据库)
 * 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
-* 注册中心`zookeeper`
-* 服务端相关配置，比如缓存，时区设置等
 
 如果您不使用某些任务类型，您可以忽略任务外部依赖项，但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
 
@@ -150,7 +148,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 bash ./bin/install.sh
 ```
 
-> **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，次为非重要信息直接忽略即可
+> **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，此为非重要信息直接忽略即可
 
 ## 登录 DolphinScheduler
 

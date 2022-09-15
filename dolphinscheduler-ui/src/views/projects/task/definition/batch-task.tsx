@@ -25,7 +25,6 @@ import {
 import { useRoute } from 'vue-router'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
   NInput,
@@ -42,7 +41,6 @@ import Card from '@/components/card'
 import VersionModal from './components/version-modal'
 import MoveModal from './components/move-modal'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
-import styles from './index.module.scss'
 import type { INodeData } from './types'
 
 const BatchTaskDefinition = defineComponent({
@@ -134,15 +132,13 @@ const BatchTaskDefinition = defineComponent({
     } = this
 
     return (
-      <>
-        <NCard>
-          <div class={styles['search-card']}>
-            <div>
-              <NButton size='small' type='primary' onClick={onCreate}>
-                {t('project.task.create_task')}
-              </NButton>
-            </div>
-            <NSpace justify='end'>
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NButton size='small' type='primary' onClick={onCreate}>
+              {t('project.task.create_task')}
+            </NButton>
+            <NSpace>
               <NInput
                 allowInput={this.trim}
                 size='small'
@@ -168,36 +164,34 @@ const BatchTaskDefinition = defineComponent({
                 clearable
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
-          </div>
-        </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestData}
-              onUpdatePageSize={onUpdatePageSize}
+          </NSpace>
+        </Card>
+        <Card title={t('project.task.batch_task')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              scrollX={this.tableWidth}
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <VersionModal
           show={this.showVersionModalRef}
@@ -221,7 +215,7 @@ const BatchTaskDefinition = defineComponent({
           readonly={this.taskReadonly}
           saving={this.taskSaving}
         />
-      </>
+      </NSpace>
     )
   }
 })

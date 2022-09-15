@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from './use-form'
 import Modal from '@/components/modal'
@@ -90,7 +96,7 @@ const ProjectModal = defineComponent({
       }
     )
 
-    return { ...toRefs(variables), t, cancelModal, confirmModal, trim}
+    return { ...toRefs(variables), t, cancelModal, confirmModal, trim }
   },
   render() {
     const { t } = this
@@ -112,7 +118,7 @@ const ProjectModal = defineComponent({
         <NForm rules={this.rules} ref='projectFormRef'>
           <NFormItem label={t('project.list.project_name')} path='projectName'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.model.projectName, 'value']}
               placeholder={t('project.list.project_tips')}
               class='input-project-name'
@@ -120,7 +126,7 @@ const ProjectModal = defineComponent({
           </NFormItem>
           <NFormItem label={t('project.list.owned_users')} path='userName'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               disabled={true}
               v-model={[this.model.userName, 'value']}
               placeholder={t('project.list.username_tips')}
@@ -131,7 +137,7 @@ const ProjectModal = defineComponent({
             path='description'
           >
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.model.description, 'value']}
               type='textarea'
               placeholder={t('project.list.description_tips')}

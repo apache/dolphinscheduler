@@ -37,7 +37,6 @@ import {
   NSwitch
 } from 'naive-ui'
 import { DeleteOutlined, PlusCircleOutlined } from '@vicons/antd'
-import styles from '../index.module.scss'
 
 const props = {
   row: {
@@ -161,9 +160,7 @@ export default defineComponent({
       >
         <NForm ref='startFormRef' model={this.startForm}>
           <NFormItem label={t('project.task.task_name')} path='task_name'>
-            <div class={styles.formItem} title={this.row.taskName}>
-              {this.row.taskName}
-            </div>
+            <div title={this.row.taskName}>{this.row.taskName}</div>
           </NFormItem>
           <NFormItem
             label={t('project.task.notification_strategy')}
@@ -217,7 +214,7 @@ export default defineComponent({
             ) : (
               <NSpace vertical>
                 {this.startParamsList.map((item, index) => (
-                  <NSpace class={styles.startup} key={Date.now() + index}>
+                  <NSpace key={Date.now() + index}>
                     <NInput
                       allowInput={this.trim}
                       pair

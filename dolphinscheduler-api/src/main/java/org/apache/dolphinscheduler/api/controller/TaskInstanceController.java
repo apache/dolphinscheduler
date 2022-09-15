@@ -30,10 +30,12 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +52,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * task instance controller
@@ -82,18 +83,18 @@ public class TaskInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryTaskListPaging", notes = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, type = "String"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-            @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type = "String"),
-            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
-            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
-            @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-            @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataType = "TaskExecuteType", example = "STREAM"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "taskName", value = "TASK_NAME", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", dataTypeClass = TaskExecutionStatus.class),
+            @ApiImplicitParam(name = "host", value = "HOST", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataTypeClass = TaskExecuteType.class, example = "STREAM"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20"),
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -119,8 +120,10 @@ public class TaskInstanceController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName, processDefinitionName,
-                taskName, executorName, startTime, endTime, searchVal, stateType, host, taskExecuteType, pageNo, pageSize);
+        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
+                processDefinitionName,
+                taskName, executorName, startTime, endTime, searchVal, stateType, host, taskExecuteType, pageNo,
+                pageSize);
         return result;
     }
 
@@ -134,7 +137,7 @@ public class TaskInstanceController extends BaseController {
      */
     @ApiOperation(value = "force-success", notes = "FORCE_TASK_SUCCESS")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+            @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "12")
     })
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
@@ -157,15 +160,15 @@ public class TaskInstanceController extends BaseController {
      */
     @ApiOperation(value = "savepoint", notes = "TASK_SAVEPOINT")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+            @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "12")
     })
     @PostMapping(value = "/{id}/savepoint")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_SAVEPOINT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> taskSavePoint(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @PathVariable(value = "id") Integer id) {
+                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                        @PathVariable(value = "id") Integer id) {
         return taskInstanceService.taskSavePoint(loginUser, projectCode, id);
     }
 
@@ -179,15 +182,15 @@ public class TaskInstanceController extends BaseController {
      */
     @ApiOperation(value = "stop", notes = "TASK_STOP")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+            @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "12")
     })
     @PostMapping(value = "/{id}/stop")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_STOP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> stopTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                        @PathVariable(value = "id") Integer id) {
+                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                   @PathVariable(value = "id") Integer id) {
         return taskInstanceService.stopTask(loginUser, projectCode, id);
     }
 }

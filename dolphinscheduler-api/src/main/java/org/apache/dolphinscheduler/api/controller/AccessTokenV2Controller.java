@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.CreateTokenRequest;
@@ -29,6 +28,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,9 +39,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import springfox.documentation.annotations.ApiIgnore;
-
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * access token controller
@@ -60,9 +61,10 @@ public class AccessTokenV2Controller extends BaseController {
      * @param createTokenRequest createTokenRequest
      * @return CreateTokenResponse CreateTokenResponse
      */
-    @ApiOperation(value = "createToken", notes = "CREATE_TOKEN_NOTES")
+    @ApiOperation(value = "createTokenV2", notes = "CREATE_TOKEN_V2")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiImplicitParam(name = "createTokenRequest", value = "createTokenRequest", required = true, dataTypeClass = CreateTokenRequest.class)
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public CreateTokenResponse createToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,

@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.api.enums;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+
 import java.util.Locale;
 import java.util.Optional;
-
-import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * status enum      // todo #4855 One category one interval
@@ -222,6 +222,9 @@ public enum Status {
     TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
     TASK_SAVEPOINT_ERROR(10196, "task savepoint error", "任务实例savepoint错误"),
     TASK_STOP_ERROR(10197, "task stop error", "任务实例停止错误"),
+    LIST_TASK_TYPE_ERROR(10200, "list task type error", "查询任务类型列表错误"),
+    DELETE_TASK_TYPE_ERROR(10200, "delete task type error", "删除任务类型错误"),
+    ADD_TASK_TYPE_ERROR(10200, "add task type error", "添加任务类型错误"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -239,6 +242,7 @@ public enum Status {
     PARENT_RESOURCE_NOT_EXIST(20015, "parent resource not exist", "父资源文件不存在"),
     RESOURCE_NOT_EXIST_OR_NO_PERMISSION(20016, "resource not exist or no permission,please view the task node and remove error resource", "请检查任务节点并移除无权限或者已删除的资源"),
     RESOURCE_IS_AUTHORIZED(20017, "resource is authorized to user {0},suffix not allowed to be modified", "资源文件已授权其他用户[{0}],后缀不允许修改"),
+    RESOURCE_HAS_FOLDER(20018, "There are files or folders in the current directory:{0}", "当前目录下有文件或文件夹[{0}]"),
 
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
     USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),

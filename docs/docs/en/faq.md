@@ -1,4 +1,5 @@
 <!-- markdown-link-check-disable -->
+
 ## Q: What's the name of this project?
 
 A: DolphinScheduler
@@ -9,13 +10,13 @@ A: DolphinScheduler
 
 A: DolphinScheduler consists of 5 services, MasterServer, WorkerServer, ApiServer, AlertServer, LoggerServer and UI.
 
-| Service                   | Description                                                  |
-| ------------------------- | ------------------------------------------------------------ |
-| MasterServer              | Mainly responsible for DAG segmentation and task status monitoring |
+|          Service          |                                                              Description                                                               |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| MasterServer              | Mainly responsible for DAG segmentation and task status monitoring                                                                     |
 | WorkerServer/LoggerServer | Mainly responsible for the submission, execution and update of task status. LoggerServer is used for Rest Api to view logs through RPC |
-| ApiServer                 | Provides the Rest Api service for the UI to call             |
-| AlertServer               | Provide alarm service                                        |
-| UI                        | Front page display                                           |
+| ApiServer                 | Provides the Rest Api service for the UI to call                                                                                       |
+| AlertServer               | Provide alarm service                                                                                                                  |
+| UI                        | Front page display                                                                                                                     |
 
 Note：**Due to the large number of services, it is recommended that the single-machine deployment is preferably 4 cores and 16G or more.**
 
@@ -30,13 +31,13 @@ A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supporte
 
 ## Q: What are the common system variable time parameters and how do I use them?
 
-A: Please refer to 'System parameter' in the system-manual 
+A: Please refer to 'System parameter' in the system-manual
 
 ---
 
 ## Q: pip install kazoo This installation gives an error. Is it necessary to install?
 
-A: This is the python connection Zookeeper needs to use, it is used to delete the master/worker temporary node info in the Zookeeper. so you can ignore error if it's your first install. after version 1.3.0, kazoo is not been needed, we use program to replace what kazoo done 
+A: This is the python connection Zookeeper needs to use, it is used to delete the master/worker temporary node info in the Zookeeper. so you can ignore error if it's your first install. after version 1.3.0, kazoo is not been needed, we use program to replace what kazoo done
 
 ---
 
@@ -78,7 +79,7 @@ A:   1, if it is node startup, check whether the .env API_BASE configuration und
 
 ​       2, If it is nginx booted and installed via **install-dolphinscheduler-ui.sh**, check if the proxy_pass      			configuration in **/etc/nginx/conf.d/dolphinscheduler.conf** is the Api Server service address
 
-​       3, if the above configuration is correct, then please check if the Api Server service is normal, 
+​       3, if the above configuration is correct, then please check if the Api Server service is normal,
 
 ​		   curl http://localhost:12345/dolphinscheduler/users/get-user-info, check the Api Server log,
 
@@ -199,7 +200,7 @@ A: Yes, **if the timing start and end time is the same time, then this timing wi
 
 A:	1, the task dependency between **DAG**, is **from the zero degree** of the DAG segmentation
 
-​		2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual. 
+​		2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual.
 
 ​	Note: **Cross-project processes or task dependencies are not supported**
 
@@ -248,12 +249,10 @@ A ： The queue in the DolphinScheduler can be configured on the user or the ten
 Note: When using the above method to specify the queue, the MR uses the following methods:
 
 ```
-	      Configuration conf = new Configuration();
-        GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
-        String[] remainingArgs = optionParser.getRemainingArgs();
+   Configuration conf = new Configuration();
+GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
+String[] remainingArgs = optionParser.getRemainingArgs();
 ```
-
-
 
 If it is a Spark task --queue mode specifies the queue
 
@@ -265,8 +264,6 @@ If it is a Spark task --queue mode specifies the queue
    <img src="https://analysys.github.io/easyscheduler_docs/images/master_worker_lack_res.png" width="60%" />
  </p>
 
-
-
 A ： Change the value of master.properties **master.reserved.memory** under conf to a smaller value, say 0.1 or the value of worker.properties **worker.reserved.memory** is a smaller value, say 0.1
 
 ---
@@ -277,14 +274,13 @@ A ： Change the value of master.properties **master.reserved.memory** under con
    <img src="https://analysys.github.io/easyscheduler_docs/images/cdh_hive_error.png" width="60%" />
  </p>
 
-
 A ： Will hive pom
 
 ```
 <dependency>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive-jdbc</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.9</version>
 </dependency>
 ```
 
@@ -301,6 +297,7 @@ change into
 ---
 
 ## Q : how to add a worker server
+
 A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
 
 ​		2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
@@ -316,24 +313,28 @@ A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluste
 ---
 
 ## Q : When DolphinScheduler release a new version, and the change between current version and latest, and how to upgrade, and version number specification
+
 A: 1, The release process of Apache Project happens in the mailing list. You can subscribe DolphinScheduler's mailing list and then when the release is in process, you'll receive release emails. Please follow this [introduction](https://github.com/apache/dolphinscheduler#get-help) to subscribe DolphinScheduler's mailing list.
-    
+
 2, When new version published, there would be release note which describe the change log, and there also have upgrade document for the previous version to new's.
 
-3, Version number is x.y.z, when x is increased, it represents the version of the new architecture. When y is increased, it means that it is incompatible with the y version before it needs to be upgraded by script or other manual processing. When the z increase represents a bug fix, the upgrade is fully compatible. No additional processing is required. Remaining problem, the 1.0.2 upgrade is not compatible with 1.0.1 and requires an upgrade script. 
+3, Version number is x.y.z, when x is increased, it represents the version of the new architecture. When y is increased, it means that it is incompatible with the y version before it needs to be upgraded by script or other manual processing. When the z increase represents a bug fix, the upgrade is fully compatible. No additional processing is required. Remaining problem, the 1.0.2 upgrade is not compatible with 1.0.1 and requires an upgrade script.
 
 ---
 
 ## Q : Subsequent tasks can execute even front task failed
+
 A: When start the workflow, you can set the task failure strategy: continue or failure.
 ![set task failure strategy](https://user-images.githubusercontent.com/15833811/80368215-ee378080-88be-11ea-9074-01a33d012b23.png)
 
 ---
 
 ## Q : Workflow template DAG, workflow instance, work task and what is the relationship among them? A DAG supports a maximum concurrency of 100, does it mean that 100 workflow instances are generated and run concurrently? A task node in a DAG also has a concurrent number configuration. Does it mean that tasks can run concurrently with multiple threads? Is the maximum number 100?
-A: 
+
+A:
 
 1.2.1 version
+
 ```
 master.properties
 Control the max parallel number of master node workflows
@@ -350,6 +351,7 @@ worker.exec.threads=100
 ---
 
 ## Q : Worker group manage page no buttons displayed
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/39816903/81903776-d8cb9180-95f4-11ea-98cb-94ca1e6a1db5.png" width="60%" />
 </p>
@@ -358,11 +360,13 @@ A: For version 1.3.0, we want to support k8s, while the ip always will be change
 ---
 
 ## Q : Why not add mysql jdbc connector to docker image
+
 A: The license of mysql jdbc connector is not compatible with apache v2 license, so it can't be included by docker image.
 
 ---
 
 ## Q : Allways fail when a task instance submit multiple yarn application
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/16174111/81312485-476e9380-90b9-11ea-9aad-ed009db899b1.png" width="60%" />
  </p>
@@ -371,32 +375,35 @@ A： This bug have fix in dev and in Requirement/TODO list.
 ---
 
 ## Q : Master server and worker server stop abnormally after run for a few days
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/18378986/81293969-c3101680-90a0-11ea-87e5-ac9f0dd53f5e.png" width="60%" />
  </p>
 A: Session timeout is too short, only 0.3 seconds. Change the config item in zookeeper.properties:
 
 ```
-   zookeeper.session.timeout=60000
-   zookeeper.connection.timeout=30000
+zookeeper.session.timeout=60000
+zookeeper.connection.timeout=30000
 ```
 
 ---
 
 ## Q : Started using the docker-compose default configuration and display zookeeper errors
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/42579056/80374318-13c98780-88c9-11ea-8d5f-53448b957f02.png" width="60%" />
  </p>
 A: This problem is solved in dev-1.3.0. This [pr](https://github.com/apache/dolphinscheduler/pull/2595) has solved this bug, brief change log:
 
 ```
-    1. add zookeeper environment variable ZOO_4LW_COMMANDS_WHITELIST in docker-compose.yml file.
-    2. change the data type of minLatency, avgLatency and maxLatency from int to float.
+1. add zookeeper environment variable ZOO_4LW_COMMANDS_WHITELIST in docker-compose.yml file.
+2. change the data type of minLatency, avgLatency and maxLatency from int to float.
 ```
 
 ---
 
 ## Q : Interface show some task would be running all the time when db delayed and log show task instance is null
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/51871547/80302626-b1478d00-87dd-11ea-97d4-08aa2244a6d0.jpg" width="60%" />
  </p>
@@ -417,50 +424,62 @@ For version under 1.2.1, some tips for this situation:
 ---
 
 ## Q : Zookeeper masters znode list ip address is 127.0.0.1, instead of wanted ip eth0 or eth1, and may can't see task log
-A: bug fix:
-   ```
-      1, confirm hostname
-      $hostname
-      hadoop1
-      2, hostname -i
-      127.0.0.1 10.3.57.15
-      3, edit /etc/hosts,delete hadoop1 from 127.0.0.1 record
-      $cat /etc/hosts
-      127.0.0.1 localhost
-      10.3.57.15 ds1 hadoop1
-      4, hostname -i
-      10.3.57.15
-   ```
 
-   Hostname cmd return server hostname, hostname -i return all matched ips configured in /etc/hosts. So after I delete the hostname matched with 127.0.0.1, and only remain internal ip resolution, instead of remove all the 127.0.0.1 resolution record. As long as hostname cmd return the correct internal ip configured in /etc/hosts can fix this bug. DolphinScheduler use the first record returned by hostname -i command. In my opion, DS should not use hostname -i to get the ip , as in many companies the devops configured the server name, we suggest use ip configured in configuration file or znode instead of /etc/hosts.
+A: bug fix:
+
+```
+1, confirm hostname
+$hostname
+hadoop1
+2, hostname -i
+127.0.0.1 10.3.57.15
+3, edit /etc/hosts,delete hadoop1 from 127.0.0.1 record
+$cat /etc/hosts
+127.0.0.1 localhost
+10.3.57.15 ds1 hadoop1
+4, hostname -i
+10.3.57.15
+```
+
+Hostname cmd return server hostname, hostname -i return all matched ips configured in /etc/hosts. So after I delete the hostname matched with 127.0.0.1, and only remain internal ip resolution, instead of remove all the 127.0.0.1 resolution record. As long as hostname cmd return the correct internal ip configured in /etc/hosts can fix this bug. DolphinScheduler use the first record returned by hostname -i command. In my opion, DS should not use hostname -i to get the ip , as in many companies the devops configured the server name, we suggest use ip configured in configuration file or znode instead of /etc/hosts.
 
 ---
 
 ## Q : The scheduling system set a second frequency task, causing the system to crash
+
 A: The scheduling system not support second frequency task.
 
 ---
 
 ## Q : Compile front-end code(dolphinscheduler-ui) show error cannot download "https://github.com/sass/node-sass/releases/download/v4.13.1/darwin-x64-72_binding.node"
-A: 1, cd dolphinscheduler-ui and delete node_modules directory 
+
+A: 1, cd dolphinscheduler-ui and delete node_modules directory
+
 ```
 sudo rm -rf node_modules
 ```
-   ​	2, install node-sass through npm.taobao.org
- ```
- sudo npm uninstall node-sass
- sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
- ```
-   3, if the 2nd step failure, please, [referer url](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
+
+​	2, install node-sass through npm.taobao.org
+
 ```
- sudo npm rebuild node-sass
+sudo npm uninstall node-sass
+sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 ```
+
+3, if the 2nd step failure, please, [referer url](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
+
+```
+sudo npm rebuild node-sass
+```
+
 When solved this problem, if you don't want to download this node every time, you can set system environment variable: SASS_BINARY_PATH= /xxx/xxx/xxx/xxx.node.
 
 ---
 
 ## Q : How to config when use mysql as database instead of postgres
+
 A: 1, Edit project root dir maven config file, remove scope test property so that mysql driver can be loaded.
+
 ```
 <dependency>
 	<groupId>mysql</groupId>
@@ -469,31 +488,36 @@ A: 1, Edit project root dir maven config file, remove scope test property so tha
 	<scope>test<scope>
 </dependency>
 ```
-   ​	2, Edit application-dao.properties and quzrtz.properties config file to use mysql driver.
-   Default is postgresSql driver because of license problem.
+
+​	2, Edit application-dao.properties and quzrtz.properties config file to use mysql driver.
+Default is postgresSql driver because of license problem.
 
 ---
 
 ## Q : How does a shell task run
+
 A: 1, Where is the executed server? Specify one worker to run the task, you can create worker group in Security Center, then the task can be send to the particular worker. If a worker group have multiple servers, which server actually execute is determined by scheduling and has randomness.
 
-   ​	2, If it is a shell file of a path on the server, how to point to the path? The server shell file, involving permissions issues, it is not recommended to do so. It is recommended that you use the storage function of the resource center, and then use the resource reference in the shell editor. The system will help you download the script to the execution directory. If the task dependent on resource center files, worker use "hdfs dfs -get" to get the resource files in HDFS, then run the task in /tmp/escheduler/exec/process, this path can be customized when installtion dolphinscheduler.
+​	2, If it is a shell file of a path on the server, how to point to the path? The server shell file, involving permissions issues, it is not recommended to do so. It is recommended that you use the storage function of the resource center, and then use the resource reference in the shell editor. The system will help you download the script to the execution directory. If the task dependent on resource center files, worker use "hdfs dfs -get" to get the resource files in HDFS, then run the task in /tmp/escheduler/exec/process, this path can be customized when installtion dolphinscheduler.
 
-   3, Which user execute the task? Task is run by the tenant through "sudo -u ${tenant}", tenant is a linux user.
+3, Which user execute the task? Task is run by the tenant through "sudo -u ${tenant}", tenant is a linux user.
 
 ---
 
 ## Q : What’s the best deploy mode you suggest in production env
-A: 1, I suggest you use 3 nodes for stability if you don't have too many tasks to run. And deploy Master/Worker server on different nodes is better. If you only have one node, you of course only can deploy them together! By the way, how many machines you need is determined by your business. The DolphinScheduler system itself does not use too many resources. Test more, and you'll find the right way to use a few machines. 
+
+A: 1, I suggest you use 3 nodes for stability if you don't have too many tasks to run. And deploy Master/Worker server on different nodes is better. If you only have one node, you of course only can deploy them together! By the way, how many machines you need is determined by your business. The DolphinScheduler system itself does not use too many resources. Test more, and you'll find the right way to use a few machines.
 
 ---
 
 ## Q : DEPENDENT Task Node
+
 A: 1, DEPENDENT task node actually does not have script, it used for config data cycle dependent logic, and then add task node after that to realize task cycle dependent.
 
 ---
 
 ## Q : How to change the boot port of the master
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/8263441/62352160-0f3e9100-b53a-11e9-95ba-3ae3dde49c72.png" width="60%" />
  </p>
@@ -502,16 +526,20 @@ A: 1, modify application_master.properties, for example: server.port=12345.
 ---
 
 ## Q : Scheduled tasks cannot be online
+
 A: 1, We can successly create scheduled task and add one record into t_scheduler_schedules table, but when I click online, front page no reaction and will lock table t_scheduler_schedules, and tested set field release_state value to 1 in table t_scheduler_schedules, and task display online state. For DS version above 1.2 table name is t_ds_schedules, other version table name is t_scheduler_schedules.
 
 ---
 
 ## Q : What is the address of swagger ui
-A: 1, For version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
+
+A: 1, For version 3.1.0+ is http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html,
+for version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
 
 ---
 
 ## Q : Front-end installation package is missing files
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/41460919/61437083-d960b080-a96e-11e9-87f1-297ba3aca5e3.png" width="60%" />
  </p>
@@ -520,37 +548,42 @@ A: 1, For version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.
   </p>
 
 A: 1, User changed the config api server config file and item
- ![apiServerContextPath](https://user-images.githubusercontent.com/41460919/61678323-1b09a680-ad35-11e9-9707-3ba68bbc70d6.png), thus lead to the problem. After resume to the default value and problem solved.
+![apiServerContextPath](https://user-images.githubusercontent.com/41460919/61678323-1b09a680-ad35-11e9-9707-3ba68bbc70d6.png), thus lead to the problem. After resume to the default value and problem solved.
 
 ---
 
 ## Q : Upload a relatively large file blocked
+
 <p align="center">
    <img src="https://user-images.githubusercontent.com/21357069/58231400-805b0e80-7d69-11e9-8107-7f37b06a95df.png" width="60%" />
  </p>
 A: 1, Edit ngnix config file, edit upload max size client_max_body_size 1024m.
-     
-   ​	2, the version of Google Chrome is old, and the latest version of the browser has been updated.
+
+​	2, the version of Google Chrome is old, and the latest version of the browser has been updated.
 
 ---
 
 ## Q : Create a spark data source, click "Test Connection", the system will fall back to the login page
+
 A: 1, edit nginx config file /etc/nginx/conf.d/escheduler.conf
+
 ```
-     proxy_connect_timeout 300s;
-     proxy_read_timeout 300s;
-     proxy_send_timeout 300s;
+proxy_connect_timeout 300s;
+proxy_read_timeout 300s;
+proxy_send_timeout 300s;
 ```
 
 ---
 
 ## Q : Workflow Dependency
+
 A: 1, It is currently judged according to natural days, at the end of last month: the judgment time is the workflow A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'. Last month: It is judged that there is an A instance completed every day from the 1st to the end of the month. Last week: There are completed A instances 7 days last week. The first two days: Judging yesterday and the day before yesterday, there must be a completed A instance for two days.
 
 ---
 
 ## Q : DS Backend Inteface Document
-A: 1, http://106.75.43.194:8888/dolphinscheduler/doc.html?language=en.
+
+A: 1, http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=en.
 
 ## During the operation of dolphinscheduler, the ip address is obtained incorrectly
 
@@ -602,13 +635,14 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 ---
 
 ## Q：Deploy for multiple YARN clusters
+
 A：By deploying different worker in different yarn clusters，the steps are as follows(eg: AWS EMR):
 
-   1. Deploying the worker server on the master node of the EMR cluster
-   
-   2. Changing `yarn.application.status.address` to current emr's yarn url in the `conf/common.properties`
-   
-   3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` to start worker-server
+1. Deploying the worker server on the master node of the EMR cluster
+
+2. Changing `yarn.application.status.address` to current emr's yarn url in the `conf/common.properties`
+
+3. Execute command `bin/dolphinscheduler-daemon.sh start worker-server` to start worker-server
 
 ---
 
@@ -703,6 +737,7 @@ DELETE FROM t_ds_task_definition_log WHERE id IN
 ## Q：Upgrade from 2.0.1 to 2.0.5 using PostgreSQL database failed
 
 A：The repair can be completed by executing the following SQL in the database:
+
 ```SQL
 update t_ds_version set version='2.0.1';
 ```
