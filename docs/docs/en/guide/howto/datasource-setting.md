@@ -8,11 +8,12 @@ We here use MySQL as an example to illustrate how to configure an external datab
 which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
 
 * First of all, follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
-* Set the following environment variables in your terminal with your database username and password for `{user}` and `{password}`:
+* Set the following environment variables in your terminal with your database address, username and password for `{address}`, `{user}` and `{password}`:
 
 ```shell
 export DATABASE=mysql
 export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL="jdbc:mysql://{address}/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```

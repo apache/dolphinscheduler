@@ -19,7 +19,7 @@
 export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
 # Never put sensitive config such as database password here in your production environment,
-# this file will be sourced everytime a new task is 
+# this file will be sourced everytime a new task is executed.
 
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
