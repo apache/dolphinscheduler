@@ -79,9 +79,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
     final int testFlag = 0;
     final ComplementDependentMode complementDependentMode = ComplementDependentMode.OFF_MODE;
     final Integer version = null;
-
     final boolean allLevelDependent = false;
-
     final JsonObject expectResponseContent = gson
         .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}",
             JsonObject.class);
