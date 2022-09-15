@@ -90,6 +90,7 @@ public class AlertDao {
      */
     public int addAlert(Alert alert) {
         if (null == alert.getAlertGroupId() || NumberUtils.INTEGER_ZERO.equals(alert.getAlertGroupId())) {
+            logger.warn("the value of alertGroupId is null or 0 ");
             return 0;
         }
 
