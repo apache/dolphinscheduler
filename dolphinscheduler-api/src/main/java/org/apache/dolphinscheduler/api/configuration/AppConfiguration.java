@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import java.util.Locale;
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
@@ -34,6 +33,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+
+import java.util.Locale;
 
 /**
  * application configuration
@@ -102,15 +103,12 @@ public class AppConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                        "/swagger-resources/**", "/webjars/**", "/v2/**",
-                        "/doc.html", "/swagger-ui.html", "*.html", "/ui/**", "/error");
+                        "/webjars/**", "/v2/**", "*.html", "/ui/**", "/error");
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
         registry.addResourceHandler("/ui/**").addResourceLocations("file:ui/");
     }

@@ -540,12 +540,6 @@
             </dependency>
             
             <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>swagger-bootstrap-ui</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            
-            <dependency>
                 <groupId>com.github.rholder</groupId>
                 <artifactId>guava-retrying</artifactId>
                 <version>${guava-retry.version}</version>
