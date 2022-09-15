@@ -17,20 +17,23 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.utils.Result;
+
 import lombok.Data;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 /**
- * page query dto
+ * workflow response
  */
-@ApiModel("QUERY-PAGE-INFO")
 @Data
-public class PageQueryDto {
+public class ResourceResponse<T> extends Result<T> {
 
-    @ApiModelProperty(example = "10", required = true)
-    private Integer pageSize = 10;
+    private T data;
 
-    @ApiModelProperty(example = "1", required = true)
-    private Integer pageNo = 1;
+    public ResourceResponse(T singleResource) {
+        super();
+        this.setCode(Status.SUCCESS.getCode());
+        this.setMsg(Status.SUCCESS.getMsg());
+        this.setData(singleResource);
+    }
 }

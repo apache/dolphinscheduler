@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
+import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
+import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
+import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -38,11 +41,13 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -68,6 +73,7 @@ import java.util.stream.Collectors;
 
 import lombok.NonNull;
 
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +116,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
+    @Autowired
+    private EnvironmentMapper environmentMapper;
+
     /**
      * save schedule
      *
@@ -150,11 +159,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         // check work flow define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        result = executorService.checkProcessDefinitionValid(projectCode, processDefinition, processDefineCode,
+        executorService.checkProcessDefinitionValid(projectCode, processDefinition, processDefineCode,
                 processDefinition.getVersion());
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
 
         Schedule scheduleObj = new Schedule();
         Date now = new Date();
@@ -212,6 +218,83 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         return result;
     }
 
+    protected void projectPermCheckByProcess(User loginUser, long processDefinitionCode) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (processDefinition == null) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+        }
+        Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
+        // check project auth
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getCode(), null);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            throw new ServiceException((String) result.get(Constants.MSG));
+        }
+    }
+
+    private void scheduleParamCheck(String scheduleParamStr) {
+        ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleParamStr, ScheduleParam.class);
+        if (scheduleParam == null) {
+            throw new ServiceException(Status.PARSE_SCHEDULE_PARAM_ERROR, scheduleParamStr);
+        }
+        if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
+            throw new ServiceException(Status.SCHEDULE_START_TIME_END_TIME_SAME);
+        }
+        if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
+            throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
+        }
+        if (!CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+            throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
+        }
+    }
+
+    /**
+     * save schedule V2, will also change process definition's warningGroupId if schedule's warningGroupId be set
+     *
+     * @param loginUser               login user
+     * @param scheduleCreateRequest   schedule create object
+     * @return Schedule object just be created
+     */
+    @Override
+    @Transactional
+    public Schedule createSchedulesV2(User loginUser,
+                                      ScheduleCreateRequest scheduleCreateRequest) {
+        this.projectPermCheckByProcess(loginUser, scheduleCreateRequest.getProcessDefinitionCode());
+
+        ProcessDefinition processDefinition =
+                processDefinitionMapper.queryByCode(scheduleCreateRequest.getProcessDefinitionCode());
+
+        // check workflow define release state
+        executorService.checkProcessDefinitionValid(processDefinition.getProjectCode(), processDefinition,
+                processDefinition.getCode(), processDefinition.getVersion());
+
+        Schedule scheduleExists =
+                scheduleMapper.queryByProcessDefinitionCode(scheduleCreateRequest.getProcessDefinitionCode());
+        if (scheduleExists != null) {
+            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, scheduleCreateRequest.getProcessDefinitionCode(),
+                    scheduleExists.getId());
+        }
+
+        Schedule schedule = scheduleCreateRequest.convert2Schedule();
+        Environment environment = environmentMapper.queryByEnvironmentCode(schedule.getEnvironmentCode());
+        if (environment == null) {
+            throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, schedule.getEnvironmentCode());
+        }
+        schedule.setUserId(loginUser.getId());
+        // give more detail when return schedule object
+        schedule.setUserName(loginUser.getUserName());
+        schedule.setProcessDefinitionName(processDefinition.getName());
+
+        this.scheduleParamCheck(scheduleCreateRequest.getScheduleParam());
+        int create = scheduleMapper.insert(schedule);
+        if (create <= 0) {
+            throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
+        }
+        // updateProcessInstance receivers and cc by process definition id
+        processDefinition.setWarningGroupId(schedule.getWarningGroupId());
+        processDefinitionMapper.updateById(processDefinition);
+        return schedule;
+    }
+
     /**
      * updateProcessInstance schedule
      *
@@ -254,7 +337,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         if (schedule == null) {
             logger.error("Schedule does not exist, scheduleId:{}.", id);
-            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, id);
+            putMsg(result, Status.SCHEDULE_NOT_EXISTS, id);
             return result;
         }
 
@@ -269,6 +352,61 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 failureStrategy, processInstancePriority, workerGroup, environmentCode);
         return result;
     }
+
+    /**
+     * update schedule object V2
+     *
+     * @param loginUser login user
+     * @param scheduleId scheduler id
+     * @param scheduleUpdateRequest the schedule object will be updated
+     * @return Schedule object
+     */
+    @Override
+    @Transactional
+    public Schedule updateSchedulesV2(User loginUser,
+                                      Integer scheduleId,
+                                      ScheduleUpdateRequest scheduleUpdateRequest) {
+        Schedule schedule = scheduleMapper.selectById(scheduleId);
+        if (schedule == null) {
+            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
+        }
+        Schedule scheduleUpdate = scheduleUpdateRequest.mergeIntoSchedule(schedule);
+
+        // check update params
+        this.projectPermCheckByProcess(loginUser, scheduleUpdate.getProcessDefinitionCode());
+        this.scheduleParamCheck(scheduleUpdateRequest.updateScheduleParam(scheduleUpdate));
+        if (scheduleUpdate.getEnvironmentCode() != null) {
+            Environment environment = environmentMapper.queryByEnvironmentCode(scheduleUpdate.getEnvironmentCode());
+            if (environment == null) {
+                throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, scheduleUpdate.getEnvironmentCode());
+            }
+        }
+
+        int update = scheduleMapper.updateById(scheduleUpdate);
+        if (update <= 0) {
+            throw new ServiceException(Status.UPDATE_SCHEDULE_ERROR);
+        }
+        return scheduleUpdate;
+    }
+
+    /**
+     * get schedule object
+     *
+     * @param loginUser login user
+     * @param scheduleId scheduler id
+     * @return Schedule object
+     */
+    @Override
+    @Transactional
+    public Schedule getSchedules(User loginUser,
+                                 Integer scheduleId) {
+        Schedule schedule = scheduleMapper.selectById(scheduleId);
+        if (schedule == null) {
+            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
+        }
+        this.projectPermCheckByProcess(loginUser, schedule.getProcessDefinitionCode());
+        return schedule;
+    };
 
     /**
      * set schedule online or offline
@@ -455,6 +593,37 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     /**
+     * query schedule
+     *
+     * @param loginUser login user
+     * @param scheduleFilterRequest schedule filter request
+     * @return schedule list page
+     */
+    @Override
+    @Transactional
+    public PageInfo<Schedule> filterSchedules(User loginUser,
+                                              ScheduleFilterRequest scheduleFilterRequest) {
+        if (scheduleFilterRequest.getProjectName() != null) {
+            Project project = projectMapper.queryByName(scheduleFilterRequest.getProjectName());
+            // check project auth
+            Map<String, Object> result =
+                    projectService.checkProjectAndAuth(loginUser, project, project.getCode(), null);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                throw new ServiceException((String) result.get(Constants.MSG));
+            }
+        }
+        Page<Schedule> page = new Page<>(scheduleFilterRequest.getPageNo(), scheduleFilterRequest.getPageSize());
+        IPage<Schedule> scheduleIPage = scheduleMapper.filterSchedules(page, scheduleFilterRequest.convert2Schedule());
+
+        PageInfo<Schedule> pageInfo =
+                new PageInfo<>(scheduleFilterRequest.getPageNo(), scheduleFilterRequest.getPageSize());
+        pageInfo.setTotal((int) scheduleIPage.getTotal());
+        pageInfo.setTotalList(scheduleIPage.getRecords());
+
+        return pageInfo;
+    };
+
+    /**
      * query schedule list
      *
      * @param loginUser   login user
@@ -523,54 +692,30 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * delete schedule by id
      *
      * @param loginUser   login user
-     * @param projectCode project code
-     * @param scheduleId  scheule id
-     * @return delete result code
+     * @param scheduleId  schedule id
      */
     @Override
-    public Map<String, Object> deleteScheduleById(User loginUser, long projectCode, Integer scheduleId) {
-
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByCode(projectCode);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
-        }
-
+    public void deleteSchedulesById(User loginUser, Integer scheduleId) {
         Schedule schedule = scheduleMapper.selectById(scheduleId);
-
         if (schedule == null) {
             logger.error("Schedule does not exist, scheduleId:{}.", scheduleId);
-            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, scheduleId);
-            return result;
+            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
         }
-
-        // Determine if the login user is the owner of the schedule
-        if (loginUser.getId() != schedule.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
-            logger.warn("User does not have permission to delete schedule, loginUserName:{}, scheduleId:{}.", loginUser.getUserName(), scheduleId);
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
         // check schedule is already online
         if (schedule.getReleaseState() == ReleaseState.ONLINE) {
             logger.warn("Only {} state schedule can be deleted, scheduleId:{}.", ReleaseState.OFFLINE.getDescp(), scheduleId);
-            putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, schedule.getId());
-            return result;
+            throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleId);
+        }
+        // Determine if the login user is the owner of the schedule
+        if (loginUser.getId() != schedule.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
+        this.projectPermCheckByProcess(loginUser, schedule.getProcessDefinitionCode());
         int delete = scheduleMapper.deleteById(scheduleId);
-
-        if (delete > 0) {
-            logger.info("Schedule delete complete, scheduleId:{}.", scheduleId);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            logger.error("Schedule delete error, scheduleId:{}.", scheduleId);
-            putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
+        if (delete <= 0) {
+            throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
         }
-        return result;
     }
 
     /**

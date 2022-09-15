@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -299,15 +300,9 @@ public class ProcessDefinitionControllerTest {
     public void testDeleteProcessDefinitionByCode() {
         long projectCode = 1L;
         long code = 1L;
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-
-        Mockito.when(processDefinitionService.deleteProcessDefinitionByCode(user, projectCode, code))
-                .thenReturn(result);
-        Result response = processDefinitionController.deleteProcessDefinitionByCode(user, projectCode, code);
-
-        Assert.assertTrue(response != null && response.isSuccess());
+        // not throw error mean pass
+        Assertions.assertDoesNotThrow(
+                () -> processDefinitionController.deleteProcessDefinitionByCode(user, projectCode, code));
     }
 
     @Test
