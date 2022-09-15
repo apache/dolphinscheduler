@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { TaskType } from '@/views/projects/task/constants/task-type'
+import type { TaskType } from '@/store/project/types'
 export type { ITaskState } from '@/common/types'
 
 export interface ProcessDefinition {
@@ -172,3 +172,5 @@ export interface IWorkflowTaskInstance {
   taskCode: number
   taskType: string
 }
+
+export { TaskType }

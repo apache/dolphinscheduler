@@ -289,6 +289,16 @@ $bgLight: #ffffff;
       }
     }
   }
+
+  span {
+    display: flex;
+    flex: 1;
+  }
+
+  .stars {
+    display: flex;
+    cursor: pointer;
+  }
 }
 
 .dag-dark .draggable {
