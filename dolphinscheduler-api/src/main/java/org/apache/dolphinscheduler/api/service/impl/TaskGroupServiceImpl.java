@@ -168,7 +168,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
                 .ne(TaskGroup::getId, id));
 
         if (exists > 0) {
-            logger.error("Task group with the same name already exists, taskGroupName:{}.", name);
+            logger.error("Task group with the same name already exists.");
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }

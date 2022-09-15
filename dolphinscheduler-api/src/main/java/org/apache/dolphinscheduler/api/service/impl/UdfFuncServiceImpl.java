@@ -107,7 +107,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         // verify udf func name exist
         if (checkUdfFuncNameExists(funcName)) {
-            logger.warn("Udf function exists, udfFuncName:{}.", funcName);
+            logger.warn("Udf function with the same name already exists.");
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
             return result;
         }
@@ -220,7 +220,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         UdfFunc udf = udfFuncMapper.selectUdfById(udfFuncId);
 
         if (udf == null) {
-            logger.error("UDF function does not exist, udfFuncId:{}, udfFuncName:{}.", udfFuncId, funcName);
+            logger.error("UDF function does not exist, udfFuncId:{}.", udfFuncId);
             result.setCode(Status.UDF_FUNCTION_NOT_EXIST.getCode());
             result.setMsg(Status.UDF_FUNCTION_NOT_EXIST.getMsg());
             return result;
@@ -382,7 +382,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
 
         if (checkUdfFuncNameExists(name)) {
-            logger.warn("Udf function exists, udfFuncName:{}.", name);
+            logger.warn("Udf function with the same already exists.");
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
         } else {
             putMsg(result, Status.SUCCESS);

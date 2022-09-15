@@ -151,7 +151,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                             relation.setCreateTime(new Date());
                             relation.setUpdateTime(new Date());
                             relationMapper.insert(relation);
-                            logger.info("Environment {} worker group {} relation create complete.", env.getName(), workerGroup);
+                            logger.info("Environment-WorkerGroup relation create complete, environmentName:{}, workerGroup:{}.",
+                                    env.getName(), relation.getWorkerGroup());
                         }
                     });
                 }

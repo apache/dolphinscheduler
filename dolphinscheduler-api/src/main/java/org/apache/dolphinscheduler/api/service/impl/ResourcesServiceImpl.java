@@ -157,7 +157,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         if (FileUtils.directoryTraversal(name)) {
-            logger.warn("Parameter name is invalid, name:{}.", name);
+            logger.warn("Parameter name is invalid, name:{}.", RegexUtils.escapeNRT(name));
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
@@ -606,13 +606,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         putMsg(result, Status.SUCCESS);
 
         if (FileUtils.directoryTraversal(name)) {
-            logger.warn("Parameter file alias name verify failed, fileAliasName:{}.", name);
+            logger.warn("Parameter file alias name verify failed, fileAliasName:{}.", RegexUtils.escapeNRT(name));
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
 
         if (file != null && FileUtils.directoryTraversal(Objects.requireNonNull(file.getOriginalFilename()))) {
-            logger.warn("File original name verify failed, fileOriginalName:{}.", file.getOriginalFilename());
+            logger.warn("File original name verify failed, fileOriginalName:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
@@ -632,7 +632,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             // determine file suffix
             if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
                 // rename file suffix and original suffix must be consistent
-                logger.warn("Rename file suffix and original suffix must be consistent, fileOriginalName:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
+                logger.warn("Rename file suffix and original suffix must be consistent, fileOriginalName:{}.",
+                        RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
                 return result;
             }
@@ -947,7 +948,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         putMsg(result, Status.SUCCESS);
         if (checkResourceExists(fullName, type.ordinal())) {
-            logger.warn("Resource with same name exists so can not create again, resourceType:{}, resourceName:{}.", type, RegexUtils.escapeNRT(fullName));
+            logger.warn("Resource with same name exists so can not create again, resourceType:{}, resourceName:{}.",
+                    type, RegexUtils.escapeNRT(fullName));
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
             // query tenant
@@ -957,12 +959,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 try {
                     String filename = storageOperate.getFileName(type, tenantCode, fullName);
                     if (storageOperate.exists(tenantCode, filename)) {
-                        logger.warn("Resource file with same name exists so can not create again, tenantCode:{}, resourceName:{}.", tenantCode, filename);
+                        logger.warn("Resource file with same name exists so can not create again, tenantCode:{}, resourceName:{}.",
+                                tenantCode, RegexUtils.escapeNRT(filename));
                         putMsg(result, Status.RESOURCE_FILE_EXIST, filename);
                     }
 
                 } catch (Exception e) {
-                    logger.error("Verify resource name failed, resourceName:{}.", fullName, e);
+                    logger.error("Verify resource name failed, resourceName:{}.", RegexUtils.escapeNRT(fullName), e);
                     putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
                 }
             } else {
@@ -994,7 +997,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (StringUtils.isNotBlank(fullName)) {
             List<Resource> resourceList = resourcesMapper.queryResource(fullName, type.ordinal());
             if (CollectionUtils.isEmpty(resourceList)) {
-                logger.error("Resources do not exist, fullName:{}, resourceType:{}.", fullName, type.getDescp());
+                logger.error("Resources do not exist, fullName:{}.",
+                        RegexUtils.escapeNRT(fullName));
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
@@ -1160,7 +1164,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         if (FileUtils.directoryTraversal(fileName)) {
-            logger.warn("File name verify failed, fileName:{}.", fileName);
+            logger.warn("File name verify failed, fileName:{}.", RegexUtils.escapeNRT(fileName));
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }

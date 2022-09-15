@@ -108,7 +108,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
             originResSet.removeAll(ownResSets);
             if (CollectionUtils.isNotEmpty(originResSet))
-                logger.warn("User does not have resource permission {} on associated resources, userId:{}", authorizationType, userId);
+                logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
             return originResSet.isEmpty();
         }
         return true;

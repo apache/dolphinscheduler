@@ -266,7 +266,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                logger.error("Tenant does not exist, tenantCode:{}.", tenantCode);
+                logger.error("Tenant does not exist.");
                 throw new ServiceException(Status.TENANT_NOT_EXIST);
             }
             tenantId = tenant.getId();
@@ -548,7 +548,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
 
         if (processDefinition == null) {
-            logger.error("Process definition does not exist, projectCode:{}, processDefinitionName:{}.", projectCode, name);
+            logger.error("Process definition does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, name);
         } else {
             DagData dagData = processService.genDagData(processDefinition);
@@ -609,7 +609,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                logger.error("Tenant does not exist, tenantCode:{}.", tenantCode);
+                logger.error("Tenant does not exist.");
                 putMsg(result, Status.TENANT_NOT_EXIST);
                 return result;
             }
@@ -634,7 +634,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // check whether the new process define name exist
             ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
-                logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.", name, definition.getCode());
+                logger.warn("Process definition with the same name already exists, processDefinitionCode:{}.",
+                        definition.getCode());
                 putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
             }
@@ -1190,7 +1191,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         dataSource = queryDatasourceByNameAndUser(datasourceName, loginUser);
                     }
                     if (dataSource == null) {
-                        logger.error("Datasource not found, dataSourceName:{}.", datasourceName);
+                        logger.error("Datasource does not found, may be its name is illegal.");
                         putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
                         return result;
                     }
@@ -1717,6 +1718,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
                 .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
 
+        if (limit < 0) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            return result;
+        }
         if (limit > processInstanceList.size()) {
             limit = processInstanceList.size();
         }
@@ -2270,7 +2275,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                logger.error("Tenant does not exist, tenantCode:{}.", tenantCode);
+                logger.error("Tenant does not exist.");
                 putMsg(result, Status.TENANT_NOT_EXIST);
                 return result;
             }
@@ -2432,7 +2437,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // check whether the new process define name exist
             ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
-                logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.", name, definition.getCode());
+                logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                        definition.getName(), definition.getCode());
                 putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
             }

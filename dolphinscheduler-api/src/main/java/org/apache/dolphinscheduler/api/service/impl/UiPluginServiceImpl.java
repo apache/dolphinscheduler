@@ -50,7 +50,7 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
         Map<String, Object> result = new HashMap<>();
         if (!pluginType.getHasUi()) {
-            logger.warn("Plugin in {} type does not have UI.", pluginType.getDesc());
+            logger.warn("Plugin in {} type does not have UI.", pluginType);
             putMsg(result, Status.PLUGIN_NOT_A_UI_COMPONENT);
             return result;
         }

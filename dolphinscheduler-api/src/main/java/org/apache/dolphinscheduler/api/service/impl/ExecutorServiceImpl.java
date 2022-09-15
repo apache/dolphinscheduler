@@ -449,7 +449,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 }
                 break;
             default:
-                logger.warn("Unknown execute type : {}", executeType);
+                logger.warn("Unknown execute type for process instance, processInstanceId:{}.", processInstance.getId());
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "unknown execute type");
 
                 break;
@@ -530,8 +530,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         if (!checkResult) {
-            logger.warn("Status of process instance is {}, so can not perform {} operation, processInstanceId:{}.",
-                    executionStatus.getDesc(), executeType, processInstance.getId());
+            logger.warn("Status of process instance is {}, so can not perform {} operation, processInstanceName:{}.",
+                    executionStatus, executeType, processInstance.getName());
             putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(),
                     executionStatus.toString(), executeType.toString());
         } else {

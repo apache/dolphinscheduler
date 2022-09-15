@@ -603,8 +603,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 columnList.add(rs.getString(COLUMN_NAME));
             }
         } catch (Exception e) {
-            logger.error("Get datasource table columns error, datasourceId:{}, tasbleName:{}.", datasourceId, tableName, e);
-            logger.error(e.toString(), e);
+            logger.error("Get datasource table columns error, datasourceId:{}.", dataSource.getId(), e);
         } finally {
             closeResult(rs);
             releaseConnection(connection);

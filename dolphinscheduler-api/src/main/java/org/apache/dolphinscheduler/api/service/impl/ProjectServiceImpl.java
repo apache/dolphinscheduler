@@ -393,7 +393,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
         User user = userMapper.queryByUserNameAccurately(userName);
         if (user == null) {
-            logger.error("User does not exist, userName:{}.", userName);
+            logger.error("User does not exist.");
             putMsg(result, Status.USER_NOT_EXIST, userName);
             return result;
         }

@@ -572,7 +572,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             updateDag(loginUser, result, taskRelation.getProcessDefinitionCode(), processTaskRelations, Lists.newArrayList(taskDefinitionToUpdate));
         }
         logger.info("Update task with upstream tasks complete, projectCode:{}, taskDefinitionCode:{}, upstreamTaskCodes:{}.",
-                projectCode, taskCode, upstreamCodes);
+                projectCode, taskCode, upstreamTaskCodes);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -851,11 +851,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         int update = taskDefinitionMapper.updateById(taskDefinition);
         int updateLog = taskDefinitionLogMapper.updateById(taskDefinitionLog);
         if ((update == 0 && updateLog == 1) || (update == 1 && updateLog == 0)) {
-            logger.error("Update taskDefinition state or taskDefinitionLog state to {} error, taskDefinitionCode:{}.", releaseState, code);
+            logger.error("Update taskDefinition state or taskDefinitionLog state error, taskDefinitionCode:{}.", code);
             putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
-        logger.error("Update taskDefinition state or taskDefinitionLog state to {} complete, taskDefinitionCode:{}.", releaseState, code);
+        logger.error("Update taskDefinition state or taskDefinitionLog state to complete, taskDefinitionCode:{}.", code);
         putMsg(result, Status.SUCCESS);
         return result;
     }

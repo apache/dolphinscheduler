@@ -411,7 +411,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         List<Long> postTaskCodeList = Lists.newArrayList(postTaskCodes.split(Constants.COMMA)).stream()
                 .map(Long::parseLong).collect(Collectors.toList());
         if (postTaskCodeList.contains(0L)) {
-            logger.warn("Parameter postTaskCodes contain 0.");
+            logger.warn("Parameter postTaskCodes contains 0.");
             putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
             return result;
         }

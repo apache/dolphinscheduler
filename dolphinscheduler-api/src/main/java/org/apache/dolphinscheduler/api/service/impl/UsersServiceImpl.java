@@ -450,7 +450,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
-                logger.warn("Time zone {} is illegal.", timeZone);
+                logger.warn("Parameter time zone is illegal.");
                 putMsg(result, Status.TIME_ZONE_ILLEGAL, timeZone);
                 return result;
             }
@@ -830,7 +830,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             udfUserMapper.insert(udfUser);
         }
 
-        logger.info("User is granted permission for UDF, userId:{}, udfIds:{}.", user.getId(), resourcesIdArr);
+        logger.info("User is granted permission for UDF, userName:{}.", user.getUserName());
 
         putMsg(result, Status.SUCCESS);
 
