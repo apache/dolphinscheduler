@@ -28,6 +28,10 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +72,7 @@ public class ProcessUtilsTest {
         Assert.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
         Mockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
                 .thenReturn(false);
-        Assert.assertEquals("", ProcessUtils.getKerberosInitCommand());
+        Assert.assertEquals("", LogUtils.getKerberosInitCommand());
     }
 
     @Test
@@ -88,7 +92,7 @@ public class ProcessUtilsTest {
             Mockito.when(hadoop.getApplicationStatus("application_1598885606600_3677")).thenReturn(running);
         } catch (Exception e) {
             e.printStackTrace();
-            ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
+            LogUtils.cancelApplication(appIds, logger, tenantCode, executePath);
         }
 
         Assert.assertNotNull(appIds);

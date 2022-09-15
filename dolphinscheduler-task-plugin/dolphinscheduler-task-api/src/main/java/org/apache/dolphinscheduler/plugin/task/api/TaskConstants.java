@@ -401,6 +401,21 @@ public class TaskConstants {
             "hadoop.security.authentication.startup.state";
 
     /**
+     * data basedir path
+     */
+    public static final String DATA_BASEDIR_PATH = "data.basedir.path";
+
+    /**
+     * dolphinscheduler.env.path
+     */
+    public static final String DOLPHINSCHEDULER_ENV_PATH = "dolphinscheduler.env.path";
+
+    /**
+     * environment properties default path
+     */
+    public static final String ENV_PATH = "dolphinscheduler_env.sh";
+
+    /**
      * Task Logger Thread's name
      */
     public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
