@@ -24,6 +24,8 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXE
 import static org.apache.dolphinscheduler.common.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
+import org.apache.dolphinscheduler.plugin.task.api.utils.CommonUtils;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -95,14 +97,7 @@ public class FileUtils {
      * @return directory of process execution
      */
     public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
-        String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
-                projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        return fileName;
+        return CommonUtils.getProcessExecDir(projectCode, processDefineCode, processDefineVersion, processInstanceId, taskInstanceId);
     }
 
     /**
@@ -119,25 +114,7 @@ public class FileUtils {
      * @throws IOException errors
      */
     public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        //if work dir exists, first delete
-        File execLocalPathFile = new File(execLocalPath);
-
-        if (execLocalPathFile.exists()) {
-            try {
-                org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
-            } catch (Exception ex) {
-                if (ex instanceof NoSuchFileException || ex.getCause() instanceof NoSuchFileException) {
-                    // this file is already be deleted.
-                } else {
-                    throw ex;
-                }
-            }
-        }
-
-        //create work dir
-        org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
-        String mkdirLog = "create dir success " + execLocalPath;
-        logger.info(mkdirLog);
+        CommonUtils.createWorkDirIfAbsent(execLocalPath);
     }
 
     /**

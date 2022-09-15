@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -238,7 +239,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 return Pair.of(true, Collections.emptyList());
             }
 
-            ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
+            LogUtils.cancelApplication(appIds, logger, tenantCode, executePath);
             return Pair.of(true, appIds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
