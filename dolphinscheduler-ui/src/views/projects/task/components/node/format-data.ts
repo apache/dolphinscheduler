@@ -35,6 +35,17 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SUB_PROCESS') {
     taskParams.processDefinitionCode = data.processDefinitionCode
   }
+
+  if(data.taskType === 'JAVA'){
+    taskParams.runType = data.runType
+    taskParams.mainArgs = data.mainArgs
+    taskParams.jvmArgs = data.jvmArgs
+    taskParams.isModulePath = data.isModulePath
+    if(data.runType === 'JAR' && data.mainJar){
+      taskParams.mainJar = {id: data.mainJar};
+    }
+  }
+
   if (
     data.taskType &&
     ['SPARK', 'MR', 'FLINK', 'FLINK_STREAM'].includes(data.taskType)
