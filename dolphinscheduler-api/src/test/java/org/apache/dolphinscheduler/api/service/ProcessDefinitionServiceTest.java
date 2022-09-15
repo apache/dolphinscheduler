@@ -79,6 +79,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -393,8 +394,16 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         definition.setVersion(1);
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(definition);
-        Set<Long> definitionCodes = Arrays.stream(String.valueOf(processDefinitionCode).split(Constants.COMMA))
-                .map(Long::parseLong).collect(Collectors.toSet());
+        Set<Long> definitionCodes = new HashSet<>();
+        // Change this catch NumberFormatException
+        for (String code : String.valueOf(processDefinitionCode).split(Constants.COMMA)) {
+            try {
+                long parse = Long.parseLong(code);
+                definitionCodes.add(parse);
+            } catch (NumberFormatException e) {
+                Assertions.fail();
+            }
+        }
         Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         Mockito.when(processService.saveProcessDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode))
