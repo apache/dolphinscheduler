@@ -17,6 +17,12 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -35,8 +41,9 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
-
-import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -47,17 +54,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-
 @Component
 public class AlertDao {
+
+    private final int QUERY_ALERT_THRESHOLD = 100;
 
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
@@ -136,12 +136,19 @@ public class AlertDao {
         return alertSendStatusMapper.insert(alertSendStatus);
     }
 
+    public int insertAlertSendStatus(List<AlertSendStatus> alertSendStatuses) {
+        if (CollectionUtils.isEmpty(alertSendStatuses)) {
+            return 0;
+        }
+        return alertSendStatusMapper.batchInsert(alertSendStatuses);
+    }
+
     /**
      * MasterServer or WorkerServer stopped
      *
      * @param alertGroupId alertGroupId
-     * @param host host
-     * @param serverType serverType
+     * @param host         host
+     * @param serverType   serverType
      */
     public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().type(serverType)
@@ -253,8 +260,10 @@ public class AlertDao {
      * List alerts that are pending for execution
      */
     public List<Alert> listPendingAlerts() {
-        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
-                .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
+        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert())
+                .lambda()
+                .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION)
+                .last("limit " + QUERY_ALERT_THRESHOLD);
         return alertMapper.selectList(wrapper);
     }
 
