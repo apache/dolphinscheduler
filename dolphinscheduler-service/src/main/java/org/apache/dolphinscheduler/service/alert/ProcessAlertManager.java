@@ -216,6 +216,9 @@ public class ProcessAlertManager {
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances,
                                          ProjectUser projectUser) {
+        if (!isNeedToSendWarning(processInstance)) {
+            return;
+        }
         Alert alert = new Alert();
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().isSuccess() ? "success" : "failed";
