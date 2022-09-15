@@ -23,13 +23,14 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -161,16 +165,16 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 WorkflowExecutionStatus.RUNNING_EXECUTION.getCode(),
                 WorkflowExecutionStatus.SUCCESS.getCode()};
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setProjectCode(1L);
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(processDefinition);
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setCode(1L);
+        processDefinitionLog.setProjectCode(1L);
+        processDefinitionLog.setReleaseState(ReleaseState.ONLINE);
+        processDefinitionLog.setUpdateTime(new Date());
+        processDefinitionLog.setCreateTime(new Date());
+        processDefinitionLogMapper.insert(processDefinitionLog);
 
         ProcessInstance processInstance = insertOne();
-        processInstance.setProcessDefinitionCode(processDefinition.getCode());
+        processInstance.setProcessDefinitionCode(processDefinitionLog.getCode());
         processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         processInstance.setIsSubProcess(Flag.NO);
         processInstance.setStartTime(new Date());
@@ -181,7 +185,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
 
         IPage<ProcessInstance> processInstanceIPage = processInstanceMapper.queryProcessInstanceListPaging(
                 page,
-                processDefinition.getProjectCode(),
+                processDefinitionLog.getProjectCode(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getName(),
                 0,
@@ -191,7 +195,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 null);
         Assert.assertNotEquals(processInstanceIPage.getTotal(), 0);
 
-        processDefinitionMapper.deleteById(processDefinition.getId());
+        processDefinitionLogMapper.deleteById(processDefinitionLog.getId());
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
