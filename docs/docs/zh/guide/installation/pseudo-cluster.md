@@ -100,8 +100,6 @@ deployUser="dolphinscheduler"
 
 * DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库](#初始化数据库)
 * 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
-* 注册中心`zookeeper`
-* 服务端相关配置，比如缓存，时区设置等
 
 如果您不使用某些任务类型，您可以忽略任务外部依赖项，但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
 

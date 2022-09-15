@@ -2,7 +2,7 @@
 
 本教程使用三种不同的方式通过 Docker 完成 DolphinScheduler 的部署，如果你想要快速体验，推荐使用 standalone-server 镜像，
 如果你想要体验比较完成的服务，推荐使用 docker-compose 启动服务。如果你已经有自己的数据库或者 Zookeeper 服务
-你想要沿用这些基础服务，你可以参考沿用已有的 PostgreSQL 和 ZooKeeper 服务完成部署。 
+你想要沿用这些基础服务，你可以参考沿用已有的 PostgreSQL 和 ZooKeeper 服务完成部署。
 
 ## 前置条件
 
@@ -56,7 +56,7 @@ $ docker-compose --profile schema up -d
 $ docker-compose --profile all up -d
 ```
 
-> 提醒：通过 docker-compose 启动服务时，除了会启动 DolphinScheduler 对应的服务外，还会启动必要依赖服务，如数据库 PostgreSQL(用户 
+> 提醒：通过 docker-compose 启动服务时，除了会启动 DolphinScheduler 对应的服务外，还会启动必要依赖服务，如数据库 PostgreSQL(用户
 > `root`, 密码 `root`, 数据库 `dolphinscheduler`) 和 服务发现 ZooKeeper。
 
 ### 沿用已有的 PostgreSQL 和 ZooKeeper 服务
@@ -126,4 +126,4 @@ $ docker run -d --name dolphinscheduler-alert-server \
 ## 环境变量
 
 可以通过环境变量来修改 Docker 运行的配置，我们在沿用已有的 PostgreSQL 和 ZooKeeper 服务中就通过环境变量修改了 Docker 的数据库配置和
-注册中心配置，关于全部的配置环境可以查看[全部的配置文件](https://github.com/apache/dolphinscheduler/blob/<version>/script/env/dolphinscheduler_env.sh) 了解 <!-- markdown-link-check-disable-line -->
+注册中心配置，关于全部的配置环境可以查看对应组件的 application.yaml 文件了解 <!-- markdown-link-check-disable-line -->

@@ -22,10 +22,10 @@
 
 ### 数据库升级
 
-修改 `./bin/env/dolphinscheduler_env.sh` 中的如下配置（{user}和{password}改成你数据库的用户名和密码），然后运行升级脚本。
+设置相关环境变量（{user}和{password}改成你数据库的用户名和密码），然后运行升级脚本。
 
 下面以 MySQL 为例，别的数据库仅需要修改成对应的配置即可。请先手动下载 [mysql-connector-java 驱动 jar](https://downloads.MySQL.com/archives/c-j/)
-jar 包 并添加到 `./tools/libs` 目录下，修改 `./bin/env/dolphinscheduler_env.sh` 文件
+jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 
     ```shell
     export DATABASE=${DATABASE:-mysql}

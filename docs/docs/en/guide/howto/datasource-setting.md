@@ -8,11 +8,12 @@ We here use MySQL as an example to illustrate how to configure an external datab
 which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
 
 * First of all, follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
-* Set the following environment variables in your terminal or modify the `bin/env/dolphinscheduler_env.sh` with your database username and password for `{user}` and `{password}`:
+* Set the following environment variables in your terminal with your database address, username and password for `{address}`, `{user}` and `{password}`:
 
 ```shell
 export DATABASE=mysql
 export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL="jdbc:mysql://{address}/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```
@@ -54,9 +55,9 @@ mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%';
 mysql> CREATE USER '{user}'@'localhost' IDENTIFIED BY '{password}';
 mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
 mysql> FLUSH PRIVILEGES;
-``` 
+```
 
-For PostgreSQL: 
+For PostgreSQL:
 ```shell
 # Use psql-tools to login PostgreSQL
 psql
@@ -72,9 +73,10 @@ echo "host    dolphinscheduler   {user}    {ip}     md5" >> $PGDATA/pg_hba.conf
 pg_ctl reload
 ```
 
-Then, modify `./bin/env/dolphinscheduler_env.sh`, change {user} and {password} to what you set in the previous step.
+Then, set the database configurations by exporting the following environment variables, change {user} and {password} to what you set in the previous step.
 
 For MySQL:
+
 ```shell
 # for mysql
 export DATABASE=${DATABASE:-mysql}
@@ -85,6 +87,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 ```
 
 For PostgreSQL:
+
 ```shell
 # for postgresql
 export DATABASE=${DATABASE:-postgresql}
