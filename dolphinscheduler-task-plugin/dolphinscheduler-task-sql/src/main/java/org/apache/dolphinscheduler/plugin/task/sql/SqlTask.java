@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -55,6 +56,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 public class SqlTask extends AbstractTask {
 
@@ -102,9 +104,6 @@ public class SqlTask extends AbstractTask {
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
         assert sqlParameters != null;
-        if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES && this.sqlParameters.getDatasource() == 0) {
-            throw new RuntimeException("unbound test data source");
-        }
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
@@ -172,7 +171,7 @@ public class SqlTask extends AbstractTask {
     public void cancel() throws TaskException {
         String type = sqlParameters.getType();
         if (DbType.HIVE == DbType.valueOf(type)) {
-            List<String> appIds = ProcessUtils.killYarnJob(taskExecutionContext);
+            List<String> appIds = LogUtils.killYarnJob(taskExecutionContext);
             logger.info("cancel task type is [{}],yarn appIds is {}", type, appIds);
         } else {
             close(connection);

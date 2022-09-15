@@ -22,16 +22,19 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -69,10 +72,10 @@ public class ProcessUtilsTest {
         PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
         PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
         PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
-        Assert.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
+        Assert.assertNotEquals("", LogUtils.getKerberosInitCommand());
         PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
                 .thenReturn(false);
-        Assert.assertEquals("", ProcessUtils.getKerberosInitCommand());
+        Assert.assertEquals("", LogUtils.getKerberosInitCommand());
     }
 
     @Test
@@ -97,7 +100,7 @@ public class ProcessUtilsTest {
             when(hadoop.getApplicationStatus("application_1598885606600_3677")).thenReturn(running);
         } catch (Exception e) {
             e.printStackTrace();
-            ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
+            LogUtils.cancelApplication(appIds, logger, tenantCode, executePath);
         }
 
         Assert.assertNotNull(appIds);
