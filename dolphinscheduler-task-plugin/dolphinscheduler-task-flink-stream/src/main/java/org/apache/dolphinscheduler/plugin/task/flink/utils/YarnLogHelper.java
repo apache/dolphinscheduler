@@ -21,24 +21,19 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.util.Preconditions;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileContext;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.logaggregation.AggregatedLogFormat;
 import org.apache.hadoop.yarn.logaggregation.LogAggregationUtils;
-import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Arrays;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * reference for yarn LogCLIHelpers
@@ -56,7 +51,7 @@ public class YarnLogHelper {
                         configuration.get(
                                 YarnConfiguration.NM_REMOTE_APP_LOG_DIR,
                                 YarnConfiguration.DEFAULT_NM_REMOTE_APP_LOG_DIR));
-        ApplicationId appId = ConverterUtils.toApplicationId(applicationId);
+        ApplicationId appId = ApplicationId.fromString(applicationId);
         // mkdir if not exist
         FileUtils.forceMkdir(new File(finishedJobLogDir));
         String logFilePath = finishedJobLogDir + "/" + applicationId + ".log";
@@ -96,7 +91,7 @@ public class YarnLogHelper {
 
             boolean foundAnyLogs = false;
 
-            while (nodeFiles.hasNext()) {
+            while (nodeFiles != null && nodeFiles.hasNext()) {
                 FileStatus thisNodeFile = nodeFiles.next();
                 if (!thisNodeFile
                         .getPath()

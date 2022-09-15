@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.enums;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import org.apache.dolphinscheduler.plugin.task.flink.client.IClusterClient;
 import org.apache.dolphinscheduler.plugin.task.flink.entity.CheckpointInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
@@ -27,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.flink.executor.YarnPerJobClusterE
 import org.apache.dolphinscheduler.plugin.task.flink.factory.YarnClusterDescriptorFactory;
 import org.apache.dolphinscheduler.plugin.task.flink.utils.HdfsUtil;
 import org.apache.dolphinscheduler.plugin.task.flink.utils.YarnLogHelper;
-
 import org.apache.flink.util.Preconditions;
 import org.apache.flink.util.function.FunctionUtils;
 import org.apache.hadoop.fs.FileSystem;
@@ -38,7 +41,8 @@ import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -46,14 +50,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
 
 public enum ClusterClient implements IClusterClient {
 
@@ -126,7 +122,7 @@ public enum ClusterClient implements IClusterClient {
 
         if (!Objects.isNull(yarnClient)) {
             try {
-                ApplicationId appId = ConverterUtils.toApplicationId(applicationId);
+                ApplicationId appId = ApplicationId.fromString(applicationId);
                 ApplicationReport report = yarnClient.getApplicationReport(appId);
 
                 YarnApplicationState yarnApplicationState = report.getYarnApplicationState();
@@ -178,12 +174,10 @@ public enum ClusterClient implements IClusterClient {
                         jobParamsInfo.getHadoopConfDir());
         FileSystem fileSystem = FileSystem.get(yarnConfiguration);
 
-        List<CheckpointInfo> checkpointInfos =
-                HdfsUtil.listFiles(
-                        fileSystem,
-                        new Path(jobParamsInfo.getHdfsPath()),
-                        (Path file) -> file.getName().startsWith("chk-"));
-        return checkpointInfos;
+        return HdfsUtil.listFiles(
+                fileSystem,
+                new Path(jobParamsInfo.getHdfsPath()),
+                (Path file) -> file.getName().startsWith("chk-"));
     }
 
     @Override

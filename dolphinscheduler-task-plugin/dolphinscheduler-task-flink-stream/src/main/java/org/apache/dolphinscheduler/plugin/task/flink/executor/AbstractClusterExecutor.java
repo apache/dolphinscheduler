@@ -17,19 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.executor;
 
-import static org.apache.flink.util.Preconditions.checkNotNull;
-import static org.apache.flink.yarn.configuration.YarnLogConfigUtil.CONFIG_FILE_LOG4J_NAME;
-import static org.apache.flink.yarn.configuration.YarnLogConfigUtil.CONFIG_FILE_LOGBACK_NAME;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.factory.YarnClusterDescriptorFactory;
 import org.apache.dolphinscheduler.plugin.task.flink.utils.JobGraphBuildUtil;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.ClusterClientProvider;
@@ -48,7 +42,8 @@ import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,8 +53,9 @@ import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.flink.util.Preconditions.checkNotNull;
+import static org.apache.flink.yarn.configuration.YarnLogConfigUtil.CONFIG_FILE_LOG4J_NAME;
+import static org.apache.flink.yarn.configuration.YarnLogConfigUtil.CONFIG_FILE_LOGBACK_NAME;
 
 public abstract class AbstractClusterExecutor {
 
@@ -109,7 +105,7 @@ public abstract class AbstractClusterExecutor {
                 YarnClient yarnClient =
                         YarnClusterDescriptorFactory.INSTANCE.createYarnClientFromYarnConf(
                                 yarnConfiguration);) {
-            yarnClient.killApplication(ConverterUtils.toApplicationId(applicationId));
+            yarnClient.killApplication(ApplicationId.fromString(applicationId));
             logger.info("killed applicationId {} was unsuccessful.", applicationId);
         } catch (YarnException e) {
             logger.error("killed applicationId {0} was failed.", e);
@@ -141,7 +137,7 @@ public abstract class AbstractClusterExecutor {
 
         logger.info("cancel Job appId:{}, jobId:{}", appId, jobId);
 
-        ApplicationId applicationId = ConverterUtils.toApplicationId(appId);
+        ApplicationId applicationId = ApplicationId.fromString(appId);
         JobID flinkJobId = new JobID(org.apache.flink.util.StringUtils.hexStringToByte(jobId));
 
         Configuration flinkConfig = getFlinkConfigFromParamsInfo();
@@ -174,7 +170,7 @@ public abstract class AbstractClusterExecutor {
             }
 
         } catch (Exception e) {
-            logger.error(String.format("cancel job failed,appId:{}, jobId:", appId, jobId), e);
+            logger.error("cancel job failed,appId:{}, jobId:{}, exception:{}", appId, jobId, e);
             return new ResultInfo(appId, jobId);
         }
 
@@ -187,7 +183,7 @@ public abstract class AbstractClusterExecutor {
 
         logger.info("cancel Job appId:{}, jobId:{}", appId, jobId);
 
-        ApplicationId applicationId = ConverterUtils.toApplicationId(appId);
+        ApplicationId applicationId = ApplicationId.fromString(appId);
         JobID flinkJobId = new JobID(org.apache.flink.util.StringUtils.hexStringToByte(jobId));
 
         Configuration flinkConfig = getFlinkConfigFromParamsInfo();
@@ -208,7 +204,7 @@ public abstract class AbstractClusterExecutor {
             }
 
         } catch (Exception e) {
-            logger.error(String.format("flink job savepoint failed, appId:{}, jobId:", appId, jobId), e);
+            logger.error("flink job savepoint failed, appId:{}, jobId:{}, exception:{}", appId, jobId, e);
             return new ResultInfo(appId, jobId);
         }
 
@@ -293,7 +289,7 @@ public abstract class AbstractClusterExecutor {
                 logger.warn(
                         "The configuration directory ('"
                                 + configurationDirectory
-                                + "') already contains a logger4J config file."
+                                + "') already contains a logger4J config file. "
                                 + "If you want to use logback, then please delete or rename the log configuration file.");
             } else {
                 logConfigFile = Optional.of(logbackFile);
