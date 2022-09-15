@@ -17,40 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
 public class CheckpointInfo {
 
     private String checkpointPath;
+
     private long createTime;
-
-    public CheckpointInfo(String checkpointPath, long createTime) {
-        this.checkpointPath = checkpointPath;
-        this.createTime = createTime;
-    }
-
-    public String getCheckpointPath() {
-        return checkpointPath;
-    }
-
-    public void setCheckpointPath(String checkpointPath) {
-        this.checkpointPath = checkpointPath;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
-    }
-
-    @Override
-    public String toString() {
-        return "CheckpointInfo{"
-                + "checkpointPath='"
-                + checkpointPath
-                + '\''
-                + ", createTime="
-                + createTime
-                + '}';
-    }
 }

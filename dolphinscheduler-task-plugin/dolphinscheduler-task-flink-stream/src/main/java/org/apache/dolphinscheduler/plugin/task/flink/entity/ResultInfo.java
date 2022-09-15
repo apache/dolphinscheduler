@@ -17,20 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 public class ResultInfo {
 
     private String appId;
+
     private String jobId;
-
-    public ResultInfo(String appId, String jobId) {
-        this.appId = appId;
-        this.jobId = jobId;
-    }
-
-    public ResultInfo() {
-
-    }
 }

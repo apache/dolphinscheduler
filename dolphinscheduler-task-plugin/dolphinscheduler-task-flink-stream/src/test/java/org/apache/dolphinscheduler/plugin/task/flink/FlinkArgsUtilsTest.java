@@ -19,16 +19,13 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.enums.ClusterClient;
 import org.apache.dolphinscheduler.plugin.task.flink.enums.FlinkStreamDeployMode;
-
-import java.util.Properties;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Properties;
 
 public class FlinkArgsUtilsTest {
 
@@ -61,15 +58,15 @@ public class FlinkArgsUtilsTest {
         confProperties.setProperty("taskmanager.numberOfTaskSlots", "2");
 
         ParamsInfo jobParamsInfo = ParamsInfo.builder()
-                .setExecArgs(execArgs)
-                .setName(jobName)
-                .setRunJarPath(runJarPath)
-                .setFlinkConfDir(flinkConfDir)
-                .setConfProperties(confProperties)
-                .setFlinkJarPath(flinkJarPath)
-                .setHadoopConfDir(hadoopConfDir)
-                .setQueue(queue)
-                .setRunMode(runMode)
+                .execArgs(execArgs)
+                .name(jobName)
+                .runJarPath(runJarPath)
+                .flinkConfDir(flinkConfDir)
+                .confProperties(confProperties)
+                .flinkJarPath(flinkJarPath)
+                .hadoopConfDir(hadoopConfDir)
+                .queue(queue)
+                .runMode(runMode)
                 .build();
 
         Assert.assertNotNull(jobParamsInfo);
@@ -81,9 +78,9 @@ public class FlinkArgsUtilsTest {
         String hadoopConfDir = "/usr/local/Cellar/hadoop/3.3.3/libexec/etc/hadoop";
 
         ParamsInfo jobParamsInfo = ParamsInfo.builder()
-                .setHadoopConfDir(hadoopConfDir)
-                .setFlinkJobId("job_id")
-                .setApplicationId("app_id")
+                .hadoopConfDir(hadoopConfDir)
+                .flinkJobId("job_id")
+                .applicationId("app_id")
                 .build();
 
         Assert.assertNotNull(jobParamsInfo);
@@ -95,9 +92,9 @@ public class FlinkArgsUtilsTest {
         String hadoopConfDir = "/usr/local/Cellar/hadoop/3.3.3/libexec/etc/hadoop";
 
         ParamsInfo jobParamsInfo = ParamsInfo.builder()
-                .setHadoopConfDir(hadoopConfDir)
-                .setFlinkJobId("job_id")
-                .setApplicationId("app_id")
+                .hadoopConfDir(hadoopConfDir)
+                .flinkJobId("job_id")
+                .applicationId("app_id")
                 .build();
 
         Assert.assertNotNull(jobParamsInfo);

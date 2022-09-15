@@ -85,9 +85,9 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
         initResultInfo();
 
         ParamsInfo jobParamsInfo = ParamsInfo.builder()
-                .setHadoopConfDir(hadoopConfDir)
-                .setApplicationId(flinkStreamResultInfo.getAppId())
-                .setFlinkJobId(flinkStreamResultInfo.getJobId())
+                .hadoopConfDir(hadoopConfDir)
+                .applicationId(flinkStreamResultInfo.getAppId())
+                .flinkJobId(flinkStreamResultInfo.getJobId())
                 .build();
 
         try {
@@ -132,16 +132,16 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
         }
 
         ParamsInfo jobParamsInfo = ParamsInfo.builder()
-                .setExecArgs(new String[]{})
-                .setName(flinkParameters.getAppName())
-                .setRunJarPath(taskExecutionContext.getExecutePath().concat(flinkParameters.getMainJar().getResourceName()))
-                .setFlinkConfDir(flinkHome.concat(FLINK_CONF_DIR))
-                .setConfProperties(confProperties)
-                .setFlinkJarPath(flinkHome.concat(FLINK_LIB_DIR))
-                .setHadoopConfDir(hadoopConfDir)
-                .setQueue(flinkParameters.getQueue())
-                .setRunMode(flinkParameters.getDeployMode())
-                .setOpenSecurity(CommonUtils.getKerberosStartupState())
+                .execArgs(new String[]{})
+                .name(flinkParameters.getAppName())
+                .runJarPath(taskExecutionContext.getExecutePath().concat(flinkParameters.getMainJar().getResourceName()))
+                .flinkConfDir(flinkHome.concat(FLINK_CONF_DIR))
+                .confProperties(confProperties)
+                .flinkJarPath(flinkHome.concat(FLINK_LIB_DIR))
+                .hadoopConfDir(hadoopConfDir)
+                .queue(flinkParameters.getQueue())
+                .runMode(flinkParameters.getDeployMode())
+                .openSecurity(CommonUtils.getKerberosStartupState())
                 .build();
 
         try {
@@ -166,9 +166,9 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
         initResultInfo();
 
         ParamsInfo jobParamsInfo = ParamsInfo.builder()
-                .setHadoopConfDir(hadoopConfDir)
-                .setApplicationId(flinkStreamResultInfo.getAppId())
-                .setOpenSecurity(CommonUtils.getKerberosStartupState())
+                .hadoopConfDir(hadoopConfDir)
+                .applicationId(flinkStreamResultInfo.getAppId())
+                .openSecurity(CommonUtils.getKerberosStartupState())
                 .build();
         checkYarnExecutionStatus(jobParamsInfo);
     }
@@ -185,10 +185,10 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
         initResultInfo();
 
         ParamsInfo jobParamsInfo = ParamsInfo.builder()
-                .setHadoopConfDir(hadoopConfDir)
-                .setFlinkJobId(flinkStreamResultInfo.getJobId())
-                .setApplicationId(flinkStreamResultInfo.getAppId())
-                .setOpenSecurity(CommonUtils.getKerberosStartupState())
+                .hadoopConfDir(hadoopConfDir)
+                .flinkJobId(flinkStreamResultInfo.getJobId())
+                .applicationId(flinkStreamResultInfo.getAppId())
+                .openSecurity(CommonUtils.getKerberosStartupState())
                 .build();
 
         try {
