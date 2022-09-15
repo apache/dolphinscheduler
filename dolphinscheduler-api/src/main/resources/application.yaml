@@ -63,7 +63,7 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.threadPool:threadPriority: 5
+      org.quartz.threadPool.threadPriority: 5
       org.quartz.jobStore.isClustered: true
       org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
       org.quartz.scheduler.instanceId: AUTO
@@ -78,7 +78,7 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
-
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
 management:
   endpoints:
     web:
