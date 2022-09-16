@@ -68,10 +68,7 @@ public class ApiApplicationServer {
             String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
             PluginDefine pluginDefine = new PluginDefine(taskPluginName, PluginType.TASK.getDesc(), paramsJson);
-            int count = pluginDao.addOrUpdatePluginDefine(pluginDefine);
-            if (count <= 0) {
-                throw new TaskPluginException("Failed to update task plugin: " + taskPluginName);
-            }
+            pluginDao.addOrUpdatePluginDefine(pluginDefine);
         }
     }
 }
