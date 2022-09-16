@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_IMPORT;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT;
@@ -73,7 +74,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -164,7 +164,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     protected User user;
     protected Exception exception;
-    protected String formatter;
     protected final static long projectCode = 1L;
     protected final static long projectCodeOther = 2L;
     protected final static long processDefinitionCode = 11L;
@@ -366,7 +365,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(definition);
         Set<Long> definitionCodes =
-                Arrays.stream("46".split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
+                Arrays.stream(String.valueOf(processDefinitionCode).split(Constants.COMMA)).map(Long::parseLong)
+                        .collect(Collectors.toSet());
         Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         Mockito.when(processService.saveProcessDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
@@ -424,54 +424,42 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 2L));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINE_NOT_EXIST.getMsg(), 2L);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // project check auth fail
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
         Mockito.when(processDefinitionMapper.queryByCode(6L)).thenReturn(this.getProcessDefinition());
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION_DELETE))
-                .thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND)).when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION_DELETE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 6L));
-        formatter = MessageFormat.format(Status.PROJECT_NOT_FOUND.getMsg(), projectCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
 
         // project check auth success, instance not exist
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION_DELETE))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project,
+                WORKFLOW_DEFINITION_DELETE);
         Mockito.when(processDefinitionMapper.queryByCode(1L)).thenReturn(null);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 1L));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINE_NOT_EXIST.getMsg(), 1L);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         ProcessDefinition processDefinition = getProcessDefinition();
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION_DELETE))
-                .thenReturn(result);
         // user no auth
         Mockito.when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(), exception.getMessage());
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), ((ServiceException) exception).getCode());
 
         // process definition online
         user.setUserType(UserType.ADMIN_USER);
-        putMsg(result, Status.SUCCESS, projectCode);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         Mockito.when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINE_STATE_ONLINE.getMsg(), processDefinition.getName());
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
 
         // scheduler list elements > 1
         processDefinition.setReleaseState(ReleaseState.OFFLINE);
         Mockito.when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
-        putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(scheduleMapper.deleteById(46)).thenReturn(1);
         Mockito.when(processDefinitionMapper.deleteById(processDefinition.getId())).thenReturn(1);
@@ -484,25 +472,20 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // scheduler online
         Schedule schedule = getSchedule();
         schedule.setReleaseState(ReleaseState.ONLINE);
-        putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        formatter =
-                MessageFormat.format(Status.SCHEDULE_STATE_ONLINE.getMsg().substring(0, 10), exception.getMessage());
-        Assertions.assertTrue(exception.getMessage().contains(formatter));
+        Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
 
         // process used by other task, sub process
         user.setUserType(UserType.ADMIN_USER);
-        putMsg(result, Status.SUCCESS, projectCode);
         TaskMainInfo taskMainInfo = getTaskMainInfo().get(0);
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(ImmutableSet.copyOf(getTaskMainInfo()));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        formatter = MessageFormat.format(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL.getMsg(),
-                String.format("%s:%s", taskMainInfo.getProcessDefinitionName(), taskMainInfo.getTaskName()));
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL.getCode(),
+                ((ServiceException) exception).getCode());
 
         // delete success
         schedule.setReleaseState(ReleaseState.OFFLINE);
@@ -513,7 +496,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
-        putMsg(result, Status.SUCCESS, projectCode);
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
     }
 
@@ -526,9 +508,10 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // project check auth fail
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_ONLINE_OFFLINE))
+                .thenReturn(result);
         Map<String, Object> map = processDefinitionService.releaseProcessDefinition(user, projectCode,
-                6, ReleaseState.OFFLINE);
+                processDefinitionCode, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
 
         // project check auth success, processes definition online
@@ -822,7 +805,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testCreateProcessDefinitionV2() {
-        Map<String, Object> result = new HashMap<>();
         Project project = this.getProject(projectCode);
 
         WorkflowCreateRequest workflowCreateRequest = new WorkflowCreateRequest();
@@ -832,49 +814,40 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // project not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createProcessDefinitionV2(user, workflowCreateRequest));
-        formatter = MessageFormat.format(Status.PROJECT_NOT_FOUND.getMsg(), projectCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
 
         // project permission error
-        putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
-
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_CREATE))
-                .thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createProcessDefinitionV2(user, workflowCreateRequest));
-        formatter =
-                MessageFormat.format(Status.USER_NO_OPERATION_PROJECT_PERM.getMsg(), user.getUserName(), projectCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+                ((ServiceException) exception).getCode());
 
         // description too long
-        result = new HashMap<>();
-        putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
         workflowCreateRequest.setDescription(taskDefinitionJson);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_CREATE))
-                .thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createProcessDefinitionV2(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getMsg(), exception.getMessage());
+        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getCode(), ((ServiceException) exception).getCode());
         workflowCreateRequest.setDescription(EMPTY_STRING);
 
         // duplicate process definition name
-        result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_CREATE))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         Mockito.when(processDefinitionMapper.verifyByDefineName(project.getCode(), name))
                 .thenReturn(this.getProcessDefinition());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createProcessDefinitionV2(user, workflowCreateRequest));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINITION_NAME_EXIST.getMsg(), name);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // tenant not exists
         Mockito.when(processDefinitionMapper.verifyByDefineName(project.getCode(), name)).thenReturn(null);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createProcessDefinitionV2(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), exception.getMessage());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // test success
         workflowCreateRequest.setTenantCode(DEFAULT);
@@ -900,51 +873,42 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testFilterProcessDefinition() {
-        Map<String, Object> result = new HashMap<>();
         Project project = this.getProject(projectCode);
         WorkflowFilterRequest workflowFilterRequest = new WorkflowFilterRequest();
         workflowFilterRequest.setProjectName(project.getName());
 
         // project permission error
-        putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
         Mockito.when(projectMapper.queryByName(project.getName())).thenReturn(project);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.filterProcessDefinition(user, workflowFilterRequest));
-        formatter =
-                MessageFormat.format(Status.USER_NO_OPERATION_PROJECT_PERM.getMsg(), user.getUserName(), projectCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+                ((ServiceException) exception).getCode());
     }
 
     @Test
     public void testGetProcessDefinition() {
-        Map<String, Object> result = new HashMap<>();
-
         // process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINE_NOT_EXIST.getMsg(), processDefinitionCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // project permission error
-        putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode))
                 .thenReturn(this.getProcessDefinition());
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject(projectCode));
-        Mockito.when(projectService.checkProjectAndAuth(user, this.getProject(projectCode), projectCode,
-                WORKFLOW_DEFINITION)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
+                .when(projectService)
+                .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        formatter =
-                MessageFormat.format(Status.USER_NO_OPERATION_PROJECT_PERM.getMsg(), user.getUserName(), projectCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+                ((ServiceException) exception).getCode());
 
         // success
-        result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        Mockito.when(projectService.checkProjectAndAuth(user, this.getProject(projectCode), projectCode,
-                WORKFLOW_DEFINITION)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, this.getProject(projectCode),
+                WORKFLOW_DEFINITION);
         ProcessDefinition processDefinition =
                 processDefinitionService.getProcessDefinition(user, processDefinitionCode);
         Assertions.assertEquals(this.getProcessDefinition(), processDefinition);
@@ -952,7 +916,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testUpdateProcessDefinitionV2() {
-        Map<String, Object> result = new HashMap<>();
         ProcessDefinition processDefinition;
 
         WorkflowUpdateRequest workflowUpdateRequest = new WorkflowUpdateRequest();
@@ -961,8 +924,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINE_NOT_EXIST.getMsg(), processDefinitionCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // error old process definition in release state
         processDefinition = this.getProcessDefinition();
@@ -970,48 +932,41 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateProcessDefinitionV2(user, processDefinitionCode, workflowUpdateRequest));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT.getMsg(), processDefinition.getName());
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error project permission
-        putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode))
-                .thenReturn(this.getProcessDefinition());
+        processDefinition = this.getProcessDefinition();
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject(projectCode));
-        Mockito.when(projectService.checkProjectAndAuth(user, this.getProject(projectCode), projectCode,
-                WORKFLOW_DEFINITION)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
+                .when(projectService)
+                .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        formatter =
-                MessageFormat.format(Status.USER_NO_OPERATION_PROJECT_PERM.getMsg(), user.getUserName(), projectCode);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error description too long
-        result = new HashMap<>();
-        putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
         workflowUpdateRequest.setDescription(taskDefinitionJson);
-        Mockito.when(
-                projectService.checkProjectAndAuth(user, this.getProject(projectCode), projectCode, WORKFLOW_UPDATE))
-                .thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
+                .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_UPDATE);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateProcessDefinitionV2(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getMsg(), exception.getMessage());
+        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getCode(), ((ServiceException) exception).getCode());
         workflowUpdateRequest.setDescription(EMPTY_STRING);
 
         // error new definition name already exists
-        result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        Mockito.when(
-                projectService.checkProjectAndAuth(user, this.getProject(projectCode), projectCode, WORKFLOW_UPDATE))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, this.getProject(projectCode),
+                WORKFLOW_UPDATE);
         Mockito.when(processDefinitionMapper.verifyByDefineName(projectCode, workflowUpdateRequest.getName()))
                 .thenReturn(this.getProcessDefinition());
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateProcessDefinitionV2(user, processDefinitionCode, workflowUpdateRequest));
-        formatter = MessageFormat.format(Status.PROCESS_DEFINITION_NAME_EXIST.getMsg(), name);
-        Assertions.assertEquals(formatter, exception.getMessage());
+        Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
-        // error new definition name already exists
+        // error tenant code not exists
         processDefinition = this.getProcessDefinition();
         workflowUpdateRequest.setTenantCode(tenantCode);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
@@ -1020,7 +975,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(tenantMapper.queryByTenantCode(workflowUpdateRequest.getTenantCode())).thenReturn(null);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateProcessDefinitionV2(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), exception.getMessage());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
         workflowUpdateRequest.setTenantCode(null);
 
         // error update process definition mapper
@@ -1029,7 +984,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(processDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateProcessDefinitionV2(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR.getMsg(), exception.getMessage());
+        Assertions.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
 
         // success
         Mockito.when(processDefinitionMapper.updateById(isA(ProcessDefinition.class))).thenReturn(1);

@@ -289,11 +289,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             throw new ServiceException(Status.PROJECT_NOT_FOUND, processDefinition.getProjectCode());
         }
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(user, project, processDefinition.getProjectCode(), WORKFLOW_CREATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            throw new ServiceException((String) result.get(Constants.MSG));
-        }
+        projectService.checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
 
         if (checkDescriptionLength(processDefinition.getDescription())) {
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
@@ -598,11 +594,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (workflowFilterRequest.getProjectName() != null) {
             Project project = projectMapper.queryByName(workflowFilterRequest.getProjectName());
             // check user access for project
-            Map<String, Object> checkResult =
-                    projectService.checkProjectAndAuth(loginUser, project, project.getCode(), WORKFLOW_DEFINITION);
-            if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
-                throw new ServiceException((String) checkResult.get(Constants.MSG));
-            }
+            projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
             processDefinition.setProjectCode(project.getCode());
         }
 
@@ -678,11 +670,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, project.getCode(), WORKFLOW_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            throw new ServiceException((String) result.get(Constants.MSG));
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
         Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
         if (tenant != null) {
@@ -998,12 +986,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, processDefinition.getProjectCode(),
-                        WORKFLOW_DEFINITION_DELETE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            throw new ServiceException((String) result.get(Constants.MSG));
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION_DELETE);
 
         // Determine if the login user is the owner of the process definition
         if (loginUser.getId() != processDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
@@ -1039,7 +1022,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (deleteRelation == 0) {
             logger.warn("The process definition has not relation, it will be delete successfully, processDefinitionCode:{}.", code);
         }
-        deleteOtherRelation(project, result, processDefinition);
+        deleteOtherRelation(project, new HashMap<>(), processDefinition);
     }
 
     /**
@@ -2628,11 +2611,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Project project = projectMapper.queryByCode(oldProcessDefinition.getProjectCode());
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(user, project,
-                oldProcessDefinition.getProjectCode(), WORKFLOW_UPDATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            throw new ServiceException((String) result.get(Constants.MSG));
-        }
+        projectService.checkProjectAndAuthThrowException(user, project, WORKFLOW_UPDATE);
 
         if (checkDescriptionLength(newProcessDefinition.getDescription())) {
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);

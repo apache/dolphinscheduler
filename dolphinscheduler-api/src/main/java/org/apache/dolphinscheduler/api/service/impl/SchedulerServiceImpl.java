@@ -225,10 +225,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
         // check project auth
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getCode(), null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            throw new ServiceException((String) result.get(Constants.MSG));
-        }
+        this.projectService.checkProjectAndAuthThrowException(loginUser, project, null);
     }
 
     private void scheduleParamCheck(String scheduleParamStr) {
@@ -606,11 +603,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (scheduleFilterRequest.getProjectName() != null) {
             Project project = projectMapper.queryByName(scheduleFilterRequest.getProjectName());
             // check project auth
-            Map<String, Object> result =
-                    projectService.checkProjectAndAuth(loginUser, project, project.getCode(), null);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                throw new ServiceException((String) result.get(Constants.MSG));
-            }
+            projectService.checkProjectAndAuthThrowException(loginUser, project, null);
         }
         Page<Schedule> page = new Page<>(scheduleFilterRequest.getPageNo(), scheduleFilterRequest.getPageSize());
         IPage<Schedule> scheduleIPage = scheduleMapper.filterSchedules(page, scheduleFilterRequest.convert2Schedule());
