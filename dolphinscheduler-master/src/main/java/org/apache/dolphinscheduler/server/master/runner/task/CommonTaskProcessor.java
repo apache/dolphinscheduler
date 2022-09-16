@@ -52,7 +52,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
-        checkAndReplaceTestDataSource();
+        if (this.taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
+            convertExeEnvironmentOnlineToTest();
+        }
+
         this.taskInstance =
                 processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
@@ -178,9 +181,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         nettyExecutorManager.executeDirectly(executionContext);
     }
 
-    protected void checkAndReplaceTestDataSource() {
-        //replace datasource
-        if (taskInstance.getTestFlag() == Constants.TEST_FLAG_YES  && "SQL".equals(taskInstance.getTaskType())) {
+    protected void convertExeEnvironmentOnlineToTest() {
+        //SQL taskType
+        if ("SQL".equals(taskInstance.getTaskType())) {
+            //replace test data source
             Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
             });
             Map<String, Object> taskInstanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
