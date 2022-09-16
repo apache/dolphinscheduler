@@ -458,6 +458,8 @@ CREATE TABLE `t_ds_process_definition_log` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
+  UNIQUE KEY `log_unique` (`code`,`version`)
+  KEY `project_code_unique` (`project_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

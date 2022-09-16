@@ -20,3 +20,8 @@ ALTER TABLE `t_ds_worker_group` ADD COLUMN `worker_group_extra_param` text DEFAU
 
 ALTER TABLE `t_ds_process_instance` ADD COLUMN `state_history` text DEFAULT NULL COMMENT 'state history desc' AFTER `state`;
 
+ALTER TABLE `t_ds_process_definition_log` ADD INDEX project_code_unique(project_code);
+
+ALTER TABLE `t_ds_process_definition_log` ADD UNIQUE `log_unique` (`code`,`version`);
+
+
