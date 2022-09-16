@@ -974,7 +974,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      *
      * @param loginUser login user
      * @param code process definition code
-     * @return delete result code
      */
     @Override
     @Transactional
@@ -1221,7 +1220,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     @Transactional
     public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result;
         Project project = projectMapper.queryByCode(projectCode);
         result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_IMPORT);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
@@ -2184,7 +2183,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * get new Task name or Process name when copy or import operate
      * @param originalName Task or Process original name
      * @param suffix "_copy_" or "_import_"
-     * @return
+     * @return new name
      */
     public String getNewName(String originalName, String suffix) {
         StringBuilder newName = new StringBuilder();

@@ -403,7 +403,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         this.projectPermCheckByProcess(loginUser, schedule.getProcessDefinitionCode());
         return schedule;
-    };
+    }
 
     /**
      * set schedule online or offline
@@ -614,7 +614,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         pageInfo.setTotalList(scheduleIPage.getRecords());
 
         return pageInfo;
-    };
+    }
 
     /**
      * query schedule list
