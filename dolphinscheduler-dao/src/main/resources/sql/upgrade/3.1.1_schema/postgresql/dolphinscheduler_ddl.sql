@@ -39,10 +39,6 @@ EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN
 
 EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_isntance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL  ';
 
---- create index
-create index idx_process_definition_log_code_version on t_ds_process_definition_log (code,version);
-create index idx_process_definition_log_project_code on t_ds_process_definition_log (project_code);
-
 
 return 'Success!';
 exception when others then
