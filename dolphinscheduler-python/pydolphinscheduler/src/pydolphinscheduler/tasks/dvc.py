@@ -16,6 +16,8 @@
 # under the License.
 
 """Task dvc."""
+from copy import deepcopy
+from typing import Dict
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task
@@ -29,31 +31,48 @@ class DvcTaskType(str):
     UPLOAD = "Upload"
 
 
-class DVCInit(Task):
+class BaseDVC(Task):
+    """Base class for dvc task."""
+
+    dvc_task_type = None
+
+    _task_custom_attr = {
+        "dvc_task_type",
+        "dvc_repository",
+    }
+
+    _child_task_dvc_attr = set()
+
+    def __init__(self, name: str, repository: str, *args, **kwargs):
+        super().__init__(name, TaskType.DVC, *args, **kwargs)
+        self.dvc_repository = repository
+
+    @property
+    def task_params(self) -> Dict:
+        """Return task params."""
+        self._task_custom_attr = deepcopy(self._task_custom_attr)
+        self._task_custom_attr.update(self._child_task_dvc_attr)
+        return super().task_params
+
+
+class DVCInit(BaseDVC):
     """Task DVC Init object, declare behavior for DVC Init task to dolphinscheduler."""
 
     dvc_task_type = DvcTaskType.INIT
 
-    _task_custom_attr = {
-        "dvc_task_type",
-        "dvc_repository",
-        "dvc_store_url",
-    }
+    _child_task_dvc_attr = {"dvc_store_url"}
 
     def __init__(self, name: str, repository: str, store_url: str, *args, **kwargs):
-        super().__init__(name, TaskType.DVC, *args, **kwargs)
-        self.dvc_repository = repository
+        super().__init__(name, repository, *args, **kwargs)
         self.dvc_store_url = store_url
 
 
-class DVCDownload(Task):
+class DVCDownload(BaseDVC):
     """Task DVC Download object, declare behavior for DVC Download task to dolphinscheduler."""
 
     dvc_task_type = DvcTaskType.DOWNLOAD
 
-    _task_custom_attr = {
-        "dvc_task_type",
-        "dvc_repository",
+    _child_task_dvc_attr = {
         "dvc_load_save_data_path",
         "dvc_data_location",
         "dvc_version",
@@ -69,21 +88,18 @@ class DVCDownload(Task):
         *args,
         **kwargs
     ):
-        super().__init__(name, TaskType.DVC, *args, **kwargs)
-        self.dvc_repository = repository
+        super().__init__(name, repository, *args, **kwargs)
         self.dvc_data_location = data_path_in_dvc_repository
         self.dvc_load_save_data_path = data_path_in_worker
         self.dvc_version = version
 
 
-class DVCUpload(Task):
+class DVCUpload(BaseDVC):
     """Task DVC Upload object, declare behavior for DVC Upload task to dolphinscheduler."""
 
     dvc_task_type = DvcTaskType.UPLOAD
 
-    _task_custom_attr = {
-        "dvc_task_type",
-        "dvc_repository",
+    _child_task_dvc_attr = {
         "dvc_load_save_data_path",
         "dvc_data_location",
         "dvc_version",
@@ -101,8 +117,7 @@ class DVCUpload(Task):
         *args,
         **kwargs
     ):
-        super().__init__(name, TaskType.DVC, *args, **kwargs)
-        self.dvc_repository = repository
+        super().__init__(name, repository, *args, **kwargs)
         self.dvc_data_location = data_path_in_dvc_repository
         self.dvc_load_save_data_path = data_path_in_worker
         self.dvc_version = version
