@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -183,7 +184,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     protected void convertExeEnvironmentOnlineToTest() {
         //SQL taskType
-        if ("SQL".equals(taskInstance.getTaskType())) {
+        if (TaskConstants.TASK_TYPE_SQL.equals(taskInstance.getTaskType())) {
             //replace test data source
             Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
             });
