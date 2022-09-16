@@ -16,6 +16,7 @@
 # under the License.
 
 """Task Pytorch."""
+from typing import Optional
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task
@@ -63,12 +64,12 @@ class Pytorch(Task):
         name: str,
         script: str,
         script_params: str = "",
-        project_path: str = DEFAULT.project_path,
+        project_path: Optional[str] = DEFAULT.project_path,
         is_create_environment: Optional[bool] = DEFAULT.is_create_environment,
         python_command: Optional[str] = DEFAULT.python_command,
         python_env_tool: Optional[str] = "conda",
         requirements: Optional[str] = "requirements.txt",
-        conda_python_version: Optional[str] ="3.7",
+        conda_python_version: Optional[str] = "3.7",
         *args,
         **kwargs,
     ):
