@@ -173,11 +173,11 @@ public class CommonTaskProcessorTest {
 
         //The data source instance has no bound test data source
         Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
-        commonTaskProcessor1.checkAndReplaceTestDataSource();
+        commonTaskProcessor1.convertExeEnvironmentOnlineToTest();
 
         //The data source instance has  bound test data source
         Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(2);
-        commonTaskProcessor1.checkAndReplaceTestDataSource();
+        commonTaskProcessor1.convertExeEnvironmentOnlineToTest();
 //      Assert.assertTrue(result);
     }
 }
