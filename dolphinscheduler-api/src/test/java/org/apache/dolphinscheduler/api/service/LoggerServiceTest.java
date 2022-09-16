@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -144,8 +143,6 @@ public class LoggerServiceTest {
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
         TaskInstance taskInstance = new TaskInstance();
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -156,10 +153,10 @@ public class LoggerServiceTest {
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, VIEW_LOG)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, VIEW_LOG);
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
-        result = loggerService.queryLog(loginUser, projectCode, 1, 1, 1);
+        Map<String, Object> result = loggerService.queryLog(loginUser, projectCode, 1, 1, 1);
         Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
     }
 
@@ -172,8 +169,6 @@ public class LoggerServiceTest {
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
         TaskInstance taskInstance = new TaskInstance();
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
@@ -183,8 +178,8 @@ public class LoggerServiceTest {
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, DOWNLOAD_LOG))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, DOWNLOAD_LOG);
+
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         Mockito.when(logClient.getLogBytes(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))

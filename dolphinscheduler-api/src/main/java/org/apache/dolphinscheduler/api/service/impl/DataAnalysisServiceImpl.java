@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
+
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
@@ -44,10 +44,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +59,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * data analysis service impl
@@ -156,10 +158,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Map<String, Object> result = new HashMap<>();
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            projectService.checkProjectAuth(loginUser, project, PROJECT_OVERVIEW);
         }
 
         Date start = null;
@@ -206,10 +205,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Map<String, Object> result = new HashMap<>();
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            projectService.checkProjectAuth(loginUser, project, PROJECT_OVERVIEW);
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();

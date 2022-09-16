@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
@@ -37,11 +40,8 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +49,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.primitives.Bytes;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
 
 /**
  * logger service impl
@@ -105,7 +102,6 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         return result;
     }
 
-
     /**
      * get log size
      *
@@ -134,12 +130,10 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, VIEW_LOG);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        // check user access for project
+        projectService.checkProjectAuth(loginUser, project, VIEW_LOG);
         // check whether the task instance can be found
         TaskInstance task = processService.findTaskInstanceById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
@@ -168,11 +162,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @Override
     public byte[] getLogBytes(User loginUser, long projectCode, int taskInstId) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,DOWNLOAD_LOG);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            throw new ServiceException("user has no permission");
-        }
+        // check user access for project
+        projectService.checkProjectAuth(loginUser, project, DOWNLOAD_LOG);
         // check whether the task instance can be found
         TaskInstance task = processService.findTaskInstanceById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {

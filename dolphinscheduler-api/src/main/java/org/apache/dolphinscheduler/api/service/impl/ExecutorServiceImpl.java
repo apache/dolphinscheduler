@@ -177,13 +177,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
                                                    int dryRun, ComplementDependentMode complementDependentMode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, WORKFLOW_START);
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
@@ -353,14 +350,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     public Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId,
                                        ExecuteType executeType) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,
+        projectService.checkProjectAuth(loginUser, project,
                 ApiFuncIdentificationConstant.map.get(executeType));
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
 
         // check master exists
         if (!checkMasterExists(result)) {
@@ -1044,13 +1038,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                       int taskDefinitionVersion,
                                                       int warningGroupId, String workerGroup, Long environmentCode,
                                                       Map<String, String> startParams, int dryRun) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, WORKFLOW_START);
 
         // check master exists
         if (!checkMasterExists(result)) {

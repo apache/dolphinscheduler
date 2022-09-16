@@ -55,31 +55,7 @@ public interface ProjectService {
      */
     Map<String, Object> queryByName(User loginUser, String projectName);
 
-    /**
-     * check project and authorization
-     *
-     * @param loginUser login user
-     * @param project project
-     * @param projectCode project code
-     * @param perm String
-     * @return true if the login user have permission to see the project
-     */
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
-
-    void checkProjectAndAuthThrowException(User loginUser, Project project, String permission);
-
-    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String perm);
-
-    /**
-     * has project and permission
-     *
-     * @param loginUser  login user
-     * @param project    project
-     * @param result     result
-     * @param permission String
-     * @return true if the login user have permission to the project
-     */
-    boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission);
+    void checkProjectAuth(User loginUser, Project project, String permission);
 
     /**
      * admin can view all projects
@@ -161,17 +137,4 @@ public interface ProjectService {
      * @return project list
      */
     Result queryProjectCreatedAndAuthorizedByUser(User loginUser);
-
-    /**
-     * check project and authorization
-     *
-     * @param result result
-     * @param loginUser login user
-     * @param project project
-     * @param projectCode project code
-     * @param perm String
-     * @return true if the login user have permission to see the project
-     */
-    void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String perm);
-
 }

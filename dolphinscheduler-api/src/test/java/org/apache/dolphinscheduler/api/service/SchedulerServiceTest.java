@@ -32,22 +32,20 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
-import org.apache.dolphinscheduler.scheduler.quartz.QuartzScheduler;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
@@ -94,7 +92,7 @@ public class SchedulerServiceTest {
         long projectCode = 1L;
         User loginUser = new User();
         loginUser.setId(1);
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result;
         Project project = getProject(projectName, projectCode);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -115,19 +113,20 @@ public class SchedulerServiceTest {
 
         Mockito.when(processDefinitionMapper.queryByCode(1)).thenReturn(processDefinition);
 
-        //hash no auth
-        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
+        // hash no auth
+        Assertions.assertDoesNotThrow(
+                () -> schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE));
 
-        Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result,null)).thenReturn(true);
-        //schedule not exists
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, null);
+        // schedule not exists
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 2, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));
 
-        //SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE
+        // SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, result.get(Constants.STATUS));
 
-        //PROCESS_DEFINE_NOT_EXIST
+        // PROCESS_DEFINE_NOT_EXIST
         schedule.setProcessDefinitionCode(2);
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
@@ -142,10 +141,10 @@ public class SchedulerServiceTest {
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
 
-        //set master
+        // set master
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(masterServers);
 
-        //SUCCESS
+        // SUCCESS
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
     }

@@ -143,10 +143,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
 
         // check work flow define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
@@ -244,10 +241,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
 
         // check schedule exists
         Schedule schedule = scheduleMapper.selectById(id);
@@ -287,10 +281,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
 
         // check schedule exists
         Schedule scheduleObj = scheduleMapper.selectById(id);
@@ -408,10 +399,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, PROJECT);
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
@@ -456,10 +444,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
 
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(project.getName());
         List<ScheduleVo> scheduleList = new ArrayList<>();
@@ -518,15 +503,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     public Map<String, Object> deleteScheduleById(User loginUser, long projectCode, Integer scheduleId) {
-
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
 
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
 
         Schedule schedule = scheduleMapper.selectById(scheduleId);
 
@@ -618,12 +598,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                                      Priority processInstancePriority,
                                                                      String workerGroup,
                                                                      long environmentCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         // check schedule exists
         Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
         if (schedule == null) {

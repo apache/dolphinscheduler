@@ -65,7 +65,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -75,6 +74,7 @@ import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -139,11 +139,12 @@ public class ProcessInstanceServiceTest {
     @Mock
     CuringParamsService curingGlobalParamsService;
 
-    private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
-            + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
-            + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"}]";
+    private final static String shellJson =
+            "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
+                    + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
+                    + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"}]";
 
-    private String taskJson =
+    private final static String taskJson =
             "[{\"name\":\"shell1\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
                     + "\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},"
                     + "\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\","
@@ -152,11 +153,11 @@ public class ProcessInstanceServiceTest {
                     + ":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\","
                     + "\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"}]";
 
-    private String taskRelationJson =
+    private final static String taskRelationJson =
             "[{\"name\":\"\",\"preTaskCode\":4254865123776,\"preTaskVersion\":1,\"postTaskCode\":4254862762304,\"postTaskVersion\":1,\"conditionType\":0,"
                     + "\"conditionParams\":{}},{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":4254865123776,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":{}}]";
 
-    private String taskDefinitionJson =
+    private final static String taskDefinitionJson =
             "[{\"code\":4254862762304,\"name\":\"test1\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
                     + "\"localParams\":[],\"rawScript\":\"echo 1\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},\"switchResult\":{}},\"flag\":\"YES\","
                     + "\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":null,\"timeout\":0,"
@@ -170,17 +171,16 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Result proejctAuthFailRes =
-                processInstanceService.queryProcessInstanceList(loginUser, projectCode, 46, "2020-01-01 00:00:00",
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode)).when(projectService)
+                .checkProjectAuth(loginUser, project, WORKFLOW_INSTANCE);
+        Exception exception = Assertions.assertThrows(ServiceException.class,
+                () -> processInstanceService.queryProcessInstanceList(loginUser, projectCode, 46, "2020-01-01 00:00:00",
                         "2020-01-02 00:00:00", "", "test_user", WorkflowExecutionStatus.SUBMITTED_SUCCESS,
-                        "192.168.xx.xx", "", 1, 10);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) proejctAuthFailRes.getCode());
+                        "192.168.xx.xx", "", 1, 10));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
 
         Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
         Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
@@ -191,9 +191,9 @@ public class ProcessInstanceServiceTest {
         pageReturn.setRecords(processInstanceList);
 
         // data parameter check
-        putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(processDefineMapper.selectById(Mockito.anyInt())).thenReturn(getProcessDefinition());
         when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), Mockito.any(), Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(),
@@ -206,10 +206,9 @@ public class ProcessInstanceServiceTest {
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) dataParameterRes.getCode());
 
         // project auth success
-        putMsg(result, Status.SUCCESS, projectCode);
-
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
@@ -259,8 +258,6 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>(5);
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
         int size = 10;
         String startTime = "2020-01-01 00:00:00";
         String endTime = "2020-08-02 00:00:00";
@@ -269,16 +266,18 @@ public class ProcessInstanceServiceTest {
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, 1)).when(projectService)
+                .checkProjectAuth(loginUser, project, WORKFLOW_INSTANCE);
+
         Map<String, Object> proejctAuthFailRes = processInstanceService
                 .queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, startTime, endTime);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailRes.get(Constants.STATUS));
 
         // project auth success
-        putMsg(result, Status.SUCCESS, projectCode);
         ProcessInstance processInstance = getProcessInstance();
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
@@ -293,23 +292,22 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode)).when(projectService)
+                .checkProjectAuth(loginUser, project, WORKFLOW_INSTANCE);
         Map<String, Object> proejctAuthFailRes =
                 processInstanceService.queryProcessInstanceById(loginUser, projectCode, 1);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailRes.get(Constants.STATUS));
 
         // project auth success
         ProcessInstance processInstance = getProcessInstance();
-        putMsg(result, Status.SUCCESS, projectCode);
         ProcessDefinition processDefinition = getProcessDefinition();
         processDefinition.setProjectCode(projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(processService.findProcessInstanceDetailById(processInstance.getId()))
                 .thenReturn(Optional.of(processInstance));
         when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
@@ -332,18 +330,17 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode)).when(projectService)
+                .checkProjectAuth(loginUser, project, WORKFLOW_INSTANCE);
+
         Map<String, Object> proejctAuthFailRes =
                 processInstanceService.queryTaskListByProcessId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailRes.get(Constants.STATUS));
 
         // project auth success
-        putMsg(result, Status.SUCCESS, projectCode);
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setState(WorkflowExecutionStatus.SUCCESS);
         TaskInstance taskInstance = new TaskInstance();
@@ -355,7 +352,8 @@ public class ProcessInstanceServiceTest {
         res.setCode(Status.SUCCESS.ordinal());
         res.setData("xxx");
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(processService.findProcessInstanceDetailById(processInstance.getId()))
                 .thenReturn(Optional.of(processInstance));
         when(processService.findValidTaskListByProcessId(processInstance.getId())).thenReturn(taskInstanceList);
@@ -382,20 +380,20 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode)).when(projectService)
+                .checkProjectAuth(loginUser, project, WORKFLOW_INSTANCE);
+
         Map<String, Object> proejctAuthFailRes =
                 processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailRes.get(Constants.STATUS));
 
         // task null
-        putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(processService.findTaskInstanceById(1)).thenReturn(null);
         Map<String, Object> taskNullRes =
                 processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, 1);
@@ -405,7 +403,6 @@ public class ProcessInstanceServiceTest {
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setTaskType("HTTP");
         taskInstance.setProcessInstanceId(1);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
@@ -418,7 +415,6 @@ public class ProcessInstanceServiceTest {
         TaskInstance subTask = getTaskInstance();
         subTask.setTaskType("SUB_PROCESS");
         subTask.setProcessInstanceId(1);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findTaskInstanceById(subTask.getId())).thenReturn(subTask);
         when(processService.findSubProcessInstance(subTask.getProcessInstanceId(), subTask.getId())).thenReturn(null);
         Map<String, Object> subprocessNotExistRes =
@@ -427,7 +423,6 @@ public class ProcessInstanceServiceTest {
 
         // sub process exist
         ProcessInstance processInstance = getProcessInstance();
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findSubProcessInstance(taskInstance.getProcessInstanceId(), taskInstance.getId()))
                 .thenReturn(processInstance);
         Map<String, Object> subprocessExistRes =
@@ -440,21 +435,21 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode)).when(projectService)
+                .checkProjectAuth(loginUser, project, INSTANCE_UPDATE);
+
         Map<String, Object> proejctAuthFailRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
                 shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailRes.get(Constants.STATUS));
 
         // process instance null
-        putMsg(result, Status.SUCCESS, projectCode);
         ProcessInstance processInstance = getProcessInstance();
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, INSTANCE_UPDATE);
+        when(processService.findProcessInstanceById(1)).thenReturn(null);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.empty());
         try {
             Map<String, Object> processInstanceNullRes =
@@ -468,7 +463,6 @@ public class ProcessInstanceServiceTest {
         // process instance not finish
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.ofNullable(processInstance));
         processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceNotFinishRes =
                 processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
                         shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
@@ -492,9 +486,9 @@ public class ProcessInstanceServiceTest {
         when(processInstanceDao.updateProcessInstance(processInstance)).thenReturn(1);
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.FALSE)).thenReturn(1);
 
+        Map<String, Object> result = new HashMap<>();
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         when(processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs)).thenReturn(result);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> processInstanceFinishRes =
                 processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
@@ -503,7 +497,6 @@ public class ProcessInstanceServiceTest {
 
         // success
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
-        putMsg(result, Status.SUCCESS, projectCode);
 
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.FALSE, Boolean.FALSE))
                 .thenReturn(1);
@@ -517,20 +510,21 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode)).when(projectService)
+                .checkProjectAuth(loginUser, project, WORKFLOW_INSTANCE);
+
         Map<String, Object> proejctAuthFailRes =
                 processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailRes.get(Constants.STATUS));
 
         // process instance null
-        putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project,
+                WORKFLOW_INSTANCE);
+        when(processService.findProcessInstanceById(1)).thenReturn(null);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.empty());
         try {
             Map<String, Object> processInstanceNullRes =
@@ -543,7 +537,6 @@ public class ProcessInstanceServiceTest {
         // not sub process
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setIsSubProcess(Flag.NO);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.ofNullable(processInstance));
         Map<String, Object> notSubProcessRes =
                 processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
@@ -551,14 +544,12 @@ public class ProcessInstanceServiceTest {
 
         // sub process
         processInstance.setIsSubProcess(Flag.YES);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findParentProcessInstance(1)).thenReturn(null);
         Map<String, Object> subProcessNullRes =
                 processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.SUB_PROCESS_INSTANCE_NOT_EXIST, subProcessNullRes.get(Constants.STATUS));
 
         // success
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findParentProcessInstance(1)).thenReturn(processInstance);
         Map<String, Object> successRes = processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -569,12 +560,9 @@ public class ProcessInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
         // process instance null
-        putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_DELETE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, INSTANCE_DELETE);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
     }
 
@@ -706,14 +694,5 @@ public class ProcessInstanceServiceTest {
         taskInstance.setEndTime(new Date());
         taskInstance.setExecutorId(-1);
         return taskInstance;
-    }
-
-    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
-        if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.put(Constants.MSG, status.getMsg());
-        }
     }
 }

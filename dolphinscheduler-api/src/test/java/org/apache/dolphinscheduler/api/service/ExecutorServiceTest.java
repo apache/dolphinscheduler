@@ -123,42 +123,37 @@ public class ExecutorServiceTest {
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
 
-    private int processDefinitionId = 1;
+    private final long processDefinitionCode = 1L;
 
-    private long processDefinitionCode = 1L;
+    private final int processInstanceId = 1;
 
-    private int processInstanceId = 1;
+    private final int taskQueueId = 1;
 
-    private int tenantId = 1;
+    private final ProcessDefinition processDefinition = new ProcessDefinition();
 
-    private int userId = 1;
+    private final ProcessInstance processInstance = new ProcessInstance();
 
-    private int taskQueueId = 1;
+    private final TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
 
-    private ProcessDefinition processDefinition = new ProcessDefinition();
+    private final User loginUser = new User();
 
-    private ProcessInstance processInstance = new ProcessInstance();
+    private final long projectCode = 1L;
 
-    private TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
+    private final static String projectName = "projectName";
 
-    private User loginUser = new User();
-
-    private long projectCode = 1L;
-
-    private String projectName = "projectName";
-
-    private Project project = new Project();
-
-    private String cronTime;
+    private final Project project = new Project();
 
     @Before
     public void init() {
         // user
+        int userId = 1;
         loginUser.setId(userId);
 
         // processDefinition
+        int processDefinitionId = 1;
         processDefinition.setId(processDefinitionId);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
+        int tenantId = 1;
         processDefinition.setTenantId(tenantId);
         processDefinition.setUserId(userId);
         processDefinition.setVersion(1);
@@ -182,19 +177,16 @@ public class ExecutorServiceTest {
         taskGroupQueue.setStatus(TaskGroupQueueStatus.WAIT_QUEUE);
         taskGroupQueue.setProcessId(processInstanceId);
 
-        // cronRangeTime
-        cronTime = "2020-01-01 00:00:00,2020-01-31 23:00:00";
-
         // mock
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START))
-                .thenReturn(checkProjectAndAuth());
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, WORKFLOW_START);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         doReturn(1).when(processService).createCommand(argThat(c -> c.getId() == null));
         doReturn(0).when(processService).createCommand(argThat(c -> c.getId() != null));
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
-        Mockito.when(processService.findProcessInstanceDetailById(processInstanceId)).thenReturn(Optional.ofNullable(processInstance));
+        Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
+                .thenReturn(Optional.ofNullable(processInstance));
         Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(processDefinition);
         Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
         Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
@@ -401,8 +393,7 @@ public class ExecutorServiceTest {
     @Test
     public void testExecuteRepeatRunning() {
         Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
-                .thenReturn(checkProjectAndAuth());
+        Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, RERUN);
         Map<String, Object> result =
                 executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -453,12 +444,6 @@ public class ExecutorServiceTest {
         schedule.setCrontab("0 0 0 1/2 * ?");
         schedulerList.add(schedule);
         return schedulerList;
-    }
-
-    private Map<String, Object> checkProjectAndAuth() {
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
-        return result;
     }
 
     @Test

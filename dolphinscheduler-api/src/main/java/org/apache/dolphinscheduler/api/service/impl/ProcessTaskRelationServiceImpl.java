@@ -100,12 +100,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> createProcessTaskRelation(User loginUser, long projectCode, long processDefinitionCode,
                                                          long preTaskCode, long postTaskCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
@@ -197,12 +195,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteTaskProcessRelation(User loginUser, long projectCode, long processDefinitionCode,
                                                          long taskCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         if (taskCode == 0) {
             putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
             return result;
@@ -281,12 +277,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteUpstreamRelation(User loginUser, long projectCode, String preTaskCodes,
                                                       long taskCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         if (StringUtils.isEmpty(preTaskCodes)) {
             putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
             return result;
@@ -360,12 +354,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteDownstreamRelation(User loginUser, long projectCode, String postTaskCodes,
                                                         long taskCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         if (StringUtils.isEmpty(postTaskCodes)) {
             putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
             return result;
@@ -410,12 +402,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryUpstreamRelation(User loginUser, long projectCode, long taskCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         List<ProcessTaskRelation> processTaskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
@@ -447,12 +437,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     public Map<String, Object> queryDownstreamRelation(User loginUser, long projectCode, long taskCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         List<ProcessTaskRelation> processTaskRelationList =
                 processTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode);
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
@@ -488,12 +476,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Override
     public Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode,
                                           long preTaskCode, long postTaskCode) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAuth(loginUser, project, null);
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));

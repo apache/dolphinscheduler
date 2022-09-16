@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_UPDATE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -44,7 +45,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +52,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -87,9 +88,9 @@ public class ProjectServiceTest {
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
-    private String projectName = "ProjectServiceTest";
-
-    private String userName = "ProjectServiceTest";
+    private final static String projectName = "ProjectServiceTest";
+    private final static String userName = "ProjectServiceTest";
+    private Exception exception;
 
     @Test
     public void testCreateProject() {
@@ -124,17 +125,17 @@ public class ProjectServiceTest {
         long projectCode = 1L;
         User loginUser = getLoginUser();
 
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, null, projectCode, PROJECT);
-        logger.info(result.toString());
-        Status status = (Status) result.get(Constants.STATUS);
-        Assert.assertEquals(Status.PROJECT_NOT_EXIST, result.get(Constants.STATUS));
+        // project not exists
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectAuth(loginUser, null, PROJECT));
+        Assert.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         Project project = getProject();
         // USER_NO_OPERATION_PROJECT_PERM
         project.setUserId(2);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result.get(Constants.STATUS));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectAuth(loginUser, project, PROJECT));
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ((ServiceException) exception).getCode());
 
         // success
         project.setUserId(1);
@@ -145,29 +146,24 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
                 0, baseServiceLogger)).thenReturn(true);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertDoesNotThrow(
+                () -> projectService.checkProjectAuth(loginUser, project, PROJECT));
 
-        Map<String, Object> result2 = new HashMap<>();
-
-        result2 = projectService.checkProjectAndAuth(loginUser, null, projectCode, PROJECT);
-        Assert.assertEquals(Status.PROJECT_NOT_EXIST, result2.get(Constants.STATUS));
-
+        // GENERAL_USER USER_NO_OPERATION_PROJECT_PERM
         Project project1 = getProject();
-        // USER_NO_OPERATION_PROJECT_PERM
         project1.setUserId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
                 loginUser.getId(), PROJECT, baseServiceLogger)).thenReturn(true);
-        result2 = projectService.checkProjectAndAuth(loginUser, project1, projectCode, PROJECT);
-        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result2.get(Constants.STATUS));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectAuth(loginUser, project1, PROJECT));
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ((ServiceException) exception).getCode());
 
         // success
         project1.setUserId(1);
-        projectService.checkProjectAndAuth(loginUser, project1, projectCode, PROJECT);
-
+        Assertions.assertDoesNotThrow(
+                () -> projectService.checkProjectAuth(loginUser, project1, PROJECT));
     }
 
     @Test
@@ -176,7 +172,6 @@ public class ProjectServiceTest {
         // Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
         User loginUser = getLoginUser();
         Project project = getProject();
-        Map<String, Object> result = new HashMap<>();
         // not exist user
         User tempUser = new User();
         tempUser.setId(Integer.MAX_VALUE);
@@ -184,12 +179,10 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
                 tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
-        boolean checkResult = projectService.hasProjectAndPerm(tempUser, project, result, null);
-        logger.info(result.toString());
-        Assert.assertFalse(checkResult);
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectAuth(tempUser, project, null));
 
         // success
-        result = new HashMap<>();
         project.setUserId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
@@ -198,9 +191,8 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
                 0, baseServiceLogger)).thenReturn(true);
-        checkResult = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        logger.info(result.toString());
-        Assert.assertTrue(checkResult);
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectAuth(loginUser, project, null));
     }
 
     @Test
@@ -213,7 +205,7 @@ public class ProjectServiceTest {
         // PROJECT_NOT_FOUNT
         Result result = projectService.deleteProject(loginUser, 11L);
         logger.info(result.toString());
-        Assert.assertTrue(Status.PROJECT_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), (int) result.getCode());
         loginUser.setId(2);
         // USER_NO_OPERATION_PROJECT_PERM
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
@@ -221,7 +213,7 @@ public class ProjectServiceTest {
                 baseServiceLogger)).thenReturn(true);
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertTrue(Status.USER_NO_OPERATION_PROJECT_PERM.getCode() == result.getCode());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), (int) result.getCode());
 
         // DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
         Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
@@ -233,14 +225,14 @@ public class ProjectServiceTest {
                 .thenReturn(true);
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertTrue(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL.getCode() == result.getCode());
+        Assert.assertEquals(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL.getCode(), (int) result.getCode());
 
         // success
         Mockito.when(projectMapper.deleteById(1)).thenReturn(1);
         Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
 
     @Test
@@ -261,16 +253,16 @@ public class ProjectServiceTest {
         // PROJECT_NOT_FOUNT
         Result result = projectService.update(loginUser, 1L, projectName, "desc", "testUser");
         logger.info(result.toString());
-        Assert.assertTrue(Status.PROJECT_NOT_FOUND.getCode() == result.getCode());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), (int) result.getCode());
 
         // PROJECT_ALREADY_EXISTS
         result = projectService.update(loginUser, 2L, projectName, "desc", userName);
         logger.info(result.toString());
-        Assert.assertTrue(Status.PROJECT_ALREADY_EXISTS.getCode() == result.getCode());
+        Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS.getCode(), (int) result.getCode());
 
         Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
         result = projectService.update(loginUser, 2L, "test", "desc", "testuser");
-        Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), (int) result.getCode());
 
         // success
         Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
@@ -278,7 +270,7 @@ public class ProjectServiceTest {
         Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
         result = projectService.update(loginUser, 2L, "test", "desc", "testUser");
         logger.info(result.toString());
-        Assert.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
 
     }
 
@@ -308,16 +300,17 @@ public class ProjectServiceTest {
         final User loginUser = this.getLoginUser();
 
         // Failure 1: PROJECT_NOT_FOUND
-        Result result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
-        logger.info("FAILURE 1: {}", result.toString());
-        Assert.assertTrue(Status.PROJECT_NOT_FOUND.getCode() == result.getCode());
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> this.projectService.queryAuthorizedUser(loginUser, 3682329499136L));
+        Assert.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // Failure 2: USER_NO_OPERATION_PROJECT_PERM
         loginUser.setId(100);
         Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(this.getProject());
-        result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
-        logger.info("FAILURE 2: {}", result.toString());
-        Assert.assertTrue(Status.USER_NO_OPERATION_PROJECT_PERM.getCode() == result.getCode());
+
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> this.projectService.queryAuthorizedUser(loginUser, 3682329499136L));
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ((ServiceException) exception).getCode());
 
         // SUCCESS
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -328,7 +321,7 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
                 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(this.userMapper.queryAuthedUserListByProjectId(1)).thenReturn(this.getUserList());
-        result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
+        Result result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
         logger.info("SUCCESS 1: {}", result.toString());
         List<User> users = (List<User>) result.getData();
         Assert.assertTrue(CollectionUtils.isNotEmpty(users));
@@ -483,7 +476,7 @@ public class ProjectServiceTest {
     /**
      * Get general user
      *
-     * @return
+     * @return user
      */
     private User getGeneralUser() {
         User user = new User();
@@ -496,7 +489,7 @@ public class ProjectServiceTest {
     /**
      * Get user list
      *
-     * @return
+     * @return user list
      */
     private List<User> getUserList() {
         List<User> userList = new ArrayList<>();
