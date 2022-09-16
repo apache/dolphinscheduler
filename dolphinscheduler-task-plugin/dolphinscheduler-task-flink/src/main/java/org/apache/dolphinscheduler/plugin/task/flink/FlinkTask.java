@@ -19,30 +19,13 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,34 +94,6 @@ public class FlinkTask extends AbstractYarnTask {
     @Override
     public AbstractParameters getParameters() {
         return flinkParameters;
-    }
-
-    @Override
-    public Set<String> getApplicationIds() throws TaskException {
-        Set<String> appIds = new HashSet<>();
-
-        File file = new File(taskRequest.getLogPath());
-        if (!file.exists()) {
-            return appIds;
-        }
-
-        /*
-         * analysis log? get submitted yarn application id
-         */
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String appId = findAppId(line);
-                if (StringUtils.isNotEmpty(appId)) {
-                    appIds.add(appId);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            throw new TaskException("get application id error, file not found, path:" + taskRequest.getLogPath());
-        } catch (IOException e) {
-            throw new TaskException("get application id error, path:" + taskRequest.getLogPath(), e);
-        }
-        return appIds;
     }
 
     /**

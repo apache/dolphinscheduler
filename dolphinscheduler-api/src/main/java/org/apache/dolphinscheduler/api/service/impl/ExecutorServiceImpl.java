@@ -31,6 +31,7 @@ import static org.apache.dolphinscheduler.common.Constants.SCHEDULE_TIME_MAX_LEN
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -367,11 +368,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
-        if (processInstance == null) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
-            return result;
-        }
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
+                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
         ProcessDefinition processDefinition =
                 processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
@@ -892,7 +890,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * create complement dependent command
      */
-    protected int createComplementDependentCommand(List<Schedule> schedules, Command command) {
+    public int createComplementDependentCommand(List<Schedule> schedules, Command command) {
         int dependentProcessDefinitionCreateCount = 0;
         Command dependentCommand;
 
@@ -906,9 +904,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 getComplementDependentDefinitionList(dependentCommand.getProcessDefinitionCode(),
                         CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup());
-
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
+            // If the id is Integer, the auto-increment id will be obtained by mybatis-plus
+            // and causing duplicate when clone it.
+            dependentCommand.setId(null);
             dependentCommand.setProcessDefinitionCode(dependentProcessDefinition.getProcessDefinitionCode());
             dependentCommand.setProcessDefinitionVersion(dependentProcessDefinition.getProcessDefinitionVersion());
             dependentCommand.setWorkerGroup(dependentProcessDefinition.getWorkerGroup());
@@ -1025,7 +1025,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     @Override
     public WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId).orElse(null);
         if (processInstance == null) {
             return null;
         }

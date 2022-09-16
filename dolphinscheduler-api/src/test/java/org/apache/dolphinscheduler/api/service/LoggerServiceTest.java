@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -28,15 +31,14 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -46,9 +48,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
 
 /**
  * logger service test
@@ -74,10 +73,8 @@ public class LoggerServiceTest {
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
-    @Before
-    public void init() {
-        this.loggerService.init();
-    }
+    @Mock
+    private LogClient logClient;
 
     @Test
     public void testQueryDataSourceList() {
@@ -85,11 +82,11 @@ public class LoggerServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Result result = loggerService.queryLog(2, 1, 1);
-        //TASK_INSTANCE_NOT_FOUND
+        // TASK_INSTANCE_NOT_FOUND
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
 
         try {
-            //HOST NOT FOUND OR ILLEGAL
+            // HOST NOT FOUND OR ILLEGAL
             result = loggerService.queryLog(1, 1, 1);
         } catch (RuntimeException e) {
             Assert.assertTrue(true);
@@ -97,7 +94,7 @@ public class LoggerServiceTest {
         }
         Assert.assertEquals(Status.TASK_INSTANCE_HOST_IS_NULL.getCode(), result.getCode().intValue());
 
-        //SUCCESS
+        // SUCCESS
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
@@ -111,7 +108,7 @@ public class LoggerServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
 
-        //task instance is null
+        // task instance is null
         try {
             loggerService.getLogBytes(2);
         } catch (RuntimeException e) {
@@ -119,7 +116,7 @@ public class LoggerServiceTest {
             logger.error("testGetLogBytes error: {}", "task instance is null");
         }
 
-        //task instance host is null
+        // task instance host is null
         try {
             loggerService.getLogBytes(1);
         } catch (RuntimeException e) {
@@ -127,11 +124,13 @@ public class LoggerServiceTest {
             logger.error("testGetLogBytes error: {}", "task instance host is null");
         }
 
-        //success
+        // success
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        //if use @RunWith(PowerMockRunner.class) mock object,sonarcloud will not calculate the coverage,
+        // if use @RunWith(PowerMockRunner.class) mock object,sonarcloud will not calculate the coverage,
         // so no assert will be added here
+        Mockito.when(logClient.getLogBytes(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+                .thenReturn(new byte[0]);
         loggerService.getLogBytes(1);
 
     }
@@ -152,12 +151,12 @@ public class LoggerServiceTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         taskDefinition.setCode(1L);
-        //SUCCESS
+        // SUCCESS
         taskInstance.setTaskCode(1L);
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,VIEW_LOG)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, VIEW_LOG)).thenReturn(result);
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         result = loggerService.queryLog(loginUser, projectCode, 1, 1, 1);
@@ -179,20 +178,18 @@ public class LoggerServiceTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         taskDefinition.setCode(1L);
-        //SUCCESS
+        // SUCCESS
         taskInstance.setTaskCode(1L);
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode,DOWNLOAD_LOG )).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, DOWNLOAD_LOG))
+                .thenReturn(result);
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        Mockito.when(logClient.getLogBytes(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+                .thenReturn(new byte[0]);
         loggerService.getLogBytes(loginUser, projectCode, 1);
-    }
-
-    @After
-    public void close() {
-        this.loggerService.close();
     }
 
     /**
