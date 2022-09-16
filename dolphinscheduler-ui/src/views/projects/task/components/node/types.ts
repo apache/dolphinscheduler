@@ -223,9 +223,9 @@ interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
   localParams?: ILocalParam[]
-  runType?:string
-  jvmArgs?:string
-  isModulePath?:boolean
+  runType?: string
+  jvmArgs?: string
+  isModulePath?: boolean
   rawScript?: string
   initScript?: string
   programType?: string
