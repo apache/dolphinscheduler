@@ -111,6 +111,7 @@ public class LogUtils {
             }
         } catch (Exception e) {
             log.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+            Thread.currentThread().interrupt();
         }
         return Collections.emptyList();
     }
