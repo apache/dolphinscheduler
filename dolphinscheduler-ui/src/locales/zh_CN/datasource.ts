@@ -65,6 +65,8 @@ export default {
   user_name_tips: '请输入用户名',
   user_password: '密码',
   user_password_tips: '请输入密码',
+  aws_region: 'AwsRegion',
+  aws_region_tips: '请输入AwsRegion',
   jdbc_format_tips: 'jdbc连接参数不是一个正确的JSON格式',
   datasource_test_flag_tips: '请选择数据源定义',
   datasource_bind_test_id_tips: '请绑定测试数据源'

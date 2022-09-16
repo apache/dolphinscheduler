@@ -68,6 +68,8 @@ export default {
   user_name_tips: 'Please enter your username',
   user_password: 'Password',
   user_password_tips: 'Please enter your password',
+  aws_region: 'Aws Region',
+  aws_region_tips: 'Please enter AwsRegion',
   jdbc_format_tips: 'jdbc connection parameters is not a correct JSON format',
   datasource_test_flag_tips: 'Please select a data source definition',
   datasource_bind_test_id_tips: 'Please bind the test data source'
