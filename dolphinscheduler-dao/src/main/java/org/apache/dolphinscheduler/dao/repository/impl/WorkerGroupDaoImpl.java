@@ -63,7 +63,9 @@ public class WorkerGroupDaoImpl implements WorkerGroupDao {
     @Override
     public int insert(@NonNull WorkerGroupDto workerGroupDto) {
         WorkerGroup workerGroup = workerGroupDto.transformToDo();
-        return workerGroupMapper.insert(workerGroup);
+        int result = workerGroupMapper.insert(workerGroup);
+        workerGroupDto.setId(workerGroup.getId());
+        return result;
     }
 
     @Override
