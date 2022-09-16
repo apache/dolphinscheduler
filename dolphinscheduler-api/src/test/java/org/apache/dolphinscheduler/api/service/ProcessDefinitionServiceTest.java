@@ -213,7 +213,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testQueryProcessDefinitionListPaging() {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
@@ -364,9 +363,16 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         ProcessDefinition definition = getProcessDefinition();
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(definition);
-        Set<Long> definitionCodes =
-                Arrays.stream(String.valueOf(processDefinitionCode).split(Constants.COMMA)).map(Long::parseLong)
-                        .collect(Collectors.toSet());
+        Set<Long> definitionCodes = new HashSet<>();
+        // Change this catch NumberFormatException
+        for (String code : String.valueOf(processDefinitionCode).split(Constants.COMMA)) {
+            try {
+                long parse = Long.parseLong(code);
+                definitionCodes.add(parse);
+            } catch (NumberFormatException e) {
+                Assertions.fail();
+            }
+        }
         Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         Mockito.when(processService.saveProcessDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
@@ -407,7 +413,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         Mockito.when(processService.saveProcessDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode))
-                .thenReturn(getProcessTaskRelation(projectCode));
+                .thenReturn(getProcessTaskRelation());
         putMsg(result, Status.SUCCESS);
 
         Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(
@@ -735,8 +741,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(1);
-        Map<String, Object> checkResult = new HashMap<>();
-        checkResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
@@ -1027,7 +1031,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         return project;
     }
 
-    private List<ProcessTaskRelation> getProcessTaskRelation(long projectCode) {
+    private List<ProcessTaskRelation> getProcessTaskRelation() {
         List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
         processTaskRelation.setProjectCode(projectCode);
