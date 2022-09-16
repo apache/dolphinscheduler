@@ -25,6 +25,7 @@ from pydolphinscheduler.tasks.http import Http
 from pydolphinscheduler.tasks.map_reduce import MR
 from pydolphinscheduler.tasks.procedure import Procedure
 from pydolphinscheduler.tasks.python import Python
+from pydolphinscheduler.tasks.pytorch import Pytorch
 from pydolphinscheduler.tasks.sagemaker import SageMaker
 from pydolphinscheduler.tasks.shell import Shell
 from pydolphinscheduler.tasks.spark import Spark
@@ -42,6 +43,7 @@ __all__ = [
     "MR",
     "Procedure",
     "Python",
+    "Pytorch",
     "Shell",
     "Spark",
     "Sql",
