@@ -19,7 +19,11 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface AlertSendStatusMapper extends BaseMapper<AlertSendStatus> {
+
+    int batchInsert(List<AlertSendStatus> alertSendStatuses);
 }

@@ -24,15 +24,24 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("t_ds_alert")
 public class Alert {
+
     /**
      * primary key
      */
@@ -117,171 +126,4 @@ public class Alert {
     @TableField(exist = false)
     private Map<String, Object> info = new HashMap<>();
 
-    public Alert() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getSign() {
-        return sign;
-    }
-
-    public void setSign(String sign) {
-        this.sign = sign;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public AlertStatus getAlertStatus() {
-        return alertStatus;
-    }
-
-    public void setAlertStatus(AlertStatus alertStatus) {
-        this.alertStatus = alertStatus;
-    }
-
-    public String getLog() {
-        return log;
-    }
-
-    public void setLog(String log) {
-        this.log = log;
-    }
-
-    public Integer getAlertGroupId() {
-        return alertGroupId;
-    }
-
-    public void setAlertGroupId(Integer alertGroupId) {
-        this.alertGroupId = alertGroupId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Map<String, Object> getInfo() {
-        return info;
-    }
-
-    public void setInfo(Map<String, Object> info) {
-        this.info = info;
-    }
-
-    public WarningType getWarningType() {
-        return warningType;
-    }
-
-    public void setWarningType(WarningType warningType) {
-        this.warningType = warningType;
-    }
-
-    public Long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(Long projectCode) {
-        this.projectCode = projectCode;
-    }
-
-    public Long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(Long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public Integer getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(Integer processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public AlertType getAlertType() {
-        return alertType;
-    }
-
-    public void setAlertType(AlertType alertType) {
-        this.alertType = alertType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Alert alert = (Alert) o;
-        return Objects.equals(id, alert.id)
-                && Objects.equals(alertGroupId, alert.alertGroupId)
-                && Objects.equals(sign, alert.sign)
-                && Objects.equals(title, alert.title)
-                && Objects.equals(content, alert.content)
-                && alertStatus == alert.alertStatus
-                && warningType == alert.warningType
-                && Objects.equals(log, alert.log)
-                && Objects.equals(createTime, alert.createTime)
-                && Objects.equals(updateTime, alert.updateTime)
-                && Objects.equals(info, alert.info)
-                ;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, sign, title, content, alertStatus, warningType, log, alertGroupId, createTime, updateTime, info);
-    }
-
-    @Override
-    public String toString() {
-        return "Alert{"
-                + "id=" + id
-                + ", sign='" + sign + '\''
-                + ", title='" + title + '\''
-                + ", content='" + content + '\''
-                + ", alertStatus=" + alertStatus
-                + ", warningType=" + warningType
-                + ", log='" + log + '\''
-                + ", alertGroupId=" + alertGroupId
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + ", info=" + info
-                + '}';
-    }
 }
