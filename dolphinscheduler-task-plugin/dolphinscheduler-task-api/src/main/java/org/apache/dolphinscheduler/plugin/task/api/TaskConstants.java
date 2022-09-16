@@ -416,6 +416,11 @@ public class TaskConstants {
     public static final String ENV_PATH = "dolphinscheduler_env.sh";
 
     /**
+     * environment properties default path
+     */
+    public static final String ETC_PROFILE_PATH = "/etc/profile";
+
+    /**
      * Task Logger Thread's name
      */
     public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
