@@ -36,27 +36,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_command")
 public class Command {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * command type
-     */
     @TableField("command_type")
     private CommandType commandType;
 
-    /**
-     * process definition code
-     */
     @TableField("process_definition_code")
     private long processDefinitionCode;
 
-    /**
-     * executor id
-     */
     @TableField("executor_id")
     private int executorId;
 
@@ -66,69 +54,36 @@ public class Command {
     @TableField("command_param")
     private String commandParam;
 
-    /**
-     * task depend type
-     */
     @TableField("task_depend_type")
     private TaskDependType taskDependType;
 
-    /**
-     * failure strategy
-     */
     @TableField("failure_strategy")
     private FailureStrategy failureStrategy;
 
-    /**
-     * warning type
-     */
     @TableField("warning_type")
     private WarningType warningType;
 
-    /**
-     * warning group id
-     */
     @TableField("warning_group_id")
     private Integer warningGroupId;
 
-    /**
-     * schedule time
-     */
     @TableField("schedule_time")
     private Date scheduleTime;
 
-    /**
-     * start time
-     */
     @TableField("start_time")
     private Date startTime;
 
-    /**
-     * process instance priority
-     */
     @TableField("process_instance_priority")
     private Priority processInstancePriority;
 
-    /**
-     * update time
-     */
     @TableField("update_time")
     private Date updateTime;
 
-    /**
-     * worker group
-     */
     @TableField("worker_group")
     private String workerGroup;
 
-    /**
-     * environment code
-     */
     @TableField("environment_code")
     private Long environmentCode;
 
-    /**
-     * dry run flag
-     */
     @TableField("dry_run")
     private int dryRun;
 
@@ -186,98 +141,5 @@ public class Command {
         this.processInstanceId = processInstanceId;
         this.processDefinitionVersion = processDefinitionVersion;
         this.testFlag = testFlag;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Command command = (Command) o;
-
-        if (id != command.id) {
-            return false;
-        }
-        if (processDefinitionCode != command.processDefinitionCode) {
-            return false;
-        }
-        if (executorId != command.executorId) {
-            return false;
-        }
-        if (workerGroup != null ? workerGroup.equals(command.workerGroup) : command.workerGroup == null) {
-            return false;
-        }
-
-        if (environmentCode != null ? environmentCode.equals(command.environmentCode)
-                : command.environmentCode == null) {
-            return false;
-        }
-
-        if (commandType != command.commandType) {
-            return false;
-        }
-        if (commandParam != null ? !commandParam.equals(command.commandParam) : command.commandParam != null) {
-            return false;
-        }
-        if (taskDependType != command.taskDependType) {
-            return false;
-        }
-        if (failureStrategy != command.failureStrategy) {
-            return false;
-        }
-        if (warningType != command.warningType) {
-            return false;
-        }
-        if (warningGroupId != null ? !warningGroupId.equals(command.warningGroupId) : command.warningGroupId != null) {
-            return false;
-        }
-        if (scheduleTime != null ? !scheduleTime.equals(command.scheduleTime) : command.scheduleTime != null) {
-            return false;
-        }
-        if (startTime != null ? !startTime.equals(command.startTime) : command.startTime != null) {
-            return false;
-        }
-        if (processInstancePriority != command.processInstancePriority) {
-            return false;
-        }
-        if (processInstanceId != command.processInstanceId) {
-            return false;
-        }
-        if (processDefinitionVersion != command.getProcessDefinitionVersion()) {
-            return false;
-        }
-
-        if (testFlag != command.testFlag){
-            return false;
-        }
-        return !(updateTime != null ? !updateTime.equals(command.updateTime) : command.updateTime != null);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (commandType != null ? commandType.hashCode() : 0);
-        result = 31 * result + Long.hashCode(processDefinitionCode);
-        result = 31 * result + executorId;
-        result = 31 * result + (commandParam != null ? commandParam.hashCode() : 0);
-        result = 31 * result + (taskDependType != null ? taskDependType.hashCode() : 0);
-        result = 31 * result + (failureStrategy != null ? failureStrategy.hashCode() : 0);
-        result = 31 * result + (warningType != null ? warningType.hashCode() : 0);
-        result = 31 * result + (warningGroupId != null ? warningGroupId.hashCode() : 0);
-        result = 31 * result + (scheduleTime != null ? scheduleTime.hashCode() : 0);
-        result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
-        result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
-        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
-        result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
-        result = 31 * result + (environmentCode != null ? environmentCode.hashCode() : 0);
-        result = 31 * result + dryRun;
-        result = 31 * result + processInstanceId;
-        result = 31 * result + processDefinitionVersion;
-        result = 31 * result + testFlag;
-        return result;
     }
 }

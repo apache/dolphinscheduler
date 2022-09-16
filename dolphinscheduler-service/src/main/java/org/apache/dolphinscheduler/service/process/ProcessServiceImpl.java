@@ -17,14 +17,21 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import io.micrometer.core.annotation.Counted;
-import org.apache.commons.collections.CollectionUtils;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -130,13 +137,9 @@ import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -149,22 +152,24 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toSet;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_FATHER_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
+import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import io.micrometer.core.annotation.Counted;
 
 /**
  * process relative dao that some mappers in this.
@@ -2505,20 +2510,15 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setOperator(operator.getId());
             taskDefinitionLog.setResourceIds(getResourceIds(taskDefinitionLog));
             if (taskDefinitionLog.getCode() == 0) {
-                try {
-                    taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
-                } catch (CodeGenerateException e) {
-                    logger.error("Task code get error, ", e);
-                    return Constants.DEFINITION_FAILURE;
-                }
+                taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
             }
             if (taskDefinitionLog.getVersion() == 0) {
                 // init first version
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
             }
 
-            TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper
-                    .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
+            TaskDefinitionLog definitionCodeAndVersion = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                    taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
             if (definitionCodeAndVersion == null) {
                 taskDefinitionLog.setUserId(operator.getId());
                 taskDefinitionLog.setCreateTime(now);
@@ -2535,39 +2535,33 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
             updateTaskDefinitionLogs.add(taskDefinitionLog);
         }
-        int insertResult = 0;
-        int updateResult = 0;
-        if (!updateTaskDefinitionLogs.isEmpty()) {
-            List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(updateTaskDefinitionLogs
-                    .stream().map(TaskDefinition::getCode).distinct().collect(Collectors.toList()));
+        if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs)) {
+            List<Long> taskDefinitionCodes = updateTaskDefinitionLogs
+                    .stream()
+                    .map(TaskDefinition::getCode)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Map<Long, TaskDefinition> taskDefinitionMap = taskDefinitionMapper.queryByCodeList(taskDefinitionCodes)
+                    .stream()
+                    .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
             for (TaskDefinitionLog taskDefinitionToUpdate : updateTaskDefinitionLogs) {
-                TaskDefinition task = null;
-                for (TaskDefinition taskDefinition : taskDefinitions) {
-                    if (taskDefinitionToUpdate.getCode() == taskDefinition.getCode()) {
-                        task = taskDefinition;
-                        break;
-                    }
-                }
+                TaskDefinition task = taskDefinitionMap.get(taskDefinitionToUpdate.getCode());
                 if (task == null) {
                     newTaskDefinitionLogs.add(taskDefinitionToUpdate);
-                } else {
-                    insertResult += taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
-                    if (Boolean.TRUE.equals(syncDefine)) {
-                        taskDefinitionToUpdate.setId(task.getId());
-                        updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
-                    } else {
-                        updateResult++;
-                    }
                 }
             }
         }
-        if (!newTaskDefinitionLogs.isEmpty()) {
-            insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
-            if (Boolean.TRUE.equals(syncDefine)) {
-                updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
-            } else {
-                updateResult += newTaskDefinitionLogs.size();
-            }
+
+        // for each taskDefinitionLog, we will insert a new version into db
+        // and update the origin one if exist
+        int updateResult = updateTaskDefinitionLogs.size();
+        int insertResult = newTaskDefinitionLogs.size();
+        if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
+            insertResult = taskDefinitionLogMapper.batchInsert(taskDefinitionLogs);
+        }
+
+        if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
+            updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
         }
         return (insertResult & updateResult) > 0 ? 1 : Constants.EXIT_CODE_SUCCESS;
     }
@@ -2588,10 +2582,8 @@ public class ProcessServiceImpl implements ProcessService {
                         : ReleaseState.OFFLINE);
         processDefinitionLog.setOperator(operator.getId());
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
-        int insertLog = processDefineLogMapper.updateById(processDefinitionLog);
-        if (insertLog == 0) {
-            insertLog = processDefineLogMapper.insert(processDefinitionLog);
-        }
+        processDefinitionLog.setId(null);
+        int insertLog = processDefineLogMapper.insert(processDefinitionLog);
         int result = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
             if (processDefinition.getId() == null) {
@@ -2618,7 +2610,8 @@ public class ProcessServiceImpl implements ProcessService {
         }
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = null;
         if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
-            taskDefinitionLogMap = taskDefinitionLogs.stream()
+            taskDefinitionLogMap = taskDefinitionLogs
+                    .stream()
                     .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinitionLog -> taskDefinitionLog));
         }
         Date now = new Date();

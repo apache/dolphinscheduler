@@ -25,14 +25,13 @@ import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -49,15 +48,6 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
-
-    @Before
-    public void before() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setWarningGroupId(0);
-        processInstance.setCommandParam("");
-        processInstance.setProcessDefinitionCode(1L);
-        processInstanceMapper.insert(processInstance);
-    }
 
     /**
      * insert
@@ -195,7 +185,6 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
             Flag.NO,
             processInstance.getTestFlag());
-
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -380,18 +369,17 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-            page,
-            definition.getProjectCode(),
-            task.getProcessInstanceId(),
-            "",
-            "",
-            "",
-            0,
-            new int[0],
-            "",
-            TaskExecuteType.BATCH,
-            null, null
-        );
+                page,
+                definition.getProjectCode(),
+                task.getProcessInstanceId(),
+                "",
+                "",
+                "",
+                0,
+                new int[0],
+                "",
+                TaskExecuteType.BATCH,
+                null, null);
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
