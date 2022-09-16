@@ -25,8 +25,8 @@ class OpenMLDB(Task):
     """Task OpenMLDB object, declare behavior for OpenMLDB task to dolphinscheduler.
 
     :param name: task name
-    :param zk: OpenMLDB cluster zookeeper address, e.g. 127.0.0.1:2181.
-    :param zk_path: OpenMLDB cluster zookeeper path, e.g. /openmldb.
+    :param zookeeper: OpenMLDB cluster zookeeper address, e.g. 127.0.0.1:2181.
+    :param zookeeper_path: OpenMLDB cluster zookeeper path, e.g. /openmldb.
     :param execute_mode: Determine the init mode, offline or online. You can switch it in sql statementself.
     :param sql: SQL statement.
     """
