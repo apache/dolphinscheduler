@@ -52,6 +52,9 @@ export function useForm(id?: number) {
     detailFormRef: ref(),
     detailForm: { ...initialValues },
     requiredDataBase: true,
+    showHost: true,
+    showPort: true,
+    showAwsRegion: false,
     showConnectType: false,
     showPrincipal: false,
     rules: {
@@ -66,7 +69,7 @@ export function useForm(id?: number) {
       host: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.host) {
+          if (!state.detailForm.host && state.showHost) {
             return new Error(t('datasource.ip_tips'))
           }
         }
@@ -74,7 +77,7 @@ export function useForm(id?: number) {
       port: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.port) {
+          if (!state.detailForm.port && state.showPort) {
             return new Error(t('datasource.port_tips'))
           }
         }
@@ -92,6 +95,14 @@ export function useForm(id?: number) {
         validator() {
           if (!state.detailForm.userName) {
             return new Error(t('datasource.user_name_tips'))
+          }
+        }
+      },
+      awsRegion: {
+        trigger: ['input'],
+        validator() {
+          if (!state.detailForm.awsRegion && state.showAwsRegion) {
+            return new Error(t('datasource.aws_region_tips'))
           }
         }
       },
@@ -126,10 +137,15 @@ export function useForm(id?: number) {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
 
+    state.requiredDataBase = (type !== 'POSTGRESQL' && type !== 'ATHENA')
+
+    state.showHost = type !== 'ATHENA'
+    state.showPort = type !== 'ATHENA'
+    state.showAwsRegion = type === 'ATHENA'
+
     if (type === 'ORACLE' && !id) {
       state.detailForm.connectType = 'ORACLE_SERVICE_NAME'
     }
-    state.requiredDataBase = type !== 'POSTGRESQL'
     state.showConnectType = type === 'ORACLE'
 
     if (type === 'HIVE' || type === 'SPARK') {
@@ -219,6 +235,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'REDSHIFT',
     label: 'REDSHIFT',
     defaultPort: 5439
+  },
+  ATHENA: {
+    value: 'ATHENA',
+    label: 'ATHENA',
+    defaultPort: 0
   }
 }
 
