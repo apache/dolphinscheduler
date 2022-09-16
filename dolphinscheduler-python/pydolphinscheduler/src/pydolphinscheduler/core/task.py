@@ -91,6 +91,7 @@ class Task(Base):
         "flag",
         "task_priority",
         "worker_group",
+        "environment_code",
         "delay_time",
         "fail_retry_times",
         "fail_retry_interval",
@@ -114,6 +115,7 @@ class Task(Base):
         flag: Optional[str] = TaskFlag.YES,
         task_priority: Optional[str] = TaskPriority.MEDIUM,
         worker_group: Optional[str] = configuration.WORKFLOW_WORKER_GROUP,
+        environment_name: Optional[str] = None,
         delay_time: Optional[int] = 0,
         fail_retry_times: Optional[int] = 0,
         fail_retry_interval: Optional[int] = 1,
@@ -134,6 +136,7 @@ class Task(Base):
         self.flag = flag
         self.task_priority = task_priority
         self.worker_group = worker_group
+        self._environment_name = environment_name
         self.fail_retry_times = fail_retry_times
         self.fail_retry_interval = fail_retry_interval
         self.delay_time = delay_time
@@ -150,6 +153,7 @@ class Task(Base):
         # move attribute code and version after _process_definition and process_definition declare
         self.code, self.version = self.gen_code_and_version()
         # Add task to process definition, maybe we could put into property process_definition latter
+
         if (
             self.process_definition is not None
             and self.code not in self.process_definition.tasks
@@ -351,3 +355,10 @@ class Task(Base):
         # result = gateway.entry_point.genTaskCodeList(DefaultTaskCodeNum.DEFAULT)
         # gateway_result_checker(result)
         return result.get("code"), result.get("version")
+
+    @property
+    def environment_code(self) -> str:
+        """Convert environment name to code."""
+        if self._environment_name is None:
+            return None
+        return JavaGate().query_environment_info(self._environment_name)

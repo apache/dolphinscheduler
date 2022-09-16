@@ -266,7 +266,7 @@ export default defineComponent({
                 {{
                   trigger: () => (
                     <NInput
-                  allowInput={this.trim}
+                      allowInput={this.trim}
                       style={{ width: '80%' }}
                       readonly={true}
                       v-model:value={this.timingForm.crontab}

@@ -20,22 +20,23 @@
 from typing import Optional
 from urllib.parse import urljoin
 
-from pydolphinscheduler.core.resource_plugin import ResourcePlugin
-
 import boto3
 
-from pydolphinscheduler.exceptions import PyResPluginException
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
+from pydolphinscheduler.resources_plugin.base.bucket import Bucket, S3FileInfo
 
 
-class S3(ResourcePlugin):
+class S3(ResourcePlugin, Bucket):
     """S3 object, declare S3 resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of S3.
+    :param access_key_id: A string representing the ID of AccessKey for Amazon S3
+    to access private files.
 
-
+    :param access_key_secret: A string representing the secret of AccessKey for Amazon S3
+    to access private files.
     """
 
-    # [start init_method]
     def __init__(
         self,
         prefix: str,
@@ -48,44 +49,26 @@ class S3(ResourcePlugin):
         self.access_key_id = access_key_id
         self.access_key_secret = access_key_secret
 
-    # [end init_method]
+    _bucket_file_info: Optional[S3FileInfo] = None
 
-    def url_join(self, prefix: str, suf: str):
-        """File url splicing."""
-        if prefix[-1] != "/":
-            prefix = prefix + "/"
-        if suf[0] == "/":
-            suf = suf[1:]
-        return urljoin(prefix + "/", suf)
-
-    def get_file_info(self, path: str):
+    def get_bucket_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
         elements = path.split("/")
-        if len(elements) < 4:
-            raise PyResPluginException("Incomplete path.")
-        """
-        https://ds-resource-plugin.s3.amazonaws.com/dir/union.sh
-        """
-        bucket = elements[2].split(".")[0]
-        key = "/".join(str(elements[i]) for i in range(3, len(elements)))
-        file_info = {
-            "bucket": bucket,
-            "key": key,
-        }
-        return file_info
+        self.get_index(path, "/", 3)
+        self._bucket_file_info = S3FileInfo(
+            bucket=elements[2].split(".")[0],
+            file_path="/".join(str(elements[i]) for i in range(3, len(elements))),
+        )
 
-    # [start read_file_method]
     def read_file(self, suf: str):
         """Get the content of the file.
 
         The address of the file is the prefix of the resource plugin plus the parameter suf.
         """
-        path = self.url_join(self.prefix, suf)
-        file_info = self.get_file_info(path)
-        bucket = file_info["bucket"]
-        key = file_info["key"]
-        s3_resource = boto3.resource('s3')
+        path = urljoin(self.prefix, suf)
+        self.get_bucket_file_info(path)
+        bucket = self._bucket_file_info.bucket
+        key = self._bucket_file_info.file_path
+        s3_resource = boto3.resource("s3")
         s3_object = s3_resource.Object(bucket, key)
-        return s3_object.get()['Body'].read().decode('utf-8')
-
-    # [end read_file_method]
+        return s3_object.get()["Body"].read().decode("utf-8")

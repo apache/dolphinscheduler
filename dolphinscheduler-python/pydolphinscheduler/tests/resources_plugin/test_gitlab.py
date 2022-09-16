@@ -18,4 +18,99 @@
 """Test github resource plugin."""
 import pytest
 
-from pydolphinscheduler.resources_plugin import GitHub
+from pydolphinscheduler.resources_plugin.gitlab import GitLab
+
+
+@pytest.mark.parametrize(
+    "attr, expected",
+    [
+        (
+            "https://gitlab.com/chenruijie/ds-gitlab/-/blob/main/union.sh",
+            {
+                "branch": "main",
+                "file_path": "union.sh",
+                "host": "https://gitlab.com",
+                "repo_name": "ds-gitlab",
+                "user": "chenruijie",
+            },
+        ),
+        (
+            "https://gitlab.com/chenruijie/ds/-/blob/dev/test/exc.sh",
+            {
+                "branch": "dev",
+                "file_path": "test/exc.sh",
+                "host": "https://gitlab.com",
+                "repo_name": "ds",
+                "user": "chenruijie",
+            },
+        ),
+    ],
+)
+def test_gitlab_get_git_file_info(attr, expected):
+    """Test the get_file_info function of the gitlab resource plugin."""
+    gitlab = GitLab(prefix="prefix")
+    gitlab.get_git_file_info(attr)
+    assert expected == gitlab._git_file_info.__dict__
+
+
+@pytest.mark.skip(reason="This test needs gitlab service")
+@pytest.mark.parametrize(
+    "attr, expected",
+    [
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds-internal/-/blob/main",
+                    "oauth_token": "24518bd4cf5bfe9xx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds/-/blob/main",
+                    "private_token": "9TyTe2xx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenrj/ds-gitlab/-/blob/main",
+                    "username": "chenrj",
+                    "password": "4295xx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds-public/-/blob/main",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "http://10.170.33.18:82/chenruijie/ds-internal/-/blob/main",
+                    "username": "chenruijie",
+                    "password": "429xxx",
+                },
+                "file_path": "union.sh",
+            },
+            "test gitlab resource plugin\n",
+        ),
+    ],
+)
+def test_gitlab_read_file(attr, expected):
+    """Test the read_file function of the gitlab resource plug-in."""
+    gitlab = GitLab(**attr.get("init"))
+    assert expected == gitlab.read_file(attr.get("file_path"))

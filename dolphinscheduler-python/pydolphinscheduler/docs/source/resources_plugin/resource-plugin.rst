@@ -31,9 +31,9 @@ Dive Into
 ---------
 It has the following key functions.
 
-- Method `__init__`: The `__init__` function has STR type parameter `prefix`, which means the plugin type of the resource.
+- Method `__init__`: The `__init__` function has STR type parameter `prefix`, which means the prefix of the resource.
 
-You can rewrite it if necessary.
+You can rewrite this function if necessary.
 
 .. literalinclude:: ../../../src/pydolphinscheduler/core/resource_plugin.py
     :start-after: [start init_method]
@@ -55,10 +55,10 @@ It is an abstract function. You must rewrite it
 
 How to use
 ----------
-Resource plug-ins can be used in task subclasses and workflows. You can use the resource plug-ins by adding the `resource_plugin` parameter when they are initialized.
-For example, local resource plug-ins, add `resource_plugin = Local("/tmp")`.
+Resource plugin can be used in task subclasses and workflows. You can use the resource plugin by adding the `resource_plugin` parameter when they are initialized.
+For example, local resource plugin, add `resource_plugin = Local("/tmp")`.
 
-The resource plug-ins we currently support is `local`, 'github'.
+The resource plugin we currently support are `local`, `github`, `gitlab`, `OSS`, `S3`.
 
 Here is an example.
 

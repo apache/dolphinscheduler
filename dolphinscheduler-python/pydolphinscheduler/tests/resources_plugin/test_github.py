@@ -16,9 +16,12 @@
 # under the License.
 
 """Test github resource plugin."""
+from unittest.mock import PropertyMock, patch
+
 import pytest
 
 from pydolphinscheduler.resources_plugin import GitHub
+from pydolphinscheduler.resources_plugin.base.git import GitFileInfo
 
 
 @pytest.mark.parametrize(
@@ -39,81 +42,6 @@ def test_github_build_req_api(attr, expected):
     """Test the build_req_api function of the github resource plug-in."""
     github = GitHub(prefix="prefix")
     assert expected == github.build_req_api(**attr)
-
-
-@pytest.mark.parametrize(
-    "attr, expected",
-    [
-        (
-            {
-                "prefix": "https://api.github.com/repos/apache/dolphinscheduler/contents/script/",
-                "suf": "install.sh",
-            },
-            "https://api.github.com/repos/apache/dolphinscheduler/contents/script/install.sh",
-        ),
-        (
-            {
-                "prefix": "https://api.github.com/repos/apache/dolphinscheduler/contents/script",
-                "suf": "/install.sh",
-            },
-            "https://api.github.com/repos/apache/dolphinscheduler/contents/script/install.sh",
-        ),
-        (
-            {
-                "prefix": "https://api.github.com/repos/apache/dolphinscheduler/contents/script/",
-                "suf": "/install.sh",
-            },
-            "https://api.github.com/repos/apache/dolphinscheduler/contents/script/install.sh",
-        ),
-    ],
-)
-def test_github_url_join(attr, expected):
-    """Test the url_join function of the github resource plug-in."""
-    github = GitHub(prefix="prefix")
-    assert expected == github.url_join(**attr)
-
-
-@pytest.mark.parametrize(
-    "attr, expected",
-    [
-        (
-            {
-                "s": "https://api.github.com/repos/apache/dolphinscheduler/contents/script/install.sh",
-                "x": "/",
-                "n": 2,
-            },
-            7,
-        ),
-        (
-            {
-                "s": "https://api.github.com/repos/apache/dolphinscheduler/contents/script/install.sh",
-                "x": "/",
-                "n": 3,
-            },
-            22,
-        ),
-        (
-            {
-                "s": "https://api.github.com/repos/apache/dolphinscheduler/contents/script/install.sh",
-                "x": "/",
-                "n": 9,
-            },
-            None,
-        ),
-        (
-            {
-                "s": "https://api.github.com/repos/apache/dolphinscheduler/contents/script/install.sh",
-                "x": "/",
-                "n": 10,
-            },
-            None,
-        ),
-    ],
-)
-def test_github_get_index(attr, expected):
-    """Test the get_index function of the github resource plug-in."""
-    github = GitHub(prefix="prefix")
-    assert expected == github.get_index(**attr)
 
 
 @pytest.mark.parametrize(
@@ -148,10 +76,11 @@ def test_github_get_index(attr, expected):
         ),
     ],
 )
-def test_github_get_file_info(attr, expected):
-    """Test the get_file_info function of the github resource plug-in."""
+def test_github_get_git_file_info(attr, expected):
+    """Test the get_git_file_info function of the github resource plug-in."""
     github = GitHub(prefix="prefix")
-    assert expected == github.get_file_info(attr)
+    github.get_git_file_info(attr)
+    assert expected == github._git_file_info.__dict__
 
 
 @pytest.mark.parametrize(
@@ -189,46 +118,49 @@ def test_github_get_file_info(attr, expected):
         ),
     ],
 )
-def test_github_get_req_url(attr, expected):
+@patch(
+    "pydolphinscheduler.resources_plugin.github.GitHub._git_file_info",
+    new_callable=PropertyMock,
+)
+def test_github_get_req_url(m_git_file_info, attr, expected):
     """Test the get_req_url function of the github resource plug-in."""
     github = GitHub(prefix="prefix")
-    assert expected == github.get_req_url(attr)
+    m_git_file_info.return_value = GitFileInfo(**attr)
+    assert expected == github.get_req_url()
 
 
 @pytest.mark.parametrize(
     "attr, expected",
     [
         (
-            "lombok.config",
-            "#\n"
-            "# Licensed to the Apache Software Foundation (ASF) under one or more\n"
-            "# contributor license agreements.  See the NOTICE file distributed with\n"
-            "# this work for additional information regarding copyright ownership.\n"
-            "# The ASF licenses this file to You under the Apache License, Version 2.0\n"
-            '# (the "License"); you may not use this file except in compliance with\n'
-            "# the License.  You may obtain a copy of the License at\n"
-            "#\n"
-            "#     http://www.apache.org/licenses/LICENSE-2.0\n"
-            "#\n"
-            "# Unless required by applicable law or agreed to in writing, software\n"
-            '# distributed under the License is distributed on an "AS IS" BASIS,\n'
-            "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
-            "# See the License for the specific language governing permissions and\n"
-            "# limitations under the License.\n"
-            "#\n"
-            "\n"
-            "lombok.addLombokGeneratedAnnotation = true\n",
+            {
+                "init": {"prefix": "prefix", "access_token": "access_token"},
+                "file_path": "github_resource_plugin.sh",
+                "file_content": "github resource plugin",
+            },
+            "github resource plugin",
+        ),
+        (
+            {
+                "init": {
+                    "prefix": "prefix",
+                },
+                "file_path": "github_resource_plugin.sh",
+                "file_content": "github resource plugin",
+            },
+            "github resource plugin",
         ),
     ],
 )
-def test_github_read_file(attr, expected):
+@patch("pydolphinscheduler.resources_plugin.github.GitHub.req")
+def test_github_read_file(m_req, attr, expected):
     """Test the read_file function of the github resource plug-in."""
-    github = GitHub(
-        prefix="https://github.com/apache/dolphinscheduler/blob/dev",
-    )
-    assert expected == github.read_file(attr)
+    github = GitHub(**attr.get("init"))
+    m_req.return_value = attr.get("file_content")
+    assert expected == github.read_file(attr.get("file_path"))
 
 
+@pytest.mark.skip(reason="Lack of test environment, need stable repository")
 @pytest.mark.parametrize(
     "attr, expected",
     [

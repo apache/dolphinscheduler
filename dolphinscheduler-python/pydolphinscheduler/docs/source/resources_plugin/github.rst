@@ -22,15 +22,12 @@ GitHub
 
 When using a github resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
 such as `resource_plugin=GitHub(prefix="https://github.com/xxx", access_token="ghpxx")`.
-The token parameter is optional. You need to add it when your warehouse is a private warehouse.
+The token parameter is optional. You need to add it when your warehouse is a private repository.
 
-Basic auth is also supported, using such as `resource_plugin=GitHub(prefix="https://github.com/xxx", username="user", password="pwd")`.
-However, in basic auth, `password` is equal to personal access token.
-
-You can view this `document <https://docs.github.com/cn/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-token>`_
+You can view this `document <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token>`_
 when creating a token.
 
-For the specific use of resource plugins, you can see `How to use` in :doc:`./resource-plugin`
+For the specific use of resource plugins, you can see `How to use` in :doc:`resource-plugin`
 
 Dive Into
 ---------

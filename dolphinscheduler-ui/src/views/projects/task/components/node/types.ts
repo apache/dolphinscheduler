@@ -223,6 +223,9 @@ interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
   localParams?: ILocalParam[]
+  runType?:string
+  jvmArgs?:string
+  isModulePath?:boolean
   rawScript?: string
   initScript?: string
   programType?: string
@@ -306,6 +309,9 @@ interface ITaskParams {
   restEndpoint?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
+  hiveCliOptions?: string
+  hiveSqlScript?: string
+  hiveCliTaskExecutionType?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string

@@ -19,13 +19,17 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
+import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * abstract yarn task
  */
-public abstract class AbstractYarnTask extends AbstractTaskExecutor {
+public abstract class AbstractYarnTask extends AbstractRemoteTask {
+
     /**
      * process task
      */
@@ -44,12 +48,13 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskRequest,
-            logger);
+                taskRequest,
+                logger);
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
@@ -69,17 +74,54 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
         }
     }
 
+    // todo
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    // todo
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
+    }
+
     /**
      * cancel application
      *
-     * @param status status
-     * @throws Exception exception
+     * @throws TaskException exception
      */
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        cancel = true;
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
+    }
+
+    /**
+     * get application ids
+     * @return
+     * @throws TaskException
+     */
+    public Set<String> getApplicationIds() throws TaskException {
+        return LogUtils.getAppIdsFromLogFile(taskRequest.getLogPath(), logger);
+    }
+
+    /**
+     * find app id
+     *
+     * @param line line
+     * @return appid
+     */
+    protected String findAppId(String line) {
+        Matcher matcher = YARN_APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 
     /**
@@ -105,9 +147,9 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
             throw new RuntimeException("The jar for the task is required.");
         }
 
-        return mainJar.getId() == 0
-            ? mainJar.getRes()
-            // when update resource maybe has error
-            : mainJar.getResourceName().replaceFirst("/", "");
+        return mainJar.getId() == null
+                ? mainJar.getRes()
+                // when update resource maybe has error
+                : mainJar.getResourceName().replaceFirst("/", "");
     }
 }

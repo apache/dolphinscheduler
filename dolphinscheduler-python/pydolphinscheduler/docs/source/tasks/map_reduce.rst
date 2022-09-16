@@ -32,3 +32,11 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.map_reduce
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/MapReduce.yaml
+   :start-after: # under the License.
+   :language: yaml

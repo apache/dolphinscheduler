@@ -162,6 +162,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/en-us/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -180,6 +184,10 @@ export default {
                             {
                                 title: 'Dinky',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'Java',
+                                link: '/en-us/docs/dev/user_doc/guide/task/java.html',
                             },
                             {
                                 title: 'SageMaker',
@@ -782,6 +790,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -800,6 +812,10 @@ export default {
                             {
                                 title: 'Dinky',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'Java',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/java.html',
                             },
                             {
                                 title: 'SageMaker',
