@@ -10,8 +10,9 @@ import java.util.Objects;
  *  Rewriting based on Twitter snowflake algorithm
  */
 public class CodeGenerateUtils {
+
     // start timestamp
-    private static final long START_TIMESTAMP = 1609430400000L; //2021-01-01 00:00:00
+    private static final long START_TIMESTAMP = 1609430400000L; // 2021-01-01 00:00:00
     // Each machine generates 32 in the same millisecond
     private static final long LOW_DIGIT_BIT = 5L;
     private static final long MIDDLE_BIT = 2L;
@@ -24,11 +25,12 @@ public class CodeGenerateUtils {
     private long recordMillisecond = -1L;
 
     private static final long SYSTEM_TIMESTAMP = System.currentTimeMillis();
-    private static final long SYSTEM_NANOTIME  = System.nanoTime();
+    private static final long SYSTEM_NANOTIME = System.nanoTime();
 
     private CodeGenerateUtils() throws CodeGenerateException {
         try {
-            this.machineHash = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % (2 << (MIDDLE_BIT - 1));
+            this.machineHash =
+                    Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % (2 << (MIDDLE_BIT - 1));
         } catch (UnknownHostException e) {
             throw new CodeGenerateException(e.getMessage());
         }
@@ -66,7 +68,8 @@ public class CodeGenerateUtils {
         return SYSTEM_TIMESTAMP + (System.nanoTime() - SYSTEM_NANOTIME) / 1000000;
     }
 
-    public static class CodeGenerateException extends Exception {
+    public static class CodeGenerateException extends RuntimeException {
+
         public CodeGenerateException(String message) {
             super(message);
         }

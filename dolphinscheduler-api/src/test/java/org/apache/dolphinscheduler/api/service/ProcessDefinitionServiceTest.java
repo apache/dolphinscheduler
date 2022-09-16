@@ -96,9 +96,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
-/**
- * process definition service test
- */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionServiceTest {
 
@@ -756,10 +753,13 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE))
                 .thenReturn(result);
 
-        Map<String, Object> updateResult =
-                processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
-                        "", "", "", 0, "root", null, "", null, ProcessExecutionTypeEnum.PARALLEL);
-        Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
+        try {
+            processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
+                    "", "", "", 0, "root", null, "", null, ProcessExecutionTypeEnum.PARALLEL);
+            Assert.fail();
+        } catch (ServiceException ex) {
+            Assert.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), ex.getCode());
+        }
     }
 
     @Test
