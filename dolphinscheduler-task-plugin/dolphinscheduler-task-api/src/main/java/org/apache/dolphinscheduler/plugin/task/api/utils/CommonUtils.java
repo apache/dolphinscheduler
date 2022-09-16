@@ -37,6 +37,10 @@ public class CommonUtils {
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(TaskConstants.DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
+    protected CommonUtils() {
+        throw new UnsupportedOperationException("Construct CommonUtils");
+    }
+
     /**
      * @return get the path of system environment variables
      */
@@ -49,7 +53,7 @@ public class CommonUtils {
                 envPath = envDefaultPath.getPath();
                 logger.debug("env path :{}", envPath);
             } else {
-                envPath = "/etc/profile";
+                envPath = TaskConstants.ETC_PROFILE_PATH;
             }
         }
 
