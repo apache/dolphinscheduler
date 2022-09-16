@@ -23,8 +23,8 @@ workflow:
 tasks:
   - name: OpenMLDB
     task_type: OpenMLDB
-    zk: "127.0.0.1:2181"
-    zk_path: "/openmldb"
+    zookeeper: "127.0.0.1:2181"
+    zookeeper_path: "/openmldb"
     execute_mode: "online"
     sql: |
       USE demo_db;

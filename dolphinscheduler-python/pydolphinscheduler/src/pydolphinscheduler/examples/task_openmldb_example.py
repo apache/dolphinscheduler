@@ -33,8 +33,8 @@ with ProcessDefinition(
 ) as pd:
     task_openmldb = OpenMLDB(
         name="task_openmldb",
-        zk="127.0.0.1:2181",
-        zk_path="/openmldb",
+        zookeeper="127.0.0.1:2181",
+        zookeeper_path="/openmldb",
         execute_mode="offline",
         sql=sql,
     )

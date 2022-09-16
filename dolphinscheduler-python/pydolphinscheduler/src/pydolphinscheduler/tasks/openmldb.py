@@ -38,9 +38,11 @@ class OpenMLDB(Task):
         "sql",
     }
 
-    def __init__(self, name, zk, zk_path, execute_mode, sql, *args, **kwargs):
+    def __init__(
+        self, name, zookeeper, zookeeper_path, execute_mode, sql, *args, **kwargs
+    ):
         super().__init__(name, TaskType.OPENMLDB, *args, **kwargs)
-        self.zk = zk
-        self.zk_path = zk_path
+        self.zk = zookeeper
+        self.zk_path = zookeeper_path
         self.execute_mode = execute_mode
         self.sql = sql

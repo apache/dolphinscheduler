@@ -24,8 +24,8 @@ from pydolphinscheduler.tasks.openmldb import OpenMLDB
 
 def test_openmldb_get_define():
     """Test task openmldb function get_define."""
-    zk = "127.0.0.1:2181"
-    zk_path = "/openmldb"
+    zookeeper = "127.0.0.1:2181"
+    zookeeper_path = "/openmldb"
     execute_mode = "offline"
 
     sql = """USE demo_db;
@@ -47,8 +47,8 @@ def test_openmldb_get_define():
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "zk": zk,
-            "zkPath": zk_path,
+            "zk": zookeeper,
+            "zkPath": zookeeper_path,
             "executeMode": execute_mode,
             "sql": sql,
             "dependence": {},
@@ -69,5 +69,5 @@ def test_openmldb_get_define():
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
         return_value=(code, version),
     ):
-        openmldb = OpenMLDB(name, zk, zk_path, execute_mode, sql)
+        openmldb = OpenMLDB(name, zookeeper, zookeeper_path, execute_mode, sql)
         assert openmldb.get_define() == expect
