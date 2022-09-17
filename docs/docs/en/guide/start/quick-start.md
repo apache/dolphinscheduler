@@ -42,7 +42,7 @@ This is a Quick Start guide to help you get a basic idea of working with Apache 
 ![create-environment](../../../../img/new_ui/dev/quick-start/create-environment.png)
 
 ## Create a token
-  
+
 ![create-token](../../../../img/new_ui/dev/quick-start/create-token.png)
 
 ## Login with regular users
