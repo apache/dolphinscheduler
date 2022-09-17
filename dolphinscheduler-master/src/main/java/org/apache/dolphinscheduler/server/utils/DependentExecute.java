@@ -185,23 +185,45 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
 
-        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionCode, dateInterval.getStartTime(), dateInterval.getEndTime());
-        if (runningProcess != null) {
-            return runningProcess;
-        }
-
-        ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
+        /**
+         * Find the last manual/schedule processInstance.
+         * Return the nonnull one first.
+         * Return the finished one first.
+         * Return the start later one first.
+         * Return the manual one first.
+         */
+        ProcessInstance lastSchedulerProcess =
+                processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
 
         ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval);
+
+        if (lastManualProcess == null && lastSchedulerProcess == null) {
+            return null;
+        }
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;
         }
+
         if (lastSchedulerProcess == null) {
             return lastManualProcess;
         }
 
-        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess : lastSchedulerProcess;
+        if (lastManualProcess.getEndTime() == null && lastSchedulerProcess.getEndTime() == null) {
+            return lastManualProcess.getStartTime().after(lastSchedulerProcess.getStartTime()) ? lastManualProcess
+                    : lastSchedulerProcess;
+        }
+
+        if (lastSchedulerProcess.getEndTime() == null) {
+            return lastManualProcess;
+        }
+
+        if (lastManualProcess.getEndTime() == null) {
+            return lastSchedulerProcess;
+        }
+
+        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess
+                : lastSchedulerProcess;
     }
 
     /**
