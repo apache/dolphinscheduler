@@ -22,6 +22,12 @@ public class DvcConstants {
         throw new IllegalStateException("Utility class");
     }
 
+    public static final class DVC_TASK_TYPE {
+        public static final String UPLOAD = "Upload";
+        public static final String DOWNLOAD = "Download";
+        public static final String INIT = "Init DVC";
+    };
+
     public static final String CHECK_AND_SET_DVC_REPO = "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=%s";
 
     public static final String SET_DATA_PATH = "DVC_DATA_PATH=%s";

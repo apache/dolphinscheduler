@@ -104,12 +104,12 @@ public class DvcTask extends AbstractTaskExecutor {
 
     public String buildCommand() {
         String command = "";
-        TaskTypeEnum taskType = parameters.getDvcTaskType();
-        if (taskType == TaskTypeEnum.UPLOAD) {
+        String taskType = parameters.getDvcTaskType();
+        if (taskType.equals(DvcConstants.DVC_TASK_TYPE.UPLOAD)) {
             command = buildUploadCommond();
-        }else if (taskType == TaskTypeEnum.DOWNLOAD){
+        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.DOWNLOAD)) {
             command = buildDownCommond();
-        }else if (taskType == TaskTypeEnum.INIT){
+        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.INIT)) {
             command = buildInitDvcCommond();
         }
         logger.info("Run DVC task with command: \n{}", command);

@@ -61,6 +61,7 @@ class TaskType(str):
     MLFLOW = "MLFLOW"
     OPENMLDB = "OPENMLDB"
     PYTORCH = "PYTORCH"
+    DVC = "DVC"
 
 
 class DefaultTaskCodeNum(str):
