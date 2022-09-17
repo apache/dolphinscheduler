@@ -67,19 +67,21 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         this.setTaskExecutionLogger();
-        initTaskParameters();
-        logger.info("condition task start");
+        logger.info("condition task submit success");
         return true;
     }
 
     @Override
     public boolean runTask() {
+        initTaskParameters();
+        logger.info("condition task start");
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
             endTask();
         } else {
             endTask();
         }
+        logger.info("condition task finished");
         return true;
     }
 
