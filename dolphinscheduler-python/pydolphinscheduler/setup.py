@@ -36,7 +36,7 @@ version = "dev"
 
 # Start package required
 prod = [
-    "boto3>=1.24.61",
+    "boto3>=1.23.10",
     "oss2>=2.16.0",
     "python-gitlab>=3.9.0",
     "click>=8.0.0",
