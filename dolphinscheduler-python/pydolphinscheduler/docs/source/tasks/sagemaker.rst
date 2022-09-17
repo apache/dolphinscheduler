@@ -32,3 +32,15 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.sagemaker
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Sagemaker.yaml
+   :start-after: # under the License.
+   :language: yaml
+
+example_sagemaker_params.json:
+
+.. literalinclude:: ../../../examples/yaml_define/example_sagemaker_params.json
+   :language: json
