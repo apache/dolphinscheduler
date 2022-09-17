@@ -20,6 +20,7 @@
 from pydolphinscheduler.tasks.condition import FAILURE, SUCCESS, And, Condition, Or
 from pydolphinscheduler.tasks.datax import CustomDataX, DataX
 from pydolphinscheduler.tasks.dependent import Dependent
+from pydolphinscheduler.tasks.dvc import DVCDownload, DVCInit, DVCUpload
 from pydolphinscheduler.tasks.flink import Flink
 from pydolphinscheduler.tasks.http import Http
 from pydolphinscheduler.tasks.map_reduce import MR
@@ -39,6 +40,9 @@ __all__ = [
     "DataX",
     "CustomDataX",
     "Dependent",
+    "DVCInit",
+    "DVCUpload",
+    "DVCDownload",
     "Flink",
     "Http",
     "MR",

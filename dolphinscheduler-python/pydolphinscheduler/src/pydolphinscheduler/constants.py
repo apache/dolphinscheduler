@@ -60,6 +60,7 @@ class TaskType(str):
     SAGEMAKER = "SAGEMAKER"
     OPENMLDB = "OPENMLDB"
     PYTORCH = "PYTORCH"
+    DVC = "DVC"
 
 
 class DefaultTaskCodeNum(str):

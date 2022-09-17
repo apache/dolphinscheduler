@@ -17,15 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.dvc;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import lombok.Data;
 
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+@Data
 public class DvcParameters extends AbstractParameters {
 
     /**
      * common parameters
      */
 
-    private TaskTypeEnum dvcTaskType;
+    private String dvcTaskType;
 
     private String dvcRepository;
 
@@ -39,67 +43,34 @@ public class DvcParameters extends AbstractParameters {
 
     private String dvcStoreUrl;
 
-    public void setDvcTaskType(TaskTypeEnum dvcTaskType) {
-        this.dvcTaskType = dvcTaskType;
-    }
-
-    public TaskTypeEnum getDvcTaskType() {
-        return dvcTaskType;
-    }
-
-    public void setDvcRepository(String dvcRepository) {
-        this.dvcRepository = dvcRepository;
-    }
-
-    public String getDvcRepository() {
-        return dvcRepository;
-    }
-
-    public void setDvcVersion(String dvcVersion) {
-        this.dvcVersion = dvcVersion;
-    }
-
-    public String getDvcVersion() {
-        return dvcVersion;
-    }
-
-    public void setDvcDataLocation(String dvcDataLocation) {
-        this.dvcDataLocation = dvcDataLocation;
-    }
-
-    public String getDvcDataLocation() {
-        return dvcDataLocation;
-    }
-
-    public void setDvcMessage(String dvcMessage) {
-        this.dvcMessage = dvcMessage;
-    }
-
-    public String getDvcMessage() {
-        return dvcMessage;
-    }
-
-    public void setDvcLoadSaveDataPath(String dvcLoadSaveDataPath) {
-        this.dvcLoadSaveDataPath = dvcLoadSaveDataPath;
-    }
-
-    public String getDvcLoadSaveDataPath() {
-        return dvcLoadSaveDataPath;
-    }
-
-    public void setDvcStoreUrl(String dvcStoreUrl) {
-        this.dvcStoreUrl = dvcStoreUrl;
-    }
-
-    public String getDvcStoreUrl() {
-        return dvcStoreUrl;
-    }
-
     @Override
     public boolean checkParameters() {
-        Boolean checkResult = true;
-        return checkResult;
-    }
 
+        if (StringUtils.isEmpty(dvcTaskType)) {
+            return false;
+        }
+
+        switch (dvcTaskType) {
+            case DvcConstants.DVC_TASK_TYPE.UPLOAD:
+                return StringUtils.isNotEmpty(dvcRepository) &&
+                    StringUtils.isNotEmpty(dvcDataLocation) &&
+                    StringUtils.isNotEmpty(dvcLoadSaveDataPath) &&
+                    StringUtils.isNotEmpty(dvcVersion) &&
+                    StringUtils.isNotEmpty(dvcMessage);
+
+            case DvcConstants.DVC_TASK_TYPE.DOWNLOAD:
+                return StringUtils.isNotEmpty(dvcRepository) &&
+                    StringUtils.isNotEmpty(dvcDataLocation) &&
+                    StringUtils.isNotEmpty(dvcLoadSaveDataPath) &&
+                    StringUtils.isNotEmpty(dvcVersion);
+
+            case DvcConstants.DVC_TASK_TYPE.INIT:
+                return StringUtils.isNotEmpty(dvcRepository) &&
+                    StringUtils.isNotEmpty(dvcStoreUrl);
+
+            default:
+                return false;
+        }
+    }
 }
 

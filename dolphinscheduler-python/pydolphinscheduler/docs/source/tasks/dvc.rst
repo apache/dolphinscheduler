@@ -15,33 +15,27 @@
    specific language governing permissions and limitations
    under the License.
 
-Tasks
-=====
+DVC
+===
 
-In this section 
+A DVC task type's example and dive into information of **PyDolphinScheduler**.
 
-.. toctree::
-   :maxdepth: 1
-   
-   func_wrap
-   shell
-   sql
-   python
-   http
+Example
+-------
 
-   switch
-   condition
-   dependent
+.. literalinclude:: ../../../src/pydolphinscheduler/examples/task_dvc_example.py
+   :start-after: [start workflow_declare]
+   :end-before: [end workflow_declare]
 
-   spark
-   flink
-   map_reduce
-   procedure
+Dive Into
+---------
 
-   datax
-   sub_process
+.. automodule:: pydolphinscheduler.tasks.dvc
 
-   sagemaker
-   openmldb
-   pytorch
-   dvc
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Dvc.yaml
+   :start-after: # under the License.
+   :language: yaml
