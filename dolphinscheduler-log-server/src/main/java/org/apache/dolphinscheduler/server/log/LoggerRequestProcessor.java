@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -95,22 +94,9 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
             case ROLL_VIEW_LOG_REQUEST:
-                RollViewLogRequestCommand rollViewLogRequest = JSONUtils.parseObject(
-                        command.getBody(), RollViewLogRequestCommand.class);
-
-                String rollViewLogPath = rollViewLogRequest.getPath();
-                if (!checkPathSecurity(rollViewLogPath)) {
-                    throw new IllegalArgumentException("Illegal path");
-                }
-
-                List<String> lines = readPartFileContent(rollViewLogPath,
-                        rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
-                StringBuilder builder = new StringBuilder();
-                for (String line : lines) {
-                    builder.append(line).append("\r\n");
-                }
-                RollViewLogResponseCommand rollViewLogRequestResponse =
-                        new RollViewLogResponseCommand(builder.toString());
+                RollViewLogRequestCommand rollViewLogRequest = JSONUtils.parseObject(command.getBody(), RollViewLogRequestCommand.class);
+                // todo: solve the NPE, this shouldn't happen in normal case
+                RollViewLogResponseCommand rollViewLogRequestResponse = readPartFileContent(rollViewLogRequest);
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
                 break;
             case REMOVE_TAK_LOG_REQUEST:
@@ -193,28 +179,34 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         return new byte[0];
     }
 
-    /**
-     * read part file content，can skip any line and read some lines
-     *
-     * @param filePath file path
-     * @param skipLine skip line
-     * @param limit read lines limit
-     * @return part file content
-     */
-    private List<String> readPartFileContent(String filePath,
-                                             int skipLine,
-                                             int limit) {
-        File file = new File(filePath);
-        if (file.exists() && file.isFile()) {
-            try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-                return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
-            } catch (IOException e) {
-                logger.error("read file error", e);
-            }
-        } else {
-            logger.info("file path: {} not exists", filePath);
+    private RollViewLogResponseCommand readPartFileContent(RollViewLogRequestCommand rollViewLogRequest) {
+
+        String rollViewLogPath = rollViewLogRequest.getPath();
+        if (!checkPathSecurity(rollViewLogPath)) {
+            logger.error("Log file path: {} is not a security path", rollViewLogPath);
+            return RollViewLogResponseCommand.error(RollViewLogResponseCommand.Status.LOG_PATH_IS_NOT_SECURITY);
         }
-        return Collections.emptyList();
+        File file = new File(rollViewLogPath);
+        if (!file.exists() || file.isFile()) {
+            logger.error("Log file path: {} doesn't exists", rollViewLogPath);
+            return RollViewLogResponseCommand.error(RollViewLogResponseCommand.Status.LOG_FILE_NOT_FOUND);
+        }
+
+        int skipLine = rollViewLogRequest.getSkipLineNum();
+        int limit = rollViewLogRequest.getLimit();
+        try (Stream<String> stream = Files.lines(Paths.get(rollViewLogPath))) {
+            List<String> lines = stream.skip(skipLine).limit(limit).collect(Collectors.toList());
+            long totalLineNumber = stream.count();
+
+            return RollViewLogResponseCommand.builder()
+                    .currentLineNumber(skipLine + lines.size())
+                    .currentTotalLineNumber(totalLineNumber)
+                    .log(String.join("\r\n", lines))
+                    .build();
+        } catch (IOException e) {
+            logger.error("Rolling view log error, meet an unknown exception, request: {}", rollViewLogRequest, e);
+            return RollViewLogResponseCommand.error(RollViewLogResponseCommand.Status.UNKNOWN_ERROR);
+        }
     }
 
 }

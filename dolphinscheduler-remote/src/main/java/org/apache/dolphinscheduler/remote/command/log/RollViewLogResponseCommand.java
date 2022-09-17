@@ -17,48 +17,61 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.io.Serializable;
 
-/**
- *  roll view log response command
- */
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RollViewLogResponseCommand implements Serializable {
 
-    /**
-     *  response data
-     */
-    private String msg;
+    private String log;
 
-    public RollViewLogResponseCommand() {
+    @Builder.Default
+    private Status responseStatus = Status.SUCCESS;
+
+    private long currentLineNumber;
+
+    private long currentTotalLineNumber;
+
+
+    public static RollViewLogResponseCommand error(Status status) {
+        RollViewLogResponseCommand rollViewLogResponseCommand = new RollViewLogResponseCommand();
+        rollViewLogResponseCommand.setResponseStatus(status);
+        return rollViewLogResponseCommand;
     }
 
-    public RollViewLogResponseCommand(String msg) {
-        this.msg = msg;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    /**
-     * package response command
-     *
-     * @param opaque request unique identification
-     * @return command
-     */
     public Command convert2Command(long opaque) {
         Command command = new Command(opaque);
         command.setType(CommandType.ROLL_VIEW_LOG_RESPONSE);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
+    }
+
+    public enum Status {
+        SUCCESS("success"),
+        LOG_PATH_IS_NOT_SECURITY("Log file path is not at a security directory"),
+        LOG_FILE_NOT_FOUND("Log file doesn't exist"),
+        UNKNOWN_ERROR("Meet an unknown exception"),
+        ;
+
+        private final String desc;
+
+        Status(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
     }
 }

@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.RollViewLogResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -75,10 +76,10 @@ public class LoggerController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<String> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "taskInstanceId") int taskInstanceId,
-                                   @RequestParam(value = "skipLineNum") int skipNum,
-                                   @RequestParam(value = "limit") int limit) {
+    public Result<RollViewLogResponse> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                                @RequestParam(value = "skipLineNum") int skipNum,
+                                                @RequestParam(value = "limit") int limit) {
         return loggerService.queryLog(taskInstanceId, skipNum, limit);
     }
 
@@ -128,12 +129,12 @@ public class LoggerController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<String> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<RollViewLogResponse> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                    @RequestParam(value = "taskInstanceId") int taskInstanceId,
                                    @RequestParam(value = "skipLineNum") int skipNum,
                                    @RequestParam(value = "limit") int limit) {
-        return returnDataList(loggerService.queryLog(loginUser, projectCode, taskInstanceId, skipNum, limit));
+        return Result.success(loggerService.queryLog(loginUser, projectCode, taskInstanceId, skipNum, limit));
     }
 
     /**

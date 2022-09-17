@@ -63,31 +63,24 @@ public class LogClient implements AutoCloseable {
     /**
      * roll view log
      *
-     * @param host host
-     * @param port port
-     * @param path path
+     * @param path        path
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return log content
      */
-    public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
-        logger.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path,
-                skipLineNum, limit);
+    public RollViewLogResponseCommand rollViewLog(Host host, String path, int skipLineNum, int limit) {
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
-        final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            Command response = client.sendSync(host, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RollViewLogResponseCommand rollReviewLog =
-                        JSONUtils.parseObject(response.getBody(), RollViewLogResponseCommand.class);
-                return rollReviewLog.getMsg();
+                return JSONUtils.parseObject(response.getBody(), RollViewLogResponseCommand.class);
             }
-            return "Roll view log response is null";
+            logger.error("Roll view log response is null, request: {}", request);
+            return RollViewLogResponseCommand.error(RollViewLogResponseCommand.Status.UNKNOWN_ERROR);
         } catch (Exception e) {
-            logger.error("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error", host, port,
-                    path, skipLineNum, limit, e);
-            return "Roll view log error: " + e.getMessage();
+            logger.error("Roll view log failed, meet an unknown exception: {}", request, e);
+            return RollViewLogResponseCommand.error(RollViewLogResponseCommand.Status.UNKNOWN_ERROR);
         }
     }
 

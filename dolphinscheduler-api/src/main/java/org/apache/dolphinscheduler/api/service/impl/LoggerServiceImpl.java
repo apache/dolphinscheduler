@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import com.google.common.primitives.Bytes;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.api.dto.RollViewLogResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -73,14 +75,14 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * view log
      *
-     * @param taskInstId task instance id
+     * @param taskInstId  task instance id
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return log string data
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Result<String> queryLog(int taskInstId, int skipLineNum, int limit) {
+    public Result<RollViewLogResponse> queryLog(int taskInstId, int skipLineNum, int limit) {
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
@@ -90,10 +92,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         if (StringUtils.isBlank(taskInstance.getHost())) {
             return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
-        Result<String> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
-        String log = queryLog(taskInstance, skipLineNum, limit);
-        result.setData(log);
-        return result;
+        RollViewLogResponse rollViewLogResponse = queryLog(taskInstance, skipLineNum, limit);
+        return Result.success(rollViewLogResponse);
     }
 
     /**
@@ -123,28 +123,24 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
+    public RollViewLogResponse queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, VIEW_LOG);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
+            throw new ServiceException((Status) result.get(Constants.STATUS));
         }
         // check whether the task instance can be found
         TaskInstance task = processService.findTaskInstanceById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND);
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
         }
-        String log = queryLog(task, skipLineNum, limit);
-        result.put(Constants.DATA_LIST, log);
-        return result;
+        return queryLog(task, skipLineNum, limit);
     }
 
     /**
@@ -179,30 +175,34 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * query log
      *
-     * @param taskInstance  task instance
-     * @param skipLineNum skip line number
-     * @param limit       limit
+     * @param taskInstance task instance
+     * @param skipLineNum  skip line number
+     * @param limit        limit
      * @return log string data
      */
-    private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
+    private RollViewLogResponse queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
         Host host = Host.of(taskInstance.getHost());
-
-        logger.info("log host : {} , logPath : {} , port : {}", host.getIp(), taskInstance.getLogPath(),
-                host.getPort());
-
         StringBuilder log = new StringBuilder();
         if (skipLineNum == 0) {
-            String head = String.format(LOG_HEAD_FORMAT,
-                    taskInstance.getLogPath(),
-                    host,
-                    Constants.SYSTEM_LINE_SEPARATOR);
+            String head = String.format(LOG_HEAD_FORMAT, taskInstance.getLogPath(), host, Constants.SYSTEM_LINE_SEPARATOR);
             log.append(head);
         }
-
-        log.append(logClient
-                .rollViewLog(host.getIp(), host.getPort(), taskInstance.getLogPath(), skipLineNum, limit));
-
-        return log.toString();
+        RollViewLogResponseCommand rollViewLogResponseCommand = logClient.rollViewLog(host, taskInstance.getLogPath(), skipLineNum, limit);
+        if (rollViewLogResponseCommand.getResponseStatus() != RollViewLogResponseCommand.Status.SUCCESS) {
+            log.append(rollViewLogResponseCommand.getResponseStatus().getDesc());
+            return RollViewLogResponse.builder()
+                    .log(log.toString())
+                    .hasNext(false)
+                    .build();
+        }
+        log.append(rollViewLogResponseCommand.getLog());
+        // If the task doesn't finish or the log doesn't end can query next
+        return RollViewLogResponse.builder()
+                .log(log.toString())
+                .currentLogLineNumber(rollViewLogResponseCommand.getCurrentLineNumber())
+                .hasNext(!taskInstance.getState().typeIsFinished()
+                        || rollViewLogResponseCommand.getCurrentLineNumber() < rollViewLogResponseCommand.getCurrentTotalLineNumber())
+                .build();
     }
 
     /**

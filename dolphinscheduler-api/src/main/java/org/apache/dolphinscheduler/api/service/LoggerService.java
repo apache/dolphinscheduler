@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.RollViewLogResponse;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -35,7 +36,7 @@ public interface LoggerService {
      * @param limit limit
      * @return log string data
      */
-    Result<String> queryLog(int taskInstId, int skipLineNum, int limit);
+    Result<RollViewLogResponse> queryLog(int taskInstId, int skipLineNum, int limit);
 
     /**
      * get log size
@@ -55,7 +56,7 @@ public interface LoggerService {
      * @param limit       limit
      * @return log string data
      */
-    Map<String, Object> queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit);
+    RollViewLogResponse queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit);
 
     /**
      * get log bytes

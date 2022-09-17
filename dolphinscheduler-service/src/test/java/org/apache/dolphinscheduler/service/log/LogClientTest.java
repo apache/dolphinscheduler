@@ -27,9 +27,6 @@ import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseComma
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Test.None;
@@ -38,6 +35,8 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.nio.charset.StandardCharsets;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LogClient.class, NetUtils.class, LoggerUtils.class, NettyRemotingClient.class})
@@ -97,13 +96,16 @@ public class LogClientTest {
         PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
         Command command = new Command();
-        command.setBody(JSONUtils.toJsonByteArray(new RollViewLogResponseCommand("success")));
+        RollViewLogResponseCommand rollViewLogResponseCommand = RollViewLogResponseCommand.builder()
+                .log("success")
+                .build();
+        command.setBody(JSONUtils.toJsonByteArray(rollViewLogResponseCommand));
         PowerMockito
                 .when(remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
                 .thenReturn(command);
 
         LogClient logClient = new LogClient();
-        String msg = logClient.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
+        RollViewLogResponseCommand msg = logClient.rollViewLog(Host.of("localhost:1234"), "/tmp/log", 0, 10);
         Assert.assertNotNull(msg);
     }
 
