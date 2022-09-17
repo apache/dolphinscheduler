@@ -94,7 +94,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
             case ROLL_VIEW_LOG_REQUEST:
-                RollViewLogRequestCommand rollViewLogRequest = JSONUtils.parseObject(command.getBody(), RollViewLogRequestCommand.class);
+                RollViewLogRequestCommand rollViewLogRequest =
+                        JSONUtils.parseObject(command.getBody(), RollViewLogRequestCommand.class);
                 // todo: solve the NPE, this shouldn't happen in normal case
                 RollViewLogResponseCommand rollViewLogRequestResponse = readPartFileContent(rollViewLogRequest);
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
@@ -187,7 +188,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             return RollViewLogResponseCommand.error(RollViewLogResponseCommand.Status.LOG_PATH_IS_NOT_SECURITY);
         }
         File file = new File(rollViewLogPath);
-        if (!file.exists() || file.isFile()) {
+        if (!file.exists() || !file.isFile()) {
             logger.error("Log file path: {} doesn't exists", rollViewLogPath);
             return RollViewLogResponseCommand.error(RollViewLogResponseCommand.Status.LOG_FILE_NOT_FOUND);
         }
