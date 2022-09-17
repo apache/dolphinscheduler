@@ -1,9 +1,11 @@
 <!-- markdown-link-check-disable -->
 
 # 前言
+
 本文档为dolphinscheduler配置文件说明文档。
 
 # 目录结构
+
 DolphinScheduler的目录结构如下：
 
 ```
@@ -98,11 +100,13 @@ DolphinScheduler的目录结构如下：
 # 配置文件详解
 
 ## dolphinscheduler-daemon.sh [启动/关闭DolphinScheduler服务脚本]
+
 dolphinscheduler-daemon.sh脚本负责DolphinScheduler的启动&关闭.
 start-all.sh/stop-all.sh最终也是通过dolphinscheduler-daemon.sh对集群进行启动/关闭操作.
 目前DolphinScheduler只是做了一个基本的设置,JVM参数请根据各自资源的实际情况自行设置.
 
 默认简化参数如下:
+
 ```bash
 export DOLPHINSCHEDULER_OPTS="
 -server
@@ -120,6 +124,7 @@ export DOLPHINSCHEDULER_OPTS="
 > 不建议设置"-XX:DisableExplicitGC" , DolphinScheduler使用Netty进行通讯,设置该参数,可能会导致内存泄漏.
 
 ## 数据库连接相关配置
+
 在DolphinScheduler中使用Spring Hikari对数据库连接进行管理，配置文件位置：
 
 |服务名称| 配置文件 |
@@ -149,8 +154,8 @@ export DOLPHINSCHEDULER_OPTS="
 
 DolphinScheduler同样可以通过设置环境变量进行数据库连接相关的配置, 将以上小写字母转成大写并把`.`换成`_`作为环境变量名, 设置值即可。
 
-
 ## Zookeeper相关配置
+
 DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功能，配置文件位置：
 |服务名称| 配置文件 |
 |--|--|
@@ -175,6 +180,7 @@ DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功�
 DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeeper相关的配置。
 
 ## common.properties [hadoop、s3、yarn配置]
+
 common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置，配置文件位置：
 |服务名称| 配置文件 |
 |--|--|
@@ -217,6 +223,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |zeppelin.rest.url | http://localhost:8080 | zeppelin RESTful API 接口地址|
 
 ## Api-server相关配置
+
 位置：`api-server/conf/application.yaml`
 |参数 |默认值| 描述|
 |--|--|--|
@@ -245,6 +252,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制|
 
 ## Master Server相关配置
+
 位置：`master-server/conf/application.yaml`
 |参数 |默认值| 描述|
 |--|--|--|
@@ -266,6 +274,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |master.registry-disconnect-strategy.max-waiting-time|100s|当Master与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Master与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Master会丢弃目前正在执行的工作流，值为0表示会无限期等待 |
 
 ## Worker Server相关配置
+
 位置：`worker-server/conf/application.yaml`
 |参数 |默认值| 描述|
 |--|--|--|
@@ -282,16 +291,16 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |worker.registry-disconnect-strategy.strategy|stop|当Worker与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
 |worker.registry-disconnect-strategy.max-waiting-time|100s|当Worker与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Worker与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Worker会丢弃kill正在执行的任务。值为0表示会无限期等待 |
 
-
 ## Alert Server相关配置
+
 位置：`alert-server/conf/application.yaml`
 |参数 |默认值| 描述|
 |--|--|--|
 |server.port|50053|Alert Server监听端口|
 |alert.port|50052|alert监听端口|
 
-
 ## Quartz相关配置
+
 这里面主要是quartz配置,请结合实际业务场景&资源进行配置,本文暂时不做展开，配置文件位置：
 
 |服务名称| 配置文件 |
@@ -319,7 +328,6 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |spring.quartz.properties.org.quartz.jobStore.driverDelegateClass | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate|
 |spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval | 5000|
 
-
 ## dolphinscheduler_env.sh [环境变量配置]
 
 通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME` 任务类型的环境配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
@@ -342,6 +350,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 ```
 
 ## 日志相关配置
+
 |服务名称| 配置文件 |
 |--|--|
 |Master Server | `master-server/conf/logback-spring.xml`|
