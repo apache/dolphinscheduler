@@ -53,8 +53,8 @@ public class BaseServiceImpl implements BaseService {
         try{
             resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
         }catch (Exception e){
-            logger.error("post handle error", e);
-            throw new RuntimeException("resource association user error", e);
+            logger.error("Post handle error, userId:{}.", userId, e);
+            throw new RuntimeException("Resource association user error", e);
         }
     }
 
@@ -193,6 +193,7 @@ public class BaseServiceImpl implements BaseService {
         if (!StringUtils.isEmpty(startDateStr)) {
             start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
+                logger.warn("Parameter startDateStr is invalid.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
@@ -203,6 +204,7 @@ public class BaseServiceImpl implements BaseService {
         if (!StringUtils.isEmpty(endDateStr)) {
             end = DateUtils.stringToDate(endDateStr);
             if (Objects.isNull(end)) {
+                logger.warn("Parameter endDateStr is invalid.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
