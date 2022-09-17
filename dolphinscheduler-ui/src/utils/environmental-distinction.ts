@@ -14,25 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ITaskState } from '@/common/types'
 
-export type { Router } from 'vue-router'
-export type { TaskInstancesRes } from '@/service/modules/task-instances/types'
+import {h} from "vue";
+import {NTag} from "naive-ui";
 
-interface IRecord {
-  name: string
-  processInstanceName: string
-  executorName: string
-  taskType: string
-  state: ITaskState
-  submitTime: string
-  startTime: string
-  endTime: string
-  duration?: string
-  retryTimes: number
-  dryRun: number
-  host: string
-  testFlag?: number
+export function renderEnvironmentalDistinctionCell(
+    testFlag: number | undefined,
+    t: Function
+) {
+    if (testFlag === 0) {
+        return h(
+            NTag,
+            { type: 'success', size: 'small' },
+            {
+                default: () => t('datasource.on_line')
+            }
+        )
+    } else if (testFlag === 1) {
+        return h(
+            NTag,
+            { type: 'warning', size: 'small' },
+            {
+                default: () => t('datasource.test')
+            }
+        )
+    } else {
+        return '-'
+    }
 }
 
-export { ITaskState, IRecord }

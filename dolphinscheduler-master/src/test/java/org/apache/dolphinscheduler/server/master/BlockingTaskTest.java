@@ -200,7 +200,8 @@ public class BlockingTaskTest {
 
         // for BlockingTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = getTaskInstanceForValidTaskList(expectResults);
-        Mockito.when(processService.findValidTaskListByProcessId(processInstance.getId()))
+        Mockito.when(processService.
+                findValidTaskListByProcessId(processInstance.getId(),processInstance.getTestFlag()))
                 .thenReturn(conditions);
         return taskInstance;
     }

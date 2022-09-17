@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.google.auto.service.AutoService;
-import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -33,7 +34,12 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
+import java.util.Map;
+
+import com.google.auto.service.AutoService;
 
 /**
  * common task processor
@@ -47,6 +53,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
+        if (this.taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
+            convertExeEnvironmentOnlineToTest();
+        }
+
         this.taskInstance =
                 processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
@@ -170,5 +180,27 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         executionContext.setHost(host);
 
         nettyExecutorManager.executeDirectly(executionContext);
+    }
+
+    protected void convertExeEnvironmentOnlineToTest() {
+        //SQL taskType
+        if (TaskConstants.TASK_TYPE_SQL.equals(taskInstance.getTaskType())) {
+            //replace test data source
+            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
+            Map<String, Object> taskInstanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
+            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(Constants.DATASOUCE);
+            Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
+            taskDefinitionParams.put(Constants.DATASOUCE, testDataSourceId);
+            taskInstanceParams.put(Constants.DATASOUCE, testDataSourceId);
+            taskInstance.getTaskDefine().setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
+            taskInstance.setTaskParams(JSONUtils.toJsonString(taskInstanceParams));
+            if (null == testDataSourceId) {
+                logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
+            } else {
+                logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
+            }
+        }
     }
 }

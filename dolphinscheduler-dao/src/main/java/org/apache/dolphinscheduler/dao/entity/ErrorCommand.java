@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -121,9 +122,14 @@ public class ErrorCommand {
      */
     private int dryRun;
 
+    /**
+     * test flag
+     */
+    @TableField("test_flag")
+    private int testFlag;
+
     public ErrorCommand() {
     }
-
     public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
@@ -141,5 +147,6 @@ public class ErrorCommand {
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
         this.dryRun = command.getDryRun();
+        this.testFlag = command.getTestFlag();
     }
 }

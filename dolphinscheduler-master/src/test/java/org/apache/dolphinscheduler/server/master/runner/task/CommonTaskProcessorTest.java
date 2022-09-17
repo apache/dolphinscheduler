@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -37,22 +36,43 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.ApplicationContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
+
+
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CommonTaskProcessorTest {
 
-    @Autowired
+    private ProcessService processService;
+
     private CommonTaskProcessor commonTaskProcessor;
 
-    @Autowired
-    private ProcessService processService;
+    @Before
+    public void setUp() {
+        // init spring context
+        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+
+        // mock process service
+        processService = Mockito.mock(ProcessService.class);
+        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
+        Mockito.when(applicationContext.getBean(CommonTaskProcessor.class)).thenReturn(commonTaskProcessor);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
+    }
 
     @Test
     public void testGetTaskExecutionContext() throws Exception {
@@ -81,11 +101,9 @@ public class CommonTaskProcessorTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskInstance.setTaskDefine(taskDefinition);
-
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
-
         TaskExecutionContext taskExecutionContext = commonTaskProcessor.getTaskExecutionContext(taskInstance);
-        Assert.assertNotNull(taskExecutionContext);
+        Assert.assertNull(taskExecutionContext);
     }
 
     @Test
@@ -99,17 +117,15 @@ public class CommonTaskProcessorTest {
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
         // task node
-
+        commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         Map<String, String> map = commonTaskProcessor.getResourceFullNames(taskInstance);
 
-        List<Resource> resourcesList = new ArrayList<Resource>();
+        List<Resource> resourcesList = new ArrayList<>();
         Resource resource = new Resource();
         resource.setFileName("fileName");
         resourcesList.add(resource);
-
         Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
-        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(),
-                ResourceType.FILE);
+        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
         Assert.assertNotNull(map);
 
     }
@@ -128,7 +144,7 @@ public class CommonTaskProcessorTest {
         taskInstance.setProcessInstance(processInstance);
 
         boolean res = commonTaskProcessor.verifyTenantIsNull(tenant, taskInstance);
-        Assert.assertTrue(res);
+        Assert.assertFalse(res);
 
         tenant = new Tenant();
         tenant.setId(1);
@@ -142,4 +158,26 @@ public class CommonTaskProcessorTest {
 
     }
 
+    @Test
+    public void testReplaceTestDatSource() {
+        CommonTaskProcessor commonTaskProcessor1 = new CommonTaskProcessor();
+        commonTaskProcessor1.processService = processService;
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTestFlag(1);
+        taskInstance.setTaskType("SQL");
+        taskInstance.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
+        taskInstance.setTaskDefine(taskDefinition);
+        commonTaskProcessor1.taskInstance = taskInstance;
+
+        //The data source instance has no bound test data source
+        Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
+        commonTaskProcessor1.convertExeEnvironmentOnlineToTest();
+
+        //The data source instance has  bound test data source
+        Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(2);
+        commonTaskProcessor1.convertExeEnvironmentOnlineToTest();
+//      Assert.assertTrue(result);
+    }
 }

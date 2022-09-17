@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.String.format;

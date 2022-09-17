@@ -103,26 +103,28 @@ public class ExecutorController extends BaseController {
      * @param workerGroup worker group
      * @param timeout timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @param testFlag testFlag
      * @return start process result code
      */
     @ApiOperation(value = "startProcessInstance", notes = "RUN_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataTypeClass = long.class, example = "100"),
-            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataTypeClass = String.class, example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
-            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataTypeClass = FailureStrategy.class),
-            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataTypeClass = TaskDependType.class),
-            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataTypeClass = CommandType.class),
-            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataTypeClass = WarningType.class),
-            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataTypeClass = RunMode.class),
-            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataTypeClass = Priority.class),
-            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataTypeClass = String.class, example = "default"),
-            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataTypeClass = long.class, example = "-1"),
-            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataTypeClass = int.class, example = "8"),
-            @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataTypeClass = int.class, example = "0"),
-            @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataTypeClass = ComplementDependentMode.class)
+            @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100"),
+            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String", example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
+            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
+            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataType = "String"),
+            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataType = "TaskDependType"),
+            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
+            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
+            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
+            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
+            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int" , example = "8"),
+            @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
+            @ApiImplicitParam(name = "testFlag", value = "TEST_FLAG", dataType = "Int", example = "0"),
+            @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataType = "complementDependentMode")
     })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -146,6 +148,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "startParams", required = false) String startParams,
                                        @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
+                                       @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                        @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
 
         if (timeout == null) {
@@ -163,8 +166,7 @@ public class ExecutorController extends BaseController {
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
-                complementDependentMode);
+                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag, complementDependentMode);
         return returnDataList(result);
     }
 
@@ -188,26 +190,28 @@ public class ExecutorController extends BaseController {
      * @param workerGroup worker group
      * @param timeout timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @param testFlag testFlag
      * @return start process result code
      */
     @ApiOperation(value = "batchStartProcessInstance", notes = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataTypeClass = String.class, example = "1,2,3"),
-            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataTypeClass = String.class, example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
-            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataTypeClass = FailureStrategy.class),
-            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataTypeClass = TaskDependType.class),
-            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataTypeClass = CommandType.class),
-            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataTypeClass = WarningType.class),
-            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", required = true, dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataTypeClass = RunMode.class),
-            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataTypeClass = Priority.class),
-            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataTypeClass = String.class, example = "default"),
-            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataTypeClass = long.class, example = "-1"),
-            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataTypeClass = int.class, example = "8"),
-            @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataTypeClass = int.class, example = "0"),
-            @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataTypeClass = ComplementDependentMode.class)
+            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "1,2,3"),
+            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String", example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
+            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType = "FailureStrategy"),
+            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataType = "String"),
+            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataType = "TaskDependType"),
+            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
+            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
+            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
+            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
+            @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
+            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8"),
+            @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
+            @ApiImplicitParam(name = "testFlag", value = "TEST_FLAG", dataType = "Int", example = "0"),
+            @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataType = "complementDependentMode")
     })
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -231,6 +235,7 @@ public class ExecutorController extends BaseController {
                                             @RequestParam(value = "startParams", required = false) String startParams,
                                             @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                             @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
+                                            @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                             @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
 
         if (timeout == null) {
@@ -259,7 +264,7 @@ public class ExecutorController extends BaseController {
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime,
                     execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                    workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                    workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
                     complementDependentMode);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {

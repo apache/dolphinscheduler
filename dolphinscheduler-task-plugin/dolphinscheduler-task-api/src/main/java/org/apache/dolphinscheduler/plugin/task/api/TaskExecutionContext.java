@@ -261,4 +261,9 @@ public class TaskExecutionContext implements Serializable {
      * max memory
      */
     private Integer memoryMax;
+
+    /**
+     * test flag
+     */
+    private int testFlag;
 }

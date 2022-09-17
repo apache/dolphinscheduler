@@ -65,7 +65,7 @@ public interface ExecutorService {
                                             RunMode runMode,
                                             Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
                                             Map<String, String> startParams, Integer expectedParallelismNumber,
-                                            int dryRun,
+                                            int dryRun, int testFlag,
                                             ComplementDependentMode complementDependentMode);
 
     /**

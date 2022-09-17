@@ -75,6 +75,7 @@ public class TaskInstanceUtils {
         target.setCpuQuota(source.getCpuQuota());
         target.setMemoryMax(source.getMemoryMax());
         target.setTaskExecuteType(source.getTaskExecuteType());
+        target.setTestFlag(source.getTestFlag());
     }
 
 }

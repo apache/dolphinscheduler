@@ -315,7 +315,7 @@ public class DataSourceServiceTest {
         DataSource dataSource = new DataSource();
         dataSource.setType(DbType.MYSQL);
         Mockito.when(dataSourceMapper.selectBatchIds(dataSourceIds)).thenReturn(Collections.singletonList(dataSource));
-        Map<String, Object> map = dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal());
+        Map<String, Object> map = dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal(),Constants.TEST_FLAG_NO);
         Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
     }
 

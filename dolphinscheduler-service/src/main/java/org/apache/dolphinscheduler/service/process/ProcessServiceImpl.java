@@ -305,6 +305,7 @@ public class ProcessServiceImpl implements ProcessService {
         }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
+        processInstance.setTestFlag(command.getTestFlag());
         // if the processDefinition is serial
         ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
@@ -600,7 +601,8 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public void removeTaskLogFile(Integer processInstanceId) {
-        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId,processInstance.getTestFlag());
         if (CollectionUtils.isEmpty(taskInstanceList)) {
             return;
         }
@@ -620,7 +622,8 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
-        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId,processInstance.getTestFlag());
         if (CollectionUtils.isEmpty(taskInstanceList)) {
             return;
         }
@@ -696,7 +699,8 @@ public class ProcessServiceImpl implements ProcessService {
                     processInstance.getProcessInstancePriority(),
                     processInstance.getDryRun(),
                     processInstance.getId(),
-                    processInstance.getProcessDefinitionVersion());
+                    processInstance.getProcessDefinitionVersion(),
+                    processInstance.getTestFlag());
             saveCommand(command);
             return;
         }
@@ -776,6 +780,7 @@ public class ProcessServiceImpl implements ProcessService {
         Integer warningGroupId = command.getWarningGroupId() == null ? 0 : command.getWarningGroupId();
         processInstance.setWarningGroupId(warningGroupId);
         processInstance.setDryRun(command.getDryRun());
+        processInstance.setTestFlag(command.getTestFlag());
 
         if (command.getScheduleTime() != null) {
             processInstance.setScheduleTime(command.getScheduleTime());
@@ -1032,7 +1037,7 @@ public class ProcessServiceImpl implements ProcessService {
             case COMPLEMENT_DATA:
                 // delete all the valid tasks when complement data if id is not null
                 if (processInstance.getId() != null) {
-                    List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId());
+                    List<TaskInstance> taskInstanceList = this.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag());
                     for (TaskInstance taskInstance : taskInstanceList) {
                         taskInstance.setFlag(Flag.NO);
                         this.updateTaskInstance(taskInstance);
@@ -1046,7 +1051,7 @@ public class ProcessServiceImpl implements ProcessService {
                     processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 }
                 // delete all the valid tasks when repeat running
-                List<TaskInstance> validTaskList = findValidTaskListByProcessId(processInstance.getId());
+                List<TaskInstance> validTaskList = findValidTaskListByProcessId(processInstance.getId(),processInstance.getTestFlag());
                 for (TaskInstance taskInstance : validTaskList) {
                     taskInstance.setFlag(Flag.NO);
                     updateTaskInstance(taskInstance);
@@ -1520,7 +1525,8 @@ public class ProcessServiceImpl implements ProcessService {
                 parentProcessInstance.getProcessInstancePriority(),
                 parentProcessInstance.getDryRun(),
                 subProcessInstanceId,
-                subProcessDefinition.getVersion());
+                subProcessDefinition.getVersion(),
+                parentProcessInstance.getTestFlag());
     }
 
     /**
@@ -1648,7 +1654,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (failureStrategy == FailureStrategy.CONTINUE) {
             return true;
         }
-        List<TaskInstance> taskInstances = this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
+        List<TaskInstance> taskInstances = this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId(),taskInstance.getTestFlag());
 
         for (TaskInstance task : taskInstances) {
             if (task.getState() == TaskExecutionStatus.FAILURE
@@ -1751,6 +1757,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskInstance.getTaskDefinitionVersion());
         this.updateTaskDefinitionResources(taskDefinition);
         taskInstance.setTaskDefine(taskDefinition);
+        taskInstance.setTestFlag(processInstance.getTestFlag());
     }
 
     /**
@@ -1838,11 +1845,12 @@ public class ProcessServiceImpl implements ProcessService {
      * find valid task list by process definition id
      *
      * @param processInstanceId processInstanceId
+     * @param testFlag          testFlag
      * @return task instance list
      */
     @Override
-    public List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId) {
-        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
+    public List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId, int testFlag) {
+        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES, testFlag);
     }
 
     /**
@@ -1853,7 +1861,8 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId) {
-        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO);
+        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
+        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO, processInstance.getTestFlag());
     }
 
     /**
@@ -2085,6 +2094,7 @@ public class ProcessServiceImpl implements ProcessService {
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         cmd.setProcessInstancePriority(processInstance.getProcessInstancePriority());
+        cmd.setTestFlag(processInstance.getTestFlag());
         createCommand(cmd);
     }
 
@@ -2184,10 +2194,11 @@ public class ProcessServiceImpl implements ProcessService {
      * @return process instance
      */
     @Override
-    public ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval) {
+    public ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
         return processInstanceMapper.queryLastSchedulerProcess(definitionCode,
                 dateInterval.getStartTime(),
-                dateInterval.getEndTime());
+                dateInterval.getEndTime(),
+                testFlag);
     }
 
     /**
@@ -2198,10 +2209,11 @@ public class ProcessServiceImpl implements ProcessService {
      * @return process instance
      */
     @Override
-    public ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval) {
+    public ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
         return processInstanceMapper.queryLastManualProcess(definitionCode,
                 dateInterval.getStartTime(),
-                dateInterval.getEndTime());
+                dateInterval.getEndTime(),
+                testFlag);
     }
 
     /**
@@ -2213,10 +2225,11 @@ public class ProcessServiceImpl implements ProcessService {
      * @return process instance
      */
     @Override
-    public ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime) {
+    public ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag) {
         return processInstanceMapper.queryLastRunningProcess(definitionCode,
                 startTime,
                 endTime,
+                testFlag,
                 WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
@@ -3144,7 +3157,7 @@ public class ProcessServiceImpl implements ProcessService {
         ProcessInstance processInstance = findProcessInstanceDetailById(task.getProcessInstanceId()).orElse(null);
         if (processInstance != null
                 && (processInstance.getState().isFailure() || processInstance.getState().isStop())) {
-            List<TaskInstance> validTaskList = findValidTaskListByProcessId(processInstance.getId());
+            List<TaskInstance> validTaskList = findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag());
             List<Long> instanceTaskCodeList =
                     validTaskList.stream().map(TaskInstance::getTaskCode).collect(Collectors.toList());
             List<ProcessTaskRelation> taskRelations = findRelationByCode(processInstance.getProcessDefinitionCode(),
@@ -3165,5 +3178,12 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             }
         }
+    }
+
+    @Override
+    public Integer queryTestDataSourceId(Integer onlineDataSourceId) {
+        Integer testDataSourceId = dataSourceMapper.queryTestDataSourceId(onlineDataSourceId);
+        if (testDataSourceId!=null) return testDataSourceId;
+        return null;
     }
 }

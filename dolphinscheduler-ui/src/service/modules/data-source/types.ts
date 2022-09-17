@@ -45,6 +45,8 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
+  testFlag?: number
+  bindTestId?: number
 }
 
 interface ListReq {

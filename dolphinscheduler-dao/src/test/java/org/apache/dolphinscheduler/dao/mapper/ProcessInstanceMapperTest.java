@@ -78,7 +78,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstance.setStartTime(start);
         processInstance.setEndTime(end);
         processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
-
+        processInstance.setTestFlag(0);
         processInstanceMapper.insert(processInstance);
         return processInstance;
     }
@@ -305,7 +305,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.updateById(processInstance);
 
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null);
+                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null, processInstance.getTestFlag());
         Assert.assertNotEquals(processInstance1, null);
         processInstanceMapper.deleteById(processInstance.getId());
     }
@@ -324,7 +324,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 WorkflowExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
 
         ProcessInstance processInstance1 = processInstanceMapper
-                .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null, stateArray);
+                .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null, processInstance.getTestFlag(), stateArray);
 
         Assert.assertNotEquals(processInstance1, null);
         processInstanceMapper.deleteById(processInstance.getId());
@@ -341,12 +341,12 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         Date start = new Date(2019 - 1900, 1 - 1, 01, 0, 0, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 01, 5, 0, 0);
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end);
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end, processInstance.getTestFlag());
         Assert.assertEquals(processInstance1.getId(), processInstance.getId());
 
         start = new Date(2019 - 1900, 1 - 1, 01, 1, 0, 0);
         processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end);
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end, processInstance.getTestFlag());
         Assert.assertNull(processInstance1);
 
         processInstanceMapper.deleteById(processInstance.getId());

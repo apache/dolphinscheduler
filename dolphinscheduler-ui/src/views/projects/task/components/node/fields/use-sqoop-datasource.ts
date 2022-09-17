@@ -19,7 +19,7 @@ import { onMounted, ref, Ref } from 'vue'
 import { queryDataSourceList } from '@/service/modules/data-source'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem, IDataBase } from '../types'
-
+import type { TypeReq } from '@/service/modules/data-source/types'
 export function useDatasource(
   model: { [field: string]: any },
   span: Ref,
@@ -33,7 +33,8 @@ export function useDatasource(
   const getDataSource = async (type: IDataBase) => {
     if (loading.value) return
     loading.value = true
-    const result = await queryDataSourceList({ type })
+    const params = { type, testFlag: 0 } as TypeReq
+    const result = await queryDataSourceList(params)
     dataSourceList.value = result.map((item: { name: string; id: number }) => ({
       label: item.name,
       value: item.id

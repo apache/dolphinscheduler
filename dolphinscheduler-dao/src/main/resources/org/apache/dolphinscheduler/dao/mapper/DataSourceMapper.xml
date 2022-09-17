@@ -26,6 +26,7 @@
         <include refid="baseSql"/>
         from t_ds_datasource
         where type=#{type}
+        and test_flag=#{testFlag}
         <if test="userId != 0">
             and id in
             (select datasource_id
@@ -40,7 +41,7 @@
 
     <select id="selectPaging" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
         select
-        d.id, d.name, d.note, d.type, d.user_id, connection_params, d.create_time, d.update_time
+        d.id, d.name, d.note, d.type, d.user_id, connection_params, d.create_time, d.update_time, d.test_flag, d.bind_test_id
         ,
         u.user_name as user_name
         from t_ds_datasource d
@@ -68,7 +69,7 @@
         where name=#{name}
     </select>
     <select id="queryAuthedDatasource" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select ds.id, ds.name, ds.note, ds.type, ds.user_id, ds.connection_params, ds.create_time, ds.update_time
+        select ds.id, ds.name, ds.note, ds.type, ds.user_id, ds.connection_params, ds.create_time, ds.update_time, ds.test_flag, ds.bind_test_id
         from t_ds_datasource ds, t_ds_relation_datasource_user rel
         where ds.id = rel.datasource_id AND rel.user_id = #{userId}
     </select>
@@ -115,7 +116,7 @@
 
     <select id="selectPagingByIds" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
         select
-        d.id, d.name, d.note, d.type, d.user_id, connection_params, d.create_time, d.update_time
+        d.id, d.name, d.note, d.type, d.user_id, connection_params, d.create_time, d.update_time, d.test_flag, d.bind_test_id
         ,
         u.user_name as user_name
         from t_ds_datasource d
@@ -132,5 +133,12 @@
         </if>
         order by update_time desc
     </select>
-
+    <select id="queryTestDataSourceId" resultType="java.lang.Integer">
+        select d.bind_test_id
+        from t_ds_datasource d
+        where d.id = #{dataSourceId}
+    </select>
+    <update id="clearBindTestId">
+        update t_ds_datasource d set bind_test_id=null where bind_test_id=#{bindTestId}
+    </update>
 </mapper>
