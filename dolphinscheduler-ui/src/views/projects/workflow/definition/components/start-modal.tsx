@@ -499,6 +499,13 @@ export default defineComponent({
               v-model:value={this.startForm.dryRun}
             />
           </NFormItem>
+          <NFormItem label={t('project.workflow.whether_test')} path='testFlag'>
+            <NSwitch
+              checkedValue={1}
+              uncheckedValue={0}
+              v-model:value={this.startForm.testFlag}
+            />
+          </NFormItem>
         </NForm>
       </Modal>
     )
