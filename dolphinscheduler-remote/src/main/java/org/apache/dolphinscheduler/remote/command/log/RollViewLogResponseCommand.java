@@ -42,7 +42,6 @@ public class RollViewLogResponseCommand implements Serializable {
 
     private long currentTotalLineNumber;
 
-
     public static RollViewLogResponseCommand error(Status status) {
         RollViewLogResponseCommand rollViewLogResponseCommand = new RollViewLogResponseCommand();
         rollViewLogResponseCommand.setResponseStatus(status);
@@ -58,6 +57,7 @@ public class RollViewLogResponseCommand implements Serializable {
     }
 
     public enum Status {
+
         SUCCESS("success"),
         LOG_PATH_IS_NOT_SECURITY("Log file path is not at a security directory"),
         LOG_FILE_NOT_FOUND("Log file doesn't exist"),

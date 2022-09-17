@@ -17,20 +17,21 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import io.netty.channel.Channel;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LoggerUtils.class})
@@ -105,5 +106,35 @@ public class LoggerRequestProcessorTest {
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
         loggerRequestProcessor.process(channel, command);
+    }
+
+    @Test
+    public void testReadPartFileContent() {
+        String logPath = LoggerRequestProcessorTest.class.getResource("/mock.log").getPath();
+        System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", logPath);
+        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
+        RollViewLogRequestCommand requestCommand = RollViewLogRequestCommand.builder()
+                .path(logPath)
+                .skipLineNum(0)
+                .limit(1)
+                .build();
+        RollViewLogResponseCommand responseCommand = loggerRequestProcessor.readPartFileContent(requestCommand);
+        Assert.assertEquals(8, responseCommand.getCurrentTotalLineNumber());
+        Assert.assertEquals(1, responseCommand.getCurrentLineNumber());
+        Assert.assertEquals("line1", responseCommand.getLog());
+        Assert.assertEquals(RollViewLogResponseCommand.Status.SUCCESS, responseCommand.getResponseStatus());
+
+        RollViewLogRequestCommand requestCommandSkipNumber = RollViewLogRequestCommand.builder()
+                .path(logPath)
+                .skipLineNum(1)
+                .limit(1)
+                .build();
+        RollViewLogResponseCommand requestCommandSkipNumberResponse =
+                loggerRequestProcessor.readPartFileContent(requestCommandSkipNumber);
+        Assert.assertEquals(8, requestCommandSkipNumberResponse.getCurrentTotalLineNumber());
+        Assert.assertEquals(2, requestCommandSkipNumberResponse.getCurrentLineNumber());
+        Assert.assertEquals("line2", requestCommandSkipNumberResponse.getLog());
+        Assert.assertEquals(RollViewLogResponseCommand.Status.SUCCESS,
+                requestCommandSkipNumberResponse.getResponseStatus());
     }
 }

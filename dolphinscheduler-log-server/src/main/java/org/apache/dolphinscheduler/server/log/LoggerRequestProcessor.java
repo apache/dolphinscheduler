@@ -43,8 +43,10 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.LineNumberReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -180,7 +182,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         return new byte[0];
     }
 
-    private RollViewLogResponseCommand readPartFileContent(RollViewLogRequestCommand rollViewLogRequest) {
+    protected RollViewLogResponseCommand readPartFileContent(RollViewLogRequestCommand rollViewLogRequest) {
 
         String rollViewLogPath = rollViewLogRequest.getPath();
         if (!checkPathSecurity(rollViewLogPath)) {
@@ -195,13 +197,16 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
         int skipLine = rollViewLogRequest.getSkipLineNum();
         int limit = rollViewLogRequest.getLimit();
-        try (Stream<String> stream = Files.lines(Paths.get(rollViewLogPath))) {
+        try (
+                Stream<String> stream = Files.lines(Paths.get(rollViewLogPath));
+                LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(rollViewLogPath))) {
+
             List<String> lines = stream.skip(skipLine).limit(limit).collect(Collectors.toList());
-            long totalLineNumber = stream.count();
+            lineNumberReader.skip(Long.MAX_VALUE);
 
             return RollViewLogResponseCommand.builder()
                     .currentLineNumber(skipLine + lines.size())
-                    .currentTotalLineNumber(totalLineNumber)
+                    .currentTotalLineNumber(lineNumberReader.getLineNumber())
                     .log(String.join("\r\n", lines))
                     .build();
         } catch (IOException e) {
