@@ -851,6 +851,13 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+
+    /**
+     * test flag
+     */
+    public static final int TEST_FLAG_NO = 0;
+    public static final int TEST_FLAG_YES = 1;
+
     /**
      * Task Types
      */
@@ -861,4 +868,6 @@ public final class Constants {
     public static final String TYPE_DATA_QUALITY = "DataQuality";
     public static final String TYPE_OTHER = "Other";
     public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
+
+    public static final String DATASOUCE = "datasource";
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Date;
@@ -78,6 +79,17 @@ public class DataSource {
      * update time
      */
     private Date updateTime;
+
+    /**
+     * test flag
+     */
+    protected int testFlag;
+
+    /**
+     * bind test data source id
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    protected Integer bindTestId;
 
     @Override
     public boolean equals(Object o) {

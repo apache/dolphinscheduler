@@ -93,6 +93,12 @@ public class Command {
     @TableField("process_definition_version")
     private int processDefinitionVersion;
 
+    /**
+     * test flag
+     */
+    @TableField("test_flag")
+    private int testFlag;
+
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -115,7 +121,8 @@ public class Command {
                    Priority processInstancePriority,
                    int dryRun,
                    int processInstanceId,
-                   int processDefinitionVersion) {
+                   int processDefinitionVersion,
+                   int testFlag) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -133,6 +140,6 @@ public class Command {
         this.dryRun = dryRun;
         this.processInstanceId = processInstanceId;
         this.processDefinitionVersion = processDefinitionVersion;
+        this.testFlag = testFlag;
     }
-
 }

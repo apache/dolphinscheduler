@@ -356,9 +356,8 @@ public class ProcessInstanceServiceTest {
         res.setData("xxx");
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        when(processService.findProcessInstanceDetailById(processInstance.getId()))
-                .thenReturn(Optional.of(processInstance));
-        when(processService.findValidTaskListByProcessId(processInstance.getId())).thenReturn(taskInstanceList);
+        when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(Optional.of(processInstance));
+        when(processService.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag())).thenReturn(taskInstanceList);
         when(loggerService.queryLog(taskInstance.getId(), 0, 4098)).thenReturn(res);
         Map<String, Object> successRes = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));

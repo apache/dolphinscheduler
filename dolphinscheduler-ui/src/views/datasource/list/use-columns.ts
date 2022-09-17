@@ -28,12 +28,13 @@ import {
 import { EditOutlined, DeleteOutlined } from '@vicons/antd'
 import JsonHighlight from './json-highlight'
 import ButtonLink from '@/components/button-link'
+import type { IDataSource, TableColumns } from './types'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import type { TableColumns } from './types'
+import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
@@ -60,6 +61,13 @@ export function useColumns(onCallback: Function) {
         title: t('datasource.datasource_type'),
         key: 'type',
         width: 180
+      },
+      {
+        title: t('datasource.datasource_definition'),
+        key: 'testFlag',
+        width: 140,
+        render: (_row: IDataSource) =>
+          renderEnvironmentalDistinctionCell(_row.testFlag, t)
       },
       {
         title: t('datasource.datasource_parameter'),
