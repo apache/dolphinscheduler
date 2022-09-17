@@ -17,11 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 
 import java.util.List;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class DependentParameters extends AbstractParameters {
 
     private List<DependentTaskModel> dependTaskList;
@@ -32,19 +36,4 @@ public class DependentParameters extends AbstractParameters {
         return true;
     }
 
-    public List<DependentTaskModel> getDependTaskList() {
-        return dependTaskList;
-    }
-
-    public void setDependTaskList(List<DependentTaskModel> dependTaskList) {
-        this.dependTaskList = dependTaskList;
-    }
-
-    public DependentRelation getRelation() {
-        return relation;
-    }
-
-    public void setRelation(DependentRelation relation) {
-        this.relation = relation;
-    }
 }
