@@ -52,11 +52,11 @@ integer in [All DSIPs][all-DSIPs] issues.
 
   ```text
   Hi community,
-  
+
   <CHANGE-TO-YOUR-PROPOSAL-DETAIL>
-  
+
   I already add a GitHub Issue for my proposal, which you could see in <CHANGE-TO-YOUR-GITHUB-ISSUE-LINK>.
-  
+
   Looking forward any feedback for this thread.
   ```
 
@@ -83,3 +83,4 @@ integer in [All DSIPs][all-DSIPs] issues.
 [github-issue-choose]: https://github.com/apache/dolphinscheduler/issues/new/choose
 [mail-to-dev]: mailto:dev@dolphinscheduler.apache.org
 [DSIP-1]: https://github.com/apache/dolphinscheduler/issues/6407
+
