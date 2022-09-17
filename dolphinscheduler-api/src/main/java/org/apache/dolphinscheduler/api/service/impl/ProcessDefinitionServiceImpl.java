@@ -1014,7 +1014,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
             logger.error("Delete process definition error, processDefinitionCode:{}.", code);
-            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
             throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
         }
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
