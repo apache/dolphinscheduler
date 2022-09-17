@@ -23,6 +23,7 @@ from pydolphinscheduler.tasks.dependent import Dependent
 from pydolphinscheduler.tasks.flink import Flink
 from pydolphinscheduler.tasks.http import Http
 from pydolphinscheduler.tasks.map_reduce import MR
+from pydolphinscheduler.tasks.openmldb import OpenMLDB
 from pydolphinscheduler.tasks.procedure import Procedure
 from pydolphinscheduler.tasks.python import Python
 from pydolphinscheduler.tasks.pytorch import Pytorch
@@ -41,6 +42,7 @@ __all__ = [
     "Flink",
     "Http",
     "MR",
+    "OpenMLDB",
     "Procedure",
     "Python",
     "Pytorch",
