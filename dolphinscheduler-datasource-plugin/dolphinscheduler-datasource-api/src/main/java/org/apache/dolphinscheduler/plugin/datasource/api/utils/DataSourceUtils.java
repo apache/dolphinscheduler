@@ -54,7 +54,7 @@ public class DataSourceUtils {
     public static ConnectionParam buildConnectionParams(BaseDataSourceParamDTO baseDataSourceParamDTO) {
         ConnectionParam connectionParams = getDatasourceProcessor(baseDataSourceParamDTO.getType())
                 .createConnectionParams(baseDataSourceParamDTO);
-        logger.info("parameters map:{}", connectionParams);
+        logger.info("Parameters map:{}", connectionParams);
         return connectionParams;
     }
 
