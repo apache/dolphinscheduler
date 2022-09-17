@@ -21,12 +21,11 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Set
 
+from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base import Base
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import launch_gateway
-from pydolphinscheduler.side import Project, Tenant, User
+from pydolphinscheduler.models import Base, Project, Tenant, User
 from pydolphinscheduler.utils.date import MAX_DATETIME, conv_from_str, conv_to_schedule
 
 
@@ -170,7 +169,7 @@ class ProcessDefinition(Base):
     def user(self) -> User:
         """Get user object.
 
-        For now we just get from python side but not from java gateway side, so it may not correct.
+        For now we just get from python models but not from java gateway models, so it may not correct.
         """
         return User(name=self._user, tenant=self._tenant)
 
@@ -358,10 +357,10 @@ class ProcessDefinition(Base):
         self.start()
 
     def _ensure_side_model_exists(self):
-        """Ensure process definition side model exists.
+        """Ensure process definition models model exists.
 
-        For now, side object including :class:`pydolphinscheduler.side.project.Project`,
-        :class:`pydolphinscheduler.side.tenant.Tenant`, :class:`pydolphinscheduler.side.user.User`.
+        For now, models object including :class:`pydolphinscheduler.models.project.Project`,
+        :class:`pydolphinscheduler.models.tenant.Tenant`, :class:`pydolphinscheduler.models.user.User`.
         If these model not exists, would create default value in
         :class:`pydolphinscheduler.constants.ProcessDefinitionDefault`.
         """

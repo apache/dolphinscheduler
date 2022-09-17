@@ -24,8 +24,8 @@ from typing import Any
 
 import pytest
 
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.configuration import (
+from pydolphinscheduler import configuration
+from pydolphinscheduler.configuration import (
     BUILD_IN_CONFIG_PATH,
     config_path,
     get_single_config,

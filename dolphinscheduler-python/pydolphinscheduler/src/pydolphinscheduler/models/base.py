@@ -19,7 +19,7 @@
 
 from typing import Dict, Optional
 
-# from pydolphinscheduler.side.user import User
+# from pydolphinscheduler.models.user import User
 from pydolphinscheduler.utils.string import attr2camel
 
 

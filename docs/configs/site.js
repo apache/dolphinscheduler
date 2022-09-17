@@ -30,7 +30,7 @@ export default {
   'en-us': {
     banner: {
       text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to disscuss them ',
-      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw'
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg'
     },
     pageMenu: [
       {
@@ -45,13 +45,13 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.0.0-alpha)',
+            text: 'latest(3.0.0)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
-            text: '1.3.9',
-            link: '/en-us/docs/1.3.9/user_doc/quick-start.html',
+            text: '2.0.6',
+            link: '/en-us/docs/2.0.6/user_doc/guide/quick-start.html',
           },
           {
             key: 'docsHistory',
@@ -129,10 +129,16 @@ export default {
       content: 'Do you need feedback? Please contact us through the following ways.',
       list: [
         {
+          name: 'Slack',
+          img1: '/img/slack.png',
+          img2: '/img/slack-selected.png',
+          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg',
+        },
+        {
           name: 'Email List',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
-          link: '/en-us/community/development/subscribe.html',
+          link: '/en-us/docs/latest/user_doc/contribute/join/subscribe.html',
         },
         {
           name: 'Twitter',
@@ -140,26 +146,14 @@ export default {
           img2: '/img/twitterblue.png',
           link: 'https://twitter.com/dolphinschedule',
         },
-        {
-          name: 'Stack Overflow',
-          img1: '/img/stackoverflow.png',
-          img2: '/img/stackoverflow-selected.png',
-          link: 'https://stackoverflow.com/questions/tagged/apache-dolphinscheduler',
-        },
-        {
-          name: 'Slack',
-          img1: '/img/slack.png',
-          img2: '/img/slack-selected.png',
-          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw',
-        },
       ],
     },
-    copyright: 'Copyright © 2019-2021 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
+    copyright: 'Copyright © 2019-2022 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
   },
   'zh-cn': {
     banner: {
       text: '🤔 有关于 Apache DolphinScheduler 的疑问，加入 Slack 频道来讨论他们 ',
-      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw'
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg'
     },
     pageMenu: [
       {
@@ -174,13 +168,13 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.0.0-alpha)',
+            text: '最新版本latest(3.0.0)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
-            text: '1.3.9',
-            link: '/zh-cn/docs/1.3.9/user_doc/quick-start.html',
+            text: '2.0.6',
+            link: '/zh-cn/docs/2.0.6/user_doc/guide/quick-start.html',
           },
           {
             key: 'docsHistory',
@@ -260,10 +254,16 @@ export default {
       content: '有问题需要反馈？请通过以下方式联系我们。',
       list: [
         {
+          name: 'Slack',
+          img1: '/img/slack.png',
+          img2: '/img/slack-selected.png',
+          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg',
+        },
+        {
           name: '邮件列表',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
-          link: '/zh-cn/community/development/subscribe.html',
+          link: '/zh-cn/docs/latest/user_doc/contribute/join/subscribe.html',
         },
         {
           name: 'Twitter',
@@ -271,20 +271,8 @@ export default {
           img2: '/img/twitterblue.png',
           link: 'https://twitter.com/dolphinschedule',
         },
-        {
-          name: 'Stack Overflow',
-          img1: '/img/stackoverflow.png',
-          img2: '/img/stackoverflow-selected.png',
-          link: 'https://stackoverflow.com/questions/tagged/apache-dolphinscheduler',
-        },
-        {
-          name: 'Slack',
-          img1: '/img/slack.png',
-          img2: '/img/slack-selected.png',
-          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw',
-        },
       ],
     },
-    copyright: 'Copyright © 2019-2021 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
+    copyright: 'Copyright © 2019-2022 The Apache Software Foundation. Apache DolphinScheduler, DolphinScheduler, and its feather logo are trademarks of The Apache Software Foundation.',
   },
 };

@@ -70,7 +70,11 @@ worker:
   max-cpu-load-avg: -1
   # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
   reserved-memory: 0.3
-  # default worker groups separated by comma, like 'worker.groups=default,test'
+  # for multiple worker groups, use hyphen before group name, e.g.
+  # groups:
+  #   - default
+  #   - group1
+  #   - group2
   groups:
     - default
   # alert server listen host

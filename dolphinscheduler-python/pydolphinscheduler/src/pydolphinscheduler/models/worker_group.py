@@ -15,28 +15,16 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""DolphinScheduler User object."""
+"""DolphinScheduler Worker Group object."""
 
 from typing import Optional
 
-from pydolphinscheduler.core import configuration
-from pydolphinscheduler.core.base_side import BaseSide
-from pydolphinscheduler.java_gateway import gateway_result_checker, launch_gateway
+from pydolphinscheduler.models import BaseSide
 
 
-class Queue(BaseSide):
-    """DolphinScheduler Queue object."""
+class WorkerGroup(BaseSide):
+    """DolphinScheduler Worker Group object."""
 
-    def __init__(
-        self,
-        name: str = configuration.WORKFLOW_QUEUE,
-        description: Optional[str] = "",
-    ):
+    def __init__(self, name: str, address: str, description: Optional[str] = None):
         super().__init__(name, description)
-
-    def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
-        """Create Queue if not exists."""
-        gateway = launch_gateway()
-        # Here we set Queue.name and Queue.queueName same as self.name
-        result = gateway.entry_point.createProject(user, self.name, self.name)
-        gateway_result_checker(result, None)
+        self.address = address
