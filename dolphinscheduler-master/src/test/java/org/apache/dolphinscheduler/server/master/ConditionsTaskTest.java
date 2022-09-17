@@ -110,7 +110,7 @@ public class ConditionsTaskTest {
         List<TaskInstance> conditions = Stream.of(
                 getTaskInstanceForValidTaskList(expectResult)).collect(Collectors.toList());
         Mockito.when(processService
-                .findValidTaskListByProcessId(processInstance.getId()))
+                .findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(conditions);
         return taskInstance;
     }
