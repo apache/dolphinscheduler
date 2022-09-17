@@ -93,9 +93,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
         if (taskInstance == null) {
+            logger.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
         }
         if (StringUtils.isBlank(taskInstance.getHost())) {
+            logger.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
         Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
@@ -197,8 +199,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
         Host host = Host.of(taskInstance.getHost());
 
-        logger.info("log host : {} , logPath : {} , port : {}", host.getIp(), taskInstance.getLogPath(),
-                host.getPort());
+        logger.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host:{}, logPath:{}, port:{}",
+                taskInstance.getId(), taskInstance.getName(), host.getIp(), taskInstance.getLogPath(), host.getPort());
 
         StringBuilder log = new StringBuilder();
         if (skipLineNum == 0) {

@@ -64,6 +64,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
         Result<Map<String, String>> result = new Result<>();
         User user = login(userId, password, extra);
         if (user == null) {
+            logger.error("Username or password entered incorrectly.");
             result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());
             result.setMsg(Status.USER_NAME_PASSWD_ERROR.getMsg());
             return result;
@@ -71,6 +72,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
 
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {
+            logger.error("The current user is deactivated, userName:{}.", user.getUserName());
             result.setCode(Status.USER_DISABLED.getCode());
             result.setMsg(Status.USER_DISABLED.getMsg());
             return result;
@@ -79,12 +81,13 @@ public abstract class AbstractAuthenticator implements Authenticator {
         // create session
         String sessionId = sessionService.createSession(user, extra);
         if (sessionId == null) {
+            logger.error("Failed to create session, userName:{}.", user.getUserName());
             result.setCode(Status.LOGIN_SESSION_FAILED.getCode());
             result.setMsg(Status.LOGIN_SESSION_FAILED.getMsg());
             return result;
         }
 
-        logger.info("sessionId : {}", sessionId);
+        logger.info("Session is created and sessionId is :{}.", sessionId);
 
         Map<String, String> data = new HashMap<>();
         data.put(Constants.SESSION_ID, sessionId);

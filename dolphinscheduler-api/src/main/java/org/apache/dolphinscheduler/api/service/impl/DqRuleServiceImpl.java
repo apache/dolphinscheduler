@@ -240,7 +240,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         try {
             result = mapper.writeValueAsString(params);
         } catch (JsonProcessingException e) {
-            logger.error("json parse error : {}", e.getMessage(), e);
+            logger.error("Json parse error.", e);
         }
 
         return result;

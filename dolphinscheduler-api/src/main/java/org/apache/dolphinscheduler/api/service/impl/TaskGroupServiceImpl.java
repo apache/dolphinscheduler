@@ -91,19 +91,23 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         if (checkDescriptionLength(description)) {
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         if (name == null) {
+            logger.warn("Parameter name can ot be null.");
             putMsg(result, Status.NAME_NULL);
             return result;
         }
         if (groupSize <= 0) {
+            logger.warn("Parameter task group size is must bigger than 1.");
             putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
             return result;
         }
         TaskGroup taskGroup1 = taskGroupMapper.queryByName(loginUser.getId(), name);
         if (taskGroup1 != null) {
+            logger.warn("Task group with the same name already exists, taskGroupName:{}.", taskGroup1.getName());
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
@@ -113,10 +117,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         taskGroup.setCreateTime(new Date());
         taskGroup.setUpdateTime(new Date());
         if (taskGroupMapper.insert(taskGroup) > 0) {
-            permissionPostHandle(AuthorizationType.TASK_GROUP, loginUser.getId(),
-                    Collections.singletonList(taskGroup.getId()), logger);
+            permissionPostHandle(AuthorizationType.TASK_GROUP, loginUser.getId(), Collections.singletonList(taskGroup.getId()),logger);
+            logger.info("Create task group complete, taskGroupName:{}.", taskGroup.getName());
             putMsg(result, Status.SUCCESS);
         } else {
+            logger.error("Create task group error, taskGroupName:{}.", taskGroup.getName());
             putMsg(result, Status.CREATE_TASK_GROUP_ERROR);
             return result;
         }
@@ -143,14 +148,17 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         if (checkDescriptionLength(description)) {
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         if (name == null) {
+            logger.warn("Parameter name can ot be null.");
             putMsg(result, Status.NAME_NULL);
             return result;
         }
         if (groupSize <= 0) {
+            logger.warn("Parameter task group size is must bigger than 1.");
             putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
             return result;
         }
@@ -160,11 +168,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
                 .ne(TaskGroup::getId, id));
 
         if (exists > 0) {
+            logger.error("Task group with the same name already exists.");
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() != Flag.YES.getCode()) {
+            logger.warn("Task group has been closed, taskGroupId:{}.", id);
             putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
             return result;
         }
@@ -175,8 +185,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             taskGroup.setName(name);
         }
         int i = taskGroupMapper.updateById(taskGroup);
-        logger.info("update result:{}", i);
-        putMsg(result, Status.SUCCESS);
+        if (i > 0) {
+            logger.info("Update task group complete, taskGroupId:{}.", id);
+            putMsg(result, Status.SUCCESS);
+        } else {
+            logger.error("Update task group error, taskGroupId:{}.", id);
+            putMsg(result, Status.UPDATE_TASK_GROUP_ERROR);
+        }
         return result;
     }
 
@@ -323,11 +338,16 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.NO.getCode()) {
+            logger.info("Task group has been closed, taskGroupId:{}.", id);
             putMsg(result, Status.TASK_GROUP_STATUS_CLOSED);
             return result;
         }
         taskGroup.setStatus(Flag.NO.getCode());
-        taskGroupMapper.updateById(taskGroup);
+        int update = taskGroupMapper.updateById(taskGroup);
+        if (update > 0)
+            logger.info("Task group close complete, taskGroupId:{}.", id);
+        else
+            logger.error("Task group close error, taskGroupId:{}.", id);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -351,12 +371,17 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.YES.getCode()) {
+            logger.info("Task group has been started, taskGroupId:{}.", id);
             putMsg(result, Status.TASK_GROUP_STATUS_OPENED);
             return result;
         }
         taskGroup.setStatus(Flag.YES.getCode());
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int update = taskGroupMapper.updateById(taskGroup);
+        if (update > 0)
+            logger.info("Task group start complete, taskGroupId:{}.", id);
+        else
+            logger.error("Task group start error, taskGroupId:{}.", id);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -391,6 +416,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         taskGroupQueueService.modifyPriority(queueId, priority);
+        logger.info("Modify task group queue priority complete, queueId:{}, priority:{}.", queueId, priority);
         putMsg(result, Status.SUCCESS);
         return result;
     }

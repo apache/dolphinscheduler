@@ -199,7 +199,7 @@ public class TenantController extends BaseController {
      *
      * @param loginUser login user
      * @param tenantCode tenant code
-     * @return true if tenant code can user, otherwise return false
+     * @return true if tenant code can use, otherwise return false
      */
     @ApiOperation(value = "verifyTenantCode", notes = "VERIFY_TENANT_CODE_NOTES")
     @ApiImplicitParams({

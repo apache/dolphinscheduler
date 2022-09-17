@@ -51,6 +51,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -60,6 +62,8 @@ import org.springframework.util.CollectionUtils;
  */
 @Service
 public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkFlowLineageService {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageServiceImpl.class);
 
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
@@ -78,6 +82,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
+            logger.error("Project does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
@@ -92,6 +97,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
+            logger.error("Project does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
@@ -160,6 +166,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
+            logger.error("Project does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }

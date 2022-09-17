@@ -37,6 +37,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import springfox.documentation.annotations.ApiIgnore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,6 +64,8 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("projects")
 public class ProjectController extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     @Autowired
     private ProjectService projectService;
@@ -163,6 +167,7 @@ public class ProjectController extends BaseController {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
+            logger.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);

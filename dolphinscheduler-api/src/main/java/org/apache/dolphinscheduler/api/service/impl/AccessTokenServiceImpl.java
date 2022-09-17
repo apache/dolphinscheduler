@@ -197,7 +197,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
-            logger.error("access token not exist,  access token id {}", id);
+            logger.error("Access token does not exist, accessTokenId:{}.", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
@@ -234,7 +234,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         // 2. check if token is existed
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
-            logger.error("access token not exist,  access token id {}", id);
+            logger.error("Access token does not exist, accessTokenId:{}.", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
