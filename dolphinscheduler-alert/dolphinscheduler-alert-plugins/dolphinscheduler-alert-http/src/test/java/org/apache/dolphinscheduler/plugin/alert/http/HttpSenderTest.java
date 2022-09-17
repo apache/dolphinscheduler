@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpSenderTest {
 
     @Test
+    @Ignore("should not make a actual request")
     public void sendTest() {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put(HttpAlertConstants.NAME_URL, "http://www.baidu.com");
