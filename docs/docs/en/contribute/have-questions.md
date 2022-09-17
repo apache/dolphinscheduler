@@ -21,8 +21,9 @@ Some quick tips when using email:
 - Tagging the subject line of your email will help you get a faster response, e.g. [api-server]: How to get open api interface?
 
 - Tags may help identify a topic by:
+
   - Component: MasterServer,ApiServer,WorkerServer,AlertServer, etc
   - Level: Beginner, Intermediate, Advanced
   - Scenario: Debug, How-to
-
 - For error logs or long code examples, please use [GitHub gist](https://gist.github.com/) and include only a few lines of the pertinent code / log within the email.
+
