@@ -25,7 +25,6 @@ DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreS
 
 > 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
 
-
 对于mysql 5.6 / 5.7：
 
 ```shell
@@ -75,6 +74,7 @@ pg_ctl reload
 然后修改`./bin/env/dolphinscheduler_env.sh`，将username和password改成你在上一步中设置的用户名{user}和密码{password}
 
 对于 MySQL：
+
 ```shell
 # for mysql
 export DATABASE=${DATABASE:-mysql}
@@ -82,9 +82,10 @@ export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
-```  
+```
 
 对于 PostgreSQL：
+
 ```shell
 # for postgresql
 export DATABASE=${DATABASE:-postgresql}
@@ -123,3 +124,4 @@ DolphinScheduler 分发的二进制包中包含他们。这部分数据源主要
 > 则仅支持 [8.0.16 及以上](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)的版本。
 
 [mysql]: https://downloads.MySQL.com/archives/c-j/
+

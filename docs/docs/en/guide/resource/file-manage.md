@@ -6,11 +6,11 @@ When the third-party jar needs to be used in the scheduling process or the user 
 
 > **_Note:_**
 >
-> * When you manage files as `admin`, remember to set up `tenant` for `admin` first. 
+> * When you manage files as `admin`, remember to set up `tenant` for `admin` first.
 
 ## Basic Operations
 
-### Create File 
+### Create File
 
 The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql, properties.
 
@@ -65,6 +65,7 @@ In the workflow definition module of project Manage, create a new workflow using
 
 - Script: 'sh hello.sh'
 - Resource: Select 'hello.sh'
+
 > Notice: When using a resource file in the script, the file name needs to be the same as the full path of the selected resource:
 > For example: if the resource path is `/resource/hello.sh`, you need to use the full path of `/resource/hello.sh` to use it in the script.
 

@@ -5,7 +5,7 @@
 We here use MySQL as an example to illustrate how to configure an external database:
 
 > NOTE: If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
-which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
+> which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
 
 * First of all, follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 * Set the following environment variables in your terminal or modify the `bin/env/dolphinscheduler_env.sh` with your database username and password for `{user}` and `{password}`:
@@ -25,7 +25,6 @@ export SPRING_DATASOURCE_PASSWORD={password}
 DolphinScheduler stores metadata in `relational database`. Currently, we support `PostgreSQL` and `MySQL`. Let's walk through how to initialize the database in `MySQL` and `PostgreSQL` :
 
 > If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
-
 
 For mysql 5.6 / 5.7
 
@@ -54,9 +53,10 @@ mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%';
 mysql> CREATE USER '{user}'@'localhost' IDENTIFIED BY '{password}';
 mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
 mysql> FLUSH PRIVILEGES;
-``` 
+```
 
-For PostgreSQL: 
+For PostgreSQL:
+
 ```shell
 # Use psql-tools to login PostgreSQL
 psql
@@ -75,6 +75,7 @@ pg_ctl reload
 Then, modify `./bin/env/dolphinscheduler_env.sh`, change {user} and {password} to what you set in the previous step.
 
 For MySQL:
+
 ```shell
 # for mysql
 export DATABASE=${DATABASE:-mysql}
@@ -85,6 +86,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 ```
 
 For PostgreSQL:
+
 ```shell
 # for postgresql
 export DATABASE=${DATABASE:-postgresql}
@@ -125,3 +127,4 @@ like Docker.
 > But if you want to use MySQL as the metabase of DolphinScheduler, it only supports [8.0.16 and above](https:/ /repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar) version.
 
 [mysql]: https://downloads.MySQL.com/archives/c-j/
+

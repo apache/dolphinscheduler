@@ -35,7 +35,7 @@ The content of the logs determines whether the logs can completely restore the s
 
 ### Log format specification
 
-The logs of Master module and Worker module are printed using the following format. 
+The logs of Master module and Worker module are printed using the following format.
 
 ```xml
 [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %msg%n
@@ -50,3 +50,4 @@ That is, the workflow instance ID and task instance ID are injected in the print
 - Branch printing of logs is prohibited. The contents of the logs need to be associated with the relevant information in the log format, and printing them in separate lines will cause the contents of the logs to not match the time and other information, and cause the logs to be mixed in a large number of log environments, which will make log retrieval more difficult.
 - The use of the "+" operator for splicing log content is prohibited. Use placeholders for formatting logs for printing to improve memory usage efficiency.
 - When the log content includes object instances, you need to make sure to override the toString() method to prevent printing meaningless hashcode.
+
