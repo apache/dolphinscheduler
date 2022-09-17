@@ -1,7 +1,7 @@
 # Dolphin Scheduler UI
 
 > Brand new UI management system (V3.0.0-Release).
-> 
+>
 > Compared with the old `UI`, it will be more standardized, and it will also have a more complete type checking mechanism. At the same time, its speed has made a qualitative leap.
 >
 > We also provide dark mode and light mode to meet the preferences of different developers. It will make your eyes shine.
@@ -63,3 +63,4 @@ vue-tsc --noEmit
 ```
 
 ---
+

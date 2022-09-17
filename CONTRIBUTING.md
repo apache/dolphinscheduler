@@ -6,11 +6,11 @@ Start by forking the dolphinscheduler GitHub repository, make changes in a branc
 
 There are three branches in the remote repository currently:
 
-  - `master` : normal delivery branch. After the stable version is released, the code for the stable version branch is merged into the master branch.
-            
-  - `dev` : daily development branch. The daily development branch, the newly submitted code can pull requests to this branch.
-  
-  - `x.x.x-release` : the stable release version.
+- `master` : normal delivery branch. After the stable version is released, the code for the stable version branch is merged into the master branch.
+
+- `dev` : daily development branch. The daily development branch, the newly submitted code can pull requests to this branch.
+
+- `x.x.x-release` : the stable release version.
 
 So, you should fork the `dev` branch.
 
@@ -39,7 +39,6 @@ git remote -v
 There will be two repositories at this time: origin (your own warehouse) and upstream (remote repository)
 
 Get/update remote repository code (already the latest code, skip it).
-
 
 ```sh
 git fetch upstream
@@ -90,7 +89,6 @@ After submitting changes to your remote repository, you should click on the new 
 <p align = "center">
 <img src = "http://geek.analysys.cn/static/upload/221/2019-04-02/90f3abbf-70ef-4334-b8d6-9014c9cf4c7f.png" width ="60%"/>
 </p>
-
 
 Select the modified local branch and the branch to merge past to create a pull request.
 

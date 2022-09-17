@@ -21,7 +21,6 @@
 
 * [COMMUNITY-LED DEVELOPMENT "THE APACHE WAY"](https://apache.org/dev/licensing-howto.html)
 
-
 以Apache为例，当我们使用了ZooKeeper，那么ZooKeeper的NOTICE文件（每个开源项目都会有NOTICE文件，一般位于根目录）则必须在我们的项目中体现，用Apache的话来讲，就是"Work" shall mean the work of authorship, whether in Source or Object form, made available under the License, as indicated by a
 copyright notice that is included in or attached to the work.
 
@@ -37,7 +36,9 @@ copyright notice that is included in or attached to the work.
 * 在dolphinscheduler-dist/release-docs/LICENSE中添加相关的maven仓库地址。
 * 在dolphinscheduler-dist/release-docs/NOTICE中追加相关的NOTICE文件，此文件请务必和原代码仓库地址中的NOTICE文件一致。
 * 在dolphinscheduler-dist/release-docs/license/下添加相关源代码的协议，文件命名为license+文件名.txt。
+
 #### check dependency license fail
+
 ```
 --- /dev/fd/63	2020-12-03 03:08:57.191579482 +0000
 +++ /dev/fd/62	2020-12-03 03:08:57.191579482 +0000
@@ -49,13 +50,16 @@ copyright notice that is included in or attached to the work.
 +mchange-commons-java-0.2.11.jar
 Error: Process completed with exit code 1.
 ```
+
 一般来讲，添加一个jar的工作往往不会如此轻易的结束，因为它往往依赖了其它各种各样的jar，这些jar我们同样需要添加相应的license。
 这种情况下，我们会在check里面得到 check dependency license fail的错误信息，如上，我们缺少了HikariCP-java6-2.3.13、c3p0等的license声明，
 按照添加jar的步骤补充即可，提示还是蛮友好的（哈哈）。
+
 ### 附件
 
 <!-- markdown-link-check-disable -->
-附件：新jar的邮件格式 
+附件：新jar的邮-->
+
 ```
 [VOTE][New Jar] jetcd-core(registry plugin support etcd3 ) 
 
@@ -96,9 +100,11 @@ https://mvnrepository.com/artifact/io.etcd/jetcd-core
 
 https://mvnrepository.com/artifact/io.etcd/jetcd-launcher
 ```
+
 <!-- markdown-link-check-enable -->
 
 ### 参考文章：
+
 * [COMMUNITY-LED DEVELOPMENT "THE APACHE WAY"](https://apache.org/dev/licensing-howto.html)
 * [ASF 3RD PARTY LICENSE POLICY](https://apache.org/legal/resolved.html)
 

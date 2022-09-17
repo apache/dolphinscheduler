@@ -71,4 +71,3 @@ process fails and ends
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation
 ideas of the big data distributed workflow scheduling system-DolphinScheduler. To be continued
 
-

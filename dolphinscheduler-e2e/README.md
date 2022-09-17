@@ -96,3 +96,4 @@ class TenantE2ETest {
 
 - For UI tests, it's common that the pages might need some time to load, or the operations might need some time to
   complete, we can use `await().untilAsserted(() -> {})` to wait for the assertions.
+

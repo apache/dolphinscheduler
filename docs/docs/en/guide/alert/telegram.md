@@ -7,17 +7,17 @@ The following shows the `Telegram` configuration example:
 
 ## Parameter Configuration
 
-| **Parameter** | **Description** |
-| --- | --- |
-| WebHook | The WebHook of Telegram when use robot to send message. |
-| botToken | The access token of robot. |
-| chatId | Sub Telegram Channel. |
-| parseMode | Message parse type (support txt, markdown, markdownV2, html). |
-| EnableProxy | Enable proxy sever. |
-| Proxy | The proxy address of the proxy server. |
-| Port | The proxy port of proxy server. |
-| User | Authentication(Username) for the proxy server. |
-| Password | Authentication(Password) for the proxy server. |
+| **Parameter** |                        **Description**                        |
+|---------------|---------------------------------------------------------------|
+| WebHook       | The WebHook of Telegram when use robot to send message.       |
+| botToken      | The access token of robot.                                    |
+| chatId        | Sub Telegram Channel.                                         |
+| parseMode     | Message parse type (support txt, markdown, markdownV2, html). |
+| EnableProxy   | Enable proxy sever.                                           |
+| Proxy         | The proxy address of the proxy server.                        |
+| Port          | The proxy port of proxy server.                               |
+| User          | Authentication(Username) for the proxy server.                |
+| Password      | Authentication(Password) for the proxy server.                |
 
 ### NOTE
 
@@ -35,3 +35,4 @@ The webhook needs to be able to receive and use the same JSON body of HTTP POST 
 - [Telegram Application Bot Guide](https://core.telegram.org/bots)
 - [Telegram Bots Api](https://core.telegram.org/bots/api)
 - [Telegram SendMessage Api](https://core.telegram.org/bots/api#sendmessage)
+

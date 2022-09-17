@@ -1,4 +1,5 @@
-# Email  
+# Email
+
 If you need to use `Email` for alerting, create an alert instance in the alert instance management and select the Email plugin.
 
 The following shows the `Email` configuration example:

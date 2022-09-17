@@ -20,7 +20,6 @@ Moreover, when we intend to refer a new software ( not limited to 3rd party jar,
 
 * [COMMUNITY-LED DEVELOPMENT "THE APACHE WAY"](https://apache.org/dev/licensing-howto.html)
 
-
 For example, we should contain the NOTICE file (every open-source project has NOTICE file, generally under root directory) of ZooKeeper in our project when we are using ZooKeeper. As the Apache explains, "Work" shall mean the work of authorship, whether in Source or Object form, made available under the License, as indicated by a copyright notice that is included in or attached to the work.
 
 We are not going to dive into every 3rd party open-source license policy, you may look up them if interested.
@@ -40,3 +39,4 @@ We need to follow the following steps when we need to add new jars or external r
 
 * [COMMUNITY-LED DEVELOPMENT "THE APACHE WAY"](https://apache.org/dev/licensing-howto.html)
 * [ASF 3RD PARTY LICENSE POLICY](https://apache.org/legal/resolved.html)
+

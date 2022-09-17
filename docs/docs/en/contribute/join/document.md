@@ -2,7 +2,7 @@
 
 Good documentation is critical for any type of software. Any contribution that can improve the DolphinScheduler documentation is welcome.
 
-###  Get the document project
+### Get the document project
 
 Documentation for the DolphinScheduler project is maintained in a separate [git repository](https://github.com/apache/dolphinscheduler-website).
 
@@ -52,8 +52,8 @@ Now you can run and build the website in your local environment.
 
 2. Simply push the changed files, for example:
 
- * `*.md`
- * `blog.js or docs.js or site.js`
+* `*.md`
+* `blog.js or docs.js or site.js`
 
 3. Submit the Pull Request to the **master** branch.
 

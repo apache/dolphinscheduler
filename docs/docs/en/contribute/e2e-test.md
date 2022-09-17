@@ -77,31 +77,31 @@ In addition, during the testing process, the elements are not manipulated direct
 The SecurityPage provides goToTab methods to test the corresponding sidebar jumps, mainly including TenantPage, UserPage, WorkerGroupPage and QueuePage. These pages are implemented in the same way, mainly to test whether the input, add and delete buttons of the form can return to the corresponding page.
 
 ```java
- public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
-        if (tab == TenantPage.class) {
-            WebElement menuTenantManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menuTenantManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menuTenantManageElement);
-            return tab.cast(new TenantPage(driver));
-        }
-        if (tab == UserPage.class) {
-            WebElement menUserManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menUserManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menUserManageElement);
-            return tab.cast(new UserPage(driver));
-        }
-        if (tab == WorkerGroupPage.class) {
-            WebElement menWorkerGroupManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menWorkerGroupManageElement);
-            return tab.cast(new WorkerGroupPage(driver));
-        }
-        if (tab == QueuePage.class) {
-            menuQueueManage().click();
-            return tab.cast(new QueuePage(driver));
-        }
-        throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
-    }
+public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
+       if (tab == TenantPage.class) {
+           WebElement menuTenantManageElement = new WebDriverWait(driver, 60)
+                   .until(ExpectedConditions.elementToBeClickable(menuTenantManage));
+           ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menuTenantManageElement);
+           return tab.cast(new TenantPage(driver));
+       }
+       if (tab == UserPage.class) {
+           WebElement menUserManageElement = new WebDriverWait(driver, 60)
+                   .until(ExpectedConditions.elementToBeClickable(menUserManage));
+           ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menUserManageElement);
+           return tab.cast(new UserPage(driver));
+       }
+       if (tab == WorkerGroupPage.class) {
+           WebElement menWorkerGroupManageElement = new WebDriverWait(driver, 60)
+                   .until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
+           ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menWorkerGroupManageElement);
+           return tab.cast(new WorkerGroupPage(driver));
+       }
+       if (tab == QueuePage.class) {
+           menuQueueManage().click();
+           return tab.cast(new QueuePage(driver));
+       }
+       throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
+   }
 ```
 
 ![SecurityPage](../../../img/e2e-test/SecurityPage.png)
@@ -146,14 +146,14 @@ The following is an example of a tenant management test. As explained earlier, w
 The browser is loaded using the RemoteWebDriver provided with Selenium. Before each test case is started there is some preparation work that needs to be done. For example: logging in the user, jumping to the corresponding page (depending on the specific test case).
 
 ```java
-    @BeforeAll
-    public static void setup() {
-        new LoginPage(browser)
-                .login("admin", "dolphinscheduler123") 
-                .goToNav(SecurityPage.class) 
-                .goToTab(TenantPage.class)
-        ;
-    }
+@BeforeAll
+public static void setup() {
+    new LoginPage(browser)
+            .login("admin", "dolphinscheduler123") 
+            .goToNav(SecurityPage.class) 
+            .goToTab(TenantPage.class)
+    ;
+}
 ```
 
 When the preparation is complete, it is time for the formal test case writing. We use a form of @Order() annotation for modularity, to confirm the order of the tests. After the tests have been run, assertions are used to determine if the tests were successful, and if the assertion returns true, the tenant creation was successful. The following code can be used as a reference:
@@ -176,14 +176,14 @@ The rest are similar cases and can be understood by referring to the specific so
 
 https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-e2e/dolphinscheduler-e2e-case/src/test/java/org/apache/dolphinscheduler/e2e/cases
 
-##  III. Supplements
+## III. Supplements
 
-When running E2E tests locally, First, you need to start the local service, you can refer to this page: 
+When running E2E tests locally, First, you need to start the local service, you can refer to this page:
 [development-environment-setup](./development-environment-setup.md)
 
 When running E2E tests locally, the `-Dlocal=true` parameter can be configured to connect locally and facilitate changes to the UI.
 
-When running E2E tests with `M1` chip, you can use `-Dm1_chip=true` parameter to configure containers supported by 
+When running E2E tests with `M1` chip, you can use `-Dm1_chip=true` parameter to configure containers supported by
 `ARM64`.
 
 ![Dlocal](../../../img/e2e-test/Dlocal.png)

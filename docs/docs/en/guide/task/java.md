@@ -9,7 +9,8 @@ This node is for executing java-type tasks and supports using files and jar pack
 - Drag the toolbar's Java task node to the palette.
 
 # Task Parameters
-| **Parameter**            | **Description**                                                                                                                                                            |
+
+|      **Parameter**       |                                                                              **Description**                                                                               |
 |--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Node Name                | The name of the set task. The node name in a workflow definition is unique.                                                                                                |
 | Run Flag                 | Indicates whether the node is scheduled properly and turns on the kill switch, if not needed.                                                                              |
@@ -38,7 +39,7 @@ The main configuration parameters are as follows:
 - Module Path
 - Main Parameters
 - Java VM Parameters
-- Script 
+- Script
 
 ![java_task](../../../../img/tasks/demo/java_task02.png)
 

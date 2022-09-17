@@ -14,7 +14,7 @@ of to [language](#language) control button.
 
 ## Time Zone
 
-DolphinScheduler support time zone setting. 
+DolphinScheduler support time zone setting.
 
 Server Time Zone
 

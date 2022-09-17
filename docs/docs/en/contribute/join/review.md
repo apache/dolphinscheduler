@@ -10,7 +10,7 @@ from the community to review them. You could see detail in [mail][mail-review-wa
 in [GitHub Discussion][discussion-result-review-wanted].
 
 > Note: It is only users mentioned in the [GitHub Discussion][discussion-result-review-wanted] can review Issues or Pull
-> Requests, Community advocates **Anyone is encouraged to review Issues and Pull Requests**. Users in 
+> Requests, Community advocates **Anyone is encouraged to review Issues and Pull Requests**. Users in
 > [GitHub Discussion][discussion-result-review-wanted] show their willing to review when we collect in the mail thread.
 > The advantage of this list is when the community has discussion, in addition to the mention Members in [team](/us-en/community/community.html),
 > you can also find some help in [GitHub Discussion][discussion-result-review-wanted] people. If you want to join the
@@ -27,43 +27,43 @@ go to section [review Pull Requests](#pull-requests).
 
 Review Issues means discuss [Issues][all-issues] in GitHub and give suggestions on it. Include but are not limited to the following situations
 
-| Situation | Reason | Label | Action |
-| ------ | ------ | ------ | ------ |
-| wont fix | Has been fixed in dev branch | [wontfix][label-wontfix] | Close Issue, inform creator the fixed version if it already release |
-| duplicate issue | Had the same problem before | [duplicate][label-duplicate] | Close issue, inform creator the link of same issue |
-| Description not clearly | Without detail reproduce step | [need more information][label-need-more-information] | Inform creator add more description |
+|        Situation        |            Reason             |                        Label                         |                               Action                                |
+|-------------------------|-------------------------------|------------------------------------------------------|---------------------------------------------------------------------|
+| wont fix                | Has been fixed in dev branch  | [wontfix][label-wontfix]                             | Close Issue, inform creator the fixed version if it already release |
+| duplicate issue         | Had the same problem before   | [duplicate][label-duplicate]                         | Close issue, inform creator the link of same issue                  |
+| Description not clearly | Without detail reproduce step | [need more information][label-need-more-information] | Inform creator add more description                                 |
 
 In addition give suggestion, add label for issue is also important during review. The labeled issues can be retrieved
 better, which convenient for further processing. An issue can with more than one label. Common issue categories are:
 
-| Label | Meaning |
-| ------ | ------ |
-| [UI][label-UI] | UI and front-end related |
-| [security][label-security] | Security Issue |
-| [user experience][label-user-experience] | User experience Issue |
-| [development][label-development] | Development Issue |
-| [Python][label-Python] | Python Issue |
-| [plug-in][label-plug-in] | Plug-in Issue |
-| [document][label-document] | Document Issue |
-| [docker][label-docker] | Docker Issue |
-| [need verify][label-need-verify] | Need verify Issue |
-| [e2e][label-e2e] | E2E Issue |
-| [win-os][label-win-os] | windows operating system Issue |
-| [suggestion][label-suggestion] | Give suggestion to us |
- 
+|                  Label                   |            Meaning             |
+|------------------------------------------|--------------------------------|
+| [UI][label-UI]                           | UI and front-end related       |
+| [security][label-security]               | Security Issue                 |
+| [user experience][label-user-experience] | User experience Issue          |
+| [development][label-development]         | Development Issue              |
+| [Python][label-Python]                   | Python Issue                   |
+| [plug-in][label-plug-in]                 | Plug-in Issue                  |
+| [document][label-document]               | Document Issue                 |
+| [docker][label-docker]                   | Docker Issue                   |
+| [need verify][label-need-verify]         | Need verify Issue              |
+| [e2e][label-e2e]                         | E2E Issue                      |
+| [win-os][label-win-os]                   | windows operating system Issue |
+| [suggestion][label-suggestion]           | Give suggestion to us          |
+
 Beside classification, label could also set the priority of Issues. The higher the priority, the more attention pay
 in the community, the easier it is to be fixed or implemented. The priority label are as follows
 
-| Label | priority |
-| ------ | ------ |
-| [priority:high][label-priority-high] | High priority |
+|                  Label                   |    priority     |
+|------------------------------------------|-----------------|
+| [priority:high][label-priority-high]     | High priority   |
 | [priority:middle][label-priority-middle] | Middle priority |
-| [priority:low][label-priority-low] | Low priority |
+| [priority:low][label-priority-low]       | Low priority    |
 
 All the labels above in common label. For all labels in this project you could see in [full label list][label-all-list]
 
 Before reading following content, please make sure you have labeled the Issue.
-  
+
 * Remove label [Waiting for reply][label-waiting-for-reply] after replying: Label [Waiting for reply][label-waiting-for-reply]
   added when [creating an Issue][issue-choose]. It makes positioning un reply issue more convenient, and you should remove
   this label after you reviewed it. If you do not remove it, will cause others to waste time looking on the same issue.
@@ -74,12 +74,12 @@ Before reading following content, please make sure you have labeled the Issue.
 
 When an Issue need to create Pull Requests, you could also labeled it from below.
 
-| Label | Mean |
-| ------ | ------ |
-| [Chore][label-Chore] | Chore for project |
-| [Good first issue][label-good-first-issue] | Good first issue for new contributor |
-| [easy to fix][label-easy-to-fix] | Easy to fix, harder than `Good first issue` |
-| [help wanted][label-help-wanted] | Help wanted |
+|                   Label                    |                    Mean                     |
+|--------------------------------------------|---------------------------------------------|
+| [Chore][label-Chore]                       | Chore for project                           |
+| [Good first issue][label-good-first-issue] | Good first issue for new contributor        |
+| [easy to fix][label-easy-to-fix]           | Easy to fix, harder than `Good first issue` |
+| [help wanted][label-help-wanted]           | Help wanted                                 |
 
 > Note: Only members have permission to add or delete label. When you need to add or remove lebals but are not member,
 > you can `@`  members to do that. But as long as you have a GitHub account, you can comment on issues and give suggestions.
@@ -90,14 +90,14 @@ When an Issue need to create Pull Requests, you could also labeled it from below
 <!-- markdown-link-check-disable -->
 Review Pull mean discussing in [Pull Requests][all-PRs] in GitHub and giving suggestions to it. DolphinScheduler's 
 Pull Requests reviewing are the same as [GitHub's reviewing changes in pull requests][gh-review-pr]. You can give your
-suggestions in Pull Requests
-
+suggestions in Pull Reque-->
 * When you think the Pull Request is OK to be merged, you can agree to the Pull Request according to the "Approve" process
   in [GitHub's reviewing changes in pull requests][gh-review-pr].
-* When you think Pull Request needs to be changed, you can comment it according to the "Comment" process in 
+* When you think Pull Request needs to be changed, you can comment it according to the "Comment" process in
   [GitHub's reviewing changes in pull requests][gh-review-pr]. And when you think issues that must be fixed before they
   merged, please follow "Request changes" in [GitHub's reviewing changes in pull requests][gh-review-pr] to ask contributors
   modify it.
+
 <!-- markdown-link-check-enable -->
 
 Labeled Pull Requests is an important part. Reasonable classification can save a lot of time for reviewers. The good news
@@ -107,11 +107,11 @@ and [priority:high][label-priority-high].
 
 Pull Requests have some unique labels of it own
 
-| Label | Mean |
-| ------ | ------ |
-| [miss document][label-miss-document] | Pull Requests miss document, and should be add |
-| [first time contributor][label-first-time-contributor] | Pull Requests submit by first time contributor |
-| [don't merge][label-do-not-merge] | Pull Requests have some problem and should not be merged |
+|                         Label                          |                           Mean                           |
+|--------------------------------------------------------|----------------------------------------------------------|
+| [miss document][label-miss-document]                   | Pull Requests miss document, and should be add           |
+| [first time contributor][label-first-time-contributor] | Pull Requests submit by first time contributor           |
+| [don't merge][label-do-not-merge]                      | Pull Requests have some problem and should not be merged |
 
 > Note: Only members have permission to add or delete label. When you need to add or remove lebals but are not member,
 > you can `@`  members to do that. But as long as you have a GitHub account, you can comment on Pull Requests and give suggestions.
@@ -151,3 +151,4 @@ Pull Requests have some unique labels of it own
 [all-issues]: https://github.com/apache/dolphinscheduler/issues
 [all-PRs]: https://github.com/apache/dolphinscheduler/pulls
 [gh-review-pr]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews
+

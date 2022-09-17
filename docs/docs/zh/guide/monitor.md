@@ -21,13 +21,13 @@
 - 主要是 DB 的健康状况
 
 ![db](../../../img/new_ui/dev/monitor/db.png)
- 
+
 ## 统计管理
 
 ### Statistics
 
 ![statistics](../../../img/new_ui/dev/monitor/statistics.png)
- 
+
 - 待执行命令数：统计 t_ds_command 表的数据
 - 执行失败的命令数：统计 t_ds_error_command 表的数据
 - 待运行任务数：统计 Zookeeper 中 task_queue 的数据

@@ -1,7 +1,8 @@
 # Commit Message 须知
 
 ### 前言
-  一个好的 commit message 是能够帮助其他的开发者（或者未来的开发者）快速理解相关变更的上下文，同时也可以帮助项目管理人员确定该提交是否适合包含在发行版中。但当我们在查看了很多开源项目的 commit log 后，发现一个有趣的问题，一部分开发者，代码质量很不错，但是 commit message 记录却比较混乱，当其他贡献者或者学习者在查看代码的时候，并不能通过 commit log 很直观的了解
+
+一个好的 commit message 是能够帮助其他的开发者（或者未来的开发者）快速理解相关变更的上下文，同时也可以帮助项目管理人员确定该提交是否适合包含在发行版中。但当我们在查看了很多开源项目的 commit log 后，发现一个有趣的问题，一部分开发者，代码质量很不错，但是 commit message 记录却比较混乱，当其他贡献者或者学习者在查看代码的时候，并不能通过 commit log 很直观的了解
 该提交前后变更的目的，正如 Peter Hutterer 所言：Re-establishing the context of a piece of code is wasteful. We can’t avoid it completely, so our efforts should go to reducing it as much as possible. Commit messages can do exactly that and as a result, a commit message shows whether a developer is a good collaborator. 因此，DolphinScheduler 结合其他社区以及 Apache 官方文档制定了该规约。
 
 ### Commit Message RIP
@@ -21,6 +22,7 @@ commit message 应该明确说明该提交解决了哪些问题（bug 修复、�
 Commit message 应该包括三个部分：Header，Body 和 Footer。其中，Header 是必需的，Body 和 Footer 可以省略。
 
 ##### header
+
 Header 部分只有一行，包括三个字段：type（必需）、scope（可选）和 subject（必需）。
 
 [DS-ISSUE编号][type] subject
@@ -57,7 +59,6 @@ Body 部分需要注意以下几点：
 
 * 语句最后不需要 ‘.’ (句号) 结尾
 
-
 ##### Footer
 
 Footer只适用于两种情况
@@ -71,17 +72,19 @@ Footer只适用于两种情况
 如果当前 commit 针对某个issue，那么可以在 Footer 部分关闭这个 issue,也可以一次关闭多个 issue 。
 
 ##### 举个例子
+
 [DS-001][docs-zh] add commit message
 
 * commit message RIP
-* build some conventions 
-* help the commit messages become clean and tidy 
-* help developers and release managers better track issues 
-and clarify the optimization in the version iteration
+* build some conventions
+* help the commit messages become clean and tidy
+* help developers and release managers better track issues
+  and clarify the optimization in the version iteration
 
 This closes #001
 
 ### 参考文档
+
 [提交消息格式](https://cwiki.apache.org/confluence/display/GEODE/Commit+Message+Format)
 
 [On commit messages-Peter Hutterer](http://who-t.blogspot.com/2009/12/on-commit-messages.html)

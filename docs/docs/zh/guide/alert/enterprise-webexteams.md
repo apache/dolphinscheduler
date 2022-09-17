@@ -9,16 +9,27 @@ WebexTeams的配置样例如下:
 ## 参数配置
 
 * botAccessToken
+
   > 在创建机器人时，获得的访问令牌
+
 * roomID
+
   > 接受消息的room ID(只支持一个ID)
+
 * toPersonId
+
   > 接受消息的用户ID(只支持一个ID)
+
 * toPersonEmail
+
   > 接受消息的用户邮箱(只支持一个邮箱)
+
 * atSomeoneInRoom
+
   > 如果消息目的地为room，被@人的用户邮箱，多个邮箱用英文逗号分隔
+
 * destination
+
   > 消息目的地，一条消息只支持一个目的地
 
 ## 创建一个机器人

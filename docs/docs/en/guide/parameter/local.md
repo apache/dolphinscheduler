@@ -61,7 +61,7 @@ You could get this value in downstream task using syntax `echo '${set_val_param}
 
 If you want to export parameters with bash variable instead of constants value, and then use them in downstream tasks,
 you could use `setValue` in your task, which more flexible such as you can get variable for exists local or HTTP resource.
-You can use syntax like 
+You can use syntax like
 
 ```shell
 lines_num=$(wget https://raw.githubusercontent.com/apache/dolphinscheduler/dev/README.md -q -O - | wc -l | xargs)

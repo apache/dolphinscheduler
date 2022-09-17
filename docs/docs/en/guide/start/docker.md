@@ -42,8 +42,8 @@ modify docker-compose's free memory up to 4 GB.
 
 - Mac：Click `Docker Desktop -> Preferences -> Resources -> Memory` modified it
 - Windows Docker Desktop：
-    - Hyper-V mode: Click `Docker Desktop -> Settings -> Resources -> Memory` modified it
-    - WSL 2 mode: see [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more detail.
+  - Hyper-V mode: Click `Docker Desktop -> Settings -> Resources -> Memory` modified it
+  - WSL 2 mode: see [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more detail.
 
 After complete the configuration, we can get the `docker-compose.yaml` file from [download page](/en-us/download/download.html)
 form its source package, and make sure you get the right version. After download the package, you can run the commands as below.
@@ -70,7 +70,6 @@ $ docker-compose --profile all up -d
 
 [Using docker-compose to start server](#using-docker-compose-to-start-server) will create new a database and the ZooKeeper
 container when it up. You could start DolphinScheduler server separately if you want to reuse your exists services.
-
 
 ```shell
 $ DOLPHINSCHEDULER_VERSION=<version>

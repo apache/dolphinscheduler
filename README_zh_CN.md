@@ -1,11 +1,10 @@
 Dolphin Scheduler Official Website
 [dolphinscheduler.apache.org](https://dolphinscheduler.apache.org)
-============
+==================================================================
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/dolphinscheduler/branch/dev)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
-
 
 [![Stargazers over time](https://starchart.cc/apache/dolphinscheduler.svg)](https://starchart.cc/apache/dolphinscheduler)
 
@@ -18,20 +17,20 @@ Dolphin Scheduler Official Website
 
 其主要目标如下：
 
- - 以DAG图的方式将Task按照任务的依赖关系关联起来，可实时可视化监控任务的运行状态
- - 支持丰富的任务类型：Shell、MR、Spark、SQL(mysql、postgresql、hive、sparksql)、Python、Sub_Process、Procedure等
- - 支持工作流定时调度、依赖调度、手动调度、手动暂停/停止/恢复，同时支持失败重试/告警、从指定节点恢复失败、Kill任务等操作
- - 支持工作流优先级、任务优先级及任务的故障转移及任务超时告警/失败
- - 支持工作流全局参数及节点自定义参数设置
- - 支持资源文件的在线上传/下载，管理等，支持在线文件创建、编辑
- - 支持任务日志在线查看及滚动、在线下载日志等
- - 实现集群HA，通过Zookeeper实现Master集群和Worker集群去中心化
- - 支持对`Master/Worker` cpu load，memory，cpu在线查看
- - 支持工作流运行历史树形/甘特图展示、支持任务状态统计、流程状态统计
- - 支持补数
- - 支持多租户
- - 支持国际化
- - 还有更多等待伙伴们探索
+- 以DAG图的方式将Task按照任务的依赖关系关联起来，可实时可视化监控任务的运行状态
+- 支持丰富的任务类型：Shell、MR、Spark、SQL(mysql、postgresql、hive、sparksql)、Python、Sub_Process、Procedure等
+- 支持工作流定时调度、依赖调度、手动调度、手动暂停/停止/恢复，同时支持失败重试/告警、从指定节点恢复失败、Kill任务等操作
+- 支持工作流优先级、任务优先级及任务的故障转移及任务超时告警/失败
+- 支持工作流全局参数及节点自定义参数设置
+- 支持资源文件的在线上传/下载，管理等，支持在线文件创建、编辑
+- 支持任务日志在线查看及滚动、在线下载日志等
+- 实现集群HA，通过Zookeeper实现Master集群和Worker集群去中心化
+- 支持对`Master/Worker` cpu load，memory，cpu在线查看
+- 支持工作流运行历史树形/甘特图展示、支持任务状态统计、流程状态统计
+- 支持补数
+- 支持多租户
+- 支持国际化
+- 还有更多等待伙伴们探索
 
 ## 系统部分截图
 

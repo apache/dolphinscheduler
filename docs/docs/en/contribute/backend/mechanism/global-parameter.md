@@ -59,3 +59,4 @@ Assign the parameters with matching values to varPool (List, which contains the 
 
 * Format the varPool as json and pass it to master.
 * The parameters that are OUT would be written into the localParam after the master has received the varPool.
+

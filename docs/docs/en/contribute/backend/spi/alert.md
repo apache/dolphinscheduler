@@ -6,7 +6,7 @@ DolphinScheduler is undergoing a microkernel + plug-in architecture change. All 
 
 For alarm-related codes, please refer to the `dolphinscheduler-alert-api` module. This module defines the extension interface of the alarm plug-in and some basic codes. When we need to realize the plug-inization of related functions, it is recommended to read the code of this block first. Of course, it is recommended that you read the document. This will reduce a lot of time, but the document There is a certain degree of lag. When the document is missing, it is recommended to take the source code as the standard (if you are interested, we also welcome you to submit related documents). In addition, we will hardly make changes to the extended interface (excluding new additions) , Unless there is a major structural adjustment, there is an incompatible upgrade version, so the existing documents can generally be satisfied.
 
-We use the native JAVA-SPI, when you need to extend, in fact, you only need to pay attention to the extension of the `org.apache.dolphinscheduler.alert.api.AlertChannelFactory` interface, the underlying logic such as plug-in loading, and other kernels have been implemented, Which makes our development more focused and simple. 
+We use the native JAVA-SPI, when you need to extend, in fact, you only need to pay attention to the extension of the `org.apache.dolphinscheduler.alert.api.AlertChannelFactory` interface, the underlying logic such as plug-in loading, and other kernels have been implemented, Which makes our development more focused and simple.
 
 In additional, the `AlertChannelFactory` extends from `PrioritySPI`, this means you can set the plugin priority, when you have two plugin has the same name, you can customize the priority by override the `getIdentify` method. The high priority plugin will be load, but if you have two plugin with the same name and same priority, the server will throw `IllegalArgumentException` when load the plugin.
 
@@ -26,8 +26,8 @@ If you don't care about its internal design, but simply want to know how to deve
 
   This module is currently a plug-in provided by us, and now we have supported dozens of plug-ins, such as Email, DingTalk, Script, etc.
 
-
 #### Alert SPI Main class information.
+
 AlertChannelFactory
 Alarm plug-in factory interface. All alarm plug-ins need to implement this interface. This interface is used to define the name of the alarm plug-in and the required parameters. The create method is used to create a specific alarm plug-in instance.
 
@@ -56,36 +56,40 @@ The specific design of alert_spi can be seen in the issue: [Alert Plugin Design]
 
 * Email
 
-     Email alert notification
+  Email alert notification
 
 * DingTalk
 
-     Alert for DingTalk group chat bots
-  
-     Related parameter configuration can refer to the DingTalk robot document.
+  Alert for DingTalk group chat bots
+
+  Related parameter configuration can refer to the DingTalk robot document.
 
 * EnterpriseWeChat
 
-     EnterpriseWeChat alert notifications
+  EnterpriseWeChat alert notifications
 
-     Related parameter configuration can refer to the EnterpriseWeChat robot document.
+  Related parameter configuration can refer to the EnterpriseWeChat robot document.
 
 * Script
 
-     We have implemented a shell script for alerting. We will pass the relevant alert parameters to the script and you can implement your alert logic in the shell. This is a good way to interface with internal alerting applications.
+  We have implemented a shell script for alerting. We will pass the relevant alert parameters to the script and you can implement your alert logic in the shell. This is a good way to interface with internal alerting applications.
 
 * SMS
 
-     SMS alerts
+  SMS alerts
+
 * FeiShu
 
   FeiShu alert notification
+
 * Slack
 
   Slack alert notification
+
 * PagerDuty
 
   PagerDuty alert notification
+
 * WebexTeams
 
   WebexTeams alert notification
@@ -95,9 +99,10 @@ The specific design of alert_spi can be seen in the issue: [Alert Plugin Design]
 * Telegram
 
   Telegram alert notification
-  
+
   Related parameter configuration can refer to the Telegram document.
 
 * Http
 
   We have implemented a Http script for alerting. And calling most of the alerting plug-ins end up being Http requests, if we not support your alert plug-in yet, you can use Http to realize your alert login. Also welcome to contribute your common plug-ins to the community :)
+

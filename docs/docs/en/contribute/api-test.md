@@ -10,7 +10,6 @@ In contrast, API testing focuses on whether a complete operation chain can be co
 
 For example, the API test of the tenant management interface focuses on whether users can log in normally; If the login fails, whether the error message can be displayed correctly. After logging in, you can perform tenant management operations through the sessionid you carry.
 
-
 ## API Test
 
 ### API-Pages
@@ -49,7 +48,6 @@ In addition, during the testing process, the interface are not requested directl
 
 On the login page, only the input parameter specification of the interface request is defined. For the output parameter of the interface request, only the unified basic response structure is defined. The data actually returned by the interface is tested in the actual test case. Whether the input and output of main test interfaces can meet the requirements of test cases.
 
-
 ### API-Cases
 
 The following is an example of a tenant management test. As explained earlier, we use docker-compose for deployment, so for each test case, we need to import the corresponding file in the form of an annotation.
@@ -86,7 +84,7 @@ https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/do
 
 ## Supplements
 
-When running API tests locally, First, you need to start the local service, you can refer to this page: 
+When running API tests locally, First, you need to start the local service, you can refer to this page:
 [development-environment-setup](./development-environment-setup.md)
 
 When running API tests locally, the `-Dlocal=true` parameter can be configured to connect locally and facilitate changes to the UI.

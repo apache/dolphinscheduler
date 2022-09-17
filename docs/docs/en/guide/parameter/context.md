@@ -49,7 +49,7 @@ When the SHELL task is completed, we can use the output passed upstream as the q
 
 > Note: If the result of the SQL node has only one row, one or multiple fields, the name of the `prop` needs to be the same as the field name. The data type can choose structure except `LIST`. The parameter assigns the value according to the same column name in the SQL query result.
 >
->If the result of the SQL node has multiple rows, one or more fields, the name of the `prop` needs to be the same as the field name. Choose the data type structure as `LIST`, and the SQL query result will be converted to `LIST<VARCHAR>`, and forward to convert to JSON as the parameter value.
+> If the result of the SQL node has multiple rows, one or more fields, the name of the `prop` needs to be the same as the field name. Choose the data type structure as `LIST`, and the SQL query result will be converted to `LIST<VARCHAR>`, and forward to convert to JSON as the parameter value.
 
 #### Save the workflow and set the global parameters
 

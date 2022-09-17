@@ -6,7 +6,7 @@ This section describes the one-click deployment of high availability DolphinSche
 
 * Available Rainbond cloud native application management platform is a prerequisite，please refer to the official `Rainbond` documentation [Rainbond Quick install](https://www.rainbond.com/docs/quick-start/quick-install)
 
-## DolphinScheduler Cluster One-click Deployment 
+## DolphinScheduler Cluster One-click Deployment
 
 * Logging in and accessing the built-in open source app store, search the keyword `dolphinscheduler` to find the DolphinScheduler App.
 
@@ -14,12 +14,12 @@ This section describes the one-click deployment of high availability DolphinSche
 
 * Click `install` on the right side of DolphinScheduler to go to the installation page. Fill in the corresponding information and click `OK` to start the installation. You will get automatically redirected to the application view.
 
-| Select item  | Description                          |
-| ------------ | ------------------------------------ |
+| Select item  |             Description             |
+|--------------|-------------------------------------|
 | Team name    | user workspace，Isolate by namespace |
-| Cluster name | select kubernetes cluster            |
-| Select app   | select application                   |
-| app version  | select DolphinScheduler version      |
+| Cluster name | select kubernetes cluster           |
+| Select app   | select application                  |
+| app version  | select DolphinScheduler version     |
 
 ![](../../../../img/rainbond/install-dolphinscheduler.png)
 
@@ -42,6 +42,7 @@ Take `worker` as an example: enter the `component -> Telescopic` page, and set t
 To verify `worker` node, enter `DolphinScheduler UI -> Monitoring -> Worker` page to view detailed node information.
 
 ![](../../../../img/rainbond/monitor-dolphinscheduler.png)
+
 ## Configuration file
 
 API and Worker Services share the configuration file `/opt/dolphinscheduler/conf/common.properties`. To modify the configurations, you only need to modify that of the API service.
@@ -60,5 +61,7 @@ Take `DataX` as an example:
    * FILE_PATH：/opt/soft
    * LOCK_PATH：/opt/soft
 3. Update component, the plug-in `Datax` will be downloaded automatically and decompress to `/opt/soft`
-![](../../../../img/rainbond/plugin.png)
+   ![](../../../../img/rainbond/plugin.png)
+
 ---
+

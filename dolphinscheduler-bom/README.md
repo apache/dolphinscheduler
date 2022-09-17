@@ -1,7 +1,9 @@
 # Introduction
-The `dolphinscheduler-bom` module is used to manage the version of third part dependencies. If you want to import 
-`dolphinscheduler-xx` to your project, you need to import `dolphinscheduler-bom` together by below way, 
+
+The `dolphinscheduler-bom` module is used to manage the version of third part dependencies. If you want to import
+`dolphinscheduler-xx` to your project, you need to import `dolphinscheduler-bom` together by below way,
 this can help you to manage the version.
+
 ```xml
 <dependencyManagement>
     <dependencies>
@@ -15,5 +17,6 @@ this can help you to manage the version.
     </dependencies>
 </dependencyManagement>
 ```
-If you want to override the version defined in `dolphinscheduler-bom` you can directly add the version at your 
+
+If you want to override the version defined in `dolphinscheduler-bom` you can directly add the version at your
 module's `dependencyManagement`.

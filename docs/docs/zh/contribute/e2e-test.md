@@ -1,4 +1,5 @@
 # DolphinScheduler — E2E 自动化测试
+
 ## 一、前置知识：
 
 ### 1、E2E 测试与单元测试的区别
@@ -76,31 +77,31 @@ public final class LoginPage extends NavBarPage {
 在安全中心页面（SecurityPage）提供了 goToTab 方法，用于测试对应侧栏的跳转，主要包括：租户管理（TenantPage）、用户管理（UserPage）、工作组管理（WorkerGroupPage）和队列管理（QueuePage）。这些页面的实现方式同理，主要测试表单的输入、增加和删除按钮是否能够返回出对应的页面。
 
 ```java
- public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
-        if (tab == TenantPage.class) {
-            WebElement menuTenantManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menuTenantManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menuTenantManageElement);
-            return tab.cast(new TenantPage(driver));
-        }
-        if (tab == UserPage.class) {
-            WebElement menUserManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menUserManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menUserManageElement);
-            return tab.cast(new UserPage(driver));
-        }
-        if (tab == WorkerGroupPage.class) {
-            WebElement menWorkerGroupManageElement = new WebDriverWait(driver, 60)
-                    .until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menWorkerGroupManageElement);
-            return tab.cast(new WorkerGroupPage(driver));
-        }
-        if (tab == QueuePage.class) {
-            menuQueueManage().click();
-            return tab.cast(new QueuePage(driver));
-        }
-        throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
-    }
+public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
+       if (tab == TenantPage.class) {
+           WebElement menuTenantManageElement = new WebDriverWait(driver, 60)
+                   .until(ExpectedConditions.elementToBeClickable(menuTenantManage));
+           ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menuTenantManageElement);
+           return tab.cast(new TenantPage(driver));
+       }
+       if (tab == UserPage.class) {
+           WebElement menUserManageElement = new WebDriverWait(driver, 60)
+                   .until(ExpectedConditions.elementToBeClickable(menUserManage));
+           ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menUserManageElement);
+           return tab.cast(new UserPage(driver));
+       }
+       if (tab == WorkerGroupPage.class) {
+           WebElement menWorkerGroupManageElement = new WebDriverWait(driver, 60)
+                   .until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
+           ((JavascriptExecutor)driver).executeScript("arguments[0].click();", menWorkerGroupManageElement);
+           return tab.cast(new WorkerGroupPage(driver));
+       }
+       if (tab == QueuePage.class) {
+           menuQueueManage().click();
+           return tab.cast(new QueuePage(driver));
+       }
+       throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
+   }
 ```
 
 ![SecurityPage](../../../img/e2e-test/SecurityPage.png)
@@ -145,14 +146,14 @@ public final class LoginPage extends NavBarPage {
 使用 Selenium 所提供的 RemoteWebDriver 来加载浏览器。在每个测试案例开始之前都需要进行一些准备工作。比如：登录用户、跳转到对应的页面（根据具体的测试案例而定）。
 
 ```java
-    @BeforeAll
-    public static void setup() {
-        new LoginPage(browser)
-                .login("admin", "dolphinscheduler123") // 登录进入租户界面
-                .goToNav(SecurityPage.class) // 安全中心
-                .goToTab(TenantPage.class)
-        ;
-    }
+@BeforeAll
+public static void setup() {
+    new LoginPage(browser)
+            .login("admin", "dolphinscheduler123") // 登录进入租户界面
+            .goToNav(SecurityPage.class) // 安全中心
+            .goToTab(TenantPage.class)
+    ;
+}
 ```
 
 在完成准备工作之后，就是正式的测试案例编写。我们使用 @Order() 注解的形式，用于模块化，确认测试顺序。在进行测试之后，使用断言来判断测试是否成功，如果断言返回 true，则表示创建租户成功。可参考创建租户的测试代码：
