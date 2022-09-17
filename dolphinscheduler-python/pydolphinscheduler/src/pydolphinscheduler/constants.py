@@ -58,6 +58,7 @@ class TaskType(str):
     SPARK = "SPARK"
     MR = "MR"
     SAGEMAKER = "SAGEMAKER"
+    OPENMLDB = "OPENMLDB"
     PYTORCH = "PYTORCH"
 
 
