@@ -149,6 +149,7 @@
         SELECT
         c.code AS process_definition_code
         ,c.name AS process_definition_name
+        ,c.version as process_definition_version
         ,a.code AS task_definition_code
         ,a.task_params
         FROM
