@@ -30,9 +30,11 @@ class OSS(ResourcePlugin, Bucket):
 
     :param prefix: A string representing the prefix of OSS.
     :param access_key_id: A string representing the ID of AccessKey for AliCloud OSS
+
     to access private files.
 
     :param access_key_secret: A string representing the secret of AccessKey for AliCloud OSS
+
     to access private files.
     """
 

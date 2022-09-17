@@ -31,9 +31,11 @@ class S3(ResourcePlugin, Bucket):
 
     :param prefix: A string representing the prefix of S3.
     :param access_key_id: A string representing the ID of AccessKey for Amazon S3
+
     to access private files.
 
     :param access_key_secret: A string representing the secret of AccessKey for Amazon S3
+
     to access private files.
     """
 
