@@ -136,7 +136,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -2903,8 +2902,10 @@ public class ProcessServiceImpl implements ProcessService {
         //try to get taskGroup
         int count = taskGroupMapper.selectAvailableCountById(groupId);
         if (count == 1 && robTaskGroupResource(taskGroupQueue)) {
+            logger.info("Success acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskId, groupId);
             return true;
         }
+        logger.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskId, groupId);
         this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
         return false;
     }
@@ -2919,11 +2920,13 @@ public class ProcessServiceImpl implements ProcessService {
                                                                     taskGroupQueue.getId(),
                                                                     TaskGroupQueueStatus.WAIT_QUEUE.getCode());
         if (affectedCount > 0) {
+            logger.info("Success rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(), taskGroupQueue.getId());
             taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
             this.taskGroupQueueMapper.updateById(taskGroupQueue);
             this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
             return true;
         }
+        logger.info("Failed to rob taskGroup, taskInstanceId: {}, taskGroupId: {}", taskGroupQueue.getTaskId(), taskGroupQueue.getId());
         return false;
     }
 
@@ -2945,26 +2948,31 @@ public class ProcessServiceImpl implements ProcessService {
 
         TaskGroup taskGroup;
         TaskGroupQueue thisTaskGroupQueue;
+        logger.info("Begin to release task group: {}", taskInstance.getTaskGroupId());
         try {
             do {
                 taskGroup = taskGroupMapper.selectById(taskInstance.getTaskGroupId());
                 if (taskGroup == null) {
+                    logger.error("The taskGroup is null, taskGroupId: {}", taskInstance.getTaskGroupId());
                     return null;
                 }
                 thisTaskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
                 if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.RELEASE) {
+                    logger.info("The taskGroupQueue's status is release, taskInstanceId: {}", taskInstance.getId());
                     return null;
                 }
             } while (thisTaskGroupQueue.getForceStart() == Flag.NO.getCode()
-                && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(),
-                                                            taskGroup.getUseSize(),
-                                                            thisTaskGroupQueue.getId(),
-                                                            TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
+                    && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(),
+                    taskGroup.getUseSize(),
+                    thisTaskGroupQueue.getId(),
+                    TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) != 1);
         } catch (Exception e) {
             logger.error("release the task group error", e);
             return null;
         }
-        logger.info("updateTask:{}", taskInstance.getName());
+        logger.info("Finished to release task group, taskGroupId: {}", taskInstance.getTaskGroupId());
+
+        logger.info("Begin to release task group queue, taskGroupId: {}", taskInstance.getTaskGroupId());
         changeTaskGroupQueueStatus(taskInstance.getId(), TaskGroupQueueStatus.RELEASE);
         TaskGroupQueue taskGroupQueue;
         do {
@@ -2973,11 +2981,13 @@ public class ProcessServiceImpl implements ProcessService {
                                                                                     Flag.NO.getCode(),
                                                                                     Flag.NO.getCode());
             if (taskGroupQueue == null) {
+                logger.info("The taskGroupQueue is null, taskGroup: {}", taskGroup.getId());
                 return null;
             }
         } while (this.taskGroupQueueMapper.updateInQueueCAS(Flag.NO.getCode(),
-                                                            Flag.YES.getCode(),
-                                                            taskGroupQueue.getId()) != 1);
+                Flag.YES.getCode(),
+                taskGroupQueue.getId()) != 1);
+        logger.info("Finished to release task group queue: taskGroupId: {}", taskInstance.getTaskGroupId());
         return this.taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
     }
 

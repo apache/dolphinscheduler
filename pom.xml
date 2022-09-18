@@ -1240,6 +1240,7 @@
     </dependencies>
 
     <modules>
+        <module>dolphinscheduler-bom</module>
         <module>dolphinscheduler-alert</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-registry</module>

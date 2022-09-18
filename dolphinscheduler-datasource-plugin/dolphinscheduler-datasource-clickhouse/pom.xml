@@ -65,8 +65,6 @@
             <version>${clickhouse.jdbc.version}</version>
         </dependency>
 
-
-
         <dependency>
             <groupId>org.lz4</groupId>
             <artifactId>lz4-java</artifactId>
