@@ -130,12 +130,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-plugin</artifactId>
+                <artifactId>dolphinscheduler-alert-plugins</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-plugin</artifactId>
+                <artifactId>dolphinscheduler-registry-plugins</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
