@@ -24,6 +24,12 @@ from pydolphinscheduler.tasks.dvc import DVCDownload, DVCInit, DVCUpload
 from pydolphinscheduler.tasks.flink import Flink
 from pydolphinscheduler.tasks.http import Http
 from pydolphinscheduler.tasks.map_reduce import MR
+from pydolphinscheduler.tasks.mlflow import (
+    MLflowModels,
+    MLFlowProjectsAutoML,
+    MLFlowProjectsBasicAlgorithm,
+    MLFlowProjectsCustom,
+)
 from pydolphinscheduler.tasks.openmldb import OpenMLDB
 from pydolphinscheduler.tasks.procedure import Procedure
 from pydolphinscheduler.tasks.python import Python
@@ -47,6 +53,10 @@ __all__ = [
     "Http",
     "MR",
     "OpenMLDB",
+    "MLFlowProjectsBasicAlgorithm",
+    "MLFlowProjectsCustom",
+    "MLFlowProjectsAutoML",
+    "MLflowModels",
     "Procedure",
     "Python",
     "Pytorch",

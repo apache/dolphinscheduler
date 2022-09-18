@@ -15,34 +15,28 @@
    specific language governing permissions and limitations
    under the License.
 
-Tasks
-=====
+MLflow
+=========
 
-In this section 
 
-.. toctree::
-   :maxdepth: 1
-   
-   func_wrap
-   shell
-   sql
-   python
-   http
+A MLflow task type's example and dive into information of **PyDolphinScheduler**.
 
-   switch
-   condition
-   dependent
+Example
+-------
 
-   spark
-   flink
-   map_reduce
-   procedure
+.. literalinclude:: ../../../src/pydolphinscheduler/examples/task_mlflow_example.py
+   :start-after: [start workflow_declare]
+   :end-before: [end workflow_declare]
 
-   datax
-   sub_process
+Dive Into
+---------
 
-   sagemaker
-   mlflow
-   openmldb
-   pytorch
-   dvc
+.. automodule:: pydolphinscheduler.tasks.mlflow
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/mlflow.yaml
+   :start-after: # under the License.
+   :language: yaml
