@@ -941,8 +941,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private void processDefinitionUsedInOtherTaskValid(ProcessDefinition processDefinition) {
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            logger.warn("Process definition can not be deleted due to {}, processDefinitionCode:{}.",
-                    ReleaseState.ONLINE.getDescp(), processDefinition.getCode());
             throw new ServiceException(Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
         }
 
@@ -950,8 +948,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessInstance> processInstances = processInstanceService
                 .queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            logger.warn("Process definition can not be deleted because there are {} executing process instances, processDefinitionCode:{}",
-                    processInstances.size(), processDefinition.getCode());
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processInstances.size());
         }
 
@@ -963,8 +959,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     .map(task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(),
                             task.getTaskName()))
                     .collect(Collectors.joining(Constants.COMMA));
-            logger.warn("Process definition can not be deleted due to being referenced by other tasks:{}, processDefinitionCode:{}",
-                    taskDepDetail, processDefinition.getCode());
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, taskDepDetail);
         }
     }
@@ -989,7 +983,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // Determine if the login user is the owner of the process definition
         if (loginUser.getId() != processDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
-            logger.warn("User does not have permission for process definition, userId:{}, processDefinitionCode:{}.", loginUser.getId(), code);
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
@@ -1001,13 +994,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
                 int delete = scheduleMapper.deleteById(scheduleObj.getId());
                 if (delete == 0) {
-                    logger.error("Delete schedule of process definition error, processDefinitionCode:{}, scheduleId:{}.", code, scheduleObj.getId());
                     throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
                 }
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
-                logger.warn("Process definition can not be deleted due to schedule {}, processDefinitionCode:{}, scheduleId:{}.",
-                        ReleaseState.ONLINE.getDescp(), processDefinition.getCode(), scheduleObj.getId());
                 throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleObj.getId());
             }
         }

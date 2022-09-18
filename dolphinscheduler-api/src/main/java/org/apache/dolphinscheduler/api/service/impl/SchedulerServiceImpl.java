@@ -691,12 +691,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void deleteSchedulesById(User loginUser, Integer scheduleId) {
         Schedule schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) {
-            logger.error("Schedule does not exist, scheduleId:{}.", scheduleId);
             throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
         }
         // check schedule is already online
         if (schedule.getReleaseState() == ReleaseState.ONLINE) {
-            logger.warn("Only {} state schedule can be deleted, scheduleId:{}.", ReleaseState.OFFLINE.getDescp(), scheduleId);
             throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleId);
         }
         // Determine if the login user is the owner of the schedule
