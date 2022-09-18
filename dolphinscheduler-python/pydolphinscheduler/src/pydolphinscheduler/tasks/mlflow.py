@@ -15,7 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Task shell."""
+"""Task mlflow."""
+from copy import deepcopy
+from typing import Dict, Optional
 
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task
@@ -48,7 +50,31 @@ DEFAULT_MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
 DEFAULT_VERSION = "master"
 
 
-class MLflowModels(Task):
+class BaseMLflow(Task):
+    """Base MLflow task."""
+
+    mlflow_task_type = None
+
+    _task_custom_attr = {
+        "mlflow_tracking_uri",
+        "mlflow_task_type",
+    }
+
+    _child_task_mlflow_attr = set()
+
+    def __init__(self, name: str, mlflow_tracking_uri: str, *args, **kwargs):
+        super().__init__(name, TaskType.MLFLOW, *args, **kwargs)
+        self.mlflow_tracking_uri = mlflow_tracking_uri
+
+    @property
+    def task_params(self) -> Dict:
+        """Return task params."""
+        self._task_custom_attr = deepcopy(self._task_custom_attr)
+        self._task_custom_attr.update(self._child_task_mlflow_attr)
+        return super().task_params
+
+
+class MLflowModels(BaseMLflow):
     """Task MLflow models object, declare behavior for MLflow models task to dolphinscheduler.
 
     Deploy machine learning models in diverse serving environments.
@@ -65,9 +91,7 @@ class MLflowModels(Task):
 
     mlflow_task_type = MLflowTaskType.MLFLOW_MODELS
 
-    _task_custom_attr = {
-        "mlflow_tracking_uri",
-        "mlflow_task_type",
+    _child_task_mlflow_attr = {
         "deploy_type",
         "deploy_model_key",
         "deploy_port",
@@ -79,17 +103,16 @@ class MLflowModels(Task):
         self,
         name: str,
         model_uri: str,
-        mlflow_tracking_uri: str = DEFAULT_MLFLOW_TRACKING_URI,
-        deploy_mode: str = MLflowDeployType.DOCKER,
-        port: int = 7000,
-        cpu_limit: float = 1.0,
-        memory_limit: str = "500M",
+        mlflow_tracking_uri: Optional[str] = DEFAULT_MLFLOW_TRACKING_URI,
+        deploy_mode: Optional[str] = MLflowDeployType.DOCKER,
+        port: Optional[int] = 7000,
+        cpu_limit: Optional[float] = 1.0,
+        memory_limit: Optional[str] = "500M",
         *args,
         **kwargs
     ):
         """Init mlflow models task."""
-        super().__init__(name, task_type=TaskType.MLFLOW, *args, **kwargs)
-        self.mlflow_tracking_uri = mlflow_tracking_uri
+        super().__init__(name, mlflow_tracking_uri, *args, **kwargs)
         self.deploy_type = deploy_mode.upper()
         self.deploy_model_key = model_uri
         self.deploy_port = port
@@ -97,7 +120,7 @@ class MLflowModels(Task):
         self.memory_limit = memory_limit
 
 
-class MLFlowProjectsCustom(Task):
+class MLFlowProjectsCustom(BaseMLflow):
     """Task MLflow projects object, declare behavior for MLflow Custom projects task to dolphinscheduler.
 
     :param name: task name
@@ -114,9 +137,7 @@ class MLFlowProjectsCustom(Task):
     mlflow_task_type = MLflowTaskType.MLFLOW_PROJECTS
     mlflow_job_type = MLflowJobType.CUSTOM_PROJECT
 
-    _task_custom_attr = {
-        "mlflow_tracking_uri",
-        "mlflow_task_type",
+    _child_task_mlflow_attr = {
         "mlflow_job_type",
         "experiment_name",
         "params",
@@ -128,23 +149,22 @@ class MLFlowProjectsCustom(Task):
         self,
         name: str,
         repository: str,
-        mlflow_tracking_uri: str = DEFAULT_MLFLOW_TRACKING_URI,
-        experiment_name: str = "",
-        parameters: str = "",
-        version: str = "master",
+        mlflow_tracking_uri: Optional[str] = DEFAULT_MLFLOW_TRACKING_URI,
+        experiment_name: Optional[str] = "",
+        parameters: Optional[str] = "",
+        version: Optional[str] = "master",
         *args,
         **kwargs
     ):
         """Init mlflow projects task."""
-        super().__init__(name, task_type=TaskType.MLFLOW, *args, **kwargs)
-        self.mlflow_tracking_uri = mlflow_tracking_uri
+        super().__init__(name, mlflow_tracking_uri, *args, **kwargs)
         self.mlflow_project_repository = repository
         self.experiment_name = experiment_name
         self.params = parameters
         self.mlflow_project_version = version
 
 
-class MLFlowProjectsAutoML(Task):
+class MLFlowProjectsAutoML(BaseMLflow):
     """Task MLflow projects object, declare behavior for AutoML task to dolphinscheduler.
 
     :param name: task name
@@ -160,9 +180,7 @@ class MLFlowProjectsAutoML(Task):
     mlflow_task_type = MLflowTaskType.MLFLOW_PROJECTS
     mlflow_job_type = MLflowJobType.AUTOML
 
-    _task_custom_attr = {
-        "mlflow_task_type",
-        "mlflow_tracking_uri",
+    _child_task_mlflow_attr = {
         "mlflow_job_type",
         "experiment_name",
         "model_name",
@@ -176,17 +194,16 @@ class MLFlowProjectsAutoML(Task):
         self,
         name: str,
         data_path: str,
-        automl_tool: str = "flaml",
-        mlflow_tracking_uri: str = DEFAULT_MLFLOW_TRACKING_URI,
-        experiment_name: str = "",
-        model_name: str = "",
-        parameters: str = "",
+        automl_tool: Optional[str] = "flaml",
+        mlflow_tracking_uri: Optional[str] = DEFAULT_MLFLOW_TRACKING_URI,
+        experiment_name: Optional[str] = "",
+        model_name: Optional[str] = "",
+        parameters: Optional[str] = "",
         *args,
         **kwargs
     ):
         """Init mlflow projects task."""
-        super().__init__(name, task_type=TaskType.MLFLOW, *args, **kwargs)
-        self.mlflow_tracking_uri = mlflow_tracking_uri
+        super().__init__(name, mlflow_tracking_uri, *args, **kwargs)
         self.data_path = data_path
         self.experiment_name = experiment_name
         self.model_name = model_name
@@ -195,7 +212,7 @@ class MLFlowProjectsAutoML(Task):
         self.register_model = bool(model_name)
 
 
-class MLFlowProjectsBasicAlgorithm(Task):
+class MLFlowProjectsBasicAlgorithm(BaseMLflow):
     """Task MLflow projects object, declare behavior for BasicAlgorithm task to dolphinscheduler.
 
     :param name: task name
@@ -210,12 +227,10 @@ class MLFlowProjectsBasicAlgorithm(Task):
 
     """
 
-    mlflow_task_type = MLflowTaskType.MLFLOW_PROJECTS
     mlflow_job_type = MLflowJobType.BASIC_ALGORITHM
+    mlflow_task_type = MLflowTaskType.MLFLOW_PROJECTS
 
-    _task_custom_attr = {
-        "mlflow_tracking_uri",
-        "mlflow_task_type",
+    _child_task_mlflow_attr = {
         "mlflow_job_type",
         "experiment_name",
         "model_name",
@@ -230,18 +245,17 @@ class MLFlowProjectsBasicAlgorithm(Task):
         self,
         name: str,
         data_path: str,
-        algorithm: str = "lightgbm",
-        mlflow_tracking_uri: str = DEFAULT_MLFLOW_TRACKING_URI,
-        experiment_name: str = "",
-        model_name: str = "",
-        parameters: str = "",
-        search_params: str = "",
+        algorithm: Optional[str] = "lightgbm",
+        mlflow_tracking_uri: Optional[str] = DEFAULT_MLFLOW_TRACKING_URI,
+        experiment_name: Optional[str] = "",
+        model_name: Optional[str] = "",
+        parameters: Optional[str] = "",
+        search_params: Optional[str] = "",
         *args,
         **kwargs
     ):
         """Init mlflow projects task."""
-        super().__init__(name, task_type=TaskType.MLFLOW, *args, **kwargs)
-        self.mlflow_tracking_uri = mlflow_tracking_uri
+        super().__init__(name, mlflow_tracking_uri, *args, **kwargs)
         self.data_path = data_path
         self.experiment_name = experiment_name
         self.model_name = model_name
