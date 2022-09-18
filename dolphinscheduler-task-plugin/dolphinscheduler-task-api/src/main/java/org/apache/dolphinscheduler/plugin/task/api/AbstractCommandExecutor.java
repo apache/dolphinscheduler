@@ -50,7 +50,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * rules for extracting application ID
      */
-    protected static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.APPLICATION_REGEX);
+    protected static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
     /**
      * rules for extracting Var Pool

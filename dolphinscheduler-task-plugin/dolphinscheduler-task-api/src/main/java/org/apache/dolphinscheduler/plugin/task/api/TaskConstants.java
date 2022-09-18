@@ -26,7 +26,7 @@ public class TaskConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
+    public static final String YARN_APPLICATION_REGEX = "application_\\d+_\\d+";
 
     public static final String SETVALUE_REGEX = "[\\$#]\\{setValue\\(([^)]*)\\)}";
 
