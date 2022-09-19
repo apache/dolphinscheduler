@@ -20,10 +20,38 @@ import { defineComponent, onMounted, PropType, ref, toRefs, watch } from 'vue'
 import { NInputNumber, NRadio, NRadioGroup, NSelect } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { ICrontabI18n } from '../types'
-import { isStr } from '../common'
+import { isStr, specificList } from '../common'
 import styles from '../index.module.scss'
 
 const props = {
+  timeMin: {
+    type: Number as PropType<number>,
+    default: 0
+  },
+  timeMax: {
+    type: Number as PropType<number>,
+    default: 60
+  },
+  intervalPerform: {
+    type: Number as PropType<number>,
+    default: 5
+  },
+  intervalStart: {
+    type: Number as PropType<number>,
+    default: 3
+  },
+  cycleStart: {
+    type: Number as PropType<number>,
+    default: 1
+  },
+  cycleEnd: {
+    type: Number as PropType<number>,
+    default: 1
+  },
+  timeSpecial: {
+    type: Number as PropType<number | string>,
+    default: 60
+  },
   timeValue: {
     type: String as PropType<string>,
     default: '*'
@@ -46,11 +74,11 @@ export default defineComponent({
 
     const timeRef = ref()
     const radioRef = ref()
-    const intervalStartRef = ref(0)
-    const intervalPerformRef = ref(0)
+    const intervalStartRef = ref(props.intervalStart)
+    const intervalPerformRef = ref(props.intervalPerform)
     const specificTimesRef = ref<Array<number>>([])
-    const cycleStartRef = ref(0)
-    const cycleEndRef = ref(0)
+    const cycleStartRef = ref(props.cycleStart)
+    const cycleEndRef = ref(props.cycleEnd)
 
     /**
      * Parse parameter value
@@ -73,8 +101,10 @@ export default defineComponent({
 
       // Positive integer (times)
       if (
-        ($timeVal.length === 1 && _.isInteger(parseInt($timeVal))) ||
-        ($timeVal.length === 2 && _.isInteger(parseInt($timeVal)))
+        ($timeVal.length === 1 ||
+          $timeVal.length === 2 ||
+          $timeVal.length === 4) &&
+        _.isInteger(parseInt($timeVal))
       ) {
         radioRef.value = 'specificTime'
         specificTimesRef.value = [parseInt($timeVal)]
@@ -232,9 +262,9 @@ export default defineComponent({
             <div class={styles['item-text']}>{t(this.timeI18n!.every)}</div>
             <div class={styles['number-input']}>
               <NInputNumber
-                defaultValue={0}
-                min={0}
-                max={59}
+                defaultValue={5}
+                min={this.timeMin}
+                max={this.timeMax}
                 v-model:value={this.intervalPerformRef}
                 onUpdateValue={this.onIntervalPerform}
               />
@@ -244,9 +274,9 @@ export default defineComponent({
             </div>
             <div class={styles['number-input']}>
               <NInputNumber
-                defaultValue={0}
-                min={0}
-                max={59}
+                defaultValue={3}
+                min={this.timeMin}
+                max={this.timeMax}
                 v-model:value={this.intervalStartRef}
                 onUpdateValue={this.onIntervalStart}
               />
@@ -261,7 +291,7 @@ export default defineComponent({
             <div class={styles['select-input']}>
               <NSelect
                 multiple
-                options={this.options}
+                options={specificList[this.timeSpecial]}
                 placeholder={t(this.timeI18n!.specificTimeTip)}
                 v-model:value={this.specificTimesRef}
                 onUpdateValue={this.onSpecificTimes}
@@ -275,9 +305,9 @@ export default defineComponent({
             <div>{t(this.timeI18n!.cycleFrom)}</div>
             <div class={styles['number-input']}>
               <NInputNumber
-                defaultValue={0}
-                min={0}
-                max={59}
+                defaultValue={1}
+                min={this.timeMin}
+                max={this.timeMax}
                 v-model:value={this.cycleStartRef}
                 onUpdateValue={this.onCycleStart}
               />
@@ -285,9 +315,9 @@ export default defineComponent({
             <div>{t(this.timeI18n!.to)}</div>
             <div class={styles['number-input']}>
               <NInputNumber
-                defaultValue={0}
-                min={0}
-                max={59}
+                defaultValue={1}
+                min={this.timeMin}
+                max={this.timeMax}
                 v-model:value={this.cycleEndRef}
                 onUpdateValue={this.onCycleEnd}
               />

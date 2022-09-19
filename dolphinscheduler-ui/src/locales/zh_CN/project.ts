@@ -43,6 +43,7 @@ export default {
     create_workflow: '创建工作流',
     import_workflow: '导入工作流',
     workflow_name: '工作流名称',
+    workflow_instance_name: '工作流实例名称',
     current_selection: '当前选择',
     online: '已上线',
     offline: '已下线',
