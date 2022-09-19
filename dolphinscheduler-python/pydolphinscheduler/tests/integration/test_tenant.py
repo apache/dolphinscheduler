@@ -63,11 +63,11 @@ def test_update_tenant():
     """Test update tenant from java gateway."""
     user = get_user()
     tenant = get_tenant(user_name=user.name)
-    tenant.update(code="test-code-updated", queue_id=1, description="test-description-updated")
+    tenant.update(user="admin", code="test-code-updated", queue_id=1, description="test-description-updated")
     tenant_ = Tenant(code=tenant.code)
     tenant_.get_tenant()
     assert tenant_.code == "test-code-updated"
-    assert tenant_.queue == 1
+    assert tenant_.queue == "queuePythonGateway"
 
 
 def test_delete_tenant():
