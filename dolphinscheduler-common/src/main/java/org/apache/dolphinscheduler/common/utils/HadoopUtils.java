@@ -71,6 +71,7 @@ import com.google.common.cache.LoadingCache;
 /**
  * hadoop utils
  * single instance
+ * By default, directory path does NOT end with '/'
  */
 public class HadoopUtils implements Closeable, StorageOperate {
 
@@ -185,7 +186,11 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @return DefaultFS
      */
     public String getDefaultFS() {
-        return getConfiguration().get(Constants.FS_DEFAULT_FS);
+        String defaultFS = getConfiguration().get(Constants.FS_DEFAULT_FS);
+        if (StringUtils.isBlank(defaultFS)) {
+            defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+        }
+        return defaultFS;
     }
 
     /**
@@ -271,12 +276,12 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
     @Override
     public String getResDir(String tenantCode) {
-        return getHdfsResDir(tenantCode);
+        return getHdfsResDir(tenantCode) + FOLDER_SEPARATOR;
     }
 
     @Override
     public String getUdfDir(String tenantCode) {
-        return getHdfsUdfDir(tenantCode);
+        return getHdfsUdfDir(tenantCode) + FOLDER_SEPARATOR;
     }
 
     /**
@@ -290,7 +295,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
      */
     @Override
     public boolean mkdir(String tenantCode, String hdfsPath) throws IOException {
-        return fs.mkdirs(new Path(hdfsPath));
+        return fs.mkdirs(new Path(addFolderSeparatorIfNotExisted(hdfsPath)));
     }
 
     @Override
@@ -321,6 +326,11 @@ public class HadoopUtils implements Closeable, StorageOperate {
      */
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
+//        if(!exists(dstPath))
+//        {
+//            fs.mkdirs(new Path(dstPath));
+//            logger.info("created the destination path: {}", dstPath);
+//        }
         return FileUtil.copy(fs, new Path(srcPath), fs, new Path(dstPath), deleteSource, overwrite, fs.getConf());
     }
 
@@ -439,8 +449,9 @@ public class HadoopUtils implements Closeable, StorageOperate {
     @Override
     public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws IOException {
         // TODO: Does listStatus truncate resultList if its size goes above certain threshold (like a 1000 in S3)
+        // TODO: add hdfs prefix  getFile
         List<StorageEntity> storageEntityList = new ArrayList<>();
-
+//        String defaultFsPrefix = getDefaultFS();
         try {
             FileStatus[] fileStatuses = fs.listStatus(new Path(path));
 
@@ -449,8 +460,10 @@ public class HadoopUtils implements Closeable, StorageOperate {
                 if (fileStatus.isDirectory()) {
                     // the path is a directory
                     String fullName = fileStatus.getPath().toString();
-                    String suffix = StringUtils.difference(path, fullName);
-                    String fileName = StringUtils.difference(defaultPath, fullName);
+                    fullName = addFolderSeparatorIfNotExisted(fullName);
+
+                    String suffix = StringUtils.difference( path, fullName);
+                    String fileName = StringUtils.difference( defaultPath, fullName);
 
                     storageEntityList.add(new StorageEntity.Builder()
                                     .alias(suffix)
@@ -471,7 +484,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
                     String[] aliasArr = fullName.split("/");
                     String alias = aliasArr[aliasArr.length - 1];
 
-                    String fileName = StringUtils.difference(defaultPath, fullName);
+                    String fileName = StringUtils.difference( defaultPath, fullName);
 
                     storageEntityList.add(new StorageEntity.Builder()
                             .alias(alias)
@@ -501,16 +514,18 @@ public class HadoopUtils implements Closeable, StorageOperate {
     public StorageEntity getFileStatus(String path, String prefix, String tenantCode, ResourceType type) throws IOException {
         try {
             FileStatus fileStatus = fs.getFileStatus(new Path(path));
-
+//            String defaultFsPrefix = getDefaultFS();
             String alias = "";
             String fileName = "";
+            String fullName = fileStatus.getPath().toString();
             if (fileStatus.isDirectory()) {
-                alias = findDirAlias(path);
-                fileName = StringUtils.difference(prefix, path);
+                fullName = addFolderSeparatorIfNotExisted(fullName);
+                alias = findDirAlias(fullName);
+                fileName = StringUtils.difference(  prefix, fullName);
             } else {
                 String[] aliasArr = fileStatus.getPath().toString().split("/");
                 alias = aliasArr[aliasArr.length - 1];
-                fileName = StringUtils.difference(prefix, fileStatus.getPath().toString());
+                fileName = StringUtils.difference(  prefix, fileStatus.getPath().toString());
             }
 
             return new StorageEntity.Builder()
@@ -521,7 +536,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
                     .description("")
                     .userName(tenantCode)
                     .type(type)
-                    .fullName(fileStatus.getPath().toString())
+                    .fullName(fullName)
                     .createTime(new Date(fileStatus.getModificationTime()))
                     .updateTime(new Date(fileStatus.getModificationTime()))
                     .build();
@@ -629,10 +644,12 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {
+        String defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+        defaultFS = defaultFS.endsWith("/") ? StringUtils.chop(defaultFS) : defaultFS;
         if (FOLDER_SEPARATOR.equals(RESOURCE_UPLOAD_PATH)) {
-            return "";
+            return defaultFS + "";
         } else {
-            return RESOURCE_UPLOAD_PATH;
+            return defaultFS + RESOURCE_UPLOAD_PATH;
         }
     }
 
@@ -908,5 +925,9 @@ public class HadoopUtils implements Closeable, StorageOperate {
         stringBuilder.append(myStr, secondLastIndex + 1, lastIndex + 1);
 
         return stringBuilder.toString();
+    }
+
+    private String addFolderSeparatorIfNotExisted(String fullName) {
+        return fullName.endsWith(FOLDER_SEPARATOR) ? fullName : fullName + FOLDER_SEPARATOR;
     }
 }

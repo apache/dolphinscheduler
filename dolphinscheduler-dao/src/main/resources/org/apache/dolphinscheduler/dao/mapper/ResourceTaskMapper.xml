@@ -26,6 +26,13 @@
         and type = #{type} limit 1
     </select>
 
+    <select id="selectResourceByFullName" resultType="org.apache.dolphinscheduler.dao.entity.ResourcesTask">
+        select
+        id, full_name, type
+        from t_ds_relation_resources_task
+        where full_name = #{fullName} limit 1
+    </select>
+
     <select id="selectBatchFullNames" resultType="java.lang.Integer">
         select
         id

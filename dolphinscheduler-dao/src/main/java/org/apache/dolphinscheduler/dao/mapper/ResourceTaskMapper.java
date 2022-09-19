@@ -14,6 +14,8 @@ public interface ResourceTaskMapper extends BaseMapper<ResourcesTask> {
     Integer existResourceByFullName(@Param("fullName") String fullName,
                                           @Param("type")ResourceType type);
 
+    ResourcesTask selectResourceByFullName(@Param("fullName") String fullName);
+
     int deleteIds(@Param("resIds")Integer[] resIds);
 
     List<Integer> selectBatchFullNames(@Param("fullNameArr") String[] fullNameArr,

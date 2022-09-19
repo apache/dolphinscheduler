@@ -75,6 +75,9 @@ import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 
+/**
+ * By default, directory path does end with '/'
+ */
 public class S3Utils implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(S3Utils.class);

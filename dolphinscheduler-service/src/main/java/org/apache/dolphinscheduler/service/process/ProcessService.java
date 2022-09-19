@@ -299,7 +299,5 @@ public interface ProcessService {
 
     public String findConfigYamlByName(String clusterName);
 
-    Integer createRelationTaskResourcesIfNotExist(String resourceFullName);
-
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 }

@@ -373,7 +373,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             existResource = storageOperate.exists(fullName);
         } catch (IOException e) {
-            logger.error("AmazonServiceException when checking resource: " + fullName);
+            logger.error("error occurred when checking resource: " + fullName);
         }
         return Boolean.TRUE.equals(existResource);
     }
@@ -445,6 +445,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String originFullName = resource.getFullName();
         String originResourceName = resource.getAlias();
 
+        // the format of hdfs folders in the implementation has a "/" at the very end, we need to remove it.
+        originFullName = originFullName.endsWith("/") ?  StringUtils.chop(originFullName) : originFullName;
+        name = name.endsWith("/") ?  StringUtils.chop(name) : name;
         // updated fullName
         String fullName = String.format(FORMAT_SS,
                 originFullName.substring(0, originFullName.lastIndexOf(FOLDER_SEPARATOR) + 1), name);
@@ -478,60 +481,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (file != null) {
             resource.setSize(file.getSize());
         }
-
-        // TODO: revise this part when modifying HDFS
-        // try {
-        // if (resource.isDirectory()) {
-        // List<Integer> childrenResource = listAllChildren(resource, false);
-        // if (CollectionUtils.isNotEmpty(childrenResource)) {
-        // String matcherFullName = Matcher.quoteReplacement(fullName);
-        // List<Resource> childResourceList;
-        // Integer[] childResIdArray = childrenResource.toArray(new Integer[childrenResource.size()]);
-        // List<Resource> resourceList = resourcesMapper.listResourceByIds(childResIdArray);
-        // childResourceList = resourceList.stream().map(t -> {
-        // t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
-        // t.setUpdateTime(now);
-        // return t;
-        // }).collect(Collectors.toList());
-        // resourcesMapper.batchUpdateResource(childResourceList);
-        //
-        // if (ResourceType.UDF.equals(resource.getType())) {
-        // List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(childResIdArray);
-        // if (CollectionUtils.isNotEmpty(udfFuncs)) {
-        // udfFuncs = udfFuncs.stream().map(t -> {
-        // t.setResourceName(t.getResourceName().replaceFirst(originFullName, matcherFullName));
-        // t.setUpdateTime(now);
-        // return t;
-        // }).collect(Collectors.toList());
-        // udfFunctionMapper.batchUpdateUdfFunc(udfFuncs);
-        // }
-        // }
-        // }
-        // } else if (ResourceType.UDF.equals(resource.getType())) {
-        // List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(new Integer[]{resourceId});
-        // if (CollectionUtils.isNotEmpty(udfFuncs)) {
-        // udfFuncs = udfFuncs.stream().map(t -> {
-        // t.setResourceName(fullName);
-        // t.setUpdateTime(now);
-        // return t;
-        // }).collect(Collectors.toList());
-        // udfFunctionMapper.batchUpdateUdfFunc(udfFuncs);
-        // }
-        //
-        // }
-        //
-        // putMsg(result, Status.SUCCESS);
-        // Map<String, Object> resultMap = new HashMap<>();
-        // for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-        // if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
-        // resultMap.put(entry.getKey().toString(), entry.getValue());
-        // }
-        // }
-        // result.setData(resultMap);
-        // } catch (Exception e) {
-        // logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
-        // throw new ServiceException(Status.UPDATE_RESOURCE_ERROR);
-        // }
 
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name) && file == null) {
@@ -569,7 +518,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } catch (Exception e) {
             logger.error(MessageFormat.format(" copy {0} -> {1} fail", originFullName, destHdfsFileName), e);
             putMsg(result, Status.HDFS_COPY_FAIL);
-            throw new ServiceException(Status.HDFS_COPY_FAIL);
+            throw new ServiceException(MessageFormat.format(
+                    Status.HDFS_COPY_FAIL.getMsg(), originFullName, destHdfsFileName ));
         }
 
         // TODO: now update db info
@@ -651,13 +601,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Result<Object> result = new Result<>();
 
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
-//        Set<Integer> resourcesIds = resourcePermissionCheckService
-//                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
-//        if (resourcesIds.isEmpty()) {
-//            result.setData(pageInfo);
-//            putMsg(result, Status.SUCCESS);
-//            return result;
-//        }
 
         int tenantId = loginUser.getTenantId();
         Tenant tenant = tenantMapper.queryById(tenantId);
@@ -680,19 +623,26 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (isAdmin(loginUser) && "".equals(fullName)) {
             // list all tenants' resources to admin users in the root directory
-            List<Tenant> tenantList = tenantMapper.selectList(null);
-            for (Tenant tenantEntity : tenantList) {
-                defaultPath = storageOperate.getResDir(tenantEntity.getTenantCode());
-                if (type.equals(ResourceType.UDF)) {
-                    defaultPath = storageOperate.getUdfDir(tenantEntity.getTenantCode());
-                }
-                try {
-                    resourcesList.addAll(storageOperate.listFilesStatus(defaultPath, defaultPath,
-                            tenantEntity.getTenantCode(), type));
-                } catch (Exception e) {
-                    logger.error(e.getMessage() + " Resource path: {}", defaultPath, e);
-                    putMsg(result, Status.RESOURCE_NOT_EXIST);
-                    throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", defaultPath));
+            List<User> userList = userMapper.selectList(null);
+            Set<String> visitedTenantEntityCode = new HashSet<>();
+            for (User userEntity : userList) {
+                String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
+                    defaultPath = storageOperate.getResDir(tenantEntityCode);
+                    if (type.equals(ResourceType.UDF)) {
+                        defaultPath = storageOperate.getUdfDir(tenantEntityCode);
+                    }
+                    try {
+                        resourcesList.addAll(storageOperate.listFilesStatus(defaultPath, defaultPath,
+                                tenantEntityCode, type));
+
+                        visitedTenantEntityCode.add(tenantEntityCode);
+                    } catch (Exception e) {
+                        logger.error(e.getMessage() + " Resource path: {}", defaultPath, e);
+                        putMsg(result, Status.RESOURCE_NOT_EXIST);
+                        throw new ServiceException(String.format(e.getMessage() +
+                                " make sure resource path: %s exists in hdfs", defaultPath));
+                    }
                 }
             }
         } else {
@@ -710,7 +660,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             } catch (Exception e) {
                 logger.error(e.getMessage() + " Resource path: {}", fullName, e);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
-                throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
+                throw new ServiceException(String.format(e.getMessage() +
+                        " make sure resource path: %s exists in hdfs", defaultPath));
             }
         }
 
@@ -837,13 +788,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 Set<String> visitedTenantEntityCode = new HashSet<>();
                 for (User userEntity : userList) {
                     String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
-                    defaultPath = storageOperate.getResDir(tenantEntityCode);
-                    if (type.equals(ResourceType.UDF)) {
-                        defaultPath = storageOperate.getUdfDir(tenantEntityCode);
+                    if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
+                        defaultPath = storageOperate.getResDir(tenantEntityCode);
+                        if (type.equals(ResourceType.UDF)) {
+                            defaultPath = storageOperate.getUdfDir(tenantEntityCode);
+                        }
+                        resourcesList.addAll(storageOperate.listFilesStatusRecursively(defaultPath, defaultPath,
+                                tenantEntityCode, type));
+                        visitedTenantEntityCode.add(tenantEntityCode);
                     }
-                    resourcesList.addAll(storageOperate.listFilesStatusRecursively(defaultPath, defaultPath,
-                            tenantEntityCode, type));
-                    visitedTenantEntityCode.add(tenantEntityCode);
                 }
             } else {
                 defaultPath = storageOperate.getResDir(tenantCode);
@@ -979,9 +932,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
 
         String[] allChildrenFullNameArray = allChildren.stream().toArray(String[]::new);
-        resourcesIdNeedToDeleteSet.addAll(
-                resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray, ResourceType.FILE));
-
+        if (allChildrenFullNameArray.length != 0) {
+            // check before using allChildrenFullNameArray to query fullnames.
+            resourcesIdNeedToDeleteSet.addAll(
+                    resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray, ResourceType.FILE));
+        }
+        logger.info("{} =====================", resourcesIdNeedToDeleteSet.size());
         // Integer[] arr = new Integer[resourcesIdSet.size()];
         // List<Map<String, Object>> resourceInUse =
         // processDefinitionMapper.queryResourcesInUseWithinResourceArray(resourcesIdSet.toArray(arr));
@@ -1043,8 +999,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     }
                 }
             }
-
-            resourceTaskMapper.deleteIds(needDeleteResourceIdArray);
+            if (needDeleteResourceIdArray.length != 0) {
+                resourceTaskMapper.deleteIds(needDeleteResourceIdArray);
+            }
         }
 
         // delete file on hdfs,S3
