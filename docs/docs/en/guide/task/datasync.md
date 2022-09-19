@@ -32,22 +32,21 @@ The follow shows the DolphinScheduler DataSync task plugin features:
 
 First, introduce some general parameters of DolphinScheduler:
 
-- **Node name**: The node name in a workflow definition is unique.
-- **Run flag**: Identifies whether this node schedules normally, if it does not need to execute, select
-  the `prohibition execution`.
-- **Descriptive information**: Describe the function of the node.
-- **Task priority**: When the number of worker threads is insufficient, execute in the order of priority from high
-  to low, and tasks with the same priority will execute in a first-in first-out order.
-- **Worker grouping**: Assign tasks to the machines of the worker group to execute. If `Default` is selected,
-  randomly select a worker machine for execution.
-- **Environment Name**: Configure the environment name in which run the script.
-- **Times of failed retry attempts**: The number of times the task failed to resubmit.
-- **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
-- **Delayed execution time**: The time (unit minute) that a task delays in execution.
-- **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm
-  email will send and the task execution will fail.
-- **Predecessor task**: Selecting a predecessor task for the current task, will set the selected predecessor task as
-  upstream of the current task.
+- **Node name**: The name of the task. Node names within the same workflow must be unique.
+- **Run flag**: Indicating whether to schedule the task. If you do not need to execute the task, you can turn on the `Prohibition execution` switch.
+- **Description**: Describing the function of this node.
+- **Task priority**: When the number of the worker threads is insufficient, the worker executes task according to the priority. When two tasks have the same priority, the worker will execute them in `first come first served` fashion.
+- **Worker group**: Machines which execute the tasks. If you choose `default`, scheduler will send the task to a random worker.
+- **Task group name**: Resource group of tasks. It will not take effect if not configured.
+- **Environment name**: Environment to execute the task.
+- **Number of failed retries**: The number of task retries for failures. You could select it by drop-down menu or fill it manually.
+- **Failure retry interval**: Interval of task retries for failures. You could select it by drop-down menu or fill it manually.
+- **CPU quota**: Assign the specified CPU time quota to the task executed. Takes a percentage value. Default -1 means unlimited. For example, the full CPU load of one core is 100%, and that of 16 cores is 1600%. You could configure it by [task.resource.limit.state](../../architecture/configuration.md).
+- **Max memory**: Assign the specified max memory to the task executed. Exceeding this limit will trigger oom to be killed and will not automatically retry. Takes an MB value. Default -1 means unlimited. You could configure it by [task.resource.limit.state](../../architecture/configuration.md).
+- **Timeout alarm**: Alarm for task timeout. When the task exceeds the "timeout threshold", an alarm email will send.
+- **Delayed execution time**: The time that a task delays for execution in minutes.
+- **Resources**: 	Resources which your task node uses.
+- **Predecessor task**: 	The upstream task of the current task node.
 
 Here are some specific parameters for the DataSync plugin:
 
