@@ -23,8 +23,8 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import org.apache.dolphinscheduler.plugin.task.flink.client.IClusterClient;
 import org.apache.dolphinscheduler.plugin.task.flink.entity.CheckpointInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.executor.KerberosSecurityContext;
 import org.apache.dolphinscheduler.plugin.task.flink.executor.YarnApplicationClusterExecutor;
 import org.apache.dolphinscheduler.plugin.task.flink.executor.YarnPerJobClusterExecutor;
@@ -64,12 +64,12 @@ public enum ClusterClient implements IClusterClient {
                     .build();
 
     @Override
-    public ResultInfo submitFlinkJob(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo submitFlinkJob(FlinkParamsInfo jobParamsInfo) throws Exception {
         FlinkStreamDeployMode mode =
                 jobParamsInfo.getRunMode() != null
                         ? FlinkStreamDeployMode.YARN_PER_JOB
                         : jobParamsInfo.getRunMode();
-        ResultInfo resultInfo;
+        FlinkResultInfo resultInfo;
         switch (mode) {
             case YARN_APPLICATION:
                 resultInfo = new YarnApplicationClusterExecutor(jobParamsInfo).submitJob();
@@ -82,25 +82,25 @@ public enum ClusterClient implements IClusterClient {
     }
 
     @Override
-    public ResultInfo submitFlinkJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo submitFlinkJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo,
                 FunctionUtils.uncheckedSupplier(() -> submitFlinkJob(jobParamsInfo)));
     }
 
     @Override
-    public ResultInfo killYarnJob(ParamsInfo jobParamsInfo) throws IOException {
+    public FlinkResultInfo killYarnJob(FlinkParamsInfo jobParamsInfo) throws IOException {
         return new YarnPerJobClusterExecutor(jobParamsInfo).killJob();
     }
 
     @Override
-    public ResultInfo killYarnJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo killYarnJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo, FunctionUtils.uncheckedSupplier(() -> killYarnJob(jobParamsInfo)));
     }
 
     @Override
-    public YarnTaskStatus getYarnJobStatus(ParamsInfo jobParamsInfo) throws Exception {
+    public YarnTaskStatus getYarnJobStatus(FlinkParamsInfo jobParamsInfo) throws Exception {
         String applicationId = jobParamsInfo.getApplicationId();
         String hadoopConfDir = jobParamsInfo.getHadoopConfDir();
         Preconditions.checkNotNull(applicationId, "yarn applicationId is not null!");
@@ -161,14 +161,14 @@ public enum ClusterClient implements IClusterClient {
     }
 
     @Override
-    public YarnTaskStatus getYarnJobStatusWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public YarnTaskStatus getYarnJobStatusWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo,
                 FunctionUtils.uncheckedSupplier(() -> getYarnJobStatus(jobParamsInfo)));
     }
 
     @Override
-    public List<CheckpointInfo> getCheckpointPaths(ParamsInfo jobParamsInfo) throws Exception {
+    public List<CheckpointInfo> getCheckpointPaths(FlinkParamsInfo jobParamsInfo) throws Exception {
         YarnConfiguration yarnConfiguration =
                 YarnClusterDescriptorFactory.INSTANCE.parseYarnConfFromConfDir(
                         jobParamsInfo.getHadoopConfDir());
@@ -181,14 +181,14 @@ public enum ClusterClient implements IClusterClient {
     }
 
     @Override
-    public List<CheckpointInfo> getCheckpointPathsWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public List<CheckpointInfo> getCheckpointPathsWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo,
                 FunctionUtils.uncheckedSupplier(() -> getCheckpointPaths(jobParamsInfo)));
     }
 
     @Override
-    public String printFinishedLogToFile(ParamsInfo jobParamsInfo) throws Exception {
+    public String printFinishedLogToFile(FlinkParamsInfo jobParamsInfo) throws Exception {
         String applicationId = jobParamsInfo.getApplicationId();
         String finishedJobLogDir = jobParamsInfo.getFinishedJobLogDir();
 
@@ -201,14 +201,14 @@ public enum ClusterClient implements IClusterClient {
     }
 
     @Override
-    public String printFinishedLogToFileWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public String printFinishedLogToFileWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo,
                 FunctionUtils.uncheckedSupplier(() -> printFinishedLogToFile(jobParamsInfo)));
     }
 
     @Override
-    public ResultInfo cancelFlinkJob(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo cancelFlinkJob(FlinkParamsInfo jobParamsInfo) throws Exception {
         Preconditions.checkNotNull(
                 jobParamsInfo.getHadoopConfDir(), "cancel job hadoopConfDir is required!");
         Preconditions.checkNotNull(
@@ -220,14 +220,14 @@ public enum ClusterClient implements IClusterClient {
     }
 
     @Override
-    public ResultInfo cancelFlinkJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo cancelFlinkJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo,
                 FunctionUtils.uncheckedSupplier(() -> cancelFlinkJob(jobParamsInfo)));
     }
 
     @Override
-    public ResultInfo cancelFlinkJobDoSavepoint(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo cancelFlinkJobDoSavepoint(FlinkParamsInfo jobParamsInfo) throws Exception {
         Preconditions.checkNotNull(
                 jobParamsInfo.getHadoopConfDir(), "cancel job hadoopConfDir is required!");
         Preconditions.checkNotNull(
@@ -239,14 +239,14 @@ public enum ClusterClient implements IClusterClient {
     }
 
     @Override
-    public ResultInfo cancelFlinkJobDoSavepointWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo cancelFlinkJobDoSavepointWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo,
                 FunctionUtils.uncheckedSupplier(() -> cancelFlinkJobDoSavepoint(jobParamsInfo)));
     }
 
     @Override
-    public ResultInfo savePointFlinkJob(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo savePointFlinkJob(FlinkParamsInfo jobParamsInfo) throws Exception {
         Preconditions.checkNotNull(
                 jobParamsInfo.getHadoopConfDir(), "cancel job hadoopConfDir is required!");
         Preconditions.checkNotNull(
@@ -257,7 +257,7 @@ public enum ClusterClient implements IClusterClient {
     }
 
     @Override
-    public ResultInfo savePointFlinkJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception {
+    public FlinkResultInfo savePointFlinkJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception {
         return KerberosSecurityContext.runSecured(
                 jobParamsInfo,
                 FunctionUtils.uncheckedSupplier(() -> savePointFlinkJob(jobParamsInfo)));

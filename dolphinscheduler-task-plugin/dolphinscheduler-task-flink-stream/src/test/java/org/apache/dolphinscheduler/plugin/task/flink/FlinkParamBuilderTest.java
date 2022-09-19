@@ -17,23 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.enums.FlinkStreamDeployMode;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-public class FlinkArgsUtilsTest {
-
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+public class FlinkParamBuilderTest {
 
     @Test
-    public void testRunJarInYarnPerMode() throws Exception {
+    public void testRunJarInYarnPerMode() {
 
         String runJarPath = "/usr/local/Cellar/apache-flink/1.15.1/libexec/examples/streaming/WindowJoin.jar";
 
@@ -57,7 +51,7 @@ public class FlinkArgsUtilsTest {
         confProperties.setProperty("taskmanager.memory.process.size", "2G");
         confProperties.setProperty("taskmanager.numberOfTaskSlots", "2");
 
-        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+        FlinkParamsInfo jobParamsInfo = FlinkParamsInfo.builder()
                 .execArgs(execArgs)
                 .name(jobName)
                 .runJarPath(runJarPath)
@@ -73,11 +67,11 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testCancelJobInYarnMode() throws Exception {
+    public void testCancelJobInYarnMode() {
 
         String hadoopConfDir = "/usr/local/Cellar/hadoop/3.3.3/libexec/etc/hadoop";
 
-        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+        FlinkParamsInfo jobParamsInfo = FlinkParamsInfo.builder()
                 .hadoopConfDir(hadoopConfDir)
                 .flinkJobId("job_id")
                 .applicationId("app_id")
@@ -87,11 +81,11 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testSavePointInYarnMode() throws Exception {
+    public void testSavePointInYarnMode() {
 
         String hadoopConfDir = "/usr/local/Cellar/hadoop/3.3.3/libexec/etc/hadoop";
 
-        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+        FlinkParamsInfo jobParamsInfo = FlinkParamsInfo.builder()
                 .hadoopConfDir(hadoopConfDir)
                 .flinkJobId("job_id")
                 .applicationId("app_id")

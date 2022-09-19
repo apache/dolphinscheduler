@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.executor;
 
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.factory.YarnClusterDescriptorFactory;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.flink.client.deployment.ClusterSpecification;
 import org.apache.flink.client.deployment.application.ApplicationConfiguration;
 import org.apache.flink.client.program.ClusterClientProvider;
@@ -38,12 +37,12 @@ public class YarnApplicationClusterExecutor extends AbstractClusterExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(YarnApplicationClusterExecutor.class);
 
-    public YarnApplicationClusterExecutor(ParamsInfo jobParamsInfo) {
+    public YarnApplicationClusterExecutor(FlinkParamsInfo jobParamsInfo) {
         super(jobParamsInfo);
     }
 
     @Override
-    public ResultInfo submitJob() {
+    public FlinkResultInfo submitJob() {
         try {
             Configuration flinkConfig = getFlinkConfigFromParamsInfo();
             flinkConfig.setString(
@@ -62,11 +61,11 @@ public class YarnApplicationClusterExecutor extends AbstractClusterExecutor {
                         clusterDescriptor.deployApplicationCluster(
                                 clusterSpecification, applicationConfiguration);
                 String applicationId = application.getClusterClient().getClusterId().toString();
-                return new ResultInfo(applicationId, "");
+                return new FlinkResultInfo(applicationId, "");
             }
         } catch (Exception e) {
             logger.error("submit job to yarn error:", e);
-            return new ResultInfo("", "");
+            return new FlinkResultInfo("", "");
         }
     }
 }

@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.enums.ClusterClient;
 import org.apache.dolphinscheduler.plugin.task.flink.enums.YarnTaskStatus;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -53,7 +53,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
 
 
-    private ResultInfo flinkStreamResultInfo;
+    private FlinkResultInfo flinkStreamResultInfo;
 
     public FlinkStreamTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -84,7 +84,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
         initResultInfo();
 
-        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+        FlinkParamsInfo jobParamsInfo = FlinkParamsInfo.builder()
                 .hadoopConfDir(hadoopConfDir)
                 .applicationId(flinkStreamResultInfo.getAppId())
                 .flinkJobId(flinkStreamResultInfo.getJobId())
@@ -92,7 +92,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
         try {
             ClusterClient clusterClient = ClusterClient.INSTANCE;
-            ResultInfo jobResult = clusterClient.cancelFlinkJob(jobParamsInfo);
+            FlinkResultInfo jobResult = clusterClient.cancelFlinkJob(jobParamsInfo);
             setExitStatusCode(EXIT_CODE_KILL);
             logger.info(
                     String.format(
@@ -110,12 +110,14 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
         if (flinkHome.isEmpty()) {
             logger.error("Please make sure to set the FLINK_HOME environment variable.");
+            throw new TaskException("Please make sure to set the FLINK_HOME environment variable.");
         }
 
         String hadoopConfDir = System.getenv(HADOOP_CONF_DIR);
 
         if (hadoopConfDir.isEmpty()) {
             logger.error("Please make sure to set the HADOOP_CONF_DIR environment variable.");
+            throw new TaskException("Please make sure to set the HADOOP_CONF_DIR environment variable.");
         }
 
         Properties confProperties = new Properties();
@@ -131,7 +133,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
             flinkParameters.setQueue("root.default");
         }
 
-        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+        FlinkParamsInfo jobParamsInfo = FlinkParamsInfo.builder()
                 .execArgs(new String[]{})
                 .name(flinkParameters.getAppName())
                 .runJarPath(taskExecutionContext.getExecutePath().concat(flinkParameters.getMainJar().getResourceName()))
@@ -146,7 +148,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
         try {
             ClusterClient clusterClient = ClusterClient.INSTANCE;
-            ResultInfo jobResult = clusterClient.submitFlinkJob(jobParamsInfo);
+            FlinkResultInfo jobResult = clusterClient.submitFlinkJob(jobParamsInfo);
             setAppIds(JSONUtils.toJsonString(jobResult));
             logger.info(
                     String.format(
@@ -165,7 +167,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
         initResultInfo();
 
-        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+        FlinkParamsInfo jobParamsInfo = FlinkParamsInfo.builder()
                 .hadoopConfDir(hadoopConfDir)
                 .applicationId(flinkStreamResultInfo.getAppId())
                 .openSecurity(CommonUtils.getKerberosStartupState())
@@ -179,12 +181,12 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
     }
 
     @Override
-    public void savePoint() throws Exception {
+    public void savePoint() throws TaskException {
         String hadoopConfDir = System.getenv(HADOOP_CONF_DIR);
 
         initResultInfo();
 
-        ParamsInfo jobParamsInfo = ParamsInfo.builder()
+        FlinkParamsInfo jobParamsInfo = FlinkParamsInfo.builder()
                 .hadoopConfDir(hadoopConfDir)
                 .flinkJobId(flinkStreamResultInfo.getJobId())
                 .applicationId(flinkStreamResultInfo.getAppId())
@@ -193,7 +195,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
 
         try {
             ClusterClient clusterClient = ClusterClient.INSTANCE;
-            ResultInfo jobResult = clusterClient.savePointFlinkJob(jobParamsInfo);
+            FlinkResultInfo jobResult = clusterClient.savePointFlinkJob(jobParamsInfo);
             logger.info(
                     String.format(
                             "job save point result, appId:%s, jobId:%s",
@@ -226,7 +228,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
     private void initResultInfo() {
         if (flinkStreamResultInfo == null) {
             if (StringUtils.isNotEmpty(getAppIds())) {
-                flinkStreamResultInfo = JSONUtils.parseObject(getAppIds(), ResultInfo.class);
+                flinkStreamResultInfo = JSONUtils.parseObject(getAppIds(), FlinkResultInfo.class);
             }
         }
         if (flinkStreamResultInfo == null) {
@@ -234,7 +236,7 @@ public class FlinkStreamTask extends AbstractRemoteTask implements StreamTask {
         }
     }
 
-    private void checkYarnExecutionStatus(ParamsInfo paramsInfo) {
+    private void checkYarnExecutionStatus(FlinkParamsInfo paramsInfo) {
         try {
             ClusterClient clusterClient = ClusterClient.INSTANCE;
             YarnTaskStatus taskStatus = clusterClient.getYarnJobStatus(paramsInfo);

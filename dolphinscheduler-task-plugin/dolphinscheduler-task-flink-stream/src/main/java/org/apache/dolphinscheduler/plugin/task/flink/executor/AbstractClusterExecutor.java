@@ -18,8 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.flink.executor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.factory.YarnClusterDescriptorFactory;
 import org.apache.dolphinscheduler.plugin.task.flink.utils.JobGraphBuildUtil;
 import org.apache.dolphinscheduler.spi.utils.Constants;
@@ -63,9 +64,9 @@ public abstract class AbstractClusterExecutor {
 
     private static final String DEFAULT_TOTAL_PROCESS_MEMORY = "1024m";
 
-    public ParamsInfo jobParamsInfo;
+    public FlinkParamsInfo jobParamsInfo;
 
-    public AbstractClusterExecutor(ParamsInfo jobParamsInfo) {
+    public AbstractClusterExecutor(FlinkParamsInfo jobParamsInfo) {
         this.jobParamsInfo = jobParamsInfo;
     }
 
@@ -74,7 +75,7 @@ public abstract class AbstractClusterExecutor {
      *
      * @return
      */
-    public abstract ResultInfo submitJob();
+    public abstract FlinkResultInfo submitJob();
 
     public YarnClient createYarnClient() throws IOException {
         YarnClient yarnClient =
@@ -91,7 +92,7 @@ public abstract class AbstractClusterExecutor {
      *
      * @return
      */
-    public ResultInfo killJob() throws IOException {
+    public FlinkResultInfo killJob() throws IOException {
         String applicationId = jobParamsInfo.getApplicationId();
         if (StringUtils.isEmpty(applicationId)) {
             throw new NullPointerException("kill yarn job applicationId is required!");
@@ -109,7 +110,7 @@ public abstract class AbstractClusterExecutor {
             logger.info("killed applicationId {} was unsuccessful.", applicationId);
         } catch (YarnException e) {
             logger.error("killed applicationId {0} was failed.", e);
-            return new ResultInfo("", "");
+            return new FlinkResultInfo("", "");
         }
 
         try (FileSystem fs = FileSystem.get(yarnConfiguration)) {
@@ -122,16 +123,16 @@ public abstract class AbstractClusterExecutor {
                         "Deleting yarn application files under {} was unsuccessful.",
                         applicationDir);
             } else {
-                logger.error(
+                logger.info(
                         "Deleting yarn application files under {} was successful.", applicationDir);
             }
         } catch (Exception e) {
             logger.error("Deleting yarn application files was failed!", e);
         }
-        return new ResultInfo("", "");
+        return new FlinkResultInfo("", "");
     }
 
-    public ResultInfo cancelJob(boolean doSavepoint) {
+    public FlinkResultInfo cancelJob(boolean doSavepoint) {
         String appId = jobParamsInfo.getApplicationId();
         String jobId = jobParamsInfo.getFlinkJobId();
 
@@ -165,19 +166,19 @@ public abstract class AbstractClusterExecutor {
                     clusterDescriptor.killCluster(applicationId);
                 } catch (FlinkException e1) {
                     logger.error("yarn cluster Descriptor kill cluster error:", e);
-                    return new ResultInfo("", "");
+                    return new FlinkResultInfo("", "");
                 }
             }
 
         } catch (Exception e) {
             logger.error("cancel job failed,appId:{}, jobId:{}, exception:{}", appId, jobId, e);
-            return new ResultInfo(appId, jobId);
+            return new FlinkResultInfo(appId, jobId);
         }
 
-        return new ResultInfo(appId, jobId);
+        return new FlinkResultInfo(appId, jobId);
     }
 
-    public ResultInfo savePoint() {
+    public FlinkResultInfo savePoint() {
         String appId = jobParamsInfo.getApplicationId();
         String jobId = jobParamsInfo.getFlinkJobId();
 
@@ -201,14 +202,15 @@ public abstract class AbstractClusterExecutor {
                 logger.info("flink job savepoint path: {}", result.toString());
             } catch (Exception e) {
                 logger.error("flink job savepoint error", e);
+                throw new TaskException("flink job savepoint failed", e);
             }
 
         } catch (Exception e) {
             logger.error("flink job savepoint failed, appId:{}, jobId:{}, exception:{}", appId, jobId, e);
-            return new ResultInfo(appId, jobId);
+            throw new TaskException("flink job savepoint failed", e);
         }
 
-        return new ResultInfo(appId, jobId);
+        return new FlinkResultInfo(appId, jobId);
     }
 
     protected Configuration getFlinkConfigFromParamsInfo() {
@@ -224,7 +226,7 @@ public abstract class AbstractClusterExecutor {
      * @param flinkConfig
      * @param jobParamsInfo
      */
-    protected void replaceDefaultGlobalConfig(Configuration flinkConfig, ParamsInfo jobParamsInfo) {
+    protected void replaceDefaultGlobalConfig(Configuration flinkConfig, FlinkParamsInfo jobParamsInfo) {
         if (!StringUtils.isEmpty(jobParamsInfo.getName())) {
             flinkConfig.setString(YarnConfigOptions.APPLICATION_NAME, jobParamsInfo.getName());
         }
