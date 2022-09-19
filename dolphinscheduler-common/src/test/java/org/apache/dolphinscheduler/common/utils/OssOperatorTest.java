@@ -29,8 +29,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
@@ -41,21 +39,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.model.Bucket;
-import com.aliyun.oss.model.PutObjectRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OssOperatorTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(OssOperatorTest.class);
-
     private static final String ACCESS_KEY_ID_MOCK = "ACCESS_KEY_ID_MOCK";
     private static final String ACCESS_KEY_SECRET_MOCK = "ACCESS_KEY_SECRET_MOCK";
     private static final String REGION_MOCK = "REGION_MOCK";
+    private static final String END_POINT_MOCK = "END_POINT_MOCK";
     private static final String BUCKET_NAME_MOCK = "BUCKET_NAME_MOCK";
     private static final String TENANT_CODE_MOCK = "TENANT_CODE_MOCK";
     private static final String DIR_MOCK = "DIR_MOCK";
@@ -65,29 +58,19 @@ public class OssOperatorTest {
     @Mock
     private OSS ossClientMock;
 
-    @Mock
-    private Bucket bucketMock;
-
-    @Mock
-    private PutObjectRequest putObjectRequestMock;
-
-    @Mock
-    private PropertyUtilsWrapper propertyUtilsWrapperMock;
-
     private OssOperator ossOperator;
 
     @Before
     public void setUp() throws Exception {
-        ossOperator = spy(OssOperator.getInstance());
-        doReturn(propertyUtilsWrapperMock).when(ossOperator).createPropertyUtilsWrapper();
+        ossOperator = spy(new OssOperator());
+        doReturn(ACCESS_KEY_ID_MOCK).when(ossOperator)
+                .readOssAccessKeyID();
+        doReturn(ACCESS_KEY_SECRET_MOCK).when(ossOperator)
+                .readOssAccessKeySecret();
+        doReturn(REGION_MOCK).when(ossOperator).readOssRegion();
+        doReturn(BUCKET_NAME_MOCK).when(ossOperator).readOssBucketName();
+        doReturn(END_POINT_MOCK).when(ossOperator).readOssEndPoint();
         doReturn(ossClientMock).when(ossOperator).buildOssClient();
-        doReturn(ACCESS_KEY_ID_MOCK).when(propertyUtilsWrapperMock)
-                .getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_ID);
-        doReturn(ACCESS_KEY_SECRET_MOCK).when(propertyUtilsWrapperMock)
-                .getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_SECRET);
-        doReturn(REGION_MOCK).when(propertyUtilsWrapperMock).getString(TaskConstants.ALIBABA_CLOUD_REGION);
-        doReturn(BUCKET_NAME_MOCK).when(propertyUtilsWrapperMock).getString(Constants.ALIBABA_CLOUD_OSS_BUCKET_NAME);
-        // doReturn(END_POINT_MOCK).when(propertyUtilsWrapperMock).getString(ALIBABA_CLOUD_OSS_END_POINT);
         doNothing().when(ossOperator).ensureBucketSuccessfullyCreated(any());
 
         ossOperator.init();
@@ -96,12 +79,11 @@ public class OssOperatorTest {
 
     @Test
     public void initOssOperator() {
-        verify(ossOperator, times(1)).createPropertyUtilsWrapper();
         verify(ossOperator, times(1)).buildOssClient();
-        Assert.assertEquals(ACCESS_KEY_ID_MOCK, ossOperator.ACCESS_KEY_ID);
-        Assert.assertEquals(ACCESS_KEY_SECRET_MOCK, ossOperator.ACCESS_KEY_SECRET);
-        Assert.assertEquals(REGION_MOCK, ossOperator.REGION);
-        Assert.assertEquals(BUCKET_NAME_MOCK, ossOperator.BUCKET_NAME);
+        Assert.assertEquals(ACCESS_KEY_ID_MOCK, ossOperator.getAccessKeyId());
+        Assert.assertEquals(ACCESS_KEY_SECRET_MOCK, ossOperator.getAccessKeySecret());
+        Assert.assertEquals(REGION_MOCK, ossOperator.getRegion());
+        Assert.assertEquals(BUCKET_NAME_MOCK, ossOperator.getBucketName());
     }
 
     @Test

@@ -183,8 +183,8 @@
                     <artifactId>jersey-core</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jetty</artifactId>
                     <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>jetty</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -294,7 +294,6 @@
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
-            <version>3.15.1</version>
         </dependency>
 
         <dependency>

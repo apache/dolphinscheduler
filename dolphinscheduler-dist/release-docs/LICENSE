@@ -471,6 +471,15 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     proto-google-common-protos 2.0.1: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-common-protos/2.0.1 Apache 2.0
     kotlin 1.6.21: https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib, Apache 2.0
     JetBrains annotations: https://mvnrepository.com/artifact/org.jetbrains/annotations, Apache 2.0
+    aliyun-java-sdk-core 4.5.10: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-java-sdk-kms 2.11.0: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-sdk-oss 3.15.1: https://github.com/aliyun/aliyun-oss-java-sdk/blob/master/README.md#license, Apache 2.0
+    ini4j 0.5.4: https://mvnrepository.com/artifact/org.ini4j/ini4j/0.5.4, Apache 2.0
+    opentracing-api 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    opentracing-noop 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    opentracing-util 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    jettison 1.1: https://github.com/jettison-json/jettison/blob/master/LICENSE, Apache 2.0
+    stax-api 1.0.1: https://mvnrepository.com/artifact/stax/stax-api/1.0.1, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -651,3 +660,8 @@ SIL licenses
     ibm-plex: SIL
     inter: https://github.com/rsms/inter SIL
     lato: SIL
+
+========================================
+JDOM licenses
+========================================
+    jdom2 2.0.6.1: https://github.com/hunterhacker/jdom/blob/master/LICENSE.txt JDOM

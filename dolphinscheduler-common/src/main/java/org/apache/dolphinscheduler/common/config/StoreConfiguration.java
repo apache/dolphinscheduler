@@ -44,7 +44,9 @@ public class StoreConfiguration {
     public StorageOperate storageOperate() {
         switch (PropertyUtils.getString(RESOURCE_STORAGE_TYPE)) {
             case STORAGE_OSS:
-                OssOperator ossOperator = OssOperator.getInstance();
+                OssOperator ossOperator = new OssOperator();
+                // TODO: change to use ossOperator.init(ossConnection) after DS supports Configuration / Connection
+                // Center
                 ossOperator.init();
                 return ossOperator;
             case STORAGE_S3:
