@@ -202,6 +202,7 @@ export default defineComponent({
       for (const dir of dirs) {
         const newDir = dirs.slice(0, index + 1).join('/')
         const id = 0
+        // should be checking whether fileName ends with "/"
         const resource = await queryResourceById(
           {
             id,
@@ -231,6 +232,7 @@ export default defineComponent({
           id
         ).then((res: ResourceFile) => {
           if (res.fileName) {
+            console.log("fileName", res.fileName)
             const dirs = res.fileName.split('/')
             if (dirs && dirs.length > 1) {
               dirs.pop(-1)
