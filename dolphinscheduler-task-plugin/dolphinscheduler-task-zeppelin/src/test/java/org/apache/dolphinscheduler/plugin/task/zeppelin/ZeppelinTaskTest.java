@@ -26,8 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -123,8 +121,8 @@ public class ZeppelinTaskTest {
 
     @Test(expected = TaskException.class)
     public void testHandleWithParagraphExecutionException() throws Exception {
-        when(this.zClient.executeParagraph(any(), any(), any(Map.class))).
-                thenThrow(new TaskException("Something wrong happens from zeppelin side"));
+        when(this.zClient.executeParagraph(any(), any(), any(Map.class)))
+                .thenThrow(new TaskException("Something wrong happens from zeppelin side"));
         this.zeppelinTask.handle(taskCallBack);
 
         Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
@@ -148,7 +146,6 @@ public class ZeppelinTaskTest {
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
         when(this.zClient.executeNote(any(), any(Map.class))).thenReturn(this.noteResult);
         this.zeppelinTask.init();
-        when(this.paragraphResult.getStatus()).thenReturn(Status.FINISHED);
         this.zeppelinTask.handle(taskCallBack);
 
         Mockito.verify(this.zClient).executeNote(MOCK_NOTE_ID,

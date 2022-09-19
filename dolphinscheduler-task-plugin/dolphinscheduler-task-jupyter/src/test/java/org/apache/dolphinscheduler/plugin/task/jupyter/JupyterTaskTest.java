@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -118,10 +117,8 @@ public class JupyterTaskTest {
     private JupyterTask prepareJupyterTaskForTest(final String jupyterTaskParameters) {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(jupyterTaskParameters);
-        JupyterPropertyReader mockedJupyterPropertyReader = Mockito.mock(JupyterPropertyReader.class);
         JupyterTask jupyterTask = spy(new JupyterTask(taskExecutionContext));
-        doReturn(mockedJupyterPropertyReader).when(jupyterTask).proxyJupyterPropertyReaderCreator();
-        doReturn("/opt/anaconda3/etc/profile.d/conda.sh").when(mockedJupyterPropertyReader).readProperty(any());
+        doReturn("/opt/anaconda3/etc/profile.d/conda.sh").when(jupyterTask).readCondaPath();
         return jupyterTask;
     }
 
