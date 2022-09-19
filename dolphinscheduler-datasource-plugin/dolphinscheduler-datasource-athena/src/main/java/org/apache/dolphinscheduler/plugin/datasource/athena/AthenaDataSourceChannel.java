@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.dvc;
+package org.apache.dolphinscheduler.plugin.datasource.athena;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public enum TaskTypeEnum {
-
-    @JsonProperty("Upload")
-    UPLOAD,
-    @JsonProperty("Download")
-    DOWNLOAD,
-    @JsonProperty("Init DVC")
-    INIT
+public class AthenaDataSourceChannel implements DataSourceChannel {
+    @Override
+    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new AthenaDataSourceClient(baseConnectionParam,dbType);
+    }
 }

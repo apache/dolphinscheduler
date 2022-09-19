@@ -79,11 +79,14 @@ You selected this USER-ID:
 Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
 You need a Passphrase to protect your secret key. # 输入apache登录密码
 ```
+
 注意：如果遇到以下错误：
+
 ```
 gpg: cancelled by user
 gpg: Key generation canceled.
 ```
+
 需要使用自己的用户登录服务器，而不是root切到自己的账户
 
 ### 查看生成的key
@@ -115,7 +118,6 @@ gpg --keyserver hkp://pool.sks-keyservers.net --send-key 85E11560
 注意：如果同步到公钥服务器，可以在服务器上查到新建的公钥
 http://keyserver.ubuntu.com:11371/pks/lookup?search=${用户名}&fingerprint=on&op=index
 备用公钥服务器 gpg --keyserver hkp://keyserver.ubuntu.com --send-key ${公钥ID}
-
 
 ## 发布Apache Maven中央仓库
 
@@ -152,7 +154,7 @@ A_USERNAME=<YOUR-APACHE-USERNAME>
 ```
 
 > 注意：设置环境变量后，我们可以直接在你的 bash 中使用该变量，而无需更改任何内容。例如，我们可以直接使用命令 `git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git`
-> 来克隆发布分支，他会自动将其中的 `"${VERSION}"` 转化成你设置的值 `<THE-VERSION-YOU-RELEASE>`。 但是您必须在一些非 bash 步骤中手动更改 
+> 来克隆发布分支，他会自动将其中的 `"${VERSION}"` 转化成你设置的值 `<THE-VERSION-YOU-RELEASE>`。 但是您必须在一些非 bash 步骤中手动更改
 > `<VERSION>` 为对应的版本号，例如发起投票中的内容。我们使用 `<VERSION>` 而不是 `"${VERSION}"` 来提示 release manager 他们必须手动更改这部分内容
 
 ### 创建发布分支
@@ -213,7 +215,7 @@ git push origin --tags
 
 > 注意1：因为 Github 不再支持在 HTTPS 协议中使用原生密码在，所以在这一步你应该使用 github token 作为密码。你可以通过 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating -a-personal-access-token
 > 了解更多如果创建 token 的信息。
-
+>
 > 注意2：命令完成后，会自动创建 `release.properties` 文件和 `*.Backup` 文件，它们在下面的命令中是需要的，不要删除它们
 
 <!-- markdown-link-check-enable -->
@@ -293,6 +295,7 @@ cd ~/ds_svn/dev/dolphinscheduler
 svn add *
 svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```
+
 ## 检查发布结果
 
 ### 检查sha512哈希
@@ -383,13 +386,13 @@ cd ../
 ### 投票阶段
 
 1. DolphinScheduler社区投票，发起投票邮件到`dev@dolphinscheduler.apache.org`。PMC需要先按照文档检查版本的正确性，然后再进行投票。
-经过至少72小时并统计到至少3个`+1 并且没有-1 PMC member`票后，即可进入下一阶段。
+   经过至少72小时并统计到至少3个`+1 并且没有-1 PMC member`票后，即可进入下一阶段。
 
 2. 宣布投票结果,发起投票结果邮件到`dev@dolphinscheduler.apache.org`。
 
 ### 投票模板
 
- 1. DolphinScheduler社区投票模板
+1. DolphinScheduler社区投票模板
 
 标题：
 
@@ -455,7 +458,6 @@ xxx
 
 Thanks everyone for taking time to check this release and help us.
 ```
-
 
 ## 完成发布
 
@@ -532,3 +534,4 @@ DolphinScheduler Resources:
 - Mailing list: dev@dolphinscheduler.apache.org
 - Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/user_doc/about/introduction.html
 ```
+

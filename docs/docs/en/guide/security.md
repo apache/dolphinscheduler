@@ -138,8 +138,8 @@ worker:
 ......
 ```
 
-- You can add new worker groups for the workers during runtime regardless of the configurations in `application.yaml` as below: 
-`Security Center` -> `Worker Group Manage` -> `Create Worker Group` -> fill in `Group Name` and `Worker Addresses` -> click `confirm`. 
+- You can add new worker groups for the workers during runtime regardless of the configurations in `application.yaml` as below:
+  `Security Center` -> `Worker Group Manage` -> `Create Worker Group` -> fill in `Group Name` and `Worker Addresses` -> click `confirm`.
 
 ## Environmental Management
 
@@ -164,10 +164,10 @@ Create a task node in the workflow definition, select the worker group and the e
 ## Cluster Management
 
 > Add or update cluster
-- Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
-
+> - Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
+>
 > Usage cluster
-- After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
+> - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
 
 ![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
 
@@ -182,5 +182,4 @@ Create a task node in the workflow definition, select the worker group and the e
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
-
 
