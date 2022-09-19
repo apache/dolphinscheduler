@@ -57,6 +57,7 @@ export function useTable() {
     searchVal: ref(taskName || null),
     processInstanceId: ref(processInstanceId ? processInstanceId : null),
     host: ref(null),
+    taskType: ref(null),
     stateType: ref(null),
     datePickerRange: ref(null),
     executorName: ref(null),
@@ -294,6 +295,7 @@ export function useTable() {
       pageNo: params.pageNo,
       searchVal: params.searchVal,
       processInstanceId: params.processInstanceId,
+      taskType: params.taskType,
       host: params.host,
       stateType: params.stateType,
       startDate: params.datePickerRange

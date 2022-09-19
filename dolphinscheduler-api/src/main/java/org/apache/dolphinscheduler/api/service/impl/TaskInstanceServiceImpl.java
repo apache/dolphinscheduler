@@ -112,6 +112,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                                       String processInstanceName,
                                       String processDefinitionName,
                                       String taskName,
+                                      String taskType,
                                       String executorName,
                                       String startDate,
                                       String endDate,
@@ -154,7 +155,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             );
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, taskExecuteType, start, end
+                page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, taskType, executorId, statusArray, host, taskExecuteType, start, end
             );
         }
         Set<String> exclusionSet = new HashSet<>();

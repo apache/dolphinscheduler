@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.junit.Assert;
 import org.junit.Before;
@@ -383,6 +385,47 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
             "",
             "",
             "",
+            "",
+            0,
+            new int[0],
+            "",
+            TaskExecuteType.BATCH,
+            null, null
+        );
+        processInstanceMapper.deleteById(processInstance.getId());
+        taskInstanceMapper.deleteById(task.getId());
+        processDefinitionMapper.deleteById(definition.getId());
+        Assert.assertEquals(taskInstanceIPage.getTotal(), 0);
+
+    }
+
+    /**
+     * test query task instance list paging by task type
+     */
+    @Test
+    public void testQueryTaskInstanceListPagingByTaskType() {
+        ProcessDefinition definition = new ProcessDefinition();
+        definition.setCode(1L);
+        definition.setProjectCode(1111L);
+        definition.setCreateTime(new Date());
+        definition.setUpdateTime(new Date());
+        processDefinitionMapper.insert(definition);
+
+        // insert ProcessInstance
+        ProcessInstance processInstance = insertProcessInstance();
+
+        // insert taskInstance
+        TaskInstance task = insertTaskInstance(processInstance.getId(), "SHELL");
+
+        Page<TaskInstance> page = new Page(1, 3);
+        IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
+            page,
+            definition.getProjectCode(),
+            task.getProcessInstanceId(),
+            "",
+            "",
+            "",
+            "SHELL",
             0,
             new int[0],
             "",

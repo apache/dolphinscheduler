@@ -195,6 +195,9 @@
         <if test="taskName != null and taskName != ''">
             and instance.name=#{taskName}
         </if>
+        <if test="taskType != null and taskType != ''">
+            and instance.task_type=#{taskType}
+        </if>
         <if test="states != null and states.length != 0">
             and instance.state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">

@@ -52,6 +52,7 @@ public interface TaskInstanceService {
                                String processInstanceName,
                                String processDefinitionName,
                                String taskName,
+                               String taskType,
                                String executorName,
                                String startDate,
                                String endDate,

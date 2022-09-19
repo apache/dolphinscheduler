@@ -32,6 +32,7 @@ import {
   NDataTable,
   NPagination
 } from 'naive-ui'
+import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
@@ -53,6 +54,7 @@ const BatchTaskInstance = defineComponent({
         searchVal: variables.searchVal,
         processInstanceId: variables.processInstanceId,
         host: variables.host,
+        taskType: variables.taskType,
         stateType: variables.stateType,
         datePickerRange: variables.datePickerRange,
         executorName: variables.executorName,
@@ -181,6 +183,16 @@ const BatchTaskInstance = defineComponent({
               v-model={[this.host, 'value']}
               size='small'
               placeholder={t('project.task.host')}
+              clearable
+            />
+            <NSelect
+              v-model={[this.taskType, 'value']}
+              size='small'
+              options={Object.keys(TASK_TYPES_MAP).map((item) => {
+                return { value: item, label: item }
+              })}
+              placeholder={t('project.task.task_type')}
+              style={{ width: '180px' }}
               clearable
             />
             <NSelect

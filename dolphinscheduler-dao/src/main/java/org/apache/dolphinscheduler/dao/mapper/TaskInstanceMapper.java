@@ -94,6 +94,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("processInstanceName") String processInstanceName,
                                                     @Param("searchVal") String searchVal,
                                                     @Param("taskName") String taskName,
+                                                    @Param("taskType") String taskType,
                                                     @Param("executorId") int executorId,
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
