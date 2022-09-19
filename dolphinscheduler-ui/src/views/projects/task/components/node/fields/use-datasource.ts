@@ -117,7 +117,7 @@ export function useDatasource(
     const res = await queryDataSourceList(parameters)
     datasourceOptions.value = res.map((item: any) => ({
       label: item.name,
-      value: item.id
+      value: String(item.id)
     }))
     const sourceField = params.sourceField || 'datasource'
     if (!res.length && model[sourceField]) model[sourceField] = null
