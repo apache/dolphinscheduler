@@ -18,6 +18,8 @@
 import type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
 import type { IOption } from '@/components/form/types'
 
+type TaskExecuteType = 'STREAM' | 'BATCH'
+
 type TaskType =
   | 'SHELL'
   | 'SUB_PROCESS'
@@ -37,8 +39,20 @@ type TaskType =
   | 'SWITCH'
   | 'SEATUNNEL'
   | 'EMR'
-  | 'SURVEIL'
-  | 'NEXT_LOOP'
+  | 'ZEPPELIN'
+  | 'K8S'
+  | 'JUPYTER'
+  | 'MLFLOW'
+  | 'OPENMLDB'
+  | 'DVC'
+  | 'JAVA'
+  | 'DINKY'
+  | 'SAGEMAKER'
+  | 'CHUNJUN'
+  | 'FLINK_STREAM'
+  | 'PYTORCH'
+  | 'HIVECLI'
+
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type DependentResultType = {
   [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
@@ -71,6 +85,7 @@ interface ITaskType {
   alias: string
   helperLinkDisable?: boolean
   taskDefinitionDisable?: boolean
+  taskExecuteType?: TaskExecuteType
 }
 interface ITaskTypeItem extends ITaskType {
   type: TaskType
@@ -91,5 +106,6 @@ export {
   TaskType,
   ITaskType,
   ITaskTypeItem,
-  TaskTypeState
+  TaskTypeState,
+  TaskExecuteType
 }

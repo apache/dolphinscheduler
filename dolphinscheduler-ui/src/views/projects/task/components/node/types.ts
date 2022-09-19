@@ -17,10 +17,7 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-import type {
-  TaskExecuteType,
-  TaskType
-} from '@/views/projects/task/constants/task-type'
+import type { TaskExecuteType, TaskType } from '@/store/project/types'
 import type { IDataBase } from '@/service/modules/data-source/types'
 import type {
   IFormItem,

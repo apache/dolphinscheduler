@@ -15,74 +15,67 @@
  * limitations under the License.
  */
 import { defineStore } from 'pinia'
-import type { TaskTypeState, ITaskType, TaskType, ITaskTypeItem } from './types'
+import type {
+  TaskTypeState,
+  TaskType,
+  ITaskTypeItem,
+  TaskExecuteType
+} from './types'
 
 export const TASK_TYPES_MAP = {
+  JAVA: {
+    alias: 'JAVA'
+  },
   SHELL: {
-    alias: 'SHELL',
-    helperLinkDisable: true
+    alias: 'SHELL'
   },
   SUB_PROCESS: {
-    alias: 'SUB_PROCESS',
-    helperLinkDisable: true
+    alias: 'SUB_PROCESS'
   },
   PROCEDURE: {
-    alias: 'PROCEDURE',
-    helperLinkDisable: true
+    alias: 'PROCEDURE'
   },
   SQL: {
-    alias: 'SQL',
-    helperLinkDisable: true
+    alias: 'SQL'
   },
   SPARK: {
-    alias: 'SPARK',
-    helperLinkDisable: true
+    alias: 'SPARK'
   },
   FLINK: {
-    alias: 'FLINK',
-    helperLinkDisable: true
+    alias: 'FLINK'
   },
   MR: {
     alias: 'MapReduce',
     helperLinkDisable: true
   },
   PYTHON: {
-    alias: 'PYTHON',
-    helperLinkDisable: true
+    alias: 'PYTHON'
   },
   DEPENDENT: {
-    alias: 'DEPENDENT',
-    helperLinkDisable: true
+    alias: 'DEPENDENT'
   },
   HTTP: {
-    alias: 'HTTP',
-    helperLinkDisable: true
+    alias: 'HTTP'
   },
   DATAX: {
-    alias: 'DataX',
-    helperLinkDisable: true
+    alias: 'DataX'
   },
   PIGEON: {
-    alias: 'PIGEON',
-    helperLinkDisable: true
+    alias: 'PIGEON'
   },
   SQOOP: {
     alias: 'SQOOP',
     helperLinkDisable: true
   },
   CONDITIONS: {
-    alias: 'CONDITIONS',
-    taskDefinitionDisable: true,
-    helperLinkDisable: true
+    alias: 'CONDITIONS'
   },
   DATA_QUALITY: {
     alias: 'DATA_QUALITY',
     helperLinkDisable: true
   },
   SWITCH: {
-    alias: 'SWITCH',
-    taskDefinitionDisable: true,
-    helperLinkDisable: true
+    alias: 'SWITCH'
   },
   SEATUNNEL: {
     alias: 'SeaTunnel',
@@ -92,15 +85,62 @@ export const TASK_TYPES_MAP = {
     alias: 'AmazonEMR',
     helperLinkDisable: true
   },
-  SURVEIL: {
-    alias: 'TRIGGER',
+  ZEPPELIN: {
+    alias: 'ZEPPELIN',
     helperLinkDisable: true
   },
-  NEXT_LOOP: {
-    alias: 'NEXT_LOOP',
+  JUPYTER: {
+    alias: 'JUPYTER',
+    helperLinkDisable: true
+  },
+  K8S: {
+    alias: 'K8S',
+    helperLinkDisable: true
+  },
+  MLFLOW: {
+    alias: 'MLFLOW',
+    helperLinkDisable: true
+  },
+  OPENMLDB: {
+    alias: 'OPENMLDB',
+    helperLinkDisable: true
+  },
+  DVC: {
+    alias: 'DVC',
+    helperLinkDisable: true
+  },
+  DINKY: {
+    alias: 'DINKY',
+    helperLinkDisable: true
+  },
+  SAGEMAKER: {
+    alias: 'SageMaker',
+    helperLinkDisable: true
+  },
+  CHUNJUN: {
+    alias: 'CHUNJUN',
+    helperLinkDisable: true
+  },
+  FLINK_STREAM: {
+    alias: 'FLINK_STREAM',
+    helperLinkDisable: true,
+    taskExecuteType: 'STREAM'
+  },
+  PYTORCH: {
+    alias: 'Pytorch',
+    helperLinkDisable: true
+  },
+  HIVECLI: {
+    alias: 'HIVECLI',
     helperLinkDisable: true
   }
-} as { [key in TaskType]: ITaskType }
+} as {
+  [key in TaskType]: {
+    alias: string
+    helperLinkDisable?: boolean
+    taskExecuteType?: TaskExecuteType
+  }
+}
 
 export const useTaskTypeStore = defineStore({
   id: 'project-task-type',
