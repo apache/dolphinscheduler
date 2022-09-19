@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -100,64 +101,69 @@ public final class AlertSenderService extends Thread {
 
     public void send(List<Alert> alerts) {
         for (Alert alert : alerts) {
-            // get alert group from alert
-            int alertId = alert.getId();
-            int alertGroupId = Optional.ofNullable(alert.getAlertGroupId()).orElse(0);
-            List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
-            if (CollectionUtils.isEmpty(alertInstanceList)) {
-                logger.error("send alert msg fail,no bind plugin instance.");
-                List<AlertResult> alertResults = Lists.newArrayList(new AlertResult("false",
-                        "no bind plugin instance"));
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, JSONUtils.toJsonString(alertResults), alertId);
-                AlertServerMetrics.incAlertFailCount();
-                continue;
-            }
-            AlertData alertData = AlertData.builder()
-                    .id(alertId)
-                    .content(alert.getContent())
-                    .log(alert.getLog())
-                    .title(alert.getTitle())
-                    .warnType(alert.getWarningType().getCode())
-                    .alertType(alert.getAlertType().getCode())
-                    .build();
-
-            int sendSuccessCount = 0;
-            List<AlertSendStatus> alertSendStatuses = new ArrayList<>();
-            List<AlertResult> alertResults = new ArrayList<>();
-            for (AlertPluginInstance instance : alertInstanceList) {
-                AlertResult alertResult = this.alertResultHandler(instance, alertData);
-                if (alertResult != null) {
-                    AlertStatus sendStatus = Boolean.parseBoolean(alertResult.getStatus())
-                            ? AlertStatus.EXECUTION_SUCCESS
-                            : AlertStatus.EXECUTION_FAILURE;
-                    AlertSendStatus alertSendStatus = AlertSendStatus.builder()
-                            .alertId(alertId)
-                            .alertPluginInstanceId(instance.getId())
-                            .sendStatus(sendStatus)
-                            .log(JSONUtils.toJsonString(alertResult))
-                            .createTime(new Date())
-                            .build();
-                    alertSendStatuses.add(alertSendStatus);
-                    if (AlertStatus.EXECUTION_SUCCESS.equals(sendStatus)) {
-                        sendSuccessCount++;
-                        AlertServerMetrics.incAlertSuccessCount();
-                    } else {
-                        AlertServerMetrics.incAlertFailCount();
-                    }
-                    alertResults.add(alertResult);
+            try {
+                LoggerUtils.setWorkflowInstanceIdMDC(alert.getProcessInstanceId());
+                // get alert group from alert
+                int alertId = alert.getId();
+                int alertGroupId = Optional.ofNullable(alert.getAlertGroupId()).orElse(0);
+                List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
+                if (CollectionUtils.isEmpty(alertInstanceList)) {
+                    logger.error("send alert msg fail,no bind plugin instance.");
+                    List<AlertResult> alertResults = Lists.newArrayList(new AlertResult("false",
+                            "no bind plugin instance"));
+                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, JSONUtils.toJsonString(alertResults), alertId);
+                    AlertServerMetrics.incAlertFailCount();
+                    continue;
                 }
+                AlertData alertData = AlertData.builder()
+                        .id(alertId)
+                        .content(alert.getContent())
+                        .log(alert.getLog())
+                        .title(alert.getTitle())
+                        .warnType(alert.getWarningType().getCode())
+                        .alertType(alert.getAlertType().getCode())
+                        .build();
+
+                int sendSuccessCount = 0;
+                List<AlertSendStatus> alertSendStatuses = new ArrayList<>();
+                List<AlertResult> alertResults = new ArrayList<>();
+                for (AlertPluginInstance instance : alertInstanceList) {
+                    AlertResult alertResult = this.alertResultHandler(instance, alertData);
+                    if (alertResult != null) {
+                        AlertStatus sendStatus = Boolean.parseBoolean(alertResult.getStatus())
+                                ? AlertStatus.EXECUTION_SUCCESS
+                                : AlertStatus.EXECUTION_FAILURE;
+                        AlertSendStatus alertSendStatus = AlertSendStatus.builder()
+                                .alertId(alertId)
+                                .alertPluginInstanceId(instance.getId())
+                                .sendStatus(sendStatus)
+                                .log(JSONUtils.toJsonString(alertResult))
+                                .createTime(new Date())
+                                .build();
+                        alertSendStatuses.add(alertSendStatus);
+                        if (AlertStatus.EXECUTION_SUCCESS.equals(sendStatus)) {
+                            sendSuccessCount++;
+                            AlertServerMetrics.incAlertSuccessCount();
+                        } else {
+                            AlertServerMetrics.incAlertFailCount();
+                        }
+                        alertResults.add(alertResult);
+                    }
+                }
+                AlertStatus alertStatus = AlertStatus.EXECUTION_SUCCESS;
+                if (sendSuccessCount == 0) {
+                    alertStatus = AlertStatus.EXECUTION_FAILURE;
+                } else if (sendSuccessCount < alertInstanceList.size()) {
+                    alertStatus = AlertStatus.EXECUTION_PARTIAL_SUCCESS;
+                }
+                // we update the alert first to avoid duplicate key in alertSendStatus
+                // this may loss the alertSendStatus if the server restart
+                // todo: use transaction to update these two table
+                alertDao.updateAlert(alertStatus, JSONUtils.toJsonString(alertResults), alertId);
+                alertDao.insertAlertSendStatus(alertSendStatuses);
+            } finally {
+                LoggerUtils.removeWorkflowInstanceIdMDC();
             }
-            AlertStatus alertStatus = AlertStatus.EXECUTION_SUCCESS;
-            if (sendSuccessCount == 0) {
-                alertStatus = AlertStatus.EXECUTION_FAILURE;
-            } else if (sendSuccessCount < alertInstanceList.size()) {
-                alertStatus = AlertStatus.EXECUTION_PARTIAL_SUCCESS;
-            }
-            // we update the alert first to avoid duplicate key in alertSendStatus
-            // this may loss the alertSendStatus if the server restart
-            // todo: use transaction to update these two table
-            alertDao.updateAlert(alertStatus, JSONUtils.toJsonString(alertResults), alertId);
-            alertDao.insertAlertSendStatus(alertSendStatuses);
         }
     }
 

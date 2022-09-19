@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.ArrayList;
@@ -87,12 +86,12 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean postSubmit() {
         super.postSubmit();
         initDependParameters();
+        logger.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
         return true;
     }
 
     @Override
     public boolean runTask() {
-        logger.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();
         }
