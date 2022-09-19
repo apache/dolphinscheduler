@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 public enum TaskExecutionStatus {
 
@@ -80,7 +80,7 @@ public enum TaskExecutionStatus {
     }
 
     public boolean isFailure() {
-        return this == TaskExecutionStatus.FAILURE;
+        return this == TaskExecutionStatus.FAILURE || this == NEED_FAULT_TOLERANCE;
     }
 
     public boolean isPause() {

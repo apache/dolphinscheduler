@@ -13,8 +13,8 @@ We encourage any form of participation in the community that will eventually bec
 * Help promote DolphinScheduler, participate in technical conferences or meetup, sharing and more.
 
 Welcome to the contributing team and join open source starting with submitting your first PR.
- - For example, add code comments or find "easy to fix" tags or some very simple issue (misspellings, etc.) and so on, first familiarize yourself with the submission process through the first simple PR.
- 
+- For example, add code comments or find "easy to fix" tags or some very simple issue (misspellings, etc.) and so on, first familiarize yourself with the submission process through the first simple PR.
+
 Note: Contributions are not limited to PR Only, but contribute to the development of the project.
 
 I'm sure you'll benefit from open source by participating in DolphinScheduler!

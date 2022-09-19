@@ -17,11 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +31,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.Logger;
 
 @Slf4j
 @UtilityClass
@@ -54,10 +56,9 @@ public class LogUtils {
         Set<String> appIds = new HashSet<>();
         try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
             stream.filter(line -> {
-                        Matcher matcher = APPLICATION_REGEX.matcher(line);
-                        return matcher.find();
-                    }
-            ).forEach(line -> {
+                Matcher matcher = APPLICATION_REGEX.matcher(line);
+                return matcher.find();
+            }).forEach(line -> {
                 Matcher matcher = APPLICATION_REGEX.matcher(line);
                 if (matcher.find()) {
                     String appId = matcher.group();
