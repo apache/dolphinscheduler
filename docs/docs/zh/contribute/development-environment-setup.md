@@ -129,7 +129,7 @@ pnpm install
 pnpm run dev
 ```
 
-截止目前，前后端已成功运行起来，浏览器访问[http://localhost:3000](http://localhost:3000)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
+截止目前，前后端已成功运行起来，浏览器访问[http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
 
 ## DolphinScheduler 普通开发模式
 
@@ -215,4 +215,4 @@ pnpm install
 pnpm run dev
 ```
 
-截止目前，前后端已成功运行起来，浏览器访问[http://localhost:3000](http://localhost:3000)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
+截止目前，前后端已成功运行起来，浏览器访问[http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
