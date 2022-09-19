@@ -365,7 +365,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * updateProcessInstance project
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
      * @param projectName project name
      * @param desc description
