@@ -19,3 +19,11 @@ HTTP
 ====
 
 .. automodule:: pydolphinscheduler.tasks.http
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Http.yaml
+   :start-after: # under the License.
+   :language: yaml

@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -28,8 +25,17 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -49,7 +55,7 @@ public class ProcessInstance {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * process definition code
@@ -65,6 +71,18 @@ public class ProcessInstance {
      * process state
      */
     private WorkflowExecutionStatus state;
+
+    /**
+     * state history
+     */
+    private String stateHistory;
+
+    /**
+     * state desc list from state history
+     */
+    @TableField(exist = false)
+    private List<StateDesc> stateDescList;
+
     /**
      * recovery flag for failover
      */
@@ -259,6 +277,11 @@ public class ProcessInstance {
     private boolean isBlocked;
 
     /**
+     * test flag
+     */
+    private int testFlag;
+
+    /**
      * set the process name with process define version and timestamp
      *
      * @param processDefinition processDefinition
@@ -310,4 +333,29 @@ public class ProcessInstance {
         return commandType;
     }
 
+    /**
+     * set state with desc
+     * @param state
+     * @param stateDesc
+     */
+    public void setStateWithDesc(WorkflowExecutionStatus state, String stateDesc) {
+        this.setState(state);
+        if (StringUtils.isEmpty(this.getStateHistory())) {
+            stateDescList = new ArrayList<>();
+        } else if (stateDescList == null) {
+            stateDescList = JSONUtils.toList(this.getStateHistory(), StateDesc.class);
+        }
+        stateDescList.add(new StateDesc(new Date(), state, stateDesc));
+        this.setStateHistory(JSONUtils.toJsonString(stateDescList));
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StateDesc {
+
+        Date time;
+        WorkflowExecutionStatus state;
+        String desc;
+    }
 }

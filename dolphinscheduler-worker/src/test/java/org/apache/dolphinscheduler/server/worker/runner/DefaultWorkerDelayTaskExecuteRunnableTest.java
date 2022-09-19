@@ -70,4 +70,29 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
         Assertions.assertEquals(TaskExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
     }
 
+    @Test
+    public void testErrorboundTestDataSource() {
+        TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
+                .dryRun(Constants.DRY_RUN_FLAG_NO)
+                .testFlag(Constants.TEST_FLAG_YES)
+                .taskInstanceId(0)
+                .processDefineId(0)
+                .firstSubmitTime(new Date())
+                .taskLogName("TestLogName")
+                .taskType("SQL")
+                .taskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"POSTGRESQL\",\"datasource\":null,\"sql\":\"select * from t_ds_user\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}")
+                .build();
+        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
+                taskExecutionContext,
+                workerConfig,
+                masterAddress,
+                workerMessageSender,
+                alertClientService,
+                taskPluginManager,
+                storageOperate
+        );
+
+        Assertions.assertAll(workerTaskExecuteRunnable::run);
+        Assertions.assertEquals(TaskExecutionStatus.FAILURE, taskExecutionContext.getCurrentExecutionStatus());
+    }
 }

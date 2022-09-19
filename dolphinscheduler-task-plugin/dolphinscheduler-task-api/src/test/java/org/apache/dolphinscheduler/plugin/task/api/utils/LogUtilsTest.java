@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
+import com.google.common.collect.Lists;
 
 public class LogUtilsTest {
 

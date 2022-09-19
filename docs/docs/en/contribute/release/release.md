@@ -192,7 +192,7 @@ mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheck
 
 It is basically the same as the previous rehearsal command, but deleting `-DdryRun=true` parameter.
 
-* `-DpushChanges=fals`: do not submit the edited version number and tag to GitHub automatically.
+* `-DpushChanges=false`: do not submit the edited version number and tag to GitHub automatically.
 
 > Note: You have to config your git `user.name` and `user.password` by command `git config --global user.email "you@example.com"`
 > and `git config --global user.name "Your Name"` if you meet some mistake like **Please tell me who you are.**
@@ -210,7 +210,7 @@ git push origin --tags
 > Note1: In this step, you should use github token for password because native password no longer supported, you can see
 > https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token for more
 > detail about how to create token about it.
-
+>
 > Note2: After the command done, it will auto-created `release.properties` file and `*.Backup` files, their will be need
 > in the following command and DO NOT DELETE THEM
 
@@ -293,6 +293,7 @@ cd ~/ds_svn/dev/dolphinscheduler
 svn add *
 svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```
+
 ## Check Release
 
 ### Check sha512 hash
@@ -353,14 +354,14 @@ cd ../
 
 Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dolphinscheduler-python-<VERSION>.tar.gz` then check the following items:
 
-*   Check whether source tarball is oversized for including nonessential files
-*   `LICENSE` and `NOTICE` files exist
-*   Correct year in `NOTICE` file
-*   There is only text files but no binary files
-*   All source files have ASF headers
-*   Codes can be compiled and pass the unit tests (mvn install)
-*   The contents of the release match with what's tagged in version control (diff -r a verify_dir tag_dir)
-*   Check if there is any extra files or folders, empty folders for example
+* Check whether source tarball is oversized for including nonessential files
+* `LICENSE` and `NOTICE` files exist
+* Correct year in `NOTICE` file
+* There is only text files but no binary files
+* All source files have ASF headers
+* Codes can be compiled and pass the unit tests (mvn install)
+* The contents of the release match with what's tagged in version control (diff -r a verify_dir tag_dir)
+* Check if there is any extra files or folders, empty folders for example
 
 #### Check binary packages
 
@@ -387,8 +388,8 @@ maybe not correct, you should filter them by yourself) and classify them and pas
 ### Vote procedure
 
 1. DolphinScheduler community vote: send the vote e-mail to `dev@dolphinscheduler.apache.org`.
-PMC needs to check the rightness of the version according to the document before they vote.
-After at least 72 hours and with at least 3 `+1 and no -1 PMC member` votes, it can come to the next stage of the vote.
+   PMC needs to check the rightness of the version according to the document before they vote.
+   After at least 72 hours and with at least 3 `+1 and no -1 PMC member` votes, it can come to the next stage of the vote.
 
 2. Announce the vote result: send the result vote e-mail to `dev@dolphinscheduler.apache.org`。
 
@@ -413,7 +414,7 @@ Release notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
 The release candidates: https://dist.apache.org/repos/dist/dev/dolphinscheduler/<VERSION>/
 
-Maven 2 staging repository: https://repository.apache.org/content/repositories/<VERSION>/org/apache/dolphinscheduler/
+Maven 2 staging repository: https://repository.apache.org/content/repositories/<STAGING.REPOSITORY>/org/apache/dolphinscheduler/
 
 Git tag for the release: https://github.com/apache/dolphinscheduler/tree/<VERSION>
 
@@ -421,7 +422,7 @@ Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
 Keys to verify the Release Candidate: https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS
 
-Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/community/release.html
+Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/contribute/release/release.html
 
 The vote will be open for at least 72 hours or until necessary number of votes are reached.
 
@@ -538,3 +539,4 @@ DolphinScheduler Resources:
 - Mailing list: dev@dolphinscheduler.apache.org
 - Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/user_doc/about/introduction.html
 ```
+

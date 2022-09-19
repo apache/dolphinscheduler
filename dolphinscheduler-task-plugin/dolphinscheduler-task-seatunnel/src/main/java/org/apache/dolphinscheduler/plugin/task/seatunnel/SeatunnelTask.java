@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
+
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -30,22 +32,23 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
 
 /**
  * seatunnel task
  */
-public class SeatunnelTask extends AbstractTaskExecutor {
+public class SeatunnelTask extends AbstractRemoteTask {
 
     /**
      * seatunnel parameters
@@ -77,6 +80,11 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     }
 
     @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
+    }
+
+    @Override
     public void init() {
         logger.info("SeaTunnel task params {}", taskExecutionContext.getTaskParams());
         if (!seatunnelParameters.checkParameters()) {
@@ -84,8 +92,9 @@ public class SeatunnelTask extends AbstractTaskExecutor {
         }
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // construct process
             String command = buildCommand();
@@ -107,9 +116,23 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
+    }
+
+    @Override
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     private String buildCommand() throws Exception {
@@ -155,11 +178,13 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     }
 
     private String buildConfigFilePath() {
-        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
-        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(),
+                taskExecutionContext.getExecutePath());
 
         if (!Files.exists(Paths.get(scriptFile))) {
             logger.info("generate script file:{}", scriptFile);

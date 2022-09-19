@@ -172,7 +172,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     private void setConditionResult() {
 
         List<TaskInstance> taskInstances = processService
-                .findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
+                .findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }
@@ -200,7 +200,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         logger.info("blocking opportunity: expected-->{}, actual-->{}", expected, this.conditionResult);
         processInstance.setBlocked(isBlocked);
         if (isBlocked) {
-            processInstance.setState(WorkflowExecutionStatus.READY_BLOCK);
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.READY_BLOCK, "ready block");
         }
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setEndTime(new Date());

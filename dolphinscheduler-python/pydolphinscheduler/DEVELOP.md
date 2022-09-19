@@ -1,20 +1,20 @@
 <!--
- Licensed to the Apache Software Foundation (ASF) under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  The ASF licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, either express or implied.  See the License for the
- specific language governing permissions and limitations
- under the License.
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
 -->
 
 # Develop
@@ -41,13 +41,12 @@ Next, we have to open pydolphinscheduler project in you editor. We recommend you
 instead of [IntelliJ IDEA][idea] to open it. And you could just open directory
 `dolphinscheduler-python/pydolphinscheduler` instead of `dolphinscheduler-python`.
 
-
 ## Brief Concept
 
 Apache DolphinScheduler is design to define workflow by UI, and pydolphinscheduler try to define it by code. When
 define by code, user usually do not care user, tenant, or queue exists or not. All user care about is created
 a new workflow by the code his/her definition. So we have some **side object** in `pydolphinscheduler/side`
-directory, their only check object exists or not, and create them if not exists. 
+directory, their only check object exists or not, and create them if not exists.
 
 ### Process Definition
 
@@ -106,7 +105,7 @@ and the next time you run it will be faster.
 
 If you failed section `lint` when you run command `tox -e local-ci`, you could try to run command `tox -e auto-lint`
 which we provider fix as many lints as possible. When I finish, you could run command `tox -e local-ci` to see
-whether the linter pass or not, you have to fix it by yourself if linter still fail. 
+whether the linter pass or not, you have to fix it by yourself if linter still fail.
 
 ### Manually
 
@@ -119,7 +118,7 @@ maybe you could follow [Black-integration][black-editor] to configure them in yo
 Our Python API CI would automatically run code style checker and unittest when you submit pull request in
 GitHub, you could also run static check locally.
 
-We recommend [pre-commit](https://pre-commit.com/) to do the checker mentioned above before you develop locally. 
+We recommend [pre-commit](https://pre-commit.com/) to do the checker mentioned above before you develop locally.
 You should install `pre-commit` by running
 
 ```shell
@@ -148,7 +147,7 @@ python -m flake8
 
 ## Build Document
 
-We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit pull request in 
+We use [sphinx][sphinx] to build docs. Dolphinscheduler Python API CI would automatically build docs when you submit pull request in
 GitHub. You may locally ensure docs could be built successfully in case the failure blocks CI, you can build by tox or manual.
 
 ### Build Document Automatically with tox
@@ -169,7 +168,7 @@ To build docs locally, install sphinx and related python modules first via:
 
 ```shell
 python -m pip install '.[doc]'
-``` 
+```
 
 Then go to document directory and execute the build command
 
@@ -261,4 +260,4 @@ users who may use it in other way.
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 [coverage]: https://coverage.readthedocs.io/en/stable/
 [isort]: https://pycqa.github.io/isort/index.html
-[sphinx]: https://www.sphinx-doc.org/en/master/
+[sphinx]: https://www.sphinx-doc.org/en/master

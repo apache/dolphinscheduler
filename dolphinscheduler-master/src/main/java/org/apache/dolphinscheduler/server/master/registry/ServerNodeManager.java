@@ -20,6 +20,10 @@ package org.apache.dolphinscheduler.server.master.registry;
 import java.util.Arrays;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -35,13 +39,10 @@ import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PreDestroy;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,8 +59,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+import javax.annotation.PreDestroy;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * server node manager
@@ -74,7 +80,6 @@ public class ServerNodeManager implements InitializingBean {
     private final ReentrantReadWriteLock workerGroupLock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock workerGroupReadLock = workerGroupLock.readLock();
     private final ReentrantReadWriteLock.WriteLock workerGroupWriteLock = workerGroupLock.writeLock();
-
 
     private final ReentrantReadWriteLock workerNodeInfoLock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock workerNodeInfoReadLock = workerNodeInfoLock.readLock();
@@ -157,7 +162,6 @@ public class ServerNodeManager implements InitializingBean {
         return MASTER_SIZE;
     }
 
-
     /**
      * init listener
      *
@@ -168,9 +172,11 @@ public class ServerNodeManager implements InitializingBean {
 
         // load nodes from zookeeper
         load();
-
+        
         // init executor service
-        executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
+        executorService =
+                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
+
         executorService.scheduleWithFixedDelay(new WorkerNodeInfoAndGroupDbSyncTask(), 0, 10, TimeUnit.SECONDS);
 
         // init MasterNodeListener listener
@@ -232,7 +238,6 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
-
     protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo, WorkerGroup wg) {
         Set<String> nodes = new HashSet<>();
         String[] addrs = wg.getAddrList().split(Constants.COMMA);
@@ -258,7 +263,8 @@ public class ServerNodeManager implements InitializingBean {
                 try {
                     String[] parts = path.split("/");
                     if (parts.length < WORKER_LISTENER_CHECK_LENGTH) {
-                        throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
+                        throw new IllegalArgumentException(
+                                String.format("worker group path : %s is not valid, ignore", path));
                     }
                     final String workerGroupName = parts[parts.length - 2];
                     final String workerAddress = parts[parts.length - 1];
@@ -286,6 +292,7 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     class MasterDataListener implements SubscribeListener {
+
         @Override
         public void notify(Event event) {
             final String path = event.path();
@@ -344,7 +351,8 @@ public class ServerNodeManager implements InitializingBean {
             } else {
                 logger.warn("current addr:{} is not in active master list", masterConfig.getMasterAddress());
             }
-            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT, masterConfig.getMasterAddress());
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE, MASTER_SLOT,
+                    masterConfig.getMasterAddress());
         } finally {
             masterLock.unlock();
         }
