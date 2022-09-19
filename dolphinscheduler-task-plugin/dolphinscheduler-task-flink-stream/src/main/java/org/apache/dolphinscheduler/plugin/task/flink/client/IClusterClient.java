@@ -18,11 +18,15 @@
 package org.apache.dolphinscheduler.plugin.task.flink.client;
 
 import org.apache.dolphinscheduler.plugin.task.flink.entity.CheckpointInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.enums.YarnTaskStatus;
 
 import java.util.List;
+
+/**
+ * cluster client interface
+ */
 public interface IClusterClient {
 
     /**
@@ -30,7 +34,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    ResultInfo submitFlinkJob(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo submitFlinkJob(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * submit flink job in kerberos env
@@ -39,7 +43,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    ResultInfo submitFlinkJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo submitFlinkJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * kill flink job in yarn and delete application files in hdfs.
@@ -48,7 +52,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    ResultInfo killYarnJob(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo killYarnJob(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * kill yarn job in kerberos env
@@ -57,7 +61,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    ResultInfo killYarnJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo killYarnJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * get yarn job status
@@ -66,7 +70,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    YarnTaskStatus getYarnJobStatus(ParamsInfo jobParamsInfo) throws Exception;
+    YarnTaskStatus getYarnJobStatus(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * get yarn job status
@@ -75,7 +79,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    YarnTaskStatus getYarnJobStatusWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    YarnTaskStatus getYarnJobStatusWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * get checkpoint path
@@ -84,7 +88,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    List<CheckpointInfo> getCheckpointPaths(ParamsInfo jobParamsInfo) throws Exception;
+    List<CheckpointInfo> getCheckpointPaths(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * get checkpoint path
@@ -93,7 +97,7 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    List<CheckpointInfo> getCheckpointPathsWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    List<CheckpointInfo> getCheckpointPathsWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * print finished job logs
@@ -102,7 +106,7 @@ public interface IClusterClient {
      * @return file path
      * @throws Exception
      */
-    String printFinishedLogToFile(ParamsInfo jobParamsInfo) throws Exception;
+    String printFinishedLogToFile(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * print finished job logs
@@ -111,7 +115,7 @@ public interface IClusterClient {
      * @return file path
      * @throws Exception
      */
-    String printFinishedLogToFileWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    String printFinishedLogToFileWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * cancel flink job by applicationId and flink job id
@@ -120,7 +124,7 @@ public interface IClusterClient {
      * @return file path
      * @throws Exception
      */
-    ResultInfo cancelFlinkJob(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo cancelFlinkJob(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * cancel flink job by applicationId and flink job id
@@ -129,7 +133,7 @@ public interface IClusterClient {
      * @return file path
      * @throws Exception
      */
-    ResultInfo cancelFlinkJobDoSavepoint(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo cancelFlinkJobDoSavepoint(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * cancel flink job by applicationId and flink job id with Kerberos
@@ -138,7 +142,7 @@ public interface IClusterClient {
      * @return file path
      * @throws Exception
      */
-    ResultInfo cancelFlinkJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo cancelFlinkJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      * cancel flink job by applicationId and flink job id with Kerberos
@@ -147,7 +151,16 @@ public interface IClusterClient {
      * @return file path
      * @throws Exception
      */
-    ResultInfo cancelFlinkJobDoSavepointWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo cancelFlinkJobDoSavepointWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
+
+    /**
+     * save
+     *
+     * @param jobParamsInfo
+     * @return
+     * @throws Exception
+     */
+    FlinkResultInfo savePointFlinkJob(FlinkParamsInfo jobParamsInfo) throws Exception;
 
     /**
      *
@@ -155,13 +168,5 @@ public interface IClusterClient {
      * @return
      * @throws Exception
      */
-    ResultInfo savePointFlinkJob(ParamsInfo jobParamsInfo) throws Exception;
-
-    /**
-     *
-     * @param jobParamsInfo
-     * @return
-     * @throws Exception
-     */
-    ResultInfo savePointFlinkJobWithKerberos(ParamsInfo jobParamsInfo) throws Exception;
+    FlinkResultInfo savePointFlinkJobWithKerberos(FlinkParamsInfo jobParamsInfo) throws Exception;
 }

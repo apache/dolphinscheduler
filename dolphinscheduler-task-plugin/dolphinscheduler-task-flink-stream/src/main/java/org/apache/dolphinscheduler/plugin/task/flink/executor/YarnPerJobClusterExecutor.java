@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.executor;
 
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ResultInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkResultInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.factory.YarnClusterDescriptorFactory;
 import org.apache.dolphinscheduler.plugin.task.flink.utils.JobGraphBuildUtil;
 
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.flink.client.deployment.ClusterSpecification;
 import org.apache.flink.client.program.ClusterClientProvider;
 import org.apache.flink.configuration.Configuration;
@@ -44,12 +43,12 @@ public class YarnPerJobClusterExecutor extends AbstractClusterExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(YarnPerJobClusterExecutor.class);
 
-    public YarnPerJobClusterExecutor(ParamsInfo jobParamsInfo) {
+    public YarnPerJobClusterExecutor(FlinkParamsInfo jobParamsInfo) {
         super(jobParamsInfo);
     }
 
     @Override
-    public ResultInfo submitJob() {
+    public FlinkResultInfo submitJob() {
         try {
             // 1. parse default flink configuration from flink-conf.yaml and dynamic replacement
             // default config.
@@ -83,11 +82,11 @@ public class YarnPerJobClusterExecutor extends AbstractClusterExecutor {
                 String jobId = jobGraph.getJobID().toString();
                 logger.info("deploy per_job with appId: {}, jobId: {}", applicationId, jobId);
 
-                return new ResultInfo(applicationId, jobId);
+                return new FlinkResultInfo(applicationId, jobId);
             }
         } catch (Exception e) {
             logger.error("submit job to yarn error: ", e);
-            return new ResultInfo("", "");
+            return new FlinkResultInfo("", "");
         }
     }
 

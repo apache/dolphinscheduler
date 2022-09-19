@@ -39,24 +39,23 @@ public enum YarnClusterDescriptorFactory implements AbstractClusterDescriptorFac
     @Override
     public ClusterDescriptor createClusterDescriptor(
                                                      String hadoopConfDir, Configuration flinkConfig) {
-        if (StringUtils.isNotBlank(hadoopConfDir)) {
-            try {
-                YarnConfiguration yarnConf = parseYarnConfFromConfDir(hadoopConfDir);
-                YarnClient yarnClient = createYarnClientFromYarnConf(yarnConf);
-
-                YarnClusterDescriptor clusterDescriptor =
-                        new YarnClusterDescriptor(
-                                flinkConfig,
-                                yarnConf,
-                                yarnClient,
-                                YarnClientYarnClusterInformationRetriever.create(yarnClient),
-                                false);
-                return clusterDescriptor;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
+        if (StringUtils.isBlank(hadoopConfDir)) {
             throw new RuntimeException("yarn mode must set param of 'hadoopConfDir'");
+        }
+        try {
+            YarnConfiguration yarnConf = parseYarnConfFromConfDir(hadoopConfDir);
+            YarnClient yarnClient = createYarnClientFromYarnConf(yarnConf);
+
+            YarnClusterDescriptor clusterDescriptor =
+                    new YarnClusterDescriptor(
+                            flinkConfig,
+                            yarnConf,
+                            yarnClient,
+                            YarnClientYarnClusterInformationRetriever.create(yarnClient),
+                            false);
+            return clusterDescriptor;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

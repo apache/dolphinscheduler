@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.utils;
 
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +45,7 @@ public class JobGraphBuildUtil {
     public static final String ALLOW_NON_RESTORED_STATE_KEY = "allowNonRestoredState";
     public static final String PARALLELISM = "parallelism.default";
 
-    public static JobGraph buildJobGraph(ParamsInfo jobParamsInfo, Configuration flinkConfig) throws Exception {
+    public static JobGraph buildJobGraph(FlinkParamsInfo jobParamsInfo, Configuration flinkConfig) throws Exception {
         Properties confProperties = jobParamsInfo.getConfProperties();
         int parallelism =
                 Objects.isNull(confProperties)

@@ -21,42 +21,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.dolphinscheduler.plugin.task.flink.enums.FlinkStreamDeployMode;
-
-import java.util.Properties;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class ParamsInfo {
+public class FlinkResultInfo {
 
-    private String name;
-    private String queue;
-    private FlinkStreamDeployMode runMode;
-    private String runJarPath;
-    private String flinkConfDir;
-    private String flinkJarPath;
-    private String flinkVersion;
-    private String hadoopConfDir;
-    private String applicationId;
-    private String flinkJobId;
-    private String entryPointClassName;
-    private String[] dependFiles;
-    private String[] execArgs;
-    private Properties confProperties;
+    private String appId;
 
-    /** security config */
-    private boolean openSecurity;
-
-    private String krb5Path;
-    private String principal;
-    private String keytabPath;
-    private boolean cacheUgi;
-
-    /** checkpoint path in hdfs */
-    private String hdfsPath;
-
-    /** finished job print log dir */
-    private String finishedJobLogDir;
+    private String jobId;
 }

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink.executor;
 
-import org.apache.dolphinscheduler.plugin.task.flink.entity.ParamsInfo;
+import org.apache.dolphinscheduler.plugin.task.flink.entity.FlinkParamsInfo;
 import org.apache.dolphinscheduler.plugin.task.flink.factory.YarnClusterDescriptorFactory;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
@@ -54,7 +54,7 @@ public class KerberosSecurityContext {
     private static Cache<String, UserGroupInformation> ugiCache =
             CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
 
-    public static <T> T runSecured(ParamsInfo jobParamsInfo,
+    public static <T> T runSecured(FlinkParamsInfo jobParamsInfo,
                                    final Supplier<T> supplier) throws IOException, InterruptedException {
         logger.info("KerberosSecurityContext jobParamsInfo:{}", jobParamsInfo.toString());
 
