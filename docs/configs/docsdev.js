@@ -271,6 +271,10 @@ export default {
                                 title: 'Oracle',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/oracle.html',
                             },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
+                            },
                         ],
                     },
                     {
@@ -874,6 +878,10 @@ export default {
                             {
                                 title: 'Spark',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
                             },
                         ],
                     },
