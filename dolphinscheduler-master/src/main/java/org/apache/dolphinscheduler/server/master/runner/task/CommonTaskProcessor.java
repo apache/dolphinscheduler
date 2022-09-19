@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import com.google.auto.service.AutoService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
@@ -44,6 +46,8 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     private TaskPriorityQueue<TaskPriority> taskUpdateQueue;
 
     private NettyExecutorManager nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
+
+    private ServerNodeManager serverNodeManager;
 
     @Override
     protected boolean submitTask() {
@@ -116,6 +120,14 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 return false;
             }
 
+            // check in advance to avoid invalid infinite loops in TaskPriorityQueueConsumer
+            if (CollectionUtils.isEmpty(serverNodeManager.getWorkerGroupNodes(taskExecutionContext.getWorkerGroup()))) {
+                logger.error("taskInstanceId : {} needs to run on worker group {}, but it does not exists.",
+                    taskInstance.getId(),
+                    taskExecutionContext.getWorkerGroup());
+                return false;
+            }
+
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);
@@ -129,6 +141,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     public void initQueue() {
         this.taskUpdateQueue = SpringApplicationContext.getBean(TaskPriorityQueueImpl.class);
+        this.serverNodeManager = SpringApplicationContext.getBean(ServerNodeManager.class);
     }
 
     @Override
