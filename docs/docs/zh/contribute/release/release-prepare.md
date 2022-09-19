@@ -29,4 +29,4 @@
   - 新增历史版本
      - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的历史版本为 `x.y.z`
   - 修改文档 sidebar
-    - `docs/configs/docs3-0-1.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`
+    - `docs/configs/docsdev.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`
