@@ -197,7 +197,7 @@ mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheck
 
 和上一步演练的命令基本相同，去掉了 `-DdryRun=true` 参数。
 
-* `-DpushChanges=fals`:不要将修改后的版本号和tag自动提交至GitHub。
+* `-DpushChanges=false`:不要将修改后的版本号和tag自动提交至GitHub。
 
 > 注意：如果你遇到来自 git 的类似 **Please tell me who you are.** 错误信息。您可以通过命令 `git config --global user.email "you@example.com"`
 > 和 `git config --global user.name "Your Name"` 来配置你的用户名和邮箱如果你遇到一些错误。
@@ -211,7 +211,7 @@ git push origin --tags
 
 <!-- markdown-link-check-disable -->
 
-> 注意1：因为 Github 不再支持在 HTTPS 协议中使用原生密码在，所以在这一步你应该使用 github token 作为密码。你可以通过 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating -a-personal-access-token
+> 注意1：因为 Github 不再支持在 HTTPS 协议中使用原生密码在，所以在这一步你应该使用 github token 作为密码。你可以通过 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 > 了解更多如果创建 token 的信息。
 
 > 注意2：命令完成后，会自动创建 `release.properties` 文件和 `*.Backup` 文件，它们在下面的命令中是需要的，不要删除它们
@@ -342,8 +342,9 @@ gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
 cd ../
 ```
 
-> 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令 `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"- bin.tar.gz`
-> 和 `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz` 将创建它们
+> 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令 
+> `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz` 和
+> `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz` 将创建它们
 
 ### 检查发布文件内容
 
@@ -408,7 +409,7 @@ Release notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
 The release candidates: https://dist.apache.org/repos/dist/dev/dolphinscheduler/<VERSION>/
 
-Maven 2 staging repository: https://repository.apache.org/content/repositories/<VERSION>/org/apache/dolphinscheduler/
+Maven 2 staging repository: https://repository.apache.org/content/repositories/<STAGING.REPOSITORY>/org/apache/dolphinscheduler/
 
 Git tag for the release: https://github.com/apache/dolphinscheduler/tree/<VERSION>
 
@@ -416,7 +417,7 @@ Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
 Keys to verify the Release Candidate: https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS
 
-Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/community/release.html
+Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/contribute/release/release.html
 
 The vote will be open for at least 72 hours or until necessary number of votes are reached.
 
