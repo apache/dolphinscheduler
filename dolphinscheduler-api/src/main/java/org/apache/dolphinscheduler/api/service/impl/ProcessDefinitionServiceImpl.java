@@ -1992,7 +1992,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                     throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                 }
-                processDefinition.setId(0);
+                processDefinition.setId(null);
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(getNewName(processDefinition.getName(), COPY_SUFFIX));
                 final Date date = new Date();
