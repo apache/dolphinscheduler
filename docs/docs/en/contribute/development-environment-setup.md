@@ -133,7 +133,7 @@ pnpm install
 pnpm run dev
 ```
 
-The browser access address [http://localhost:3000](http://localhost:3000) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+The browser access address [http://localhost:5173](http://localhost:5173) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
 
 ## DolphinScheduler Normal Mode
 
@@ -223,4 +223,4 @@ pnpm install
 pnpm run dev
 ```
 
-The browser access address [http://localhost:3000](http://localhost:3000) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+The browser access address [http://localhost:5173](http://localhost:5173) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
