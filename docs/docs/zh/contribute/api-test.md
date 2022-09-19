@@ -1,4 +1,5 @@
 # DolphinScheduler — API 测试
+
 ## 前置知识：
 
 ### API 测试与单元测试的区别
@@ -47,9 +48,7 @@ public final class LoginPage {
 
 在登陆页面（LoginPage）只定义接口请求的入参规范，对于接口请求出参只定义统一的基础响应结构，接口实际返回的data数据则再实际的测试用例中测试。主要测试接口的输入和输出是否能够符合测试用例的要求。
 
-
 ### API-Cases
-
 
 下面以租户管理测试为例，前文已经说明，我们使用 docker-compose 进行部署，所以每个测试案例，都需要以注解的形式引入对应的文件。
 
@@ -82,7 +81,6 @@ public final class LoginPage {
 其余的都是类似的情况，可参考具体的源码来理解。
 
 https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/cases
-
 
 ## 补充
 

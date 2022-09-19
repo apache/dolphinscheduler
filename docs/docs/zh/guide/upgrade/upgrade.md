@@ -22,18 +22,18 @@
 
 ### 数据库升级
 
-修改 `./bin/env/dolphinscheduler_env.sh` 中的如下配置（{user}和{password}改成你数据库的用户名和密码），然后运行升级脚本。
+设置相关环境变量（{user}和{password}改成你数据库的用户名和密码），然后运行升级脚本。
 
 下面以 MySQL 为例，别的数据库仅需要修改成对应的配置即可。请先手动下载 [mysql-connector-java 驱动 jar](https://downloads.MySQL.com/archives/c-j/)
-jar 包 并添加到 `./tools/libs` 目录下，修改 `./bin/env/dolphinscheduler_env.sh` 文件
+jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 
-    ```shell
-    export DATABASE=${DATABASE:-mysql}
-    export SPRING_PROFILES_ACTIVE=${DATABASE}
-    export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
-    export SPRING_DATASOURCE_USERNAME={user}
-    export SPRING_DATASOURCE_PASSWORD={password}
-    ```
+        ```shell
+        export DATABASE=${DATABASE:-mysql}
+        export SPRING_PROFILES_ACTIVE=${DATABASE}
+        export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
+        export SPRING_DATASOURCE_USERNAME={user}
+        export SPRING_DATASOURCE_PASSWORD={password}
+        ```
 
 执行数据库升级脚本：`sh ./tools/bin/upgrade-schema.sh`
 
@@ -61,10 +61,10 @@ jar 包 并添加到 `./tools/libs` 目录下，修改 `./bin/env/dolphinschedul
 
 * 查询已备份的数据库，查看 `t_ds_worker_group` 表记录，重点看下id、name和ip_list三个字段
 
-| id | name | ip_list    |
-| :---         |     :---:      |          ---: |
-| 1   | service1     | 192.168.xx.10    |
-| 2   | service2     | 192.168.xx.11,192.168.xx.12      |
+| id |   name   |                     ip_list |
+|:---|:--------:|----------------------------:|
+| 1  | service1 |               192.168.xx.10 |
+| 2  | service2 | 192.168.xx.11,192.168.xx.12 |
 
 * 修改 `bin/env/install_config.conf` 中的 workers 参数
 

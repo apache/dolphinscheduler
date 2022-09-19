@@ -107,6 +107,8 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
             originResSet.removeAll(ownResSets);
+            if (CollectionUtils.isNotEmpty(originResSet))
+                logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
             return originResSet.isEmpty();
         }
         return true;
@@ -116,7 +118,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     public boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId, String permissionKey, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
-            logger.error("user id {} doesn't exist", userId);
+            logger.error("User does not exist, userId:{}.", userId);
             return false;
         }
         if (user.getUserType().equals(UserType.ADMIN_USER)) {
@@ -139,7 +141,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     public Set<Object> userOwnedResourceIdsAcquisition(Object authorizationType, Integer userId, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
-            logger.error("user id {} doesn't exist", userId);
+            logger.error("User does not exist, userId:{}.", userId);
             return Collections.emptySet();
         }
         return (Set<Object>) RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(

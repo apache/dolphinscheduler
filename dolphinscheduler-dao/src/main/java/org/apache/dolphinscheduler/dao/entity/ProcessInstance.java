@@ -277,6 +277,11 @@ public class ProcessInstance {
     private boolean isBlocked;
 
     /**
+     * test flag
+     */
+    private int testFlag;
+
+    /**
      * set the process name with process define version and timestamp
      *
      * @param processDefinition processDefinition
