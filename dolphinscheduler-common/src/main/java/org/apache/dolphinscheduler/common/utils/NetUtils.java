@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.http.conn.util.InetAddressUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.net.util.IPAddressUtil;
 
 /**
  * NetUtils
@@ -182,7 +182,7 @@ public class NetUtils {
         }
         String name = address.getHostAddress();
         return (name != null
-                && IPAddressUtil.isIPv4LiteralAddress(name)
+                && InetAddressUtils.isIPv4Address(name)
                 && !address.isAnyLocalAddress()
                 && !address.isLoopbackAddress());
     }
