@@ -84,9 +84,14 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     boolean allDependentItemFinished;
 
+    protected boolean postSubmit() {
+        super.postSubmit();
+        initDependParameters();
+        return true;
+    }
+
     @Override
     public boolean runTask() {
-        initDependParameters();
         logger.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();
