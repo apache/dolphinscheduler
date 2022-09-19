@@ -785,7 +785,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      *
      * @param processDefinition ProcessDefinition you change task definition and task relation
      */
-    private void processDefinitionUsedInOtherTaskValid(ProcessDefinition processDefinition) {
+    protected void processDefinitionUsedInOtherTaskValid(ProcessDefinition processDefinition) {
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
             throw new ServiceException(Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getName());
