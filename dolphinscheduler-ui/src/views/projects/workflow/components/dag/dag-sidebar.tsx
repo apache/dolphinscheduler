@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, reactive, ref } from 'vue'
+import { defineComponent, onMounted, reactive } from 'vue'
 import { useTaskTypeStore } from '@/store/project'
 import styles from './dag.module.scss'
 import type { TaskType } from './types'
@@ -79,10 +79,10 @@ export default defineComponent({
 
     const handleCollection = (item: any) => {
       item.collection
-        ? CancelCollection(item.taskName).then((res: any) => {
+        ? CancelCollection(item.taskName).then(() => {
             handleDagMenu()
           })
-        : Collection(item.taskName).then((res: any) => {
+        : Collection(item.taskName).then(() => {
             handleDagMenu()
           })
       item.collection = !item.collection
