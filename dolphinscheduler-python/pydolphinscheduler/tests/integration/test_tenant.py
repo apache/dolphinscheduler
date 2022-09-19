@@ -73,7 +73,7 @@ def test_update_tenant():
 def test_delete_tenant():
     """Test delete tenant from java gateway."""
     user = get_user()
-    tenant = get_tenant(user_name=user.name)
+    tenant = get_tenant(user_name="admin")
     tenant.delete()
     tenant_ = Tenant(code=tenant.code)
     tenant_.get_tenant()
