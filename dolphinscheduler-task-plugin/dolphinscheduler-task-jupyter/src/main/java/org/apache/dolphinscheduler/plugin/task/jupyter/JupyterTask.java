@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -35,10 +35,13 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class JupyterTask extends AbstractTaskExecutor {
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JupyterTask extends AbstractRemoteTask {
 
     /**
      * jupyter parameters
@@ -61,6 +64,11 @@ public class JupyterTask extends AbstractTaskExecutor {
     }
 
     @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
+    }
+
+    @Override
     public void init() {
         logger.info("jupyter task params {}", taskExecutionContext.getTaskParams());
 
@@ -76,8 +84,9 @@ public class JupyterTask extends AbstractTaskExecutor {
         }
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
@@ -94,6 +103,16 @@ public class JupyterTask extends AbstractTaskExecutor {
             exitStatusCode = -1;
             throw new TaskException("Execute jupyter task failed", e);
         }
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
     }
 
     /**
@@ -223,9 +242,13 @@ public class JupyterTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     @Override

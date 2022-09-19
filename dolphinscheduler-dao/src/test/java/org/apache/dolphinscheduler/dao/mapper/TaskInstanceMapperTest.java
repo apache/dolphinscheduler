@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Collections;
 import java.util.Date;
@@ -34,7 +35,6 @@ import java.util.List;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -51,15 +51,6 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
-
-    @Before
-    public void before() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setWarningGroupId(0);
-        processInstance.setCommandParam("");
-        processInstance.setProcessDefinitionCode(1L);
-        processInstanceMapper.insert(processInstance);
-    }
 
     /**
      * insert
@@ -84,6 +75,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
         processInstance.setProcessDefinitionCode(1L);
+        processInstance.setTestFlag(0);
         processInstanceMapper.insert(processInstance);
         return processInstanceMapper.queryByProcessDefineCode(1L, 1).get(0);
     }
@@ -188,13 +180,14 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         List<TaskInstance> taskInstances = taskInstanceMapper.findValidTaskListByProcessId(
                 task.getProcessInstanceId(),
-                Flag.YES);
+                Flag.YES,
+                processInstance.getTestFlag());
 
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
-            Flag.NO);
-
+            Flag.NO,
+            processInstance.getTestFlag());
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);

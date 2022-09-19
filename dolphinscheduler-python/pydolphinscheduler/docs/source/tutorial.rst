@@ -37,6 +37,8 @@ There are two types of tutorials: traditional and task decorator.
   versatility to the traditional way because it only supported Python functions and without build-in tasks
   supported. But it is helpful if your workflow is all built with Python or if you already have some Python
   workflow code and want to migrate them to pydolphinscheduler.
+- **YAML File**: We can use pydolphinscheduler CLI to create process using YAML file: :code:`pydolphinscheduler yaml -f tutorial.yaml`. 
+  We can find more YAML file examples in `examples/yaml_define <https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-python/pydolphinscheduler/examples/yaml_define>`_
 
 .. tab:: Tradition
 
@@ -51,6 +53,12 @@ There are two types of tutorials: traditional and task decorator.
       :dedent: 0
       :start-after: [start tutorial]
       :end-before: [end tutorial]
+
+.. tab:: YAML File
+
+   .. literalinclude:: ../../examples/yaml_define/tutorial.yaml
+      :start-after: # under the License.
+      :language: yaml
 
 Import Necessary Module
 -----------------------
@@ -104,6 +112,13 @@ will be running this task in the DolphinScheduler worker. See :ref:`section tena
       :start-after: [start workflow_declare]
       :end-before: [end workflow_declare]
 
+.. tab:: YAML File
+
+   .. literalinclude:: ../../examples/yaml_define/tutorial.yaml
+      :start-after: # under the License.
+      :end-before: # Define the tasks under the workflow
+      :language: yaml
+
 We could find more detail about :code:`ProcessDefinition` in :ref:`concept about process definition <concept:process definition>`
 if you are interested in it. For all arguments of object process definition, you could find in the
 :class:`pydolphinscheduler.core.process_definition` API documentation.
@@ -139,6 +154,12 @@ Task Declaration
    It makes our workflow more Pythonic, but be careful that when we use task decorator mode mean we only use
    Python function as a task and could not use the :doc:`built-in tasks <tasks/index>` most of the cases.
 
+.. tab:: YAML File
+
+   .. literalinclude:: ../../examples/yaml_define/tutorial.yaml
+      :start-after: # Define the tasks under the workflow 
+      :language: yaml
+
 Setting Task Dependence
 -----------------------
 
@@ -166,6 +187,14 @@ and task `task_child_two` was done, because both two task is `task_union`'s upst
       :dedent: 0
       :start-after: [start task_relation_declare]
       :end-before: [end task_relation_declare]
+
+.. tab:: YAML File
+
+   We can use :code:`deps:[]` to set task dependence
+
+   .. literalinclude:: ../../examples/yaml_define/tutorial.yaml
+      :start-after: # Define the tasks under the workflow 
+      :language: yaml
 
 .. note::
 
@@ -198,6 +227,17 @@ will create workflow definition as well as workflow schedule.
       :start-after: [start submit_or_run]
       :end-before: [end submit_or_run]
 
+.. tab:: YAML File
+
+   pydolphinscheduler YAML CLI always submit workflow. We can run the workflow if we set :code:`run: true`
+
+   .. code-block:: yaml
+
+     # Define the workflow
+     workflow:
+       name: "tutorial"
+       run: true
+
 At last, we could execute this workflow code in your terminal like other Python scripts, running
 :code:`python tutorial.py` to trigger and execute it.
 
@@ -218,6 +258,62 @@ named "tutorial" or "tutorial_decorator". The task graph of workflow like below:
 .. literalinclude:: ../../src/pydolphinscheduler/examples/tutorial.py
    :language: text
    :lines: 24-28
+
+Create Process Using YAML File
+------------------------------
+
+We can use pydolphinscheduler CLI to create process using YAML file
+
+.. code-block:: bash
+
+   pydolphinscheduler yaml -f Shell.yaml
+
+We can use the following four special grammars to define workflows more flexibly.
+
+- :code:`$FILE{"file_name"}`: Read the file (:code:`file_name`) contents and replace them to that location.
+- :code:`$WORKFLOW{"other_workflow.yaml"}`: Refer to another process defined using YAML file (:code:`other_workflow.yaml`) and replace the process name in this location.
+- :code:`$ENV{env_name}`: Read the environment variable (:code:`env_name`) and replace it to that location.
+- :code:`${CONFIG.key_name}`: Read the configuration value of key (:code:`key_name`) and it them to that location.
+
+
+In addition, when loading the file path use :code:`$FILE{"file_name"}` or :code:`$WORKFLOW{"other_workflow.yaml"}`, pydolphinscheduler will search in the path of the YAMl file if the file does not exist.
+
+For exmaples, our file directory structure is as follows:
+
+.. code-block:: bash
+
+   .
+   └── yaml_define
+       ├── Condition.yaml
+       ├── DataX.yaml
+       ├── Dependent_External.yaml
+       ├── Dependent.yaml
+       ├── example_datax.json
+       ├── example_sql.sql
+       ├── example_subprocess.yaml
+       ├── Flink.yaml
+       ├── Http.yaml
+       ├── MapReduce.yaml
+       ├── MoreConfiguration.yaml
+       ├── Procedure.yaml
+       ├── Python.yaml
+       ├── Shell.yaml
+       ├── Spark.yaml
+       ├── Sql.yaml
+       ├── SubProcess.yaml
+       └── Switch.yaml
+
+After we run
+
+.. code-block:: bash
+
+   pydolphinscheduler yaml -file yaml_define/SubProcess.yaml
+
+
+the :code:`$WORKFLOW{"example_sub_workflow.yaml"}` will be set to :code:`$WORKFLOW{"yaml_define/example_sub_workflow.yaml"}`, because :code:`./example_subprocess.yaml` does not exist and :code:`yaml_define/example_sub_workflow.yaml` does.
+
+Furthermore, this feature supports recursion all the way down.
+
 
 .. _`DolphinScheduler project page`: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/project.html
 .. _`Python context manager`: https://docs.python.org/3/library/stdtypes.html#context-manager-types

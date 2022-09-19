@@ -6,11 +6,11 @@ When the third-party jar needs to be used in the scheduling process or the user 
 
 > **_Note:_**
 >
-> * When you manage files as `admin`, remember to set up `tenant` for `admin` first. 
+> * When you manage files as `admin`, remember to set up `tenant` for `admin` first.
 
 ## Basic Operations
 
-### Create File 
+### Create File
 
 The file format supports the following types: txt, log, sh, conf, cfg, py, java, sql, xml, hql, properties.
 
@@ -21,12 +21,6 @@ The file format supports the following types: txt, log, sh, conf, cfg, py, java,
 Click the "Upload File" button to upload, drag the file to the upload area, the file name will be automatically completed with the uploaded file name.
 
 ![upload-file](../../../../img/new_ui/dev/resource/upload-file.png)
-
-### Re-upload file
-
-Click the "Re-upload File" button in the file list to re-upload the file, drag and drop the file to the upload area, and the file name will be automatically completed with the uploaded file name.
-
-![reuplod_file](../../../../img/reupload_file_en.png)
 
 ### View File
 
@@ -65,6 +59,7 @@ In the workflow definition module of project Manage, create a new workflow using
 
 - Script: 'sh hello.sh'
 - Resource: Select 'hello.sh'
+
 > Notice: When using a resource file in the script, the file name needs to be the same as the full path of the selected resource:
 > For example: if the resource path is `/resource/hello.sh`, you need to use the full path of `/resource/hello.sh` to use it in the script.
 

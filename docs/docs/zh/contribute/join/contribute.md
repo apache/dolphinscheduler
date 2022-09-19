@@ -2,7 +2,7 @@
 
 首先非常感谢大家选择和使用 DolphinScheduler，非常欢迎大家加入 DolphinScheduler 大家庭，融入开源世界！
 
-我们鼓励任何形式的参与社区，最终成为 Committer 或 PPMC，如： 
+我们鼓励任何形式的参与社区，最终成为 Committer 或 PPMC，如：
 * 将遇到的问题通过 github 上 [issue](https://github.com/apache/dolphinscheduler/issues) 的形式反馈出来
 * 回答别人遇到的 issue 问题
 * 帮助完善文档
@@ -13,7 +13,7 @@
 * 帮助推广 DolphinScheduler，参与技术大会或者 meetup 的分享等
 
 欢迎加入贡献的队伍，加入开源从提交第一个 PR 开始
-  - 比如添加代码注释或找到带有 ”easy to fix” 标记或一些非常简单的 issue(拼写错误等) 等等，先通过第一个简单的 PR 熟悉提交流程
+- 比如添加代码注释或找到带有 ”easy to fix” 标记或一些非常简单的 issue(拼写错误等) 等等，先通过第一个简单的 PR 熟悉提交流程
 
 注：贡献不仅仅限于 PR 哈，对促进项目发展的都是贡献
 
@@ -26,7 +26,6 @@
 ### 2. 参与代码贡献
 
 参考[参与贡献 Issue 需知](./issue.md)，[参与贡献 Pull Request 需知](./pull-request.md)，[参与贡献 CommitMessage 需知](./commit-message.md)
-
 
 ### 3. 如何领取 Issue，提交 Pull Request
 

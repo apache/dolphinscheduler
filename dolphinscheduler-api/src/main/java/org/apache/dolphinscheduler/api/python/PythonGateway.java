@@ -30,8 +30,10 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
+import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -87,7 +89,10 @@ public class PythonGateway {
     private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
     private static final int DEFAULT_DRY_RUN = 0;
+    private static final int DEFAULT_TEST_FLAG = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
+    // We use admin user's user_id to skip some permission issue from python gateway service
+    private static final int ADMIN_USER_ID = 1;
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -97,6 +102,9 @@ public class PythonGateway {
 
     @Autowired
     private TenantService tenantService;
+
+    @Autowired
+    private EnvironmentService environmentService;
 
     @Autowired
     private ExecutorService executorService;
@@ -137,7 +145,7 @@ public class PythonGateway {
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
         {
-            setId(Integer.MAX_VALUE);
+            setId(ADMIN_USER_ID);
             setUserName("dummyUser");
             setUserType(UserType.ADMIN_USER);
         }
@@ -248,7 +256,7 @@ public class PythonGateway {
             processDefinitionCode = processDefinition.getCode();
         }
 
-        // Fresh process definition schedule 
+        // Fresh process definition schedule
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
@@ -350,6 +358,7 @@ public class PythonGateway {
                 null,
                 null,
                 DEFAULT_DRY_RUN,
+                DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE
         );
     }
@@ -561,6 +570,25 @@ public class PythonGateway {
         result.put("name", namedResources.get(0).getName());
         return result;
     }
+
+    /**
+     * Get environment info by given environment name. It return environment code.
+     * Useful in Python API create task which need environment information.
+     *
+     * @param environmentName name of the environment
+     */
+    public Long getEnvironmentInfo(String environmentName) {
+        Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
+
+        if (result.get("data") == null) {
+            String msg = String.format("Can not find valid environment by name %s", environmentName);
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        EnvironmentDto environmentDto = EnvironmentDto.class.cast(result.get("data"));
+        return environmentDto.getCode();
+    }
+
 
     /**
      * Get resource by given resource type and full name. It return map contain resource id, name.
