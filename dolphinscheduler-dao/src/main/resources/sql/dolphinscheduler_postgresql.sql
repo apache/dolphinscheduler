@@ -378,7 +378,8 @@ CREATE TABLE t_ds_process_definition_log (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-
+create index idx_process_definition_log_code_version on t_ds_process_definition_log (code,version);
+create index idx_process_definition_log_project_code on t_ds_process_definition_log (project_code);
 --
 -- Table structure for table t_ds_task_definition
 --

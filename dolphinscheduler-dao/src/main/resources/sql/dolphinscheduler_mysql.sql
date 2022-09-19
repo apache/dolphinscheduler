@@ -441,28 +441,31 @@ CREATE TABLE `t_ds_process_definition` (
 -- Table structure for t_ds_process_definition_log
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_definition_log`;
-CREATE TABLE `t_ds_process_definition_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'process definition name',
-  `version` int(11) DEFAULT '0' COMMENT 'process definition version',
-  `description` text COMMENT 'description',
-  `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
-  `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
-  `global_params` text COMMENT 'global parameters',
-  `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
-  `locations` text COMMENT 'Node location information',
-  `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
-  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
-  `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
-  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+CREATE TABLE `t_ds_process_definition_log`
+(
+    `id`               int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+    `code`             bigint(20) NOT NULL COMMENT 'encoding',
+    `name`             varchar(200) DEFAULT NULL COMMENT 'process definition name',
+    `version`          int(11) DEFAULT '0' COMMENT 'process definition version',
+    `description`      text COMMENT 'description',
+    `project_code`     bigint(20) NOT NULL COMMENT 'project code',
+    `release_state`    tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
+    `user_id`          int(11) DEFAULT NULL COMMENT 'process definition creator id',
+    `global_params`    text COMMENT 'global parameters',
+    `flag`             tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
+    `locations`        text COMMENT 'Node location information',
+    `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
+    `timeout`          int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
+    `tenant_id`        int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+    `execution_type`   tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
+    `operator`         int(11) DEFAULT NULL COMMENT 'operator user id',
+    `operate_time`     datetime     DEFAULT NULL COMMENT 'operate time',
+    `create_time`      datetime NOT NULL COMMENT 'create time',
+    `update_time`      datetime NOT NULL COMMENT 'update time',
+    PRIMARY KEY (`id`)
+    UNIQUE KEY `log_unique` (`code`,`version`);
+    KEY `project_code_idx` (`project_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8);
 
 -- ----------------------------
 -- Table structure for t_ds_task_definition
