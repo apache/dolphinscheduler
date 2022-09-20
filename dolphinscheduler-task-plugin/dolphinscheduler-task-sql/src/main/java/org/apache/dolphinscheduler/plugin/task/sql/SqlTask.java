@@ -255,6 +255,15 @@ public class SqlTask extends AbstractTaskExecutor {
                 resultJSONArray.add(mapOfColValues);
                 rowCount++;
             }
+            // result is null,output table metadata
+            if (resultJSONArray.isEmpty()) {
+                ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
+                for (int i = 1; i <= num; i++) {
+                    emptyOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(""));
+                }
+                resultJSONArray.add(emptyOfColValues);
+            }
+
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, rowCount);
             logger.info("display sql result {} rows as follows:", displayRows);
