@@ -15,11 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.common.model;
 
-/**
- * data base types
- */
-public enum ResUploadType {
-    HDFS, S3, OSS, NONE
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class OssConnection {
+
+    public String accessKeyId;
+    public String accessKeySecret;
+    public String endPoint;
+
 }

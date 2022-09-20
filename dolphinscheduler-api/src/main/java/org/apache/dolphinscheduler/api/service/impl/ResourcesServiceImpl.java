@@ -410,6 +410,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+        // TODO: deal with OSS
         if (resource.isDirectory() && storageOperate.returnStorageType().equals(ResUploadType.S3)
                 && !resource.getFileName().equals(name)) {
             logger.warn("Directory in S3 storage can not be renamed.");
@@ -874,7 +875,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Integer> allChildren = listAllChildren(resource, true);
 
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
-        
         if (needDeleteResourceIdArray.length >= 2) {
             logger.warn("Resource can not be deleted because there are files or folders {} in the current directory.", resource.getFileName());
             putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
