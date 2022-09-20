@@ -14,12 +14,12 @@
 
 * 点击 DolphinScheduler 右侧的 `安装` 进入安装页面，填写对应的信息，点击确定即可开始安装，自动跳转至应用视图。
 
-| 选择项   | 说明                                                         |
-| -------- | ------------------------------------------------------------ |
-| 团队名称 | 用户自建的工作空间，以命名空间隔离                           |
-| 集群名称 | 选择 DolphinScheduler 被部署到哪一个 K8s 集群                |
+| 选择项  |                      说明                      |
+|------|----------------------------------------------|
+| 团队名称 | 用户自建的工作空间，以命名空间隔离                            |
+| 集群名称 | 选择 DolphinScheduler 被部署到哪一个 K8s 集群           |
 | 选择应用 | 选择 DolphinScheduler 被部署到哪一个应用，应用中包含有若干有关联的组件 |
-| 应用版本 | 选择 DolphinScheduler 的版本，目前可选版本为 3.0.0-beta2     |
+| 应用版本 | 选择 DolphinScheduler 的版本，目前可选版本为 3.0.0-beta2  |
 
 ![](../../../../img/rainbond/install-dolphinscheduler.png)
 
@@ -61,5 +61,7 @@ Worker 服务默认安装了 Python3，使用时可以添加环境变量  `PYTHO
    * FILE_PATH：/opt/soft
    * LOCK_PATH：/opt/soft
 3. 更新组件，初始化插件会自动下载 `Datax` 并解压到 `/opt/soft`目录下。
-![](../../../../img/rainbond/plugin.png)
+   ![](../../../../img/rainbond/plugin.png)
+
 ---
+

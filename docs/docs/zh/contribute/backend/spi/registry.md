@@ -6,9 +6,10 @@
 
 * 注册中心插件配置, 以Zookeeper 为例 (registry.properties)
   dolphinscheduler-service/src/main/resources/registry.properties
+
   ```registry.properties
-   registry.plugin.name=zookeeper
-   registry.servers=127.0.0.1:2181
+  registry.plugin.name=zookeeper
+  registry.servers=127.0.0.1:2181
   ```
 
 具体配置信息请参考具体插件提供的参数信息，例如 zk：`org/apache/dolphinscheduler/plugin/registry/zookeeper/ZookeeperConfiguration.java`
@@ -19,6 +20,7 @@
 `dolphinscheduler-registry-api` 定义了实现插件的标准，当你需要扩展插件的时候只需要实现 `org.apache.dolphinscheduler.registry.api.RegistryFactory` 即可。
 
 `dolphinscheduler-registry-plugin` 模块下是我们目前所提供的注册中心插件。
+
 #### FAQ
 
 1：registry connect timeout

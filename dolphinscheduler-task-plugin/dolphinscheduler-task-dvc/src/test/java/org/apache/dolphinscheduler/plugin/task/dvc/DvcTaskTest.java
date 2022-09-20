@@ -124,7 +124,7 @@ public class DvcTaskTest {
 
     private DvcParameters createUploadParameters() {
         DvcParameters parameters = new DvcParameters();
-        parameters.setDvcTaskType(TaskTypeEnum.UPLOAD);
+        parameters.setDvcTaskType(DvcConstants.DVC_TASK_TYPE.UPLOAD);
         parameters.setDvcRepository("git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example");
         parameters.setDvcLoadSaveDataPath("/home/<YOUR-NAME-OR-ORG>/test");
         parameters.setDvcDataLocation("test");
@@ -135,7 +135,7 @@ public class DvcTaskTest {
 
     private DvcParameters createDownloadParameters() {
         DvcParameters parameters = new DvcParameters();
-        parameters.setDvcTaskType(TaskTypeEnum.DOWNLOAD);
+        parameters.setDvcTaskType(DvcConstants.DVC_TASK_TYPE.DOWNLOAD);
         parameters.setDvcRepository("git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example");
         parameters.setDvcLoadSaveDataPath("data");
         parameters.setDvcDataLocation("iris");
@@ -145,7 +145,7 @@ public class DvcTaskTest {
 
     private DvcParameters createInitDvcParameters() {
         DvcParameters parameters = new DvcParameters();
-        parameters.setDvcTaskType(TaskTypeEnum.INIT);
+        parameters.setDvcTaskType(DvcConstants.DVC_TASK_TYPE.INIT);
         parameters.setDvcRepository("git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example");
         parameters.setDvcStoreUrl("~/.dvc_test");
         return parameters;

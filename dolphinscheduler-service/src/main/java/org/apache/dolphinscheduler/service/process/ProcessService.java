@@ -145,7 +145,7 @@ public interface ProcessService {
 
     List<Integer> findTaskIdByInstanceState(int instanceId, TaskExecutionStatus state);
 
-    List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId);
+    List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId, int testFlag);
 
     List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId);
 
@@ -190,11 +190,11 @@ public interface ProcessService {
 
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
 
-    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval);
+    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
-    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval);
+    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
-    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime);
+    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag);
 
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
 
@@ -298,4 +298,6 @@ public interface ProcessService {
     public String findConfigYamlByName(String clusterName);
 
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
+
+    Integer queryTestDataSourceId(Integer onlineDataSourceId);
 }

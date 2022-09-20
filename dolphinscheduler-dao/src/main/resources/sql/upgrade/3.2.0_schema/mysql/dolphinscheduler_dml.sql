@@ -13,18 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.plugin.task.dvc;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public enum TaskTypeEnum {
-
-    @JsonProperty("Upload")
-    UPLOAD,
-    @JsonProperty("Download")
-    DOWNLOAD,
-    @JsonProperty("Init DVC")
-    INIT
-}
+*/
