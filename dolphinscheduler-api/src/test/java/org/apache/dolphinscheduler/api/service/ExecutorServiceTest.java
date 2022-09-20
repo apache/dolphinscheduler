@@ -409,8 +409,6 @@ public class ExecutorServiceTest {
     @Test
     public void testOfTestRun(){
         Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
-                .thenReturn(checkProjectAndAuth());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
