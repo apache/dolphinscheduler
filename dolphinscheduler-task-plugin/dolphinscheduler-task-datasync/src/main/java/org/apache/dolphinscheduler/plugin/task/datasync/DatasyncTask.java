@@ -96,17 +96,27 @@ public class DatasyncTask extends AbstractRemoteTask {
 
     @Override
     public void cancelApplication() throws TaskException {
+        checkApplicationId();
         hook.cancelDatasyncTask();
     }
 
-
     @Override
     public void trackApplicationStatus() throws TaskException {
+        checkApplicationId();
         Boolean isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
         if (!isFinishedSuccessfully) {
             exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
         } else {
             exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
+        }
+    }
+
+    /**
+     * check datasync applicationId if null
+     */
+    private void checkApplicationId() {
+        if (StringUtils.isEmpty(hook.getTaskExecArn())) {
+            throw new TaskException("datasync taskExecArn is null, not created yet");
         }
     }
 
