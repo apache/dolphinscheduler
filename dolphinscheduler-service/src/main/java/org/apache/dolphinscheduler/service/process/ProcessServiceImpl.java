@@ -2516,6 +2516,7 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
             updateTaskDefinitionLogs.add(taskDefinitionLog);
         }
+
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs)) {
             List<Long> taskDefinitionCodes = updateTaskDefinitionLogs
                     .stream()
@@ -2535,15 +2536,24 @@ public class ProcessServiceImpl implements ProcessService {
 
         // for each taskDefinitionLog, we will insert a new version into db
         // and update the origin one if exist
-        int updateResult = updateTaskDefinitionLogs.size();
-        int insertResult = newTaskDefinitionLogs.size();
-        if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
-            insertResult = taskDefinitionLogMapper.batchInsert(taskDefinitionLogs);
+        int updateResult = 0;
+        int insertResult = 0;
+        if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs)) {
+            insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
+        }
+        if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs)) {
+            insertResult += taskDefinitionLogMapper.batchInsert(updateTaskDefinitionLogs);
         }
 
         if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
         }
+        if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
+            for (TaskDefinitionLog taskDefinitionLog : updateTaskDefinitionLogs) {
+                updateResult += taskDefinitionMapper.updateById(taskDefinitionLog);
+            }
+        }
+
         return (insertResult & updateResult) > 0 ? 1 : Constants.EXIT_CODE_SUCCESS;
     }
 
