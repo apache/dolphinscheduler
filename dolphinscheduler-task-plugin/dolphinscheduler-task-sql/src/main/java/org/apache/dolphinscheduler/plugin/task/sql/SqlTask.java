@@ -261,8 +261,22 @@ public class SqlTask extends AbstractTask {
                 resultJSONArray.add(mapOfColValues);
                 rowCount++;
             }
-            // generate query results
-            generateRow(resultJSONArray, md, num, rowCount);
+            // result is null,output table metadata
+            if (resultJSONArray.isEmpty()) {
+                ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
+                for (int i = 1; i <= num; i++) {
+                    emptyOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(""));
+                }
+                resultJSONArray.add(emptyOfColValues);
+            }
+
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            displayRows = Math.min(displayRows, rowCount);
+            logger.info("display sql result {} rows as follows:", displayRows);
+            for (int i = 0; i < displayRows; i++) {
+                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
+                logger.info("row {} : {}", i + 1, row);
+            }
         }
         String result = JSONUtils.toJsonString(resultJSONArray);
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
@@ -315,6 +329,7 @@ public class SqlTask extends AbstractTask {
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
+            logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
