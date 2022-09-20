@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -418,10 +420,31 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      */
     @Override
     public List<K8sNamespace> queryNamespaceAvailable(User loginUser) {
+        List<K8sNamespace> k8sNamespaces;
         if (isAdmin(loginUser)) {
-            return k8sNamespaceMapper.selectList(null);
+            k8sNamespaces = k8sNamespaceMapper.selectList(null);
         } else {
-            return k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());
+             k8sNamespaces = k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());
+        }
+        setClusterName(k8sNamespaces);
+        return k8sNamespaces;
+    }
+
+    /**
+     * set cluster_name
+     * @param k8sNamespaces source data
+     */
+    private void setClusterName(List<K8sNamespace> k8sNamespaces) {
+        if (CollectionUtils.isNotEmpty(k8sNamespaces)) {
+            List<Cluster> clusters = clusterMapper.queryAllClusterList();
+            if (CollectionUtils.isNotEmpty(clusters)) {
+                Map<Long, String> codeNameMap = clusters.stream()
+                        .collect(Collectors.toMap(Cluster::getCode, Cluster::getName, (a, b) -> a));
+                for (K8sNamespace k8sNamespace : k8sNamespaces) {
+                    String clusterName = codeNameMap.get(k8sNamespace.getClusterCode());
+                    k8sNamespace.setClusterName(clusterName);
+                }
+            }
         }
     }
 
