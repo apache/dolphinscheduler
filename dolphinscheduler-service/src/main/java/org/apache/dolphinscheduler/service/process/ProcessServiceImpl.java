@@ -967,7 +967,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (processInstance.getCommandParam() != null) {
             Map<String, String> processCmdParam = JSONUtils.toMap(processInstance.getCommandParam());
             processCmdParam.forEach((key, value) -> {
-                if (!cmdParam.containsKey(key)) {
+                if (cmdParam != null && !cmdParam.containsKey(key)) {
                     cmdParam.put(key, value);
                 }
             });
@@ -998,15 +998,19 @@ public class ProcessServiceImpl implements ProcessService {
                         TaskExecutionStatus.NEED_FAULT_TOLERANCE);
                 List<Integer> killedList =
                         this.findTaskIdByInstanceState(processInstance.getId(), TaskExecutionStatus.KILL);
-                cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+                if (cmdParam != null) {
+                    cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+                }
 
                 failedList.addAll(killedList);
                 failedList.addAll(toleranceList);
                 for (Integer taskId : failedList) {
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
-                cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
+                if (cmdParam != null) {
+                    cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
                         String.join(Constants.COMMA, convertIntListToString(failedList)));
+                }
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
                 break;
@@ -1016,15 +1020,19 @@ public class ProcessServiceImpl implements ProcessService {
                 break;
             case RECOVER_SUSPENDED_PROCESS:
                 // find pause tasks and init task's state
-                cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+                if (cmdParam != null) {
+                    cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+                }
                 List<Integer> stopNodeList = findTaskIdByInstanceState(processInstance.getId(),
                         TaskExecutionStatus.KILL);
                 for (Integer taskId : stopNodeList) {
                     // initialize the pause state
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
-                cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
+                if (cmdParam != null) {
+                    cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
                         String.join(",", convertIntListToString(stopNodeList)));
+                }
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
                 break;
@@ -1046,7 +1054,7 @@ public class ProcessServiceImpl implements ProcessService {
                 break;
             case REPEAT_RUNNING:
                 // delete the recover task names from command parameter
-                if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
+                if (cmdParam != null && cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
                     cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
                     processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 }
@@ -1133,15 +1141,18 @@ public class ProcessServiceImpl implements ProcessService {
             return;
         }
 
-        Date start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-        Date end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        Date start = null, end = null;
+        if (cmdParam != null) {
+            start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
+            end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        }
         List<Date> complementDate = Lists.newLinkedList();
         if (start != null && end != null) {
             List<Schedule> listSchedules =
                     queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
             complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
         }
-        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+        if (cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
             complementDate = CronUtils.getSelfScheduleDateList(cmdParam);
         }
 
@@ -1150,7 +1161,10 @@ public class ProcessServiceImpl implements ProcessService {
         }
 
         // time zone
-        String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+        String timezoneId = null;
+        if (cmdParam != null) {
+            timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+        }
 
         String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
                 processDefinition.getGlobalParamMap(),
