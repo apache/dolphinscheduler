@@ -261,22 +261,8 @@ public class SqlTask extends AbstractTask {
                 resultJSONArray.add(mapOfColValues);
                 rowCount++;
             }
-            // result is null,output table metadata
-            if (resultJSONArray.isEmpty()) {
-                ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
-                for (int i = 1; i <= num; i++) {
-                    emptyOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(""));
-                }
-                resultJSONArray.add(emptyOfColValues);
-            }
-
-            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
-            displayRows = Math.min(displayRows, rowCount);
-            logger.info("display sql result {} rows as follows:", displayRows);
-            for (int i = 0; i < displayRows; i++) {
-                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-                logger.info("row {} : {}", i + 1, row);
-            }
+            // generate query results
+            generateRow(resultJSONArray, md, num, rowCount);
         }
         String result = JSONUtils.toJsonString(resultJSONArray);
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
@@ -287,6 +273,30 @@ public class SqlTask extends AbstractTask {
         logger.debug("execute sql result : {}", result);
         return result;
     }
+
+    /**
+     * Output Query Results as JsonString
+     */
+
+    private void generateRow(ArrayNode resultJSONArray, ResultSetMetaData md, int metaColumnsNum, int rowCount) throws SQLException {
+        if (resultJSONArray.isEmpty()) {
+            logger.info("sql query results is empty");
+            ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
+            for (int i = 1; i <= metaColumnsNum; i++) {
+                emptyOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(""));
+            }
+            resultJSONArray.add(emptyOfColValues);
+        } else {
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            displayRows = Math.min(displayRows, rowCount);
+            logger.info("display sql result {} rows as follows:", displayRows);
+            for (int i = 0; i < displayRows; i++) {
+                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
+                logger.info("row {} : {}", i + 1, row);
+            }
+        }
+    }
+
 
     /**
      * send alert as an attachment
