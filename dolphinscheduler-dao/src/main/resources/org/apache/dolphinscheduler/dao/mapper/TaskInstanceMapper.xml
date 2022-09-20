@@ -185,7 +185,10 @@
         left join t_ds_process_instance process on process.id=instance.process_instance_id
         where define.project_code = #{projectCode}
         <if test="startTime != null">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+            and instance.start_time <![CDATA[ >=]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="processInstanceId != 0">
             and instance.process_instance_id = #{processInstanceId}
@@ -229,7 +232,10 @@
         left join t_ds_process_definition process on process.code=relation.process_definition_code and process.version = relation.process_definition_version
         where define.project_code = #{projectCode}
         <if test="startTime != null">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+            and instance.start_time <![CDATA[ >=]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')
