@@ -58,7 +58,9 @@ class Tenant(BaseSide):
         self.code = tenant.getTenantCode()
         return
 
-    def update(self, user=configuration.USER_NAME, code=None, queue_id=None, description=None) -> None:
+    def update(
+        self, user=configuration.USER_NAME, code=None, queue_id=None, description=None
+    ) -> None:
         """Update Tenant."""
         JavaGate().grant_tenant_to_user(self.user_name, self.code)
         JavaGate().update_tenant(user, self.tenant_id, code, queue_id, description)

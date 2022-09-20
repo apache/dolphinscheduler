@@ -91,7 +91,15 @@ class User(BaseSide):
         self.status = user.getState()
         return
 
-    def update(self, password=None, email=None, phone=None, tenant=None, queue=None, status=None) -> None:
+    def update(
+        self,
+        password=None,
+        email=None,
+        phone=None,
+        tenant=None,
+        queue=None,
+        status=None,
+    ) -> None:
         """Update User."""
         user = JavaGate().update_user(
             self.name,

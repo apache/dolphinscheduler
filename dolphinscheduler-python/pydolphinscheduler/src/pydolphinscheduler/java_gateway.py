@@ -28,9 +28,9 @@ from pydolphinscheduler.exceptions import PyDSJavaGatewayException
 
 
 def launch_gateway(
-        address: Optional[str] = None,
-        port: Optional[int] = None,
-        auto_convert: Optional[bool] = True,
+    address: Optional[str] = None,
+    port: Optional[int] = None,
+    auto_convert: Optional[bool] = True,
 ) -> JavaGateway:
     """Launch java gateway to pydolphinscheduler.
 
@@ -48,18 +48,18 @@ def launch_gateway(
 
 
 def gateway_result_checker(
-        result: JavaMap,
-        msg_check: Optional[str] = JavaGatewayDefault.RESULT_MESSAGE_SUCCESS,
+    result: JavaMap,
+    msg_check: Optional[str] = JavaGatewayDefault.RESULT_MESSAGE_SUCCESS,
 ) -> Any:
     """Check weather java gateway result success or not."""
     if (
-            result[JavaGatewayDefault.RESULT_STATUS_KEYWORD].toString()
-            != JavaGatewayDefault.RESULT_STATUS_SUCCESS
+        result[JavaGatewayDefault.RESULT_STATUS_KEYWORD].toString()
+        != JavaGatewayDefault.RESULT_STATUS_SUCCESS
     ):
         raise PyDSJavaGatewayException("Failed when try to got result for java gateway")
     if (
-            msg_check is not None
-            and result[JavaGatewayDefault.RESULT_MESSAGE_KEYWORD] != msg_check
+        msg_check is not None
+        and result[JavaGatewayDefault.RESULT_MESSAGE_KEYWORD] != msg_check
     ):
         raise PyDSJavaGatewayException("Get result state not success.")
     return result
@@ -69,10 +69,10 @@ class JavaGate:
     """Launch java gateway to pydolphin scheduler."""
 
     def __init__(
-            self,
-            address: Optional[str] = None,
-            port: Optional[int] = None,
-            auto_convert: Optional[bool] = True,
+        self,
+        address: Optional[str] = None,
+        port: Optional[int] = None,
+        auto_convert: Optional[bool] = True,
     ):
         self.java_gateway = launch_gateway(address, port, auto_convert)
 
@@ -87,7 +87,7 @@ class JavaGate:
         )
 
     def create_or_update_resource(
-            self, user_name: str, name: str, content: str, description: Optional[str] = None
+        self, user_name: str, name: str, content: str, description: Optional[str] = None
     ):
         """Create or update resource through java gateway."""
         return self.java_gateway.entry_point.createOrUpdateResource(
@@ -99,7 +99,7 @@ class JavaGate:
         return self.java_gateway.entry_point.queryResourcesFileInfo(user_name, name)
 
     def get_code_and_version(
-            self, project_name: str, process_definition_name: str, task_name: str
+        self, project_name: str, process_definition_name: str, task_name: str
     ):
         """Get code and version through java gateway."""
         return self.java_gateway.entry_point.getCodeAndVersion(
@@ -107,86 +107,71 @@ class JavaGate:
         )
 
     def create_or_grant_project(
-            self, user: str, name: str, description: Optional[str] = None
+        self, user: str, name: str, description: Optional[str] = None
     ):
         """Create or grant project through java gateway."""
         return self.java_gateway.entry_point.createOrGrantProject(
             user, name, description
         )
 
-    def query_project_by_name(
-            self, user: str, name: str
-    ):
+    def query_project_by_name(self, user: str, name: str):
         """Query project through java gateway."""
-        return self.java_gateway.entry_point.queryProjectByName(
-            user, name
-        )
+        return self.java_gateway.entry_point.queryProjectByName(user, name)
 
     def update_project(
-            self, user: str, project_code: str, project_name: str, description: str
+        self, user: str, project_code: str, project_name: str, description: str
     ):
         """Update project through java gateway."""
         return self.java_gateway.entry_point.updateProject(
             user, project_code, project_name, description
         )
 
-    def delete_project(
-            self, user: str, code: str
-    ):
+    def delete_project(self, user: str, code: str):
         """Delete project through java gateway."""
-        return self.java_gateway.entry_point.deleteProject(
-            user, code
-        )
+        return self.java_gateway.entry_point.deleteProject(user, code)
 
     def create_tenant(
-            self, tenant_name: str, queue_name: str, description: Optional[str] = None
+        self, tenant_name: str, queue_name: str, description: Optional[str] = None
     ):
         """Create tenant through java gateway."""
         return self.java_gateway.entry_point.createTenant(
             tenant_name, description, queue_name
         )
 
-    def query_tenant(
-            self, tenant_code: str
-    ):
+    def query_tenant(self, tenant_code: str):
         """Query tenant through java gateway."""
-        return self.java_gateway.entry_point.queryTenantByCode(
-            tenant_code
-        )
+        return self.java_gateway.entry_point.queryTenantByCode(tenant_code)
 
-    def grant_tenant_to_user(
-            self, user_name: str, tenant_code: str
-    ):
+    def grant_tenant_to_user(self, user_name: str, tenant_code: str):
         """Grant tenant to user through java gateway."""
-        return self.java_gateway.entry_point.grantTenantToUser(
-            user_name, tenant_code
-        )
+        return self.java_gateway.entry_point.grantTenantToUser(user_name, tenant_code)
 
     def update_tenant(
-            self, user: str, tenant_id: int, code: str, queue_id: int, description: Optional[str] = None
+        self,
+        user: str,
+        tenant_id: int,
+        code: str,
+        queue_id: int,
+        description: Optional[str] = None,
     ):
         """Update tenant through java gateway."""
         return self.java_gateway.entry_point.updateTenant(
             user, tenant_id, code, queue_id, description
         )
 
-    def delete_tenant(
-            self, user: str, tenant_id: int
-    ):
+    def delete_tenant(self, user: str, tenant_id: int):
         """Delete tenant through java gateway."""
-        return self.java_gateway.entry_point.deleteTenantById(
-            user, tenant_id
-        )
+        return self.java_gateway.entry_point.deleteTenantById(user, tenant_id)
 
     def create_user(
-            self,
-            name: str,
-            password: str,
-            email: str,
-            phone: str,
-            tenant: str,
-            queue: str,
-            status: int,
+        self,
+        name: str,
+        password: str,
+        email: str,
+        phone: str,
+        tenant: str,
+        queue: str,
+        status: int,
     ):
         """Create user through java gateway."""
         return self.java_gateway.entry_point.createUser(
@@ -197,27 +182,30 @@ class JavaGate:
         """Query user through java gateway."""
         return self.java_gateway.queryUser(user_id)
 
-    def update_user(self,
-                    name: str,
-                    password: str,
-                    email: str,
-                    phone: str,
-                    tenant: str,
-                    queue: str,
-                    status: int,
-                    ):
+    def update_user(
+        self,
+        name: str,
+        password: str,
+        email: str,
+        phone: str,
+        tenant: str,
+        queue: str,
+        status: int,
+    ):
         """Update user through java gateway."""
-        return self.java_gateway.entry_point.updateUser(name, password, email, phone, tenant, queue, status)
+        return self.java_gateway.entry_point.updateUser(
+            name, password, email, phone, tenant, queue, status
+        )
 
     def delete_user(self, name: str, user_id: int):
         """Delete user through java gateway."""
         return self.java_gateway.entry_point.deleteUser(name, user_id)
 
     def get_dependent_info(
-            self,
-            project_name: str,
-            process_definition_name: str,
-            task_name: Optional[str] = None,
+        self,
+        project_name: str,
+        process_definition_name: str,
+        task_name: Optional[str] = None,
     ):
         """Get dependent info through java gateway."""
         return self.java_gateway.entry_point.getDependentInfo(
@@ -225,7 +213,7 @@ class JavaGate:
         )
 
     def get_process_definition_info(
-            self, user_name: str, project_name: str, process_definition_name: str
+        self, user_name: str, project_name: str, process_definition_name: str
     ):
         """Get process definition info through java gateway."""
         return self.java_gateway.entry_point.getProcessDefinitionInfo(
@@ -272,15 +260,15 @@ class JavaGate:
         )
 
     def exec_process_instance(
-            self,
-            user_name: str,
-            project_name: str,
-            process_definition_name: str,
-            cron_time: str,
-            worker_group: str,
-            warning_type: str,
-            warning_group_id: int,
-            timeout: int,
+        self,
+        user_name: str,
+        project_name: str,
+        process_definition_name: str,
+        cron_time: str,
+        worker_group: str,
+        warning_type: str,
+        warning_group_id: int,
+        timeout: int,
     ):
         """Exec process instance through java gateway."""
         return self.java_gateway.entry_point.execProcessInstance(

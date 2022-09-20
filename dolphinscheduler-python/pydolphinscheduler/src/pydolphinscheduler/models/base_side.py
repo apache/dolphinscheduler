@@ -40,8 +40,9 @@ class BaseSide(Base):
         raise NotImplementedError
 
     def delete_all(self):
+        """Delete all method."""
         if not self:
             return
-        listPro = [key for key in self.__dict__.keys()]
-        for key in listPro:
+        list_pro = [key for key in self.__dict__.keys()]
+        for key in list_pro:
             self.__delattr__(key)

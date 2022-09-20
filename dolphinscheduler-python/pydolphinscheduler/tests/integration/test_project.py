@@ -21,22 +21,24 @@ import pytest
 from pydolphinscheduler.models import Project, User
 
 
-def get_user(name="test-name",
-             password="test-password",
-             email="test-email@abc.com",
-             phone="17366637777",
-             tenant="test-tenant",
-             queue="test-queue",
-             status=1):
+def get_user(
+    name="test-name",
+    password="test-password",
+    email="test-email@abc.com",
+    phone="17366637777",
+    tenant="test-tenant",
+    queue="test-queue",
+    status=1,
+):
     """Get a test user."""
     user = User(name, password, email, phone, tenant, queue, status)
     user.create_if_not_exists()
     return user
 
 
-def get_project(name="test-name-1",
-                description="test-description",
-                code="test-project-code"):
+def get_project(
+    name="test-name-1", description="test-description", code="test-project-code"
+):
     """Get a test project."""
     project = Project(name, description, code=code)
     user = get_user()
@@ -57,7 +59,12 @@ def test_update_project():
     """Test update project from java gateway."""
     project = get_project()
     project.get_project_by_name(user="test-name", name=project.name)
-    project.update(user="test-name", project_code=project.code, project_name="test-name-updated", description="test-description-updated")
+    project.update(
+        user="test-name",
+        project_code=project.code,
+        project_name="test-name-updated",
+        description="test-description-updated",
+    )
     project_ = Project()
     project_.get_project_by_name(user="test-name", name="test-name-updated")
     assert project_.description == "test-description-updated"
@@ -70,6 +77,6 @@ def test_delete_project():
     project.delete(user="test-name")
 
     with pytest.raises(AttributeError) as excinfo:
-        var = project.name
+        _ = project.name
 
     assert excinfo.type == AttributeError

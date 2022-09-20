@@ -21,24 +21,28 @@ import pytest
 from pydolphinscheduler.models import Tenant, User
 
 
-def get_user(name="test-name",
-             password="test-password",
-             email="test-email@abc.com",
-             phone="17366637777",
-             tenant="test-tenant",
-             queue="test-queue",
-             status=1):
+def get_user(
+    name="test-name",
+    password="test-password",
+    email="test-email@abc.com",
+    phone="17366637777",
+    tenant="test-tenant",
+    queue="test-queue",
+    status=1,
+):
     """Get a test user."""
     user = User(name, password, email, phone, tenant, queue, status)
     user.create_if_not_exists()
     return user
 
 
-def get_tenant(name="test-name-1",
-               queue="test-queue-1",
-               description="test-description",
-               tenant_code="test-tenant-code",
-               user_name=None):
+def get_tenant(
+    name="test-name-1",
+    queue="test-queue-1",
+    description="test-description",
+    tenant_code="test-tenant-code",
+    user_name=None,
+):
     """Get a test tenant."""
     tenant = Tenant(name, queue, description, code=tenant_code, user_name=user_name)
     tenant.create_if_not_exists(name)
@@ -63,7 +67,12 @@ def test_update_tenant():
     """Test update tenant from java gateway."""
     user = get_user()
     tenant = get_tenant(user_name=user.name)
-    tenant.update(user="admin", code="test-code-updated", queue_id=1, description="test-description-updated")
+    tenant.update(
+        user="admin",
+        code="test-code-updated",
+        queue_id=1,
+        description="test-description-updated",
+    )
     tenant_ = Tenant(code=tenant.code)
     tenant_.get_tenant()
     assert tenant_.code == "test-code-updated"
@@ -72,7 +81,6 @@ def test_update_tenant():
 
 def test_delete_tenant():
     """Test delete tenant from java gateway."""
-    user = get_user()
     tenant = get_tenant(user_name="admin")
     code = tenant.code
     tenant.delete()
