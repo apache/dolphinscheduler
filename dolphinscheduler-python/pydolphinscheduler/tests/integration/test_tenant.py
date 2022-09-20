@@ -74,10 +74,10 @@ def test_delete_tenant():
     """Test delete tenant from java gateway."""
     user = get_user()
     tenant = get_tenant(user_name="admin")
+    code = tenant.code
     tenant.delete()
-    tenant_ = Tenant(code=tenant.code)
-    tenant_.get_tenant()
+    tenant_ = Tenant(code=code)
     with pytest.raises(AttributeError) as excinfo:
-        var = tenant_.tenant_id
+        tenant_.get_tenant()
 
     assert excinfo.type == AttributeError
