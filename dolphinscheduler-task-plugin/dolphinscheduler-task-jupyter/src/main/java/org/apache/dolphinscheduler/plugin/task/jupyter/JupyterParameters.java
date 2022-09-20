@@ -17,70 +17,38 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
 
-/**
- * jupyter parameters
- */
-@Getter
-@Setter
-@ToString
+import lombok.Data;
+
+@Data
 public class JupyterParameters extends AbstractParameters {
 
-    /**
-     * conda env name
-     */
     private String condaEnvName;
 
-    /**
-     * input note path
-     */
     private String inputNotePath;
 
-    /**
-     * output note path
-     */
     private String outputNotePath;
 
-    /**
-     * parameters to pass into jupyter note cells
-     */
+    // parameters to pass into jupyter note cells
     private String parameters;
 
-    /**
-     * jupyter kernel
-     */
     private String kernel;
 
-    /**
-     * the execution engine name to use in evaluating the notebook
-     */
+    // the execution engine name to use in evaluating the notebook
     private String engine;
 
-    /**
-     * time in seconds to wait for each cell before failing execution (default: forever)
-     */
+    // time in seconds to wait for each cell before failing execution (default: forever)
     private String executionTimeout;
 
-    /**
-     * time in seconds to wait for kernel to start
-     */
+    // time in seconds to wait for kernel to start
     private String startTimeout;
 
-    /**
-     * other arguments
-     */
     private String others;
-
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
 
     @Override
@@ -90,7 +58,9 @@ public class JupyterParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return condaEnvName != null && inputNotePath != null && outputNotePath != null;
+        return StringUtils.isNotEmpty(condaEnvName) &&
+                StringUtils.isNotEmpty(inputNotePath) &&
+                StringUtils.isNotEmpty(outputNotePath);
     }
 
 }

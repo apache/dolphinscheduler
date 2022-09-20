@@ -165,7 +165,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
      *
      * @return ZeppelinClient
      */
-    private ZeppelinClient getZeppelinClient() {
+    protected ZeppelinClient getZeppelinClient() {
         final String restEndpoint = zeppelinParameters.getRestEndpoint();
         final ClientConfig clientConfig = new ClientConfig(restEndpoint);
         ZeppelinClient zClient = null;
