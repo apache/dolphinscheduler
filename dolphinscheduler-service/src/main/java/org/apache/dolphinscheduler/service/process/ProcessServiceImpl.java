@@ -1031,7 +1031,7 @@ public class ProcessServiceImpl implements ProcessService {
                 }
                 if (cmdParam != null) {
                     cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
-                        String.join(",", convertIntListToString(stopNodeList)));
+                        String.join(Constants.COMMA, convertIntListToString(stopNodeList)));
                 }
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
