@@ -341,7 +341,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            logger.error("Process definition does not exist, processDefinitionCode:{}.", schedule.getProcessDefinitionCode());
+            logger.error("Process definition does not exist, processDefinitionCode:{}.",
+                    schedule.getProcessDefinitionCode());
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(schedule.getProcessDefinitionCode()));
             return result;
         }
@@ -374,7 +375,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             scheduleUpdate = scheduleUpdateRequest.mergeIntoSchedule(schedule);
             // check update params
             this.scheduleParamCheck(scheduleUpdateRequest.updateScheduleParam(scheduleUpdate));
-        } catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchMethodException e) {
+        } catch (InvocationTargetException | IllegalAccessException | InstantiationException
+                | NoSuchMethodException e) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleUpdateRequest.toString());
         }
         // check update params
@@ -455,14 +457,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ProcessDefinition processDefinition =
                 processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            logger.error("Process definition does not exist, processDefinitionCode:{}.", scheduleObj.getProcessDefinitionCode());
+            logger.error("Process definition does not exist, processDefinitionCode:{}.",
+                    scheduleObj.getProcessDefinitionCode());
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(scheduleObj.getProcessDefinitionCode()));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations =
                 processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
         if (processTaskRelations.isEmpty()) {
-            logger.error("Process task relations do not exist, projectCode:{}, processDefinitionCode:{}.", projectCode, processDefinition.getCode());
+            logger.error("Process task relations do not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                    processDefinition.getCode());
             putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
             return result;
         }
@@ -478,7 +482,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             List<Long> subProcessDefineCodes = new ArrayList<>();
             processService.recurseFindSubProcess(processDefinition.getCode(), subProcessDefineCodes);
             if (!subProcessDefineCodes.isEmpty()) {
-                logger.info("Need to check sub process definition state before change schedule state, subProcessDefineCodes:{}.",
+                logger.info(
+                        "Need to check sub process definition state before change schedule state, subProcessDefineCodes:{}.",
                         org.apache.commons.lang.StringUtils.join(subProcessDefineCodes, ","));
                 List<ProcessDefinition> subProcessDefinitionList =
                         processDefinitionMapper.queryByCodes(subProcessDefineCodes);
@@ -488,7 +493,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                          * if there is no online process, exit directly
                          */
                         if (subProcessDefinition.getReleaseState() != ReleaseState.ONLINE) {
-                            logger.warn("Only sub process definition state is {} can change schedule state, subProcessDefinitionCode:{}.",
+                            logger.warn(
+                                    "Only sub process definition state is {} can change schedule state, subProcessDefinitionCode:{}.",
                                     ReleaseState.ONLINE.getDescp(), subProcessDefinition.getCode());
                             putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE,
                                     String.valueOf(subProcessDefinition.getId()));
@@ -655,7 +661,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     public void setSchedule(int projectId, Schedule schedule) {
-        logger.info("Set schedule state {}, project id: {}, scheduleId: {}", schedule.getReleaseState().getDescp(), projectId, schedule.getId());
+        logger.info("Set schedule state {}, project id: {}, scheduleId: {}", schedule.getReleaseState().getDescp(),
+                projectId, schedule.getId());
         schedulerApi.insertOrUpdateScheduleTask(projectId, schedule);
     }
 
@@ -787,7 +794,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         // check schedule exists
         Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
         if (schedule == null) {
-            logger.error("Schedule of process definition does not exist, processDefinitionCode:{}.", processDefinitionCode);
+            logger.error("Schedule of process definition does not exist, processDefinitionCode:{}.",
+                    processDefinitionCode);
             putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, processDefinitionCode);
             return result;
         }
@@ -809,8 +817,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                 FailureStrategy failureStrategy, Priority processInstancePriority, String workerGroup,
                                 long environmentCode) {
         if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE,
-            Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
-            logger.warn("Schedule can not be updated due to schedule is {}, scheduleId:{}.", ReleaseState.ONLINE.getDescp(), schedule.getId());
+                Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
+            logger.warn("Schedule can not be updated due to schedule is {}, scheduleId:{}.",
+                    ReleaseState.ONLINE.getDescp(), schedule.getId());
             return;
         }
 

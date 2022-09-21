@@ -376,28 +376,29 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleMapper.selectById(scheduleId)).thenReturn(this.getSchedule());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
-        Assertions.assertEquals(Status.SCHEDULE_START_TIME_END_TIME_SAME.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(Status.SCHEDULE_START_TIME_END_TIME_SAME.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error schedule parameter same start time after than end time
         String badStartTime = "2022-01-01 12:13:14";
         scheduleUpdateRequest.setStartTime(badStartTime);
         exception = Assertions.assertThrows(ServiceException.class,
-            () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
+                () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
         Assertions.assertEquals(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR.getCode(),
-            ((ServiceException) exception).getCode());
+                ((ServiceException) exception).getCode());
         scheduleUpdateRequest.setStartTime(startTime);
 
         // error schedule crontab
         String badCrontab = "0 0 123 * * ? *";
         scheduleUpdateRequest.setCrontab(badCrontab);
         exception = Assertions.assertThrows(ServiceException.class,
-            () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
+                () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
         Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());
         scheduleUpdateRequest.setCrontab(crontab);
 
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
-            () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
+                () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
         Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // error project permissions

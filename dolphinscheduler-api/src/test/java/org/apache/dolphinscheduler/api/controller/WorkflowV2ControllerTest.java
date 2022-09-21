@@ -104,7 +104,8 @@ public class WorkflowV2ControllerTest {
 
         Mockito.when(processDefinitionService.updateProcessDefinitionV2(user, 1L, workflowUpdateRequest))
                 .thenReturn(this.getProcessDefinition(newName));
-        Result<ProcessDefinition> resourceResponse = workflowV2Controller.updateWorkflow(user, 1L, workflowUpdateRequest);
+        Result<ProcessDefinition> resourceResponse =
+                workflowV2Controller.updateWorkflow(user, 1L, workflowUpdateRequest);
 
         Assert.assertEquals(this.getProcessDefinition(newName), resourceResponse.getData());
     }
@@ -124,7 +125,8 @@ public class WorkflowV2ControllerTest {
 
         Mockito.when(processDefinitionService.filterProcessDefinition(user, workflowFilterRequest))
                 .thenReturn(this.getProcessDefinitionPage(name));
-        Result<PageInfo<ProcessDefinition>> pageResourceResponse = workflowV2Controller.filterWorkflows(user, workflowFilterRequest);
+        Result<PageInfo<ProcessDefinition>> pageResourceResponse =
+                workflowV2Controller.filterWorkflows(user, workflowFilterRequest);
 
         PageInfo<ProcessDefinition> processDefinitionPage = pageResourceResponse.getData();
         Assertions.assertIterableEquals(this.getProcessDefinitionPage(name).getTotalList(),

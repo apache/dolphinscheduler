@@ -28,6 +28,9 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import java.util.Date;
 
 import lombok.Data;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.swagger.annotations.ApiModelProperty;
 
 import com.google.gson.Gson;
