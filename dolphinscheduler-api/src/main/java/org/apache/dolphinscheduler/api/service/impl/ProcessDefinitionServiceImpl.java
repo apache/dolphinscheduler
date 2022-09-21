@@ -2007,7 +2007,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-
         if (StringUtils.isBlank(scheduleJson)) {
             return result;
         }
@@ -2019,6 +2018,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, scheduleResultStatus);
             throw new ServiceException(scheduleResultStatus);
         }
+
         return result;
     }
 

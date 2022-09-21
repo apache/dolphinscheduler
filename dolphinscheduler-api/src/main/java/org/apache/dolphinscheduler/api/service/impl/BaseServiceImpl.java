@@ -164,7 +164,6 @@ public class BaseServiceImpl implements BaseService {
             }
         }
         result.put(Constants.START_TIME, start);
-
         Date end = null;
         if (!StringUtils.isEmpty(endDateStr)) {
             end = DateUtils.getScheduleDate(endDateStr);
@@ -174,7 +173,6 @@ public class BaseServiceImpl implements BaseService {
             }
         }
         result.put(Constants.END_TIME, end);
-
         putMsg(result, Status.SUCCESS);
         return result;
     }
