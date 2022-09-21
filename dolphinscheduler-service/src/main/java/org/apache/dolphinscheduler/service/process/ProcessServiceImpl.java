@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
@@ -30,8 +31,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
 
-import static java.util.stream.Collectors.toSet;
-
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -131,10 +133,6 @@ import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2565,7 +2563,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
                                 List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs,
-                                Boolean syncDefine) {
+                                Boolean syncDefine, boolean isDelete) {
         if (taskRelationList.isEmpty()) {
             return Constants.EXIT_CODE_SUCCESS;
         }
@@ -2604,12 +2602,24 @@ public class ProcessServiceImpl implements ProcessService {
                 if (result) {
                     return Constants.EXIT_CODE_SUCCESS;
                 }
-                processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
+                if (isDelete) {
+                    processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
+                }
             }
             insert = processTaskRelationMapper.batchInsert(taskRelationList);
         }
         int resultLog = processTaskRelationLogMapper.batchInsert(taskRelationList);
         return (insert & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
+    }
+
+    /**
+     * save task relations by default, delete history while adding
+     */
+    @Override
+    public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion, List<ProcessTaskRelationLog> taskRelationList,
+                                List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine) {
+        return saveTaskRelation(operator, projectCode, processDefinitionCode, processDefinitionVersion, taskRelationList,
+            taskDefinitionLogs, syncDefine, true);
     }
 
     @Override

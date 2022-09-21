@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -49,9 +51,6 @@ import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,6 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * task definition service impl
@@ -193,6 +193,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
             return result;
         }
+        if (taskDefinition.getVersion() == 0) {
+            // init first version
+            taskDefinition.setVersion(Constants.VERSION_FIRST);
+        }
         if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
                 .taskType(taskDefinition.getTaskType())
                 .taskParams(taskDefinition.getTaskParams())
@@ -249,7 +253,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             processTaskRelationLogList.add(processTaskRelationLog);
         }
         int insertResult = processService.saveTaskRelation(loginUser, projectCode, processDefinition.getCode(), processDefinition.getVersion(),
-            processTaskRelationLogList, Lists.newArrayList(), Boolean.TRUE);
+            processTaskRelationLogList, Lists.newArrayList(), Boolean.TRUE, false);
         if (insertResult != Constants.EXIT_CODE_SUCCESS) {
             putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
@@ -487,6 +491,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         } else {
             if (taskDefinitionToUpdate == null) {
                 taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
+                TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+                if (taskDefinition == null) {
+                    putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+                    return result;
+                }
+                taskDefinitionToUpdate.setVersion(taskDefinition.getVersion());
             }
         }
         Map<Long, TaskDefinition> queryUpStreamTaskCodeMap;
@@ -518,7 +528,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     }
                 }
             }
-            processTaskRelationList.removeAll(relationList);
+//            processTaskRelationList.removeAll(relationList);
             for (Map.Entry<Long, TaskDefinition> queryUpStreamTask : queryUpStreamTaskCodeMap.entrySet()) {
                 taskRelation.setPreTaskCode(queryUpStreamTask.getKey());
                 taskRelation.setPreTaskVersion(queryUpStreamTask.getValue().getVersion());
@@ -527,7 +537,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             if (queryUpStreamTaskCodeMap.isEmpty() && !processTaskRelationList.isEmpty()) {
                 processTaskRelationList.add(processTaskRelationList.get(0));
             }
-            updateDag(loginUser, result, taskRelation.getProcessDefinitionCode(), processTaskRelations, Lists.newArrayList(taskDefinitionToUpdate));
+            processTaskRelationList= Lists.newArrayList(Sets.newHashSet(processTaskRelationList));
+            updateDag(loginUser, result, taskRelation.getProcessDefinitionCode(), processTaskRelationList, Lists.newArrayList(taskDefinitionToUpdate));
         }
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
