@@ -26,11 +26,12 @@ import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class K8sTask extends AbstractK8sTask {
@@ -58,6 +59,11 @@ public class K8sTask extends AbstractK8sTask {
     }
 
     @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
+    }
+
+    @Override
     public AbstractParameters getParameters() {
         return k8sTaskParameters;
     }
@@ -66,7 +72,7 @@ public class K8sTask extends AbstractK8sTask {
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        Map<String,String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
+        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
         String namespaceName = namespace.get(NAMESPACE_NAME);
         String clusterName = namespace.get(CLUSTER);
         k8sTaskMainParameters.setImage(k8sTaskParameters.getImage());

@@ -23,8 +23,6 @@ export function useMlflowModels(model: { [field: string]: any }): IJsonItem[] {
   const deployTypeSpan = ref(0)
   const deployModelKeySpan = ref(0)
   const deployPortSpan = ref(0)
-  const cpuLimitSpan = ref(0)
-  const memoryLimitSpan = ref(0)
 
   const setFlag = () => {
     model.isModels = model.mlflowTaskType === 'MLflow Models' ? true : false
@@ -41,14 +39,6 @@ export function useMlflowModels(model: { [field: string]: any }): IJsonItem[] {
     () => {
       setFlag()
       resetSpan()
-    }
-  )
-
-  watch(
-    () => [model.deployType],
-    () => {
-     cpuLimitSpan.value = model.deployType === "DOCKER COMPOSE" ? 12 : 0 
-     memoryLimitSpan.value = model.deployType === "DOCKER COMPOSE" ? 12 : 0 
     }
   )
 
@@ -74,18 +64,6 @@ export function useMlflowModels(model: { [field: string]: any }): IJsonItem[] {
       field: 'deployPort',
       name: t('project.node.mlflow_deployPort'),
       span: deployPortSpan
-    },
-    {
-      type: 'input',
-      field: 'cpuLimit',
-      name: t('project.node.mlflow_cpuLimit'),
-      span: cpuLimitSpan
-    },
-    {
-      type: 'input',
-      field: 'memoryLimit',
-      name: t('project.node.mlflow_memoryLimit'),
-      span: memoryLimitSpan
     }
   ]
 }
@@ -98,9 +76,5 @@ const DEPLOY_TYPE = [
   {
     label: 'DOCKER',
     value: 'DOCKER'
-  },
-  {
-    label: 'DOCKER COMPOSE',
-    value: 'DOCKER COMPOSE'
   }
 ]

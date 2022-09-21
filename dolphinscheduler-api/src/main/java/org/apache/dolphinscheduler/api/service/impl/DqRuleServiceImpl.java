@@ -17,19 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections4.CollectionUtils;
+import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
+import static org.apache.dolphinscheduler.spi.utils.Constants.CHANGE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.SMALL;
+
 import org.apache.dolphinscheduler.api.dto.RuleDefinition;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -57,10 +53,8 @@ import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.input.InputParamProps;
 import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,9 +64,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
-import static org.apache.dolphinscheduler.spi.utils.Constants.CHANGE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.SMALL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * DqRuleServiceImpl
@@ -136,9 +138,9 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         if (CollectionUtils.isNotEmpty(dataSourceList)) {
             options = new ArrayList<>();
 
-            for (DataSource dataSource: dataSourceList) {
+            for (DataSource dataSource : dataSourceList) {
                 ParamsOptions childrenOption =
-                        new ParamsOptions(dataSource.getName(),dataSource.getId(),false);
+                        new ParamsOptions(dataSource.getName(), dataSource.getId(), false);
                 options.add(childrenOption);
             }
         }
@@ -158,7 +160,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                                       Integer pageNo,
                                       Integer pageSize) {
         Result result = new Result();
-        
+
         Date start = null;
         Date end = null;
         try {
@@ -194,7 +196,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                         DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(dqRule.getId()));
                 List<DqRuleExecuteSql> ruleExecuteSqlList = dqRuleExecuteSqlMapper.getExecuteSqlList(dqRule.getId());
 
-                RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList,ruleExecuteSqlList);
+                RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList, ruleExecuteSqlList);
                 dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
             });
 
@@ -211,7 +213,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         List<PluginParams> params = new ArrayList<>();
 
         for (DqRuleInputEntry inputEntry : ruleInputEntryList) {
-            if (Boolean.TRUE.equals(inputEntry.getShow())) {
+            if (Boolean.TRUE.equals(inputEntry.getIsShow())) {
                 switch (Objects.requireNonNull(FormType.of(inputEntry.getType()))) {
                     case INPUT:
                         params.add(getInputParam(inputEntry));
@@ -238,7 +240,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         try {
             result = mapper.writeValueAsString(params);
         } catch (JsonProcessingException e) {
-            logger.error("json parse error : {}", e.getMessage(), e);
+            logger.error("Json parse error.", e);
         }
 
         return result;
@@ -254,14 +256,14 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         paramProps.setRows(1);
 
         return InputParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
-                        .setRequired(inputEntry.getValidate())
+                        .setRequired(inputEntry.getIsValidate())
                         .build())
                 .setProps(paramProps)
                 .setValue(inputEntry.getValue())
                 .setPlaceholder(inputEntry.getPlaceholder())
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 
@@ -278,18 +280,19 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
             case DATASOURCE_TYPE:
                 options = new ArrayList<>();
                 ParamsOptions paramsOptions = null;
-                for (DbType dbtype: DbType.values()) {
-                    paramsOptions = new ParamsOptions(dbtype.name(),dbtype.getCode(),false);
+                for (DbType dbtype : DbType.values()) {
+                    paramsOptions = new ParamsOptions(dbtype.name(), dbtype.getCode(), false);
                     options.add(paramsOptions);
                 }
                 break;
             case COMPARISON_TYPE:
                 options = new ArrayList<>();
                 ParamsOptions comparisonOptions = null;
-                List<DqComparisonType> list = dqComparisonTypeMapper.selectList(new QueryWrapper<DqComparisonType>().orderByAsc("id"));
+                List<DqComparisonType> list =
+                        dqComparisonTypeMapper.selectList(new QueryWrapper<DqComparisonType>().orderByAsc("id"));
 
-                for (DqComparisonType type: list) {
-                    comparisonOptions = new ParamsOptions(type.getType(), type.getId(),false);
+                for (DqComparisonType type : list) {
+                    comparisonOptions = new ParamsOptions(type.getType(), type.getId(), false);
                     options.add(comparisonOptions);
                 }
                 break;
@@ -298,12 +301,12 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         }
 
         return SelectParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .setOptions(options)
                 .setValue(inputEntry.getValue())
                 .setSize(SMALL)
                 .setPlaceHolder(inputEntry.getPlaceholder())
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 
@@ -315,25 +318,26 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         paramProps.setRows(2);
 
         return InputParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
-                                     .setRequired(inputEntry.getValidate())
-                                     .build())
+                        .setRequired(inputEntry.getIsValidate())
+                        .build())
                 .setProps(paramProps)
                 .setValue(inputEntry.getValue())
                 .setPlaceholder(inputEntry.getPlaceholder())
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 
     private GroupParam getGroupParam(DqRuleInputEntry inputEntry) {
         return GroupParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
-                        .setRequired(inputEntry.getValidate())
+                        .setRequired(inputEntry.getIsValidate())
                         .build())
-                .setProps(new GroupParamsProps().setRules(JSONUtils.toList(inputEntry.getOptions(),PluginParams.class)).setFontSize(20))
-                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(CHANGE) : null)
+                .setProps(new GroupParamsProps().setRules(JSONUtils.toList(inputEntry.getOptions(), PluginParams.class))
+                        .setFontSize(20))
+                .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
     }
 }

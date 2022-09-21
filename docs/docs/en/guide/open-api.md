@@ -20,22 +20,22 @@ Generally, projects and processes are created through pages, but considering the
 
 #### Query project list
 
-1. Open the API documentation 
+1. Open the API documentation
 
-> Address：http://{API server ip}:12345/dolphinscheduler/doc.html?language=en_US&lang=en
+> Address：http://{API server ip}:12345/dolphinscheduler/swagger-ui/index.html?language=en_US&lang=en
 
 ![api-doc](../../../img/new_ui/dev/open-api/api_doc.png)
 
 2. select a test API, the API selected for this test is `queryAllProjectList`
 
-    > projects/list
-                                                                                  >
+   > projects/list
+
 3. Open `Postman`, fill in the API address, enter the `Token` in `Headers`, and then send the request to view the result:
-    
+
    ```
-    token: The Token just generated
-    ```
-   
+   token: The Token just generated
+   ```
+
 ![api-test](../../../img/new_ui/dev/open-api/api_test.png)
 
 #### Create a Project
@@ -63,6 +63,3 @@ If you are interested in the source code of creating a project, please continue 
 ![api-source01](../../../img/new_ui/dev/open-api/api_source01.png)
 
 ![api-source02](../../../img/new_ui/dev/open-api/api_source02.png)
-
-
-

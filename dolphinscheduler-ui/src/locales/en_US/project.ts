@@ -39,6 +39,9 @@ export default {
     delete_confirm: 'Delete?'
   },
   workflow: {
+    on_line: 'Online',
+    test: 'Test',
+    operating_environment: 'Operating Environment',
     workflow_relation: 'Workflow Relation',
     create_workflow: 'Create Workflow',
     import_workflow: 'Import Workflow',
@@ -103,6 +106,7 @@ export default {
     complement_data: 'Complement Data',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
+    whether_test: 'Whether Test',
     continue: 'Continue',
     end: 'End',
     none_send: 'None',
@@ -131,7 +135,6 @@ export default {
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version',
-    run_type: 'Run Type',
     scheduling_time: 'Scheduling Time',
     duration: 'Duration',
     run_times: 'Run Times',
@@ -203,6 +206,9 @@ export default {
       'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    on_line: 'Online',
+    test: 'Test',
+    operating_environment: 'Operating Environment',
     cancel_full_screen: 'Cancel full screen',
     enter_full_screen: 'Enter full screen',
     current_task_settings: 'Current task settings',
@@ -217,6 +223,7 @@ export default {
     workflow_state: 'Workflow State',
     version: 'Version',
     current_version: 'Current Version',
+    run_type: 'Run Type',
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     description: 'Description',
@@ -309,6 +316,10 @@ export default {
     online: 'Online'
   },
   node: {
+    jvm_args: 'Java VM Parameters',
+    jvm_args_tips: 'Please enter virtual machine parameters',
+    run_type: 'Run Type',
+    is_module_path: 'Use Module Path',
     return_back: 'Return',
     current_node_settings: 'Current node settings',
     instructions: 'Instructions',
@@ -646,11 +657,20 @@ export default {
     zeppelin_paragraph_id_tips:
       'Please enter the paragraph id of your zeppelin paragraph',
     zeppelin_parameters: 'parameters',
-    zeppelin_parameters_tips: 'Please enter the parameters for zeppelin dynamic form',
+    zeppelin_parameters_tips:
+      'Please enter the parameters for zeppelin dynamic form',
     zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
-    zeppelin_rest_endpoint_tips: 'Please enter the rest endpoint of your Zeppelin server',
-    zeppelin_production_note_directory: 'Directory for cloned zeppelin note in production mode',
-    zeppelin_production_note_directory_tips: 'Please enter the production note directory to enable production mode',
+    zeppelin_rest_endpoint_tips:
+      'Please enter the rest endpoint of your Zeppelin server',
+    zeppelin_production_note_directory:
+      'Directory for cloned zeppelin note in production mode',
+    zeppelin_production_note_directory_tips:
+      'Please enter the production note directory to enable production mode',
+    hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
+    hive_sql_script: 'Hive SQL Script',
+    hive_cli_options: 'Hive Cli Options',
+    hive_cli_options_tips:
+      'Please enter the options for hive cli, e.g. --verbose',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips:
       'Please enter the conda environment name of papermill',
@@ -701,7 +721,7 @@ export default {
     mlflow_deployModelKey: 'Model-URI',
     mlflow_deployPort: 'Port',
     mlflowProjectRepository: 'Repository',
-    mlflowProjectRepository_tips: 'github respository or path on worker',
+    mlflowProjectRepository_tips: 'git respository or path on worker',
     mlflowProjectVersion: 'Project Version',
     mlflowProjectVersion_tips: 'git version',
     mlflow_cpuLimit: 'Max Cpu Limit',
@@ -764,6 +784,7 @@ export default {
     pytorch_python_env_tool: 'Python Environment Manager Tool',
     pytorch_requirements: 'Requirement File',
     pytorch_conda_python_version: 'Python Version',
-    pytorch_conda_python_version_tips: 'Please enter the version number, such as 3.6, 3.7, 3.x'
+    pytorch_conda_python_version_tips:
+      'Please enter the version number, such as 3.6, 3.7, 3.x'
   }
 }

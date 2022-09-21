@@ -357,7 +357,7 @@ public class TaskConstants {
     /**
      * resource storage type
      */
-   // public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
+    // public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
      * kerberos
@@ -389,7 +389,6 @@ public class TaskConstants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
-
     /**
      * hadoop.security.authentication
      */
@@ -398,7 +397,8 @@ public class TaskConstants {
     /**
      * hadoop.security.authentication
      */
-    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+            "hadoop.security.authentication.startup.state";
 
     /**
      * Task Logger Thread's name
@@ -439,7 +439,8 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_STREAM = "STREAM";
 
-    public static final List<String> COMPLEX_TASK_TYPES = Arrays.asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
+    public static final List<String> COMPLEX_TASK_TYPES = Arrays
+            .asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
 
     /**
      * aws config
@@ -447,6 +448,13 @@ public class TaskConstants {
     public static final String AWS_ACCESS_KEY_ID = "resource.aws.access.key.id";
     public static final String AWS_SECRET_ACCESS_KEY = "resource.aws.secret.access.key";
     public static final String AWS_REGION = "resource.aws.region";
+
+    /**
+     * alibaba cloud config
+     */
+    public static final String ALIBABA_CLOUD_ACCESS_KEY_ID = "resource.alibaba.cloud.access.key.id";
+    public static final String ALIBABA_CLOUD_ACCESS_KEY_SECRET = "resource.alibaba.cloud.access.key.secret";
+    public static final String ALIBABA_CLOUD_REGION = "resource.alibaba.cloud.region";
 
     /**
      * use for k8s task
@@ -459,7 +467,7 @@ public class TaskConstants {
     public static final String LAYER_LABEL = "k8s.cn/layer";
     public static final String LAYER_LABEL_VALUE = "batch";
     public static final String NAME_LABEL = "k8s.cn/name";
-    public static final String  TASK_INSTANCE_ID = "taskInstanceId";
+    public static final String TASK_INSTANCE_ID = "taskInstanceId";
     public static final String MI = "Mi";
     public static final int JOB_TTL_SECONDS = 300;
     public static final int LOG_LINES = 500;

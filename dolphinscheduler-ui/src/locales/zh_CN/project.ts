@@ -39,6 +39,9 @@ export default {
     delete_confirm: '确定删除吗?'
   },
   workflow: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     workflow_relation: '工作流关系',
     create_workflow: '创建工作流',
     import_workflow: '导入工作流',
@@ -105,6 +108,7 @@ export default {
     complement_data: '补数',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
+    whether_test: '是否测试',
     continue: '继续',
     end: '结束',
     none_send: '都不发',
@@ -203,6 +207,9 @@ export default {
       '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     cancel_full_screen: '取消全屏',
     enter_full_screen: '全屏',
     current_task_settings: '当前任务设置',
@@ -310,6 +317,10 @@ export default {
     online: '已上线'
   },
   node: {
+    is_module_path: '使用模块路径',
+    run_type: '运行类型',
+    jvm_args: '虚拟机参数',
+    jvm_args_tips: '请输入虚拟机参数',
     return_back: '返回上一节点',
     current_node_settings: '当前节点设置',
     instructions: '使用说明',
@@ -638,12 +649,17 @@ export default {
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
     zeppelin_production_note_directory: '生产模式下存放克隆note的目录',
-    zeppelin_production_note_directory_tips: '请输入生产环境note目录以启用生产模式',
+    zeppelin_production_note_directory_tips:
+      '请输入生产环境note目录以启用生产模式',
     zeppelin_paragraph_id_tips: '请输入zeppelin paragraph id',
     zeppelin_parameters: 'parameters',
     zeppelin_parameters_tips: '请输入zeppelin dynamic form参数',
     zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
     zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint',
+    hive_cli_task_execution_type: 'Hive Cli 任务类型',
+    hive_sql_script: 'Hive SQL 脚本',
+    hive_cli_options: 'Hive Cli 选项',
+    hive_cli_options_tips: '请输入您的Hive Cli选项，如--verbose等',
     jupyter_conda_env_name: 'condaEnvName',
     jupyter_conda_env_name_tips: '请输入papermill所在的conda环境名',
     jupyter_input_note_path: 'inputNotePath',
@@ -688,7 +704,7 @@ export default {
     mlflow_deployModelKey: '部署的模型URI',
     mlflow_deployPort: '监听端口',
     mlflowProjectRepository: '运行仓库',
-    mlflowProjectRepository_tips: '可以为github仓库或worker上的路径',
+    mlflowProjectRepository_tips: '可以为git仓库或worker上的路径',
     mlflowProjectVersion: '项目版本',
     mlflowProjectVersion_tips: '项目git版本',
     mlflow_cpuLimit: '最大cpu限制',

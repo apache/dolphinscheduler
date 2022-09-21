@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -143,7 +149,7 @@ const ClusterModal = defineComponent({
                   path='name'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-cluster-name'
                     placeholder={t('security.cluster.cluster_name_tips')}
                     v-model={[this.model.name, 'value']}
@@ -154,7 +160,7 @@ const ClusterModal = defineComponent({
                   path='k8s_config'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-cluster-config'
                     placeholder={envK8sConfigPlaceholder}
                     type='textarea'
@@ -167,7 +173,7 @@ const ClusterModal = defineComponent({
                   path='yarn_config'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-yarn-config'
                     placeholder={envYarnConfigPlaceholder}
                     disabled={true}
@@ -179,7 +185,7 @@ const ClusterModal = defineComponent({
                   path='description'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-cluster-desc'
                     placeholder={t('security.cluster.cluster_description_tips')}
                     v-model={[this.model.description, 'value']}

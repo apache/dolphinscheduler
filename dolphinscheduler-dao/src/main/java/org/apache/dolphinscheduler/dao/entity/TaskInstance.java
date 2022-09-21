@@ -38,13 +38,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.core.type.TypeReference;
-
-import lombok.Data;
 
 /**
  * task instance
@@ -57,7 +57,7 @@ public class TaskInstance implements Serializable {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * task name
@@ -300,6 +300,11 @@ public class TaskInstance implements Serializable {
      */
     private TaskExecuteType taskExecuteType;
 
+    /**
+     * test flag
+     */
+    private int testFlag;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
@@ -370,7 +375,6 @@ public class TaskInstance implements Serializable {
     public boolean isFirstRun() {
         return endTime == null;
     }
-
 
     /**
      * determine if a task instance can retry

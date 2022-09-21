@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UiPluginServiceImpl.class);
+
     @Autowired
     PluginDefineMapper pluginDefineMapper;
 
@@ -46,12 +50,14 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
         Map<String, Object> result = new HashMap<>();
         if (!pluginType.getHasUi()) {
+            logger.warn("Plugin does not have UI.");
             putMsg(result, Status.PLUGIN_NOT_A_UI_COMPONENT);
             return result;
         }
         List<PluginDefine> pluginDefines = pluginDefineMapper.queryByPluginType(pluginType.getDesc());
 
         if (CollectionUtils.isEmpty(pluginDefines)) {
+            logger.warn("Query plugins result is null, check status of plugins.");
             putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL);
             return result;
         }
@@ -66,6 +72,7 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
         Map<String, Object> result = new HashMap<>();
         PluginDefine pluginDefine = pluginDefineMapper.queryDetailById(id);
         if (null == pluginDefine) {
+            logger.warn("Query plugins result is empty, pluginId:{}.", id);
             putMsg(result, Status.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL);
             return result;
         }

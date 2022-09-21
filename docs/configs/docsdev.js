@@ -90,6 +90,10 @@ export default {
                         title: 'Task',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/en-us/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/en-us/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -162,6 +166,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/en-us/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -180,6 +188,10 @@ export default {
                             {
                                 title: 'Dinky',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'Java',
+                                link: '/en-us/docs/dev/user_doc/guide/task/java.html',
                             },
                             {
                                 title: 'SageMaker',
@@ -262,6 +274,10 @@ export default {
                             {
                                 title: 'Oracle',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/oracle.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
                             },
                         ],
                     },
@@ -710,6 +726,10 @@ export default {
                         title: '任务类型',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -782,6 +802,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -800,6 +824,10 @@ export default {
                             {
                                 title: 'Dinky',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
+                            },
+                            {
+                                title: 'Java',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/java.html',
                             },
                             {
                                 title: 'SageMaker',
@@ -858,6 +886,10 @@ export default {
                             {
                                 title: 'Spark',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
                             },
                         ],
                     },

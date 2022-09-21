@@ -23,11 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.*;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -60,7 +56,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SqlTask extends AbstractTaskExecutor {
+public class SqlTask extends AbstractTask {
 
     /**
      * taskExecutionContext
@@ -90,6 +86,8 @@ public class SqlTask extends AbstractTaskExecutor {
 
     private SQLTaskExecutionContext sqlTaskExecutionContext;
 
+    public static final int TEST_FLAG_YES = 1;
+
     /**
      * Abstract Yarn Task
      *
@@ -101,6 +99,9 @@ public class SqlTask extends AbstractTaskExecutor {
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
         assert sqlParameters != null;
+        if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES && this.sqlParameters.getDatasource() == 0) {
+            throw new RuntimeException("unbound test data source");
+        }
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
@@ -114,7 +115,7 @@ public class SqlTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
@@ -162,6 +163,11 @@ public class SqlTask extends AbstractTaskExecutor {
             logger.error("sql task error", e);
             throw new TaskException("Execute sql task failed", e);
         }
+    }
+
+    @Override
+    public void cancel() throws TaskException {
+
     }
 
     /**
@@ -290,7 +296,6 @@ public class SqlTask extends AbstractTaskExecutor {
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
-            logger.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
@@ -362,7 +367,7 @@ public class SqlTask extends AbstractTaskExecutor {
                     ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
                 }
             }
-            logger.info("prepare statement replace sql : {} ", stmt);
+            logger.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(), sqlBinds.getParamsMap());
             return stmt;
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);

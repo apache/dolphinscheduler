@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.common.base.Strings;
 import lombok.NonNull;
 import org.apache.dolphinscheduler.common.Constants;
@@ -26,6 +27,7 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -34,6 +36,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -49,6 +52,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Date;
+import java.util.List;
 
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
@@ -90,7 +94,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         logger.info("Set task logger name: {}", taskLogName);
     }
 
-    protected abstract void executeTask();
+    protected abstract void executeTask(TaskCallBack taskCallBack);
 
     protected void afterExecute() throws TaskException {
         if (task == null) {
@@ -118,8 +122,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         // cancel the task
         if (task != null) {
             try {
-                task.cancelApplication(true);
-                ProcessUtils.killYarnJob(taskExecutionContext);
+                task.cancel();
+                List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
+                if (CollectionUtils.isNotEmpty(appIds)) {
+                    ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                }
             } catch (Exception e) {
                 logger.error("Task execute failed and cancel the application failed, this will not affect the taskInstance status, but you need to check manual", e);
             }
@@ -148,7 +155,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             beforeExecute();
 
-            executeTask();
+            TaskCallBack taskCallBack = TaskCallbackImpl.builder().workerMessageSender(workerMessageSender).masterAddress(masterAddress).build();
+            executeTask(taskCallBack);
 
             afterExecute();
 
