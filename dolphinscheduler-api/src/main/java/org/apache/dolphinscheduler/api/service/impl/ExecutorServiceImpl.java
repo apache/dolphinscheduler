@@ -707,13 +707,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     logger.warn("The startDate {} is later than the endDate {}", start, end);
                     break;
                 }
-                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
-                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
-                command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-                createCount = processService.createCommand(command);
 
                 // dependent process definition
                 List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start, ZoneId.systemDefault().getId()));
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end, ZoneId.systemDefault().getId()));
+                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, JSONUtils.toJsonString(CronUtils.getSelfFireDateList(start, end, schedules)));
+                command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                createCount = processService.createCommand(command);
 
                 if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
                     logger.info("process code: {} complement dependent in off mode or schedule's size is 0, skip "
