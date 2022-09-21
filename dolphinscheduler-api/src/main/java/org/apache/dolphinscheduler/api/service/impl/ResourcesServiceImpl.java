@@ -420,6 +420,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+        // TODO: deal with OSS
         if (resource.isDirectory() && storageOperate.returnStorageType().equals(ResUploadType.S3)
                 && !resource.getFileName().equals(name)) {
             logger.warn("Directory in S3 storage can not be renamed.");
@@ -923,27 +924,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<String> allChildren = storageOperate.listFilesStatusRecursively(fullName, defaultPath,
                 resTenantCode, ResourceType.FILE).stream().map(storageEntity -> storageEntity.getFullName()).collect(Collectors.toList());
 
-
         String[] allChildrenFullNameArray = allChildren.stream().toArray(String[]::new);
         if (allChildrenFullNameArray.length != 0) {
             // check before using allChildrenFullNameArray to query fullnames.
             resourcesIdNeedToDeleteSet.addAll(
                     resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray, ResourceType.FILE));
         }
-        logger.info("{} =====================", resourcesIdNeedToDeleteSet.size());
-        // Integer[] arr = new Integer[resourcesIdSet.size()];
-        // List<Map<String, Object>> resourceInUse =
-        // processDefinitionMapper.queryResourcesInUseWithinResourceArray(resourcesIdSet.toArray(arr));
 
         Integer[] needDeleteResourceIdArray =
                 resourcesIdNeedToDeleteSet.toArray(new Integer[resourcesIdNeedToDeleteSet.size()]);
-
-        // TODO: is this still correct?
-//        if (needDeleteResourceIdArray.length >= 2) {
-//            logger.error("can't be deleted,because There are files or folders in the current directory:{}", resource);
-//            putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
-//            return result;
-//        }
 
         // if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {

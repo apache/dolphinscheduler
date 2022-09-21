@@ -71,9 +71,11 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         result.setMsg(Status.SUCCESS.getMsg());
 
         when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(""), eq(""), any(), any(),
-            eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any())).thenReturn(result);
+                eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
+                        .thenReturn(result);
         Result taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
-            "", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00", TaskExecuteType.BATCH, pageNo, pageSize);
+                "", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
+                TaskExecuteType.BATCH, pageNo, pageSize);
         Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
     }
 
@@ -91,9 +93,9 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success", "cxc_1113")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
