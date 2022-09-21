@@ -120,3 +120,6 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_R_test_flag;
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_R_test_flag;
+
+create index log_unique on t_ds_process_definition_log (code,version);
+create index project_code_idx on t_ds_process_definition_log (project_code);

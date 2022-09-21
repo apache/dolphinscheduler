@@ -119,3 +119,8 @@ d//
 delimiter ;
 select uc_dolphin_T_t_ds_task_instance_R_test_flag();
 DROP FUNCTION uc_dolphin_T_t_ds_task_instance_R_test_flag();
+
+alter table create index
+
+create index idx_process_definition_log_code_version on t_ds_process_definition_log (code,version);
+create index idx_process_definition_log_project_code on t_ds_process_definition_log (project_code);
