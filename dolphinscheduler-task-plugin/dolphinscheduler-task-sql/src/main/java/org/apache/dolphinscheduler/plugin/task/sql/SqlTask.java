@@ -261,14 +261,6 @@ public class SqlTask extends AbstractTask {
                 resultJSONArray.add(mapOfColValues);
                 rowCount++;
             }
-            // result is null,output table metadata
-            if (resultJSONArray.isEmpty()) {
-                ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
-                for (int i = 1; i <= num; i++) {
-                    emptyOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(""));
-                }
-                resultJSONArray.add(emptyOfColValues);
-            }
 
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, rowCount);
@@ -278,7 +270,10 @@ public class SqlTask extends AbstractTask {
                 logger.info("row {} : {}", i + 1, row);
             }
         }
-        String result = JSONUtils.toJsonString(resultJSONArray);
+
+        String result = resultJSONArray.isEmpty() ?
+            JSONUtils.toJsonString(generateEmptyRow(resultSet)) : JSONUtils.toJsonString(resultJSONArray);
+
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
@@ -289,26 +284,23 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * Output Query Results as JsonString
+     * generate empty Results as ArrayNode
      */
-
-    private void generateRow(ArrayNode resultJSONArray, ResultSetMetaData md, int metaColumnsNum, int rowCount) throws SQLException {
-        if (resultJSONArray.isEmpty()) {
+    private ArrayNode generateEmptyRow(ResultSet resultSet) throws SQLException {
+        ArrayNode resultJSONArray = JSONUtils.createArrayNode();
+        ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
+        if (resultSet != null) {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnsNum = metaData.getColumnCount();
             logger.info("sql query results is empty");
-            ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
-            for (int i = 1; i <= metaColumnsNum; i++) {
-                emptyOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(""));
+            for (int i = 1; i <= columnsNum; i++) {
+                emptyOfColValues.set(metaData.getColumnLabel(i), JSONUtils.toJsonNode(""));
             }
-            resultJSONArray.add(emptyOfColValues);
         } else {
-            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
-            displayRows = Math.min(displayRows, rowCount);
-            logger.info("display sql result {} rows as follows:", displayRows);
-            for (int i = 0; i < displayRows; i++) {
-                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-                logger.info("row {} : {}", i + 1, row);
-            }
+            emptyOfColValues.set("error", JSONUtils.toJsonNode("resultSet is null"));
         }
+        resultJSONArray.add(emptyOfColValues);
+        return resultJSONArray;
     }
 
 
