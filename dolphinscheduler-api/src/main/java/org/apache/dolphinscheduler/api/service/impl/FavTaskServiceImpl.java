@@ -43,9 +43,16 @@ public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskServic
         Set<String> userFavTaskTypes = favMapper.getUserFavTaskTypes(loginUser.getId());
 
         List<FavTaskDto> defaultTaskTypes = taskTypeConfiguration.getDefaultTaskTypes();
+        List<FavTaskDto> result = new ArrayList<>();
         defaultTaskTypes.forEach(e -> {
-            if (userFavTaskTypes.contains(e.getTaskName())) {
-                e.setCollection(true);
+            try {
+                FavTaskDto clone = (FavTaskDto) e.clone();
+                if (userFavTaskTypes.contains(clone.getTaskName())) {
+                    clone.setCollection(true);
+                }
+                result.add(clone);
+            } catch (CloneNotSupportedException ex) {
+                throw new RuntimeException(ex);
             }
         });
         return defaultTaskTypes;
