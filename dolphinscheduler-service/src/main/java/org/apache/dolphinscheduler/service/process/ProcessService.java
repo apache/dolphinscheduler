@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -227,6 +226,13 @@ public interface ProcessService {
 
     int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean syncDefine, Boolean isFromProcessDefine);
 
+    int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
+                         List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs,
+                         Boolean syncDefine, boolean isDelete);
+
+    /**
+     * save task relations by default, delete history while adding
+     */
     int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
                          List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs,
                          Boolean syncDefine);
