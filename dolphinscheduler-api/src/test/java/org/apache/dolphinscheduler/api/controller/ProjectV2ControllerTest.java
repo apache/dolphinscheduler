@@ -76,7 +76,7 @@ public class ProjectV2ControllerTest {
         projectUpdateReq.setDescription("james lbj");
         projectUpdateReq.setUserName("admin");
         Mockito.when(projectService.update(user, projectCode, projectUpdateReq.getProjectName(),
-            projectUpdateReq.getDescription(), projectUpdateReq.getUserName())).thenReturn(result);
+                projectUpdateReq.getDescription(), projectUpdateReq.getUserName())).thenReturn(result);
         Result response = projectV2Controller.updateProject(user, projectCode, projectUpdateReq);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
@@ -101,7 +101,7 @@ public class ProjectV2ControllerTest {
 
         Result result = Result.success(new PageInfo<Resource>(1, 10));
         Mockito.when(projectService.queryProjectListPaging(user, projectQueryReq.getPageSize(),
-            projectQueryReq.getPageNo(), projectQueryReq.getSearchVal())).thenReturn(result);
+                projectQueryReq.getPageNo(), projectQueryReq.getSearchVal())).thenReturn(result);
         Result response = projectV2Controller.queryProjectListPaging(user, projectQueryReq);
         Assert.assertTrue(response != null && response.isSuccess());
     }
@@ -142,6 +142,16 @@ public class ProjectV2ControllerTest {
         putMsg(result, Status.SUCCESS);
         Mockito.when(projectService.queryAllProjectList(user)).thenReturn(result);
         Result response = projectV2Controller.queryAllProjectList(user);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
+    @Test
+    public void testQueryAllProjectListForDependent() {
+        User user = new User();
+        user.setId(0);
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        Mockito.when(projectService.queryAllProjectListForDependent()).thenReturn(result);
+        Result response = projectV2Controller.queryAllProjectListForDependent(user);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 

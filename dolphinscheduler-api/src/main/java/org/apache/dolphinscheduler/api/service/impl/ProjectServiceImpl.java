@@ -603,4 +603,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
     }
 
+    /**
+     * query all project for dependent node
+     *
+     * @return project list
+     */
+    @Override
+    public Result queryAllProjectListForDependent() {
+        Result result = new Result<>();
+        List<Project> projects =
+                projectMapper.queryAllProjectForDependent();
+        result.setData(projects);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
 }
