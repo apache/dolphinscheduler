@@ -56,7 +56,7 @@ public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskServic
                 throw new RuntimeException(ex);
             }
         });
-        return defaultTaskTypes;
+        return result;
     }
 
     @Override
