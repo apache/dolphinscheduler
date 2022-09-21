@@ -154,6 +154,7 @@ public class AlertSenderServiceTest {
         String content = "alert mail test content";
         List<Alert> alertList = new ArrayList<>();
         Alert alert = new Alert();
+        alert.setId(1);
         alert.setAlertGroupId(alertGroupId);
         alert.setTitle(title);
         alert.setContent(content);

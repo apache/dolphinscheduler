@@ -32,5 +32,5 @@ registry:
 After do this two steps, you can start your DolphinScheduler cluster, your cluster will use mysql as registry center to
 store server metadata.
 
-NOTE: You need to add `mysql-connector-java.jar` into DS classpath, since this plugin will not bundle this driver in distribution. 
+NOTE: You need to add `mysql-connector-java.jar` into DS classpath, since this plugin will not bundle this driver in distribution.
 You can get the detail about <a href="https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/installation/pseudo-cluster.html">Initialize the Database</a>

@@ -23,12 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
-import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.*;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -93,6 +88,8 @@ public class SqlTask extends AbstractTask {
 
     private SQLTaskExecutionContext sqlTaskExecutionContext;
 
+    public static final int TEST_FLAG_YES = 1;
+
     /**
      * Abstract Yarn Task
      *
@@ -104,6 +101,9 @@ public class SqlTask extends AbstractTask {
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
         assert sqlParameters != null;
+        if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES && this.sqlParameters.getDatasource() == 0) {
+            throw new RuntimeException("unbound test data source");
+        }
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
@@ -400,7 +400,7 @@ public class SqlTask extends AbstractTask {
                     ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
                 }
             }
-            logger.info("prepare statement replace sql : {} ", stmt);
+            logger.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(), sqlBinds.getParamsMap());
             return stmt;
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);

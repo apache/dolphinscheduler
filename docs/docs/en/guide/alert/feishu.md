@@ -10,6 +10,7 @@ The following shows the `Feishu` configuration example:
 ## Parameter Configuration
 
 * Webhook
+
   > Copy the robot webhook URL shown below:
 
   ![alert-feishu-webhook](../../../../img/new_ui/dev/alert/alert_feishu_webhook.png)

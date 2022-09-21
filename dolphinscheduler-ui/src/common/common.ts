@@ -37,7 +37,6 @@ import {
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
 import { ITaskStateConfig } from './types'
-
 /**
  * Intelligent display kb m
  */

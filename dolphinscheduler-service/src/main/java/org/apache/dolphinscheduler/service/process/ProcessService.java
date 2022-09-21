@@ -58,6 +58,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,7 +78,7 @@ public interface ProcessService {
 
     boolean verifyIsNeedCreateCommand(Command command);
 
-    ProcessInstance findProcessInstanceDetailById(int processId);
+    Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
     List<TaskDefinition> getTaskNodeListByDefinition(long defineCode);
 
@@ -144,7 +145,7 @@ public interface ProcessService {
 
     List<Integer> findTaskIdByInstanceState(int instanceId, TaskExecutionStatus state);
 
-    List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId);
+    List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId, int testFlag);
 
     List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId);
 
@@ -189,11 +190,11 @@ public interface ProcessService {
 
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
 
-    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval);
+    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
-    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval);
+    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
-    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime);
+    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag);
 
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
 
@@ -297,4 +298,6 @@ public interface ProcessService {
     public String findConfigYamlByName(String clusterName);
 
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
+
+    Integer queryTestDataSourceId(Integer onlineDataSourceId);
 }

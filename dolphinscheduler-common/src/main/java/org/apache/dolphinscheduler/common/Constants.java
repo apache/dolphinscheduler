@@ -57,6 +57,8 @@ public final class Constants {
 
     public static final String STORAGE_S3 = "S3";
 
+    public static final String STORAGE_OSS = "OSS";
+
     public static final String STORAGE_HDFS = "HDFS";
 
     public static final String EMPTY_STRING = "";
@@ -150,6 +152,10 @@ public final class Constants {
 
     public static final String AWS_S3_BUCKET_NAME = "resource.aws.s3.bucket.name";
     public static final String AWS_END_POINT = "resource.aws.s3.endpoint";
+
+    public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
+    public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
+
     /**
      * comma ,
      */
@@ -734,7 +740,7 @@ public final class Constants {
      * dataSource sensitive param
      */
     public static final String DATASOURCE_PASSWORD_REGEX =
-            "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
+            "(?<=((?i)password((\":\")|(=')))).*?(?=((\")|(')))";
 
     /**
      * default worker group
@@ -851,6 +857,13 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+
+    /**
+     * test flag
+     */
+    public static final int TEST_FLAG_NO = 0;
+    public static final int TEST_FLAG_YES = 1;
+
     /**
      * Task Types
      */
@@ -861,4 +874,6 @@ public final class Constants {
     public static final String TYPE_DATA_QUALITY = "DataQuality";
     public static final String TYPE_OTHER = "Other";
     public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
+
+    public static final String DATASOUCE = "datasource";
 }

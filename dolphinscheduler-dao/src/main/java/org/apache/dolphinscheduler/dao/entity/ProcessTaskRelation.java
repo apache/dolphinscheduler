@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Date;
-import java.util.Objects;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Data
+@NoArgsConstructor
 @TableName("t_ds_process_task_relation")
 public class ProcessTaskRelation {
 
@@ -103,9 +104,6 @@ public class ProcessTaskRelation {
      */
     private Date updateTime;
 
-    public ProcessTaskRelation() {
-    }
-
     public ProcessTaskRelation(String name,
                                int processDefinitionVersion,
                                long projectCode,
@@ -132,28 +130,4 @@ public class ProcessTaskRelation {
         this.updateTime = updateTime;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ProcessTaskRelation that = (ProcessTaskRelation) o;
-        return processDefinitionVersion == that.processDefinitionVersion
-                && projectCode == that.projectCode
-                && processDefinitionCode == that.processDefinitionCode
-                && preTaskCode == that.preTaskCode
-                && preTaskVersion == that.preTaskVersion
-                && postTaskCode == that.postTaskCode
-                && postTaskVersion == that.postTaskVersion
-                && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, processDefinitionVersion, projectCode, processDefinitionCode, preTaskCode,
-                preTaskVersion, postTaskCode, postTaskVersion);
-    }
 }
