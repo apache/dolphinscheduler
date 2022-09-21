@@ -43,7 +43,6 @@ class MLflowDeployType(str):
 
     MLFLOW = "MLFLOW"
     DOCKER = "DOCKER"
-    DOCKER_COMPOSE = "DOCKER COMPOSE"
 
 
 DEFAULT_MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
@@ -83,10 +82,8 @@ class MLflowModels(BaseMLflow):
     :param model_uri: Model-URI of MLflow , support models:/<model_name>/suffix format and runs:/ format.
         See https://mlflow.org/docs/latest/tracking.html#artifact-stores
     :param mlflow_tracking_uri: MLflow tracking server uri, default is http://127.0.0.1:5000
-    :param deploy_mode: MLflow deploy mode, support MLFLOW, DOCKER, DOCKER COMPOSE, default is DOCKER
+    :param deploy_mode: MLflow deploy mode, support MLFLOW, DOCKER, default is DOCKER
     :param port: deploy port, default is 7000
-    :param cpu_limit: cpu limit, default is 1.0
-    :param memory_limit: memory limit, default is 500M
     """
 
     mlflow_task_type = MLflowTaskType.MLFLOW_MODELS
@@ -95,8 +92,6 @@ class MLflowModels(BaseMLflow):
         "deploy_type",
         "deploy_model_key",
         "deploy_port",
-        "cpu_limit",
-        "memory_limit",
     }
 
     def __init__(
@@ -106,8 +101,6 @@ class MLflowModels(BaseMLflow):
         mlflow_tracking_uri: Optional[str] = DEFAULT_MLFLOW_TRACKING_URI,
         deploy_mode: Optional[str] = MLflowDeployType.DOCKER,
         port: Optional[int] = 7000,
-        cpu_limit: Optional[float] = 1.0,
-        memory_limit: Optional[str] = "500M",
         *args,
         **kwargs
     ):
@@ -116,8 +109,6 @@ class MLflowModels(BaseMLflow):
         self.deploy_type = deploy_mode.upper()
         self.deploy_model_key = model_uri
         self.deploy_port = port
-        self.cpu_limit = cpu_limit
-        self.memory_limit = memory_limit
 
 
 class MLFlowProjectsCustom(BaseMLflow):
