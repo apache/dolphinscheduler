@@ -76,7 +76,7 @@ worker:
   groups:
     - default
   # alert server listen host
-  alert-listen-host: localhost
+  alert-listen-host: ${ALERT_LISTEN_HOST:localhost}
   alert-listen-port: 50052
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
