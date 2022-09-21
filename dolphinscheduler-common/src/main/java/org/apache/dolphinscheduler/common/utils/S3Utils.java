@@ -35,6 +35,7 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.google.common.base.Joiner;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.storage.StorageEntity;
@@ -54,10 +55,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -175,6 +173,25 @@ public class S3Utils implements Closeable, StorageOperate {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
         return String.format(FORMAT_S_S, getS3ResDir(tenantCode), fileName);
+    }
+
+    @Override
+    public String getResourceFileName(String fullName) {
+        // here is a quick fix here to get fileName. We get the resource upload path and
+        // get the index of the first appearance of resource upload path. The index is put
+        // in the start index of the substring function and get the result substring containing
+        // tenantcode and "resource" directory and the fileName.
+        // Then we split the result substring
+        // with "/" and join all elements except the first two elements because they are
+        // tenantCode and "resource" directory.
+        String resourceUploadPath = RESOURCE_UPLOAD_PATH.endsWith("/") ?
+                StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
+        // +1 because we want to skip the "/" after resource upload path as well.
+        String pathContainingTenantNResource = fullName.substring(
+                fullName.indexOf(resourceUploadPath)
+                        + resourceUploadPath.length() + 1);
+        String[] fileNameArr = pathContainingTenantNResource.split("/");
+        return Joiner.on("/").join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
     }
 
     @Override

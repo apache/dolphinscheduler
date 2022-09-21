@@ -453,15 +453,6 @@ delimiter ;
 CALL add_t_ds_alert_idx_idx_status;
 DROP PROCEDURE add_t_ds_alert_idx_idx_status;
 
--- Add resource limit column
-ALTER TABLE `t_ds_task_definition` ADD COLUMN `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity' AFTER `task_group_priority`;
-ALTER TABLE `t_ds_task_definition` ADD COLUMN `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity' AFTER `task_group_priority`;
-ALTER TABLE `t_ds_task_definition` ADD COLUMN `resource_ids_new` text COMMENT 'new resources id only for relation' AFTER `resource_ids`;
-ALTER TABLE `t_ds_task_definition_log` ADD COLUMN `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity' AFTER `operate_time`;
-ALTER TABLE `t_ds_task_definition_log` ADD COLUMN `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity' AFTER `cpu_quota`;
-ALTER TABLE `t_ds_task_definition_log` ADD COLUMN `resource_ids_new` text COMMENT 'new resources id only for relation' AFTER `resource_ids`;
-ALTER TABLE `t_ds_task_instance` ADD COLUMN `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity' AFTER `dry_run`;
-ALTER TABLE `t_ds_task_instance` ADD COLUMN `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity' AFTER `cpu_quota`;
 -- ALTER TABLE `t_ds_alert` ADD COLUMN `project_code` bigint DEFAULT NULL COMMENT 'project_code';
 -- ALTER TABLE `t_ds_alert` ADD COLUMN `process_definition_code` bigint DEFAULT NULL COMMENT 'process_definition_code';
 -- ALTER TABLE `t_ds_alert` ADD COLUMN `process_instance_id` int DEFAULT NULL COMMENT 'process_instance_id';

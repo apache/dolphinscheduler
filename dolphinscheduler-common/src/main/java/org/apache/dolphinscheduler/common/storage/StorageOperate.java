@@ -70,6 +70,13 @@ public interface StorageOperate {
     String getResourceFileName(String tenantCode, String fullName);
 
     /**
+     * get the path of the resource file excluding the base path.
+     * @param fullName
+     * @return
+     */
+    String getResourceFileName(String fullName);
+
+    /**
      * get the path of the file
      * @param resourceType
      * @param tenantCode

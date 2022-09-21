@@ -1791,11 +1791,11 @@ public class ProcessServiceImpl implements ProcessService {
             }
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
-            ResourcesTask result = resourceTaskMapper.selectResourceByFullName(resourceFullName);
-            if (result != null) {
-                resourceInfo.setId(result.getId());
+            Integer resultList = resourceTaskMapper.existResourceByFullName(resourceFullName);
+            if (resultList != null) {
+                resourceInfo.setId(resultList);
                 resourceInfo.setRes(res.getRes());
-                resourceInfo.setResourceName(result.getFullName());
+                resourceInfo.setResourceName(resourceFullName);
             }
             if (logger.isInfoEnabled()) {
                 logger.info("updated resource info {}",
@@ -2511,6 +2511,8 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setCreateTime(definitionCodeAndVersion.getCreateTime());
             updateTaskDefinitionLogs.add(taskDefinitionLog);
         }
+        int updateResult = updateTaskDefinitionLogs.size();
+
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs)) {
             List<Long> taskDefinitionCodes = updateTaskDefinitionLogs
                     .stream()
@@ -2532,12 +2534,19 @@ public class ProcessServiceImpl implements ProcessService {
                     }
                     taskDefinitionToUpdate.setResourceIdsNew(Joiner.on(",").join(resourceIdsNewSet));
                 }
+
+                if (Boolean.TRUE.equals(syncDefine)) {
+                    taskDefinitionToUpdate.setId(task.getId());
+                    updateResult += taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+                } else {
+                    updateResult++;
+                }
             }
         }
 
         // for each taskDefinitionLog, we will insert a new version into db
         // and update the origin one if exist
-        int updateResult = updateTaskDefinitionLogs.size();
+
         int insertResult = newTaskDefinitionLogs.size();
         if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
             insertResult = taskDefinitionLogMapper.batchInsert(taskDefinitionLogs);
@@ -3200,7 +3209,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     private Integer createRelationTaskResourcesIfNotExist(String resourceFullName) {
 
-        Integer resourceId = resourceTaskMapper.existResourceByFullName(resourceFullName, ResourceType.FILE);
+        Integer resourceId = resourceTaskMapper.existResourceByFullName(resourceFullName);
         if ( null == resourceId) {
             // create the relation if not exist
             ResourcesTask resourcesTask = new ResourcesTask(resourceFullName, ResourceType.FILE);

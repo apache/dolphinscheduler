@@ -18,17 +18,12 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper">
+    <sql id="baseSqlV2">
+        ${alias}.full_name, ${alias}.id, ${alias}.type
+    </sql>
     <select id="existResourceByFullName" resultType="java.lang.Integer">
         select
         id
-        from t_ds_relation_resources_task
-        where full_name = #{fullName}
-        and type = #{type} limit 1
-    </select>
-
-    <select id="selectResourceByFullName" resultType="org.apache.dolphinscheduler.dao.entity.ResourcesTask">
-        select
-        id, full_name, type
         from t_ds_relation_resources_task
         where full_name = #{fullName} limit 1
     </select>

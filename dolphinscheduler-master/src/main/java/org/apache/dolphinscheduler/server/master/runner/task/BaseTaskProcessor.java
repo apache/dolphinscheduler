@@ -623,7 +623,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
-                // TODO: remove the commented part after knowing what is 'old version'
+                // TODO: Modify this part to accomodate oldversionresources in the future.
 //                Set<ResourceInfo> oldVersionResources =
 //                        projectResourceFiles.stream().filter(t -> t.getId() == null).collect(Collectors.toSet());
 //                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
@@ -642,7 +642,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 //                    resources.forEach(t -> resourcesMap.put(t.getFullName(),
 //                            processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
 //                }
-            }
+                projectResourceFiles.forEach(file -> resourcesMap.put(file.getResourceName(),processService.queryTenantCodeByResName(file.getResourceName(), ResourceType.FILE)));            }
         }
 
         return resourcesMap;

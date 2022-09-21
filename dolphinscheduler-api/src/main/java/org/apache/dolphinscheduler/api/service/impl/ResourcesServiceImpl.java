@@ -515,7 +515,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         // TODO: now update db info
-        Integer oldResourceId = resourceTaskMapper.existResourceByFullName(originFullName, type);
+        Integer oldResourceId = resourceTaskMapper.existResourceByFullName(originFullName);
         if (oldResourceId != null) {
             ResourcesTask updatedResource = new ResourcesTask(fullName, type);
             updatedResource.setId(oldResourceId);
@@ -592,7 +592,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result queryResourceListPaging(User loginUser, int directoryId, String fullName, String resTenantCode,
                                           ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
 
         int tenantId = loginUser.getTenantId();
@@ -1102,7 +1101,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Integer resourceId = resourceTaskMapper.existResourceByFullName(defaultPath + fileName, type);
+        Integer resourceId = resourceTaskMapper.existResourceByFullName(defaultPath + fileName);
         if (resourceId != null) {
             file.setId(resourceId);
         }
@@ -1144,7 +1143,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         StorageEntity file;
         try {
             file = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, type);
-            Integer resourceId = resourceTaskMapper.existResourceByFullName(file.getFullName(), file.getType());
+            Integer resourceId = resourceTaskMapper.existResourceByFullName(file.getFullName());
             if (resourceId != null) {
                 file.setId(resourceId);
             }

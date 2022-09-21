@@ -97,7 +97,7 @@
             #{taskDefinition.taskPriority},#{taskDefinition.workerGroup},#{taskDefinition.environmentCode},#{taskDefinition.failRetryTimes},
             #{taskDefinition.failRetryInterval},#{taskDefinition.timeoutFlag},#{taskDefinition.timeoutNotifyStrategy},#{taskDefinition.timeout},
             #{taskDefinition.delayTime},#{taskDefinition.resourceIds},#{taskDefinition.resourceIdsNew},#{taskDefinition.createTime},#{taskDefinition.updateTime},
-            #{taskDefinition.taskGroupId}, #{taskDefinition.taskExecuteType)
+            #{taskDefinition.taskGroupId}, #{taskDefinition.taskExecuteType})
         </foreach>
     </insert>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
