@@ -790,16 +790,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Override
     @Transactional
-    public Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser,
-                                                                   long projectCode,
-                                                                   String codes) {
+    public Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser, long projectCode, String codes) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(codes)) {
             putMsg(result, Status.SUCCESS);
             return result;
         }
 
-        Set<Long> definitionCodes = Arrays.stream(codes.split(Constants.COMMA)).map(Long::parseLong)
+        Set<Long> definitionCodes = Arrays.stream(codes.split(Constants.COMMA))
+                .map(Long::parseLong)
                 .collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
         Set<Long> queryCodes =
@@ -808,11 +807,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Set<Long> diffCode =
                 definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
 
-        Set<String> deleteFailedSet = new HashSet<>();
-        diffCode.forEach(code -> deleteFailedSet.add(code + "[null]"));
-        if (!deleteFailedSet.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join(",", deleteFailedSet));
-            return result;
+        if (!diffCode.isEmpty()) {
+            logger.error("Process definition does not exist, processCodes:{}.",
+                    diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA)));
+            throw new ServiceException(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR,
+                    diffCode.stream().map(code -> code + "[process definition not exist]").collect(Collectors.joining(Constants.COMMA)));
         }
 
         for (ProcessDefinition process : processDefinitionList) {
@@ -820,15 +819,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             try {
                 deleteResult = this.deleteProcessDefinitionByCode(loginUser, projectCode, process.getCode());
             } catch (Exception e) {
-                String formatter =
-                        MessageFormat.format(Status.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(), e.getMessage());
-                throw new ServiceException(formatter, e);
+                logger.error("Delete process definition error, processName:{}", process.getName(), e);
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName());
             }
             if (deleteResult.get(Constants.STATUS) != Status.SUCCESS) {
                 // throw exception to rollback
-                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR,
-                        process.getName(),
-                        deleteResult.get(Constants.MSG));
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), deleteResult.get(Constants.MSG));
             }
         }
         putMsg(result, Status.SUCCESS);
