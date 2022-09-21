@@ -79,4 +79,14 @@ public class SparkConstants {
      */
     public static final String SQL_FROM_FILE = "-f";
 
+    /**
+     * spark submit command for sql
+     */
+    public static final String SPARK_SQL_COMMAND = "${SPARK_HOME}/bin/spark-sql";
+
+    /**
+     * spark submit command
+     */
+    public static final String SPARK_SUBMIT_COMMAND = "${SPARK_HOME}/bin/spark-submit";
+
 }

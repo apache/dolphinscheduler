@@ -25,6 +25,7 @@ It started after version 2.0.5 released
 ## dev
 
 * Remove parameter ``task_location`` in process definition and Java Gateway service ([#11681](https://github.com/apache/dolphinscheduler/pull/11681))
+* Remove the spark version of spark task ([#11860](https://github.com/apache/dolphinscheduler/pull/11860)).
 
 ## 3.0.0
 

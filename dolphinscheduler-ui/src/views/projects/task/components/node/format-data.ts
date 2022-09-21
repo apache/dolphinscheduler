@@ -62,7 +62,6 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SPARK') {
-    taskParams.sparkVersion = data.sparkVersion
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
     taskParams.numExecutors = data.numExecutors

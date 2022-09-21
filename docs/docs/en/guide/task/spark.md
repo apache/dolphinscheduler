@@ -20,7 +20,6 @@ Spark task type for executing Spark application. When executing the Spark task, 
 |       **Parameter**        |                                                                  **Description**                                                                  |
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | Program type               | Supports Java, Scala, Python, and SQL.                                                                                                            |
-| Spark version              | Support Spark1 and Spark2.                                                                                                                        |
 | The class of main function | The **full path** of Main Class, the entry point of the Spark program.                                                                            |
 | Main jar package           | The Spark jar package (upload by Resource Center).                                                                                                |
 | SQL scripts                | SQL statements in .sql files that Spark sql runs.                                                                                                 |

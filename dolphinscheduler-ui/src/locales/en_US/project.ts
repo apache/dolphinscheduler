@@ -400,7 +400,6 @@ export default {
     value_required_tips: 'value(required)',
     pre_tasks: 'Pre tasks',
     program_type: 'Program Type',
-    spark_version: 'Spark Version',
     main_class: 'Main Class',
     main_class_tips: 'Please enter main class',
     main_package: 'Main Package',
