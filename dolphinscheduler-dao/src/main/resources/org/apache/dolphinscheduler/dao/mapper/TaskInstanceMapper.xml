@@ -22,13 +22,13 @@
         id, name, task_type, process_instance_id, task_code, task_definition_version, state, submit_time,
         start_time, end_time, host, execute_path, log_path, alert_flag, retry_times, pid, app_link,
         flag, retry_interval, max_retry_times, task_instance_priority, worker_group,environment_code , executor_id,
-        first_submit_time, delay_time, task_params, var_pool, dry_run, task_group_id, cpu_quota, memory_max, task_execute_type
+        first_submit_time, delay_time, task_params, var_pool, dry_run, test_flag, task_group_id, cpu_quota, memory_max, task_execute_type
     </sql>
     <sql id="baseSqlV2">
         ${alias}.id, ${alias}.name, ${alias}.task_type, ${alias}.task_code, ${alias}.task_definition_version, ${alias}.process_instance_id, ${alias}.state, ${alias}.submit_time,
         ${alias}.start_time, ${alias}.end_time, ${alias}.host, ${alias}.execute_path, ${alias}.log_path, ${alias}.alert_flag, ${alias}.retry_times, ${alias}.pid, ${alias}.app_link,
         ${alias}.flag, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group,${alias}.environment_code , ${alias}.executor_id,
-        ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.task_params, ${alias}.var_pool, ${alias}.dry_run, ${alias}.task_group_id, ${alias}.task_execute_type
+        ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.task_params, ${alias}.var_pool, ${alias}.dry_run, ${alias}.test_flag, ${alias}.task_group_id, ${alias}.task_execute_type
     </sql>
     <update id="setFailoverByHostAndStateArray">
         update t_ds_task_instance
@@ -54,6 +54,7 @@
         from t_ds_task_instance
         WHERE process_instance_id = #{processInstanceId}
         and flag = #{flag}
+        and test_flag=#{testFlag}
         order by start_time desc
     </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
@@ -184,7 +185,10 @@
         left join t_ds_process_instance process on process.id=instance.process_instance_id
         where define.project_code = #{projectCode}
         <if test="startTime != null">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+            and instance.start_time <![CDATA[ >=]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="processInstanceId != 0">
             and instance.process_instance_id = #{processInstanceId}
@@ -228,7 +232,10 @@
         left join t_ds_process_definition process on process.code=relation.process_definition_code and process.version = relation.process_definition_version
         where define.project_code = #{projectCode}
         <if test="startTime != null">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+            and instance.start_time <![CDATA[ >=]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')

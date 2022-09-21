@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProcessInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -70,6 +71,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -308,7 +310,8 @@ public class ProcessInstanceServiceTest {
         processDefinition.setProjectCode(projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(processInstance);
+        when(processService.findProcessInstanceDetailById(processInstance.getId()))
+                .thenReturn(Optional.of(processInstance));
         when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
         Map<String, Object> successRes = processInstanceService.queryProcessInstanceById(loginUser, projectCode, 1);
@@ -353,8 +356,8 @@ public class ProcessInstanceServiceTest {
         res.setData("xxx");
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(processInstance);
-        when(processService.findValidTaskListByProcessId(processInstance.getId())).thenReturn(taskInstanceList);
+        when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(Optional.of(processInstance));
+        when(processService.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag())).thenReturn(taskInstanceList);
         when(loggerService.queryLog(taskInstance.getId(), 0, 4098)).thenReturn(res);
         Map<String, Object> successRes = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -451,14 +454,18 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = getProcessInstance();
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE)).thenReturn(result);
-        when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
-        Map<String, Object> processInstanceNullRes =
-                processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
+        when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.empty());
+        try {
+            Map<String, Object> processInstanceNullRes =
+                    processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
+                            shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
+            Assert.fail();
+        } catch (ServiceException ex) {
+            Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST.getCode(), ex.getCode());
+        }
 
         // process instance not finish
-        when(processService.findProcessInstanceDetailById(1)).thenReturn(processInstance);
+        when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.ofNullable(processInstance));
         processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceNotFinishRes =
@@ -523,16 +530,20 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
-        Map<String, Object> processInstanceNullRes =
-                processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
+        when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.empty());
+        try {
+            Map<String, Object> processInstanceNullRes =
+                    processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
+
+        } catch (ServiceException ex) {
+            Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST.getCode(), ex.getCode());
+        }
 
         // not sub process
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setIsSubProcess(Flag.NO);
         putMsg(result, Status.SUCCESS, projectCode);
-        when(processService.findProcessInstanceDetailById(1)).thenReturn(processInstance);
+        when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.ofNullable(processInstance));
         Map<String, Object> notSubProcessRes =
                 processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE, notSubProcessRes.get(Constants.STATUS));

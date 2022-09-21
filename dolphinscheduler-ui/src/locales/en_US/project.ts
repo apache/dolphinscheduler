@@ -39,6 +39,9 @@ export default {
     delete_confirm: 'Delete?'
   },
   workflow: {
+    on_line: 'Online',
+    test: 'Test',
+    operating_environment: 'Operating Environment',
     workflow_relation: 'Workflow Relation',
     create_workflow: 'Create Workflow',
     import_workflow: 'Import Workflow',
@@ -103,6 +106,7 @@ export default {
     complement_data: 'Complement Data',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
+    whether_test: 'Whether Test',
     continue: 'Continue',
     end: 'End',
     none_send: 'None',
@@ -202,6 +206,9 @@ export default {
       'There is not any workflows. Please create a workflow, and then visit this page again.'
   },
   task: {
+    on_line: 'Online',
+    test: 'Test',
+    operating_environment: 'Operating Environment',
     cancel_full_screen: 'Cancel full screen',
     enter_full_screen: 'Enter full screen',
     current_task_settings: 'Current task settings',
@@ -393,7 +400,6 @@ export default {
     value_required_tips: 'value(required)',
     pre_tasks: 'Pre tasks',
     program_type: 'Program Type',
-    spark_version: 'Spark Version',
     main_class: 'Main Class',
     main_class_tips: 'Please enter main class',
     main_package: 'Main Package',
@@ -714,7 +720,7 @@ export default {
     mlflow_deployModelKey: 'Model-URI',
     mlflow_deployPort: 'Port',
     mlflowProjectRepository: 'Repository',
-    mlflowProjectRepository_tips: 'github respository or path on worker',
+    mlflowProjectRepository_tips: 'git respository or path on worker',
     mlflowProjectVersion: 'Project Version',
     mlflowProjectVersion_tips: 'git version',
     mlflow_cpuLimit: 'Max Cpu Limit',

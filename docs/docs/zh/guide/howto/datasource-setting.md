@@ -7,11 +7,12 @@
 > 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
 
 * 首先，参照 [数据源配置](datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
-* 在你的命令行或者修改 bin/env/dolphinscheduler_env.sh 设定下列环境变量，将 `{user}` 和 `{password}` 改为你数据库的用户名和密码
+* 在你的命令行设定下列环境变量，将 `{address}`, `{user}` 和 `{password}` 改为你数据库的地址, 用户名和密码
 
 ```shell
 export DATABASE=mysql
 export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL="jdbc:mysql://{address}/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```
@@ -24,7 +25,6 @@ export SPRING_DATASOURCE_PASSWORD={password}
 DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreSQL 和 MySQL。下面分别介绍如何使用 MySQL 和 PostgresQL 初始化数据库。
 
 > 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
-
 
 对于mysql 5.6 / 5.7：
 
@@ -72,9 +72,10 @@ echo "host    dolphinscheduler   {user}    {ip}     md5" >> $PGDATA/pg_hba.conf
 pg_ctl reload
 ```
 
-然后修改`./bin/env/dolphinscheduler_env.sh`，将username和password改成你在上一步中设置的用户名{user}和密码{password}
+然后设置以下环境变量，将username和password改成你在上一步中设置的用户名{user}和密码{password}
 
 对于 MySQL：
+
 ```shell
 # for mysql
 export DATABASE=${DATABASE:-mysql}
@@ -82,9 +83,10 @@ export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
-```  
+```
 
 对于 PostgreSQL：
+
 ```shell
 # for postgresql
 export DATABASE=${DATABASE:-postgresql}
@@ -123,3 +125,4 @@ DolphinScheduler 分发的二进制包中包含他们。这部分数据源主要
 > 则仅支持 [8.0.16 及以上](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)的版本。
 
 [mysql]: https://downloads.MySQL.com/archives/c-j/
+
