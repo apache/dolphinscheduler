@@ -60,12 +60,9 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public Map<String, Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
         List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
-
         result.put(Constants.DATA_LIST, monitorRecordList);
         putMsg(result, Status.SUCCESS);
-
         return result;
 
     }
@@ -78,9 +75,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      */
     @Override
     public Map<String, Object> queryMaster(User loginUser) {
-
         Map<String, Object> result = new HashMap<>();
-
         List<Server> masterServers = getServerListFromRegistry(true);
         result.put(Constants.DATA_LIST, masterServers);
         putMsg(result, Status.SUCCESS);
