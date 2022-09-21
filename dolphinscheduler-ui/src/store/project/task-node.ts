@@ -33,7 +33,7 @@ export const useTaskNodeStore = defineStore({
     preTaskOptions: [],
     postTaskOptions: [],
     preTasks: [],
-    upstreamTaskMap: [],
+    upstreamTaskMapKey: [],
     resources: [],
     mainJars: {},
     name: '',
