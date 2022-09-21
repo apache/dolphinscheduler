@@ -31,11 +31,11 @@ export function useNamespace(): IJsonItem {
     loading.value = true
     const totalList = await getAllNamespaces()
     options.value = (totalList || []).map(
-      (item: { id: string; namespace: string; k8s: string }) => ({
-        label: `${item.namespace}(${item.k8s})`,
+      (item: { id: string; namespace: string; clusterName: string }) => ({
+        label: `${item.namespace}(${item.clusterName})`,
         value: JSON.stringify({
           name: item.namespace,
-          cluster: item.k8s
+          cluster: item.clusterName
         })
       })
     )
