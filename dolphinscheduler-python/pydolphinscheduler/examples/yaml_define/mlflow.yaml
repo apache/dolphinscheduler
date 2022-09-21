@@ -32,15 +32,6 @@ tasks:
     parameters: -P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9
     experiment_name: xgboost
 
-
-  - name: deploy_mlflow
-    deps: [train_xgboost_native]
-    task_type: MLflowModels 
-    model_uri: models:/xgboost_native/Production
-    mlflow_tracking_uri: *mlflow_tracking_uri
-    deploy_mode: MLFLOW
-    port: 7001
-
   - name: train_automl
     task_type: MLFlowProjectsAutoML 
     mlflow_tracking_uri: *mlflow_tracking_uri
@@ -68,11 +59,11 @@ tasks:
     data_path: /data/examples/iris
     search_params: max_depth=[5, 10];n_estimators=[100, 200]
 
-
-  - name: deploy_docker_compose
-    task_type: MLflowModels 
+  - name: deploy_mlflow
     deps: [train_basic_algorithm]
+    task_type: MLflowModels
     model_uri: models:/iris_B/Production
     mlflow_tracking_uri: *mlflow_tracking_uri
-    deploy_mode: DOCKER COMPOSE
-    port: 7003
+    deploy_mode: MLFLOW
+    port: 7001
+

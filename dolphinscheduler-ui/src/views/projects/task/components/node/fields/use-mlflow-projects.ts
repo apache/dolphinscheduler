@@ -280,16 +280,16 @@ export function useCustomProject(model: { [field: string]: any }): IJsonItem[] {
 
 export const MLFLOW_JOB_TYPE = [
   {
-    label: 'BasicAlgorithm',
-    value: 'BasicAlgorithm'
+    label: 'Custom Project',
+    value: 'CustomProject'
   },
   {
     label: 'AutoML',
     value: 'AutoML'
   },
   {
-    label: 'Custom Project',
-    value: 'CustomProject'
+    label: 'BasicAlgorithm',
+    value: 'BasicAlgorithm'
   }
 ]
 export const ALGORITHM = [
@@ -312,11 +312,11 @@ export const ALGORITHM = [
 ]
 export const AutoMLTOOL = [
   {
-    label: 'autosklearn',
-    value: 'autosklearn'
-  },
-  {
     label: 'flaml',
     value: 'flaml'
+  },
+  {
+    label: 'autosklearn',
+    value: 'autosklearn'
   }
 ]

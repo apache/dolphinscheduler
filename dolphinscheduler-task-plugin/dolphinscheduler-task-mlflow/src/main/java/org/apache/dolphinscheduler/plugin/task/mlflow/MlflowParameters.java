@@ -17,10 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.mlflow;
 
+import lombok.Data;
+
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.HashMap;
 
+@Data
 public class MlflowParameters extends AbstractParameters {
 
     /**
@@ -36,7 +40,7 @@ public class MlflowParameters extends AbstractParameters {
      */
     private String mlflowProjectRepository;
 
-    private String mlflowProjectVersion = "master";
+    private String mlflowProjectVersion = "";
 
     /**
      * AutoML parameters
@@ -76,160 +80,9 @@ public class MlflowParameters extends AbstractParameters {
 
     private String deployPort;
 
-    private String cpuLimit;
-
-    private String memoryLimit;
-
-    public void setAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
-    }
-
-    public String getAlgorithm() {
-        return algorithm;
-    }
-
-    public void setParams(String params) {
-        this.params = params;
-    }
-
-    public String getParams() {
-        return params;
-    }
-
-    public void setSearchParams(String searchParams) {
-        this.searchParams = searchParams;
-    }
-
-    public String getSearchParams() {
-        return searchParams;
-    }
-
-    public void setDataPaths(String dataPath) {
-        this.dataPath = dataPath;
-    }
-
-    public String getDataPath() {
-        return dataPath;
-    }
-
-    public void setMlflowTaskType(String mlflowTaskType) {
-        this.mlflowTaskType = mlflowTaskType;
-    }
-
-    public String getMlflowTaskType() {
-        return mlflowTaskType;
-    }
-
-    public void setExperimentNames(String experimentName) {
-        this.experimentName = experimentName;
-    }
-
-    public String getExperimentName() {
-        return experimentName;
-    }
-
-    public void setModelNames(String modelName) {
-        this.modelName = modelName;
-    }
-
-    public String getModelName() {
-        return modelName;
-    }
-
-    public void setMlflowTrackingUris(String mlflowTrackingUri) {
-        this.mlflowTrackingUri = mlflowTrackingUri;
-    }
-
-    public String getMlflowTrackingUri() {
-        return mlflowTrackingUri;
-    }
-
-    public void setMlflowJobType(String mlflowJobType) {
-        this.mlflowJobType = mlflowJobType;
-    }
-
-    public String getMlflowJobType() {
-        return mlflowJobType;
-    }
-
-    public void setAutomlTool(String automlTool) {
-        this.automlTool = automlTool;
-    }
-
-    public String getMlflowProjectRepository() {
-        return mlflowProjectRepository;
-    }
-
-    public void setMlflowProjectRepository(String mlflowProjectRepository) {
-        this.mlflowProjectRepository = mlflowProjectRepository;
-    }
-
-    public String getMlflowProjectVersion() {
-        return mlflowProjectVersion;
-    }
-
-    public void setMlflowProjectVersion(String mlflowProjectVersion) {
-        this.mlflowProjectVersion = mlflowProjectVersion;
-    }
-
-    public String getAutomlTool() {
-        return automlTool;
-    }
-
-    public void setDeployType(String deployType) {
-        this.deployType = deployType;
-    }
-
-    public String getDeployType() {
-        return deployType;
-    }
-
-    public void setDeployModelKey(String deployModelKey) {
-        this.deployModelKey = deployModelKey;
-    }
-
-    public String getDeployModelKey() {
-        return deployModelKey;
-    }
-
-    public void setDeployPort(String deployPort) {
-        this.deployPort = deployPort;
-    }
-
-    public String getDeployPort() {
-        return deployPort;
-    }
-
-    public void setCpuLimit(String cpuLimit) {
-        this.cpuLimit = cpuLimit;
-    }
-
-    public String getCpuLimit() {
-        return cpuLimit;
-    }
-
-    public void setMemoryLimit(String memoryLimit) {
-        this.memoryLimit = memoryLimit;
-    }
-
-    public String getMemoryLimit() {
-        return memoryLimit;
-    }
-
     @Override
     public boolean checkParameters() {
-        Boolean checkResult = true;
-//        Boolean checkResult = mlflowTrackingUri != null;
-//        if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
-//            checkResult &= dataPath != null;
-//            checkResult &= experimentName != null;
-//        } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
-//            checkResult &= dataPath != null;
-//            checkResult &= automlTool != null;
-//            checkResult &= experimentName != null;
-//        } else {
-//        }
-        return checkResult;
+        return StringUtils.isNotEmpty(mlflowTrackingUri);
     }
 
     public HashMap<String, String> getParamsMap() {
@@ -240,11 +93,13 @@ public class MlflowParameters extends AbstractParameters {
         paramsMap.put("experiment_name", experimentName);
         paramsMap.put("model_name", modelName);
         paramsMap.put("MLFLOW_TRACKING_URI", mlflowTrackingUri);
-        if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
-            addParamsMapForBasicAlgorithm(paramsMap);
-        } else if (mlflowJobType.equals(MlflowConstants.JOB_TYPE_AUTOML)) {
-            getParamsMapForAutoML(paramsMap);
-        } else {
+        switch (mlflowJobType){
+            case MlflowConstants.JOB_TYPE_BASIC_ALGORITHM:
+                addParamsMapForBasicAlgorithm(paramsMap);
+                break;
+            case MlflowConstants.JOB_TYPE_AUTOML:
+                getParamsMapForAutoML(paramsMap);
+                break;
         }
         return paramsMap;
     }
@@ -262,6 +117,10 @@ public class MlflowParameters extends AbstractParameters {
         paramsMap.put("repo_version", MlflowConstants.PRESET_REPOSITORY_VERSION);
     }
 
+    public Boolean isCustomProject() {
+        return mlflowJobType.equals(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT);
+    }
+
     public String getModelKeyName(String tag) throws IllegalArgumentException {
         String imageName;
         if (deployModelKey.startsWith("runs:")) {
@@ -271,23 +130,18 @@ public class MlflowParameters extends AbstractParameters {
         } else {
             throw new IllegalArgumentException("model key must start with runs:/ or models:/ ");
         }
-        imageName = imageName.replace("/", tag);
+        imageName = imageName.replace("/", tag).toLowerCase();
         return imageName;
     }
 
-    public String getDockerComposeEnvCommand() {
-        String imageName = "mlflow/" + getModelKeyName(":");
-        String env = String.format(MlflowConstants.SET_DOCKER_COMPOSE_ENV, imageName, getContainerName(), deployPort, cpuLimit, memoryLimit);
-        return env;
-    }
-
     public String getContainerName(){
-        String containerName = "ds-mlflow-" + getModelKeyName("-");
-        return containerName;
+        return "ds-mlflow-" + getModelKeyName("-");
     }
 
     public boolean getIsDeployDocker(){
-        return deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER) || deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE);
+        if (StringUtils.isEmpty(deployType)) {
+            return false;
+        }
+        return deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER);
     }
-
-};
+}
