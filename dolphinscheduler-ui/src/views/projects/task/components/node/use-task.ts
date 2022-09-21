@@ -27,13 +27,7 @@ import type {
   EditWorkflowDefinition
 } from './types'
 
-export function useTask({
-  data,
-  projectCode,
-  from,
-  readonly,
-  definition
-}: {
+export function useTask({ data, projectCode, from, readonly, definition }: {
   data: ITaskData
   projectCode: number
   from?: number
@@ -46,6 +40,9 @@ export function useTask({
 } {
   const taskStore = useTaskNodeStore()
   taskStore.updateDefinition(unref(definition), data?.code)
+  taskStore.updateUpstreamTaskMapKey(
+    data && data.upstreamTaskMapKey ? data.upstreamTaskMapKey : []
+  )
 
   const jsonRef = ref([]) as Ref<IJsonItem[]>
   const elementsRef = ref([]) as Ref<IFormItem[]>
@@ -64,7 +61,8 @@ export function useTask({
 
   const { model, json } = nodes[data.taskType || 'SHELL'](params)
   jsonRef.value = json
-  model.preTasks = taskStore.getPreTasks
+  // debugger
+  model.preTasks = taskStore.getPreTasks.length > 0 ? taskStore.getPreTasks : taskStore.getUpstreamTaskMapKey
   model.name = taskStore.getName
 
   const getElements = () => {
