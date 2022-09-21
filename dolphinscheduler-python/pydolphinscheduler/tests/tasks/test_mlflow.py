@@ -63,19 +63,15 @@ def test_mlflow_models_get_define():
     name = "mlflow_models"
     model_uri = "models:/xgboost_native/Production"
     port = 7001
-    cpu_limit = 2.0
-    memory_limit = "600M"
 
     expect = deepcopy(EXPECT)
     expect["name"] = name
     task_params = expect["taskParams"]
     task_params["mlflowTrackingUri"] = MLFLOW_TRACKING_URI
     task_params["mlflowTaskType"] = MLflowTaskType.MLFLOW_MODELS
-    task_params["deployType"] = MLflowDeployType.DOCKER_COMPOSE
+    task_params["deployType"] = MLflowDeployType.DOCKER
     task_params["deployModelKey"] = model_uri
     task_params["deployPort"] = port
-    task_params["cpuLimit"] = cpu_limit
-    task_params["memoryLimit"] = memory_limit
 
     with patch(
         "pydolphinscheduler.core.task.Task.gen_code_and_version",
@@ -85,10 +81,8 @@ def test_mlflow_models_get_define():
             name=name,
             model_uri=model_uri,
             mlflow_tracking_uri=MLFLOW_TRACKING_URI,
-            deploy_mode=MLflowDeployType.DOCKER_COMPOSE,
+            deploy_mode=MLflowDeployType.DOCKER,
             port=port,
-            cpu_limit=cpu_limit,
-            memory_limit=memory_limit,
         )
         assert task.get_define() == expect
 

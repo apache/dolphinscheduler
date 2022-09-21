@@ -4,7 +4,7 @@
 
 [MLflow](https://mlflow.org) 是一个MLops领域一个优秀的开源项目， 用于管理机器学习的生命周期，包括实验、可再现性、部署和中心模型注册。
 
-MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow Models。（Model Registry将在不就的将来支持）。
+MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflow Models。（Model Registry将在不就的将来支持）。
 
 - MLflow Projects: 将代码打包，并可以运行到任务的平台上。
 - MLflow Models: 在不同的服务环境中部署机器学习模型。
@@ -12,19 +12,13 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 目前 Mlflow 组件支持的和即将支持的内容如下中：
 
-- [x] MLflow Projects
-  - [x] BasicAlgorithm: 基础算法，包含LogisticRegression, svm, lightgbm, xgboost
-  - [x] AutoML: AutoML工具，包含autosklean, flaml
-  - [x] Custom projects: 支持运行自己的MLflow Projects项目
-- [ ] MLflow Models
-  - [x] MLFLOW: 直接使用 `mlflow models serve` 部署模型。
-  - [x] Docker: 打包 DOCKER 镜像后部署模型。
-  - [x] Docker Compose: 使用Docker Compose 部署模型，将会取代上面的Docker部署。
-  - [ ] Seldon core: 构建完镜像后，使用Seldon Core 部署到k8s集群上, 可以使用Seldon Core的生成模型管理能力。
-  - [ ] k8s: 构建完镜像后， 部署到k8s集群上。
-  - [ ] MLflow deployments: 内置的允许MLflow 部署模块, 如内置的部署到Sagemaker等。
-- [ ] Model Registry
-  - [ ] Register Model: 注册相关工件(模型以及相关的参数，指标)到模型中心
+- MLflow Projects
+  - BasicAlgorithm: 基础算法，包含LogisticRegression， svm， lightgbm， xgboost
+  - AutoML: AutoML工具，包含autosklean， flaml
+  - Custom projects: 支持运行自己的MLflow Projects项目
+- MLflow Models
+  - MLFLOW: 直接使用 `mlflow models serve` 部署模型。
+  - Docker: 打包 DOCKER 镜像后部署模型。
 
 ## 创建任务
 
@@ -95,27 +89,32 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects, 和MLflow
 
 ![mlflow-models-docker](../../../../img/tasks/demo/mlflow-models-docker.png)
 
-#### DOCKER COMPOSE
-
-![mlflow-models-docker-compose](../../../../img/tasks/demo/mlflow-models-docker-compose.png)
-
-| **任务参数** |                **描述**                |
-|----------|--------------------------------------|
-| 最大CPU限制  | 如 `1.0` 或者 `0.5`，与 docker compose 一致 |
-| 最大内存限制   | 如 `1G` 或者 `500M`，与 docker compose 一致 |
-
 ## 环境准备
 
 ### conda 环境配置
 
-你需要进入admin账户配置一个conda环境变量（请提前[安装anaconda](https://docs.continuum.io/anaconda/install/)
-或者[安装miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) )。
+请提前[安装anaconda](https://docs.continuum.io/anaconda/install/) 或者[安装miniconda](https://docs.conda.io/en/latest/miniconda.html#installing)
+
+**方法A：**
+
+配置文件：/dolphinscheduler/conf/env/dolphinscheduler_env.sh。
+
+在文件最后添加内容
+```
+# 配置你的conda环境路径
+export PATH=/opt/anaconda3/bin:$PATH
+```
+
+**方法B：**
+
+你需要进入admin账户配置一个conda环境变量。
 
 ![mlflow-conda-env](../../../../img/tasks/demo/mlflow-conda-env.png)
 
 后续注意配置任务时，环境选择上面创建的conda环境，否则程序会找不到conda环境。
 
 ![mlflow-set-conda-env](../../../../img/tasks/demo/mlflow-set-conda-env.png)
+
 
 ### MLflow service 启动
 
@@ -134,4 +133,16 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 可以通过访问 MLflow service (`http://localhost:5000`) 页面查看实验与模型。
 
 ![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)
+
+
+### 内置算法仓库配置
+
+如果遇到github无法访问的情况，可以修改`commom.properties`配置文件的以下字段，将github地址替换能访问的地址。
+
+```yaml
+# mlflow task plugin preset repository
+ml.mlflow.preset_repository=https://github.com/apache/dolphinscheduler-mlflow
+# mlflow task plugin preset repository version
+ml.mlflow.preset_repository_version="main"
+```
 

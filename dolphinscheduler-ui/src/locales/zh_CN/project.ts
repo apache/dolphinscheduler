@@ -693,7 +693,7 @@ export default {
     mlflow_deployModelKey: '部署的模型URI',
     mlflow_deployPort: '监听端口',
     mlflowProjectRepository: '运行仓库',
-    mlflowProjectRepository_tips: '可以为github仓库或worker上的路径',
+    mlflowProjectRepository_tips: '可以为git仓库或worker上的路径',
     mlflowProjectVersion: '项目版本',
     mlflowProjectVersion_tips: '项目git版本',
     mlflow_cpuLimit: '最大cpu限制',

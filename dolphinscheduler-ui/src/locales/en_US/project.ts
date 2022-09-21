@@ -710,7 +710,7 @@ export default {
     mlflow_deployModelKey: 'Model-URI',
     mlflow_deployPort: 'Port',
     mlflowProjectRepository: 'Repository',
-    mlflowProjectRepository_tips: 'github respository or path on worker',
+    mlflowProjectRepository_tips: 'git respository or path on worker',
     mlflowProjectVersion: 'Project Version',
     mlflowProjectVersion_tips: 'git version',
     mlflow_cpuLimit: 'Max Cpu Limit',

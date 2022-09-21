@@ -369,8 +369,6 @@ export function formatParams(data: INodeData): {
     taskParams.deployModelKey = data.deployModelKey
     taskParams.mlflowProjectRepository = data.mlflowProjectRepository
     taskParams.mlflowProjectVersion = data.mlflowProjectVersion
-    taskParams.cpuLimit = data.cpuLimit
-    taskParams.memoryLimit = data.memoryLimit
   }
 
   if (data.taskType === 'DVC') {
