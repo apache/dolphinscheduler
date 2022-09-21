@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -53,11 +54,13 @@ import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.quartz.CronExpression;
 import org.quartz.JobKey;
@@ -578,11 +581,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         try {
             cronExpression = CronUtils.parse2CronExpression(scheduleParam.getCrontab());
+            cronExpression.setTimeZone(TimeZone.getTimeZone(scheduleParam.getTimezoneId()));
         } catch (ParseException e) {
             logger.error(e.getMessage(), e);
             putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
             return result;
         }
+
         List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime, cronExpression, Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
         List<String> previewDateList = new ArrayList<>();
         selfFireDateList.forEach(date -> previewDateList.add(DateUtils.dateToString(date, scheduleParam.getTimezoneId())));
