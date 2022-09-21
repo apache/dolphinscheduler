@@ -291,5 +291,4 @@ public class PropertyUtils {
         });
         return propertiesMap;
     }
-
 }
