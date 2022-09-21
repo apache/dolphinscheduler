@@ -59,7 +59,6 @@ export default defineComponent({
     const refresh = () => {
       queryProcessInstanceById(id, projectCode).then((res: any) => {
         instance.value = res
-        console.log(res)
         if (!res.dagData.processDefinition.locations) {
           setTimeout(() => {
             const graph = dagInstanceRef.value
