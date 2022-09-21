@@ -51,28 +51,30 @@ class Tenant(BaseSide):
         self.code = tenant.getTenantCode()
         # gateway_result_checker(result, None)
 
-    def get_tenant(self):
+    @classmethod
+    def get_tenant(cls, code: str) -> "Tenant":
         """Get Tenant list."""
-        tenant = JavaGate().query_tenant(self.code)
-        self.tenant_id = tenant.getId()
-        self.code = tenant.getTenantCode()
-        return
+        tenant = JavaGate().query_tenant(code)
+        if tenant is None:
+            return cls()
+        return cls(
+            description=tenant.getDescription(),
+            tenant_id=tenant.getId(),
+            code=tenant.getTenantCode(),
+            queue=tenant.getQueueId(),
+        )
 
     def update(
         self, user=configuration.USER_NAME, code=None, queue_id=None, description=None
     ) -> None:
         """Update Tenant."""
-        JavaGate().grant_tenant_to_user(self.user_name, self.code)
         JavaGate().update_tenant(user, self.tenant_id, code, queue_id, description)
         # TODO: check queue_id and queue_name
         self.queue = str(queue_id)
         self.code = code
         self.description = description
-        return
 
     def delete(self) -> None:
         """Delete Tenant."""
-        JavaGate().grant_tenant_to_user(self.user_name, self.code)
         JavaGate().delete_tenant(self.user_name, self.tenant_id)
         self.delete_all()
-        return

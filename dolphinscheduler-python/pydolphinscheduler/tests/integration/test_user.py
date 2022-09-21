@@ -41,7 +41,15 @@ def get_user(
     status=1,
 ):
     """Get a test user."""
-    user = User(name, password, email, phone, tenant, queue, status)
+    user = User(
+        name=name,
+        password=password,
+        email=email,
+        phone=phone,
+        tenant=tenant,
+        queue=queue,
+        status=status,
+    )
     user.create_if_not_exists()
     return user
 
@@ -64,8 +72,7 @@ def test_create_user():
 def test_get_user():
     """Test get user from java gateway."""
     user = get_user()
-    user_ = User(user.name)
-    user_.get_user(user.user_id)
+    user_ = User.get_user(user.user_id)
     assert user_.password == md5(user.password)
     assert user_.email == user.email
     assert user_.phone == user.phone
@@ -83,8 +90,7 @@ def test_update_user():
         queue="test-queue-updated",
         status=2,
     )
-    user_ = User(user.name)
-    user_.get_user(user.user_id)
+    user_ = User.get_user(user.user_id)
     assert user_.password == md5("test-password-")
     assert user_.email == "test-email-updated@abc.com"
     assert user_.phone == "17366637766"

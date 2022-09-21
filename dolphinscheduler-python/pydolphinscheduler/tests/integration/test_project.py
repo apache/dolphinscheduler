@@ -36,9 +36,7 @@ def get_user(
     return user
 
 
-def get_project(
-    name="test-name-1", description="test-description", code="test-project-code"
-):
+def get_project(name="test-name-1", description="test-description", code=1):
     """Get a test project."""
     project = Project(name, description, code=code)
     user = get_user()
@@ -49,8 +47,7 @@ def get_project(
 def test_create_and_get_project():
     """Test create and get project from java gateway."""
     project = get_project()
-    project_ = Project()
-    project_.get_project_by_name(user="test-name", name=project.name)
+    project_ = Project.get_project_by_name(user="test-name", name=project.name)
     assert project_.name == project.name
     assert project_.description == project.description
 
@@ -58,15 +55,14 @@ def test_create_and_get_project():
 def test_update_project():
     """Test update project from java gateway."""
     project = get_project()
-    project.get_project_by_name(user="test-name", name=project.name)
+    project = project.get_project_by_name(user="test-name", name=project.name)
     project.update(
         user="test-name",
         project_code=project.code,
         project_name="test-name-updated",
         description="test-description-updated",
     )
-    project_ = Project()
-    project_.get_project_by_name(user="test-name", name="test-name-updated")
+    project_ = Project.get_project_by_name(user="test-name", name="test-name-updated")
     assert project_.description == "test-description-updated"
 
 

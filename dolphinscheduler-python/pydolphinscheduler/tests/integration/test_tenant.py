@@ -58,34 +58,29 @@ def test_create_tenant():
 def test_get_tenant():
     """Test get tenant from java gateway."""
     tenant = get_tenant()
-    tenant_ = Tenant(code=tenant.code)
-    tenant_.get_tenant()
+    tenant_ = Tenant.get_tenant(tenant.code)
     assert tenant_.tenant_id == tenant.tenant_id
 
 
 def test_update_tenant():
     """Test update tenant from java gateway."""
-    user = get_user()
-    tenant = get_tenant(user_name=user.name)
+    tenant = get_tenant(user_name="admin")
     tenant.update(
         user="admin",
         code="test-code-updated",
         queue_id=1,
         description="test-description-updated",
     )
-    tenant_ = Tenant(code=tenant.code)
-    tenant_.get_tenant()
+    tenant_ = Tenant.get_tenant(code=tenant.code)
     assert tenant_.code == "test-code-updated"
-    assert tenant_.queue == "queuePythonGateway"
+    assert tenant_.queue == 1
 
 
 def test_delete_tenant():
     """Test delete tenant from java gateway."""
     tenant = get_tenant(user_name="admin")
-    code = tenant.code
     tenant.delete()
-    tenant_ = Tenant(code=code)
     with pytest.raises(AttributeError) as excinfo:
-        tenant_.get_tenant()
+        _ = tenant.tenant_id
 
     assert excinfo.type == AttributeError

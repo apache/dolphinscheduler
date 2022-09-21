@@ -411,10 +411,6 @@ public class PythonGateway {
         return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
     }
 
-    public void grantTenantToUser(String userName, String tenantCode) throws Exception {
-        tenantService.grantTenantToUser(userName, tenantCode);
-    }
-
     public Tenant queryTenantByCode(String tenantCode) {
         return (Tenant) tenantService.queryByTenantCode(tenantCode).get(Constants.DATA_LIST);
     }

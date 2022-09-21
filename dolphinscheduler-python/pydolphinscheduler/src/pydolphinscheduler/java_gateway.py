@@ -119,14 +119,14 @@ class JavaGate:
         return self.java_gateway.entry_point.queryProjectByName(user, name)
 
     def update_project(
-        self, user: str, project_code: str, project_name: str, description: str
+        self, user: str, project_code: int, project_name: str, description: str
     ):
         """Update project through java gateway."""
         return self.java_gateway.entry_point.updateProject(
             user, project_code, project_name, description
         )
 
-    def delete_project(self, user: str, code: str):
+    def delete_project(self, user: str, code: int):
         """Delete project through java gateway."""
         return self.java_gateway.entry_point.deleteProject(user, code)
 

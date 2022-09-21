@@ -74,22 +74,28 @@ class User(BaseSide):
             self.queue,
             self.status,
         )
-        print(user.user_id)
         self.user_id = user.getId()
         # TODO recover result checker
         # gateway_result_checker(result, None)
 
-    def get_user(self, user_id) -> None:
+    @classmethod
+    def get_user(cls, user_id) -> "User":
         """Get User."""
         user = JavaGate().query_user(user_id)
-        self.user_id = user.getId()
-        self.name = user.getUserName()
-        self.password = user.getUserPassword()
-        self.email = user.getEmail()
-        self.phone = user.getPhone()
-        self.queue = user.getQueueName()
-        self.status = user.getState()
-        return
+        if user is None:
+            return cls("")
+        user_id = user.getId()
+        user = cls(
+            name=user.getUserName(),
+            password=user.getUserPassword(),
+            email=user.getEmail(),
+            phone=user.getPhone(),
+            tenant=user.getTenantCode(),
+            queue=user.getQueueName(),
+            status=user.getState(),
+        )
+        user.user_id = user_id
+        return user
 
     def update(
         self,
@@ -117,10 +123,8 @@ class User(BaseSide):
         self.phone = user.getPhone()
         self.queue = user.getQueueName()
         self.status = user.getState()
-        return
 
     def delete(self) -> None:
         """Delete User."""
         JavaGate().delete_user(self.name, self.user_id)
         self.delete_all()
-        return
