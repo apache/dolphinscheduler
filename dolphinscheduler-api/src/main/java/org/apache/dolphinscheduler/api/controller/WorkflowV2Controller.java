@@ -23,12 +23,9 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINIT
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.dto.PageResourceResponse;
-import org.apache.dolphinscheduler.api.dto.ResourceResponse;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -80,11 +77,11 @@ public class WorkflowV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ResourceResponse createWorkflows(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestBody WorkflowCreateRequest workflowCreateRequest) {
+    public Result<ProcessDefinition> createWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                    @RequestBody WorkflowCreateRequest workflowCreateRequest) {
         ProcessDefinition processDefinition =
                 processDefinitionService.createProcessDefinitionV2(loginUser, workflowCreateRequest);
-        return new ResourceResponse(processDefinition);
+        return Result.success(processDefinition);
     }
 
     /**
@@ -102,10 +99,10 @@ public class WorkflowV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteWorkflows(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                  @PathVariable("code") Long code) {
+    public Result deleteWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @PathVariable("code") Long code) {
         processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
-        return new Result(Status.SUCCESS);
+        return Result.success();
     }
 
     /**
@@ -121,12 +118,12 @@ public class WorkflowV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ResourceResponse updateWorkflows(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @PathVariable("code") Long code,
-                                            @RequestBody WorkflowUpdateRequest workflowUpdateRequest) {
+    public Result<ProcessDefinition> updateWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                    @PathVariable("code") Long code,
+                                                    @RequestBody WorkflowUpdateRequest workflowUpdateRequest) {
         ProcessDefinition processDefinition =
                 processDefinitionService.updateProcessDefinitionV2(loginUser, code, workflowUpdateRequest);
-        return new ResourceResponse(processDefinition);
+        return Result.success(processDefinition);
     }
 
     /**
@@ -141,10 +138,10 @@ public class WorkflowV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ResourceResponse getWorkflows(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable("code") Long code) {
+    public Result<ProcessDefinition> getWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                 @PathVariable("code") Long code) {
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(loginUser, code);
-        return new ResourceResponse(processDefinition);
+        return Result.success(processDefinition);
     }
 
     /**
@@ -159,10 +156,10 @@ public class WorkflowV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public PageResourceResponse filterWorkflows(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                @RequestBody WorkflowFilterRequest workflowFilterRequest) {
+    public Result<PageInfo<ProcessDefinition>> filterWorkflows(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                               @RequestBody WorkflowFilterRequest workflowFilterRequest) {
         PageInfo<ProcessDefinition> processDefinitions =
                 processDefinitionService.filterProcessDefinition(loginUser, workflowFilterRequest);
-        return new PageResourceResponse(processDefinitions);
+        return Result.success(processDefinitions);
     }
 }

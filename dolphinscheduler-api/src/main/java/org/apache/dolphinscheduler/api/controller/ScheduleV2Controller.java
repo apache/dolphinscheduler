@@ -24,14 +24,10 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_P
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.dto.PageResourceResponse;
-import org.apache.dolphinscheduler.api.dto.ResourceResponse;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -70,9 +66,6 @@ public class ScheduleV2Controller extends BaseController {
     @Autowired
     private SchedulerService schedulerService;
 
-    @Autowired
-    private ProcessDefinitionService processDefinitionService;
-
     /**
      * Create resource schedule
      *
@@ -85,10 +78,10 @@ public class ScheduleV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ResourceResponse createSchedules(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestBody ScheduleCreateRequest scheduleCreateRequest) {
+    public Result<Schedule> createSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @RequestBody ScheduleCreateRequest scheduleCreateRequest) {
         Schedule schedule = schedulerService.createSchedulesV2(loginUser, scheduleCreateRequest);
-        return new ResourceResponse(schedule);
+        return Result.success(schedule);
     }
 
     /**
@@ -105,10 +98,10 @@ public class ScheduleV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteSchedules(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                  @PathVariable("id") Integer id) {
+    public Result deleteSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @PathVariable("id") Integer id) {
         schedulerService.deleteSchedulesById(loginUser, id);
-        return new Result(Status.SUCCESS);
+        return Result.success();
     }
 
     /**
@@ -124,11 +117,11 @@ public class ScheduleV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ResourceResponse updateSchedules(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @PathVariable("id") Integer id,
-                                            @RequestBody ScheduleUpdateRequest scheduleUpdateRequest) {
+    public Result<Schedule> updateSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @PathVariable("id") Integer id,
+                                           @RequestBody ScheduleUpdateRequest scheduleUpdateRequest) {
         Schedule schedule = schedulerService.updateSchedulesV2(loginUser, id, scheduleUpdateRequest);
-        return new ResourceResponse(schedule);
+        return Result.success(schedule);
     }
 
     /**
@@ -143,10 +136,10 @@ public class ScheduleV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ResourceResponse getSchedules(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable("id") Integer id) {
+    public Result<Schedule> getSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @PathVariable("id") Integer id) {
         Schedule schedule = schedulerService.getSchedule(loginUser, id);
-        return new ResourceResponse(schedule);
+        return Result.success(schedule);
     }
 
     /**
@@ -161,9 +154,9 @@ public class ScheduleV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public PageResourceResponse filterSchedules(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                @RequestBody ScheduleFilterRequest scheduleFilterRequest) {
+    public Result<PageInfo<Schedule>> filterSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @RequestBody ScheduleFilterRequest scheduleFilterRequest) {
         PageInfo<Schedule> schedules = schedulerService.filterSchedules(loginUser, scheduleFilterRequest);
-        return new PageResourceResponse(schedules);
+        return Result.success(schedules);
     }
 }

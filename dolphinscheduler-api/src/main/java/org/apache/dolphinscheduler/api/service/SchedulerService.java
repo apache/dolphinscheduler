@@ -118,8 +118,8 @@ public interface SchedulerService {
      * @param scheduleId scheduler id
      * @return Schedule object
      */
-    Schedule getSchedules(User loginUser,
-                          Integer scheduleId);
+    Schedule getSchedule(User loginUser,
+                         Integer scheduleId);
 
     /**
      * set schedule online or offline

@@ -25,16 +25,21 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import io.swagger.annotations.ApiModelProperty;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 /**
  * schedule update request
@@ -77,21 +82,19 @@ public class ScheduleUpdateRequest {
     @ApiModelProperty(example = "environment-code")
     private long environmentCode;
 
-    public String updateScheduleParam(Schedule schedule) {
+    public String updateScheduleParam(Schedule schedule) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
         Schedule scheduleUpdate = this.mergeIntoSchedule(schedule);
-        return "{\"startTime\":\"" +
-                format(scheduleUpdate.getStartTime(), YYYY_MM_DD_HH_MM_SS, schedule.getTimezoneId()) +
-                "\",\"endTime\":\"" +
-                format(scheduleUpdate.getEndTime(), YYYY_MM_DD_HH_MM_SS, schedule.getTimezoneId()) +
-                "\",\"crontab\":\"" +
-                scheduleUpdate.getCrontab() +
-                "\",\"timezoneId\":\"" +
-                scheduleUpdate.getTimezoneId() +
-                "\"}";
+
+        String startTimeUpdate = scheduleUpdate.getStartTime() == null ? null : format(scheduleUpdate.getStartTime(), YYYY_MM_DD_HH_MM_SS, schedule.getTimezoneId());
+        String endTimeUpdate = scheduleUpdate.getEndTime() == null ? null : format(scheduleUpdate.getEndTime(), YYYY_MM_DD_HH_MM_SS, schedule.getTimezoneId());
+        ScheduleParam scheduleParam = new ScheduleParam(startTimeUpdate, endTimeUpdate, scheduleUpdate.getCrontab(), scheduleUpdate.getTimezoneId());
+
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        return gson.toJson(scheduleParam);
     }
 
-    public Schedule mergeIntoSchedule(Schedule schedule) {
-        Schedule scheduleDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(schedule), Schedule.class);
+    public Schedule mergeIntoSchedule(Schedule schedule) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
+        Schedule scheduleDeepCopy = (Schedule) BeanUtils.cloneBean(schedule);;
         assert scheduleDeepCopy != null;
         if (this.crontab != null) {
             scheduleDeepCopy.setCrontab(this.crontab);

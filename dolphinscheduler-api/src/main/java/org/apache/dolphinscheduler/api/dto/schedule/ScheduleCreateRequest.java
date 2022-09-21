@@ -30,6 +30,9 @@ import java.util.Date;
 import lombok.Data;
 import io.swagger.annotations.ApiModelProperty;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
  * schedule create request
  */
@@ -73,15 +76,9 @@ public class ScheduleCreateRequest {
     private long environmentCode;
 
     public String getScheduleParam() {
-        return "{\"startTime\":\"" +
-                this.startTime +
-                "\",\"endTime\":\"" +
-                this.endTime +
-                "\",\"crontab\":\"" +
-                this.crontab +
-                "\",\"timezoneId\":\"" +
-                this.timezoneId +
-                "\"}";
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        ScheduleParam scheduleParam = new ScheduleParam(this.startTime, this.endTime, this.crontab, this.timezoneId);
+        return gson.toJson(scheduleParam);
     }
 
     public Schedule convert2Schedule() {

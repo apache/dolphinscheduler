@@ -60,6 +60,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -367,11 +368,18 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (schedule == null) {
             throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
         }
-        Schedule scheduleUpdate = scheduleUpdateRequest.mergeIntoSchedule(schedule);
 
+        Schedule scheduleUpdate;
+        try {
+            scheduleUpdate = scheduleUpdateRequest.mergeIntoSchedule(schedule);
+            // check update params
+            this.scheduleParamCheck(scheduleUpdateRequest.updateScheduleParam(scheduleUpdate));
+        } catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchMethodException e) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleUpdateRequest.toString());
+        }
         // check update params
         this.projectPermCheckByProcess(loginUser, scheduleUpdate.getProcessDefinitionCode());
-        this.scheduleParamCheck(scheduleUpdateRequest.updateScheduleParam(scheduleUpdate));
+
         if (scheduleUpdate.getEnvironmentCode() != null) {
             Environment environment = environmentMapper.queryByEnvironmentCode(scheduleUpdate.getEnvironmentCode());
             if (environment == null) {
@@ -395,8 +403,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     @Transactional
-    public Schedule getSchedules(User loginUser,
-                                 Integer scheduleId) {
+    public Schedule getSchedule(User loginUser,
+                                Integer scheduleId) {
         Schedule schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) {
             throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);

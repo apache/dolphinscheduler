@@ -19,13 +19,12 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
 
-import org.apache.dolphinscheduler.api.dto.PageResourceResponse;
-import org.apache.dolphinscheduler.api.dto.ResourceResponse;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -94,7 +93,7 @@ public class WorkflowV2ControllerTest {
 
         Mockito.when(processDefinitionService.createProcessDefinitionV2(user, workflowCreateRequest))
                 .thenReturn(this.getProcessDefinition(name));
-        ResourceResponse resourceResponse = workflowV2Controller.createWorkflows(user, workflowCreateRequest);
+        Result<ProcessDefinition> resourceResponse = workflowV2Controller.createWorkflow(user, workflowCreateRequest);
         Assert.assertEquals(this.getProcessDefinition(name), resourceResponse.getData());
     }
 
@@ -105,7 +104,7 @@ public class WorkflowV2ControllerTest {
 
         Mockito.when(processDefinitionService.updateProcessDefinitionV2(user, 1L, workflowUpdateRequest))
                 .thenReturn(this.getProcessDefinition(newName));
-        ResourceResponse resourceResponse = workflowV2Controller.updateWorkflows(user, 1L, workflowUpdateRequest);
+        Result<ProcessDefinition> resourceResponse = workflowV2Controller.updateWorkflow(user, 1L, workflowUpdateRequest);
 
         Assert.assertEquals(this.getProcessDefinition(newName), resourceResponse.getData());
     }
@@ -114,7 +113,7 @@ public class WorkflowV2ControllerTest {
     public void testGetWorkflow() {
         Mockito.when(processDefinitionService.getProcessDefinition(user, 1L))
                 .thenReturn(this.getProcessDefinition(name));
-        ResourceResponse resourceResponse = workflowV2Controller.getWorkflows(user, 1L);
+        Result<ProcessDefinition> resourceResponse = workflowV2Controller.getWorkflow(user, 1L);
         Assertions.assertEquals(this.getProcessDefinition(name), resourceResponse.getData());
     }
 
@@ -125,10 +124,9 @@ public class WorkflowV2ControllerTest {
 
         Mockito.when(processDefinitionService.filterProcessDefinition(user, workflowFilterRequest))
                 .thenReturn(this.getProcessDefinitionPage(name));
-        PageResourceResponse pageResourceResponse = workflowV2Controller.filterWorkflows(user, workflowFilterRequest);
+        Result<PageInfo<ProcessDefinition>> pageResourceResponse = workflowV2Controller.filterWorkflows(user, workflowFilterRequest);
 
-        PageInfo<ProcessDefinition> processDefinitionPage =
-                (PageInfo<ProcessDefinition>) pageResourceResponse.getData();
+        PageInfo<ProcessDefinition> processDefinitionPage = pageResourceResponse.getData();
         Assertions.assertIterableEquals(this.getProcessDefinitionPage(name).getTotalList(),
                 processDefinitionPage.getTotalList());
     }
