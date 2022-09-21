@@ -145,7 +145,7 @@ public class ScheduleV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ResourceResponse getSchedules(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @PathVariable("id") Integer id) {
-        Schedule schedule = schedulerService.getSchedules(loginUser, id);
+        Schedule schedule = schedulerService.getSchedule(loginUser, id);
         return new ResourceResponse(schedule);
     }
 
