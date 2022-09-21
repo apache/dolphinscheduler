@@ -20,7 +20,7 @@ import { useI18n } from 'vue-i18n'
 import { NEllipsis, NIcon } from 'naive-ui'
 import { useRelationCustomParams, useDependentTimeout } from '.'
 import { useTaskNodeStore } from '@/store/project/task-node'
-import { queryAllProjectList } from '@/service/modules/projects'
+import { queryAllProjectListForDependent } from '@/service/modules/projects'
 import { tasksState } from '@/common/common'
 import {
   queryProcessDefinitionList,
@@ -176,7 +176,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   } as { [key in IDateType]: { value: string; label: string }[] }
 
   const getProjectList = async () => {
-    const result = await queryAllProjectList()
+    const result = await queryAllProjectListForDependent()
     projectList.value = result.map((item: { code: number; name: string }) => ({
       value: item.code,
       label: () => h(NEllipsis, null, item.name)

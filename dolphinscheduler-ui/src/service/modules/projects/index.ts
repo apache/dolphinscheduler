@@ -85,3 +85,10 @@ export function deleteProject(code: number): any {
     method: 'delete'
   })
 }
+
+export function queryAllProjectListForDependent(): any {
+  return axios({
+    url: '/projects/list-dependent',
+    method: 'get'
+  })
+}

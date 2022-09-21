@@ -141,7 +141,16 @@ public class ProjectControllerTest {
         Result response = projectController.queryAllProjectList(user);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
-
+    @Test
+    public void testQueryAllProjectListForDependent() {
+        User user = new User();
+        user.setId(0);
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        Mockito.when(projectService.queryAllProjectListForDependent()).thenReturn(result);
+        Result response = projectController.queryAllProjectListForDependent(user);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
     private Project getProject() {
         Project project = new Project();
         project.setCode(1L);

@@ -404,6 +404,16 @@ public class ProjectServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
 
     }
+    @Test
+    public void queryAllProjectListForDependent() {
+        Mockito.when(projectMapper.queryAllProjectForDependent()).thenReturn(getList());
+
+        Result result = projectService.queryAllProjectListForDependent();
+        logger.info(result.toString());
+        List<Project> projects = (List<Project>) result.getData();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+
+    }
 
     @Test
     public void testQueryUnauthorizedProject() {

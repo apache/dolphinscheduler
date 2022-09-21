@@ -180,4 +180,9 @@
             union select id as project_id  from t_ds_project where user_id=#{userId})
         </if>
     </select>
+
+    <select id="queryAllProjectForDependent" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select code, name
+        from t_ds_project
+    </select>
 </mapper>

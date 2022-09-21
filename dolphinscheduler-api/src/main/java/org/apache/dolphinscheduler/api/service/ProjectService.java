@@ -174,4 +174,10 @@ public interface ProjectService {
      */
     void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String perm);
 
+    /**
+     * the project list in dependent node's permissions should not be restricted
+     * @return project list
+     */
+    Result queryAllProjectListForDependent();
+
 }
