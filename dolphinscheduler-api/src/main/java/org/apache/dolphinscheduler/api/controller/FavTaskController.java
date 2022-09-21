@@ -65,7 +65,6 @@ public class FavTaskController extends BaseController {
     @ApiOperation(value = "listTaskType", notes = "LIST_TASK_TYPE")
     @GetMapping(value = "/taskTypes")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listTaskType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<FavTaskDto> favTaskList = favTaskService.getFavTaskList(loginUser);
