@@ -2532,6 +2532,8 @@ public class ProcessServiceImpl implements ProcessService {
                 TaskDefinition task = taskDefinitionMap.get(taskDefinitionToUpdate.getCode());
                 if (task == null) {
                     newTaskDefinitionLogs.add(taskDefinitionToUpdate);
+                } else {
+                    taskDefinitionToUpdate.setId(task.getId());
                 }
             }
         }
@@ -2561,14 +2563,12 @@ public class ProcessServiceImpl implements ProcessService {
         }
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             for (TaskDefinitionLog taskDefinitionLog : updateTaskDefinitionLogs) {
-                TaskDefinition task = taskDefinitionMap.get(taskDefinitionLog.getCode());
                 Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionLog);
                     List<Integer> resourceIdsNewSet = new ArrayList<>();
                     for (String resourceFullName: resourceFullNameSet) {
                         resourceIdsNewSet.add(createRelationTaskResourcesIfNotExist(resourceFullName));
                     }
                     taskDefinitionLog.setResourceIdsNew(Joiner.on(",").join(resourceIdsNewSet));
-                taskDefinitionLog.setId(task.getId());
                 
                 updateResult += taskDefinitionMapper.updateById(taskDefinitionLog);
             }
