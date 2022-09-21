@@ -19,6 +19,8 @@ import { defineComponent, PropType, toRefs, h, unref } from 'vue'
 import { NSpin, NGrid, NForm, NFormItemGi } from 'naive-ui'
 import { useForm } from './use-form'
 import type { GridProps, IMeta } from './types'
+import { IFormItem } from "./types";
+import styles from './index.module.scss'
 
 const props = {
   meta: {
@@ -35,6 +37,8 @@ const props = {
   }
 }
 
+const taskParamDefineGroup = ['name', 'taskType', 'processName', 'flag', 'description', 'taskPriority', 'workerGroup', 'environmentCode', 'taskGroupId', 'taskGroupPriority', 'failRetryTimes', 'failRetryInterval', 'cpuQuota', 'memoryMax', 'delayTime', 'timeoutFlag', 'timeoutNotifyStrategy', 'timeout']
+
 const Form = defineComponent({
   name: 'DSForm',
   props,
@@ -48,27 +52,48 @@ const Form = defineComponent({
   render(props: { meta: IMeta; layout?: GridProps; loading?: boolean }) {
     const { loading, layout, meta } = props
     const { elements = [], ...restFormProps } = meta
-    return (
-      <NSpin show={loading}>
-        <NForm {...restFormProps} ref='formRef'>
-          <NGrid {...layout}>
-            {elements.map((element) => {
-              const { span = 24, path, widget, ...formItemProps } = element
+    const taskDefineParams = []
+    const taskBodyParams = []
+    for (let element of elements) {
+      let pathorclass = element.path ? element.path : element.class ? element.class : ''
+      if (taskParamDefineGroup.indexOf(pathorclass) >= 0) {
+        taskDefineParams.push(element)
+      } else {
+        taskBodyParams.push(element)
+      }
+    }
+    const drawElements = (elements: IFormItem[]) => {
+      return elements.map((element) => {
+        const { span = 24, path, widget, ...formItemProps } = element
 
-              return (
-                <NFormItemGi
-                  {...formItemProps}
-                  span={unref(span) === void 0 ? 24 : unref(span)}
-                  path={path}
-                  key={path || String(Date.now() + Math.random())}
-                >
-                  {h(widget)}
-                </NFormItemGi>
-              )
-            })}
-          </NGrid>
-        </NForm>
-      </NSpin>
+        return (
+            <NFormItemGi
+                { ...formItemProps }
+                span={ unref(span) === void 0 ? 24 : unref(span) }
+                path={ path }
+                key={ path || String(Date.now() + Math.random()) }
+            >
+              { h(widget) }
+            </NFormItemGi>
+        )
+      })
+    }
+    debugger;
+    return (
+        <NSpin show={ loading }>
+          <NForm class={ styles.form } { ...restFormProps } ref='formRef'>
+            <div class={ styles.paramsLeft }>
+              <NGrid { ...layout }>
+                { drawElements(taskDefineParams) }
+              </NGrid>
+            </div>
+            <div class={ styles.paramsRight }>
+              <NGrid  { ...layout }>
+                { drawElements(taskBodyParams) }
+              </NGrid>
+            </div>
+          </NForm>
+        </NSpin>
     )
   }
 })

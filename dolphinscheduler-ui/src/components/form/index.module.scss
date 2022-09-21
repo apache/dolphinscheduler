@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-.container {
-  width: 80%;
-  min-width: 800px;
+.form {
+  display: flex;
+  justify-content: space-between;
 }
 
-.modal-card {
-  max-height: 95vh;
+.paramsLeft {
+  width: 40%;
 }
 
-.header-icon {
-  padding-right: 5px;
+.paramsRight {
+  width: 56%;
 }
