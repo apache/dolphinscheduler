@@ -88,7 +88,9 @@ export function useTask(projectCode: number) {
 
   const onEditTask = async (row: IRecord, readonly: boolean) => {
     const result = await queryTaskDefinitionByCode(row.taskCode, projectCode)
-    task.taskData = { ...result, processName: row.processDefinitionCode }
+    // debugger
+    task.taskData = {...result, processName: row.processDefinitionCode, upstreamTaskMapKey: row.upstreamTaskMapKey}
+    // task.taskData = { ...result, processName: row.processDefinitionCode }
     task.taskShow = true
     task.taskReadonly = readonly
   }

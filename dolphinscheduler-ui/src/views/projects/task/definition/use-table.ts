@@ -307,12 +307,16 @@ export function useTable(onEdit: Function) {
       queryTaskDefinitionListPaging({ ...params }, { projectCode }).then(
         (res: TaskDefinitionRes) => {
           variables.tableData = res.totalList.map((item, unused) => {
+            // debugger
             if (Object.keys(item.upstreamTaskMap).length > 0) {
+              // debugger
+              item.upstreamTaskMapKey = Object.keys(item.upstreamTaskMap).map(Number)
               item.upstreamTaskMap = Object.keys(item.upstreamTaskMap).map(
                 (code) => item.upstreamTaskMap[code]
               )
             } else {
               item.upstreamTaskMap = []
+              item.upstreamTaskMapKey = []
             }
 
             return {

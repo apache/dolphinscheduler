@@ -31,20 +31,24 @@ interface IResource {
   name: string
   children?: IResource[]
 }
+
 interface IMainJar {
   id: number
   fullName: string
   children: IMainJar[]
 }
+
 interface TaskNodeState {
   postTaskOptions: IOption[]
   preTaskOptions: IOption[]
   preTasks: number[]
+  upstreamTaskMapKey: number[]
   resources: IResource[]
   mainJars: { [key in ProgramType]?: IMainJar[] }
   name: string
   dependentResult: DependentResultType
 }
+
 export {
   TaskNodeState,
   EditWorkflowDefinition,

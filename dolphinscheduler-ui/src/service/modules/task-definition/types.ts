@@ -65,6 +65,7 @@ interface TaskDefinitionItem {
   processDefinitionName: string
   processReleaseState: string
   upstreamTaskMap: any
+  upstreamTaskMapKey: any
   upstreamTaskCode: number
   upstreamTaskName: string
 }

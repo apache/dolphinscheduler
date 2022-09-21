@@ -33,6 +33,7 @@ export const useTaskNodeStore = defineStore({
     preTaskOptions: [],
     postTaskOptions: [],
     preTasks: [],
+    upstreamTaskMap: [],
     resources: [],
     mainJars: {},
     name: '',
@@ -48,6 +49,9 @@ export const useTaskNodeStore = defineStore({
     },
     getPreTasks(): number[] {
       return this.preTasks
+    },
+    getUpstreamTaskMapKey(): number[] {
+      return this.upstreamTaskMapKey
     },
     getResources(): IResource[] {
       return this.resources
@@ -123,6 +127,9 @@ export const useTaskNodeStore = defineStore({
     updateResource(resources: IResource[]) {
       this.resources = resources
     },
+    updateUpstreamTaskMapKey(upstreamTaskMapKey: number[]) {
+      this.upstreamTaskMapKey = upstreamTaskMapKey
+    },
     updateMainJar(type: ProgramType, mainJar: IMainJar[]) {
       this.mainJars[type] = mainJar
     },
@@ -140,6 +147,7 @@ export const useTaskNodeStore = defineStore({
       this.preTaskOptions = []
       this.postTaskOptions = []
       this.preTasks = []
+      this.upstreamTaskMapKey = []
       this.resources = []
       this.mainJars = {}
       this.name = ''
