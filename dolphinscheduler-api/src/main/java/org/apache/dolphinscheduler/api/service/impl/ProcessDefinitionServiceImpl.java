@@ -117,7 +117,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -811,12 +810,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     public Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser, long projectCode, String codes) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(codes)) {
-            putMsg(result, Status.SUCCESS);
+            logger.error("Parameter processDefinitionCodes is empty, projectCode is {}.", projectCode);
+            putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
             return result;
         }
 
-        Set<Long> definitionCodes = Arrays.stream(codes.split(Constants.COMMA))
-                .map(Long::parseLong)
+        Set<Long> definitionCodes = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
         Set<Long> queryCodes =
@@ -829,7 +828,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.error("Process definition does not exist, processCodes:{}.",
                     diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA)));
             throw new ServiceException(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR,
-                    diffCode.stream().map(code -> code + "[process definition not exist]").collect(Collectors.joining(Constants.COMMA)));
+                    diffCode.stream().map(code -> code + "[process definition not exist]")
+                            .collect(Collectors.joining(Constants.COMMA))
+            );
         }
 
         for (ProcessDefinition process : processDefinitionList) {
@@ -842,7 +843,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             if (deleteResult.get(Constants.STATUS) != Status.SUCCESS) {
                 // throw exception to rollback
-                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), deleteResult.get(Constants.MSG));
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(),
+                        deleteResult.get(Constants.MSG));
             }
         }
         putMsg(result, Status.SUCCESS);
