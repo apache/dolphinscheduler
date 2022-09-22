@@ -1315,7 +1315,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return false;
         }
         processDefinition.setName(importProcessDefinitionName);
-        processDefinition.setId(0);
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
