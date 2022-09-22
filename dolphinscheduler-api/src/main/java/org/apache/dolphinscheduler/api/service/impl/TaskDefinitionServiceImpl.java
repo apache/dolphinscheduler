@@ -109,8 +109,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * create task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param taskDefinitionJson task definition json
      */
     @Transactional
@@ -133,10 +133,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
-                    .taskType(taskDefinitionLog.getTaskType())
-                    .taskParams(taskDefinitionLog.getTaskParams())
-                    .dependence(taskDefinitionLog.getDependence())
-                    .build())) {
+                .taskType(taskDefinitionLog.getTaskType())
+                .taskParams(taskDefinitionLog.getTaskParams())
+                .dependence(taskDefinitionLog.getDependence())
+                .build())) {
                 logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
@@ -158,11 +158,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * create single task definition that binds the workflow
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return create result code
      */
     @Transactional
@@ -198,10 +198,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             taskDefinition.setVersion(Constants.VERSION_FIRST);
         }
         if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
-                .taskType(taskDefinition.getTaskType())
-                .taskParams(taskDefinition.getTaskParams())
-                .dependence(taskDefinition.getDependence())
-                .build())) {
+            .taskType(taskDefinition.getTaskType())
+            .taskParams(taskDefinition.getTaskParams())
+            .dependence(taskDefinition.getDependence())
+            .build())) {
             logger.error("task definition {} parameter invalid", taskDefinition.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinition.getName());
             return result;
@@ -272,10 +272,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * query task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param processCode process code
-     * @param taskName task name
+     * @param taskName    task name
      */
     @Override
     public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, long processCode, String taskName) {
@@ -300,9 +300,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * delete task definition
      * Only offline and no downstream dependency can be deleted
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode task code
+     * @param taskCode    task code
      */
     @Transactional
     @Override
@@ -329,9 +329,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryDownstreamByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
             Set<Long> postTaskCodes = processTaskRelationList
-                    .stream()
-                    .map(ProcessTaskRelation::getPostTaskCode)
-                    .collect(Collectors.toSet());
+                .stream()
+                .map(ProcessTaskRelation::getPostTaskCode)
+                .collect(Collectors.toSet());
             putMsg(result, Status.TASK_HAS_DOWNSTREAM, StringUtils.join(postTaskCodes, ","));
             return result;
         }
@@ -365,7 +365,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         List<ProcessTaskRelationLog> relationLogs = processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinition.getCode(),
-                insertVersion, relationLogs, taskDefinitionLogs, Boolean.TRUE);
+            insertVersion, relationLogs, taskDefinitionLogs, Boolean.TRUE);
         if (insertResult == Constants.EXIT_CODE_SUCCESS) {
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
@@ -378,9 +378,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task code
      * @param taskDefinitionJsonObj task definition json object
      */
     @Transactional
@@ -428,10 +428,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return null;
         }
         if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
-                .taskType(taskDefinitionToUpdate.getTaskType())
-                .taskParams(taskDefinitionToUpdate.getTaskParams())
-                .dependence(taskDefinitionToUpdate.getDependence())
-                .build())) {
+            .taskType(taskDefinitionToUpdate.getTaskType())
+            .taskParams(taskDefinitionToUpdate.getTaskParams())
+            .dependence(taskDefinitionToUpdate.getDependence())
+            .build())) {
             logger.error("task definition {} parameter invalid", taskDefinitionToUpdate.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
             return null;
@@ -465,11 +465,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition and upstream
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task definition code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return update result code
      */
     @Override
@@ -516,7 +516,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             ProcessTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, taskRelation.getProcessDefinitionCode());
             List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
-            List<ProcessTaskRelation> relationList = Lists.newArrayList();
+//            List<ProcessTaskRelation> relationList = Lists.newArrayList();
             for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
                 if (processTaskRelation.getPostTaskCode() == taskCode) {
                     if (queryUpStreamTaskCodeMap.containsKey(processTaskRelation.getPreTaskCode()) && processTaskRelation.getPreTaskCode() != 0L) {
@@ -524,20 +524,37 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     } else {
                         processTaskRelation.setPreTaskCode(0L);
                         processTaskRelation.setPreTaskVersion(0);
-                        relationList.add(processTaskRelation);
+//                        relationList.add(processTaskRelation);
                     }
                 }
             }
 //            processTaskRelationList.removeAll(relationList);
             for (Map.Entry<Long, TaskDefinition> queryUpStreamTask : queryUpStreamTaskCodeMap.entrySet()) {
-                taskRelation.setPreTaskCode(queryUpStreamTask.getKey());
-                taskRelation.setPreTaskVersion(queryUpStreamTask.getValue().getVersion());
-                processTaskRelationList.add(taskRelation);
+                ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+                processTaskRelation.setPreTaskCode(queryUpStreamTask.getKey());
+                processTaskRelation.setPreTaskVersion(queryUpStreamTask.getValue().getVersion());
+                processTaskRelation.setPostTaskCode(taskCode);
+                processTaskRelation.setPostTaskVersion(taskDefinitionToUpdate.getVersion());
+                processTaskRelation.setConditionType(ConditionType.NONE);
+                processTaskRelation.setConditionParams("{}");
+                processTaskRelationList.add(processTaskRelation);
             }
             if (queryUpStreamTaskCodeMap.isEmpty() && !processTaskRelationList.isEmpty()) {
                 processTaskRelationList.add(processTaskRelationList.get(0));
             }
-            processTaskRelationList= Lists.newArrayList(Sets.newHashSet(processTaskRelationList));
+            processTaskRelationList.sort((p1, p2) -> Long.compare(p2.getPreTaskCode(), p1.getPreTaskCode()));
+            boolean sign = false;
+            for (int i = 0; i < processTaskRelationList.size(); i++) {
+                ProcessTaskRelation processTaskRelation = processTaskRelationList.get(i);
+                if (processTaskRelation.getPostTaskCode() == taskCode) {
+                    if (processTaskRelation.getPreTaskCode() != 0) {
+                        sign = true;
+                    } else if (sign) {
+                        processTaskRelationList.remove(processTaskRelation);
+                    }
+                }
+            }
+            processTaskRelationList = Lists.newArrayList(Sets.newHashSet(processTaskRelationList));
             updateDag(loginUser, result, taskRelation.getProcessDefinitionCode(), processTaskRelationList, Lists.newArrayList(taskDefinitionToUpdate));
         }
         result.put(Constants.DATA_LIST, taskCode);
@@ -549,10 +566,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * switch task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode task code
-     * @param version the version user want to switch
+     * @param taskCode    task code
+     * @param version     the version user want to switch
      */
     @Transactional
     @Override
@@ -684,7 +701,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
         IPage<TaskMainInfo> taskMainInfoIPage = taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
-                searchTaskName, taskType == null ? StringUtils.EMPTY : taskType);
+            searchTaskName, taskType == null ? StringUtils.EMPTY : taskType);
         List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
         if (!records.isEmpty()) {
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
@@ -742,9 +759,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * release task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param code         task definition code
      * @param releaseState releaseState
      * @return update result code
      */
