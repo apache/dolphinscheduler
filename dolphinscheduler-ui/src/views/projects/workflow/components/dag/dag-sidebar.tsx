@@ -16,7 +16,6 @@
  */
 
 import { defineComponent, onMounted, reactive } from 'vue'
-import { useTaskTypeStore } from '@/store/project'
 import styles from './dag.module.scss'
 import type { TaskType } from './types'
 import { NCollapse, NCollapseItem, NIcon } from 'naive-ui'
