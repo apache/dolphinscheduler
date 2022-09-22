@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -32,7 +33,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
@@ -44,6 +44,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,6 +78,7 @@ import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import sun.tools.jar.resources.jar;
 
 public class DataxTask extends AbstractTaskExecutor {
     /**
@@ -94,6 +96,17 @@ public class DataxTask extends AbstractTaskExecutor {
      * datax path
      */
     private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
+
+    /**
+     * datax hdfs path
+     */
+    private static final String DATAX_HDFS_PATH = "DATAX_HDFS_PATH";
+
+    /**
+     * datax hdfs path
+     */
+    private static final String DATAX_ON_YARN_DEPEND_JAR = "DATAX_ON_YARN_DEPEND_JAR";
+
     /**
      * datax channel count
      */
@@ -155,9 +168,18 @@ public class DataxTask extends AbstractTaskExecutor {
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-            // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);
-            String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
+
+            String dataxHdfsPath = System.getenv(DATAX_HDFS_PATH);
+            String dataxOnYarnDependJar = System.getenv(DATAX_ON_YARN_DEPEND_JAR);
+
+            String shellCommandFilePath = null;
+            if (StringUtils.isNotBlank(dataxHdfsPath) && StringUtils.isNotBlank(dataxOnYarnDependJar)){
+                shellCommandFilePath = buildYarnShellCommandFile(jsonFilePath, paramsMap, dataxHdfsPath, dataxOnYarnDependJar);
+            }else {
+                shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
+            }
+
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
@@ -368,6 +390,56 @@ public class DataxTask extends AbstractTaskExecutor {
         return core;
     }
 
+    private String buildYarnShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap, String dataxHdfsPath, String dataxOnYarnDependJar)
+            throws Exception {
+        // generate scripts
+        String fileName = String.format("%s/%s_node.%s",
+                taskExecutionContext.getTaskAppId(),
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
+
+        Path path = new File(fileName).toPath();
+
+        if (Files.exists(path)) {
+            return fileName;
+        }
+
+        int xms = Math.max(dataXParameters.getXms(), 1);
+        int xmx = Math.max(dataXParameters.getXmx(), 1);
+        int jvm = Math.max(xms, xmx);
+
+        StringBuilder sbr = new StringBuilder("yarn jar " + dataxOnYarnDependJar);;
+        sbr.append(" -jar_path " + dataxOnYarnDependJar);
+        sbr.append(" -appname datax-job");
+        sbr.append(" -master_memory " + (jvm * 1024));
+        sbr.append(" -datax_job " + jobConfigFilePath);
+        sbr.append(" -datax_home_hdfs " + dataxHdfsPath);
+
+        if (paramsMap.size() != 0){
+            StringBuilder customParameters = new StringBuilder();
+            for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+                customParameters.append(entry.getKey()).append("=").append(entry.getValue().getValue()).append(",");
+            }
+            sbr.append(" -p " + customParameters);
+        }
+
+        // replace placeholder
+        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
+        logger.debug("raw script : {}", dataxCommand);
+
+        // create shell command file
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, attr);
+        }
+
+        Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
+
+        return fileName;
+    }
     /**
      * create command
      *
@@ -378,7 +450,6 @@ public class DataxTask extends AbstractTaskExecutor {
             throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
-                taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTaskAppId(),
                 SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
 
