@@ -50,7 +50,7 @@
     *******************************************
     3.业务属性方式
     在自定义格式后直接“+/-”数字
-    支持日志格式：yyyy-MM-dd/yyyyMMdd/yyyy-MM-dd HH:mm:ss/yyyyMMddHHmmss
+    支持日志格式：所有日期表达式，例如：yyyy-MM-dd/yyyyMMddHHmmss
     * 当天：$[this_day(yyyy-MM-dd)]，如：2022-08-26 => 2022-08-26
     * 昨天：$[last_day(yyyy-MM-dd)]，如：2022-08-26 => 2022-08-25
     * 年的第N周，以周一为起点：$[year_week(yyyy-MM-dd)]，如：2022-08-26 => 2022-34

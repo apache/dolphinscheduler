@@ -381,7 +381,7 @@ public class TimePlaceholderUtils {
      * @param date       date
      * @return week of year
      */
-    public static String calcYearWeek(String expression, Date date) {
+    public static String calculateYearWeek(String expression, Date date) {
 
         String dataFormat = expression.substring(YEAR_WEEK.length() + 1, expression.length() - 1);
 
@@ -412,7 +412,7 @@ public class TimePlaceholderUtils {
      * @param weekDay day of week
      * @return date_string
      */
-    private static String transformYearWeek(Date date,String format,int weekDay) {
+    private static String transformYearWeek(Date date, String format, int weekDay) {
         Calendar calendar = Calendar.getInstance();
         //Minimum number of days required for the first week of the year
         calendar.setMinimalDaysInFirstWeek(4);
