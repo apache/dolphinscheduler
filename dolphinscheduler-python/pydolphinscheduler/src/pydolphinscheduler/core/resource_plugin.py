@@ -17,8 +17,9 @@
 
 """DolphinScheduler ResourcePlugin object."""
 
-
 from abc import ABCMeta, abstractmethod
+
+from pydolphinscheduler.exceptions import PyResPluginException
 
 
 # [start resource_plugin_definition]
@@ -44,6 +45,14 @@ class ResourcePlugin(object, metaclass=ABCMeta):
         """
 
     # [end abstractmethod read_file]
+
+    def get_index(self, s: str, x, n):
+        """Find the subscript of the nth occurrence of the X character in the string s."""
+        if n <= s.count(x):
+            all_index = [key for key, value in enumerate(s) if value == x]
+            return all_index[n - 1]
+        else:
+            raise PyResPluginException("Incomplete path.")
 
 
 # [end resource_plugin_definition]
