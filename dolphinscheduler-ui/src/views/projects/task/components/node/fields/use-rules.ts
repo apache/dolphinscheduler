@@ -130,9 +130,11 @@ export function useRules(
     }
     if (item.field === 'src_table') {
       item.options = srcTableOptions
+      item.props.filterable = true
     }
     if (item.field === 'target_table') {
       item.options = targetTableOptions
+      item.props.filterable = true
     }
     if (item.field === 'src_field') {
       item.options = srcTableColumnOptions
