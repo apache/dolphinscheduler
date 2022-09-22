@@ -735,12 +735,14 @@ public class UsersServiceTest {
         String userName = "userTest0001";
         String userPassword = "userTest";
         String email = "abc@x.com";
-        String phone = "123456789";
+        String phone = "17366666666";
         String tenantCode = "tenantCode";
         int stat = 1;
 
         // User exists
         Mockito.when(userMapper.existUser(userName)).thenReturn(true);
+        Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
+        Mockito.when(userMapper.queryDetailsById(getUser().getId())).thenReturn(getUser());
         Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
         user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);

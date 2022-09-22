@@ -31,11 +31,42 @@ class Project(BaseSide):
         self,
         name: str = configuration.WORKFLOW_PROJECT,
         description: Optional[str] = None,
+        code: Optional[int] = None,
     ):
         super().__init__(name, description)
+        self.code = code
 
     def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
         """Create Project if not exists."""
         JavaGate().create_or_grant_project(user, self.name, self.description)
         # TODO recover result checker
         # gateway_result_checker(result, None)
+
+    @classmethod
+    def get_project_by_name(cls, user=configuration.USER_NAME, name=None) -> "Project":
+        """Get Project by name."""
+        project = JavaGate().query_project_by_name(user, name)
+        if project is None:
+            return cls()
+        return cls(
+            name=project.getName(),
+            description=project.getDescription(),
+            code=project.getCode(),
+        )
+
+    def update(
+        self,
+        user=configuration.USER_NAME,
+        project_code=None,
+        project_name=None,
+        description=None,
+    ) -> None:
+        """Update Project."""
+        JavaGate().update_project(user, project_code, project_name, description)
+        self.name = project_name
+        self.description = description
+
+    def delete(self, user=configuration.USER_NAME) -> None:
+        """Delete Project."""
+        JavaGate().delete_project(user, self.code)
+        self.delete_all()
