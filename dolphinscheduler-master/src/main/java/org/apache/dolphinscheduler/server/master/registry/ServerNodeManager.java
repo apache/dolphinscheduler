@@ -375,7 +375,7 @@ public class ServerNodeManager implements InitializingBean {
         registryWorkerGroupWriteLock.lock();
         try {
             if (type == Type.REMOVE) {
-                if (!registryWorkerGroupNodes.contains(workerGroup)) {
+                if (!registryWorkerGroupNodes.containsKey(workerGroup)) {
                     logger.warn("cannot remove worker group {}, not in active list", workerGroup);
                     return;
                 }
