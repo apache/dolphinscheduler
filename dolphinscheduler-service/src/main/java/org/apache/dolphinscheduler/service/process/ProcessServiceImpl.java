@@ -409,6 +409,7 @@ public class ProcessServiceImpl implements ProcessService {
                 commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
                 command.setCommandParam(JSONUtils.toJsonString(commandParams));
             }
+            command.setId(null);
             result = commandMapper.insert(command);
         }
         return result;
