@@ -775,8 +775,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
 
                         logger.info("before create complement command: startDate:{}, startStr:{}, endDate:{}, endStr:{}, complement date list: {}",
-                            listDate.get(startDateIndex), DateUtils.dateToString(listDate.get(startDateIndex), ZoneId.systemDefault().getId()),
-                            listDate.get(endDateIndex), DateUtils.dateToString(listDate.get(endDateIndex), ZoneId.systemDefault().getId()), JSONUtils.toJsonString(CronUtils.getSelfFireDateList(startDate, endDate, schedules)));
+                            listDate.get(startDateIndex),
+                            cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE),
+                            listDate.get(endDateIndex),
+                            cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE),
+                            cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST));
 
                         processService.createCommand(command);
 
