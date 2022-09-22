@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Duration;
 import java.util.regex.Pattern;
@@ -55,6 +56,8 @@ public final class Constants {
     public static final String RESOURCE_TYPE_UDF = "udfs";
 
     public static final String STORAGE_S3 = "S3";
+
+    public static final String STORAGE_OSS = "OSS";
 
     public static final String STORAGE_HDFS = "HDFS";
 
@@ -144,6 +147,10 @@ public final class Constants {
 
     public static final String AWS_S3_BUCKET_NAME = "resource.aws.s3.bucket.name";
     public static final String AWS_END_POINT = "resource.aws.s3.endpoint";
+
+    public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
+    public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
+
     /**
      * comma ,
      */

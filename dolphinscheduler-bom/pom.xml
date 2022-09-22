@@ -85,6 +85,7 @@
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <hibernate-validator.version>6.2.2.Final</hibernate-validator.version>
         <aws-sdk.version>1.12.160</aws-sdk.version>
+        <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
         <joda-time.version>2.10.13</joda-time.version>
         <okhttp.version>3.14.9</okhttp.version>
         <json-path.version>2.7.0</json-path.version>
@@ -651,6 +652,18 @@
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun-sdk-oss.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
             </dependency>
 
             <dependency>
