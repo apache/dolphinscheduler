@@ -31,8 +31,6 @@ export default defineComponent({
   name: 'workflow-dag-sidebar',
   emits: ['dragStart'],
   setup(props, context) {
-    const taskTypeStore = useTaskTypeStore()
-
     const variables = reactive({
       dataList: [],
       universal: [],
