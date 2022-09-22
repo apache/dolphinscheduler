@@ -362,7 +362,7 @@ public class TimePlaceholderUtils {
 
                 value = String.valueOf(timestamp.getTime() / 1000);
             } else if (expression.startsWith(YEAR_WEEK)) {
-                value = calcYearWeek(expression,date);
+                value = calculateYearWeek(expression,date);
             } else {
                 Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
                 value = DateUtils.format(entry.getKey(), entry.getValue());
