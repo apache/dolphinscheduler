@@ -371,6 +371,7 @@ interface ITaskData
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams
+  upstreamTaskMapKey?: []
 }
 
 export {
