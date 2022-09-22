@@ -160,8 +160,7 @@ common:
     # dolphinscheduler env
     HADOOP_HOME: "/opt/soft/hadoop"
     HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
-    SPARK_HOME1: "/opt/soft/spark1"
-    SPARK_HOME2: "/opt/soft/spark2"
+    SPARK_HOME: "/opt/soft/spark"
     PYTHON_HOME: "/usr/bin/python"
     JAVA_HOME: "/usr/local/openjdk-8"
     HIVE_HOME: "/opt/soft/hive"
