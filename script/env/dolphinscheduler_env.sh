@@ -45,9 +45,5 @@ export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 export SEATUNNEL_HOME=${SEATUNNEL_HOME:-/opt/soft/seatunnel}
 export CHUNJUN_HOME=${CHUNJUN_HOME:-/opt/soft/chunjun}
-#export DATAX_ON_YARN_DEPEND_JAR=${DATAX_ON_YARN_DEPEND_JAR:-/opt/soft/datax/datax-on-yarn-1.0.0.jar}
-#DATAX_HDFS_HOME is HDFS path
-#export DATAX_HDFS_PATH=${DATAX_HDFS_HOME:-/hdfs/opt/hadoop/datax.tar.gz}
-
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$SEATUNNEL_HOME/bin:$CHUNJUN_HOME/bin:$PATH
