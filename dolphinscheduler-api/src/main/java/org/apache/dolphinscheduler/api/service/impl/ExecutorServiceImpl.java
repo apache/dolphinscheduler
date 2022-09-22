@@ -437,6 +437,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
+        List<String> workerGroupNames = workerGroupService.getAllWorkerGroupNames();
+        if (!workerGroupNames.contains(processInstance.getWorkerGroup())) {
+            putMsg(result, Status.WORKER_GROUP_NOT_EXISTS_PROCESSING, processInstance.getId(),
+                processInstance.getWorkerGroup());
+            return result;
+        }
+
         ProcessDefinition processDefinition =
                 processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
