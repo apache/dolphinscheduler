@@ -303,7 +303,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion == 0) {
             throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
-        }
+        } else
+            logger.info("Save process definition complete, processCode:{}, processVersion:{}.",
+                    processDefinition.getCode(), insertVersion);
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(),
                 insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
@@ -679,6 +681,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.info("The task has not changed, so skip");
         }
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
+            logger.error("Update task definitions error, projectCode:{}, processCode:{}.",
+                    processDefinition.getProjectCode(), processDefinition.getCode());
             putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
@@ -710,12 +714,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (insertVersion <= 0) {
                 putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            }
+            } else
+                logger.info("Update process definition complete, processCode:{}, processVersion:{}.",
+                        processDefinition.getCode(), insertVersion);
 
             taskUsedInOtherTaskValid(processDefinition, taskRelationList);
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                     processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
             if (insertResult == Constants.EXIT_CODE_SUCCESS) {
+                logger.info(
+                        "Update process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+                        processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
                 putMsg(result, Status.SUCCESS);
                 result.put(Constants.DATA_LIST, processDefinition);
             } else {
@@ -724,6 +733,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             saveOtherRelation(loginUser, processDefinition, result, otherParamsJson);
         } else {
+            logger.info(
+                    "Process definition does not need to be updated because there is no change, projectCode:{}, processCode:{}, processVersion:{}.",
+                    processDefinition.getProjectCode(), processDefinition.getCode(), processDefinition.getVersion());
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
         }
@@ -779,6 +791,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessInstance> processInstances = processInstanceService
                 .queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
+            logger.warn(
+                    "Process definition can not be deleted because there are {} executing process instances, processDefinitionCode:{}",
+                    processInstances.size(), processDefinition.getCode());
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processInstances.size());
         }
 
@@ -790,6 +805,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     .map(task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(),
                             task.getTaskName()))
                     .collect(Collectors.joining(Constants.COMMA));
+            logger.warn(
+                    "Process definition can not be deleted due to being referenced by other tasks:{}, processDefinitionCode:{}",
+                    taskDepDetail, processDefinition.getCode());
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, taskDepDetail);
         }
     }
@@ -820,6 +838,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // Determine if the login user is the owner of the process definition
         if (loginUser.getId() != processDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
+            logger.warn("User does not have permission for process definition, userId:{}, processDefinitionCode:{}.",
+                    loginUser.getId(), code);
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -832,11 +852,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
                 int delete = scheduleMapper.deleteById(scheduleObj.getId());
                 if (delete == 0) {
+                    logger.error(
+                            "Delete schedule of process definition error, processDefinitionCode:{}, scheduleId:{}.",
+                            code, scheduleObj.getId());
                     putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
                     throw new ServiceException(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
                 }
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
+                logger.warn(
+                        "Process definition can not be deleted due to schedule {}, processDefinitionCode:{}, scheduleId:{}.",
+                        ReleaseState.ONLINE.getDescp(), processDefinition.getCode(), scheduleObj.getId());
                 putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, scheduleObj.getId());
                 return result;
             }
@@ -848,7 +874,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if (deleteRelation == 0) {
-            logger.warn("The process definition has not relation, it will be delete successfully");
+            logger.warn(
+                    "The process definition has not relation, it will be delete successfully, processDefinitionCode:{}.",
+                    code);
         }
         deleteOtherRelation(project, result, processDefinition);
         putMsg(result, Status.SUCCESS);
@@ -897,22 +925,31 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
+                logger.info("Set process definition online, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                        code);
                 break;
             case OFFLINE:
                 processDefinition.setReleaseState(releaseState);
                 int updateProcess = processDefinitionMapper.updateById(processDefinition);
                 Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(code);
-                if (updateProcess > 0 && schedule != null) {
-                    logger.info("set schedule offline, project code: {}, schedule id: {}, process definition code: {}",
-                            projectCode, schedule.getId(), code);
-                    // set status
-                    schedule.setReleaseState(releaseState);
-                    int updateSchedule = scheduleMapper.updateById(schedule);
-                    if (updateSchedule == 0) {
-                        putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
-                        throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
+                if (updateProcess > 0) {
+                    logger.info("Set process definition offline, projectCode:{}, processDefinitionCode:{}.",
+                            projectCode, code);
+                    if (schedule != null) {
+                        // set status
+                        schedule.setReleaseState(releaseState);
+                        int updateSchedule = scheduleMapper.updateById(schedule);
+                        if (updateSchedule == 0) {
+                            logger.error(
+                                    "Set schedule offline error, projectCode:{}, processDefinitionCode:{}, scheduleId:{}",
+                                    projectCode, code, schedule.getId());
+                            putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
+                            throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
+                        } else
+                            logger.info("Set schedule offline, projectCode:{}, processDefinitionCode:{}, scheduleId:{}",
+                                    projectCode, code, schedule.getId());
+                        schedulerService.deleteSchedule(project.getId(), schedule.getId());
                     }
-                    schedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             default:
@@ -1272,6 +1309,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
         } catch (CodeGenerateException e) {
+            logger.error(
+                    "Save process definition error because generate process definition code error, projectCode:{}.",
+                    projectCode, e);
             putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             return false;
         }
@@ -1294,7 +1334,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 taskCodeMap.put(taskDefinitionLog.getCode(), code);
                 taskDefinitionLog.setCode(code);
             } catch (CodeGenerateException e) {
-                logger.error("Task code get error, ", e);
+                logger.error("Generate task definition code error, projectCode:{}, processDefinitionCode:{}",
+                        projectCode, processDefinition.getCode(), e);
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return false;
             }
@@ -1303,6 +1344,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
+            logger.error("Save task definition error, projectCode:{}, processDefinitionCode:{}", projectCode,
+                    processDefinition.getCode());
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
@@ -1345,6 +1388,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(createDagResult, Status.SUCCESS);
         } else {
             result.putAll(createDagResult);
+            logger.error("Import process definition error, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                    processDefinition.getCode());
             throw new ServiceException(Status.IMPORT_PROCESS_DEFINE_ERROR);
         }
 
@@ -1357,10 +1402,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             schedule.setUpdateTime(now);
             int scheduleInsert = scheduleMapper.insert(schedule);
             if (0 == scheduleInsert) {
+                logger.error(
+                        "Import process definition error due to save schedule fail, projectCode:{}, processDefinitionCode:{}.",
+                        projectCode, processDefinition.getCode());
                 putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
                 throw new ServiceException(Status.IMPORT_PROCESS_DEFINE_ERROR);
             }
         }
+
+        logger.info("Import process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                processDefinition.getCode());
         return true;
     }
 
@@ -1934,7 +1985,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                     throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                 }
-                processDefinition.setId(0);
+                processDefinition.setId(null);
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(getNewName(processDefinition.getName(), COPY_SUFFIX));
                 final Date date = new Date();
@@ -1967,6 +2018,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs,
                             otherParamsJson));
                 } catch (Exception e) {
+                    logger.error("Copy process definition error, processDefinitionCode from {} to {}.",
+                            oldProcessDefinitionCode, processDefinition.getCode(), e);
                     putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);
                 }
@@ -1975,6 +2028,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null,
                             Lists.newArrayList(), otherParamsJson));
                 } catch (Exception e) {
+                    logger.error("Move process definition error, processDefinitionCode:{}.",
+                            processDefinition.getCode(), e);
                     putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.MOVE_PROCESS_DEFINITION_ERROR);
                 }
@@ -2030,6 +2085,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (Objects.isNull(processDefinition) || projectCode != processDefinition.getProjectCode()) {
+            logger.error(
+                    "Switch process definition error because it does not exist, projectCode:{}, processDefinitionCode:{}.",
+                    projectCode, code);
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_ERROR, code);
             return result;
         }
@@ -2037,15 +2095,23 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinitionLog processDefinitionLog =
                 processDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
         if (Objects.isNull(processDefinitionLog)) {
+            logger.error(
+                    "Switch process definition error because version does not exist, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    projectCode, code, version);
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR,
                     processDefinition.getCode(), version);
             return result;
         }
         int switchVersion = processService.switchVersion(processDefinition, processDefinitionLog);
         if (switchVersion <= 0) {
+            logger.error(
+                    "Switch process definition version error, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    projectCode, code, version);
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
             throw new ServiceException(Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
         }
+        logger.info("Switch process definition version complete, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                projectCode, code, version);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -2062,14 +2128,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private void checkBatchOperateResult(long srcProjectCode, long targetProjectCode,
                                          Map<String, Object> result, List<String> failedProcessList, boolean isCopy) {
         if (!failedProcessList.isEmpty()) {
+            String failedProcess = String.join(",", failedProcessList);
             if (isCopy) {
-                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode,
-                        String.join(",", failedProcessList));
+                logger.error(
+                        "Copy process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
+                        srcProjectCode, targetProjectCode, failedProcess);
+                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
             } else {
-                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode,
-                        String.join(",", failedProcessList));
+                logger.error(
+                        "Move process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
+                        srcProjectCode, targetProjectCode, failedProcess);
+                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
             }
         } else {
+            logger.info("Batch {} process definition complete, srcProjectCode:{}, targetProjectCode:{}.",
+                    isCopy ? "copy" : "move", srcProjectCode, targetProjectCode);
             putMsg(result, Status.SUCCESS);
         }
     }
@@ -2136,16 +2209,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
         } else {
             if (processDefinition.getVersion() == version) {
+                logger.warn(
+                        "Process definition can not be deleted due to version is being used, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                        projectCode, code, version);
                 putMsg(result, Status.MAIN_TABLE_USING_VERSION);
                 return result;
             }
             int deleteLog = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
             int deleteRelationLog = processTaskRelationLogMapper.deleteByCode(code, version);
             if (deleteLog == 0 || deleteRelationLog == 0) {
+                logger.error(
+                        "Delete process definition version error, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                        projectCode, code, version);
                 putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
             }
             deleteOtherRelation(project, result, processDefinition);
+            logger.info(
+                    "Delete process definition version complete, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    projectCode, code, version);
             putMsg(result, Status.SUCCESS);
         }
         return result;
@@ -2255,7 +2337,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Date now = new Date();
         scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
         if (DateUtils.differSec(scheduleObj.getStartTime(), scheduleObj.getEndTime()) == 0) {
-            logger.warn("The start time must not be the same as the end");
+            logger.warn("The schedule start time must not be the same as the end, processDefinitionCode:{}.",
+                    processDefinition.getCode());
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
             return result;
         }
@@ -2476,6 +2559,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     int updateSchedule = scheduleMapper.updateById(scheduleObj);
                     if (updateSchedule == 0) {
+                        logger.error(
+                                "Set schedule offline error, projectCode:{}, processDefinitionCode:{}, scheduleId:{}",
+                                projectCode, code, scheduleObj.getId());
                         putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
                         throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
                     }
