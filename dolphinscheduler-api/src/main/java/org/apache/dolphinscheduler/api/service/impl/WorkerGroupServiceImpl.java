@@ -400,4 +400,21 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return result;
     }
 
+    /**
+     * get all worker group names
+     *
+     * @return worker group name list
+     */
+    @Override
+    public List<String> getAllWorkerGroupNames() {
+        List<WorkerGroup> workerGroups = getWorkerGroups(false, null);
+        List<String> availableWorkerGroupList = workerGroups.stream()
+            .map(WorkerGroup::getName)
+            .collect(Collectors.toList());
+        if (!availableWorkerGroupList.contains(Constants.DEFAULT_WORKER_GROUP)) {
+            availableWorkerGroupList.add(Constants.DEFAULT_WORKER_GROUP);
+        }
+        return availableWorkerGroupList;
+    }
+
 }

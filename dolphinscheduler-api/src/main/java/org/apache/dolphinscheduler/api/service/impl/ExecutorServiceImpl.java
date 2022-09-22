@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -59,6 +60,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -144,6 +146,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Autowired
+    private WorkerGroupService workerGroupService;
 
     /**
      * execute process instance
@@ -306,8 +311,61 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             logger.warn("Subprocess definition of process definition is not {}, processDefinitionCode:{}.", ReleaseState.ONLINE.getDescp(), processDefineCode);
             putMsg(result, Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
         } else {
-            result.put(Constants.STATUS, Status.SUCCESS);
+            List<String> workerGroupNames = workerGroupService.getAllWorkerGroupNames();
+            return checkWorkerGroupNameExists(processDefinition, workerGroupNames);
         }
+        return result;
+    }
+
+    /**
+     * check whether worker group is available
+     *
+     * @param processDefinition process definition
+     * @param workerGroupNames worker group name list
+     * @return check result
+     */
+    public Map<String, Object> checkWorkerGroupNameExists(ProcessDefinition processDefinition,
+        List<String> workerGroupNames) {
+        Map<String, Object> result = new HashMap<>();
+        // get all task definitions in this process definition
+        List<ProcessTaskRelation> processTaskRelations = processService
+            .findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
+        List<TaskDefinitionLog> taskDefinitionLogList = processService
+            .genTaskDefineList(processTaskRelations);
+        List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream()
+            .map(t -> (TaskDefinition) t).collect(
+                Collectors.toList());
+
+        for (TaskDefinition taskDefinition : taskDefinitions) {
+            if (!workerGroupNames.contains(taskDefinition.getWorkerGroup())) {
+                logger.error("Cannot find worker group {} configured on task definition named {} ",
+                    taskDefinition.getWorkerGroup(), taskDefinition.getName());
+                putMsg(result, Status.WORKER_GROUP_NOT_EXISTS, taskDefinition.getName(),
+                    taskDefinition.getWorkerGroup());
+                return result;
+            }
+
+            if (TaskConstants.TASK_TYPE_SUB_PROCESS
+                .equalsIgnoreCase(taskDefinition.getTaskType())) {
+                long subProcessCode = Long
+                    .parseLong(JSONUtils.getNodeString(taskDefinition.getTaskParams(),
+                        Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE));
+
+                ProcessDefinition subProcessDefinition = processDefinitionMapper
+                    .queryByCode(subProcessCode);
+                if (subProcessDefinition == null) {
+                    putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(subProcessCode));
+                    return result;
+                }
+                // check all sub process recursively
+                Map<String, Object> subResult = checkWorkerGroupNameExists(subProcessDefinition,
+                    workerGroupNames);
+                if (subResult.get(Constants.STATUS) != Status.SUCCESS) {
+                    return subResult;
+                }
+            }
+        }
+        result.put(Constants.STATUS, Status.SUCCESS);
         return result;
     }
 
@@ -817,10 +875,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     logger.info("Creating command, commandInfo:{}.", command);
                     createCount = processService.createCommand(command);
-                    if (createCount > 0)
+                    if (createCount > 0) {
                         logger.info("Create {} command complete, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                    else
+                    } else {
                         logger.error("Create {} command error, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    }
                 }
                 if (startDate != null && endDate != null) {
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startDate);
@@ -828,10 +887,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     logger.info("Creating command, commandInfo:{}.", command);
                     createCount = processService.createCommand(command);
-                    if (createCount > 0)
+                    if (createCount > 0) {
                         logger.info("Create {} command complete, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                    else
+                    } else {
                         logger.error("Create {} command error, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    }
                     // dependent process definition
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
                             command.getProcessDefinitionCode());
@@ -885,10 +945,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                     DateUtils.dateToString(listDate.get(endDateIndex)));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             logger.info("Creating command, commandInfo:{}.", command);
-                            if (processService.createCommand(command) > 0)
+                            if (processService.createCommand(command) > 0) {
                                 logger.info("Create {} command complete, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                            else
+                            } else {
                                 logger.error("Create {} command error, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            }
                             if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
                                 logger.info("Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, processDefinitionCode:{}.", command.getProcessDefinitionCode());
                             } else {
@@ -911,10 +972,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(COMMA, stringDate));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             logger.info("Creating command, commandInfo:{}.", command);
-                            if (processService.createCommand(command) > 0)
+                            if (processService.createCommand(command) > 0) {
                                 logger.info("Create {} command complete, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                            else
+                            } else {
                                 logger.error("Create {} command error, processDefinitionCode:{}", command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            }
                         }
                     }
                 }
