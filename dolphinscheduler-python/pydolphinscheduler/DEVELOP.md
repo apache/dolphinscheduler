@@ -260,4 +260,4 @@ users who may use it in other way.
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 [coverage]: https://coverage.readthedocs.io/en/stable/
 [isort]: https://pycqa.github.io/isort/index.html
-[sphinx]: https://www.sphinx-doc.org/en/mas-->
+[sphinx]: https://www.sphinx-doc.org/en/master/
