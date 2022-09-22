@@ -48,6 +48,7 @@ class User(BaseSide):
         status: Optional[int] = configuration.USER_STATE,
     ):
         super().__init__(name)
+        self.user_id: Optional[int] = None
         self.password = password
         self.email = email
         self.phone = phone
@@ -64,7 +65,7 @@ class User(BaseSide):
         """Create User if not exists."""
         # Should make sure queue already exists.
         self.create_tenant_if_not_exists()
-        JavaGate().create_user(
+        user = JavaGate().create_user(
             self.name,
             self.password,
             self.email,
@@ -73,5 +74,57 @@ class User(BaseSide):
             self.queue,
             self.status,
         )
+        self.user_id = user.getId()
         # TODO recover result checker
         # gateway_result_checker(result, None)
+
+    @classmethod
+    def get_user(cls, user_id) -> "User":
+        """Get User."""
+        user = JavaGate().query_user(user_id)
+        if user is None:
+            return cls("")
+        user_id = user.getId()
+        user = cls(
+            name=user.getUserName(),
+            password=user.getUserPassword(),
+            email=user.getEmail(),
+            phone=user.getPhone(),
+            tenant=user.getTenantCode(),
+            queue=user.getQueueName(),
+            status=user.getState(),
+        )
+        user.user_id = user_id
+        return user
+
+    def update(
+        self,
+        password=None,
+        email=None,
+        phone=None,
+        tenant=None,
+        queue=None,
+        status=None,
+    ) -> None:
+        """Update User."""
+        user = JavaGate().update_user(
+            self.name,
+            password,
+            email,
+            phone,
+            tenant,
+            queue,
+            status,
+        )
+        self.user_id = user.getId()
+        self.name = user.getUserName()
+        self.password = user.getUserPassword()
+        self.email = user.getEmail()
+        self.phone = user.getPhone()
+        self.queue = user.getQueueName()
+        self.status = user.getState()
+
+    def delete(self) -> None:
+        """Delete User."""
+        JavaGate().delete_user(self.name, self.user_id)
+        self.delete_all()
