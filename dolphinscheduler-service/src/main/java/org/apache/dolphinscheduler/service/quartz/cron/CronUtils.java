@@ -29,18 +29,22 @@ import static com.cronutils.model.CronType.QUARTZ;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -225,6 +229,9 @@ public class CronUtils {
             logger.error(e.getMessage(), e);
             return Collections.emptyList();
         }
+        String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        ZoneId zoneId = StringUtils.isNotEmpty(timezone) ? ZoneId.of(timezone) : ZoneId.systemDefault();
+        cronExpression.setTimeZone(TimeZone.getTimeZone(zoneId));
         return getSelfFireDateList(startTime, endTime, cronExpression);
     }
 

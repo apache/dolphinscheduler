@@ -622,9 +622,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
 
         if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,
-                cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)
-                    .substring(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).indexOf(COMMA) + 1));
+            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, JSONUtils.toJsonString(complementListDate.subList(1, complementListDate.size())));
         }
 
         if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
@@ -848,18 +846,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 // reset global params while there are start parameters
                 setGlobalParamIfCommanded(processDefinition, cmdParam);
 
-                Date start = null;
-                Date end = null;
-                if(cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE) && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_END_DATE)){
-                    start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-                    end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-                }
-                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
                 if (complementListDate.isEmpty() && needComplementProcess()) {
-                    complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
-                    logger.info(" process definition code:{} complement data: {}",
-                                processInstance.getProcessDefinitionCode(),
-                                complementListDate.toString());
+                    complementListDate = JSONUtils.toList(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST), Date.class);
+                    logger.info("process definition code:{}, complement data: {}", processInstance.getProcessDefinitionCode(), complementListDate.toString());
 
                     if (!complementListDate.isEmpty() && Flag.NO == processInstance.getIsSubProcess()) {
                         processInstance.setScheduleTime(complementListDate.get(0));
