@@ -341,10 +341,6 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         processDefinitionMapper.insert(definition);
         taskInstanceMapper.updateById(task);
 
-        List<ExecuteStatusCount> count = taskInstanceMapper.countTaskInstanceStateByProjectCodes(
-            null, null,
-            new Long[] {definition.getProjectCode()});
-
         processDefinitionMapper.deleteById(definition.getId());
         taskInstanceMapper.deleteById(task.getId());
     }
