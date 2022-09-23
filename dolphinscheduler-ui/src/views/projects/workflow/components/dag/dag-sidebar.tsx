@@ -99,7 +99,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.fav')}
               name='0'
-              class='fav'
+              class='task-cate-fav'
               v-slots={{
                 default: () => {
                   return variables.fav.map((task: any) => (
@@ -152,7 +152,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.universal')}
               name='1'
-              class='universal'
+              class='task-cate-universal'
               v-slots={{
                 default: () => {
                   return variables.universal.map((task: any) => (
@@ -205,7 +205,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.cloud')}
               name='2'
-              class='cloud'
+              class='task-cate-cloud'
               v-slots={{
                 default: () => {
                   return variables.cloud.map((task: any) => (
@@ -258,7 +258,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.logic')}
               name='3'
-              class='logic'
+              class='task-cate-logic'
               v-slots={{
                 default: () => {
                   return variables.logic.map((task: any) => (
@@ -311,7 +311,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.di')}
               name='4'
-              class='di'
+              class='task-cate-di'
               v-slots={{
                 default: () => {
                   return variables.di.map((task: any) => (
@@ -364,7 +364,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.dq')}
               name='5'
-              class='dq'
+              class='task-cate-dq'
               v-slots={{
                 default: () => {
                   return variables.dq.map((task: any) => (
@@ -417,7 +417,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.other')}
               name='6'
-              class='other'
+              class='task-cate-other'
               v-slots={{
                 default: () => {
                   return variables.other.map((task: any) => (
