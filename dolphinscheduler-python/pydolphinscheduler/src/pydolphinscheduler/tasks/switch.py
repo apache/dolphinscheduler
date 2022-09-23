@@ -134,6 +134,11 @@ class Switch(Task):
     if task `switch` in this workflow.
     """
 
+    _task_ignore_attr = {
+        "condition_result",
+        "dependence",
+    }
+
     def __init__(self, name: str, condition: SwitchCondition, *args, **kwargs):
         super().__init__(name, TaskType.SWITCH, *args, **kwargs)
         self.condition = condition

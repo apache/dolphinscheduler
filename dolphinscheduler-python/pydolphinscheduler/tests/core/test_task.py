@@ -18,6 +18,7 @@
 """Test Task class function."""
 import logging
 import re
+from typing import Set
 from unittest.mock import PropertyMock, patch
 
 import pytest
@@ -26,11 +27,77 @@ from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task, TaskRelation
 from pydolphinscheduler.exceptions import PyResPluginException
 from pydolphinscheduler.resources_plugin import Local
-from tests.testing.task import Task as testTask
+from tests.testing.task import Task as TestTask
 from tests.testing.task import TaskWithCode
 
 TEST_TASK_RELATION_SET = set()
 TEST_TASK_RELATION_SIZE = 0
+
+
+@pytest.mark.parametrize(
+    "addition, ignore, expect",
+    [
+        (
+            set(),
+            set(),
+            {
+                "local_params",
+                "resource_list",
+                "dependence",
+                "wait_start_timeout",
+                "condition_result",
+            },
+        ),
+        (
+            set(),
+            {"dependence", "condition_result", "not_exists"},
+            {
+                "local_params",
+                "resource_list",
+                "wait_start_timeout",
+            },
+        ),
+        (
+            {
+                "not_exists_1",
+                "not_exists_2",
+            },
+            set(),
+            {
+                "not_exists_1",
+                "not_exists_2",
+                "local_params",
+                "resource_list",
+                "dependence",
+                "wait_start_timeout",
+                "condition_result",
+            },
+        ),
+        # test addition and ignore conflict to see behavior
+        (
+            {
+                "not_exists",
+            },
+            {"condition_result", "not_exists"},
+            {
+                "not_exists",
+                "local_params",
+                "resource_list",
+                "dependence",
+                "wait_start_timeout",
+            },
+        ),
+    ],
+)
+def test__get_attr(addition: Set, ignore: Set, expect: Set):
+    """Test task function `_get_attr`."""
+    task = TestTask(
+        name="test-get-attr",
+        task_type="test",
+    )
+    task._task_custom_attr = addition
+    task._task_ignore_attr = ignore
+    assert task._get_attr() == expect
 
 
 @pytest.mark.parametrize(
@@ -74,7 +141,7 @@ TEST_TASK_RELATION_SIZE = 0
 )
 def test_property_task_params(mock_resource, mock_user_name, attr, expect):
     """Test class task property."""
-    task = testTask(
+    task = TestTask(
         "test-property-task-params",
         "test-task",
         **attr,
@@ -184,8 +251,8 @@ def test_two_tasks_shift(shift: str):
 
     Here we test both `>>` and `<<` bit operator.
     """
-    upstream = testTask(name="upstream", task_type=shift)
-    downstream = testTask(name="downstream", task_type=shift)
+    upstream = TestTask(name="upstream", task_type=shift)
+    downstream = TestTask(name="downstream", task_type=shift)
     if shift == "<<":
         downstream << upstream
     elif shift == ">>":
@@ -221,10 +288,10 @@ def test_tasks_list_shift(dep_expr: str, flag: str):
         "downstream": "upstream",
     }
     task_type = "dep_task_and_tasks"
-    task = testTask(name="upstream", task_type=task_type)
+    task = TestTask(name="upstream", task_type=task_type)
     tasks = [
-        testTask(name="downstream1", task_type=task_type),
-        testTask(name="downstream2", task_type=task_type),
+        TestTask(name="downstream1", task_type=task_type),
+        TestTask(name="downstream2", task_type=task_type),
     ]
 
     # Use build-in function eval to simply test case and reduce duplicate code
