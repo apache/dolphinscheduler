@@ -84,6 +84,7 @@ public class ParameterUtils {
         if (!StringUtils.isEmpty(inputString)) {
             return inputString.replace("%", "////%").replaceAll("[\n|\r\t]", "_");
         }
+
         return inputString;
     }
 
