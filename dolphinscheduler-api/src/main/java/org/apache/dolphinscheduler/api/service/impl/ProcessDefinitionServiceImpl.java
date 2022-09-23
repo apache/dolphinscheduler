@@ -339,7 +339,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * create process definition V2
+     * create single process definition
      *
      * @param loginUser login user
      * @param workflowCreateRequest the new workflow object will be created
@@ -347,7 +347,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     @Transactional
-    public ProcessDefinition createProcessDefinitionV2(User loginUser, WorkflowCreateRequest workflowCreateRequest) {
+    public ProcessDefinition createSingleProcessDefinition(User loginUser,
+                                                           WorkflowCreateRequest workflowCreateRequest) {
         ProcessDefinition processDefinition = workflowCreateRequest.convert2ProcessDefinition();
         this.createWorkflowValid(loginUser, processDefinition);
 
@@ -2667,7 +2668,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * update resource workflow V2
+     * update single resource workflow
      *
      * @param loginUser     login user
      * @param workflowCode     workflow resource code want to update
@@ -2676,9 +2677,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     @Transactional
-    public ProcessDefinition updateProcessDefinitionV2(User loginUser,
-                                                       long workflowCode,
-                                                       WorkflowUpdateRequest workflowUpdateRequest) {
+    public ProcessDefinition updateSingleProcessDefinition(User loginUser,
+                                                           long workflowCode,
+                                                           WorkflowUpdateRequest workflowUpdateRequest) {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(workflowCode);
         // check process definition exists
         if (processDefinition == null) {

@@ -80,7 +80,7 @@ public class WorkflowV2Controller extends BaseController {
     public Result<ProcessDefinition> createWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @RequestBody WorkflowCreateRequest workflowCreateRequest) {
         ProcessDefinition processDefinition =
-                processDefinitionService.createProcessDefinitionV2(loginUser, workflowCreateRequest);
+                processDefinitionService.createSingleProcessDefinition(loginUser, workflowCreateRequest);
         return Result.success(processDefinition);
     }
 
@@ -122,7 +122,7 @@ public class WorkflowV2Controller extends BaseController {
                                                     @PathVariable("code") Long code,
                                                     @RequestBody WorkflowUpdateRequest workflowUpdateRequest) {
         ProcessDefinition processDefinition =
-                processDefinitionService.updateProcessDefinitionV2(loginUser, code, workflowUpdateRequest);
+                processDefinitionService.updateSingleProcessDefinition(loginUser, code, workflowUpdateRequest);
         return Result.success(processDefinition);
     }
 

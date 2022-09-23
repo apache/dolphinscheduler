@@ -91,7 +91,7 @@ public class WorkflowV2ControllerTest {
         workflowCreateRequest.setWarningGroupId(warningGroupId);
         workflowCreateRequest.setExecutionType(executionType);
 
-        Mockito.when(processDefinitionService.createProcessDefinitionV2(user, workflowCreateRequest))
+        Mockito.when(processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest))
                 .thenReturn(this.getProcessDefinition(name));
         Result<ProcessDefinition> resourceResponse = workflowV2Controller.createWorkflow(user, workflowCreateRequest);
         Assert.assertEquals(this.getProcessDefinition(name), resourceResponse.getData());
@@ -102,7 +102,7 @@ public class WorkflowV2ControllerTest {
         WorkflowUpdateRequest workflowUpdateRequest = new WorkflowUpdateRequest();
         workflowUpdateRequest.setName(newName);
 
-        Mockito.when(processDefinitionService.updateProcessDefinitionV2(user, 1L, workflowUpdateRequest))
+        Mockito.when(processDefinitionService.updateSingleProcessDefinition(user, 1L, workflowUpdateRequest))
                 .thenReturn(this.getProcessDefinition(newName));
         Result<ProcessDefinition> resourceResponse =
                 workflowV2Controller.updateWorkflow(user, 1L, workflowUpdateRequest);

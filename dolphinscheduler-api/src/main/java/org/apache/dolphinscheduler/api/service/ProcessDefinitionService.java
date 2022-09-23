@@ -77,7 +77,7 @@ public interface ProcessDefinitionService {
      * @param workflowCreateRequest the new workflow object will be created
      * @return New ProcessDefinition object created just now
      */
-    ProcessDefinition createProcessDefinitionV2(User loginUser, WorkflowCreateRequest workflowCreateRequest);
+    ProcessDefinition createSingleProcessDefinition(User loginUser, WorkflowCreateRequest workflowCreateRequest);
 
     /**
      * query process definition list
@@ -467,9 +467,9 @@ public interface ProcessDefinitionService {
      * @param workflowUpdateRequest workflow update requests
      * @return ProcessDefinition instance
      */
-    ProcessDefinition updateProcessDefinitionV2(User loginUser,
-                                                long workflowCode,
-                                                WorkflowUpdateRequest workflowUpdateRequest);
+    ProcessDefinition updateSingleProcessDefinition(User loginUser,
+                                                    long workflowCode,
+                                                    WorkflowUpdateRequest workflowUpdateRequest);
 
     /**
      * release process definition and schedule
