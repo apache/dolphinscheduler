@@ -99,6 +99,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.fav')}
               name='0'
+              class='fav'
               v-slots={{
                 default: () => {
                   return variables.fav.map((task: any) => (
@@ -151,6 +152,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.universal')}
               name='1'
+              class='universal'
               v-slots={{
                 default: () => {
                   return variables.universal.map((task: any) => (
@@ -203,6 +205,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.cloud')}
               name='2'
+              class='cloud'
               v-slots={{
                 default: () => {
                   return variables.cloud.map((task: any) => (
@@ -255,6 +258,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.logic')}
               name='3'
+              class='logic'
               v-slots={{
                 default: () => {
                   return variables.logic.map((task: any) => (
@@ -307,6 +311,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.di')}
               name='4'
+              class='di'
               v-slots={{
                 default: () => {
                   return variables.di.map((task: any) => (
@@ -359,6 +364,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.dq')}
               name='5'
+              class='dq'
               v-slots={{
                 default: () => {
                   return variables.dq.map((task: any) => (
@@ -411,6 +417,7 @@ export default defineComponent({
             <NCollapseItem
               title={t('project.menu.other')}
               name='6'
+              class='other'
               v-slots={{
                 default: () => {
                   return variables.other.map((task: any) => (
