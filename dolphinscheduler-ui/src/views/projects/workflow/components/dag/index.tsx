@@ -54,6 +54,7 @@ import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
 import utils from '@/utils'
+import { useLogTimerStore } from '@/store/logTimer/logTimer'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -232,6 +233,7 @@ export default defineComponent({
     const handleViewLog = (taskId: number, taskType: string) => {
       taskModalVisible.value = false
       viewLog(taskId, taskType)
+      console.log('start get logs');
       getLogs()
     }
 
@@ -307,6 +309,8 @@ export default defineComponent({
     )
 
     onBeforeUnmount(() => clearInterval(statusTimerRef.value))
+
+    console.log('test view log');
 
     return () => (
       <div

@@ -74,21 +74,27 @@ const TaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
-    const getLogs = (row: any) => {
+    const getLogs = (row: any, logTimer: number) => {
+      console.log('hi', logTimer);
+
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: Number(row.id),
           limit: variables.limit,
           skipLineNum: variables.skipLineNum
-        }).then((res: string) => {
-          variables.logRef += res
+        }).then((res: any) => {
+          console.log('res', res);
+
+          variables.logRef += res.message || '';
           if (res) {
             variables.limit += 1000
             variables.skipLineNum += 1000
-            getLogs(row)
+            getLogs(row, logTimer);
           } else {
             variables.logLoadingRef = false
           }
+        }).catch((error: string) => {
+          console.log(`error occurs ${error}`);
         }),
         {}
       )
@@ -96,11 +102,10 @@ const TaskInstance = defineComponent({
       return state
     }
 
-    const refreshLogs = (row: any, logTimer: number) => {
+    const refreshLogs = (row: any) => {
       variables.logRef = ''
       variables.limit = 1000
       variables.skipLineNum = 0
-      const delayGetLogsId = setInterval(getLogs.bind(row), logTimer);
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -118,7 +123,10 @@ const TaskInstance = defineComponent({
       () => variables.showModalRef,
       () => {
         if (variables.showModalRef) {
-          getLogs(variables.row)
+          console.log('variables row', variables.row);
+
+          // get logs is called 
+          getLogs(variables.row, logTimer)
         } else {
           variables.row = {}
           variables.logRef = ''
@@ -151,6 +159,8 @@ const TaskInstance = defineComponent({
       loadingRef,
       refreshLogs
     } = this
+
+    console.log('hi');
 
     return (
       <>
