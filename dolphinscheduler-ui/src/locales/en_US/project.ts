@@ -779,5 +779,14 @@ export default {
     pytorch_conda_python_version: 'Python Version',
     pytorch_conda_python_version_tips:
       'Please enter the version number, such as 3.6, 3.7, 3.x'
+  },
+  menu: {
+    fav: 'Favorites',
+    universal: 'Universal',
+    cloud: 'Cloud',
+    logic: 'Logic',
+    di: 'Data Integration',
+    dq: 'Data Quality',
+    other: 'Other',
   }
 }

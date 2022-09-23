@@ -25,6 +25,7 @@ import {
   Collection,
   getDagMenu
 } from '@/service/modules/dag-menu'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   name: 'workflow-dag-sidebar',
@@ -40,6 +41,8 @@ export default defineComponent({
       other: [],
       fav: []
     })
+
+    const { t } = useI18n()
 
     const handleDagMenu = () => {
       getDagMenu().then((res: any) => {
@@ -94,7 +97,7 @@ export default defineComponent({
         <NCollapse default-expanded-names='1' accordion>
           {variables.fav.length > 0 && (
             <NCollapseItem
-              title='收藏组件'
+              title={t('project.menu.fav')}
               name='0'
               v-slots={{
                 default: () => {
@@ -146,7 +149,7 @@ export default defineComponent({
           )}
           {variables.universal.length > 0 && (
             <NCollapseItem
-              title='通用组件'
+              title={t('project.menu.universal')}
               name='1'
               v-slots={{
                 default: () => {
@@ -198,7 +201,7 @@ export default defineComponent({
           )}
           {variables.cloud.length > 0 && (
             <NCollapseItem
-              title='云'
+              title={t('project.menu.cloud')}
               name='2'
               v-slots={{
                 default: () => {
@@ -250,7 +253,7 @@ export default defineComponent({
           )}
           {variables.logic.length > 0 && (
             <NCollapseItem
-              title='逻辑节点'
+              title={t('project.menu.logic')}
               name='3'
               v-slots={{
                 default: () => {
@@ -302,7 +305,7 @@ export default defineComponent({
           )}
           {variables.di.length > 0 && (
             <NCollapseItem
-              title='数据集成'
+              title={t('project.menu.di')}
               name='4'
               v-slots={{
                 default: () => {
@@ -354,7 +357,7 @@ export default defineComponent({
           )}
           {variables.dq.length > 0 && (
             <NCollapseItem
-              title='数据质量'
+              title={t('project.menu.dq')}
               name='5'
               v-slots={{
                 default: () => {
@@ -406,7 +409,7 @@ export default defineComponent({
           )}
           {variables.other.length > 0 && (
             <NCollapseItem
-              title='其他'
+              title={t('project.menu.other')}
               name='6'
               v-slots={{
                 default: () => {
