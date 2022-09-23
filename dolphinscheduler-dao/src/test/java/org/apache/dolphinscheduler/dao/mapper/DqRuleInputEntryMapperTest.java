@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
 import java.util.List;
 
 /**
