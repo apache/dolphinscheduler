@@ -255,21 +255,20 @@
 | 13 |                      | executorMemory | String | executor内存 |
 | 14 |                      | executorCores  | String | executor核数 |
 | 15 |                      | programType    | String | 程序类型       | JAVA,SCALA,PYTHON    |
-| 16 |                      | sparkVersion   | String | Spark 版本   | SPARK1 , SPARK2      |
-| 17 |                      | localParams    | Array  | 自定义参数      |
-| 18 |                      | resourceList   | Array  | 资源文件       |
-| 19 | description          |                | String | 描述         |                      |
-| 20 | runFlag              |                | String | 运行标识       |                      |
-| 21 | conditionResult      |                | Object | 条件分支       |                      |
-| 22 |                      | successNode    | Array  | 成功跳转节点     |                      |
-| 23 |                      | failedNode     | Array  | 失败跳转节点     |
-| 24 | dependence           |                | Object | 任务依赖       | 与params互斥            |
-| 25 | maxRetryTimes        |                | String | 最大重试次数     |                      |
-| 26 | retryInterval        |                | String | 重试间隔       |                      |
-| 27 | timeout              |                | Object | 超时控制       |                      |
-| 28 | taskInstancePriority |                | String | 任务优先级      |                      |
-| 29 | workerGroup          |                | String | Worker 分组  |                      |
-| 30 | preTasks             |                | Array  | 前置任务       |                      |
+| 16 |                      | localParams    | Array  | 自定义参数      |
+| 17 |                      | resourceList   | Array  | 资源文件       |
+| 18 | description          |                | String | 描述         |                      |
+| 19 | runFlag              |                | String | 运行标识       |                      |
+| 20 | conditionResult      |                | Object | 条件分支       |                      |
+| 21 |                      | successNode    | Array  | 成功跳转节点     |                      |
+| 22 |                      | failedNode     | Array  | 失败跳转节点     |
+| 23 | dependence           |                | Object | 任务依赖       | 与params互斥            |
+| 24 | maxRetryTimes        |                | String | 最大重试次数     |                      |
+| 25 | retryInterval        |                | String | 重试间隔       |                      |
+| 26 | timeout              |                | Object | 超时控制       |                      |
+| 27 | taskInstancePriority |                | String | 任务优先级      |                      |
+| 28 | workerGroup          |                | String | Worker 分组  |                      |
+| 29 | preTasks             |                | Array  | 前置任务       |                      |
 
 **节点数据样例:**
 
@@ -301,8 +300,7 @@
         "executorCores":2,
         "mainArgs":"10",
         "others":"",
-        "programType":"SCALA",
-        "sparkVersion":"SPARK2"
+        "programType":"SCALA"
     },
     "description":"",
     "runFlag":"NORMAL",

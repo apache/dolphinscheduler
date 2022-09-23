@@ -43,17 +43,6 @@ with ProcessDefinition(
         experiment_name="xgboost",
     )
 
-    # Using MLFLOW to deploy model from custom mlflow project
-    deploy_mlflow = MLflowModels(
-        name="deploy_mlflow",
-        model_uri="models:/xgboost_native/Production",
-        mlflow_tracking_uri=mlflow_tracking_uri,
-        deploy_mode=MLflowDeployType.MLFLOW,
-        port=7001,
-    )
-
-    train_custom >> deploy_mlflow
-
     # run automl to train model
     train_automl = MLFlowProjectsAutoML(
         name="train_automl",
@@ -88,16 +77,16 @@ with ProcessDefinition(
         search_params="max_depth=[5, 10];n_estimators=[100, 200]",
     )
 
-    # Using DOCKER COMPOSE to deploy model from train_basic_algorithm
-    deploy_docker_compose = MLflowModels(
-        name="deploy_docker_compose",
+    # Using MLFLOW to deploy model from training lightgbm project
+    deploy_mlflow = MLflowModels(
+        name="deploy_mlflow",
         model_uri="models:/iris_B/Production",
         mlflow_tracking_uri=mlflow_tracking_uri,
-        deploy_mode=MLflowDeployType.DOCKER_COMPOSE,
-        port=7003,
+        deploy_mode=MLflowDeployType.MLFLOW,
+        port=7001,
     )
 
-    train_basic_algorithm >> deploy_docker_compose
+    train_basic_algorithm >> deploy_mlflow
 
     pd.submit()
 
