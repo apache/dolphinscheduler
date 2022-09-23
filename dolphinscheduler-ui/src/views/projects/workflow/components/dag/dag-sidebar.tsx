@@ -16,7 +16,6 @@
  */
 
 import { defineComponent, onMounted, reactive } from 'vue'
-import { useTaskTypeStore } from '@/store/project'
 import styles from './dag.module.scss'
 import type { TaskType } from './types'
 import { NCollapse, NCollapseItem, NIcon } from 'naive-ui'
@@ -26,13 +25,12 @@ import {
   Collection,
   getDagMenu
 } from '@/service/modules/dag-menu'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   name: 'workflow-dag-sidebar',
   emits: ['dragStart'],
   setup(props, context) {
-    const taskTypeStore = useTaskTypeStore()
-
     const variables = reactive({
       dataList: [],
       universal: [],
@@ -43,6 +41,8 @@ export default defineComponent({
       other: [],
       fav: []
     })
+
+    const { t } = useI18n()
 
     const handleDagMenu = () => {
       getDagMenu().then((res: any) => {
@@ -93,375 +93,380 @@ export default defineComponent({
     })
 
     return () =>
-      taskTypeStore.getTaskType.length ? (
-        <div class={styles.sidebar}>
-          <NCollapse default-expanded-names='1' accordion>
-            {variables.fav.length > 0 && (
-              <NCollapseItem
-                title='收藏组件'
-                name='0'
-                v-slots={{
-                  default: () => {
-                    return variables.fav.map((task: any) => (
+      <div class={styles.sidebar}>
+        <NCollapse default-expanded-names='1' accordion>
+          {variables.fav.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.fav')}
+              name='0'
+              class='fav'
+              v-slots={{
+                default: () => {
+                  return variables.fav.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
                       <div
-                        class={[styles.draggable, `task-item-${task.type}`]}
-                        draggable='true'
-                        onDragstart={(e) => {
-                          context.emit('dragStart', e, task.type as TaskType)
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
                         }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
                       >
-                        <em
-                          class={[
-                            styles['sidebar-icon'],
-                            styles['icon-' + task.type.toLocaleLowerCase()]
-                          ]}
-                        />
-                        <span>{task.taskName}</span>
-                        <div
-                          class={styles.stars}
-                          onMouseenter={() => {
-                            task.starHover = true
-                          }}
-                          onMouseleave={() => {
-                            task.starHover = false
-                          }}
-                          onClick={() => handleCollection(task)}
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
                         >
-                          <NIcon
-                            size='20'
-                            color={
-                              task.collection || task.starHover
-                                ? '#288FFF'
-                                : '#ccc'
-                            }
-                          >
-                            {task.collection ? (
-                              <StarFilled />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </NIcon>
-                        </div>
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
                       </div>
-                    ))
-                  }
-                }}
-              ></NCollapseItem>
-            )}
-            {variables.universal.length > 0 && (
-              <NCollapseItem
-                title='通用组件'
-                name='1'
-                v-slots={{
-                  default: () => {
-                    return variables.universal.map((task: any) => (
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.universal.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.universal')}
+              name='1'
+              class='universal'
+              v-slots={{
+                default: () => {
+                  return variables.universal.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
                       <div
-                        class={[styles.draggable, `task-item-${task.type}`]}
-                        draggable='true'
-                        onDragstart={(e) => {
-                          context.emit('dragStart', e, task.type as TaskType)
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
                         }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
                       >
-                        <em
-                          class={[
-                            styles['sidebar-icon'],
-                            styles['icon-' + task.type.toLocaleLowerCase()]
-                          ]}
-                        />
-                        <span>{task.taskName}</span>
-                        <div
-                          class={styles.stars}
-                          onMouseenter={() => {
-                            task.starHover = true
-                          }}
-                          onMouseleave={() => {
-                            task.starHover = false
-                          }}
-                          onClick={() => handleCollection(task)}
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
                         >
-                          <NIcon
-                            size='20'
-                            color={
-                              task.collection || task.starHover
-                                ? '#288FFF'
-                                : '#ccc'
-                            }
-                          >
-                            {task.collection ? (
-                              <StarFilled />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </NIcon>
-                        </div>
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
                       </div>
-                    ))
-                  }
-                }}
-              ></NCollapseItem>
-            )}
-            {variables.cloud.length > 0 && (
-              <NCollapseItem
-                title='云'
-                name='2'
-                v-slots={{
-                  default: () => {
-                    return variables.cloud.map((task: any) => (
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.cloud.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.cloud')}
+              name='2'
+              class='cloud'
+              v-slots={{
+                default: () => {
+                  return variables.cloud.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
                       <div
-                        class={[styles.draggable, `task-item-${task.type}`]}
-                        draggable='true'
-                        onDragstart={(e) => {
-                          context.emit('dragStart', e, task.type as TaskType)
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
                         }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
                       >
-                        <em
-                          class={[
-                            styles['sidebar-icon'],
-                            styles['icon-' + task.type.toLocaleLowerCase()]
-                          ]}
-                        />
-                        <span>{task.taskName}</span>
-                        <div
-                          class={styles.stars}
-                          onMouseenter={() => {
-                            task.starHover = true
-                          }}
-                          onMouseleave={() => {
-                            task.starHover = false
-                          }}
-                          onClick={() => handleCollection(task)}
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
                         >
-                          <NIcon
-                            size='20'
-                            color={
-                              task.collection || task.starHover
-                                ? '#288FFF'
-                                : '#ccc'
-                            }
-                          >
-                            {task.collection ? (
-                              <StarFilled />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </NIcon>
-                        </div>
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
                       </div>
-                    ))
-                  }
-                }}
-              ></NCollapseItem>
-            )}
-            {variables.logic.length > 0 && (
-              <NCollapseItem
-                title='逻辑节点'
-                name='3'
-                v-slots={{
-                  default: () => {
-                    return variables.logic.map((task: any) => (
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.logic.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.logic')}
+              name='3'
+              class='logic'
+              v-slots={{
+                default: () => {
+                  return variables.logic.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
                       <div
-                        class={[styles.draggable, `task-item-${task.type}`]}
-                        draggable='true'
-                        onDragstart={(e) => {
-                          context.emit('dragStart', e, task.type as TaskType)
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
                         }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
                       >
-                        <em
-                          class={[
-                            styles['sidebar-icon'],
-                            styles['icon-' + task.type.toLocaleLowerCase()]
-                          ]}
-                        />
-                        <span>{task.taskName}</span>
-                        <div
-                          class={styles.stars}
-                          onMouseenter={() => {
-                            task.starHover = true
-                          }}
-                          onMouseleave={() => {
-                            task.starHover = false
-                          }}
-                          onClick={() => handleCollection(task)}
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
                         >
-                          <NIcon
-                            size='20'
-                            color={
-                              task.collection || task.starHover
-                                ? '#288FFF'
-                                : '#ccc'
-                            }
-                          >
-                            {task.collection ? (
-                              <StarFilled />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </NIcon>
-                        </div>
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
                       </div>
-                    ))
-                  }
-                }}
-              ></NCollapseItem>
-            )}
-            {variables.di.length > 0 && (
-              <NCollapseItem
-                title='数据集成'
-                name='4'
-                v-slots={{
-                  default: () => {
-                    return variables.di.map((task: any) => (
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.di.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.di')}
+              name='4'
+              class='di'
+              v-slots={{
+                default: () => {
+                  return variables.di.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
                       <div
-                        class={[styles.draggable, `task-item-${task.type}`]}
-                        draggable='true'
-                        onDragstart={(e) => {
-                          context.emit('dragStart', e, task.type as TaskType)
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
                         }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
                       >
-                        <em
-                          class={[
-                            styles['sidebar-icon'],
-                            styles['icon-' + task.type.toLocaleLowerCase()]
-                          ]}
-                        />
-                        <span>{task.taskName}</span>
-                        <div
-                          class={styles.stars}
-                          onMouseenter={() => {
-                            task.starHover = true
-                          }}
-                          onMouseleave={() => {
-                            task.starHover = false
-                          }}
-                          onClick={() => handleCollection(task)}
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
                         >
-                          <NIcon
-                            size='20'
-                            color={
-                              task.collection || task.starHover
-                                ? '#288FFF'
-                                : '#ccc'
-                            }
-                          >
-                            {task.collection ? (
-                              <StarFilled />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </NIcon>
-                        </div>
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
                       </div>
-                    ))
-                  }
-                }}
-              ></NCollapseItem>
-            )}
-            {variables.dq.length > 0 && (
-              <NCollapseItem
-                title='数据质量'
-                name='5'
-                v-slots={{
-                  default: () => {
-                    return variables.dq.map((task: any) => (
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.dq.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.dq')}
+              name='5'
+              class='dq'
+              v-slots={{
+                default: () => {
+                  return variables.dq.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
                       <div
-                        class={[styles.draggable, `task-item-${task.type}`]}
-                        draggable='true'
-                        onDragstart={(e) => {
-                          context.emit('dragStart', e, task.type as TaskType)
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
                         }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
                       >
-                        <em
-                          class={[
-                            styles['sidebar-icon'],
-                            styles['icon-' + task.type.toLocaleLowerCase()]
-                          ]}
-                        />
-                        <span>{task.taskName}</span>
-                        <div
-                          class={styles.stars}
-                          onMouseenter={() => {
-                            task.starHover = true
-                          }}
-                          onMouseleave={() => {
-                            task.starHover = false
-                          }}
-                          onClick={() => handleCollection(task)}
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
                         >
-                          <NIcon
-                            size='20'
-                            color={
-                              task.collection || task.starHover
-                                ? '#288FFF'
-                                : '#ccc'
-                            }
-                          >
-                            {task.collection ? (
-                              <StarFilled />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </NIcon>
-                        </div>
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
                       </div>
-                    ))
-                  }
-                }}
-              ></NCollapseItem>
-            )}
-            {variables.other.length > 0 && (
-              <NCollapseItem
-                title='其他'
-                name='6'
-                v-slots={{
-                  default: () => {
-                    return variables.other.map((task: any) => (
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.other.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.other')}
+              name='6'
+              class='other'
+              v-slots={{
+                default: () => {
+                  return variables.other.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
                       <div
-                        class={[styles.draggable, `task-item-${task.type}`]}
-                        draggable='true'
-                        onDragstart={(e) => {
-                          context.emit('dragStart', e, task.type as TaskType)
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
                         }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
                       >
-                        <em
-                          class={[
-                            styles['sidebar-icon'],
-                            styles['icon-' + task.type.toLocaleLowerCase()]
-                          ]}
-                        />
-                        <span>{task.taskName}</span>
-                        <div
-                          class={styles.stars}
-                          onMouseenter={() => {
-                            task.starHover = true
-                          }}
-                          onMouseleave={() => {
-                            task.starHover = false
-                          }}
-                          onClick={() => handleCollection(task)}
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
                         >
-                          <NIcon
-                            size='20'
-                            color={
-                              task.collection || task.starHover
-                                ? '#288FFF'
-                                : '#ccc'
-                            }
-                          >
-                            {task.collection ? (
-                              <StarFilled />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </NIcon>
-                        </div>
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
                       </div>
-                    ))
-                  }
-                }}
-              ></NCollapseItem>
-            )}
-          </NCollapse>
-        </div>
-      ) : null
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+        </NCollapse>
+      </div>
   }
 })
