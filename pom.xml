@@ -92,6 +92,7 @@
         <docker.tag>${project.version}</docker.tag>
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
+        <htrace.version>4.2.0-incubating</htrace.version>
 
         <python.sign.skip>true</python.sign.skip>
         <skipDepCheck>true</skipDepCheck>
