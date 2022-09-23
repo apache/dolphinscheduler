@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
+import { useI18n } from 'vue-i18n'
 import { NForm, NFormItem, NSelect } from "naive-ui";
 import { defineComponent } from "vue";
 import { useLogTimerStore } from '@/store/logTimer/logTimer'
-import type { logTimer } from '@/store/logTimer/logTimer'
+import type { logTimer } from '@/store/logTimer/types'
 import cookies from 'js-cookie'
  
 // Update LogTimer store when select value is updated
 const handleUpdateValue = (logTimer: logTimer) => {
     const logTimerStore = useLogTimerStore()
     logTimerStore.setLogTimer(logTimer)
-    cookies.set('logTimer', logTimer, { path: '/' })
+    cookies.set('logTimer', String(logTimer), { path: '/' })
 }
 
 const setting = defineComponent({
@@ -72,11 +73,12 @@ const setting = defineComponent({
         return {defaultLogTimer, logTimerMap, logTimerOptions}
     },
     render() {
+        const { t } = useI18n()
+
         return ( 
             <>
-            <div>UI Setting</div>
             <NForm>
-                <NFormItem label="Log Auto Refresh Time">
+                <NFormItem label={t('ui_setting.log.refresh_time')}>
                 <NSelect
                     default-value={this.logTimerMap[this.defaultLogTimer]}
                     options={this.logTimerOptions} 
