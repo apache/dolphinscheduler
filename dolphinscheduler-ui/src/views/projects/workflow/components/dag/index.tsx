@@ -85,6 +85,9 @@ export default defineComponent({
     const route = useRoute()
     const theme = useThemeStore()
 
+    const logTimerStore = useLogTimerStore()
+    const logTimer = logTimerStore.getLogTimer;
+
     // Whether the graph can be operated
     provide('readonly', toRef(props, 'readonly'))
 
@@ -230,27 +233,31 @@ export default defineComponent({
       saveModelToggle(false)
     }
 
-    const handleViewLog = (taskId: number, taskType: string) => {
+    const handleViewLog = (taskId: number, taskType: string, logTimer: number) => {
       taskModalVisible.value = false
       viewLog(taskId, taskType)
-      console.log('start get logs');
-      getLogs()
+      getLogs(logTimer);
     }
 
-    const getLogs = () => {
+    const getLogs = (logTimer: number) => {
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: nodeVariables.logTaskId,
           limit: nodeVariables.limit,
           skipLineNum: nodeVariables.skipLineNum
-        }).then((res: string) => {
-          nodeVariables.logRef += res
-          if (res) {
+        }).then((res: any) => {
+          nodeVariables.logRef += res.message || '';
+          if (res && res.message !== '') {
             nodeVariables.limit += 1000
             nodeVariables.skipLineNum += 1000
-            getLogs()
+            getLogs(logTimer)
           } else {
             nodeVariables.logLoadingRef = false
+            setTimeout(() => {
+              nodeVariables.limit += 1000
+              nodeVariables.skipLineNum += 1000
+              getLogs(logTimer);
+            }, logTimer* 1000);
           }
         }),
         {}
@@ -259,11 +266,11 @@ export default defineComponent({
       return state
     }
 
-    const refreshLogs = () => {
+    const refreshLogs = (logTimer: number) => {
       nodeVariables.logRef = ''
       nodeVariables.limit = 1000
       nodeVariables.skipLineNum = 0
-      getLogs()
+      getLogs(logTimer)
     }
 
     const downloadLogs = () => {
@@ -309,8 +316,6 @@ export default defineComponent({
     )
 
     onBeforeUnmount(() => clearInterval(statusTimerRef.value))
-
-    console.log('test view log');
 
     return () => (
       <div

@@ -75,23 +75,27 @@ const TaskInstance = defineComponent({
     }
 
     const getLogs = (row: any, logTimer: number) => {
-      console.log('hi', logTimer);
-
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: Number(row.id),
           limit: variables.limit,
           skipLineNum: variables.skipLineNum
         }).then((res: any) => {
-          console.log('res', res);
-
           variables.logRef += res.message || '';
-          if (res) {
+          if (res && res.message !== '') {
             variables.limit += 1000
             variables.skipLineNum += 1000
             getLogs(row, logTimer);
           } else {
+            // Automatically refresh the log based on the interval user defined in UI setting
             variables.logLoadingRef = false
+            setTimeout(() => {
+              variables.logRef = ''
+              variables.limit = 1000
+              variables.skipLineNum = 0
+              variables.logLoadingRef = true
+              getLogs(row, logTimer);
+            }, logTimer* 1000);
           }
         }).catch((error: string) => {
           console.log(`error occurs ${error}`);
@@ -123,8 +127,6 @@ const TaskInstance = defineComponent({
       () => variables.showModalRef,
       () => {
         if (variables.showModalRef) {
-          console.log('variables row', variables.row);
-
           // get logs is called 
           getLogs(variables.row, logTimer)
         } else {
@@ -159,8 +161,6 @@ const TaskInstance = defineComponent({
       loadingRef,
       refreshLogs
     } = this
-
-    console.log('hi');
 
     return (
       <>
