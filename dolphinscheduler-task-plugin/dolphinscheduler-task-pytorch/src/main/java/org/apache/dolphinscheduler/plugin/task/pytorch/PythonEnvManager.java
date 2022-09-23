@@ -40,7 +40,7 @@ public class PythonEnvManager {
 
     private static final String VIRTUALENV_BUILD = "virtualenv -p ${PYTHON_HOME} %s";
 
-    private static final String INSTALL_COMMAND = "python -m pip install -r %s";
+    private static final String INSTALL_COMMAND = "%s -m pip install -r %s";
 
     private String pythonEnvTool = ENV_TOOL_VENV;
 
@@ -54,7 +54,7 @@ public class PythonEnvManager {
         } else if (pythonEnvTool.equals(ENV_TOOL_CONDA)) {
             buildCommand = String.format(CONDA_BUILD, condaPythonVersion, CREATE_ENV_NAME);
         }
-        String installCommand = String.format(INSTALL_COMMAND, requirementPath);
+        String installCommand = String.format(INSTALL_COMMAND, getPythonCommand(), requirementPath);
 
         return buildCommand + " && " + sourceCommand + " && " + installCommand;
     }
