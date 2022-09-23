@@ -59,12 +59,21 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     @FindBy(className = "items")
     private List<WebElement> workflowList;
 
+    @FindBy(className = "n-collapse-item n-collapse-item--left-arrow-placement logic")
+    private WebElement subProcessList;
+
     public WorkflowDefinitionTab(RemoteWebDriver driver) {
         super(driver);
     }
 
     public WorkflowForm createWorkflow() {
         buttonCreateProcess().click();
+
+        return new WorkflowForm(driver);
+    }
+
+    public WorkflowForm createSubProcessWorkflow() {
+        subProcessList().click();
 
         return new WorkflowForm(driver);
     }
