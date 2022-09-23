@@ -236,8 +236,6 @@ def test_switch_get_define(mock_task_code_version):
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "dependence": {},
-            "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
             "switchResult": {
                 "dependTaskList": [
