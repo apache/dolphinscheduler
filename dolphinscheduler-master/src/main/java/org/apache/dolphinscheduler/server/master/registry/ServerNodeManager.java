@@ -186,7 +186,7 @@ public class ServerNodeManager implements InitializingBean {
         Collection<String> workerGroups = registryClient.getWorkerGroupDirectly();
         for (String workerGroup : workerGroups) {
             syncWorkerGroupNodesFromRegistry(workerGroup,
-                registryClient.getWorkerGroupNodesDirectly(workerGroup), null);
+                registryClient.getWorkerGroupNodesDirectly(workerGroup), Type.ADD);
         }
     }
 
