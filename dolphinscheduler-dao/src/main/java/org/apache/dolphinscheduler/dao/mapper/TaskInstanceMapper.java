@@ -61,6 +61,14 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                       @Param("taskIds") int[] taskIds);
 
     /**
+     * @param workerGroupName workerGroupName
+     * @param states          states array
+     * @return process instance list
+     */
+    List<TaskInstance> queryByWorkerGroupNameAndStatus(@Param("workerGroupName") String workerGroupName,
+                                                          @Param("states") int[] states);
+
+    /**
      * Statistics task instance group by given project codes list by start time
      * <p>
      * We only need project codes to determine whether the task instance belongs to the user or not.

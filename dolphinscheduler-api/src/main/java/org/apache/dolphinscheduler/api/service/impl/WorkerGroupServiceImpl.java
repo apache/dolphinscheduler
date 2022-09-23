@@ -31,9 +31,11 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -72,6 +74,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    private TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
     private RegistryClient registryClient;
@@ -379,6 +384,17 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
         }
+
+        List<TaskInstance> taskInstanceList = taskInstanceMapper
+                .queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
+        if (CollectionUtils.isNotEmpty(taskInstanceList)) {
+            List<Integer> TaskInstanceIdList = taskInstanceList.stream().map(TaskInstance::getId).collect(Collectors.toList());
+            logger.warn("Delete worker group failed because there are {} TaskInstanceIdList are using it, TaskInstanceIdList:{}.",
+                    TaskInstanceIdList.size(), TaskInstanceIdList);
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_TASK_ID_FAIL, TaskInstanceIdList.size());
+            return result;
+        }
+
         workerGroupMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), "");
         logger.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
