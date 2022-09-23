@@ -516,7 +516,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             ProcessTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, taskRelation.getProcessDefinitionCode());
             List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
-//            List<ProcessTaskRelation> relationList = Lists.newArrayList();
             for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
                 if (processTaskRelation.getPostTaskCode() == taskCode) {
                     if (queryUpStreamTaskCodeMap.containsKey(processTaskRelation.getPreTaskCode()) && processTaskRelation.getPreTaskCode() != 0L) {
@@ -524,11 +523,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     } else {
                         processTaskRelation.setPreTaskCode(0L);
                         processTaskRelation.setPreTaskVersion(0);
-//                        relationList.add(processTaskRelation);
                     }
                 }
             }
-//            processTaskRelationList.removeAll(relationList);
             for (Map.Entry<Long, TaskDefinition> queryUpStreamTask : queryUpStreamTaskCodeMap.entrySet()) {
                 ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
                 processTaskRelation.setPreTaskCode(queryUpStreamTask.getKey());
