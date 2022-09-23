@@ -231,7 +231,7 @@ class Task(Base):
         """Set attribute condition_result."""
         self._condition_result = condition_result
 
-    def _get_attr(self) -> set[str]:
+    def _get_attr(self) -> Set[str]:
         """Get final task task_params attribute.
 
         Base on `_task_default_attr`, append attribute from `_task_custom_attr` and subtract attribute from
