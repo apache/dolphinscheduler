@@ -26,3 +26,4 @@ In this section
    develop
    resource-plugin
    local
+   github

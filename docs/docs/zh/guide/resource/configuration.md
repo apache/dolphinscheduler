@@ -46,10 +46,10 @@
 # user data local directory path, please make sure the directory exists and have read write permissions
 data.basedir.path=/tmp/dolphinscheduler
 
-# resource storage type: HDFS, S3, NONE
+# resource storage type: HDFS, S3, OSS, NONE
 resource.storage.type=HDFS
 
-# resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration,
+# resource store on HDFS/S3/OSS path, resource file will store to this hadoop hdfs path, self configuration,
 # please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/tmp/dolphinscheduler
 
@@ -63,6 +63,17 @@ resource.aws.region=cn-north-1
 resource.aws.s3.bucket.name=dolphinscheduler
 # You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
 resource.aws.s3.endpoint=http://localhost:9000
+
+# alibaba cloud access key id, required if you set resource.storage.type=OSS 
+resource.alibaba.cloud.access.key.id=<your-access-key-id>
+# alibaba cloud access key secret, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.access.key.secret=<your-access-key-secret>
+# alibaba cloud region, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.region=cn-hangzhou
+# oss bucket name, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.oss.bucket.name=dolphinscheduler
+# oss bucket endpoint, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
 
 # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
 resource.hdfs.root.user=root

@@ -15,8 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.spark;
+package org.apache.dolphinscheduler.common.model;
 
-public enum SparkVersion {
-    SPARK1, SPARK2
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class OssConnection {
+
+    public String accessKeyId;
+    public String accessKeySecret;
+    public String endPoint;
+
 }

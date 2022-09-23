@@ -15,35 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.common.factory;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.common.model.OssConnection;
 
-public enum SparkVersion {
+import lombok.experimental.UtilityClass;
 
-    /**
-     * 0 SPARK1
-     * 1 SPARK2
-     * 2 SPARKSQL
-     */
-    SPARK1(0, "SPARK1"),
-    SPARK2(1, "SPARK2"),
-    SPARKSQL(2, "SPARKSQL");
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 
-    SparkVersion(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
+@UtilityClass
+public class OssClientFactory {
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
+    public OSS buildOssClient(OssConnection ossConnection) {
+        return new OSSClientBuilder().build(ossConnection.getEndPoint(),
+                ossConnection.getAccessKeyId(), ossConnection.getAccessKeySecret());
     }
 }
