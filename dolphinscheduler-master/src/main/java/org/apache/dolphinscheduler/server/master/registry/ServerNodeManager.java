@@ -82,14 +82,6 @@ public class ServerNodeManager implements InitializingBean {
     private final ReentrantReadWriteLock.ReadLock workerNodeInfoReadLock = workerNodeInfoLock.readLock();
     private final ReentrantReadWriteLock.WriteLock workerNodeInfoWriteLock = workerNodeInfoLock.writeLock();
 
-    private final ReentrantReadWriteLock registryWorkerGroupLock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock.ReadLock registryWorkerGroupReadLock = registryWorkerGroupLock.readLock();
-    private final ReentrantReadWriteLock.WriteLock registryWorkerGroupWriteLock = registryWorkerGroupLock.writeLock();
-
-    private final ReentrantReadWriteLock dbWorkerGroupLock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock.ReadLock dbWorkerGroupReadLock = dbWorkerGroupLock.readLock();
-    private final ReentrantReadWriteLock.WriteLock dbWorkerGroupWriteLock = dbWorkerGroupLock.writeLock();
-
     /**
      * worker group nodes, workerGroup -> ips, combining registryWorkerGroupNodes and dbWorkerGroupNodes
      */
@@ -205,7 +197,6 @@ public class ServerNodeManager implements InitializingBean {
 
         @Override
         public void run() {
-            dbWorkerGroupWriteLock.lock();
             try {
                 dbWorkerGroupNodes.clear();
 
@@ -232,7 +223,6 @@ public class ServerNodeManager implements InitializingBean {
             } catch (Exception e) {
                 logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             } finally {
-                dbWorkerGroupWriteLock.unlock();
                 refreshWorkerGroupNodes();
             }
         }
@@ -372,7 +362,6 @@ public class ServerNodeManager implements InitializingBean {
      */
     private void syncWorkerGroupNodesFromRegistry(String workerGroup, Collection<String> nodes,
         Type type) {
-        registryWorkerGroupWriteLock.lock();
         try {
             if (type == Type.REMOVE) {
                 if (!registryWorkerGroupNodes.containsKey(workerGroup)) {
@@ -388,7 +377,6 @@ public class ServerNodeManager implements InitializingBean {
                 registryWorkerGroupNodes.put(workerGroup, workerNodes);
             }
         } finally {
-            registryWorkerGroupWriteLock.unlock();
             refreshWorkerGroupNodes();
         }
     }
@@ -398,8 +386,6 @@ public class ServerNodeManager implements InitializingBean {
      */
     private void refreshWorkerGroupNodes() {
         workerGroupWriteLock.lock();
-        registryWorkerGroupReadLock.lock();
-        dbWorkerGroupReadLock.lock();
         try {
             workerGroupNodes.clear();
             workerGroupNodes.putAll(registryWorkerGroupNodes);
@@ -408,27 +394,6 @@ public class ServerNodeManager implements InitializingBean {
                 Arrays.toString(workerGroupNodes.keySet().toArray()));
         } finally {
             notifyWorkerInfoChangeListeners();
-            workerGroupWriteLock.unlock();
-            registryWorkerGroupReadLock.unlock();
-            dbWorkerGroupReadLock.unlock();
-        }
-    }
-
-
-    /**
-     * sync worker group nodes
-     *
-     * @param workerGroup worker group
-     * @param nodes worker nodes
-     */
-    private void syncWorkerGroupNodes(String workerGroup, Collection<String> nodes) {
-        workerGroupWriteLock.lock();
-        try {
-            Set<String> workerNodes = workerGroupNodes.getOrDefault(workerGroup, new HashSet<>());
-            workerNodes.clear();
-            workerNodes.addAll(nodes);
-            workerGroupNodes.put(workerGroup, workerNodes);
-        } finally {
             workerGroupWriteLock.unlock();
         }
     }
