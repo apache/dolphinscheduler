@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import { useI18n } from 'vue-i18n'
 import { NForm, NFormItem, NSelect } from "naive-ui";
 import { defineComponent } from "vue";
 import { useLogTimerStore } from '@/store/logTimer/logTimer'
@@ -72,11 +73,12 @@ const setting = defineComponent({
         return {defaultLogTimer, logTimerMap, logTimerOptions}
     },
     render() {
+        const { t } = useI18n()
+
         return ( 
             <>
-            <div>UI Setting</div>
             <NForm>
-                <NFormItem label="Log Auto Refresh Time">
+                <NFormItem label={t('ui_setting.log.refresh_time')}>
                 <NSelect
                     default-value={this.logTimerMap[this.defaultLogTimer]}
                     options={this.logTimerOptions} 

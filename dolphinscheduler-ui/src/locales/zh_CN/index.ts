@@ -30,6 +30,7 @@ import resource from '@/locales/zh_CN/resource'
 import security from '@/locales/zh_CN/security'
 import theme from '@/locales/zh_CN/theme'
 import user_dropdown from '@/locales/zh_CN/user-dropdown'
+import ui_setting from '@/locales/zh_CN/ui_setting'
 
 export default {
   login,
@@ -46,5 +47,6 @@ export default {
   security,
   datasource,
   data_quality,
-  crontab
+  crontab,
+  ui_setting
 }
