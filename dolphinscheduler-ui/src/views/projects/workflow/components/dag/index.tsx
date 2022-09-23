@@ -318,8 +318,6 @@ export default defineComponent({
 
     onBeforeUnmount(() => clearInterval(statusTimerRef.value))
 
-    console.log('test view log');
-
     return () => (
       <div
         class={[
