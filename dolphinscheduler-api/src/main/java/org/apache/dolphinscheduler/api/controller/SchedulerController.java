@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.OFFLINE_SCHEDULE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.PREVIEW_SCHEDULE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.PUBLISH_SCHEDULE_ONLINE_ERROR;
@@ -28,6 +28,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR
 import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -64,7 +65,7 @@ import io.swagger.annotations.ApiParam;
 /**
  * scheduler controller
  */
-@Api(tags = "SCHEDULER_TAG")
+@Api(tags = "SCHEDULE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/schedules")
 public class SchedulerController extends BaseController {
@@ -260,19 +261,19 @@ public class SchedulerController extends BaseController {
      * @param id scheule id
      * @return delete result code
      */
-    @ApiOperation(value = "deleteScheduleById", notes = "OFFLINE_SCHEDULE_NOTES")
+    @ApiOperation(value = "deleteScheduleById", notes = "DELETE_SCHEDULE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_SCHEDULE_CRON_BY_ID_ERROR)
+    @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
                                      @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                      @PathVariable("id") Integer id) {
-        Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectCode, id);
-        return returnDataList(result);
+        schedulerService.deleteSchedulesById(loginUser, id);
+        return new Result(Status.SUCCESS);
     }
 
     /**

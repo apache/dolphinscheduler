@@ -90,4 +90,29 @@
         from t_ds_schedules
         where process_definition_code = #{processDefinitionCode} and release_state = 1
     </select>
+
+    <select id="filterSchedules"
+            parameterType="org.apache.dolphinscheduler.dao.entity.Schedule"
+            resultType="org.apache.dolphinscheduler.dao.entity.Schedule"
+    >
+        SELECT pd.name as process_definition_name, p.name as project_name,
+        <include refid="baseSqlV2">
+            <property name="alias" value="s"/>
+        </include>
+        FROM t_ds_schedules s
+        join t_ds_process_definition pd on s.process_definition_code = pd.code
+        join t_ds_project as p on pd.project_code = p.code
+        <where>
+            <if test=" schedule.projectName != null and schedule.projectName != ''">
+                and p.name like concat('%', #{schedule.projectName}, '%')
+            </if>
+            <if test=" schedule.processDefinitionName != null and schedule.processDefinitionName != ''">
+                and pd.name like concat('%', #{schedule.processDefinitionName}, '%')
+            </if>
+            <if test=" schedule.releaseState != null and schedule.releaseState != ''">
+                and s.release_state = #{schedule.releaseState}
+            </if>
+        </where>
+        order by update_time desc, id asc
+    </select>
 </mapper>

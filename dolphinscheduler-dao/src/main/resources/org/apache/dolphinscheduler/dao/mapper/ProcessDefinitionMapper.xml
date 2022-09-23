@@ -83,6 +83,26 @@
         </if>
         order by update_time desc
     </select>
+    <select id="filterProcessDefinition"
+            parameterType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
+    >
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_process_definition
+        <where>
+            <if test=" pd.projectCode != 0">
+                and project_code = #{pd.projectCode}
+            </if>
+            <if test=" pd.name != null and pd.name != ''">
+                and name like concat('%', #{pd.name}, '%')
+            </if>
+            <if test=" pd.releaseState != null and pd.releaseState != ''">
+                and release_state = #{pd.releaseState}
+            </if>
+        </where>
+        order by update_time desc, id asc
+    </select>
 
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select

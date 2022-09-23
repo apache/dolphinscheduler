@@ -27,6 +27,7 @@ import java.text.MessageFormat;
  * @param <T> T
  */
 public class Result<T> {
+
     /**
      * status
      */
@@ -50,13 +51,13 @@ public class Result<T> {
         this.msg = msg;
     }
 
-    private Result(Status status) {
+    public Result(Status status) {
         if (status != null) {
             this.code = status.getCode();
             this.msg = status.getMsg();
         }
     }
-    
+
     public Result(Integer code, String msg, T data) {
         this.code = code;
         this.msg = msg;
@@ -73,7 +74,7 @@ public class Result<T> {
     public static <T> Result<T> success(T data) {
         return new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), data);
     }
-    
+
     public static Result success() {
         return success(null);
     }

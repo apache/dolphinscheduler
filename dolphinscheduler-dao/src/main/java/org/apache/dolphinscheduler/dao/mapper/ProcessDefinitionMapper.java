@@ -116,6 +116,16 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
                                                    @Param("projectCode") long projectCode);
 
     /**
+     * Filter process definitions
+     *
+     * @param page page
+     * @param processDefinition process definition object
+     * @return process definition IPage
+     */
+    IPage<ProcessDefinition> filterProcessDefinition(IPage<ProcessDefinition> page,
+                                                     @Param("pd") ProcessDefinition processDefinition);
+
+    /**
      * query all process definition list
      *
      * @param projectCode projectCode

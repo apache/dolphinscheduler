@@ -15,22 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.api.dto.schedule;
 
-import lombok.Data;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * page query dto
- */
-@ApiModel("QUERY-PAGE-INFO")
-@Data
-public class PageQueryDto {
+@Getter
+@Setter
+public class ScheduleParam {
 
-    @ApiModelProperty(example = "10", required = true)
-    private Integer pageSize = 10;
+    private String startTime;
+    private String endTime;
+    private String crontab;
+    private String timezoneId;
 
-    @ApiModelProperty(example = "1", required = true)
-    private Integer pageNo = 1;
+    public ScheduleParam(String startTime, String endTime, String crontab, String timezoneId) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.crontab = crontab;
+        this.timezoneId = timezoneId;
+    }
 }
