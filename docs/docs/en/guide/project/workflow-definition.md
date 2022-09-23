@@ -56,7 +56,7 @@ Click the `Save` button and configure `process execution type` in the pop-up win
 
 - `Parallel`: If there are multiple instances of the same workflow definition, execute the instances in parallel.
 - `Serial Wait`: If there are multiple instances of the same workflow definition, execute the instances in serial.
-- `Serial Discard`: If there are multiple instances of the same workflow definition, discard the later ones.
+- `Serial Discard`: If there are multiple instances of the same workflow definition, discard the later ones and kill the current running ones.
 - `Serial Priority`: If there are multiple instances of the same workflow definition, execute the instances according to the priority in serial.
 
 ![workflow-execution-type](../../../../img/new_ui/dev/project/workflow-execution-type.png)
@@ -71,7 +71,7 @@ Workflow running parameter description:
 
 * **Failure strategy**: When a task node fails to execute, other parallel task nodes need to execute the strategy. "Continue" means: After a task fails, other task nodes execute normally; "End" means: Terminate all tasks being executed, and terminate the entire process.
 * **Notification strategy**: When the process ends, send process execution information notification emails according to the process status, including no status, success, failure, success or failure.
-* **Process priority**: The priority of process operation, divided into five levels: the highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), the lowest (LOWEST). When the number of master threads is insufficient, processes with higher levels will be executed first in the execution queue, and processes with the same priority will be executed in the order of first-in, first-out.
+* **Process priority**: The priority of process execution, there are five different priorities: the highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), the lowest (LOWEST). When the number of master threads is insufficient, processes with higher priorities in the execution queue will run first. Processes with the same priority will run in first-come-first-served fashion.
 * **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker.
 * **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group.
 * **Startup parameters**: Set or override the value of global parameters when starting a new process instance.
