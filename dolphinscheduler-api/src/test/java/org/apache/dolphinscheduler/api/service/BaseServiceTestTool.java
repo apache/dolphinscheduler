@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.api.service;
 
-import lombok.Data;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.common.Constants;
 
-/**
- * page query dto
- */
-@ApiModel("QUERY-PAGE-INFO")
-@Data
-public class PageQueryDto {
+import java.text.MessageFormat;
+import java.util.Map;
 
-    @ApiModelProperty(example = "10", required = true)
-    private Integer pageSize = 10;
+public class BaseServiceTestTool {
 
-    @ApiModelProperty(example = "1", required = true)
-    private Integer pageNo = 1;
+    protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
+    }
 }
