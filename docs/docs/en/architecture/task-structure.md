@@ -256,21 +256,20 @@ No.|parameter name||type|description |note
 | 13  |                      | executorMemory | String | executor memory             |
 | 14  |                      | executorCores  | String | executor cores              |
 | 15  |                      | programType    | String | program type                | JAVA,SCALA,PYTHON            |
-| 16  |                      | sparkVersion   | String | Spark version               | SPARK1 , SPARK2              |
-| 17  |                      | localParams    | Array  | customized local parameters |
-| 18  |                      | resourceList   | Array  | resource files              |
-| 19  | description          |                | String | description                 |                              |
-| 20  | runFlag              |                | String | execution flag              |                              |
-| 21  | conditionResult      |                | Object | condition branch            |                              |
-| 22  |                      | successNode    | Array  | jump to node if success     |                              |
-| 23  |                      | failedNode     | Array  | jump to node if failure     |
-| 24  | dependence           |                | Object | task dependency             | mutual exclusion with params |
-| 25  | maxRetryTimes        |                | String | max retry times             |                              |
-| 26  | retryInterval        |                | String | retry interval              |                              |
-| 27  | timeout              |                | Object | timeout                     |                              |
-| 28  | taskInstancePriority |                | String | task priority               |                              |
-| 29  | workerGroup          |                | String | Worker group                |                              |
-| 30  | preTasks             |                | Array  | preposition tasks           |                              |
+| 16  |                      | localParams    | Array  | customized local parameters |
+| 17  |                      | resourceList   | Array  | resource files              |
+| 18  | description          |                | String | description                 |                              |
+| 19  | runFlag              |                | String | execution flag              |                              |
+| 20  | conditionResult      |                | Object | condition branch            |                              |
+| 21  |                      | successNode    | Array  | jump to node if success     |                              |
+| 22  |                      | failedNode     | Array  | jump to node if failure     |
+| 23  | dependence           |                | Object | task dependency             | mutual exclusion with params |
+| 24  | maxRetryTimes        |                | String | max retry times             |                              |
+| 25  | retryInterval        |                | String | retry interval              |                              |
+| 26  | timeout              |                | Object | timeout                     |                              |
+| 27  | taskInstancePriority |                | String | task priority               |                              |
+| 28  | workerGroup          |                | String | Worker group                |                              |
+| 29  | preTasks             |                | Array  | preposition tasks           |                              |
 
 **Node data example:**
 
@@ -302,8 +301,7 @@ No.|parameter name||type|description |note
         "executorCores":2,
         "mainArgs":"10",
         "others":"",
-        "programType":"SCALA",
-        "sparkVersion":"SPARK2"
+        "programType":"SCALA"
     },
     "description":"",
     "runFlag":"NORMAL",

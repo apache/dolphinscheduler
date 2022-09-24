@@ -18,13 +18,15 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class ScriptSender {
+
     private static final Logger logger = LoggerFactory.getLogger(ScriptSender.class);
     private static final String ALERT_TITLE_OPTION = " -t ";
     private static final String ALERT_CONTENT_OPTION = " -c ";
@@ -54,22 +56,40 @@ public final class ScriptSender {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
-        //validate script path in case of injections
+        // validate script path in case of injections
         File shellScriptFile = new File(scriptPath);
-        //validate existence
+        // validate existence
         if (!shellScriptFile.exists()) {
             logger.error("shell script not exist : {}", scriptPath);
             alertResult.setMessage("shell script not exist : " + scriptPath);
             return alertResult;
         }
-        //validate is file
+        // validate is file
         if (!shellScriptFile.isFile()) {
             logger.error("shell script is not a file : {}", scriptPath);
             alertResult.setMessage("shell script is not a file : " + scriptPath);
             return alertResult;
         }
 
-        String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
+        // avoid command injection (RCE vulnerability)
+        if (userParams.contains("'")) {
+            logger.error("shell script illegal user params : {}", userParams);
+            alertResult.setMessage("shell script illegal user params : " + userParams);
+            return alertResult;
+        }
+        if (title.contains("'")) {
+            logger.error("shell script illegal title : {}", title);
+            alertResult.setMessage("shell script illegal title : " + title);
+            return alertResult;
+        }
+        if (content.contains("'")) {
+            logger.error("shell script illegal content : {}", content);
+            alertResult.setMessage("shell script illegal content : " + content);
+            return alertResult;
+        }
+
+        String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION
+                + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
         int exitCode = ProcessUtils.executeScript(cmd);
 
         if (exitCode == 0) {

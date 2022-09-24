@@ -229,7 +229,6 @@ interface ITaskParams {
   rawScript?: string
   initScript?: string
   programType?: string
-  sparkVersion?: string
   flinkVersion?: string
   jobManagerMemory?: string
   taskManagerMemory?: string

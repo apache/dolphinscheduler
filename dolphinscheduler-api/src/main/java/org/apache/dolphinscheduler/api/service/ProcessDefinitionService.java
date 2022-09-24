@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -68,6 +71,15 @@ public interface ProcessDefinitionService {
                                                 ProcessExecutionTypeEnum executionType);
 
     /**
+     * create process definition V2
+     *
+     * @param loginUser login user
+     * @param workflowCreateRequest the new workflow object will be created
+     * @return New ProcessDefinition object created just now
+     */
+    ProcessDefinition createSingleProcessDefinition(User loginUser, WorkflowCreateRequest workflowCreateRequest);
+
+    /**
      * query process definition list
      *
      * @param loginUser login user
@@ -108,6 +120,16 @@ public interface ProcessDefinitionService {
                                                                  Integer pageSize);
 
     /**
+     * Filter resource process definitions
+     *
+     * @param loginUser login user
+     * @param workflowFilterRequest workflow filter requests
+     * @return List process definition
+     */
+    PageInfo<ProcessDefinition> filterProcessDefinition(User loginUser,
+                                                        WorkflowFilterRequest workflowFilterRequest);
+
+    /**
      * query detail of process definition
      *
      * @param loginUser login user
@@ -119,6 +141,16 @@ public interface ProcessDefinitionService {
     Map<String, Object> queryProcessDefinitionByCode(User loginUser,
                                                      long projectCode,
                                                      long code);
+
+    /**
+     * Get resource workflow
+     *
+     * @param loginUser login user
+     * @param code process definition code
+     * @return Process definition Object
+     */
+    ProcessDefinition getProcessDefinition(User loginUser,
+                                           long code);
 
     /**
      * query detail of process definition
@@ -208,13 +240,10 @@ public interface ProcessDefinitionService {
      * delete process definition by code
      *
      * @param loginUser login user
-     * @param projectCode project code
      * @param code process definition code
-     * @return delete result code
      */
-    Map<String, Object> deleteProcessDefinitionByCode(User loginUser,
-                                                      long projectCode,
-                                                      long code);
+    void deleteProcessDefinitionByCode(User loginUser,
+                                       long code);
 
     /**
      * release process definition: online / offline
@@ -429,6 +458,18 @@ public interface ProcessDefinitionService {
                                                          String scheduleJson,
                                                          String otherParamsJson,
                                                          ProcessExecutionTypeEnum executionType);
+
+    /**
+     * update process definition basic info, not including task definition, task relation and location.
+     *
+     * @param loginUser login user
+     * @param workflowCode workflow resource code you want to update
+     * @param workflowUpdateRequest workflow update requests
+     * @return ProcessDefinition instance
+     */
+    ProcessDefinition updateSingleProcessDefinition(User loginUser,
+                                                    long workflowCode,
+                                                    WorkflowUpdateRequest workflowUpdateRequest);
 
     /**
      * release process definition and schedule
