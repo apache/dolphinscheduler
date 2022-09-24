@@ -29,9 +29,11 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -73,6 +75,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private RegistryClient registryClient;
+
+    @Autowired
+    private TaskInstanceMapper taskInstanceMapper;
 
     /**
      * create or update a worker group
@@ -332,6 +337,19 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
         }
+
+        List<TaskInstance> taskInstances = taskInstanceMapper
+            .queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+                Constants.NOT_TERMINATED_STATES);
+        if (CollectionUtils.isNotEmpty(taskInstances)) {
+            logger.error(
+                "cannot delete the worker group {}, because there are {} task instance in executing using it",
+                workerGroup.getName(), taskInstances.size());
+            putMsg(result, Status.DELETE_WORKER_GROUP_FAILED_TASK_INSTANCE_EXIST,
+                taskInstances.size());
+            return result;
+        }
+
         workerGroupMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), "");
         logger.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());

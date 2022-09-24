@@ -386,4 +386,33 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         Assert.assertEquals(taskInstanceIPage.getTotal(), 0);
 
     }
+
+    /**
+     * test query task instance list by worker group and status
+     */
+    @Test
+    public void testQueryByWorkerGroupNameAndStatus() {
+        // insert ProcessInstance
+        ProcessInstance processInstance = insertProcessInstance();
+
+        // insert taskInstance
+        TaskInstance task = insertTaskInstance(processInstance.getId());
+        task.setHost("111.111.11.11");
+        task.setWorkerGroup("app01");
+        taskInstanceMapper.updateById(task);
+
+        int[] states = {task.getState().getCode()};
+        List<TaskInstance> tasks = taskInstanceMapper.queryByWorkerGroupNameAndStatus(
+            "app01",
+            states
+        );
+        List<TaskInstance> tasks2 = taskInstanceMapper.queryByWorkerGroupNameAndStatus(
+            "app02",
+            states
+        );
+        taskInstanceMapper.deleteById(task.getId());
+        Assert.assertNotEquals(states, null);
+        Assert.assertEquals(tasks.size(), 1);
+        Assert.assertEquals(tasks2.size(), 0);
+    }
 }

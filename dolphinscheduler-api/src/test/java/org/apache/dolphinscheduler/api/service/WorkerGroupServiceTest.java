@@ -24,9 +24,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -61,6 +63,9 @@ public class WorkerGroupServiceTest {
 
     @MockBean(name = "processInstanceMapper")
     private ProcessInstanceMapper processInstanceMapper;
+
+    @MockBean(name = "taskInstanceMapper")
+    private TaskInstanceMapper taskInstanceMapper;
 
     private String groupName = "groupName000001";
 
@@ -98,8 +103,16 @@ public class WorkerGroupServiceTest {
         WorkerGroup wg3 = getWorkerGroup(3);
         Mockito.when(workerGroupMapper.selectById(3)).thenReturn(wg3);
         Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg3.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(new ArrayList<>());
+        Mockito.when(taskInstanceMapper.queryByWorkerGroupNameAndStatus(wg3.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(new ArrayList<>());
         result = workerGroupService.deleteWorkerGroupById(user, 3);
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.get(Constants.MSG));
+
+        WorkerGroup wg4 = getWorkerGroup(4);
+        Mockito.when(workerGroupMapper.selectById(4)).thenReturn(wg4);
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg4.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(new ArrayList<>());
+        Mockito.when(taskInstanceMapper.queryByWorkerGroupNameAndStatus(wg4.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(getTaskInstanceList());
+        result = workerGroupService.deleteWorkerGroupById(user, 4);
+        Assert.assertEquals(Status.DELETE_WORKER_GROUP_FAILED_TASK_INSTANCE_EXIST.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
     }
 
     /**
@@ -109,6 +122,15 @@ public class WorkerGroupServiceTest {
         List<ProcessInstance> processInstances = new ArrayList<>();
         processInstances.add(new ProcessInstance());
         return processInstances;
+    }
+
+    /**
+     * get task instances
+     */
+    private List<TaskInstance> getTaskInstanceList() {
+        List<TaskInstance> taskInstances = new ArrayList<>();
+        taskInstances.add(new TaskInstance());
+        return taskInstances;
     }
 
     @Test
