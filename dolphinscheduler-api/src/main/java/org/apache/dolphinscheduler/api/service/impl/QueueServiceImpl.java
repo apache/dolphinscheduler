@@ -180,6 +180,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueMapper.insert(queueObj);
 
         result.setData(queueObj);
+        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
         return result;
@@ -209,7 +210,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         if (checkIfQueueIsInUsing(existsQueue.getQueueName(), updateQueue.getQueueName())) {
             //update user related old queue
             Integer relatedUserNums = userMapper.updateUserQueue(existsQueue.getQueueName(), updateQueue.getQueueName());
-            logger.info("old queue have related {} user, exec update user success.", relatedUserNums);
+            logger.info("Old queue have related {} users, exec update user success.", relatedUserNums);
         }
 
         queueMapper.updateById(updateQueue);
@@ -284,11 +285,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Queue createQueueIfNotExists(String queue, String queueName) {
         Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
         if (!Objects.isNull(existsQueue)) {
+            logger.info("Queue exists, so return it, queueName:{}.", queueName);
             return existsQueue;
         }
         Queue queueObj = new Queue(queueName, queue);
         createQueueValid(queueObj);
         queueMapper.insert(queueObj);
+        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         return queueObj;
     }
 

@@ -229,7 +229,7 @@ export PYTHON_HOME=/bin/python
 Note: This is **PYTHON_HOME** , which is the absolute path of the python command, not the simple PYTHON_HOME. Also note that when exporting the PATH, you need to directly
 
 ```
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
 ```
 
 ​		2，For versions prior to 1.0.3, the Python task only supports the Python version of the system. It does not support specifying the Python version.
@@ -280,7 +280,7 @@ A ： Will hive pom
 <dependency>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive-jdbc</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.9</version>
 </dependency>
 ```
 
@@ -533,7 +533,8 @@ A: 1, We can successly create scheduled task and add one record into t_scheduler
 
 ## Q : What is the address of swagger ui
 
-A: 1, For version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
+A: 1, For version 3.1.0+ is http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html,
+for version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
 
 ---
 
@@ -582,7 +583,7 @@ A: 1, It is currently judged according to natural days, at the end of last month
 
 ## Q : DS Backend Inteface Document
 
-A: 1, http://106.75.43.194:8888/dolphinscheduler/doc.html?language=en.
+A: 1, http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=en.
 
 ## During the operation of dolphinscheduler, the ip address is obtained incorrectly
 
@@ -752,4 +753,3 @@ start API server. If you want disabled when Python gateway service you could cha
 ---
 
 We will collect more FAQ later
-

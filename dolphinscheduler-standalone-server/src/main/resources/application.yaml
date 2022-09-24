@@ -16,8 +16,6 @@
 #
 
 spring:
-  application:
-    name: standalone-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -47,7 +45,7 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.threadPool:threadPriority: 5
+      org.quartz.threadPool.threadPriority: 5
       org.quartz.jobStore.isClustered: true
       org.quartz.jobStore.class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
       org.quartz.scheduler.instanceId: AUTO
@@ -62,6 +60,7 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
   servlet:
     multipart:
       max-file-size: 1024MB

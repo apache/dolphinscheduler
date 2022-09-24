@@ -39,6 +39,9 @@ export default {
     delete_confirm: '确定删除吗?'
   },
   workflow: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     workflow_relation: '工作流关系',
     create_workflow: '创建工作流',
     import_workflow: '导入工作流',
@@ -105,6 +108,7 @@ export default {
     complement_data: '补数',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
+    whether_test: '是否测试',
     continue: '继续',
     end: '结束',
     none_send: '都不发',
@@ -203,6 +207,9 @@ export default {
       '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     cancel_full_screen: '取消全屏',
     enter_full_screen: '全屏',
     current_task_settings: '当前任务设置',
@@ -310,6 +317,10 @@ export default {
     online: '已上线'
   },
   node: {
+    is_module_path: '使用模块路径',
+    run_type: '运行类型',
+    jvm_args: '虚拟机参数',
+    jvm_args_tips: '请输入虚拟机参数',
     return_back: '返回上一节点',
     current_node_settings: '当前节点设置',
     instructions: '使用说明',
@@ -385,7 +396,6 @@ export default {
     value_required_tips: 'value(必填)',
     pre_tasks: '前置任务',
     program_type: '程序类型',
-    spark_version: 'Spark版本',
     main_class: '主函数的Class',
     main_class_tips: '请填写主函数的Class',
     main_package: '主程序包',
@@ -693,7 +703,7 @@ export default {
     mlflow_deployModelKey: '部署的模型URI',
     mlflow_deployPort: '监听端口',
     mlflowProjectRepository: '运行仓库',
-    mlflowProjectRepository_tips: '可以为github仓库或worker上的路径',
+    mlflowProjectRepository_tips: '可以为git仓库或worker上的路径',
     mlflowProjectVersion: '项目版本',
     mlflowProjectVersion_tips: '项目git版本',
     mlflow_cpuLimit: '最大cpu限制',

@@ -7,14 +7,14 @@ The following is the `WebexTeams` configuration example:
 
 ## Parameter Configuration
 
-| **Parameter** | **Description** |
-| --- | --- |
-| botAccessToken | The access token of robot. |
-| roomID | The ID of the room that receives message (only support one room ID). |
-| toPersonId | The person ID of the recipient when sending a private 1:1 message. |
-| toPersonEmail | The email address of the recipient when sending a private 1:1 message. |
+|  **Parameter**  |                                                     **Description**                                                     |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------|
+| botAccessToken  | The access token of robot.                                                                                              |
+| roomID          | The ID of the room that receives message (only support one room ID).                                                    |
+| toPersonId      | The person ID of the recipient when sending a private 1:1 message.                                                      |
+| toPersonEmail   | The email address of the recipient when sending a private 1:1 message.                                                  |
 | atSomeoneInRoom | If the message destination is room, the emails of the person being @, use `,` (eng commas) to separate multiple emails. |
-| destination |The destination of the message (one message only support one destination). |
+| destination     | The destination of the message (one message only support one destination).                                              |
 
 ## Create Bot
 
@@ -59,3 +59,4 @@ The `Room ID` we can acquire it from the `id` of creating a new group chat room 
 
 - [WebexTeams Application Bot Guide](https://developer.webex.com/docs/bots)
 - [WebexTeams Message Guide](https://developer.webex.com/docs/api/v1/messages/create-a-message)
+

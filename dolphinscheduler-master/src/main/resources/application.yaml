@@ -17,8 +17,6 @@
 spring:
   banner:
     charset: UTF-8
-  application:
-    name: master-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"

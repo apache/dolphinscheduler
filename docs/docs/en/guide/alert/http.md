@@ -4,13 +4,13 @@ If you need to use `Http script` for alerting, create an alert instance in the a
 
 ## Parameter Configuration
 
-| **Parameter** | **Description** |
-| --- | --- |
-| URL | The `Http` request URL needs to contain protocol, host, path and parameters if the method is `GET`. |
-| Request Type | Select the request type from `POST` or `GET`. |
-| Headers | The headers of the `Http` request in JSON format. |
-| Body | The request body of the `Http` request in JSON format, when using `POST` method to alert. |
-| Content Field | The field name to place the alert information. |
+| **Parameter** |                                           **Description**                                           |
+|---------------|-----------------------------------------------------------------------------------------------------|
+| URL           | The `Http` request URL needs to contain protocol, host, path and parameters if the method is `GET`. |
+| Request Type  | Select the request type from `POST` or `GET`.                                                       |
+| Headers       | The headers of the `Http` request in JSON format.                                                   |
+| Body          | The request body of the `Http` request in JSON format, when using `POST` method to alert.           |
+| Content Field | The field name to place the alert information.                                                      |
 
 ## Send Type
 

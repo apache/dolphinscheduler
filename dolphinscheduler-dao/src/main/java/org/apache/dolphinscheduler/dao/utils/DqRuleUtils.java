@@ -34,7 +34,8 @@ public class DqRuleUtils {
 
     public static List<DqRuleInputEntry> transformInputEntry(List<DqRuleInputEntry> ruleInputEntryList) {
         for (DqRuleInputEntry dqRuleInputEntry : ruleInputEntryList) {
-            Map<String,Object> valuesMap = JSONUtils.toMap(dqRuleInputEntry.getValuesMap(),String.class,Object.class);
+            Map<String, Object> valuesMap =
+                    JSONUtils.toMap(dqRuleInputEntry.getValuesMap(), String.class, Object.class);
             if (valuesMap != null) {
 
                 if (valuesMap.get(dqRuleInputEntry.getField()) != null) {
@@ -43,7 +44,7 @@ public class DqRuleUtils {
                 }
 
                 if (valuesMap.get("is_show") != null) {
-                    dqRuleInputEntry.setShow(Boolean.parseBoolean(String.valueOf(valuesMap.get("is_show"))));
+                    dqRuleInputEntry.setIsShow(Boolean.parseBoolean(String.valueOf(valuesMap.get("is_show"))));
                 }
 
                 if (valuesMap.get("can_edit") != null) {

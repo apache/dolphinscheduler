@@ -26,7 +26,6 @@
     <artifactId>dolphinscheduler-api</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -38,7 +37,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -159,6 +157,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-test</artifactId>
             <scope>test</scope>
@@ -177,8 +181,13 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-ldap</artifactId>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-fabric8-config</artifactId>
         </dependency>
 
         <dependency>
@@ -187,7 +196,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <testResources>
             <testResource>

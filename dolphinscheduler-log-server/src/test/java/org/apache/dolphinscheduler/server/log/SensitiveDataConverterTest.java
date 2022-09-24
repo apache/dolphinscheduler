@@ -47,11 +47,11 @@ public class SensitiveDataConverterTest {
             + "\"database\":\"carbond\","
             + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
             + "\"user\":\"view\","
-            + "\"password\":\"******\"}";
+            + "\"password\":\"*****\"}";
 
     @Test
     public void convert() {
-        Assert.assertNotEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
     }
 
     /**
@@ -62,8 +62,8 @@ public class SensitiveDataConverterTest {
         logger.info("parameter : {}", logMsg);
         logger.info("parameter : {}", passwordHandler(pwdPattern, logMsg));
 
-        Assert.assertEquals(logMsg, passwordHandler(pwdPattern, logMsg));
-        Assert.assertNotEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
 
     }
 
