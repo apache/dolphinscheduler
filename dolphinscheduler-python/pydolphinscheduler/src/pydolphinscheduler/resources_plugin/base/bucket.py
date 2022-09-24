@@ -76,7 +76,7 @@ class S3FileInfo(BucketFileInfo):
 
 
 class Bucket(object, metaclass=ABCMeta):
-    """An abstract class of online code warehouse based on git implementation."""
+    """An abstract class of online code repository based on git implementation."""
 
     _bucket_file_info: Optional = None
 
