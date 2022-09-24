@@ -73,6 +73,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     }
 
     public WorkflowForm createSubProcessWorkflow() {
+        buttonCreateProcess().click();
         subProcessList().click();
 
         return new WorkflowForm(driver);
