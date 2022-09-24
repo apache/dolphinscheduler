@@ -63,7 +63,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     /**
      * @param workerGroupName workerGroupName
      * @param states          states array
-     * @return process instance list
+     * @return task instance list
      */
     List<TaskInstance> queryByWorkerGroupNameAndStatus(@Param("workerGroupName") String workerGroupName,
                                                           @Param("states") int[] states);
