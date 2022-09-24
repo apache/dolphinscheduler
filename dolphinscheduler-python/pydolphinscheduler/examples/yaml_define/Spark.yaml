@@ -27,4 +27,3 @@ tasks:
     main_package: test_java.jar
     program_type: SCALA
     deploy_mode: local
-    spark_version: SPARK1

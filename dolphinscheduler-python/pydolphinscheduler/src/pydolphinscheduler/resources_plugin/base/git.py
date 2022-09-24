@@ -105,7 +105,7 @@ class GitLabFileInfo(GitFileInfo):
 
 
 class Git(object, metaclass=ABCMeta):
-    """An abstract class of online code warehouse based on git implementation."""
+    """An abstract class of online code repository based on git implementation."""
 
     _git_file_info: Optional = None
 

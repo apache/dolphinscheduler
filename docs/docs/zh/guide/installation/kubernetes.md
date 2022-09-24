@@ -360,7 +360,7 @@ kubectl cp -n test spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/
 
 因为存储卷 `sharedStoragePersistence` 被挂载到 `/opt/soft`, 因此 `/opt/soft` 中的所有文件都不会丢失
 
-5. 登录到容器并确保 `SPARK_HOME2` 存在
+5. 登录到容器并确保 `SPARK_HOME` 存在
 
 ```bash
 kubectl exec -it dolphinscheduler-worker-0 bash
@@ -369,7 +369,7 @@ cd /opt/soft
 tar zxf spark-2.4.7-bin-hadoop2.7.tgz
 rm -f spark-2.4.7-bin-hadoop2.7.tgz
 ln -s spark-2.4.7-bin-hadoop2.7 spark2 # or just mv
-$SPARK_HOME2/bin/spark-submit --version
+$SPARK_HOME/bin/spark-submit --version
 ```
 
 如果一切执行正常，最后一条命令将会打印 Spark 版本信息
@@ -377,7 +377,7 @@ $SPARK_HOME2/bin/spark-submit --version
 6. 在一个 Shell 任务下验证 Spark
 
 ```
-$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.11-2.4.7.jar
+$SPARK_HOME/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME/examples/jars/spark-examples_2.11-2.4.7.jar
 ```
 
 检查任务日志是否包含输出 `Pi is roughly 3.146015`
@@ -386,7 +386,6 @@ $SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_H
 
 文件 `spark-examples_2.11-2.4.7.jar` 需要先被上传到资源中心，然后创建一个 Spark 任务并设置:
 
-- Spark版本: `SPARK2`
 - 主函数的Class: `org.apache.spark.examples.SparkPi`
 - 主程序包: `spark-examples_2.11-2.4.7.jar`
 - 部署方式: `local`
@@ -398,47 +397,6 @@ $SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_H
 Spark on YARN (部署方式为 `cluster` 或 `client`) 需要 Hadoop 支持. 类似于 Spark 支持, 支持 Hadoop 的操作几乎和前面的步骤相同
 
 确保 `$HADOOP_HOME` 和 `$HADOOP_CONF_DIR` 存在
-
-### 如何支持 Spark 3？
-
-事实上，使用 `spark-submit` 提交应用的方式是相同的, 无论是 Spark 1, 2 或 3. 换句话说，`SPARK_HOME2` 的语义是第二个 `SPARK_HOME`, 而非 `SPARK2` 的 `HOME`, 因此只需设置 `SPARK_HOME2=/path/to/spark3` 即可
-
-以 Spark 3.1.1 为例:
-
-1. 下载 Spark 3.1.1 发布的二进制包 `spark-3.1.1-bin-hadoop2.7.tgz`
-
-2. 确保 `common.sharedStoragePersistence.enabled` 开启
-
-3. 部署 dolphinscheduler (详见**安装 dolphinscheduler**)
-
-4. 复制 Spark 3.1.1 二进制包到 Docker 容器中
-
-```bash
-kubectl cp spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft
-kubectl cp -n test spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft # with test namespace
-```
-
-5. 登录到容器并确保 `SPARK_HOME2` 存在
-
-```bash
-kubectl exec -it dolphinscheduler-worker-0 bash
-kubectl exec -n test -it dolphinscheduler-worker-0 bash # with test namespace
-cd /opt/soft
-tar zxf spark-3.1.1-bin-hadoop2.7.tgz
-rm -f spark-3.1.1-bin-hadoop2.7.tgz
-ln -s spark-3.1.1-bin-hadoop2.7 spark2 # or just mv
-$SPARK_HOME2/bin/spark-submit --version
-```
-
-如果一切执行正常，最后一条命令将会打印 Spark 版本信息
-
-6. 在一个 Shell 任务下验证 Spark
-
-```
-$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.12-3.1.1.jar
-```
-
-检查任务日志是否包含输出 `Pi is roughly 3.146015`
 
 ### 如何在 Master、Worker 和 Api 服务之间支持共享存储？
 
@@ -579,8 +537,7 @@ common:
 | `common.configmap.SW_GRPC_LOG_SERVER_PORT`                           | Set grpc log server port for skywalking                                                                                       | `11800`                               |
 | `common.configmap.HADOOP_HOME`                                       | Set `HADOOP_HOME` for DolphinScheduler's task environment                                                                     | `/opt/soft/hadoop`                    |
 | `common.configmap.HADOOP_CONF_DIR`                                   | Set `HADOOP_CONF_DIR` for DolphinScheduler's task environment                                                                 | `/opt/soft/hadoop/etc/hadoop`         |
-| `common.configmap.SPARK_HOME1`                                       | Set `SPARK_HOME1` for DolphinScheduler's task environment                                                                     | `/opt/soft/spark1`                    |
-| `common.configmap.SPARK_HOME2`                                       | Set `SPARK_HOME2` for DolphinScheduler's task environment                                                                     | `/opt/soft/spark2`                    |
+| `common.configmap.SPARK_HOME`                                        | Set `SPARK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/spark`                     |
 | `common.configmap.PYTHON_HOME`                                       | Set `PYTHON_HOME` for DolphinScheduler's task environment                                                                     | `/usr/bin/python`                     |
 | `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/usr/local/openjdk-8`                |
 | `common.configmap.HIVE_HOME`                                         | Set `HIVE_HOME` for DolphinScheduler's task environment                                                                       | `/opt/soft/hive`                      |
