@@ -186,7 +186,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.urlContains("/edit"));
 
-        new WebDriverWait(driver, 5).until((ExpectedCondition<Object>) webDriver -> editor.getText().length() > 0);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.textToBePresentInElement(driver.findElementByTagName("body"), fileName));
 
         editFileBox().codeEditor().content(scripts);
         editFileBox().buttonSubmit().click();

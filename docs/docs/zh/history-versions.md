@@ -1,11 +1,12 @@
 <!-- markdown-link-check-disable -->
 
 # 历史版本：
+
 #### 以下是Apache DolphinScheduler每个稳定版本的设置说明。
 
-### Versions: 3.0.0-beta-2
+### Versions: 3.0.0
 
-#### Links： [3.0.0-beta-2 文档](../3.0.0/user_doc/about/introduction.md)
+#### Links： [3.0.0 文档](../3.0.0/user_doc/about/introduction.md)
 
 ### 版本：2.0.6
 
@@ -78,3 +79,4 @@
 ### 版本：Dev
 
 #### 地址：[Dev 文档](../dev/user_doc/about/introduction.md)
+

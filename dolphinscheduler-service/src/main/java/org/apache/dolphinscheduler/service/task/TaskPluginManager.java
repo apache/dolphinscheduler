@@ -17,24 +17,20 @@
 
 package org.apache.dolphinscheduler.service.task;
 
-import static java.lang.String.format;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ServiceLoader;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 @Component
 public class TaskPluginManager {
@@ -53,19 +49,19 @@ public class TaskPluginManager {
             logger.warn("The task plugin has already been loaded");
             return;
         }
-        ServiceLoader.load(TaskChannelFactory.class).forEach(factory -> {
-            final String name = factory.getName();
+        PrioritySPIFactory<TaskChannelFactory> prioritySPIFactory = new PrioritySPIFactory<>(TaskChannelFactory.class);
+        for (Map.Entry<String, TaskChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
+            String factoryName = entry.getKey();
+            TaskChannelFactory factory = entry.getValue();
 
-            logger.info("Registering task plugin: {}", name);
+            logger.info("Registering task plugin: {} - {}", factoryName, factory.getClass());
 
-            if (taskChannelFactoryMap.containsKey(name)) {
-                throw new TaskPluginException(format("Duplicate task plugins named '%s'", name));
-            }
-            taskChannelFactoryMap.put(name, factory);
-            taskChannelMap.put(name, factory.create());
+            taskChannelFactoryMap.put(factoryName, factory);
+            taskChannelMap.put(factoryName, factory.create());
 
-            logger.info("Registered task plugin: {}", name);
-        });
+            logger.info("Registered task plugin: {} - {}", factoryName, factory.getClass());
+        }
+
     }
 
     public Map<String, TaskChannel> getTaskChannelMap() {

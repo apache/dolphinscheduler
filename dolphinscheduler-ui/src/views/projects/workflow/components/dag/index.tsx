@@ -86,13 +86,14 @@ export default defineComponent({
     const theme = useThemeStore()
 
     const logTimerStore = useLogTimerStore()
-    const logTimer = logTimerStore.getLogTimer;
+    const logTimer = logTimerStore.getLogTimer
 
     // Whether the graph can be operated
     provide('readonly', toRef(props, 'readonly'))
 
     const graph = ref<Graph>()
     provide('graph', graph)
+    context.expose(graph)
 
     // Auto layout modal
     const {
@@ -123,11 +124,11 @@ export default defineComponent({
     })
 
     // start button in the dag node menu
-    const startReadonly = computed(() => {
+    const startDisplay = computed(() => {
       if (props.definition) {
         return (
           route.name === 'workflow-definition-detail' &&
-          props.definition!.processDefinition.releaseState === 'NOT_RELEASE'
+          props.definition!.processDefinition.releaseState === 'ONLINE'
         )
       } else {
         return false
@@ -135,17 +136,17 @@ export default defineComponent({
     })
 
     // other button in the dag node menu
-    const menuReadonly = computed(() => {
+    const menuDisplay = computed(() => {
       if (props.instance) {
         return (
-          props.instance.state !== 'WAITING_THREAD' &&
-          props.instance.state !== 'SUCCESS' &&
-          props.instance.state !== 'PAUSE' &&
-          props.instance.state !== 'FAILURE' &&
-          props.instance.state !== 'STOP'
+          props.instance.state === 'WAITING_THREAD' ||
+          props.instance.state === 'SUCCESS' ||
+          props.instance.state === 'PAUSE' ||
+          props.instance.state === 'FAILURE' ||
+          props.instance.state === 'STOP'
         )
       } else if (props.definition) {
-        return props.definition!.processDefinition.releaseState === 'ONLINE'
+        return props.definition!.processDefinition.releaseState === 'OFFLINE'
       } else {
         return false
       }
@@ -236,7 +237,8 @@ export default defineComponent({
     const handleViewLog = (taskId: number, taskType: string, logTimer: number) => {
       taskModalVisible.value = false
       viewLog(taskId, taskType)
-      getLogs(logTimer);
+
+      getLogs(logTimer)
     }
 
     const getLogs = (logTimer: number) => {
@@ -246,18 +248,19 @@ export default defineComponent({
           limit: nodeVariables.limit,
           skipLineNum: nodeVariables.skipLineNum
         }).then((res: any) => {
-          nodeVariables.logRef += res.message || '';
+
+          nodeVariables.logRef += res.message || ''
           if (res && res.message !== '') {
             nodeVariables.limit += 1000
-            nodeVariables.skipLineNum += 1000
+            nodeVariables.skipLineNum += res.lineNum
             getLogs(logTimer)
           } else {
             nodeVariables.logLoadingRef = false
             setTimeout(() => {
               nodeVariables.limit += 1000
               nodeVariables.skipLineNum += 1000
-              getLogs(logTimer);
-            }, logTimer* 1000);
+              getLogs(logTimer)
+            }, logTimer * 1000)
           }
         }),
         {}
@@ -346,7 +349,7 @@ export default defineComponent({
         />
         {!!props.definition && (
           <VersionModal
-            isInstance={props.instance ? true : false}
+            isInstance={!!props.instance}
             v-model:row={props.definition.processDefinition}
             v-model:show={versionModalShow.value}
             onUpdateList={refreshDetail}
@@ -371,8 +374,8 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
-          startReadonly={startReadonly.value}
-          menuReadonly={menuReadonly.value}
+          startDisplay={startDisplay.value}
+          menuDisplay={menuDisplay.value}
           taskInstance={taskInstance.value}
           cell={nodeVariables.menuCell as Cell}
           visible={nodeVariables.menuVisible}

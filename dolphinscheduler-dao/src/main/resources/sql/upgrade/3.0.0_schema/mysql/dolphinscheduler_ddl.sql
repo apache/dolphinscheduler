@@ -17,26 +17,6 @@
 
 SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
--- uc_dolphin_T_t_ds_resources_R_full_name
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_resources_R_full_name;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name()
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
-        WHERE TABLE_NAME='t_ds_resources'
-        AND TABLE_SCHEMA=(SELECT DATABASE())
-        AND COLUMN_NAME ='full_name')
-    THEN
-ALTER TABLE t_ds_resources MODIFY COLUMN `full_name` varchar(128);
-END IF;
-END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_resources_R_full_name;
-DROP PROCEDURE uc_dolphin_T_t_ds_resources_R_full_name;
-
 -- uc_dolphin_T_t_ds_alert_R_sign
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_alert_R_sign;
 delimiter d//
@@ -59,50 +39,461 @@ CALL uc_dolphin_T_t_ds_alert_R_sign;
 DROP PROCEDURE uc_dolphin_T_t_ds_alert_R_sign;
 
 -- add unique key to t_ds_relation_project_user
-ALTER TABLE t_ds_relation_project_user ADD UNIQUE KEY uniq_uid_pid(user_id,project_id);
+drop PROCEDURE if EXISTS add_t_ds_relation_project_user_uk_uniq_uid_pid;
+delimiter d//
+CREATE PROCEDURE add_t_ds_relation_project_user_uk_uniq_uid_pid()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_relation_project_user'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='uniq_uid_pid')
+    THEN
+ALTER TABLE t_ds_relation_project_user ADD UNIQUE KEY uniq_uid_pid(user_id, project_id);
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL add_t_ds_relation_project_user_uk_uniq_uid_pid;
+DROP PROCEDURE add_t_ds_relation_project_user_uk_uniq_uid_pid;
+
+-- drop t_ds_relation_project_user key user_id_index
+drop PROCEDURE if EXISTS drop_t_ds_relation_project_user_key_user_id_index;
+delimiter d//
+CREATE PROCEDURE drop_t_ds_relation_project_user_key_user_id_index()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_relation_project_user'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='user_id_index')
+    THEN
+ALTER TABLE `t_ds_relation_project_user` DROP KEY `user_id_index`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_t_ds_relation_project_user_key_user_id_index;
+DROP PROCEDURE drop_t_ds_relation_project_user_key_user_id_index;
 
 -- add unique key to t_ds_project
+drop PROCEDURE if EXISTS add_t_ds_project_uk_unique_name;
+delimiter d//
+CREATE PROCEDURE add_t_ds_project_uk_unique_name()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_project'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='unique_name')
+    THEN
 ALTER TABLE t_ds_project ADD UNIQUE KEY unique_name(name);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_project_uk_unique_name;
+DROP PROCEDURE add_t_ds_project_uk_unique_name;
+
+drop PROCEDURE if EXISTS add_t_ds_project_uk_unique_code;
+delimiter d//
+CREATE PROCEDURE add_t_ds_project_uk_unique_code()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_project'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='unique_code')
+    THEN
 ALTER TABLE t_ds_project ADD UNIQUE KEY unique_code(code);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_project_uk_unique_code;
+DROP PROCEDURE add_t_ds_project_uk_unique_code;
 
 -- add unique key to t_ds_queue
+drop PROCEDURE if EXISTS add_t_ds_queue_uk_unique_queue_name;
+delimiter d//
+CREATE PROCEDURE add_t_ds_queue_uk_unique_queue_name()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_queue'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='unique_queue_name')
+    THEN
 ALTER TABLE t_ds_queue ADD UNIQUE KEY unique_queue_name(queue_name);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_queue_uk_unique_queue_name;
+DROP PROCEDURE add_t_ds_queue_uk_unique_queue_name;
 
 -- add unique key to t_ds_udfs
+drop PROCEDURE if EXISTS add_t_ds_udfs_uk_unique_func_name;
+delimiter d//
+CREATE PROCEDURE add_t_ds_udfs_uk_unique_func_name()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_udfs'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='unique_func_name')
+    THEN
 ALTER TABLE t_ds_udfs ADD UNIQUE KEY unique_func_name(func_name);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_udfs_uk_unique_func_name;
+DROP PROCEDURE add_t_ds_udfs_uk_unique_func_name;
 
 -- add unique key to t_ds_tenant
+drop PROCEDURE if EXISTS add_t_ds_tenant_uk_unique_tenant_code;
+delimiter d//
+CREATE PROCEDURE add_t_ds_tenant_uk_unique_tenant_code()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_tenant'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='unique_tenant_code')
+    THEN
 ALTER TABLE t_ds_tenant ADD UNIQUE KEY unique_tenant_code(tenant_code);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_tenant_uk_unique_tenant_code;
+DROP PROCEDURE add_t_ds_tenant_uk_unique_tenant_code;
 
+-- ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
+drop PROCEDURE if EXISTS add_t_ds_task_instance_uk_idx_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_instance_uk_idx_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_task_instance'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_code_version')
+    THEN
 ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_instance_uk_idx_code_version;
+DROP PROCEDURE add_t_ds_task_instance_uk_idx_code_version;
+
+-- ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
+drop PROCEDURE if EXISTS modify_t_ds_task_instance_col_task_params;
+delimiter d//
+CREATE PROCEDURE modify_t_ds_task_instance_col_task_params()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_instance'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME ='task_params')
+    THEN
 ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_params` longtext COMMENT 'job custom parameters' AFTER `app_link`;
+END IF;
+END;
+d//
+delimiter ;
+CALL modify_t_ds_task_instance_col_task_params;
+DROP PROCEDURE modify_t_ds_task_instance_col_task_params;
+
+-- ALTER TABLE `t_ds_task_instance` ADD COLUMN `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id';
+drop PROCEDURE if EXISTS add_t_ds_task_instance_col_task_group_id;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_instance_col_task_group_id()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_instance'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME ='task_group_id')
+    THEN
+ALTER TABLE `t_ds_task_instance` ADD COLUMN `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' after `var_pool`;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_instance_col_task_group_id;
+DROP PROCEDURE add_t_ds_task_instance_col_task_group_id;
+
+-- ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_code` (`project_code`, `process_definition_code`) USING BTREE;
+drop PROCEDURE if EXISTS add_t_ds_process_task_relation_key_idx_code;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_task_relation_key_idx_code()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_process_task_relation'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_code')
+    THEN
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_code` (`project_code`, `process_definition_code`) USING BTREE;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_process_task_relation_key_idx_code;
+DROP PROCEDURE add_t_ds_process_task_relation_key_idx_code;
+
+-- ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_pre_task_code_version` (`pre_task_code`,`pre_task_version`);
+drop PROCEDURE if EXISTS add_t_ds_process_task_relation_key_idx_pre_task_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_task_relation_key_idx_pre_task_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_process_task_relation'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_pre_task_code_version')
+    THEN
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_pre_task_code_version` (`pre_task_code`,`pre_task_version`);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_process_task_relation_key_idx_pre_task_code_version;
+DROP PROCEDURE add_t_ds_process_task_relation_key_idx_pre_task_code_version;
+
+-- ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_post_task_code_version` (`post_task_code`,`post_task_version`);
+drop PROCEDURE if EXISTS add_t_ds_process_task_relation_key_idx_post_task_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_task_relation_key_idx_post_task_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_process_task_relation'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_post_task_code_version')
+    THEN
 ALTER TABLE `t_ds_process_task_relation` ADD KEY `idx_post_task_code_version` (`post_task_code`,`post_task_version`);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_process_task_relation_key_idx_post_task_code_version;
+DROP PROCEDURE add_t_ds_process_task_relation_key_idx_post_task_code_version;
+
+-- ALTER TABLE `t_ds_process_task_relation_log` ADD KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`) USING BTREE;
+drop PROCEDURE if EXISTS add_t_ds_process_task_relation_key_idx_process_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_task_relation_key_idx_process_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_process_task_relation_log'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_process_code_version')
+    THEN
 ALTER TABLE `t_ds_process_task_relation_log` ADD KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`) USING BTREE;
-ALTER TABLE `t_ds_relation_process_instance` ADD KEY `idx_parent_process_task`( `parent_process_instance_id`, `parent_task_instance_id` );
-ALTER TABLE `t_ds_relation_process_instance` ADD KEY `idx_process_instance_id`(`process_instance_id`);
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_process_task_relation_key_idx_process_code_version;
+DROP PROCEDURE add_t_ds_process_task_relation_key_idx_process_code_version;
 
+-- ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_project_code` (`project_code`) USING BTREE;
+drop PROCEDURE if EXISTS add_t_ds_task_definition_log_key_idx_process_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_definition_log_key_idx_process_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_task_definition_log'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_project_code')
+    THEN
 ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_project_code` (`project_code`) USING BTREE;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_definition_log_key_idx_process_code_version;
+DROP PROCEDURE add_t_ds_task_definition_log_key_idx_process_code_version;
+
+-- ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_code_version` (`code`,`version`) USING BTREE;
+drop PROCEDURE if EXISTS add_t_ds_task_definition_log_key_idx_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_definition_log_key_idx_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_task_definition_log'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_code_version')
+    THEN
 ALTER TABLE `t_ds_task_definition_log` ADD INDEX `idx_code_version` (`code`,`version`) USING BTREE;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_definition_log_key_idx_code_version;
+DROP PROCEDURE add_t_ds_task_definition_log_key_idx_code_version;
+
+-- alter table t_ds_task_definition_log add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
+drop PROCEDURE if EXISTS add_t_ds_task_definition_log_col_task_group_id;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_definition_log_col_task_group_id()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_definition_log'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='task_group_id')
+    THEN
 alter table t_ds_task_definition_log add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
-alter table t_ds_task_definition_log add `task_group_priority` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `task_group_id`;
-alter table t_ds_task_definition add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
-alter table t_ds_task_definition add `task_group_priority` int(11) DEFAULT '0' COMMENT 'task group id' AFTER `task_group_id`;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_definition_log_col_task_group_id;
+DROP PROCEDURE add_t_ds_task_definition_log_col_task_group_id;
 
+-- alter table t_ds_task_definition_log add `task_group_id` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `resource_ids`;
+drop PROCEDURE if EXISTS add_t_ds_task_definition_col_task_group_id;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_definition_col_task_group_id()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_definition'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='task_group_id')
+    THEN
+alter table t_ds_task_definition add `task_group_id` int DEFAULT NULL COMMENT 'task group id';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_definition_col_task_group_id;
+DROP PROCEDURE add_t_ds_task_definition_col_task_group_id;
+
+-- alter table t_ds_task_definition_log add `task_group_priority` int(11) DEFAULT NULL COMMENT 'task group id' AFTER `task_group_id`;
+drop PROCEDURE if EXISTS add_t_ds_task_definition_log_col_task_group_priority;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_definition_log_col_task_group_priority()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_definition_log'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='task_group_priority')
+    THEN
+alter table t_ds_task_definition_log add `task_group_priority` tinyint DEFAULT '0' COMMENT 'task group priority' AFTER `task_group_id`;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_definition_log_col_task_group_priority;
+DROP PROCEDURE add_t_ds_task_definition_log_col_task_group_priority;
+
+-- alter table t_ds_task_definition add `task_group_priority` int(11) DEFAULT '0' COMMENT 'task group id' AFTER `task_group_id`;
+drop PROCEDURE if EXISTS add_t_ds_task_definition_col_task_group_priority;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_definition_col_task_group_priority()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_definition'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='task_group_priority')
+    THEN
+alter table t_ds_task_definition add `task_group_priority` tinyint DEFAULT '0' COMMENT 'task group priority' AFTER `task_group_id`;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_definition_col_task_group_priority;
+DROP PROCEDURE add_t_ds_task_definition_col_task_group_priority;
+
+-- ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone';
+drop PROCEDURE if EXISTS add_t_ds_user_col_time_zone;
+delimiter d//
+CREATE PROCEDURE add_t_ds_user_col_time_zone()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_user'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='time_zone')
+    THEN
 ALTER TABLE `t_ds_user` ADD COLUMN `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_user_col_time_zone;
+DROP PROCEDURE add_t_ds_user_col_time_zone;
+
+-- ALTER TABLE `t_ds_alert` ADD COLUMN `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed';
+drop PROCEDURE if EXISTS add_t_ds_alert_col_warning_type;
+delimiter d//
+CREATE PROCEDURE add_t_ds_alert_col_warning_type()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_alert'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='warning_type')
+    THEN
 ALTER TABLE `t_ds_alert` ADD COLUMN `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_alert_col_warning_type;
+DROP PROCEDURE add_t_ds_alert_col_warning_type;
 
+-- ALTER TABLE `t_ds_alert` ADD INDEX `idx_status` (`alert_status`) USING BTREE;
+drop PROCEDURE if EXISTS add_t_ds_alert_idx_idx_status;
+delimiter d//
+CREATE PROCEDURE add_t_ds_alert_idx_idx_status()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_alert'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='idx_status')
+    THEN
 ALTER TABLE `t_ds_alert` ADD INDEX `idx_status` (`alert_status`) USING BTREE;
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_alert_idx_idx_status;
+DROP PROCEDURE add_t_ds_alert_idx_idx_status;
 
--- Add resource limit column
-ALTER TABLE `t_ds_task_definition` ADD COLUMN `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity' AFTER `task_group_priority`;
-ALTER TABLE `t_ds_task_definition` ADD COLUMN `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity' AFTER `cpu_quota`;
-ALTER TABLE `t_ds_task_definition_log` ADD COLUMN `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity' AFTER `operate_time`;
-ALTER TABLE `t_ds_task_definition_log` ADD COLUMN `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity' AFTER `cpu_quota`;
-ALTER TABLE `t_ds_task_instance` ADD COLUMN `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity' AFTER `dry_run`;
-ALTER TABLE `t_ds_task_instance` ADD COLUMN `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity' AFTER `cpu_quota`;
+-- ALTER TABLE `t_ds_alert` ADD COLUMN `project_code` bigint DEFAULT NULL COMMENT 'project_code';
+-- ALTER TABLE `t_ds_alert` ADD COLUMN `process_definition_code` bigint DEFAULT NULL COMMENT 'process_definition_code';
+-- ALTER TABLE `t_ds_alert` ADD COLUMN `process_instance_id` int DEFAULT NULL COMMENT 'process_instance_id';
+-- ALTER TABLE `t_ds_alert` ADD COLUMN `alert_type` int DEFAULT NULL COMMENT 'alert_type';
+drop PROCEDURE if EXISTS add_t_ds_alert_col_project_code;
+delimiter d//
+CREATE PROCEDURE add_t_ds_alert_col_project_code()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_alert'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='project_code')
+    THEN
+ALTER TABLE `t_ds_alert` ADD COLUMN `project_code` bigint DEFAULT NULL COMMENT 'project_code';
+ALTER TABLE `t_ds_alert` ADD COLUMN `process_definition_code` bigint DEFAULT NULL COMMENT 'process_definition_code';
+ALTER TABLE `t_ds_alert` ADD COLUMN `process_instance_id` int DEFAULT NULL COMMENT 'process_instance_id';
+ALTER TABLE `t_ds_alert` ADD COLUMN `alert_type` int DEFAULT NULL COMMENT 'alert_type';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_alert_col_project_code;
+DROP PROCEDURE add_t_ds_alert_col_project_code;
 
+-- t_ds_task_instance
+drop PROCEDURE if EXISTS alter_t_ds_task_instance_col_log_path;
+delimiter d//
+CREATE PROCEDURE alter_t_ds_task_instance_col_log_path()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_instance'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='log_path')
+    THEN
+ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `log_path` longtext DEFAULT NULL COMMENT 'task log path';
+END IF;
+END;
+d//
+delimiter ;
+CALL alter_t_ds_task_instance_col_log_path;
+DROP PROCEDURE alter_t_ds_task_instance_col_log_path;
 
 --
 -- Table structure for table `t_ds_dq_comparison_type`
@@ -266,19 +657,19 @@ CREATE TABLE `t_ds_k8s` (
 DROP TABLE IF EXISTS `t_ds_k8s_namespace`;
 CREATE TABLE `t_ds_k8s_namespace` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` bigint(20) NOT NULL DEFAULT '0',
   `limits_memory` int(11) DEFAULT NULL,
   `namespace` varchar(100) DEFAULT NULL,
+  `online_job_num` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `pod_replicas` int(11) DEFAULT NULL,
   `pod_request_cpu` decimal(14,3) DEFAULT NULL,
   `pod_request_memory` int(11) DEFAULT NULL,
   `limits_cpu` decimal(14,3) DEFAULT NULL,
-  `cluster_code` bigint(20) NOT NULL DEFAULT '0',
+  `k8s` varchar(100) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `k8s_namespace_unique` (`namespace`,`cluster_code`)
+  UNIQUE KEY `k8s_namespace_unique` (`namespace`,`k8s`)
 ) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
 
 -- ----------------------------
@@ -293,24 +684,71 @@ CREATE TABLE `t_ds_relation_namespace_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `user_id_index` (`user_id`),
   UNIQUE KEY `namespace_user_unique` (`user_id`,`namespace_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
 
 -- ----------------------------
--- Table structure for t_ds_cluster
+-- Table structure for t_ds_alert_send_status
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_cluster`;
-CREATE TABLE `t_ds_cluster` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
-  `name` varchar(100) NOT NULL COMMENT 'cluster name',
-  `config` text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
-  `description` text NULL DEFAULT NULL COMMENT 'the details',
-  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `cluster_name_unique` (`name`),
-  UNIQUE KEY `cluster_code_unique` (`code`)
+DROP TABLE IF EXISTS t_ds_alert_send_status;
+CREATE TABLE t_ds_alert_send_status (
+    `id`                            int(11) NOT NULL AUTO_INCREMENT,
+    `alert_id`                      int(11) NOT NULL,
+    `alert_plugin_instance_id`      int(11) NOT NULL,
+    `send_status`                   tinyint(4) DEFAULT '0',
+    `log`                           text,
+    `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_audit_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_audit_log`;
+CREATE TABLE `t_ds_audit_log` (
+    `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+    `user_id` int(11) NOT NULL COMMENT 'user id',
+    `resource_type` int(11) NOT NULL COMMENT 'resource type',
+    `operation` int(11) NOT NULL COMMENT 'operation',
+    `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+    `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_task_group
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_group`;
+CREATE TABLE `t_ds_task_group` (
+   `id`  int(11)  NOT NULL AUTO_INCREMENT COMMENT'key',
+   `name` varchar(100) DEFAULT NULL COMMENT 'task_group name',
+   `description` varchar(200) DEFAULT NULL,
+   `group_size` int (11) NOT NULL COMMENT'group size',
+   `use_size` int (11) DEFAULT '0' COMMENT 'used size',
+   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+   `project_code` bigint(20) DEFAULT 0 COMMENT 'project code',
+   `status` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
+   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY(`id`)
+) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_task_group_queue
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_group_queue`;
+CREATE TABLE `t_ds_task_group_queue` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT'key',
+   `task_id` int(11) DEFAULT NULL COMMENT 'taskintanceid',
+   `task_name` varchar(100) DEFAULT NULL COMMENT 'TaskInstance name',
+   `group_id`  int(11) DEFAULT NULL COMMENT 'taskGroup id',
+   `process_id` int(11) DEFAULT NULL COMMENT 'processInstace id',
+   `priority` int(8) DEFAULT '0' COMMENT 'priority',
+   `status` tinyint(4) DEFAULT '-1' COMMENT '-1: waiting  1: running  2: finished',
+   `force_start` tinyint(4) DEFAULT '0' COMMENT 'is force start 0 NO ,1 YES',
+   `in_queue` tinyint(4) DEFAULT '0' COMMENT 'ready to get the queue by other task finish 0 NO ,1 YES',
+   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY( `id` )
+)ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;

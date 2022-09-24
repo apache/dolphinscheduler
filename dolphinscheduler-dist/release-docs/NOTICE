@@ -362,7 +362,7 @@ This product contains the Maven wrapper scripts from 'Maven Wrapper', that provi
 Spring Framework NOTICE
 
 ========================================================================
-Spring Framework 5.3.19
+Spring Framework 5.3.22
 Copyright (c) 2002-2022 Pivotal, Inc.
 
 This product is licensed to you under the Apache License, Version 2.0
@@ -1408,18 +1408,6 @@ This project contains annotations derived from JCIP-ANNOTATIONS
 Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
 =========================================================================
 
-
-htrace-core NOTICE
-
-
-=========================================================================
-Copyright 2015 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
 Hadoop NOTICE
 
 =========================================================================
@@ -1681,16 +1669,6 @@ which has the following notices:
  * This product includes software from the Spring Framework,under the Apache License 2.0 (see: StringUtils.containsWhitespace())
 
 The binary distribution of this product bundles binaries of
-Apache Log4j 1.2.17,
-which has the following notices:
- * ResolverUtil.java
-    Copyright 2005-2006 Tim Fennell
-  Dumbster SMTP test server
-    Copyright 2004 Jason Paul Kitchen
-  TypeUtil.java
-    Copyright 2002-2012 Ramnivas Laddad, Juergen Hoeller, Chris Beams
-
-The binary distribution of this product bundles binaries of
 Jetty 6.1.26,
 which has the following notices:
  * ==============================================================
@@ -1781,7 +1759,7 @@ which has the following notices:
    granted provided that the copyright notice appears in all copies./
 
 The binary distribution of this product bundles binaries of
-Snappy for Java 1.0.4.1,
+Snappy for Java 1.1.8.4,
 which has the following notices:
  * This product includes software developed by Google
     Snappy: http://code.google.com/p/snappy/ (New BSD License)
@@ -1990,3 +1968,131 @@ Xmlbeans NOTICE
     - W3C XML Schema documents Copyright 2001-2003 (c) World Wide Web
       Consortium (Massachusetts Institute of Technology, European Research
       Consortium for Informatics and Mathematics, Keio University)
+
+=========================================================================
+
+jetcd NOTICE
+
+=========================================================================
+
+    CoreOS Project
+    Copyright 2018 CoreOS, Inc
+
+    This product includes software developed at CoreOS, Inc.
+    (http://www.coreos.com/).
+
+=========================================================================
+
+grpc NOTICE
+
+=========================================================================
+
+    Copyright 2014 The gRPC Authors
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    -----------------------------------------------------------------------
+
+    This product contains a modified portion of 'OkHttp', an open source
+    HTTP & SPDY client for Android and Java applications, which can be obtained
+    at:
+
+      * LICENSE:
+        * okhttp/third_party/okhttp/LICENSE (Apache License 2.0)
+      * HOMEPAGE:
+        * https://github.com/square/okhttp
+      * LOCATION_IN_GRPC:
+        * okhttp/third_party/okhttp
+
+    This product contains a modified portion of 'Envoy', an open source
+    cloud-native high-performance edge/middle/service proxy, which can be
+    obtained at:
+
+      * LICENSE:
+        * xds/third_party/envoy/LICENSE (Apache License 2.0)
+      * NOTICE:
+        * xds/third_party/envoy/NOTICE
+      * HOMEPAGE:
+        * https://www.envoyproxy.io
+      * LOCATION_IN_GRPC:
+        * xds/third_party/envoy
+
+    This product contains a modified portion of 'protoc-gen-validate (PGV)',
+    an open source protoc plugin to generate polyglot message validators,
+    which can be obtained at:
+
+      * LICENSE:
+        * xds/third_party/protoc-gen-validate/LICENSE (Apache License 2.0)
+      * NOTICE:
+          * xds/third_party/protoc-gen-validate/NOTICE
+      * HOMEPAGE:
+        * https://github.com/envoyproxy/protoc-gen-validate
+      * LOCATION_IN_GRPC:
+        * xds/third_party/protoc-gen-validate
+
+    This product contains a modified portion of 'udpa',
+    an open source universal data plane API, which can be obtained at:
+
+      * LICENSE:
+        * xds/third_party/udpa/LICENSE (Apache License 2.0)
+      * HOMEPAGE:
+        * https://github.com/cncf/udpa
+      * LOCATION_IN_GRPC:
+        * xds/third_party/udpa
+
+=========================================================================
+
+perfmark NOTICE
+
+=========================================================================
+
+    Copyright 2019 Google LLC
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    -----------------------------------------------------------------------
+
+    This product contains a modified portion of 'Catapult', an open source
+    Trace Event viewer for Chome, Linux, and Android applications, which can
+    be obtained at:
+
+      * LICENSE:
+        * traceviewer/src/main/resources/io/perfmark/traceviewer/third_party/catapult/LICENSE (New BSD License)
+      * HOMEPAGE:
+        * https://github.com/catapult-project/catapult
+
+    This product contains a modified portion of 'Polymer', a library for Web
+    Components, which can be obtained at:
+      * LICENSE:
+        * traceviewer/src/main/resources/io/perfmark/traceviewer/third_party/polymer/LICENSE (New BSD License)
+      * HOMEPAGE:
+        * https://github.com/Polymer/polymer
+
+
+    This product contains a modified portion of 'ASM', an open source
+    Java Bytecode library, which can be obtained at:
+
+      * LICENSE:
+        * agent/src/main/resources/io/perfmark/agent/third_party/asm/LICENSE (BSD style License)
+      * HOMEPAGE:
+        * https://asm.ow2.io/

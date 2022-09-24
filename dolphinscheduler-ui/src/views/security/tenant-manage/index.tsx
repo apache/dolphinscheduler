@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, onMounted, watch, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  onMounted,
+  watch,
+  getCurrentInstance
+} from 'vue'
 import {
   NButton,
   NInput,
@@ -107,7 +113,7 @@ const tenementManage = defineComponent({
             </NButton>
             <NSpace>
               <NInput
-                  allowInput={this.trim}
+                allowInput={this.trim}
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('security.tenant.search_tips')}

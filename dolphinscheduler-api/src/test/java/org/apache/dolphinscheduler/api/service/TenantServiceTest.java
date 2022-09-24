@@ -106,7 +106,7 @@ public class TenantServiceTest {
 
         User loginUser = getLoginUser();
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result;
 
@@ -169,8 +169,9 @@ public class TenantServiceTest {
     @Test
     public void testUpdateTenant() throws Exception {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(tenantMapper.updateById(getTenant())).thenReturn(1);
 
         // update not exists tenant
         Throwable exception = Assertions.assertThrows(ServiceException.class, () -> tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, tenantDesc));
@@ -187,7 +188,7 @@ public class TenantServiceTest {
 
     @Test
     public void testDeleteTenantById() throws Exception {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null, getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, Constants.NOT_TERMINATED_STATES))
@@ -218,6 +219,7 @@ public class TenantServiceTest {
 
         // success
         Mockito.when(tenantMapper.queryById(4)).thenReturn(getTenant(4));
+        Mockito.when(tenantMapper.deleteById(4)).thenReturn(1);
         Map<String, Object> result = tenantService.deleteTenantById(getLoginUser(), 4);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }

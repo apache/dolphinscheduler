@@ -162,6 +162,7 @@ public class Constants {
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
     public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
+    public static final String COM_ATHENA_JDBC_DRIVER = "com.simba.athena.jdbc.Driver";
 
 
     /**
@@ -176,6 +177,7 @@ public class Constants {
     public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
     public static final String PRESTO_VALIDATION_QUERY = "select 1";
     public static final String REDHIFT_VALIDATION_QUERY = "select 1";
+    public static final String ATHENA_VALIDATION_QUERY = "select 1";
 
     /**
      * jdbc url
@@ -190,6 +192,7 @@ public class Constants {
     public static final String JDBC_DB2 = "jdbc:db2://";
     public static final String JDBC_PRESTO = "jdbc:presto://";
     public static final String JDBC_REDSHIFT = "jdbc:redshift://";
+    public static final String JDBC_ATHENA = "jdbc:awsathena://";
 
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";

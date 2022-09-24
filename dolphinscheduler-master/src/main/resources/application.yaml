@@ -17,8 +17,6 @@
 spring:
   banner:
     charset: UTF-8
-  application:
-    name: master-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -54,9 +52,9 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.threadPool:threadPriority: 5
+      org.quartz.threadPool.threadPriority: 5
       org.quartz.jobStore.isClustered: true
-      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.jobStore.class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
       org.quartz.scheduler.instanceId: AUTO
       org.quartz.jobStore.tablePrefix: QRTZ_
       org.quartz.jobStore.acquireTriggersWithinLock: true
@@ -66,6 +64,7 @@ spring:
       org.quartz.threadPool.makeThreadsDaemons: true
       org.quartz.threadPool.threadCount: 25
       org.quartz.jobStore.misfireThreshold: 60000
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
@@ -98,8 +97,6 @@ master:
   host-selector: lower_weight
   # master heartbeat interval
   heartbeat-interval: 10s
-  # Master heart beat task error threshold, if the continuous error count exceed this count, the master will close.
-  heartbeat-error-threshold: 5
   # master commit task retry times
   task-commit-retry-times: 5
   # master commit task interval
@@ -113,6 +110,11 @@ master:
   failover-interval: 10m
   # kill yarn jon when failover taskInstance, default true
   kill-yarn-job-when-task-failover: true
+  registry-disconnect-strategy:
+    # The disconnect strategy: stop, waiting
+    strategy: waiting
+    # The max waiting time to reconnect to registry if you set the strategy to waiting
+    max-waiting-time: 100s
 
 server:
   port: 5679

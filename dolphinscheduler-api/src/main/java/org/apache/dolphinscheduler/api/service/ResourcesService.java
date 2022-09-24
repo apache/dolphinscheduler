@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -218,6 +219,15 @@ public interface ResourcesService {
      * @return unauthorized result code
      */
     Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
+
+    /**
+     * Get resource by given resource type and full name.
+     * Useful in Python API create task which need processDefinition information.
+     *
+     * @param userName user who query resource
+     * @param fullName full name of the resource
+     */
+    Resource queryResourcesFileInfo(String userName, String fullName);
 
     /**
      * unauthorized file

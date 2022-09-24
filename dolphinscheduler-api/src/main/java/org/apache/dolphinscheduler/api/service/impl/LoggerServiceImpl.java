@@ -24,13 +24,14 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -65,7 +66,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @Autowired
     private ProcessService processService;
 
-    private LogClientService logClient;
+    @Autowired
+    private LogClient logClient;
 
     @Autowired
     ProjectMapper projectMapper;
@@ -75,20 +77,6 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
     @Autowired
     TaskDefinitionMapper taskDefinitionMapper;
-
-    @PostConstruct
-    public void init() {
-        if (Objects.isNull(this.logClient)) {
-            this.logClient = new LogClientService();
-        }
-    }
-
-    @PreDestroy
-    public void close() {
-        if (Objects.nonNull(this.logClient) && this.logClient.isRunning()) {
-            logClient.close();
-        }
-    }
 
     /**
      * view log
@@ -100,19 +88,22 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Result<String> queryLog(int taskInstId, int skipLineNum, int limit) {
+    public Result<ResponseTaskLog> queryLog(int taskInstId, int skipLineNum, int limit) {
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
         if (taskInstance == null) {
+            logger.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
         }
         if (StringUtils.isBlank(taskInstance.getHost())) {
+            logger.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
-        Result<String> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
-        String log = queryLog(taskInstance,skipLineNum,limit);
-        result.setData(log);
+        Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
+        String log = queryLog(taskInstance, skipLineNum, limit);
+        int lineNum = log.split("\\r\\n").length;
+        result.setData(new ResponseTaskLog(lineNum, log));
         return result;
     }
 
@@ -208,8 +199,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
         Host host = Host.of(taskInstance.getHost());
 
-        logger.info("log host : {} , logPath : {} , port : {}", host.getIp(), taskInstance.getLogPath(),
-                host.getPort());
+        logger.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host:{}, logPath:{}, port:{}",
+                taskInstance.getId(), taskInstance.getName(), host.getIp(), taskInstance.getLogPath(), host.getPort());
 
         StringBuilder log = new StringBuilder();
         if (skipLineNum == 0) {

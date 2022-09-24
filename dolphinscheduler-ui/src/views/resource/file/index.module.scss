@@ -36,13 +36,6 @@
   margin-left: 160px;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-}
-
 .table-box {
   table {
     width: 100%;
@@ -70,27 +63,6 @@
   }
 }
 
-.table-card {
-  > div div {
-    flex: none !important;
-  }
-}
-
 .breadcrumb {
   padding-left: 10px;
-}
-
-.conditions-model {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px 0;
-  .right {
-    > .form-box {
-      .list {
-        float: right;
-        margin: 3px 0 3px 4px;
-      }
-    }
-  }
 }

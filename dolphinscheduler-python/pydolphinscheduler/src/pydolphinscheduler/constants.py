@@ -57,6 +57,11 @@ class TaskType(str):
     FLINK = "FLINK"
     SPARK = "SPARK"
     MR = "MR"
+    SAGEMAKER = "SAGEMAKER"
+    MLFLOW = "MLFLOW"
+    OPENMLDB = "OPENMLDB"
+    PYTORCH = "PYTORCH"
+    DVC = "DVC"
 
 
 class DefaultTaskCodeNum(str):

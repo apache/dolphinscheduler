@@ -35,15 +35,15 @@ import lombok.ToString;
 public class TaskExecuteAckCommand extends BaseCommand {
 
     private int taskInstanceId;
-    private int status;
+    private boolean success;
 
-    public TaskExecuteAckCommand(int status,
+    public TaskExecuteAckCommand(boolean success,
                                  int taskInstanceId,
                                  String sourceServerAddress,
                                  String messageReceiverAddress,
                                  long messageSendTime) {
         super(sourceServerAddress, messageReceiverAddress, messageSendTime);
-        this.status = status;
+        this.success = success;
         this.taskInstanceId = taskInstanceId;
     }
 

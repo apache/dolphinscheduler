@@ -31,15 +31,15 @@ import lombok.ToString;
 public class TaskRejectAckCommand extends BaseCommand {
 
     private int taskInstanceId;
-    private int status;
+    private boolean success;
 
-    public TaskRejectAckCommand(int status,
+    public TaskRejectAckCommand(boolean success,
                                 int taskInstanceId,
                                 String messageSenderAddress,
                                 String messageReceiverAddress,
                                 long messageSendTime) {
         super(messageSenderAddress, messageReceiverAddress, messageSendTime);
-        this.status = status;
+        this.success = success;
         this.taskInstanceId = taskInstanceId;
     }
 

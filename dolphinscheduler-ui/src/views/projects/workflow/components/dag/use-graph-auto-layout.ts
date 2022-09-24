@@ -80,7 +80,7 @@ export function useGraphAutoLayout(options: Options) {
    * @returns
    */
   function format(layoutConfig: LayoutConfig) {
-    if (!layoutConfig) {
+    if (Object.keys(layoutConfig).length === 0) {
       layoutConfig = DEFAULT_LAYOUT_CONFIG
     }
     const graph = graphRef?.value
@@ -155,6 +155,8 @@ export function useGraphAutoLayout(options: Options) {
         format(formValue.value)
         toggle(false)
       })
+    } else {
+      format({} as LayoutConfig)
     }
   }
 

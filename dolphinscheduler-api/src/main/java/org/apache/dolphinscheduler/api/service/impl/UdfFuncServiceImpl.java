@@ -93,22 +93,28 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
+        if(checkDescriptionLength(desc)){
+            logger.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+            logger.error("Storage does not start up, resource upload startup state: {}.", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
 
         // verify udf func name exist
         if (checkUdfFuncNameExists(funcName)) {
+            logger.warn("Udf function with the same name already exists.");
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
             return result;
         }
 
         Resource resource = resourceMapper.selectById(resourceId);
         if (resource == null) {
-            logger.error("resourceId {} is not exist", resourceId);
+            logger.error("Resource does not exist, resourceId:{}.", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -134,6 +140,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         udf.setUpdateTime(now);
 
         udfFuncMapper.insert(udf);
+        logger.info("UDF function create complete, udfFuncName:{}.", udf.getFuncName());
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(AuthorizationType.UDF, loginUser.getId(), Collections.singletonList(udf.getId()), logger);
         return result;
@@ -165,6 +172,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
+            logger.error("Resource does not exist, resourceId:{}.", id);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -203,11 +211,16 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-
+        if(checkDescriptionLength(desc)){
+            logger.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         // verify udfFunc is exist
         UdfFunc udf = udfFuncMapper.selectUdfById(udfFuncId);
 
         if (udf == null) {
+            logger.error("UDF function does not exist, udfFuncId:{}.", udfFuncId);
             result.setCode(Status.UDF_FUNCTION_NOT_EXIST.getCode());
             result.setMsg(Status.UDF_FUNCTION_NOT_EXIST.getMsg());
             return result;
@@ -215,7 +228,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+            logger.error("Storage does not start up, resource upload startup state: {}.", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -223,7 +236,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         // verify udfFuncName is exist
         if (!funcName.equals(udf.getFuncName())) {
             if (checkUdfFuncNameExists(funcName)) {
-                logger.error("UdfFuncRequest {} has exist, can't create again.", funcName);
+                logger.warn("Udf function exists, can not create again, udfFuncName:{}.", funcName);
                 result.setCode(Status.UDF_FUNCTION_EXISTS.getCode());
                 result.setMsg(Status.UDF_FUNCTION_EXISTS.getMsg());
                 return result;
@@ -232,7 +245,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         Resource resource = resourceMapper.selectById(resourceId);
         if (resource == null) {
-            logger.error("resourceId {} is not exist", resourceId);
+            logger.error("Resource does not exist, resourceId:{}.", resourceId);
             result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
             result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
             return result;
@@ -252,6 +265,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         udf.setUpdateTime(now);
 
         udfFuncMapper.updateById(udf);
+        logger.info("UDF function update complete, udfFuncId:{}, udfFuncName:{}.", udfFuncId, funcName);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -347,6 +361,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
+        logger.info("UDF function delete complete, udfFuncId:{}.", id);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -367,6 +382,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
 
         if (checkUdfFuncNameExists(name)) {
+            logger.warn("Udf function with the same already exists.");
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
         } else {
             putMsg(result, Status.SUCCESS);

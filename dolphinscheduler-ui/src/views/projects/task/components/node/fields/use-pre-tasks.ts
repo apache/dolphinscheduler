@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import type { IJsonItem } from '../types'
@@ -22,6 +23,14 @@ import type { IJsonItem } from '../types'
 export function usePreTasks(): IJsonItem {
   const { t } = useI18n()
   const taskStore = useTaskNodeStore()
+  const options = ref(taskStore.getPreTaskOptions)
+
+  watch(
+    () => taskStore.getPreTaskOptions,
+    (value) => {
+      options.value = value
+    }
+  )
 
   return {
     type: 'select',
@@ -33,6 +42,6 @@ export function usePreTasks(): IJsonItem {
       multiple: true,
       filterable: true
     },
-    options: taskStore.getPreTaskOptions
+    options
   }
 }

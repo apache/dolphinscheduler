@@ -41,7 +41,8 @@ backend:
   - 'script/**/*'
 
 document:
-  - any: ['docs/**/*']
+  - 'docs/**/*'
+  - 'dolphinscheduler-python/pydolphinscheduler/docs/**/*'
 
 CI&CD:
   - any: ['.github/**/*']

@@ -17,33 +17,36 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
+import com.google.common.collect.Sets;
+import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-
-import java.time.Duration;
-import java.util.Set;
-
+import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
-import com.google.common.collect.Sets;
+import java.time.Duration;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import lombok.Data;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
 @Data
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = "worker")
 public class WorkerConfig implements Validator {
+
+    private Logger logger = LoggerFactory.getLogger(WorkerConfig.class);
+
     private int listenPort = 1234;
     private int execThreads = 10;
     private Duration heartbeatInterval = Duration.ofSeconds(10);
-    /**
-     * Worker heart beat task error threshold, if the continuous error count exceed this count, the worker will close.
-     */
-    private int heartbeatErrorThreshold = 5;
     private int hostWeight = 100;
     private boolean tenantAutoCreate = true;
     private boolean tenantDistributedUser = false;
@@ -52,10 +55,13 @@ public class WorkerConfig implements Validator {
     private Set<String> groups = Sets.newHashSet("default");
     private String alertListenHost = "localhost";
     private int alertListenPort = 50052;
+    private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
+
     /**
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
      */
     private String workerAddress;
+    private Set<String> workerGroupRegistryPaths;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -68,15 +74,42 @@ public class WorkerConfig implements Validator {
         if (workerConfig.getExecThreads() <= 0) {
             errors.rejectValue("exec-threads", null, "should be a positive value");
         }
-        if (workerConfig.getHeartbeatInterval().toMillis() <= 0) {
+        if (workerConfig.getHeartbeatInterval().getSeconds() <= 0) {
             errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
         }
         if (workerConfig.getMaxCpuLoadAvg() <= 0) {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        if (workerConfig.getHeartbeatErrorThreshold() <= 0) {
-            errors.rejectValue("heartbeat-error-threshold", null, "should be a positive value");
-        }
         workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+
+        workerConfig.setGroups(workerConfig.getGroups().stream().map(String::trim).collect(Collectors.toSet()));
+        if (CollectionUtils.isEmpty(workerConfig.getGroups())) {
+            errors.rejectValue("groups", null, "should not be empty");
+        }
+
+        Set<String> workerRegistryPaths = workerConfig.getGroups()
+                .stream()
+                .map(workerGroup -> REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerGroup + "/" + workerConfig.getWorkerAddress())
+                .collect(Collectors.toSet());
+
+        workerConfig.setWorkerGroupRegistryPaths(workerRegistryPaths);
+        printConfig();
+    }
+
+    private void printConfig() {
+        logger.info("Worker config: listenPort -> {}", listenPort);
+        logger.info("Worker config: execThreads -> {}", execThreads);
+        logger.info("Worker config: heartbeatInterval -> {}", heartbeatInterval);
+        logger.info("Worker config: hostWeight -> {}", hostWeight);
+        logger.info("Worker config: tenantAutoCreate -> {}", tenantAutoCreate);
+        logger.info("Worker config: tenantDistributedUser -> {}", tenantDistributedUser);
+        logger.info("Worker config: maxCpuLoadAvg -> {}", maxCpuLoadAvg);
+        logger.info("Worker config: reservedMemory -> {}", reservedMemory);
+        logger.info("Worker config: groups -> {}", groups);
+        logger.info("Worker config: alertListenHost -> {}", alertListenHost);
+        logger.info("Worker config: alertListenPort -> {}", alertListenPort);
+        logger.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
+        logger.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
+        logger.info("Worker config: workerGroupRegistryPaths: {}", workerGroupRegistryPaths);
     }
 }
