@@ -117,4 +117,14 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,
                                              @Param("status") int status);
+
+
+    /**
+     * @param workerGroupName workerGroupName
+     * @param states          states array
+     * @return task instance list
+     */
+    List<TaskInstance> queryByWorkerGroupNameAndStatus(
+            @Param("workerGroupName") String workerGroupName,
+            @Param("states") int[] states);
 }

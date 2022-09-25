@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -89,6 +90,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstance.setEndTime(new Date());
         taskInstance.setProcessInstanceId(processInstanceId);
         taskInstance.setTaskType(taskType);
+        taskInstance.setWorkerGroup("workgroup");
         taskInstanceMapper.insert(taskInstance);
         return taskInstance;
     }
@@ -289,6 +291,23 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 Collections.singletonList(task.getTaskCode()));
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertEquals(taskInstances.size(), 1);
+    }
+
+
+    /**
+     * test query by workgroup and state
+     */
+    @Test
+    public void testQueryByWorkerGroupNameAndStatus() {
+
+        // insert taskInstance
+        TaskInstance task = insertTaskInstance(10, "SHEEL");
+
+        List<TaskInstance> taskInstances = taskInstanceMapper.queryByWorkerGroupNameAndStatus(
+                "workgroup",
+                Constants.NOT_TERMINATED_STATES);
+        taskInstanceMapper.deleteById(task.getId());
+        Assert.assertEquals(1, taskInstances.size());
     }
 
     /**

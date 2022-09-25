@@ -201,6 +201,9 @@ public enum Status {
             "Switch process definition version error: not exists process definition version, [process definition id {0}] [version number {1}]",
             "切换工作流版本出错：工作流版本信息不存在，[工作流id {0}] [版本号 {1}]"),
     QUERY_PROCESS_DEFINITION_VERSIONS_ERROR(10154, "query process definition versions error", "查询工作流历史版本信息出错"),
+    DELETE_WORKER_GROUP_BY_TASK_ID_FAIL(10155,
+            "delete worker group by id fail, for there are {0} task instances in executing using it",
+            "删除Worker分组失败，因为有[{0}]个运行中的任务实例正在使用"),
     DELETE_PROCESS_DEFINITION_VERSION_ERROR(10156, "delete process definition version error", "删除工作流历史版本出错"),
 
     QUERY_USER_CREATED_PROJECT_ERROR(10157, "query user created project error error", "查询用户创建的项目错误"),
