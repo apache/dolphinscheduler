@@ -92,7 +92,7 @@ public class SqlTask extends AbstractTask {
 
     public static final int TEST_FLAG_YES = 1;
 
-    private static final String sqlSeparator = ";\n";
+    private static final String SQL_SEPARATOR = ";\n";
 
     /**
      * Abstract Yarn Task
@@ -133,7 +133,7 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getConnParams(),
                 sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
-        String separator = sqlSeparator;
+        String separator = SQL_SEPARATOR;
         try {
 
             // get datasource
