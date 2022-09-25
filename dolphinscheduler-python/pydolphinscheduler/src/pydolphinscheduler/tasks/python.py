@@ -59,44 +59,46 @@ class Python(Task):
         "raw_script",
     }
 
+    ext: set = {".py"}
+    ext_attr: str = "_raw_script"
+
     def __init__(
         self, name: str, definition: Union[str, types.FunctionType], *args, **kwargs
     ):
+        self._raw_script = self.raw_script(definition)
         super().__init__(name, TaskType.PYTHON, *args, **kwargs)
-        self.definition = definition
 
-    def _build_exe_str(self) -> str:
+    def _build_exe_str(self, definition: Union[str, types.FunctionType]) -> str:
         """Build executable string from given definition.
 
         Attribute ``self.definition`` almost is a function, we need to call this function after parsing it
         to string. The easier way to call a function is using syntax ``func()`` and we use it to call it too.
         """
-        if isinstance(self.definition, types.FunctionType):
-            py_function = inspect.getsource(self.definition)
-            func_str = f"{py_function}{self.definition.__name__}()"
+        if isinstance(definition, types.FunctionType):
+            py_function = inspect.getsource(definition)
+            func_str = f"{py_function}{definition.__name__}()"
         else:
             pattern = re.compile("^def (\\w+)\\(")
-            find = pattern.findall(self.definition)
+            find = pattern.findall(definition)
             if not find:
                 log.warning(
                     "Python definition is simple script instead of function, with value %s",
-                    self.definition,
+                    definition,
                 )
-                return self.definition
+                return definition
             # Keep function str and function callable always have one blank line
             func_str = (
-                f"{self.definition}{find[0]}()"
-                if self.definition.endswith("\n")
-                else f"{self.definition}\n{find[0]}()"
+                f"{definition}{find[0]}()"
+                if definition.endswith("\n")
+                else f"{definition}\n{find[0]}()"
             )
         return func_str
 
-    @property
-    def raw_script(self) -> str:
+    def raw_script(self, definition: Union[str, types.FunctionType]) -> str:
         """Get python task define attribute `raw_script`."""
-        if isinstance(self.definition, (str, types.FunctionType)):
-            return self._build_exe_str()
+        if isinstance(definition, (str, types.FunctionType)):
+            return self._build_exe_str(definition)
         else:
             raise PyDSParamException(
-                "Parameter definition do not support % for now.", type(self.definition)
+                "Parameter definition do not support % for now.", type(definition)
             )
