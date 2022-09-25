@@ -979,17 +979,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         for (ProcessDefinition process : processDefinitionList) {
-            Map<String, Object> deleteResult;
             try {
-                deleteResult = this.deleteProcessDefinitionByCode(loginUser, projectCode, process.getCode());
+                this.deleteProcessDefinitionByCode(loginUser, process.getCode());
             } catch (Exception e) {
-                logger.error("Delete process definition error, processName:{}", process.getName(), e);
-                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName());
-            }
-            if (deleteResult.get(Constants.STATUS) != Status.SUCCESS) {
-                // throw exception to rollback
-                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(),
-                        deleteResult.get(Constants.MSG));
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
             }
         }
         putMsg(result, Status.SUCCESS);
