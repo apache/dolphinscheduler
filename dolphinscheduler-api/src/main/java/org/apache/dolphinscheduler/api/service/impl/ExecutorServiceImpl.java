@@ -341,7 +341,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         List<TaskDefinitionLog> taskDefinitionLogList = processService
             .genTaskDefineList(processTaskRelations);
         List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream()
-            .map(t -> (TaskDefinition) t).collect(
+            .map(TaskDefinition.class::cast).collect(
                 Collectors.toList());
 
         for (TaskDefinition taskDefinition : taskDefinitions) {
