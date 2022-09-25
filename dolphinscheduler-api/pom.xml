@@ -191,8 +191,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.htrace</groupId>
-            <artifactId>htrace-core4</artifactId>
+            <groupId>org.apache.hbase.thirdparty</groupId>
+            <artifactId>hbase-noop-htrace</artifactId>
             <version>${htrace.version}</version>
             <scope>runtime</scope>
         </dependency>

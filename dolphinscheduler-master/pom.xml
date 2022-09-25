@@ -96,8 +96,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.htrace</groupId>
-            <artifactId>htrace-core4</artifactId>
+            <groupId>org.apache.hbase.thirdparty</groupId>
+            <artifactId>hbase-noop-htrace</artifactId>
             <version>${htrace.version}</version>
         </dependency>
 
@@ -159,6 +159,11 @@
                     <artifactId>htrace-core4</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
