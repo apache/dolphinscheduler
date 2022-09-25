@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -59,6 +60,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -144,6 +146,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Autowired
+    private WorkerGroupService workerGroupService;
 
     /**
      * execute process instance
@@ -305,6 +310,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (!checkSubProcessDefinitionValid(processDefinition)) {
             throw new ServiceException(Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
         }
+        // check worker group exists
+        List<String> workerGroupNames = workerGroupService.getAllWorkerGroupNames();
+        if (!checkWorkerGroupNameExists(processDefinition, workerGroupNames)){
+            throw new ServiceException(Status.WORKER_GROUP_NOT_EXISTS);
+        }
     }
 
     /**
@@ -345,6 +355,50 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
+     * check whether worker group is available
+     *
+     * @param processDefinition process definition
+     * @param workerGroupNames worker group name list
+     * @return result
+     */
+    public boolean checkWorkerGroupNameExists(ProcessDefinition processDefinition,
+        List<String> workerGroupNames) {
+        // get all task definitions in this process definition
+        List<ProcessTaskRelation> processTaskRelations = processService
+            .findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
+        List<TaskDefinitionLog> taskDefinitionLogList = processService
+            .genTaskDefineList(processTaskRelations);
+        List<TaskDefinition> taskDefinitions = taskDefinitionLogList.stream()
+            .map(TaskDefinition.class::cast).collect(
+                Collectors.toList());
+
+        for (TaskDefinition taskDefinition : taskDefinitions) {
+            if (!workerGroupNames.contains(taskDefinition.getWorkerGroup())) {
+                logger.error("Cannot find worker group {} configured on task definition named {} ",
+                    taskDefinition.getWorkerGroup(), taskDefinition.getName());
+                return false;
+            }
+
+            if (TaskConstants.TASK_TYPE_SUB_PROCESS
+                .equalsIgnoreCase(taskDefinition.getTaskType())) {
+                long subProcessCode = Long
+                    .parseLong(JSONUtils.getNodeString(taskDefinition.getTaskParams(),
+                        Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE));
+
+                ProcessDefinition subProcessDefinition = processDefinitionMapper
+                    .queryByCode(subProcessCode);
+                if (subProcessDefinition == null) {
+                    return false;
+                }
+                if (!checkWorkerGroupNameExists(subProcessDefinition, workerGroupNames)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
     
     
@@ -374,6 +428,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+
+        // check worker group exists
+        List<String> workerGroupNames = workerGroupService.getAllWorkerGroupNames();
+        if (!workerGroupNames.contains(processInstance.getWorkerGroup())) {
+            putMsg(result, Status.WORKER_GROUP_NOT_EXISTS_PROCESSING, processInstance.getId(),
+                processInstance.getWorkerGroup());
+            return result;
+        }
 
         ProcessDefinition processDefinition =
                 processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),

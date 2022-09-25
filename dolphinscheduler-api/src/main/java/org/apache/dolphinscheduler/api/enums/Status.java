@@ -357,6 +357,8 @@ public enum Status {
     BATCH_EXECUTE_PROCESS_INSTANCE_ERROR(50058, "change process instance status error: {0}", "修改工作实例状态错误: {0}"),
     START_TASK_INSTANCE_ERROR(50059, "start task instance error", "运行任务流实例错误"),
     DELETE_PROCESS_DEFINE_ERROR(50060, "delete process definition [{0}] error: {1}", "删除工作流定义[{0}]错误: {1}"),
+    WORKER_GROUP_NOT_EXISTS(50061, "exist task's worker group not exists", "存在任务的Wroker工作组不存在"),
+    WORKER_GROUP_NOT_EXISTS_PROCESSING(50062, "process instance [{0}] Worker group [{1}] not exists", "工作流实例[{0}]中Worker工作组[{1}]不存在"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),

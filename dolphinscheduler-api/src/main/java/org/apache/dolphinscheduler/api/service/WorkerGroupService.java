@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.List;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -72,5 +73,11 @@ public interface WorkerGroupService {
      * @return all worker address list
      */
     Map<String, Object> getWorkerAddressList();
+
+    /**
+     * get all worker group names
+     * @return worker group name list
+     */
+    List<String> getAllWorkerGroupNames();
 
 }
