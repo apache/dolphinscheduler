@@ -55,25 +55,24 @@ class Python(Task):
         want to execute.
     """
 
-    _task_custom_attr = {
-        "raw_script",
-    }
+    _task_custom_attr = {"raw_script", "definition"}
 
     ext: set = {".py"}
-    ext_attr: str = "_raw_script"
+    ext_attr: Union[str, types.FunctionType] = "_definition"
 
     def __init__(
         self, name: str, definition: Union[str, types.FunctionType], *args, **kwargs
     ):
-        self._raw_script = self.raw_script(definition)
+        self._definition = definition
         super().__init__(name, TaskType.PYTHON, *args, **kwargs)
 
-    def _build_exe_str(self, definition: Union[str, types.FunctionType]) -> str:
+    def _build_exe_str(self) -> str:
         """Build executable string from given definition.
 
         Attribute ``self.definition`` almost is a function, we need to call this function after parsing it
         to string. The easier way to call a function is using syntax ``func()`` and we use it to call it too.
         """
+        definition = getattr(self, "definition")
         if isinstance(definition, types.FunctionType):
             py_function = inspect.getsource(definition)
             func_str = f"{py_function}{definition.__name__}()"
@@ -94,11 +93,13 @@ class Python(Task):
             )
         return func_str
 
-    def raw_script(self, definition: Union[str, types.FunctionType]) -> str:
+    @property
+    def raw_script(self) -> str:
         """Get python task define attribute `raw_script`."""
-        if isinstance(definition, (str, types.FunctionType)):
-            return self._build_exe_str(definition)
+        if isinstance(getattr(self, "definition"), (str, types.FunctionType)):
+            return self._build_exe_str()
         else:
             raise PyDSParamException(
-                "Parameter definition do not support % for now.", type(definition)
+                "Parameter definition do not support % for now.",
+                type(getattr(self, "definition")),
             )
