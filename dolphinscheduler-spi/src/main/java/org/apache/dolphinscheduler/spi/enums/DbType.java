@@ -75,4 +75,12 @@ public enum DbType {
     public boolean isHive() {
         return this == DbType.HIVE;
     }
+
+    /**
+     * support execute multiple segmented statements at a time
+     * @return
+     */
+    public boolean isSupportMultipleStatement() {
+        return isHive() || this == DbType.SPARK;
+    }
 }

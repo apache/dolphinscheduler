@@ -642,8 +642,6 @@ export default {
     emr_flow_define_json_tips: '请输入工作流定义',
     emr_steps_define_json: 'stepsDefineJson',
     emr_steps_define_json_tips: '请输入EMR步骤定义',
-    segment_separator: '分段执行符号',
-    segment_separator_tips: '请输入分段执行符号',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
