@@ -159,8 +159,10 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             TaskInstance taskInstance = entry.getValue();
             String address = NetUtils.getAddr(masterConfig.getListenPort());
             if (processInstance.getHost().equalsIgnoreCase(address)) {
+                logger.info("Process host is local master, will notify it");
                 this.notifyMyself(processInstance, taskInstance);
             } else {
+                logger.info("Process host is remote master, will notify it");
                 this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
             }
         }
@@ -190,8 +192,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                                TaskInstance taskInstance) {
         String processInstanceHost = processInstance.getHost();
         if (Strings.isNullOrEmpty(processInstanceHost)) {
-            logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(),
-                    taskInstance.getId());
+            logger.error("Process {} host is empty, cannot notify task {} now, taskId: {}", processInstance.getName(),
+                    taskInstance.getName(), taskInstance.getId());
             return;
         }
         WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
