@@ -28,6 +28,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT;
 import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.isA;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
@@ -66,6 +68,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
@@ -168,6 +171,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     protected User user;
     protected Exception exception;
@@ -505,6 +511,12 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(anyLong(), anyLong()))
+            .thenReturn(getProcessTaskRelation());
+        Mockito.when(processTaskRelationMapper.deleteByCode(anyLong(), anyLong()))
+            .thenReturn(1);
+        Mockito.when(taskDefinitionMapper.deleteByCodeList(anyList()))
+            .thenReturn(1);
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
     }
 
