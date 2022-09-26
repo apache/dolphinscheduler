@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -29,28 +26,21 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({
-        JSONUtils.class
-})
-@PowerMockIgnore({"javax.*"})
-
+@RunWith(MockitoJUnitRunner.class)
 public class SparkTaskTest {
 
     @Test
     public void testBuildCommandWithSparkSql() throws Exception {
         String parameters = buildSparkParametersWithSparkSql();
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
+        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
 
-        SparkTask sparkTask = spy(new SparkTask(taskExecutionContext));
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
         Assert.assertEquals(sparkTask.buildCommand(),
                 "${SPARK_HOME}/bin/spark-sql " +
@@ -68,11 +58,9 @@ public class SparkTaskTest {
     @Test
     public void testBuildCommandWithSparkSubmit() {
         String parameters = buildSparkParametersWithSparkSubmit();
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
-        SparkTask sparkTask = spy(new SparkTask(taskExecutionContext));
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
         Assert.assertEquals(sparkTask.buildCommand(),
                 "${SPARK_HOME}/bin/spark-submit " +
