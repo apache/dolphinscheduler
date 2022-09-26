@@ -37,13 +37,9 @@ import java.util.List;
 @ToString
 public class DatasyncParameters extends AbstractParameters {
 
-    @JsonProperty("DestinationLocationArn")
     private String destinationLocationArn;
-    @JsonProperty("SourceLocationArn")
     private String sourceLocationArn;
-    @JsonProperty("Name")
     private String name;
-    @JsonProperty("CloudWatchLogGroupArn")
     private String cloudWatchLogGroupArn;
 
     private boolean jsonFormat;
