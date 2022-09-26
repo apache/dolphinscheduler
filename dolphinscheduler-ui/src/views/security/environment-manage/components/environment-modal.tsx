@@ -160,7 +160,6 @@ const EnvironmentModal = defineComponent({
                   path='config'
                 >
                   <NInput
-                    allowInput={this.trim}
                     class='input-environment-config'
                     placeholder={envConfigPlaceholder}
                     type='textarea'
