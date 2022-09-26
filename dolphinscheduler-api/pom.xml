@@ -193,8 +193,6 @@
         <dependency>
             <groupId>org.apache.hbase.thirdparty</groupId>
             <artifactId>hbase-noop-htrace</artifactId>
-            <version>${htrace.version}</version>
-            <scope>runtime</scope>
         </dependency>
 
         <dependency>

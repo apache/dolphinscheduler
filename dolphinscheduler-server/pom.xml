@@ -143,7 +143,6 @@
         <dependency>
             <groupId>org.apache.hbase.thirdparty</groupId>
             <artifactId>hbase-noop-htrace</artifactId>
-            <version>${htrace.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
@@ -194,10 +193,6 @@
                 <exclusion>
                     <artifactId>log4j</artifactId>
                     <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.htrace</groupId>
-                    <artifactId>htrace-core4</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

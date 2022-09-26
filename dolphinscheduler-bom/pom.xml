@@ -96,6 +96,7 @@
         <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
         <snakeyaml.version>1.31</snakeyaml.version>
+        <htrace.version>4.1.1</htrace.version>
     </properties>
 
     <dependencyManagement>
@@ -452,13 +453,6 @@
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.htrace</groupId>
-                <artifactId>htrace-core4</artifactId>
-                <scope>provided</scope>
-                <!-- set to provided to exclude from all hadoop-* transitive dependencies -->
             </dependency>
 
             <!-- replace htrace-core with hbase-noop-htrace for CVE -->
