@@ -796,11 +796,12 @@ CREATE TABLE `t_ds_resources` (
 DROP TABLE IF EXISTS `t_ds_relation_resources_task`;
 CREATE TABLE `t_ds_relation_resources_task` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `task_id` int(11) DEFAULT NULL COMMENT 'task id',
   `full_name` varchar(255) DEFAULT NULL,
   `type` tinyint DEFAULT NULL COMMENT 'resource type,0:FILE,1:UDF',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_relation_resources_task_un` (`full_name`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3
+  UNIQUE KEY `t_ds_relation_resources_task_un` (`task_id`, `full_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
 
 -- ----------------------------
 -- Records of t_ds_relation_resources_task

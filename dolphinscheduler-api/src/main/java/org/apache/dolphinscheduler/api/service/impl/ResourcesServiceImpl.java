@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -54,7 +55,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -62,8 +64,10 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.beanutils.BeanMap;
@@ -117,6 +121,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private UdfFuncMapper udfFunctionMapper;
 
     @Autowired
+    private ProcessService processService;
+
+    @Autowired
+    private ProcessDefinitionService processDefinitionService;
+
+    @Autowired
     private TenantMapper tenantMapper;
 
     @Autowired
@@ -126,7 +136,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private ResourceUserMapper resourceUserMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Autowired
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
@@ -480,6 +493,72 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+        List<ResourcesTask> existResourcesList = resourceTaskMapper.selectByMap(
+            Collections.singletonMap("full_name", originFullName));
+
+        if (existResourcesList.size() > 0 && !fullName.equals(originFullName)) {
+            // check if any related task is online. If it is, it can not be updated.
+            for (ResourcesTask existResource : existResourcesList) {
+                int taskId = existResource.getTaskId();
+                if (processService.isTaskOnline(taskDefinitionMapper.selectById(taskId).getCode())) {
+                    logger.error("can't be updated,because it is used of process definition that's online");
+                    logger.error("resource task relation id:{} is used of task code {}", existResource.getId(), taskDefinitionMapper.selectById(taskId).getCode());
+                    putMsg(result, Status.RESOURCE_IS_USED);
+                    return result;
+                }
+            }
+
+            for (ResourcesTask existResource : existResourcesList) {
+                int taskId = existResource.getTaskId();
+                long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
+
+                // use taskCode to get processDefinitionCode, then get a list of processDefinitionLog.
+                List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
+                        Collections.singletonMap("post_task_code", taskCode));
+                long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
+                int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
+                List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
+                        processTaskRelation.get(0).getProjectCode(),
+                        processDefinitionCode);
+
+                List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
+
+                if (taskRelationList.size() > 0) {
+                    ProcessDefinitionLog processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                            processDefinitionCode, processDefinitionVersion);
+                    for (ProcessTaskRelation taskRelation: taskRelationList) {
+                        long taskCodeInProcess = taskRelation.getPostTaskCode();
+                        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
+                        if (taskCodeInProcess == taskCode) {
+                            taskDefinition.setTaskParams(RemoveResourceFromResourceList(originFullName, taskDefinition.getTaskParams()));
+                            taskDefinition.setTaskParams(AddResourceToResourceList(fullName, taskDefinition.getTaskParams()));
+                        }
+                        taskDefinitionLogList.add(taskDefinition);
+                    }
+                    // get all taskLogs associated with that workflow, process
+                    if (processDefinition != null) {
+                        processDefinitionService.updateProcessDefinition(loginUser,
+                                processDefinition.getProjectCode(),
+                                processDefinition.getName(),
+                                processDefinition.getCode(),
+                                processDefinition.getDescription(),
+                                processDefinition.getGlobalParams(),
+                                processDefinition.getLocations(),
+                                processDefinition.getTimeout(),
+                                tenantCode,
+                                JSONUtils.toJsonString(taskRelationList.toArray()),
+                                JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
+                                "",
+                                processDefinition.getExecutionType()
+                                );
+                    }
+                }
+
+                // delete the old resource record in t_ds_relation_resources_task
+//                resourceTaskMapper.deleteById(existResource.getId());
+            }
+        }
+
         if (file != null) {
             // fail upload
             if (!upload(loginUser, fullName, file, type)) {
@@ -503,7 +582,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         // get the path of dest file in hdfs
-        // String destHdfsFileName = storageOperate.getFileName(resource.getType(), tenantCode, fullName);
         String destHdfsFileName = fullName;
         try {
             logger.info("start  copy {} -> {}", originFullName, destHdfsFileName);
@@ -513,14 +591,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.HDFS_COPY_FAIL);
             throw new ServiceException(MessageFormat.format(
                     Status.HDFS_COPY_FAIL.getMsg(), originFullName, destHdfsFileName ));
-        }
-
-        // TODO: now update db info
-        Integer oldResourceId = resourceTaskMapper.existResourceByFullName(originFullName);
-        if (oldResourceId != null) {
-            ResourcesTask updatedResource = new ResourcesTask(fullName, type);
-            updatedResource.setId(oldResourceId);
-            resourceTaskMapper.updateById(updatedResource);
         }
 
         return result;
@@ -889,7 +959,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String defaultPath = storageOperate.getResDir(tenantCode);
         StorageEntity resource;
         try {
-            resource = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, ResourceType.FILE);
+            resource = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, null);
         } catch (Exception e) {
             logger.error(e.getMessage() + " Resource path: {}", fullName, e);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -911,28 +981,19 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        // get all resource id_news of process definitions those are released
-        List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        Map<Integer, Set<Long>> resourceProcessMap =
-                ResourceProcessDefinitionUtils.getResourceObjectMap(list, "code", Long.class);
-        Map<Integer, Set<Integer>> resourceTaskMap =
-                ResourceProcessDefinitionUtils.getResourceObjectMap(list, "td_id", Integer.class);
-        Set<Integer> resourceIdInUseSet = resourceProcessMap.keySet();
-
         // recursively delete a folder
-        Set<Integer> resourcesIdNeedToDeleteSet = new HashSet<>();
         List<String> allChildren = storageOperate.listFilesStatusRecursively(fullName, defaultPath,
-                resTenantCode, ResourceType.FILE).stream().map(storageEntity -> storageEntity.getFullName()).collect(Collectors.toList());
+                resTenantCode, resource.getType()).stream().map(storageEntity -> storageEntity.getFullName()).collect(Collectors.toList());
 
+        Set<ResourcesTask> resourcesNeedToDeleteSet = new HashSet<>();
         String[] allChildrenFullNameArray = allChildren.stream().toArray(String[]::new);
+
+        // check before using allChildrenFullNameArray to query full names.
         if (allChildrenFullNameArray.length != 0) {
-            // check before using allChildrenFullNameArray to query fullnames.
-            resourcesIdNeedToDeleteSet.addAll(
-                    resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray, ResourceType.FILE));
+            resourcesNeedToDeleteSet.addAll(
+                    resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray));
         }
 
-        Integer[] needDeleteResourceIdArray =
-                resourcesIdNeedToDeleteSet.toArray(new Integer[resourcesIdNeedToDeleteSet.size()]);
 
         // if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
@@ -944,43 +1005,68 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
-        resourceIdInUseSet.retainAll(resourcesIdNeedToDeleteSet);
-        if (CollectionUtils.isNotEmpty(resourceIdInUseSet)) {
-            logger.error("can't be deleted,because it is used of process definition");
-            for (Integer resId : resourceIdInUseSet) {
-                logger.error("resource id:{} is used of process definition {}", resId, resourceProcessMap.get(resId));
-            }
-            putMsg(result, Status.RESOURCE_IS_USED);
-            return result;
-        }
-
-        // update parent size
-        // resourcesMapper.selectBatchIds(Arrays.asList(needDeleteResourceIdArray)).forEach(item -> {
-        // updateParentResourceSize(item, item.getSize() * -1);
-        // });
-
         // delete data in database
-        if (needDeleteResourceIdArray.length > 0) {
+        if (resourcesNeedToDeleteSet.size() > 0) {
+            for (ResourcesTask resourcesTask : resourcesNeedToDeleteSet) {
+                int taskId = resourcesTask.getTaskId();
+                if (processService.isTaskOnline(taskDefinitionMapper.selectById(taskId).getCode())) {
+                    logger.error("can't be deleted,because it is used of process definition that's online");
+                    logger.error("resource task relation id:{} is used of task code {}", resourcesTask.getId(), taskDefinitionMapper.selectById(taskId).getCode());
+                    putMsg(result, Status.RESOURCE_IS_USED);
+                    return result;
+                }
+            }
+
             // update resource_ids_new, task_params in task definition
-            for (int resourceIdNeedToDelete : needDeleteResourceIdArray) {
-                String resourceFullNameToDelete = resourceTaskMapper.selectById(resourceIdNeedToDelete).getFullName();
-                // new method getResourceTaskMap in util
-                Set<Integer> taskSetContainsResId = resourceTaskMap.get(resourceIdNeedToDelete);
-                if (taskSetContainsResId != null) {
-                    for (Integer taskDefinitionId: taskSetContainsResId) {
-                        TaskDefinition td = taskDefinitionMapper.selectById(taskDefinitionId);
-                        td.setTaskParams(RemoveResourceFromResourceList(resourceFullNameToDelete, td.getTaskParams()));
-                        // IdsNew could be null, should be a res = idsNew == null ? "" : idsNew;
-                        td.setResourceIdsNew(RemoveResourceFromIdsNew(resourceIdNeedToDelete, td.getResourceIdsNew()));
-                        int isSuccessful = taskDefinitionMapper.updateById(td);
-                        if (isSuccessful != 1) {
-                            logger.error("delete task relation error while deleting {}", resourceFullNameToDelete);
-                            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
-                            return result;
+            for (ResourcesTask existResource: resourcesNeedToDeleteSet) {
+                int taskId = existResource.getTaskId();
+                long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
+
+                // use taskCode to get processDefinitionCode, then get a list of processDefinitionLog.
+                List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
+                        Collections.singletonMap("post_task_code", taskCode));
+                long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
+                int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
+                List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
+                        processTaskRelation.get(0).getProjectCode(),
+                        processDefinitionCode);
+
+                List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
+
+                if (taskRelationList.size() > 0) {
+                    ProcessDefinitionLog processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                            processDefinitionCode, processDefinitionVersion);
+                    for (ProcessTaskRelation taskRelation: taskRelationList) {
+                        long taskCodeInProcess = taskRelation.getPostTaskCode();
+                        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
+                        if (taskCodeInProcess == taskCode) {
+                            taskDefinition.setTaskParams(RemoveResourceFromResourceList(fullName, taskDefinition.getTaskParams()));
                         }
+                        taskDefinitionLogList.add(taskDefinition);
+                    }
+                    // get all taskLogs associated with that workflow, process
+                    if (processDefinition != null) {
+                        processDefinitionService.updateProcessDefinition(loginUser,
+                                processDefinition.getProjectCode(),
+                                processDefinition.getName(),
+                                processDefinition.getCode(),
+                                processDefinition.getDescription(),
+                                processDefinition.getGlobalParams(),
+                                processDefinition.getLocations(),
+                                processDefinition.getTimeout(),
+                                tenantCode,
+                                JSONUtils.toJsonString(taskRelationList.toArray()),
+                                JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
+                                "",
+                                processDefinition.getExecutionType()
+                        );
                     }
                 }
             }
+
+            Integer[] needDeleteResourceIdArray = resourcesNeedToDeleteSet
+                    .stream().map(resourcesTask -> resourcesTask.getId())
+                    .toArray(Integer[]::new);
             if (needDeleteResourceIdArray.length != 0) {
                 resourceTaskMapper.deleteIds(needDeleteResourceIdArray);
             }
@@ -1008,6 +1094,28 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     .collect(Collectors.toList());
 
             taskParameters.put("resourceList", updatedResourceInfoList);
+            return JSONUtils.toJsonString(taskParameters);
+        }
+        return taskParameter;
+    }
+
+    private String AddResourceToResourceList(String stringToAdd, String taskParameter) {
+        Map<String, Object> taskParameters = JSONUtils.parseObject(
+                taskParameter,
+                new TypeReference<Map<String, Object>>() {
+                });
+
+        if (taskParameters.containsKey("resourceList")) {
+            String resourceListStr = JSONUtils.toJsonString(taskParameters.get("resourceList"));
+            List<ResourceInfo> resourceInfos = JSONUtils.toList(resourceListStr, ResourceInfo.class);
+
+            // add updated resource to replace the original resource.
+            ResourceInfo newResource = new ResourceInfo();
+            newResource.setResourceName(stringToAdd);
+            resourceInfos.add(newResource);
+
+            taskParameters.put("resourceList", resourceInfos);
+
             return JSONUtils.toJsonString(taskParameters);
         }
         return taskParameter;
@@ -1090,11 +1198,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Integer resourceId = resourceTaskMapper.existResourceByFullName(defaultPath + fileName);
-        if (resourceId != null) {
-            file.setId(resourceId);
-        }
-
         putMsg(result, Status.SUCCESS);
         result.setData(file);
         return result;
@@ -1132,10 +1235,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         StorageEntity file;
         try {
             file = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, type);
-            Integer resourceId = resourceTaskMapper.existResourceByFullName(file.getFullName());
-            if (resourceId != null) {
-                file.setId(resourceId);
-            }
         } catch (Exception e) {
             logger.error(e.getMessage() + " Resource path: {}", fullName, e);
             putMsg(result, Status.RESOURCE_NOT_EXIST);

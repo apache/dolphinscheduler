@@ -179,12 +179,6 @@ public class TaskDefinition {
     private String resourceIds;
 
     /**
-     * new resource ids, fullName of the resource
-     */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private String resourceIdsNew;
-
-    /**
      * create time
      */
     private Date createTime;

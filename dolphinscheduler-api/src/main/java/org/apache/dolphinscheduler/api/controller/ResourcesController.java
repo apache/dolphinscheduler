@@ -189,7 +189,6 @@ public class ResourcesController extends BaseController {
                                          @RequestParam(value = "name") String alias,
                                          @RequestParam(value = "description", required = false) String description,
                                          @RequestParam(value = "file", required = false) MultipartFile file) {
-        //todo verify the resource name
         return resourceService.updateResource(loginUser, resourceId, fullName, tenantCode, alias, description, type, file);
     }
 

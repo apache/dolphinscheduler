@@ -35,15 +35,19 @@ public class ResourcesTask {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
+    private int taskId;
+
     private ResourceType type;
 
-    public ResourcesTask(int id, String fullName, ResourceType type) {
+    public ResourcesTask(int id, String fullName, int taskId, ResourceType type) {
         this.id = id;
         this.fullName = fullName;
+        this.taskId = taskId;
         this.type = type;
     }
 
-    public ResourcesTask(String fullName, ResourceType type) {
+    public ResourcesTask(int taskId, String fullName, ResourceType type) {
+        this.taskId = taskId;
         this.fullName = fullName;
         this.type = type;
     }
@@ -52,6 +56,7 @@ public class ResourcesTask {
     public String toString() {
         return "ResourcesTask{" +
                 "id=" + id +
+                "taskId" + taskId +
                 ", fullName='" + fullName + '\'' +
                 ", type=" + type +
                 '}';

@@ -19,25 +19,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper">
     <sql id="baseSqlV2">
-        ${alias}.full_name, ${alias}.id, ${alias}.type
+        ${alias}.id, ${alias}.full_name, ${alias}.task_id, ${alias}.type
     </sql>
-    <select id="existResourceByFullName" resultType="java.lang.Integer">
+    <select id="existResourceByTaskIdNFullName" resultType="java.lang.Integer">
         select
         id
         from t_ds_relation_resources_task
-        where full_name = #{fullName} limit 1
+        where full_name = #{fullName} and task_id = #{taskId} limit 1
     </select>
 
-    <select id="selectBatchFullNames" resultType="java.lang.Integer">
+    <select id="selectBatchFullNames" resultType="org.apache.dolphinscheduler.dao.entity.ResourcesTask">
         select
-        id
+        id, full_name, task_id, type
         from t_ds_relation_resources_task
         where full_name in
         <foreach collection="fullNameArr" item="i" open="(" close=")" separator=",">
             #{i}
         </foreach>
-        and type = #{type}
     </select>
+
+    <update id="updateResource" >
+        UPDATE t_ds_relation_resources_task SET full_name=#{fullName} WHERE id=#{id}
+    </update>
 
     <delete id="deleteIds" parameterType="java.lang.Integer">
         delete from t_ds_relation_resources_task where id in

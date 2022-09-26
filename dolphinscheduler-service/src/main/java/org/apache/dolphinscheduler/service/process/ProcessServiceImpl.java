@@ -113,6 +113,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -1758,7 +1759,7 @@ public class ProcessServiceImpl implements ProcessService {
                 ResourceInfo mainJar = JSONUtils.parseObject(
                         JSONUtils.toJsonString(mainJarObj),
                         ResourceInfo.class);
-                ResourceInfo resourceInfo = updateResourceInfo(mainJar);
+                ResourceInfo resourceInfo = updateResourceInfo(taskDefinition.getId(), mainJar);
                 if (resourceInfo != null) {
                     taskParameters.put("mainJar", resourceInfo);
                 }
@@ -1769,7 +1770,7 @@ public class ProcessServiceImpl implements ProcessService {
                 List<ResourceInfo> resourceInfos = JSONUtils.toList(resourceListStr, ResourceInfo.class);
                 List<ResourceInfo> updatedResourceInfos = resourceInfos
                         .stream()
-                        .map(this::updateResourceInfo)
+                        .map(resourceInfo -> updateResourceInfo(taskDefinition.getId(), resourceInfo))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList());
                 taskParameters.put("resourceList", updatedResourceInfos);
@@ -1785,7 +1786,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param res origin resource info
      * @return {@link ResourceInfo}
      */
-    private ResourceInfo updateResourceInfo(ResourceInfo res) {
+    private ResourceInfo updateResourceInfo(int task_id, ResourceInfo res) {
         ResourceInfo resourceInfo = null;
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {
@@ -1796,7 +1797,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
-            Integer resultList = resourceTaskMapper.existResourceByFullName(resourceFullName);
+            Integer resultList = resourceTaskMapper.existResourceByTaskIdNFullName(task_id, resourceFullName);
             if (resultList != null) {
                 resourceInfo.setId(resultList);
                 resourceInfo.setRes(res.getRes());
@@ -2550,26 +2551,43 @@ public class ProcessServiceImpl implements ProcessService {
         }
 
         if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
+            updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
+
             for (TaskDefinitionLog newTaskDefinitionLog: newTaskDefinitionLogs) {
                 Set<String> resourceFullNameSet = getResourceFullNames(newTaskDefinitionLog);
-                List<Integer> resourceIdsNewSet = new ArrayList<>();
                 for (String resourceFullName : resourceFullNameSet) {
-                    resourceIdsNewSet.add(createRelationTaskResourcesIfNotExist(resourceFullName));
+                        List<TaskDefinition> taskDefinitionList =  taskDefinitionMapper.selectByMap(
+                                Collections.singletonMap("code", newTaskDefinitionLog.getCode()));
+                        if (taskDefinitionList.size() > 0) {
+                            createRelationTaskResourcesIfNotExist(
+                                    taskDefinitionList.get(0).getId(),resourceFullName);
+                    }
                 }
-                newTaskDefinitionLog.setResourceIdsNew(Joiner.on(",").join(resourceIdsNewSet));
             }
 
-            updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
         }
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             for (TaskDefinitionLog taskDefinitionLog : updateTaskDefinitionLogs) {
                 Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionLog);
-                    List<Integer> resourceIdsNewSet = new ArrayList<>();
-                    for (String resourceFullName: resourceFullNameSet) {
-                        resourceIdsNewSet.add(createRelationTaskResourcesIfNotExist(resourceFullName));
+
+                // getTaskId, deleteTask
+                for (ResourcesTask resourcesTask: resourceTaskMapper.selectByMap(
+                        Collections.singletonMap("task_id",
+                                taskDefinitionMapper.queryByCode(taskDefinitionLog.getCode()).getId()))) {
+                    if (!resourceFullNameSet.contains(resourcesTask.getFullName())){
+                        resourceTaskMapper.deleteById(resourcesTask.getId());
                     }
-                    taskDefinitionLog.setResourceIdsNew(Joiner.on(",").join(resourceIdsNewSet));
-                
+                }
+
+                for (String resourceFullName : resourceFullNameSet) {
+                        List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
+                                Collections.singletonMap("code", taskDefinitionLog.getCode()));
+                        if (taskDefinitionList.size() > 0) {
+                            createRelationTaskResourcesIfNotExist(
+                                    taskDefinitionList.get(0).getId(),resourceFullName);
+                        }
+                }
+
                 updateResult += taskDefinitionMapper.updateById(taskDefinitionLog);
             }
         }
@@ -3219,12 +3237,12 @@ public class ProcessServiceImpl implements ProcessService {
         return resourceFullNames;
     }
 
-    private Integer createRelationTaskResourcesIfNotExist(String resourceFullName) {
+    private Integer createRelationTaskResourcesIfNotExist(int taskId, String resourceFullName) {
 
-        Integer resourceId = resourceTaskMapper.existResourceByFullName(resourceFullName);
+        Integer resourceId = resourceTaskMapper.existResourceByTaskIdNFullName(taskId, resourceFullName);
         if ( null == resourceId) {
             // create the relation if not exist
-            ResourcesTask resourcesTask = new ResourcesTask(resourceFullName, ResourceType.FILE);
+            ResourcesTask resourcesTask = new ResourcesTask(taskId, resourceFullName, ResourceType.FILE);
             resourceTaskMapper.insert(resourcesTask);
             return resourcesTask.getId();
         }

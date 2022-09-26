@@ -31,10 +31,11 @@ import java.util.List;
  * resource task relation mapper interface
  */
 public interface ResourceTaskMapper extends BaseMapper<ResourcesTask> {
-    Integer existResourceByFullName(@Param("fullName") String fullName);
+    Integer existResourceByTaskIdNFullName(@Param("taskId") int task_id, @Param("fullName") String fullName);
 
     int deleteIds(@Param("resIds")Integer[] resIds);
 
-    List<Integer> selectBatchFullNames(@Param("fullNameArr") String[] fullNameArr,
-                                             @Param("type")ResourceType type);
+    int updateResource(@Param("id") int id, @Param("fullName") String fullName);
+
+    List<ResourcesTask> selectBatchFullNames(@Param("fullNameArr") String[] fullNameArr);
 }
