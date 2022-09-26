@@ -62,6 +62,9 @@ public class WorkflowUpdateRequest {
     @ApiModelProperty(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", notes = "default PARALLEL if not provide.")
     private String executionType;
 
+    @ApiModelProperty(example = "[{\\\"taskCode\\\":7009653961024,\\\"x\\\":312,\\\"y\\\":196}]")
+    private String location;
+
     public ProcessDefinition mergeIntoProcessDefinition(ProcessDefinition processDefinition) {
         ProcessDefinition processDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
@@ -89,6 +92,9 @@ public class WorkflowUpdateRequest {
         }
         if (this.executionType != null) {
             processDefinitionDeepCopy.setExecutionType(ProcessExecutionTypeEnum.valueOf(this.executionType));
+        }
+        if (this.location != null) {
+            processDefinitionDeepCopy.setLocations(this.location);
         }
 
         int version = processDefinitionDeepCopy.getVersion() + 1;

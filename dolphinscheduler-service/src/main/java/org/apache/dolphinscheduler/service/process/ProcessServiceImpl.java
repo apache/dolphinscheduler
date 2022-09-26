@@ -2449,16 +2449,17 @@ public class ProcessServiceImpl implements ProcessService {
         if (!processTaskRelationList.isEmpty()) {
             processTaskRelationMapper.deleteByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         }
-        List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
-        int batchInsert = processTaskRelationMapper.batchInsert(processTaskRelationLogList);
+        List<ProcessTaskRelation> processTaskRelationListFromLog = processTaskRelationLogMapper
+                .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion()).stream()
+                .map(ProcessTaskRelation::new).collect(Collectors.toList());
+        int batchInsert = processTaskRelationMapper.batchInsert(processTaskRelationListFromLog);
         if (batchInsert == 0) {
             return Constants.EXIT_CODE_FAILURE;
         } else {
             int result = 0;
-            for (ProcessTaskRelationLog taskRelationLog : processTaskRelationLogList) {
-                int switchResult = switchTaskDefinitionVersion(taskRelationLog.getPostTaskCode(),
-                        taskRelationLog.getPostTaskVersion());
+            for (ProcessTaskRelation taskRelation : processTaskRelationListFromLog) {
+                int switchResult = switchTaskDefinitionVersion(taskRelation.getPostTaskCode(),
+                        taskRelation.getPostTaskVersion());
                 if (switchResult != Constants.EXIT_CODE_FAILURE) {
                     result++;
                 }
@@ -2674,7 +2675,9 @@ public class ProcessServiceImpl implements ProcessService {
                 }
                 processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
             }
-            insert = processTaskRelationMapper.batchInsert(taskRelationList);
+            List<ProcessTaskRelation> processTaskRelations =
+                    taskRelationList.stream().map(ProcessTaskRelation::new).collect(Collectors.toList());
+            insert = processTaskRelationMapper.batchInsert(processTaskRelations);
         }
         int resultLog = processTaskRelationLogMapper.batchInsert(taskRelationList);
         return (insert & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
