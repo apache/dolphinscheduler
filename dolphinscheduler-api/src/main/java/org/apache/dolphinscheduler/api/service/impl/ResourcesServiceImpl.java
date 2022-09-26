@@ -495,7 +495,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<ResourcesTask> existResourcesList = resourceTaskMapper.selectByMap(
             Collections.singletonMap("full_name", originFullName));
 
-        if (existResourcesList.size() > 0 && !fullName.equals(originFullName)) {
+        if (existResourcesList.size() > 0 && !fullName.equals(originFullName) && !resource.isDirectory()) {
             // check if any related task is online. If it is, it can not be updated.
             for (ResourcesTask existResource : existResourcesList) {
                 int taskId = existResource.getTaskId();
@@ -1034,7 +1034,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         long taskCodeInProcess = taskRelation.getPostTaskCode();
                         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
                         if (taskCodeInProcess == taskCode) {
-                            taskDefinition.setTaskParams(RemoveResourceFromResourceList(fullName, taskDefinition.getTaskParams()));
+                            taskDefinition.setTaskParams(RemoveResourceFromResourceList(existResource.getFullName(), taskDefinition.getTaskParams()));
                         }
                         taskDefinitionLogList.add(taskDefinition);
                     }
@@ -1057,13 +1057,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         );
                     }
                 }
-            }
-
-            Integer[] needDeleteResourceIdArray = resourcesNeedToDeleteSet
-                    .stream().map(resourcesTask -> resourcesTask.getId())
-                    .toArray(Integer[]::new);
-            if (needDeleteResourceIdArray.length != 0) {
-                resourceTaskMapper.deleteIds(needDeleteResourceIdArray);
             }
         }
 
