@@ -481,6 +481,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     opentracing-util 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
     jettison 1.1: https://github.com/jettison-json/jettison/blob/master/LICENSE, Apache 2.0
     stax-api 1.0.1: https://mvnrepository.com/artifact/stax/stax-api/1.0.1, Apache 2.0
+    hbase-noop-htrace 4.1.1: https://mvnrepository.com/artifact/org.apache.hbase.thirdparty/hbase-noop-htrace/4.1.1, Apache 2.0
 
 ========================================================================
 BSD licenses

@@ -78,6 +78,7 @@ hadoop-mapreduce-client-jobclient-3.2.4.jar
 hadoop-yarn-api-3.2.4.jar
 hadoop-yarn-client-3.2.4.jar
 hadoop-yarn-common-3.2.4.jar
+hbase-noop-htrace-4.1.1.jar
 hibernate-validator-6.2.2.Final.jar
 hive-common-2.3.9.jar
 hive-jdbc-2.3.9.jar
