@@ -15,35 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.common.Constants;
 
-public enum SparkVersion {
+import java.text.MessageFormat;
+import java.util.Map;
 
-    /**
-     * 0 SPARK1
-     * 1 SPARK2
-     * 2 SPARKSQL
-     */
-    SPARK1(0, "SPARK1"),
-    SPARK2(1, "SPARK2"),
-    SPARKSQL(2, "SPARKSQL");
+public class BaseServiceTestTool {
 
-    SparkVersion(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
+    protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
     }
 }

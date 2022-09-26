@@ -56,13 +56,6 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
-      type: 'select',
-      field: 'sparkVersion',
-      span: 12,
-      name: t('project.node.spark_version'),
-      options: SPARK_VERSIONS
-    },
-    {
       type: 'input',
       field: 'mainClass',
       span: mainClassSpan,
@@ -150,16 +143,5 @@ export const PROGRAM_TYPES = [
   {
     label: 'SQL',
     value: 'SQL'
-  }
-]
-
-export const SPARK_VERSIONS = [
-  {
-    label: 'SPARK2',
-    value: 'SPARK2'
-  },
-  {
-    label: 'SPARK1',
-    value: 'SPARK1'
   }
 ]
