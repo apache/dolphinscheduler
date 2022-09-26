@@ -475,7 +475,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        // updateResource data
         Date now = new Date();
         long originFileSize = resource.getSize();
 
@@ -512,7 +511,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 int taskId = existResource.getTaskId();
                 long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
 
-                // use taskCode to get processDefinitionCode, then get a list of processDefinitionLog.
                 List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
                         Collections.singletonMap("post_task_code", taskCode));
                 long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
@@ -535,7 +533,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         }
                         taskDefinitionLogList.add(taskDefinition);
                     }
-                    // get all taskLogs associated with that workflow, process
+
+                    // update workflow & task definition associated to the resource
                     if (processDefinition != null) {
                         processDefinitionService.updateProcessDefinition(loginUser,
                                 processDefinition.getProjectCode(),
@@ -554,8 +553,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     }
                 }
 
-                // delete the old resource record in t_ds_relation_resources_task
-//                resourceTaskMapper.deleteById(existResource.getId());
             }
         }
 
@@ -577,7 +574,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 }
             }
 
-            // updateParentResourceSize(resource, resource.getSize() - originFileSize);
             return result;
         }
 
@@ -796,7 +792,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String localFilename = FileUtils.getUploadFilename(tenantCode, UUID.randomUUID().toString());
 
         // save file to hdfs, and delete original file
-        // String fileName = storageOperate.getFileName(type, tenantCode, fullName);
         String resourcePath = storageOperate.getDir(type, tenantCode);
         try {
             // if tenant dir not exists
@@ -1017,7 +1012,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 }
             }
 
-            // update resource_ids_new, task_params in task definition
             for (ResourcesTask existResource: resourcesNeedToDeleteSet) {
                 int taskId = existResource.getTaskId();
                 long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
@@ -1044,7 +1038,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         }
                         taskDefinitionLogList.add(taskDefinition);
                     }
-                    // get all taskLogs associated with that workflow, process
+
+                    // update workflow & task definition associated to the resource
                     if (processDefinition != null) {
                         processDefinitionService.updateProcessDefinition(loginUser,
                                 processDefinition.getProjectCode(),

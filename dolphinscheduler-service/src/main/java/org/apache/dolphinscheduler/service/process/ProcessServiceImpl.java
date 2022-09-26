@@ -2570,7 +2570,7 @@ public class ProcessServiceImpl implements ProcessService {
             for (TaskDefinitionLog taskDefinitionLog : updateTaskDefinitionLogs) {
                 Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionLog);
 
-                // getTaskId, deleteTask
+                // remove resources that user deselected.
                 for (ResourcesTask resourcesTask: resourceTaskMapper.selectByMap(
                         Collections.singletonMap("task_id",
                                 taskDefinitionMapper.queryByCode(taskDefinitionLog.getCode()).getId()))) {
