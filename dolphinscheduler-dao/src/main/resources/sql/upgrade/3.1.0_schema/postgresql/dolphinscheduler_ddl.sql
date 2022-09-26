@@ -19,8 +19,8 @@
 ALTER TABLE t_ds_k8s_namespace DROP COLUMN IF EXISTS online_job_num;
 ALTER TABLE t_ds_k8s_namespace DROP COLUMN IF EXISTS k8s;
 ALTER TABLE t_ds_k8s_namespace DROP CONSTRAINT IF EXISTS k8s_namespace_unique;
-ALTER TABLE t_ds_k8s_namespace ADD COLUMN IF NOT EXISTS code bigint(20) NOT NULL DEFAULT '0';
-ALTER TABLE t_ds_k8s_namespace ADD COLUMN IF NOT EXISTS cluster_code bigint(20) NOT NULL DEFAULT '0';
+ALTER TABLE t_ds_k8s_namespace ADD COLUMN IF NOT EXISTS code bigint NOT NULL DEFAULT '0';
+ALTER TABLE t_ds_k8s_namespace ADD COLUMN IF NOT EXISTS cluster_code bigint NOT NULL DEFAULT '0';
 ALTER TABLE t_ds_k8s_namespace DROP CONSTRAINT IF EXISTS k8s_namespace_unique;
 ALTER TABLE t_ds_k8s_namespace ADD CONSTRAINT k8s_namespace_unique UNIQUE (namespace, cluster_code);
 
@@ -72,3 +72,5 @@ ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS task_execute_type int DE
 ALTER TABLE t_ds_task_instance DROP CONSTRAINT IF EXISTS foreign_key_instance_id;
 ALTER TABLE t_ds_project alter COLUMN description type varchar(255);
 ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
+ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS other_params_json text DEFAULT NULL;
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL;
