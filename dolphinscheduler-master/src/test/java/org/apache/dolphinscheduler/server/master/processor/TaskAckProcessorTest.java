@@ -29,17 +29,15 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import io.netty.channel.Channel;
 
 /**
  * task ack processor test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({SpringApplicationContext.class, TaskEvent.class})
+@RunWith(MockitoJUnitRunner.class)
 public class TaskAckProcessorTest {
 
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
@@ -51,18 +49,18 @@ public class TaskAckProcessorTest {
 
     @Before
     public void before() {
-        PowerMockito.mockStatic(SpringApplicationContext.class);
+        Mockito.mockStatic(SpringApplicationContext.class);
 
-        taskEventService = PowerMockito.mock(TaskEventService.class);
-        PowerMockito.when(SpringApplicationContext.getBean(TaskEventService.class)).thenReturn(taskEventService);
+        taskEventService = Mockito.mock(TaskEventService.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskEventService.class)).thenReturn(taskEventService);
 
-        processService = PowerMockito.mock(ProcessService.class);
-        PowerMockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        processService = Mockito.mock(ProcessService.class);
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
         taskExecuteRunningProcessor = new TaskExecuteRunningProcessor();
 
-        channel = PowerMockito.mock(Channel.class);
-        taskResponseEvent = PowerMockito.mock(TaskEvent.class);
+        channel = Mockito.mock(Channel.class);
+        taskResponseEvent = Mockito.mock(TaskEvent.class);
 
         taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                 " 127.0.0.1:1234",
@@ -78,18 +76,5 @@ public class TaskAckProcessorTest {
 
     @Test
     public void testProcess() {
-        // Command command = taskExecuteAckCommand.convert2Command();
-        // Assert.assertEquals(CommandType.TASK_EXECUTE_ACK,command.getType());
-        // InetSocketAddress socketAddress = new InetSocketAddress("localhost",12345);
-        // PowerMockito.when(channel.remoteAddress()).thenReturn(socketAddress);
-        // PowerMockito.mockStatic(TaskResponseEvent.class);
-        //
-        // PowerMockito.when(TaskResponseEvent.newAck(Mockito.any(), Mockito.any(), Mockito.anyString(),
-        // Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), channel))
-        // .thenReturn(taskResponseEvent);
-        // TaskInstance taskInstance = PowerMockito.mock(TaskInstance.class);
-        // PowerMockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
-        //
-        // taskAckProcessor.process(channel,command);
     }
 }

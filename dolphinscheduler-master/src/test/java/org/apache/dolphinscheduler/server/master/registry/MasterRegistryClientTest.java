@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.registry;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -30,9 +29,7 @@ import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,17 +37,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * MasterRegistryClientTest
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({RegistryClient.class})
-@PowerMockIgnore({"javax.management.*"})
+@RunWith(MockitoJUnitRunner.class)
 public class MasterRegistryClientTest {
 
     @InjectMocks
@@ -70,12 +63,7 @@ public class MasterRegistryClientTest {
 
     @Before
     public void before() throws Exception {
-        given(registryClient.getLock(Mockito.anyString())).willReturn(true);
-        given(registryClient.releaseLock(Mockito.anyString())).willReturn(true);
         given(registryClient.getHostByEventDataPath(Mockito.anyString())).willReturn("127.0.0.1:8080");
-        given(registryClient.getStoppable()).willReturn(cause -> {
-
-        });
         ReflectionTestUtils.setField(masterRegistryClient, "registryClient", registryClient);
         ReflectionTestUtils.setField(masterRegistryClient, "masterHeartBeatTask", masterHeartBeatTask);
 
@@ -85,23 +73,15 @@ public class MasterRegistryClientTest {
         processInstance.setRestartTime(new Date());
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
-        given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
-                .willReturn(Arrays.asList(processInstance));
-        doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setStartTime(new Date());
         taskInstance.setHost("127.0.0.1:8080");
-        given(processService.queryNeedFailoverTaskInstances(Mockito.anyString()))
-                .willReturn(Arrays.asList(taskInstance));
-        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(Optional.of(processInstance));
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any())).willReturn(true);
         Server server = new Server();
         server.setHost("127.0.0.1");
         server.setPort(8080);
         server.setCreateTime(new Date());
-        given(registryClient.getServerList(NodeType.WORKER)).willReturn(Arrays.asList(server));
-        given(registryClient.getServerList(NodeType.MASTER)).willReturn(Arrays.asList(server));
     }
 
     @Test
