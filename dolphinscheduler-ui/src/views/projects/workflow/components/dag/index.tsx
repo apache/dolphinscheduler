@@ -234,7 +234,7 @@ export default defineComponent({
       saveModelToggle(false)
     }
 
-    const handleViewLog = (taskId: number, taskType: string, logTimer: number) => {
+    const handleViewLog = (taskId: number, taskType: string) => {
       taskModalVisible.value = false
       viewLog(taskId, taskType)
       getLogs(logTimer)
