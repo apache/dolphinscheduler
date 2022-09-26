@@ -49,7 +49,7 @@ export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
   watch(
     () => model.programType,
     (value) => {
-        getMainJars(value)
+      getMainJars(value)
     }
   )
 

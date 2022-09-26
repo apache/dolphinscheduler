@@ -16,7 +16,7 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCustomParams, useResources ,useJavaTaskMainJar} from '.'
+import { useCustomParams, useResources, useJavaTaskMainJar } from '.'
 import type { IJsonItem } from '../types'
 
 export function useJava(model: { [field: string]: any }): IJsonItem[] {
@@ -24,39 +24,39 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
   const rawScriptSpan = computed(() => (model.runType === 'JAR' ? 0 : 24))
   return [
     {
-        type: 'select',
-        field: 'runType',
-        span: 12,
-        name: t('project.node.run_type'),
-        options: RUN_TYPES,
-        value: model.runType
-      },
-      {
-          type: 'switch',
-          field: 'isModulePath',
-          span: 24,
-          name: t('project.node.is_module_path'),
-          value: model.isModulePath
-      },
-      {
-        type: 'input',
-        field: 'mainArgs',
-        name: t('project.node.main_arguments'),
-        props: {
-          type: 'textarea',
-          placeholder: t('project.node.main_arguments_tips')
-        }
-      },
-      {
-        type: 'input',
-        field: 'jvmArgs',
-        name: t('project.node.jvm_args'),
-        props: {
-          type: 'textarea',
-          placeholder: t('project.node.jvm_args_tips')
-        }
-      },
-      useJavaTaskMainJar(model),
+      type: 'select',
+      field: 'runType',
+      span: 12,
+      name: t('project.node.run_type'),
+      options: RUN_TYPES,
+      value: model.runType
+    },
+    {
+      type: 'switch',
+      field: 'isModulePath',
+      span: 24,
+      name: t('project.node.is_module_path'),
+      value: model.isModulePath
+    },
+    {
+      type: 'input',
+      field: 'mainArgs',
+      name: t('project.node.main_arguments'),
+      props: {
+        type: 'textarea',
+        placeholder: t('project.node.main_arguments_tips')
+      }
+    },
+    {
+      type: 'input',
+      field: 'jvmArgs',
+      name: t('project.node.jvm_args'),
+      props: {
+        type: 'textarea',
+        placeholder: t('project.node.jvm_args_tips')
+      }
+    },
+    useJavaTaskMainJar(model),
     {
       type: 'editor',
       field: 'rawScript',
@@ -74,13 +74,12 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
 }
 
 export const RUN_TYPES = [
-    {
-      label: 'JAVA',
-      value: 'JAVA'
-    },
-    {
-      label: 'JAR',
-      value: 'JAR'
-    }
-  ]
-  
+  {
+    label: 'JAVA',
+    value: 'JAVA'
+  },
+  {
+    label: 'JAR',
+    value: 'JAR'
+  }
+]

@@ -36,13 +36,13 @@ export function formatParams(data: INodeData): {
     taskParams.processDefinitionCode = data.processDefinitionCode
   }
 
-  if(data.taskType === 'JAVA'){
+  if (data.taskType === 'JAVA') {
     taskParams.runType = data.runType
     taskParams.mainArgs = data.mainArgs
     taskParams.jvmArgs = data.jvmArgs
     taskParams.isModulePath = data.isModulePath
-    if(data.runType === 'JAR' && data.mainJar){
-      taskParams.mainJar = {id: data.mainJar};
+    if (data.runType === 'JAR' && data.mainJar) {
+      taskParams.mainJar = { id: data.mainJar }
     }
   }
 

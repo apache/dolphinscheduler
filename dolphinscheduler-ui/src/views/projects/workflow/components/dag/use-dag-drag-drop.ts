@@ -20,7 +20,7 @@ import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
 import { genTaskCodeList } from '@/service/modules/task-definition'
 import { Coordinate, Dragged } from './types'
-import { TaskType } from '@/views/projects/task/constants/task-type'
+import { TaskType } from '@/store/project/types'
 import { useRoute } from 'vue-router'
 
 interface Options {

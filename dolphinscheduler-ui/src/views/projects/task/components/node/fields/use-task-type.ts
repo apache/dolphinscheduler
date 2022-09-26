@@ -16,7 +16,7 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import type { IJsonItem } from '../types'
 
 export function useTaskType(
