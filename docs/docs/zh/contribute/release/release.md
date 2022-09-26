@@ -488,11 +488,10 @@ svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 - **apache/dolphinscheduler-website** 仓库：
   - `download/en-us/download.md` 和 `download/zh-cn/download.md`: 增加 `<VERSION>` 版本发布包的下载
   - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `<VERSION>` 的新键值对
-- **apache/dolphinscheduler** 仓库：
+- **apache/dolphinscheduler** 仓库 (dev 分支)：
   - `docs/configs/site.js`:
     - `docsLatest`: 更新为 `<VERSION>`
     - `docs0`: 两处 `en-us/zh-cn` 的 `text` 更新为 `latest(<VERSION>)`
-    - `docsxyz`: 两处 `en-us/zh-cn` 的 `children` 增加 `key` 为 `docsxyz`, `text` 为 `<VERSION>` 的下拉菜单
   - `docs/configs/index.md.jsx`: 增加 `'<VERSION>': docsxyzConfig,`
   - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的发版版本 `<VERSION>` 的链接
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler 在 GitHub issue 中有版本选择的部分，当有新版本发版后，需要更新这部分的内容。目前与版本关联的是
