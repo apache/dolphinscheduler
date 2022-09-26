@@ -4,6 +4,10 @@
 
 #### Setup instructions,  are available for each stable version of Apache DolphinScheduler below:
 
+### Versions: 3.1.0
+
+#### Links： [3.1.0 Document](../3.1.0/user_doc/about/introduction.md)
+
 ### Versions: 3.0.0
 
 #### Links： [3.0.0 Document](../3.0.0/user_doc/about/introduction.md)
