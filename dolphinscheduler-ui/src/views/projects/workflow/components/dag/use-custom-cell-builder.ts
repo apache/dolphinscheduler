@@ -18,10 +18,8 @@
 import type { Node, Edge } from '@antv/x6'
 import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import utils from '@/utils'
-import {
-  TASK_TYPES_MAP,
-  TaskType
-} from '@/views/projects/task/constants/task-type'
+import { TaskType } from '@/store/project/types'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import { WorkflowDefinition, Coordinate } from './types'
 
 export function useCustomCellBuilder() {
@@ -96,7 +94,7 @@ export function useCustomCellBuilder() {
           // Use href instead of xlink:href, you may lose the icon when downloadPNG
           'xlink:href': `${
             import.meta.env.BASE_URL
-          }images/task-icons/${(type !== 'FLINK_STREAM'
+          }images/task-icons/${(type !== ('FLINK_STREAM' as TaskType)
             ? type
             : 'FLINK'
           ).toLocaleLowerCase()}.png`
