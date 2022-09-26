@@ -1,0 +1,18 @@
+{
+    "ParallelismConfiguration":{
+        "MaxParallelExecutionSteps":1
+    },
+    "PipelineExecutionDescription":"run pipeline using ds",
+    "PipelineExecutionDisplayName":"ds-sagemaker-pipeline",
+    "PipelineName":"DsSagemakerPipeline",
+    "PipelineParameters":[
+        {
+            "Name":"InputData",
+            "Value": "s3://sagemaker/dataset/dataset.csv"
+        },
+        {
+            "Name":"InferenceData",
+            "Value": "s3://sagemaker/dataset/inference.csv"
+        }
+    ]
+}

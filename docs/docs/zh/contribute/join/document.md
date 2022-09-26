@@ -52,8 +52,8 @@ DolphinScheduler 网站由 [docsite](https://github.com/chengshiwen/docsite-ext)
 
 2. 只需推送更改的文件，例如：
 
- * `*.md`
- * `blog.js or docs.js or site.js`
+* `*.md`
+* `blog.js or docs.js or site.js`
 
 3. 向 **master** 分支提交 Pull Request。
 

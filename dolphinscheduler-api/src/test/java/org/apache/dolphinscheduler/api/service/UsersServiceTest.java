@@ -306,6 +306,7 @@ public class UsersServiceTest {
 
             // success
             when(userMapper.selectById(1)).thenReturn(getUser());
+            when(userMapper.updateById(getUser())).thenReturn(1);
             result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
                     "13457864543", "queue", 1, "Asia/Shanghai");
             logger.info(result.toString());
@@ -322,8 +323,8 @@ public class UsersServiceTest {
         try {
             when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
             when(userMapper.selectById(1)).thenReturn(getUser());
-            when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(0);
-            // no operate
+            when(userMapper.deleteById(1)).thenReturn(1);
+            //no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
             Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
@@ -740,12 +741,14 @@ public class UsersServiceTest {
         String userName = "userTest0001";
         String userPassword = "userTest";
         String email = "abc@x.com";
-        String phone = "123456789";
+        String phone = "17366666666";
         String tenantCode = "tenantCode";
         int stat = 1;
 
         // User exists
         Mockito.when(userMapper.existUser(userName)).thenReturn(true);
+        Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
+        Mockito.when(userMapper.queryDetailsById(getUser().getId())).thenReturn(getUser());
         Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
         user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);

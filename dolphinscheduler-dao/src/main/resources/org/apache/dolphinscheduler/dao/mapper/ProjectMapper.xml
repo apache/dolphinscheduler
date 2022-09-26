@@ -162,13 +162,11 @@
 
     <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
-        <include refid="baseSqlV2">
-            <property name="alias" value="p"/>
-        </include>
-        from t_ds_project p
+        <include refid="baseSql"/>
+        from t_ds_project
+        where 1 = 1
         <if test="userId != 0">
-            right join t_ds_relation_project_user rpu on p.id = rpu.project_id
-            where rpu.user_id = #{userId}
+            and user_id = #{userId}
         </if>
     </select>
 
@@ -181,5 +179,10 @@
             and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
             union select id as project_id  from t_ds_project where user_id=#{userId})
         </if>
+    </select>
+
+    <select id="queryAllProjectForDependent" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select code, name
+        from t_ds_project
     </select>
 </mapper>

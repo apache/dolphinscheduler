@@ -101,8 +101,6 @@ The directory structure of DolphinScheduler is as follows:
 
 ## Configurations in Details
 
-
-
 ### dolphinscheduler-daemon.sh [startup or shutdown DolphinScheduler application]
 
 dolphinscheduler-daemon.sh is responsible for DolphinScheduler startup and shutdown.
@@ -110,6 +108,7 @@ Essentially, start-all.sh or stop-all.sh startup and shutdown the cluster via do
 Currently, DolphinScheduler just makes a basic config, remember to config further JVM options based on your practical situation of resources.
 
 Default simplified parameters are:
+
 ```bash
 export DOLPHINSCHEDULER_OPTS="
 -server
@@ -157,8 +156,8 @@ The default configuration is as follows:
 
 Note that DolphinScheduler also supports database configuration through `bin/env/dolphinscheduler_env.sh`.
 
-
 ### Zookeeper related configuration
+
 DolphinScheduler uses Zookeeper for cluster management, fault tolerance, event monitoring and other functions. Configuration file location:
 |Service| Configuration file  |
 |--|--|
@@ -226,8 +225,8 @@ The default configuration is as follows:
 |alert.rpc.port | 50052 | the RPC port of Alert Server|
 |zeppelin.rest.url | http://localhost:8080 | the RESTful API url of zeppelin|
 
-
 ### Api-server related configuration
+
 Location: `api-server/conf/application.yaml`
 
 |Parameters | Default value| Description|
@@ -257,6 +256,7 @@ Location: `api-server/conf/application.yaml`
 |traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
 
 ### Master Server related configuration
+
 Location: `master-server/conf/application.yaml`
 
 |Parameters | Default value| Description|
@@ -278,8 +278,8 @@ Location: `master-server/conf/application.yaml`
 |master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
 |master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will waitting infinitely|
 
-
 ### Worker Server related configuration
+
 Location: `worker-server/conf/application.yaml`
 
 |Parameters | Default value| Description|
@@ -298,13 +298,13 @@ Location: `worker-server/conf/application.yaml`
 |worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will waitting infinitely |
 
 ### Alert Server related configuration
+
 Location: `alert-server/conf/application.yaml`
 
 |Parameters | Default value| Description|
 |--|--|--|
 |server.port|50053|the port of Alert Server|
 |alert.port|50052|the port of alert|
-
 
 ### Quartz related configuration
 
@@ -335,43 +335,25 @@ The default configuration is as follows:
 |spring.quartz.properties.org.quartz.jobStore.driverDelegateClass | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate|
 |spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval | 5000|
 
-
 ### dolphinscheduler_env.sh [load environment variables configs]
 
 When using shell to commit tasks, DolphinScheduler will export environment variables from `bin/env/dolphinscheduler_env.sh`. The
-mainly configuration including `JAVA_HOME`, mata database, registry center, and task configuration.
+mainly configuration including `JAVA_HOME` and other environment paths.
 
 ```bash
 # JAVA_HOME, will use it to start DolphinScheduler server
 export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
-# Database related configuration, set database type, username and password
-export DATABASE=${DATABASE:-postgresql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL
-export SPRING_DATASOURCE_USERNAME
-export SPRING_DATASOURCE_PASSWORD
-
-# DolphinScheduler server related configuration
-export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
-export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
-export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
-
-# Registry center configuration, determines the type and link of the registry center
-export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
-export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
-
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
-export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
-export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
 export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 ```
 
 ### Log related configuration

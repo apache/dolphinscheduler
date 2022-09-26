@@ -62,7 +62,6 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SPARK') {
-    taskParams.sparkVersion = data.sparkVersion
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
     taskParams.numExecutors = data.numExecutors
@@ -380,8 +379,6 @@ export function formatParams(data: INodeData): {
     taskParams.deployModelKey = data.deployModelKey
     taskParams.mlflowProjectRepository = data.mlflowProjectRepository
     taskParams.mlflowProjectVersion = data.mlflowProjectVersion
-    taskParams.cpuLimit = data.cpuLimit
-    taskParams.memoryLimit = data.memoryLimit
   }
 
   if (data.taskType === 'DVC') {
