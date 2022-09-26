@@ -86,12 +86,21 @@ public class DatasyncTask extends AbstractRemoteTask {
     @Override
     public void submitApplication() throws TaskException {
         try {
-            int exitStatusCode = runDatasyncTask();
+            int exitStatusCode = checkCreateTask();
+            if (exitStatusCode == TaskConstants.EXIT_CODE_FAILURE) {
+                //if create task failure go end
+                setExitStatusCode(exitStatusCode);
+                return;
+            }
+            //start task
+            exitStatusCode = startDatasyncTask();
             setExitStatusCode(exitStatusCode);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("datasync task error", e);
         }
+        //set taskExecArn to the appIds if start success
+        setAppIds(hook.getTaskExecArn());
     }
 
     @Override
@@ -112,21 +121,16 @@ public class DatasyncTask extends AbstractRemoteTask {
     }
 
     /**
-     * check datasync applicationId if null
+     * check datasync applicationId or get it from appId
      */
     private void checkApplicationId() {
-        if (StringUtils.isEmpty(hook.getTaskExecArn())) {
-            throw new TaskException("datasync taskExecArn is null, not created yet");
+        String taskExecArn = hook.getTaskExecArn();
+        if (StringUtils.isEmpty(taskExecArn)) {
+            if (StringUtils.isEmpty(getAppIds())) {
+                throw new TaskException("datasync taskExecArn is null, not created yet");
+            }
+            hook.setTaskExecArn(getAppIds());
         }
-    }
-
-    public int runDatasyncTask() {
-        int exitStatusCode;
-        exitStatusCode = checkCreateTask();
-        if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
-            exitStatusCode = startDatasyncTask();
-        }
-        return exitStatusCode;
     }
 
     public int checkCreateTask() {
@@ -144,13 +148,7 @@ public class DatasyncTask extends AbstractRemoteTask {
         if (!isStartSuccessfully) {
             return TaskConstants.EXIT_CODE_FAILURE;
         }
-        //started success, need time to exec
-        Boolean isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
-        if (!isFinishedSuccessfully) {
-            return TaskConstants.EXIT_CODE_FAILURE;
-        } else {
-            return TaskConstants.EXIT_CODE_SUCCESS;
-        }
+        return TaskConstants.EXIT_CODE_SUCCESS;
     }
 
     @Override
