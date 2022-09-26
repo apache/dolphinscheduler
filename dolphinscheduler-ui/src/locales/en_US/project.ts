@@ -648,8 +648,6 @@ export default {
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
     emr_steps_define_json: 'stepsDefineJson',
     emr_steps_define_json_tips: 'Please enter the definition of the emr step.',
-    segment_separator: 'Segment Execution Separator',
-    segment_separator_tips: 'Please enter the segment execution separator',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: 'Please enter the note id of your zeppelin note',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
@@ -785,5 +783,14 @@ export default {
     pytorch_conda_python_version: 'Python Version',
     pytorch_conda_python_version_tips:
       'Please enter the version number, such as 3.6, 3.7, 3.x'
+  },
+  menu: {
+    fav: 'Favorites',
+    universal: 'Universal',
+    cloud: 'Cloud',
+    logic: 'Logic',
+    di: 'Data Integration',
+    dq: 'Data Quality',
+    other: 'Other',
   }
 }
