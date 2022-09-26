@@ -525,26 +525,13 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                         "12[process definition not exist]");
         Assertions.assertEquals(formatter, exception.getMessage());
 
-        // project check auth fail
+        // return the right data
         Map<String, Object> result = new HashMap<>();
         final String singleCodes = "11";
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
         definitionCodes = Lists.newArrayList(singleCodes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
         Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(process);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION_DELETE))
-                .thenReturn(result);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, singleCodes));
-        formatter = MessageFormat.format(Status.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(),
-                Status.USER_NO_OPERATION_PERM.getMsg());
-        Assertions.assertEquals(formatter, exception.getMessage());
-
-        // project check auth success
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION_DELETE))
-                .thenReturn(result);
 
         // process definition online
         user.setUserType(UserType.ADMIN_USER);
@@ -561,12 +548,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // delete success
         process.setReleaseState(ReleaseState.OFFLINE);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(process);
-        Schedule schedule = getSchedule();
         Mockito.when(processDefinitionMapper.deleteById(process.getId())).thenReturn(1);
-        Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
         Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), process.getCode()))
                 .thenReturn(1);
-        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
                 .thenReturn(Collections.emptySet());
         putMsg(result, Status.SUCCESS, projectCode);
