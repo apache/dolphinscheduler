@@ -15,18 +15,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>dev-SNAPSHOT</version>
+        <version>3.1.0</version>
     </parent>
     <artifactId>dolphinscheduler-python</artifactId>
-    <name>${project.artifactId}</name>
     <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
 
     <profiles>
         <profile>
@@ -45,10 +44,10 @@
                         <executions>
                             <execution>
                                 <id>python-api-prepare</id>
-                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>prepare-package</phase>
                                 <configuration>
                                     <executable>python</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
@@ -64,10 +63,10 @@
                             </execution>
                             <execution>
                                 <id>python-api-clean</id>
-                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>prepare-package</phase>
                                 <configuration>
                                     <executable>python</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
@@ -79,10 +78,10 @@
                             </execution>
                             <execution>
                                 <id>python-api-build</id>
-                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>prepare-package</phase>
                                 <configuration>
                                     <executable>python</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
@@ -95,10 +94,10 @@
                             <!-- Rename Python dist package to avoid confusion with dolphinscheduler main package -->
                             <execution>
                                 <id>python-pkg-rename-tar</id>
-                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>prepare-package</phase>
                                 <configuration>
                                     <executable>bash</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
@@ -110,10 +109,10 @@
                             </execution>
                             <execution>
                                 <id>python-pkg-rename-whl</id>
-                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>prepare-package</phase>
                                 <configuration>
                                     <executable>bash</executable>
                                     <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
@@ -125,10 +124,10 @@
                             </execution>
                             <execution>
                                 <id>sign-source</id>
-                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>prepare-package</phase>
                                 <configuration>
                                     <skip>${python.sign.skip}</skip>
                                     <executable>bash</executable>
@@ -142,10 +141,10 @@
                             </execution>
                             <execution>
                                 <id>sign-wheel</id>
-                                <phase>prepare-package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
+                                <phase>prepare-package</phase>
                                 <configuration>
                                     <skip>${python.sign.skip}</skip>
                                     <executable>bash</executable>
