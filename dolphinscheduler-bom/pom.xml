@@ -455,6 +455,13 @@
                 <version>${hadoop.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.htrace</groupId>
+                <artifactId>htrace-core4</artifactId>
+                <scope>provided</scope>
+                <!-- set to provided to exclude from all hadoop-* transitive dependencies -->
+            </dependency>
+
             <!-- replace htrace-core with hbase-noop-htrace for CVE -->
             <dependency>
                 <groupId>org.apache.hbase.thirdparty</groupId>
