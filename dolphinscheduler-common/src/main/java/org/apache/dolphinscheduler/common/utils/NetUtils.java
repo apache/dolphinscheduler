@@ -32,8 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
+import org.apache.http.conn.util.InetAddressUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
  */
 public class NetUtils {
 
-    private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
     private static final String NETWORK_PRIORITY_DEFAULT = "default";
     private static final String NETWORK_PRIORITY_INNER = "inner";
     private static final String NETWORK_PRIORITY_OUTER = "outer";
@@ -183,7 +182,7 @@ public class NetUtils {
         }
         String name = address.getHostAddress();
         return (name != null
-                && IP_PATTERN.matcher(name).matches()
+                && InetAddressUtils.isIPv4Address(name)
                 && !address.isAnyLocalAddress()
                 && !address.isLoopbackAddress());
     }
@@ -237,7 +236,8 @@ public class NetUtils {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
-            if (ignoreNetworkInterface(networkInterface)) { // ignore
+            // ignore
+            if (ignoreNetworkInterface(networkInterface)) {
                 continue;
             }
             validNetworkInterfaces.add(networkInterface);
