@@ -6,7 +6,7 @@
 
 ### Versions: 3.1.0
 
-#### Links： [3.1.0 文档](../3.1.0/user_doc/about/introduction.md)
+#### Links： [3.1.0 Document](../3.1.0/user_doc/about/introduction.md)
 
 ### Versions: 3.0.0
 
