@@ -172,11 +172,6 @@ export default {
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
-            key: 'docs301',
-            text: '3.0.1',
-            link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
-          },
-          {
             key: 'docs1',
             text: '2.0.6',
             link: '/zh-cn/docs/2.0.6/user_doc/guide/quick-start.html',
