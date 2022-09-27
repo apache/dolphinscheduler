@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils.placeholder;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -46,13 +47,11 @@ public class BusinessTimeUtils {
      * @return business time
      */
     public static Map<String, String> getBusinessTime(CommandType commandType, Date runTime) {
-        Date businessDate = runTime;
-        Map<String, String> result = new HashMap<>();
+        Date businessDate;
         switch (commandType) {
             case COMPLEMENT_DATA:
-                if (runTime == null) {
-                    return result;
-                }
+                businessDate = DateUtils.addDays(runTime, -1);
+                break;
             case START_PROCESS:
             case START_CURRENT_TASK_PROCESS:
             case RECOVER_TOLERANCE_FAULT_PROCESS:
@@ -71,6 +70,7 @@ public class BusinessTimeUtils {
                 break;
         }
         Date businessCurrentDate = addDays(businessDate, 1);
+        Map<String, String> result = new HashMap<>();
         result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE));
         result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE));
         result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME));
