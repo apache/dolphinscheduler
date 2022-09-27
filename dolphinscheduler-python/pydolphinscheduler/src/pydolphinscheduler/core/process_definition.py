@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional, Set
 from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.resource import Resource
+from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.exceptions import PyDSParamException, PyDSTaskNoFoundException
 from pydolphinscheduler.java_gateway import JavaGate
 from pydolphinscheduler.models import Base, Project, Tenant, User
@@ -111,6 +112,7 @@ class ProcessDefinition(Base):
         timeout: Optional[int] = 0,
         release_state: Optional[str] = configuration.WORKFLOW_RELEASE_STATE,
         param: Optional[Dict] = None,
+        resource_plugin: Optional[ResourcePlugin] = None,
         resource_list: Optional[List[Resource]] = None,
     ):
         super().__init__(name, description)
@@ -134,6 +136,7 @@ class ProcessDefinition(Base):
         self._release_state = release_state
         self.param = param
         self.tasks: dict = {}
+        self.resource_plugin = resource_plugin
         # TODO how to fix circle import
         self._task_relations: set["TaskRelation"] = set()  # noqa: F821
         self._process_definition_code = None
@@ -274,19 +277,6 @@ class ProcessDefinition(Base):
                 "timezoneId": self.timezone,
             }
 
-    # TODO inti DAG's tasks are in the same location with default {x: 0, y: 0}
-    @property
-    def task_location(self) -> List[Dict]:
-        """Return all tasks location for all process definition.
-
-        For now, we only set all location with same x and y valued equal to 0. Because we do not
-        find a good way to set task locations. This is requests from java gateway interface.
-        """
-        if not self.tasks:
-            return [self.tasks]
-        else:
-            return [{"taskCode": task_code, "x": 0, "y": 0} for task_code in self.tasks]
-
     @property
     def task_list(self) -> List["Task"]:  # noqa: F821
         """Return list of tasks objects."""
@@ -400,7 +390,6 @@ class ProcessDefinition(Base):
             json.dumps(self.param_json),
             self.warning_type,
             self.warning_group_id,
-            json.dumps(self.task_location),
             self.timeout,
             self.worker_group,
             self._tenant,

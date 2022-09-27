@@ -38,7 +38,8 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                @Param("state") Integer state);
 
     List<TaskInstance> findValidTaskListByProcessId(@Param("processInstanceId") Integer processInstanceId,
-                                                    @Param("flag") Flag flag);
+                                                    @Param("flag") Flag flag,
+                                                    @Param("testFlag") int testFlag);
 
     List<TaskInstance> queryByHostAndStatus(@Param("host") String host,
                                             @Param("states") int[] stateArray);
@@ -52,6 +53,9 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     TaskInstance queryByInstanceIdAndCode(@Param("processInstanceId") int processInstanceId,
                                           @Param("taskCode") Long taskCode);
+
+    List<TaskInstance> queryByProcessInstanceIdsAndTaskCodes(@Param("processInstanceIds") List<Integer> processInstanceIds,
+                                                  @Param("taskCodes") List<Long> taskCodes);
 
     Integer countTask(@Param("projectCodes") Long[] projectCodes,
                       @Param("taskIds") int[] taskIds);

@@ -21,12 +21,20 @@ import static java.util.Objects.requireNonNull;
 
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
+
+import java.util.Objects;
+
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class PluginDao {
+
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
 
@@ -43,20 +51,36 @@ public class PluginDao {
      * add or update plugin define
      *
      * @param pluginDefine new pluginDefine
+     * @return plugin id
      */
-    public int addOrUpdatePluginDefine(PluginDefine pluginDefine) {
-        requireNonNull(pluginDefine, "pluginDefine is null");
+    public int addOrUpdatePluginDefine(@NonNull PluginDefine pluginDefine) {
         requireNonNull(pluginDefine.getPluginName(), "pluginName is null");
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
-        PluginDefine currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+        PluginDefine currPluginDefine =
+                pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (currPluginDefine == null) {
-            if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() > 0) {
-                return pluginDefine.getId();
+            try {
+                if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() != null) {
+                    return pluginDefine.getId();
+                }
+                throw new TaskPluginException(
+                        String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
+                                pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+            } catch (TaskPluginException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                log.error("Insert plugin definition error, there may already exist a plugin", ex);
+                currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(),
+                        pluginDefine.getPluginType());
+                if (currPluginDefine == null) {
+                    throw new TaskPluginException(
+                            String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
+                                    pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+                }
             }
-            throw new IllegalStateException("Failed to insert plugin definition");
         }
-        if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
+        if (!Objects.equals(currPluginDefine.getPluginParams(), pluginDefine.getPluginParams())) {
             currPluginDefine.setUpdateTime(pluginDefine.getUpdateTime());
             currPluginDefine.setPluginParams(pluginDefine.getPluginParams());
             pluginDefineMapper.updateById(currPluginDefine);

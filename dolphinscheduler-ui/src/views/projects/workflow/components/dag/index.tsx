@@ -89,6 +89,7 @@ export default defineComponent({
 
     const graph = ref<Graph>()
     provide('graph', graph)
+    context.expose(graph)
 
     // Auto layout modal
     const {

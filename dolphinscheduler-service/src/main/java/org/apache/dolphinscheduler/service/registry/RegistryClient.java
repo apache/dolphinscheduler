@@ -19,11 +19,13 @@ package org.apache.dolphinscheduler.service.registry;
 
 import com.google.common.base.Strings;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -94,21 +96,33 @@ public class RegistryClient {
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
-            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(entry.getValue());
-            if (heartBeat == null) {
+            String serverPath = entry.getKey();
+            String heartBeatJson = entry.getValue();
+            if (StringUtils.isEmpty(heartBeatJson)) {
+                logger.error("The heartBeatJson is empty, serverPath: {}", serverPath);
                 continue;
             }
-
             Server server = new Server();
-            server.setResInfo(JSONUtils.toJsonString(heartBeat));
-            server.setCreateTime(new Date(heartBeat.getStartupTime()));
-            server.setLastHeartbeatTime(new Date(heartBeat.getReportTime()));
-            server.setId(heartBeat.getProcessId());
+            switch (nodeType) {
+                case MASTER:
+                    MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(heartBeatJson, MasterHeartBeat.class);
+                    server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
+                    server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
+                    server.setId(masterHeartBeat.getProcessId());
+                    break;
+                case WORKER:
+                    WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(heartBeatJson, WorkerHeartBeat.class);
+                    server.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
+                    server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
+                    server.setId(workerHeartBeat.getProcessId());
+                    break;
+            }
 
-            String key = entry.getKey();
-            server.setZkDirectory(parentPath + "/" + key);
+            server.setResInfo(heartBeatJson);
+            // todo: add host, port in heartBeat Info, so that we don't need to parse this again
+            server.setZkDirectory(parentPath + "/" + serverPath);
             // set host and port
-            String[] hostAndPort = key.split(COLON);
+            String[] hostAndPort = serverPath.split(COLON);
             String[] hosts = hostAndPort[0].split(DIVISION_STRING);
             // fetch the last one
             server.setHost(hosts[hosts.length - 1]);

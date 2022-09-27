@@ -24,13 +24,13 @@ export default {
   port: 8080,
   domain: 'dolphinscheduler.apache.org',
   copyToDist: ['asset', 'img', 'file', '.asf.yaml', 'sitemap.xml', '.nojekyll', '.htaccess', 'googled0df7b96f277a143.html'],
-  docsLatest: '3.0.0',
+  docsLatest: '3.0.1',
   defaultSearch: 'google', // default search engine
   defaultLanguage: 'en-us',
   'en-us': {
     banner: {
       text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to disscuss them ',
-      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g'
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg'
     },
     pageMenu: [
       {
@@ -45,7 +45,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.0.0)',
+            text: 'latest(3.0.1)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
@@ -132,13 +132,13 @@ export default {
           name: 'Slack',
           img1: '/img/slack.png',
           img2: '/img/slack-selected.png',
-          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g',
+          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg',
         },
         {
           name: 'Email List',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
-          link: '/en-us/community/development/subscribe.html',
+          link: '/en-us/docs/latest/user_doc/contribute/join/subscribe.html',
         },
         {
           name: 'Twitter',
@@ -153,7 +153,7 @@ export default {
   'zh-cn': {
     banner: {
       text: '🤔 有关于 Apache DolphinScheduler 的疑问，加入 Slack 频道来讨论他们 ',
-      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g'
+      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg'
     },
     pageMenu: [
       {
@@ -168,7 +168,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.0.0)',
+            text: '最新版本latest(3.0.1)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
@@ -257,13 +257,13 @@ export default {
           name: 'Slack',
           img1: '/img/slack.png',
           img2: '/img/slack-selected.png',
-          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e0s4agia-Ofkxa93zStmqTm9UsQBE8g',
+          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg',
         },
         {
           name: '邮件列表',
           img1: '/img/emailgray.png',
           img2: '/img/emailblue.png',
-          link: '/zh-cn/community/development/subscribe.html',
+          link: '/zh-cn/docs/latest/user_doc/contribute/join/subscribe.html',
         },
         {
           name: 'Twitter',

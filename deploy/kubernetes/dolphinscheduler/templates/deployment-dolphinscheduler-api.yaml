@@ -71,7 +71,6 @@ spec:
               value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
-            {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
             {{ range $key, $value :=  .Values.api.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -106,6 +105,9 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-api
+            - name: config-volume
+              mountPath: /opt/dolphinscheduler/conf/common.properties
+              subPath: common_properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
       volumes:
@@ -116,5 +118,8 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        - name: config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-configs
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}

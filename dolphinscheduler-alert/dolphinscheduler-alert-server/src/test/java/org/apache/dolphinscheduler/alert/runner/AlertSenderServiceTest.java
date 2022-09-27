@@ -92,6 +92,7 @@ public class AlertSenderServiceTest {
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
                 pluginDefineId, pluginInstanceParams, pluginInstanceName);
+        alertPluginInstance.setId(1);
         alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);
 
@@ -153,6 +154,7 @@ public class AlertSenderServiceTest {
         String content = "alert mail test content";
         List<Alert> alertList = new ArrayList<>();
         Alert alert = new Alert();
+        alert.setId(1);
         alert.setAlertGroupId(alertGroupId);
         alert.setTitle(title);
         alert.setContent(content);

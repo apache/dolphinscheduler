@@ -17,16 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+import static org.apache.dolphinscheduler.spi.utils.Constants.RESOURCE_STORAGE_TYPE;
+
 import org.apache.dolphinscheduler.spi.enums.ResUploadType;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
-
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
-import static org.apache.dolphinscheduler.spi.utils.Constants.RESOURCE_STORAGE_TYPE;
 
 /**
  * common utils
@@ -36,7 +37,7 @@ public class CommonUtils {
     private CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
     }
-    
+
     /**
      * if upload resource is HDFS and kerberos startup is true , else false
      *
@@ -70,7 +71,8 @@ public class CommonUtils {
      * @param loginUserKeytabPath loginUserKeytabPath
      * @throws IOException errors
      */
-    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) throws IOException {
+    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername,
+                                        String loginUserKeytabPath) throws IOException {
         Configuration configuration = new Configuration();
         configuration.setClassLoader(configuration.getClass().getClassLoader());
         loadKerberosConf(javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath, configuration);
@@ -86,12 +88,16 @@ public class CommonUtils {
      * @return load kerberos config return true
      * @throws IOException errors
      */
-    public static boolean loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath, Configuration configuration) throws IOException {
+    public static boolean loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername,
+                                           String loginUserKeytabPath, Configuration configuration) throws IOException {
         if (CommonUtils.getKerberosStartupState()) {
-            System.setProperty(JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf, PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH)));
+            System.setProperty(JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf,
+                    PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH)));
             configuration.set(HADOOP_SECURITY_AUTHENTICATION, KERBEROS);
             UserGroupInformation.setConfiguration(configuration);
-            UserGroupInformation.loginUserFromKeytab(StringUtils.defaultIfBlank(loginUserKeytabUsername, PropertyUtils.getString(LOGIN_USER_KEY_TAB_USERNAME)),
+            UserGroupInformation.loginUserFromKeytab(
+                    StringUtils.defaultIfBlank(loginUserKeytabUsername,
+                            PropertyUtils.getString(LOGIN_USER_KEY_TAB_USERNAME)),
                     StringUtils.defaultIfBlank(loginUserKeytabPath, PropertyUtils.getString(LOGIN_USER_KEY_TAB_PATH)));
             return true;
         }
@@ -101,7 +107,7 @@ public class CommonUtils {
     public static String getDataQualityJarName() {
         String dqsJarName = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
 
-        if (org.apache.commons.lang.StringUtils.isEmpty(dqsJarName)) {
+        if (StringUtils.isEmpty(dqsJarName)) {
             return "dolphinscheduler-data-quality.jar";
         }
 
@@ -134,7 +140,7 @@ public class CommonUtils {
     public static String getHdfsDataBasePath() {
         String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
         if ("/".equals(resourceUploadPath)) {
-            // if basepath is configured to /,  the generated url may be  //default/resources (with extra leading /)
+            // if basepath is configured to /, the generated url may be //default/resources (with extra leading /)
             return "";
         } else {
             return resourceUploadPath;

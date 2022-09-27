@@ -24,7 +24,13 @@ import {
   NPagination,
   NSpace
 } from 'naive-ui'
-import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'

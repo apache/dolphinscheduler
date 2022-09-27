@@ -20,15 +20,18 @@
 package org.apache.dolphinscheduler.alert.api;
 
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
 
 import java.util.List;
 
 /**
  * alert channel factory
  */
-public interface AlertChannelFactory {
+public interface AlertChannelFactory extends PrioritySPI {
     /**
      * Returns the name of the alert channel
+     *
      * @return the name of the alert channel
      */
     String name();
@@ -44,4 +47,8 @@ public interface AlertChannelFactory {
      * Returns the configurable parameters that this plugin needs to display on the web ui
      */
     List<PluginParams> params();
+
+    default SPIIdentify getIdentify() {
+        return SPIIdentify.builder().name(name()).build();
+    }
 }

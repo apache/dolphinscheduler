@@ -27,7 +27,7 @@ import {
   computed
 } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from "vue-router"
+import { useRoute } from 'vue-router'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useModal } from './use-modal'
@@ -147,7 +147,9 @@ export default defineComponent({
       }
     ]
 
-    const showTaskDependType = computed(() => route.name === 'workflow-definition-detail')
+    const showTaskDependType = computed(
+      () => route.name === 'workflow-definition-detail'
+    )
 
     const renderLabel = (option: any) => {
       return [
@@ -267,13 +269,19 @@ export default defineComponent({
             >
               <NRadioGroup v-model:value={this.startForm.taskDependType}>
                 <NSpace>
-                  <NRadio value='TASK_POST'>{t('project.workflow.backward_execution')}</NRadio>
-                  <NRadio value='TASK_PRE'>{t('project.workflow.forward_execution')}</NRadio>
-                  <NRadio value='TASK_ONLY'>{t('project.workflow.current_node_execution')}</NRadio>
+                  <NRadio value='TASK_POST'>
+                    {t('project.workflow.backward_execution')}
+                  </NRadio>
+                  <NRadio value='TASK_PRE'>
+                    {t('project.workflow.forward_execution')}
+                  </NRadio>
+                  <NRadio value='TASK_ONLY'>
+                    {t('project.workflow.current_node_execution')}
+                  </NRadio>
                 </NSpace>
               </NRadioGroup>
-            </NFormItem>)
-          }
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.notification_strategy')}
             path='warningType'
@@ -345,7 +353,9 @@ export default defineComponent({
                   label={t('project.workflow.mode_of_dependent')}
                   path='complementDependentMode'
                 >
-                  <NRadioGroup v-model:value={this.startForm.complementDependentMode}>
+                  <NRadioGroup
+                    v-model:value={this.startForm.complementDependentMode}
+                  >
                     <NSpace>
                       <NRadio value={'OFF_MODE'}>
                         {t('project.workflow.close')}
@@ -380,7 +390,7 @@ export default defineComponent({
                       {t('project.workflow.custom_parallelism')}
                     </NCheckbox>
                     <NInput
-                  allowInput={this.trim}
+                      allowInput={this.trim}
                       disabled={!this.parallelismRef}
                       placeholder={t(
                         'project.workflow.please_enter_parallelism'
@@ -419,7 +429,7 @@ export default defineComponent({
                       />
                     ) : (
                       <NInput
-                  allowInput={this.trim}
+                        allowInput={this.trim}
                         clearable
                         type='textarea'
                         v-model:value={this.startForm.scheduleTime}
@@ -445,7 +455,7 @@ export default defineComponent({
                 {this.startParamsList.map((item, index) => (
                   <NSpace class={styles.startup} key={Date.now() + index}>
                     <NInput
-                  allowInput={this.trim}
+                      allowInput={this.trim}
                       pair
                       separator=':'
                       placeholder={['prop', 'value']}
@@ -487,6 +497,13 @@ export default defineComponent({
               checkedValue={1}
               uncheckedValue={0}
               v-model:value={this.startForm.dryRun}
+            />
+          </NFormItem>
+          <NFormItem label={t('project.workflow.whether_test')} path='testFlag'>
+            <NSwitch
+              checkedValue={1}
+              uncheckedValue={0}
+              v-model:value={this.startForm.testFlag}
             />
           </NFormItem>
         </NForm>

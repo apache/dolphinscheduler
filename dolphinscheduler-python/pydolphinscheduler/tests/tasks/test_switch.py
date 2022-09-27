@@ -236,8 +236,6 @@ def test_switch_get_define(mock_task_code_version):
         "taskParams": {
             "resourceList": [],
             "localParams": [],
-            "dependence": {},
-            "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
             "switchResult": {
                 "dependTaskList": [
@@ -250,6 +248,7 @@ def test_switch_get_define(mock_task_code_version):
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",

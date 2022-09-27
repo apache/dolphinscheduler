@@ -9,7 +9,8 @@
 
 ### Configure `common.properties`
 
-Configure `api-server/conf/common.properties` and `worker-server/conf/common.properties` as follows:
+If you deploy DolphinScheduler in `Cluster` or `Pseudo-Cluster` mode, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
+If you deploy DolphinScheduler in `Standalone` mode, you only need to configure `standalone-server/conf/common.properties` as follows:
 
 - Change `resource.storage.upload.base.path` to your local directory path. Please make sure the `tenant resource.hdfs.root.user` has read and write permissions for `resource.storage.upload.base.path`, e,g. `/tmp/dolphinscheduler`. `DolphinScheduler` will create the directory you configure if it does not exist.
 - Modify `resource.storage.type=HDFS` and `resource.hdfs.fs.defaultFS=file:///`.
@@ -44,9 +45,9 @@ data.basedir.path=/tmp/dolphinscheduler
 # resource view suffixs
 #resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
 
-# resource storage type: HDFS, S3, NONE
+# resource storage type: HDFS, S3, OSS, NONE
 resource.storage.type=NONE
-# resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
+# resource store on HDFS/S3/OSS path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/tmp/dolphinscheduler
 
 # The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
@@ -59,6 +60,17 @@ resource.aws.region=cn-north-1
 resource.aws.s3.bucket.name=dolphinscheduler
 # You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
 resource.aws.s3.endpoint=http://localhost:9000
+
+# alibaba cloud access key id, required if you set resource.storage.type=OSS 
+resource.alibaba.cloud.access.key.id=<your-access-key-id>
+# alibaba cloud access key secret, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.access.key.secret=<your-access-key-secret>
+# alibaba cloud region, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.region=cn-hangzhou
+# oss bucket name, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.oss.bucket.name=dolphinscheduler
+# oss bucket endpoint, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
 
 # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
 resource.hdfs.root.user=hdfs
@@ -133,6 +145,7 @@ task.resource.limit.state=false
 
 > **Note:**
 >
-> *  If only the `api-server/conf/common.properties` file is configured, then resource uploading is enabled, but you can not use resources in task. If you want to use or execute the files in the workflow you need to configure `worker-server/conf/common.properties` too.
+> * If only the `api-server/conf/common.properties` file is configured, then resource uploading is enabled, but you can not use resources in task. If you want to use or execute the files in the workflow you need to configure `worker-server/conf/common.properties` too.
 > * If you want to use the resource upload function, the deployment user in [installation and deployment](../installation/standalone.md) must have relevant operation authority.
 > * If you using a Hadoop cluster with HA, you need to enable HDFS resource upload, and you need to copy the `core-site.xml` and `hdfs-site.xml` under the Hadoop cluster to `worker-server/conf` and `api-server/conf`, otherwise skip this copy step.
+
