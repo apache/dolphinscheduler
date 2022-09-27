@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
+import com.google.common.base.Splitter;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -41,6 +45,7 @@ import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.TenantUser;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
@@ -53,6 +58,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
@@ -129,6 +135,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
+
+    @Autowired
+    private TenantUserMapper tenantUserMapper;
 
     /**
      * create user, only system admin have permission
@@ -1364,5 +1373,84 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
         return user;
+    }
+
+    @Override
+    public Map<String, Object> grantTenant(User loginUser, Integer userId, String tenantIds) {
+        Map<String, Object> result = new HashMap<>();
+        if (!isAdmin((loginUser))) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        if (Objects.isNull(userId)) {
+            putMsg(result, Status.GRANT_TENANT_NOT_FOUND_USER_ERROR);
+            return result;
+        }
+
+        User user = userMapper.selectById(userId);
+        if (Objects.isNull(user)) {
+            putMsg(result, Status.GRANT_TENANT_NOT_FOUND_USER_ERROR);
+            return result;
+        }
+
+        if (isAdmin(user)) {
+            putMsg(result, Status.GRANT_TENANT_NOT_FOUND_USER_ERROR);
+            return result;
+        }
+
+        if (!StringUtils.isNotBlank(tenantIds)) {
+            putMsg(result, Status.GRANT_TENANT_NOT_EXISTS_ERROR);
+            return result;
+        }
+
+        Set<Integer> tenantIdList = Splitter.on(",")
+            .omitEmptyStrings()
+            .splitToStream(tenantIds)
+            .map(Integer::parseInt)
+            .collect(Collectors.toSet());
+
+        if (CollectionUtils.isEmpty(tenantIdList)) {
+            putMsg(result, Status.GRANT_TENANT_NOT_EXISTS_ERROR);
+            return result;
+        }
+
+        Set<Integer> existedTenantSet = tenantUserMapper
+            .selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, user.getId()))
+            .stream()
+            .map(TenantUser::getTenantId).collect(Collectors.toSet());
+
+        try {
+            SetUtils.difference(tenantIdList, existedTenantSet)
+                .stream()
+                .forEach(tenantId -> {
+                    TenantUser tenantUser = new TenantUser();
+                    tenantUser.setUserId(userId);
+                    tenantUser.setTenantId(tenantId);
+                    tenantUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+                    tenantUserMapper.insert(tenantUser);
+                });
+
+            SetUtils.difference(existedTenantSet, tenantIdList)
+                .stream()
+                .forEach(tenantId -> {
+                    tenantUserMapper.delete(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId).eq(TenantUser::getTenantId, tenantId));
+                });
+            putMsg(result, Status.SUCCESS);
+        } catch (Exception ex) {
+            logger.error("Failed to grant tenants to the user {}, error:{}", user.getUserName(), ex.getMessage());
+            putMsg(result, Status.GRANT_TENANT_ERROR);
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> revokeTenant(User loginUser, Integer userId, String tenantIds) {
+        Map<String, Object> result = new HashMap<>();
+        if (!isAdmin((loginUser))) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+        return result;
     }
 }

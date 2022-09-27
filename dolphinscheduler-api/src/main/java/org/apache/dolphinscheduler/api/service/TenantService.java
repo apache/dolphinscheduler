@@ -17,7 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -114,4 +120,24 @@ public interface TenantService {
      * @return Tenant object
      */
     Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName);
+
+
+    /**
+     * query authorized tenant
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return tenants that the user have permission to see, Except for items created by this user
+     */
+    public Result queryAuthorizedTenant(User loginUser, Integer userId);
+
+    /**
+     * query unauthorized tenant
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return the tenants that the user hasn't permission to see
+     */
+    Result queryUnauthorizedTenant(User loginUser, Integer userId);
+
 }

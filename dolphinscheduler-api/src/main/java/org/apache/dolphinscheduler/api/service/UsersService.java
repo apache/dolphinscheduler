@@ -315,4 +315,24 @@ public interface UsersService {
     User createUserIfNotExists(String userName, String userPassword, String email, String phone, String tenantCode,
                                String queue,
                                int state) throws IOException;
+
+    /**
+     * grant tenant
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param tenantIds tenant id array
+     * @return grant result code
+     */
+    Map<String, Object> grantTenant(User loginUser, Integer userId, String tenantIds);
+
+    /**
+     * revoke several tenants' permission for specified user.
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param tenantIds   tenant ids
+     * @return
+     */
+    Map<String, Object> revokeTenant(User loginUser, Integer userId, String tenantIds);
+
 }

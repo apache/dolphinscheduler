@@ -441,6 +441,13 @@ public enum Status {
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
+
+    GRANT_TENANT_ERROR(1500001, "Failed to grant tenants", "授权租户失败"),
+    GRANT_TENANT_NOT_EXISTS_ERROR(1500002, "The tenants [{0}] not exists", "授权租户[{0}]不存在"),
+    GRANT_TENANT_NOT_FOUND_USER_ERROR(1500003, "The user not exists", "授权用户不存在"),
+    GRANT_TENANT_FOR_ADMIN_USER_ERROR(1500004, "The admin user has all authority to use any tenant. So you can't change that.", "管理员用户拥有所有租户使用权限，所以不能为管理员用户授权或修改租户."),
+    QUERY_UNAUTHORIZED_TENANT_ERROR(1500010, "Failed to query unauthorized tenants.", "查询未授权租户错误"),
+    QUERY_AUTHORIZED_TENANT_ERROR(1500011, "Failed to query authorized tenants", "查询授权租户错误"),
     ;
 
     private final int code;

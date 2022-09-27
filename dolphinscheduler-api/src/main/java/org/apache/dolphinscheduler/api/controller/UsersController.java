@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERRO
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
@@ -566,6 +567,30 @@ public class UsersController extends BaseController {
         List<String> formatUserNames =
                 userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
+        return returnDataList(result);
+    }
+
+    /**
+     * grant tenant
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param tenantIds tenant id array
+     * @return grant result code
+     */
+    @ApiOperation(value = "grantTenant", notes = "GRANT_TENANT_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100"),
+        @ApiImplicitParam(name = "tenantIds", value = "TENANT_IDS", required = true, dataTypeClass = String.class)
+    })
+    @PostMapping(value = "/grant-tenant")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GRANT_TENANT_ERROR)
+    @AccessLogAnnotation
+    public Result grantTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+        @RequestParam(value = "userId") Integer userId,
+        @RequestParam(value = "tenantIds") String tenantIds) {
+        Map<String, Object> result = usersService.grantTenant(loginUser, userId, tenantIds);
         return returnDataList(result);
     }
 }

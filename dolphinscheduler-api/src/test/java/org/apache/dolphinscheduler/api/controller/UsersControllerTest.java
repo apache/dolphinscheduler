@@ -366,4 +366,22 @@ public class UsersControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
+
+    @Test
+    public void testGrantTenant() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userId", "-1");
+        paramsMap.add("tenantIds", "3");
+
+        MvcResult mvcResult = mockMvc.perform(post("/users/grant-tenant")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.GRANT_TENANT_NOT_FOUND_USER_ERROR.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 }

@@ -19,8 +19,12 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_PROJECT;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
 
@@ -213,5 +217,46 @@ public class TenantController extends BaseController {
                                    @RequestParam(value = "tenantCode") String tenantCode) {
         return tenantService.verifyTenantCode(tenantCode);
     }
+
+    /**
+     * query unauthorized tenant
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return the tenants that the user hasn't permission to see
+     */
+    @ApiOperation(value = "queryUnauthorizedTenant", notes = "QUERY_UNAUTHORIZED_TENANT_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", dataTypeClass = int.class, example = "100")
+    })
+    @GetMapping(value = "/unauth-tenant")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_UNAUTHORIZED_TENANT_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryUnauthorizedTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+        @RequestParam("userId") Integer userId) {
+        return tenantService.queryUnauthorizedTenant(loginUser, userId);
+    }
+
+    /**
+     * query authorized tenant
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return tenants that the user has permission to see, Except for items created by this user
+     */
+    @ApiOperation(value = "queryAuthorizedTenant", notes = "QUERY_AUTHORIZED_TENANT_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userId", value = "USER_ID", dataTypeClass = int.class, example = "100")
+    })
+    @GetMapping(value = "/authed-tenant")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUTHORIZED_TENANT_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryAuthorizedTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+        @RequestParam("userId") Integer userId) {
+        return tenantService.queryAuthorizedTenant(loginUser, userId);
+    }
+
 
 }

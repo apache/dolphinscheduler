@@ -1969,3 +1969,25 @@ CREATE TABLE t_ds_fav
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );
+
+
+
+--
+-- Table structure for table t_ds_relation_tenant_user
+--
+
+DROP TABLE IF EXISTS t_ds_relation_tenant_user;
+CREATE TABLE t_ds_relation_tenant_user (
+    id int NOT NULL  ,
+    user_id int NOT NULL ,
+    tenant_id int DEFAULT NULL ,
+    perm int DEFAULT '1' ,
+    create_time timestamp DEFAULT NULL ,
+    update_time timestamp DEFAULT NULL ,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_relation_tenant_user_un UNIQUE (user_id, tenant_id)
+);
+
+DROP SEQUENCE IF EXISTS t_ds_relation_tenant_user_id_sequence;
+CREATE SEQUENCE  t_ds_relation_tenant_user_id_sequence;
+ALTER TABLE t_ds_relation_tenant_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_tenant_user_id_sequence');

@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.ResultTest;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -252,6 +253,21 @@ public class TenantServiceTest {
         Mockito.when(queueService.createQueueIfNotExists(queue, queueName)).thenReturn(getQueue());
         tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
         Assert.assertEquals(new Tenant(tenantCode, tenantDesc, getQueue().getId()), tenant);
+    }
+
+    @Test
+    public void testQueryAuthorizedTenant() {
+        Result result = tenantService.queryAuthorizedTenant(getLoginUser(), -1);
+
+        Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+    }
+
+
+    @Test
+    public void testQueryUnAuthorizedTenant() {
+        Result result = tenantService.queryAuthorizedTenant(getLoginUser(), -1);
+
+        Assert.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
     }
 
     /**

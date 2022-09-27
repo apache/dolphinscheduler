@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -34,12 +36,15 @@ import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.TenantUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +89,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
+
+    @Autowired
+    private TenantUserMapper tenantUserMapper;
 
     /**
      * Check the tenant new object valid or not
@@ -394,5 +402,82 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
         return tenant;
+    }
+
+    /**
+     * query authorized tenant
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return tenants that the user have permission to see, Except for items created by this user
+     */
+    @Override
+    public Result queryAuthorizedTenant(User loginUser, Integer userId) {
+        Result result = new Result();
+
+        User user = userMapper.selectById(userId);
+
+        if (Objects.isNull(user)) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        List<Tenant> tenants;
+        if (isAdmin(user)) {
+            tenants = tenantMapper.queryAll();
+        } else {
+            Set<Integer> tenantIds = tenantUserMapper.selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId))
+                .stream()
+                .map(TenantUser::getTenantId)
+                .collect(Collectors.toSet());
+
+            // add the default tenant of the user to the set.
+            tenantIds.add(user.getTenantId());
+            tenants = tenantMapper.selectBatchIds(tenantIds);
+        }
+
+        result.setData(tenants);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * query unauthorized tenant
+     *
+     * @param loginUser login user
+     * @param userId    user id
+     * @return the tenants that the user hasn't permission to see
+     */
+    @Override
+    public Result queryUnauthorizedTenant(User loginUser, Integer userId) {
+        Result result = new Result();
+
+        User user = userMapper.selectById(userId);
+
+        if (Objects.isNull(user)) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        List<Tenant> tenants;
+        if (isAdmin(user)) {
+            tenants = new ArrayList<>();
+        } else {
+            Set<Integer> tenantIds = tenantUserMapper.selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId))
+                .stream()
+                .map(TenantUser::getTenantId)
+                .collect(Collectors.toSet());
+
+            // add the default tenant of the user to the set.
+            tenantIds.add(user.getTenantId());
+
+            tenants = tenantMapper.selectList(new QueryWrapper<Tenant>().lambda().notIn(Tenant::getId, tenantIds));
+        }
+
+        result.setData(tenants);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
     }
 }
