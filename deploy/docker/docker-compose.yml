@@ -83,6 +83,7 @@ services:
       dolphinscheduler-zookeeper:
         condition: service_healthy
     volumes:
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
@@ -99,6 +100,7 @@ services:
       timeout: 5s
       retries: 3
     volumes:
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
       - dolphinscheduler
@@ -116,6 +118,7 @@ services:
       dolphinscheduler-zookeeper:
         condition: service_healthy
     volumes:
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
     networks:
@@ -134,6 +137,7 @@ services:
       dolphinscheduler-zookeeper:
         condition: service_healthy
     volumes:
+      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
       - dolphinscheduler-worker-data:/tmp/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
