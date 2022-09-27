@@ -95,7 +95,7 @@
         <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
         <snakeyaml.version>1.31</snakeyaml.version>
-        <flink.version>1.15.1</flink.version>
+        <flink.version>1.15.2</flink.version>
         <kerb.version>2.0.1</kerb.version>
         <flink.shaded.hadoop.version>2.8.3-7.0</flink.shaded.hadoop.version>
     </properties>
