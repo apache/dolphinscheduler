@@ -23,8 +23,7 @@ The following steps are recommended (to be initiated only by an existing 2PMC me
    so you could gather support from other PMC members for your proposal.
 2. Keep the discussion open for more than 3 days but no more than 1 week, unless there is any express objection or concern.
 3. If the PMC generally agrees to the proposal, send an email titled `[VOTE] Promote xxx as new committer` to `private@dolphinscheduler.apache.org`.
-4. Keep the voting process open for more than 3 days, but no more than 1 week. Consider the result as `Consensus Approval` if there are three +1 votes and
-   +1 votes > -1 votes.
+4. Keep the voting process open for more than 3 days, but no more than 1 week. Consider the result as `Consensus Approval` if there are `3 + 1` votes with `NO` vetos. Please note that +1 votes > -1 votes.
 5. Send an email titled `[RESULT][VOTE] Promote xxx as new committer` to `private@dolphinscheduler.apache.org`, and list the voting details, including who the voters are.
 
 ## Invite new committer
