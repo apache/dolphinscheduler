@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.dms;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+
+import java.lang.reflect.Field;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,21 +32,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.support.membermodification.MemberModifier;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStateException;
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({
-    JSONUtils.class,
-    PropertyUtils.class,
-    DmsHook.class
-})
-@PowerMockIgnore({"javax.*"})
+@RunWith(MockitoJUnitRunner.class)
 public class DmsTaskTest {
 
     @Mock
@@ -56,11 +47,10 @@ public class DmsTaskTest {
 
     @Before
     public void before() throws Exception {
-        whenNew(DmsHook.class).withAnyArguments().thenReturn(dmsHook);
         DmsParameters dmsParameters = new DmsParameters();
         dmsTask = initTask(dmsParameters);
-        dmsTask.initDmsHook();
-        MemberModifier.field(DmsTask.class, "dmsHook").set(dmsTask, dmsHook);
+        Field testAField = dmsTask.getClass().getDeclaredField("dmsHook");
+        testAField.set(dmsTask, dmsHook);
     }
 
     @Test
@@ -86,7 +76,6 @@ public class DmsTaskTest {
         dmsParameters.setJsonData(jsonData);
 
         DmsTask dmsTask = initTask(dmsParameters);
-        dmsTask.initDmsHook();
         dmsTask.convertJsonParameters();
         DmsParameters dmsParametersNew = dmsTask.getParameters();
         Assert.assertEquals("task6", dmsParametersNew.getReplicationTaskIdentifier());
@@ -102,6 +91,8 @@ public class DmsTaskTest {
 
     @Test
     public void testCheckCreateReplicationTask() throws Exception {
+
+
         DmsParameters dmsParameters = dmsTask.getParameters();
 
         dmsParameters.setIsRestartTask(true);
@@ -149,7 +140,6 @@ public class DmsTaskTest {
 
         DmsParameters parameters = dmsTask.getParameters();
         parameters.setIsRestartTask(false);
-        when(dmsHook.testConnectionEndpoint()).thenReturn(true);
         when(dmsHook.startReplicationTask()).thenThrow(new InvalidResourceStateException("other error"));
         Assert.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.startReplicationTask());
     }
@@ -191,7 +181,6 @@ public class DmsTaskTest {
         String parameters = JSONUtils.toJsonString(dmsParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/dolphinscheduler_dms_%s");
         return taskExecutionContext;
     }
 }
