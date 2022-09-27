@@ -23,27 +23,27 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
+import org.apache.dolphinscheduler.service.factory.NettyRemotingClientFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * alert client service test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({AlertClientService.class})
+@RunWith(MockitoJUnitRunner.class)
 public class AlertClientServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertClientServiceTest.class);
@@ -52,11 +52,20 @@ public class AlertClientServiceTest {
 
     private AlertClientService alertClient;
 
+    private MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory;
+
     @Before
     public void before() throws Exception {
-        client = PowerMockito.mock(NettyRemotingClient.class);
-        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(client);
+        client = Mockito.mock(NettyRemotingClient.class);
+        mockedNettyRemotingClientFactory = Mockito.mockStatic(NettyRemotingClientFactory.class);
+        mockedNettyRemotingClientFactory.when(NettyRemotingClientFactory::buildNettyRemotingClient)
+                .thenReturn(client);
         alertClient = new AlertClientService();
+    }
+
+    @After
+    public void after() {
+        mockedNettyRemotingClientFactory.close();
     }
 
     @Test
@@ -89,7 +98,7 @@ public class AlertClientServiceTest {
                 new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         Command resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
 
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.isSuccess());
@@ -104,7 +113,7 @@ public class AlertClientServiceTest {
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.isSuccess());
@@ -118,7 +127,7 @@ public class AlertClientServiceTest {
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.isSuccess());
@@ -131,7 +140,7 @@ public class AlertClientServiceTest {
         alertResult.setMessage("Abnormal information inside the alert plug-in code");
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertFalse(alertSendResponseCommand.isSuccess());
@@ -145,7 +154,7 @@ public class AlertClientServiceTest {
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
         Assert.assertTrue(alertSendResponseCommand.isSuccess());
