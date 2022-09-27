@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.emr;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -41,7 +40,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
-import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
 import com.amazonaws.services.elasticmapreduce.model.AmazonElasticMapReduceException;
 import com.amazonaws.services.elasticmapreduce.model.Cluster;
 import com.amazonaws.services.elasticmapreduce.model.ClusterState;
@@ -121,7 +119,7 @@ public class EmrJobFlowTaskTest {
         RunJobFlowResult runJobFlowResult = Mockito.mock(RunJobFlowResult.class);
         Mockito.when(emrClient.runJobFlow(any())).thenReturn(runJobFlowResult);
         Mockito.when(runJobFlowResult.getJobFlowId()).thenReturn("xx");
-//        Mockito.doReturn(emrClient).when(emrJobFlowTask, "createEmrClient");
+        Mockito.doReturn(emrClient).when(emrJobFlowTask).createEmrClient();
         DescribeClusterResult describeClusterResult = Mockito.mock(DescribeClusterResult.class);
         Mockito.when(emrClient.describeCluster(any())).thenReturn(describeClusterResult);
 
@@ -168,8 +166,7 @@ public class EmrJobFlowTaskTest {
 
     @Test(expected = TaskException.class)
     public void testCanNotParseJson() throws Exception {
-        Mockito.mockStatic(JSONUtils.class);
-//        Mockito.when(emrJobFlowTask, "createRunJobFlowRequest").thenThrow(new EmrTaskException("can not parse RunJobFlowRequest from json", new Exception("error")));
+        Mockito.when(emrJobFlowTask.createRunJobFlowRequest()).thenThrow(new EmrTaskException("can not parse RunJobFlowRequest from json", new Exception("error")));
         emrJobFlowTask.handle(taskCallBack);
     }
 

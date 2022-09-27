@@ -26,8 +26,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,8 +36,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
 import com.amazonaws.services.sagemaker.model.DescribePipelineExecutionResult;
-import com.amazonaws.services.sagemaker.model.ListPipelineExecutionStepsResult;
-import com.amazonaws.services.sagemaker.model.PipelineExecutionStep;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionResult;
 import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
@@ -71,13 +67,6 @@ public class SagemakerTaskTest {
 
         DescribePipelineExecutionResult describePipelineExecutionResult = Mockito.mock(DescribePipelineExecutionResult.class);
         Mockito.when(describePipelineExecutionResult.getPipelineExecutionStatus()).thenReturn("Executing", "Succeeded");
-
-        ListPipelineExecutionStepsResult listPipelineExecutionStepsResult =
-            Mockito.mock(ListPipelineExecutionStepsResult.class);
-        PipelineExecutionStep pipelineExecutionStep = Mockito.mock(PipelineExecutionStep.class);
-        List<PipelineExecutionStep> pipelineExecutionSteps = new ArrayList<>();
-        pipelineExecutionSteps.add(pipelineExecutionStep);
-        pipelineExecutionSteps.add(pipelineExecutionStep);
 
         Mockito.when(client.startPipelineExecution(any())).thenReturn(startPipelineExecutionResult);
         Mockito.when(client.stopPipelineExecution(any())).thenReturn(stopPipelineExecutionResult);
