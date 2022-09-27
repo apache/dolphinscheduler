@@ -17,7 +17,7 @@
 
 import { ref, onMounted, watch } from 'vue'
 import { remove, cloneDeep } from 'lodash'
-import { TaskType } from '@/views/projects/task/constants/task-type'
+import { TaskType } from '@/store/project/types'
 import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
 import type { Ref } from 'vue'

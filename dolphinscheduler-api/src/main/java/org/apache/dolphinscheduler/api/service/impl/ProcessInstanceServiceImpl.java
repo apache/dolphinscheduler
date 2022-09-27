@@ -18,14 +18,19 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.*;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
+import org.apache.dolphinscheduler.api.service.LoggerService;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
+import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -38,8 +43,26 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -50,18 +73,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
+import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_NOT_EXIST;
+import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR;
+import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
+import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
+import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.PROCESS_INSTANCE_STATE;
+import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 /**
  * process instance service impl
@@ -69,7 +112,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 @Service
 public class ProcessInstanceServiceImpl extends BaseServiceImpl implements ProcessInstanceService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceServiceImpl.class);
+
     public static final String TASK_TYPE = "taskType";
+
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
 
     @Autowired
@@ -83,6 +129,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    ProcessInstanceDao processInstanceDao;
 
     @Autowired
     ProcessDefinitionMapper processDefineMapper;
@@ -184,13 +233,15 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId)
+                .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processId));
 
         ProcessDefinition processDefinition =
                 processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
 
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+            logger.error("Process definition does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
             processInstance.setLocations(processDefinition.getLocations());
@@ -297,20 +348,20 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     public Map<String, Object> queryTaskListByProcessId(User loginUser, long projectCode,
                                                         Integer processId) throws IOException {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
-        ProcessDefinition processDefinition =
-                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId)
+                .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processId));
+        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         if (processDefinition != null && projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processId);
+            logger.error("Process definition does not exist, projectCode:{}, processDefinitionId:{}.", projectCode, processId);
+            putMsg(result, PROCESS_INSTANCE_NOT_EXIST, processId);
             return result;
         }
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processId);
+        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
         addDependResultForTaskList(taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
@@ -327,6 +378,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
         for (TaskInstance taskInstance : taskInstanceList) {
             if (TASK_TYPE_DEPENDENT.equalsIgnoreCase(taskInstance.getTaskType())) {
+                logger.info("DEPENDENT type task instance need to set dependent result, taskCode:{}, taskInstanceId:{}", taskInstance.getTaskCode(), taskInstance.getId());
                 Result<ResponseTaskLog> logResult = loggerService.queryLog(
                         taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {
@@ -342,6 +394,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     public Map<String, DependResult> parseLogForDependentResult(String log) throws IOException {
         Map<String, DependResult> resultMap = new HashMap<>();
         if (StringUtils.isEmpty(log)) {
+            logger.warn("Log content is empty.");
             return resultMap;
         }
 
@@ -387,17 +440,20 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskId);
         if (taskInstance == null) {
+            logger.error("Task instance does not exist, projectCode:{}, taskInstanceId{}.", projectCode, taskId);
             putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
             return result;
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskInstance.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
+            logger.error("Task definition does not exist, projectCode:{}, taskDefinitionCode:{}.", projectCode, taskInstance.getTaskCode());
             putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
             return result;
         }
 
         if (!taskInstance.isSubProcess()) {
+            logger.warn("Task instance is not {} type instance, projectCode:{}, taskInstanceId:{}.", TASK_TYPE_SUB_PROCESS, projectCode, taskId);
             putMsg(result, Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, taskInstance.getName());
             return result;
         }
@@ -405,6 +461,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ProcessInstance subWorkflowInstance = processService.findSubProcessInstance(
                 taskInstance.getProcessInstanceId(), taskInstance.getId());
         if (subWorkflowInstance == null) {
+            logger.error("SubProcess instance does not exist, projectCode:{}, taskInstanceId:{}.", projectCode, taskInstance.getId());
             putMsg(result, Status.SUB_PROCESS_INSTANCE_NOT_EXIST, taskId);
             return result;
         }
@@ -439,28 +496,25 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                      String globalParams,
                                                      String locations, int timeout, String tenantCode) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         // check process instance exists
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
-        if (processInstance == null) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
-            return result;
-        }
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
+                .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
         // check process instance exists in project
-        ProcessDefinition processDefinition0 =
-                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+        ProcessDefinition processDefinition0 = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         if (processDefinition0 != null && projectCode != processDefinition0.getProjectCode()) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode, processInstance.getProcessDefinitionCode());
+            putMsg(result, PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
-        // check process instance status
+        //check process instance status
         if (!processInstance.getState().isFinished()) {
-            putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR,
+            logger.warn("Process Instance state is {} so can not update process instance, processInstanceId:{}.", processInstance.getState().getDesc(), processInstanceId);
+            putMsg(result, PROCESS_INSTANCE_STATE_OPERATION_ERROR,
                     processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
@@ -477,6 +531,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
+            logger.warn("Parameter taskDefinitionJson is empty");
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             return result;
         }
@@ -486,12 +541,14 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                     .taskParams(taskDefinitionLog.getTaskParams())
                     .dependence(taskDefinitionLog.getDependence())
                     .build())) {
+                logger.error("Task parameters are invalid,  taskDefinitionName:{}.", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
             }
         }
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, syncDefine);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
+            logger.error("Update task definition error, projectCode:{}, processInstanceId:{}", projectCode, processInstanceId);
             putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
@@ -508,6 +565,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
+                logger.error("Tenant does not exist.");
                 putMsg(result, Status.TENANT_NOT_EXIST);
                 return result;
             }
@@ -518,24 +576,34 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         processDefinition.setUpdateTime(new Date());
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, syncDefine, Boolean.FALSE);
         if (insertVersion == 0) {
+            logger.error("Update process definition error, projectCode:{}, processDefinitionName:{}.", projectCode, processDefinition.getName());
             putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
-        }
+        } else
+            logger.info("Update process definition complete, projectCode:{}, processDefinitionName:{}.", projectCode, processDefinition.getName());
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, syncDefine);
         if (insertResult == Constants.EXIT_CODE_SUCCESS) {
+            logger.info("Update task relations complete, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}.",
+                    projectCode, processDefinition.getCode(), insertVersion);
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
         } else {
+            logger.info("Update task relations error, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}.",
+                    projectCode, processDefinition.getCode(), insertVersion);
             putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
         processInstance.setProcessDefinitionVersion(insertVersion);
-        int update = processService.updateProcessInstance(processInstance);
+        int update = processInstanceDao.updateProcessInstance(processInstance);
         if (update == 0) {
+            logger.error("Update process instance version error, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}",
+                    projectCode, processDefinition.getCode(), insertVersion);
             putMsg(result, Status.UPDATE_PROCESS_INSTANCE_ERROR);
             throw new ServiceException(Status.UPDATE_PROCESS_INSTANCE_ERROR);
         }
+        logger.info("Update process instance complete, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}",
+                projectCode, processDefinition.getCode(), insertVersion, processInstanceId);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -578,18 +646,17 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        ProcessInstance subInstance = processService.findProcessInstanceDetailById(subId);
-        if (subInstance == null) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, subId);
-            return result;
-        }
+        ProcessInstance subInstance = processService.findProcessInstanceDetailById(subId)
+                .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, subId));
         if (subInstance.getIsSubProcess() == Flag.NO) {
+            logger.warn("Process instance is not sub process instance type, processInstanceId:{}, processInstanceName:{}.", subId, subInstance.getName());
             putMsg(result, Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE, subInstance.getName());
             return result;
         }
 
         ProcessInstance parentWorkflowInstance = processService.findParentProcessInstance(subId);
         if (parentWorkflowInstance == null) {
+            logger.error("Parent process instance does not exist, projectCode:{}, subProcessInstanceId:{}.", projectCode, subId);
             putMsg(result, Status.SUB_PROCESS_INSTANCE_NOT_EXIST);
             return result;
         }
@@ -618,29 +685,29 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
-        if (null == processInstance) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, String.valueOf(processInstanceId));
-            return result;
-        }
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
+                .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
         // check process instance status
         if (!processInstance.getState().isFinished()) {
-            putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR,
-                    processInstance.getName(), processInstance.getState().toString(), "delete");
-            return result;
+            logger.warn("Process Instance state is {} so can not delete process instance, processInstanceId:{}.",
+                    processInstance.getState().getDesc(), processInstanceId);
+            throw new ServiceException(PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(), processInstance.getState(), "delete");
         }
 
         ProcessDefinition processDefinition =
                 processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         if (processDefinition != null && projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, String.valueOf(processInstanceId));
-            return result;
+            logger.error("Process definition does not exist, projectCode:{}, ProcessDefinitionCode:{}.",
+                    projectCode, processInstance.getProcessDefinitionCode());
+            throw new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
         }
 
         try {
             processService.removeTaskLogFile(processInstanceId);
         } catch (Exception ignore) {
             // ignore
+            logger.warn("Remove task log file exception, projectCode:{}, ProcessDefinitionCode{}, processInstanceId:{}.",
+                    projectCode, processInstance.getProcessDefinitionCode(), processInstanceId);
         }
 
         // delete database cascade
@@ -651,8 +718,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         processService.deleteWorkTaskInstanceByProcessInstanceId(processInstanceId);
 
         if (delete > 0) {
+            logger.info("Delete process instance complete, projectCode:{}, ProcessDefinitionCode{}, processInstanceId:{}.",
+                    projectCode, processInstance.getProcessDefinitionCode(), processInstanceId);
             putMsg(result, Status.SUCCESS);
         } else {
+            logger.error("Delete process instance error, projectCode:{}, ProcessDefinitionCode{}, processInstanceId:{}.",
+                    projectCode, processInstance.getProcessDefinitionCode(), processInstanceId);
             putMsg(result, Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
             throw new ServiceException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
         }
@@ -674,13 +745,16 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
 
         if (processInstance == null) {
-            throw new RuntimeException("workflow instance is null");
+            logger.error("Process instance does not exist, projectCode:{}, processInstanceId:{}.", projectCode, processInstanceId);
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            return result;
         }
 
         ProcessDefinition processDefinition =
                 processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
         if (processDefinition != null && projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode, processInstance.getProcessDefinitionCode());
+            putMsg(result, PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
 
@@ -727,7 +801,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                             Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES);
+                taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES, processInstance.getTestFlag());
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
@@ -762,14 +836,17 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
 
         if (processInstance == null) {
-            throw new RuntimeException("workflow instance is null");
+            logger.error("Process instance does not exist, projectCode:{}, processInstanceId:{}.", projectCode, processInstanceId);
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            return result;
         }
 
         ProcessDefinition processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode, processInstance.getProcessDefinitionCode());
+            putMsg(result, PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
         GanttDto ganttDto = new GanttDto();
@@ -780,24 +857,35 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ganttDto.setTaskNames(nodeList);
 
         List<Task> taskList = new ArrayList<>();
-        for (String node : nodeList) {
-            TaskInstance taskInstance =
-                    taskInstanceMapper.queryByInstanceIdAndCode(processInstanceId, Long.parseLong(node));
-            if (taskInstance == null) {
-                continue;
+        if (!nodeList.isEmpty()) {
+            List<Long> taskCodes = nodeList.stream().map(Long::parseLong).collect(Collectors.toList());
+            List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
+                    Collections.singletonList(processInstanceId), taskCodes);
+            for (String node : nodeList) {
+                TaskInstance taskInstance = null;
+                for (TaskInstance instance : taskInstances) {
+                    if (instance.getProcessInstanceId() == processInstanceId
+                            && instance.getTaskCode() == Long.parseLong(node)) {
+                        taskInstance = instance;
+                        break;
+                    }
+                }
+                if (taskInstance == null) {
+                    continue;
+                }
+                Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
+                Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
+                Task task = new Task();
+                task.setTaskName(taskInstance.getName());
+                task.getStartDate().add(startTime.getTime());
+                task.getEndDate().add(endTime.getTime());
+                task.setIsoStart(startTime);
+                task.setIsoEnd(endTime);
+                task.setStatus(taskInstance.getState().getDesc().toUpperCase());
+                task.setExecutionDate(taskInstance.getStartTime());
+                task.setDuration(DateUtils.format2Readable(endTime.getTime() - startTime.getTime()));
+                taskList.add(task);
             }
-            Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
-            Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
-            Task task = new Task();
-            task.setTaskName(taskInstance.getName());
-            task.getStartDate().add(startTime.getTime());
-            task.getEndDate().add(endTime.getTime());
-            task.setIsoStart(startTime);
-            task.setIsoEnd(endTime);
-            task.setStatus(taskInstance.getState().toString());
-            task.setExecutionDate(taskInstance.getStartTime());
-            task.setDuration(DateUtils.format2Readable(endTime.getTime() - startTime.getTime()));
-            taskList.add(task);
         }
         ganttDto.setTasks(taskList);
 

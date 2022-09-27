@@ -90,6 +90,10 @@ export default {
                         title: 'Task',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/en-us/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/en-us/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -162,6 +166,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/en-us/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -182,12 +190,20 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
                             {
+                                title: 'Java',
+                                link: '/en-us/docs/dev/user_doc/guide/task/java.html',
+                            },
+                            {
                                 title: 'SageMaker',
                                 link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
                             {
                                 title: 'ChunJun',
                                 link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
+                            {
+                                title: 'Pytorch',
+                                link: '/en-us/docs/dev/user_doc/guide/task/pytorch.html',
                             },
                         ],
                     },
@@ -258,6 +274,10 @@ export default {
                             {
                                 title: 'Oracle',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/oracle.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
                             },
                         ],
                     },
@@ -567,6 +587,10 @@ export default {
                                 title: 'API Automation Test',
                                 link: '/en-us/docs/dev/user_doc/contribute/api-test.html',
                             },
+                            {
+                                title: 'Log Specification',
+                                link: '/en-us/docs/dev/user_doc/contribute/log-specification.html',
+                            },
                         ],
                     },
                     {
@@ -702,6 +726,10 @@ export default {
                         title: '任务类型',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -774,6 +802,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -794,12 +826,20 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
                             },
                             {
+                                title: 'Java',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/java.html',
+                            },
+                            {
                                 title: 'SageMaker',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
                             {
                                 title: 'ChunJun',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
+                            {
+                                title: 'Pytorch',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/pytorch.html',
                             },
                         ],
                     },
@@ -846,6 +886,10 @@ export default {
                             {
                                 title: 'Spark',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
                             },
                         ],
                     },
@@ -1154,6 +1198,10 @@ export default {
                             {
                                 title: 'API 自动化测试',
                                 link: '/zh-cn/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                            {
+                                title: '日志规范',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/log-specification.html',
                             },
                         ],
                     },

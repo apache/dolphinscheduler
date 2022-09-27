@@ -26,6 +26,7 @@ type IDataBase =
   | 'DB2'
   | 'PRESTO'
   | 'REDSHIFT'
+  | 'ATHENA'
 
 interface IDataSource {
   id?: number
@@ -40,9 +41,12 @@ interface IDataSource {
   loginUserKeytabPath?: string
   userName?: string
   password?: string
+  awsRegion?: string
   database?: string
   connectType?: string
   other?: object
+  testFlag?: number
+  bindTestId?: number
 }
 
 interface ListReq {

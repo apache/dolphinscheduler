@@ -17,22 +17,24 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import lombok.NonNull;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.log.LogClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
-
+import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -40,11 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import lombok.NonNull;
 
 /**
  * mainly used to get the start command line of a process.
@@ -190,18 +187,16 @@ public class ProcessUtils {
      * @param taskExecutionContext taskExecutionContext
      * @return yarn application ids
      */
-    public static List<String> killYarnJob(@NonNull TaskExecutionContext taskExecutionContext) {
+    public static @Nullable List<String> killYarnJob(@NonNull LogClient logClient,
+                                                     @NonNull TaskExecutionContext taskExecutionContext) {
         if (taskExecutionContext.getLogPath() == null) {
             return Collections.emptyList();
         }
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            String log;
-            try (LogClientService logClient = new LogClientService()) {
-                Host host = Host.of(taskExecutionContext.getHost());
-                log = logClient.viewLog(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
-            }
-            if (!StringUtils.isEmpty(log)) {
+            Host host = Host.of(taskExecutionContext.getHost());
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
+            if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
                             .setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
@@ -211,16 +206,13 @@ public class ProcessUtils {
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                List<String> appIds = LoggerUtils.getAppIds(log, logger);
-                if (CollectionUtils.isNotEmpty(appIds)) {
-                    cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
-                            taskExecutionContext.getExecutePath());
-                    return appIds;
-                }
+                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                return appIds;
+            } else {
+                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId());
             }
-
         } catch (Exception e) {
-            logger.error("kill yarn job failure", e);
+            logger.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         return Collections.emptyList();
     }

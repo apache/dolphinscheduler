@@ -17,6 +17,7 @@
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 import { useMlflowProjects, useMlflowModels } from '.'
+import { useCustomParams, useResources } from '.'
 
 export const MLFLOW_TASK_TYPE = [
   {
@@ -61,6 +62,8 @@ export function useMlflow(model: { [field: string]: any }): IJsonItem[] {
       options: MLFLOW_TASK_TYPE
     },
     ...useMlflowProjects(model),
-    ...useMlflowModels(model)
+    ...useMlflowModels(model),
+    useResources(),
+    ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }

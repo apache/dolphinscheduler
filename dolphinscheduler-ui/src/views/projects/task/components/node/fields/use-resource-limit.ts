@@ -29,7 +29,7 @@ export function useResourceLimit(): IJsonItem[] {
       slots: {
         suffix: () => '%'
       },
-      props: {min: -1}
+      props: { min: -1 }
     },
     {
       type: 'input-number',
@@ -39,7 +39,7 @@ export function useResourceLimit(): IJsonItem[] {
       slots: {
         suffix: () => t('project.node.mb')
       },
-      props: {min: -1}
+      props: { min: -1 }
     }
   ]
 }

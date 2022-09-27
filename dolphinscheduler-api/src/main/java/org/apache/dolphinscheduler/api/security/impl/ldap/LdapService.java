@@ -38,32 +38,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.stereotype.Component;
 
 @Component
 @Configuration
 public class LdapService {
+
     private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
 
-    @Value("${security.authentication.ldap.user.admin:null}")
+    @Value("${security.authentication.ldap.user.admin:#{null}}")
     private String adminUserId;
 
-    @Value("${security.authentication.ldap.urls:null}")
+    @Value("${security.authentication.ldap.urls:#{null}}")
     private String ldapUrls;
 
-    @Value("${security.authentication.ldap.base-dn:null}")
+    @Value("${security.authentication.ldap.base-dn:#{null}}")
     private String ldapBaseDn;
 
-    @Value("${security.authentication.ldap.username:null}")
+    @Value("${security.authentication.ldap.username:#{null}}")
     private String ldapSecurityPrincipal;
 
-    @Value("${security.authentication.ldap.password:null}")
+    @Value("${security.authentication.ldap.password:#{null}}")
     private String ldapPrincipalPassword;
 
-    @Value("${security.authentication.ldap.user.identity-attribute:null}")
+    @Value("${security.authentication.ldap.user.identity-attribute:#{null}}")
     private String ldapUserIdentifyingAttribute;
 
-    @Value("${security.authentication.ldap.user.email-attribute:null}")
+    @Value("${security.authentication.ldap.user.email-attribute:#{null}}")
     private String ldapEmailAttribute;
 
     @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
@@ -89,20 +91,19 @@ public class LdapService {
         Properties searchEnv = getManagerLdapEnv();
         LdapContext ctx = null;
         try {
-            //Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
+            // Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
             ctx = new InitialLdapContext(searchEnv, null);
             SearchControls sc = new SearchControls();
             sc.setReturningAttributes(new String[]{ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String searchFilter = String.format("(%s=%s)", ldapUserIdentifyingAttribute, userId);
-            //Search for the user you want to authenticate, search him with some attribute
-            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, searchFilter, sc);
+            EqualsFilter filter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
+            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter.toString(), sc);
             if (results.hasMore()) {
                 // get the users DN (distinguishedName) from the result
                 SearchResult result = results.next();
                 NamingEnumeration<? extends Attribute> attrs = result.getAttributes().getAll();
                 while (attrs.hasMore()) {
-                    //Open another connection to the LDAP server with the found DN and the password
+                    // Open another connection to the LDAP server with the found DN and the password
                     searchEnv.put(Context.SECURITY_PRINCIPAL, result.getNameInNamespace());
                     searchEnv.put(Context.SECURITY_CREDENTIALS, userPwd);
                     try {
@@ -149,7 +150,8 @@ public class LdapService {
 
     public LdapUserNotExistActionType getLdapUserNotExistAction() {
         if (StringUtils.isBlank(ldapUserNotExistAction)) {
-            logger.info("security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
+            logger.info(
+                    "security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
             return LdapUserNotExistActionType.CREATE;
         }
 

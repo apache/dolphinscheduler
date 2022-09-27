@@ -17,31 +17,38 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
-
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
+import com.alibaba.druid.sql.parser.SQLStatementParser;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -58,7 +65,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,19 +72,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
-import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
-import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
-public class DataxTask extends AbstractTaskExecutor {
+public class DataxTask extends AbstractTask {
     /**
      * jvm parameters
      */
@@ -150,7 +148,7 @@ public class DataxTask extends AbstractTaskExecutor {
      * @throws Exception if error throws Exception
      */
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
@@ -161,26 +159,32 @@ public class DataxTask extends AbstractTaskExecutor {
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current DataX task has been interrupted", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("The current DataX task has been interrupted", e);
         } catch (Exception e) {
             logger.error("datax task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("Execute DataX task failed", e);
         }
     }
 
     /**
      * cancel DataX process
      *
-     * @param cancelApplication cancelApplication
-     * @throws Exception if error throws Exception
+     * @throws TaskException if error throws Exception
      */
     @Override
-    public void cancelApplication(boolean cancelApplication)
-            throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     /**
@@ -565,7 +569,7 @@ public class DataxTask extends AbstractTaskExecutor {
             int num = md.getColumnCount();
             columnNames = new String[num];
             for (int i = 1; i <= num; i++) {
-                columnNames[i - 1] = md.getColumnName(i);
+                columnNames[i - 1] = md.getColumnName(i).replace("t.","");
             }
         } catch (SQLException | ExecutionException e) {
             logger.error(e.getMessage(), e);

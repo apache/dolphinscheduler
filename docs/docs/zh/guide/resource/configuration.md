@@ -9,12 +9,13 @@
 
 ### 配置 `common.properties` 文件
 
-对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`
+如果您以 `集群` 模式或者 `伪集群` 模式部署DolphinScheduler，您需要对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`；
+若您以 `单机` 模式部署DolphinScheduler，您只需要配置 `standalone-server/conf/common.properties`，具体配置如下：
 
 - 将 `resource.storage.upload.base.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`resource.storage.upload.base.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
 - 修改 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///`。
 
->    **注意**：如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
+> **注意**：如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
 
 ## 对接分布式或远端对象存储
 
@@ -45,10 +46,10 @@
 # user data local directory path, please make sure the directory exists and have read write permissions
 data.basedir.path=/tmp/dolphinscheduler
 
-# resource storage type: HDFS, S3, NONE
+# resource storage type: HDFS, S3, OSS, NONE
 resource.storage.type=HDFS
 
-# resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration,
+# resource store on HDFS/S3/OSS path, resource file will store to this hadoop hdfs path, self configuration,
 # please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/tmp/dolphinscheduler
 
@@ -62,6 +63,17 @@ resource.aws.region=cn-north-1
 resource.aws.s3.bucket.name=dolphinscheduler
 # You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
 resource.aws.s3.endpoint=http://localhost:9000
+
+# alibaba cloud access key id, required if you set resource.storage.type=OSS 
+resource.alibaba.cloud.access.key.id=<your-access-key-id>
+# alibaba cloud access key secret, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.access.key.secret=<your-access-key-secret>
+# alibaba cloud region, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.region=cn-hangzhou
+# oss bucket name, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.oss.bucket.name=dolphinscheduler
+# oss bucket endpoint, required if you set resource.storage.type=OSS
+resource.alibaba.cloud.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
 
 # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
 resource.hdfs.root.user=root
@@ -132,8 +144,9 @@ development.state=false
 alert.rpc.port=50052
 ```
 
->    **注意**：
+> **注意**：
 >
->    * 如果只配置了 `api-server/conf/common.properties` 的文件，则只是开启了资源上传的操作，并不能满足正常使用。如果想要在工作流中执行相关文件则需要额外配置 `worker-server/conf/common.properties`。
->    * 如果用到资源上传的功能，那么[安装部署](../installation/standalone.md)中，部署用户需要有这部分的操作权限。
->    * 如果 Hadoop 集群的 NameNode 配置了 HA 的话，需要开启 HDFS 类型的资源上传，同时需要将 Hadoop 集群下的 `core-site.xml` 和 `hdfs-site.xml` 复制到 `worker-server/conf` 以及 `api-server/conf`，非 NameNode HA 跳过次步骤。
+> * 如果只配置了 `api-server/conf/common.properties` 的文件，则只是开启了资源上传的操作，并不能满足正常使用。如果想要在工作流中执行相关文件则需要额外配置 `worker-server/conf/common.properties`。
+> * 如果用到资源上传的功能，那么[安装部署](../installation/standalone.md)中，部署用户需要有这部分的操作权限。
+> * 如果 Hadoop 集群的 NameNode 配置了 HA 的话，需要开启 HDFS 类型的资源上传，同时需要将 Hadoop 集群下的 `core-site.xml` 和 `hdfs-site.xml` 复制到 `worker-server/conf` 以及 `api-server/conf`，非 NameNode HA 跳过次步骤。
+

@@ -19,7 +19,7 @@
 
 from unittest.mock import patch
 
-from pydolphinscheduler.tasks.spark import DeployMode, ProgramType, Spark, SparkVersion
+from pydolphinscheduler.tasks.spark import DeployMode, ProgramType, Spark
 
 
 @patch(
@@ -50,7 +50,6 @@ def test_spark_get_define(mock_resource):
             },
             "programType": program_type,
             "deployMode": deploy_mode,
-            "sparkVersion": SparkVersion.SPARK2,
             "driverCores": 1,
             "driverMemory": "512M",
             "numExecutors": 2,
@@ -68,6 +67,7 @@ def test_spark_get_define(mock_resource):
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",

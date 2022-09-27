@@ -16,20 +16,14 @@
  */
 package org.apache.dolphinscheduler.server.log;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.LoggerContextVO;
-import ch.qos.logback.core.spi.FilterReply;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Marker;
 
-import java.util.Map;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.spi.FilterReply;
 
 public class TaskLogFilterTest {
 
@@ -37,8 +31,8 @@ public class TaskLogFilterTest {
     public void decide() {
         TaskLogFilter taskLogFilter = new TaskLogFilter();
 
+        FilterReply filterReply = taskLogFilter.decide(new LoggingEvent() {
 
-        FilterReply filterReply = taskLogFilter.decide(new ILoggingEvent() {
             @Override
             public String getThreadName() {
                 return TaskConstants.TASK_APPID_LOG_FORMAT;
@@ -67,51 +61,6 @@ public class TaskLogFilterTest {
             @Override
             public String getLoggerName() {
                 return TaskConstants.TASK_LOG_LOGGER_NAME;
-            }
-
-            @Override
-            public LoggerContextVO getLoggerContextVO() {
-                return null;
-            }
-
-            @Override
-            public IThrowableProxy getThrowableProxy() {
-                return null;
-            }
-
-            @Override
-            public StackTraceElement[] getCallerData() {
-                return new StackTraceElement[0];
-            }
-
-            @Override
-            public boolean hasCallerData() {
-                return false;
-            }
-
-            @Override
-            public Marker getMarker() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getMDCPropertyMap() {
-                return null;
-            }
-
-            @Override
-            public Map<String, String> getMdc() {
-                return null;
-            }
-
-            @Override
-            public long getTimeStamp() {
-                return 0;
-            }
-
-            @Override
-            public void prepareForDeferredProcessing() {
-
             }
         });
 

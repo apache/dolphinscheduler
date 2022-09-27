@@ -123,7 +123,7 @@ public class K8sManager {
             Config config = Config.fromKubeconfig(configYaml);
             return new DefaultKubernetesClient(config);
         } catch (Exception e) {
-            logger.error("fail to get k8s ApiClient", e);
+            logger.error("Fail to get k8s ApiClient", e);
             throw new RemotingException("fail to get k8s ApiClient:" + e.getMessage());
         }
     }

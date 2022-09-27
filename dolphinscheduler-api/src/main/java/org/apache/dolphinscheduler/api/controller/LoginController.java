@@ -30,8 +30,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.commons.httpclient.HttpStatus;
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 
 import java.util.Map;
 
@@ -50,7 +52,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * login controller
@@ -66,7 +67,6 @@ public class LoginController extends BaseController {
     @Autowired
     private Authenticator authenticator;
 
-
     /**
      * login
      *
@@ -78,8 +78,8 @@ public class LoginController extends BaseController {
      */
     @ApiOperation(value = "login", notes = "LOGIN_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType = "String")
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataTypeClass = String.class)
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)
@@ -88,10 +88,10 @@ public class LoginController extends BaseController {
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
                         HttpServletResponse response) {
-        //user name check
+        // user name check
         if (StringUtils.isEmpty(userName)) {
             return error(Status.USER_NAME_NULL.getCode(),
-                Status.USER_NAME_NULL.getMsg());
+                    Status.USER_NAME_NULL.getMsg());
         }
 
         // user ip check
@@ -132,7 +132,7 @@ public class LoginController extends BaseController {
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);
         sessionService.signOut(ip, loginUser);
-        //clear session
+        // clear session
         request.removeAttribute(Constants.SESSION_USER);
         return success();
     }

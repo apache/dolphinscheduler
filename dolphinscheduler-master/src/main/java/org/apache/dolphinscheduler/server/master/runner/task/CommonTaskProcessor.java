@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -34,6 +37,7 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.Map;
 
 import com.google.auto.service.AutoService;
 
@@ -49,6 +53,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
+        if (this.taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
+            convertExeEnvironmentOnlineToTest();
+        }
+
         this.taskInstance =
                 processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
@@ -148,24 +156,51 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             taskInstance.setState(TaskExecutionStatus.KILL);
             taskInstance.setEndTime(new Date());
             processService.updateTaskInstance(taskInstance);
-
-            TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
-            killCommand.setTaskInstanceId(taskInstance.getId());
-
-            ExecutionContext executionContext =
-                    new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
-
-            Host host = Host.of(taskInstance.getHost());
-            executionContext.setHost(host);
-
-            nettyExecutorManager.executeDirectly(executionContext);
-        } catch (ExecuteException e) {
-            logger.error("kill task error:", e);
+            if (StringUtils.isNotEmpty(taskInstance.getHost())) {
+                killRemoteTask();
+            }
+        } catch (Exception e) {
+            logger.error("master kill task error, taskInstance id: {}", taskInstance.getId(), e);
             return false;
         }
 
-        logger.info("master kill taskInstance name :{} taskInstance id:{}",
+        logger.info("master success kill taskInstance name: {} taskInstance id: {}",
                 taskInstance.getName(), taskInstance.getId());
         return true;
+    }
+
+    private void killRemoteTask() throws ExecuteException {
+        TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
+        killCommand.setTaskInstanceId(taskInstance.getId());
+
+        ExecutionContext executionContext =
+                new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER, taskInstance);
+
+        Host host = Host.of(taskInstance.getHost());
+        executionContext.setHost(host);
+
+        nettyExecutorManager.executeDirectly(executionContext);
+    }
+
+    protected void convertExeEnvironmentOnlineToTest() {
+        //SQL taskType
+        if (TaskConstants.TASK_TYPE_SQL.equals(taskInstance.getTaskType())) {
+            //replace test data source
+            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
+            Map<String, Object> taskInstanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+            });
+            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(Constants.DATASOUCE);
+            Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
+            taskDefinitionParams.put(Constants.DATASOUCE, testDataSourceId);
+            taskInstanceParams.put(Constants.DATASOUCE, testDataSourceId);
+            taskInstance.getTaskDefine().setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
+            taskInstance.setTaskParams(JSONUtils.toJsonString(taskInstanceParams));
+            if (null == testDataSourceId) {
+                logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
+            } else {
+                logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
+            }
+        }
     }
 }

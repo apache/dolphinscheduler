@@ -187,11 +187,13 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param definitionCode definitionCode
      * @param startTime      startTime
      * @param endTime        endTime
+     * @param testFlag       testFlag
      * @return process instance
      */
     ProcessInstance queryLastSchedulerProcess(@Param("processDefinitionCode") Long definitionCode,
                                               @Param("startTime") Date startTime,
-                                              @Param("endTime") Date endTime);
+                                              @Param("endTime") Date endTime,
+                                              @Param("testFlag") int testFlag);
 
     /**
      * query last running process instance
@@ -199,12 +201,14 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param definitionCode definitionCode
      * @param startTime      startTime
      * @param endTime        endTime
+     * @param testFlag       testFlag
      * @param stateArray     stateArray
      * @return process instance
      */
     ProcessInstance queryLastRunningProcess(@Param("processDefinitionCode") Long definitionCode,
                                             @Param("startTime") Date startTime,
                                             @Param("endTime") Date endTime,
+                                            @Param("testFlag") int testFlag,
                                             @Param("states") int[] stateArray);
 
     /**
@@ -213,11 +217,13 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param definitionCode definitionCode
      * @param startTime      startTime
      * @param endTime        endTime
+     * @param testFlag       testFlag
      * @return process instance
      */
     ProcessInstance queryLastManualProcess(@Param("processDefinitionCode") Long definitionCode,
                                            @Param("startTime") Date startTime,
-                                           @Param("endTime") Date endTime);
+                                           @Param("endTime") Date endTime,
+                                           @Param("testFlag") int testFlag);
 
     /**
      * query top n process instance order by running duration
@@ -250,7 +256,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     List<ProcessInstance> queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(@Param("processDefinitionCode") Long processDefinitionCode,
                                                                                                 @Param("processDefinitionVersion") int processDefinitionVersion,
                                                                                                 @Param("states") int[] states,
-                                                                                                @Param("id") int id);
+                                                                                                @Param("id") Integer id);
 
     int updateGlobalParamsById(@Param("globalParams") String globalParams,
                                @Param("id") int id);
