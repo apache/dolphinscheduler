@@ -17,16 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
+import static org.apache.commons.lang3.time.DateUtils.addWeeks;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_MONTHS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_STRING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_STRING;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HYPHEN;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAST_DAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_STRING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_BEGIN;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_END;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_FIRST_DAY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_LAST_DAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_STRING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.N;
@@ -35,9 +40,13 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RIGHT_BRACE_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_STRING;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.THIS_DAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TIMESTAMP;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_BEGIN;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_END;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_FIRST_DAY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_LAST_DAY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.YEAR_WEEK;
 import static org.apache.dolphinscheduler.spi.utils.DateUtils.addDays;
 import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMinutes;
 import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMonths;
@@ -47,6 +56,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -351,6 +361,8 @@ public class TimePlaceholderUtils {
                 Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
 
                 value = String.valueOf(timestamp.getTime() / 1000);
+            } else if (expression.startsWith(YEAR_WEEK)) {
+                value = calculateYearWeek(expression,date);
             } else {
                 Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
                 value = DateUtils.format(entry.getKey(), entry.getValue());
@@ -361,6 +373,92 @@ public class TimePlaceholderUtils {
         }
 
         return value;
+    }
+
+    /**
+     * get week of year
+     * @param expression expression
+     * @param date       date
+     * @return week of year
+     */
+    public static String calculateYearWeek(String expression, Date date) {
+
+        String dataFormat = expression.substring(YEAR_WEEK.length() + 1, expression.length() - 1);
+
+        String targetDate = "";
+        try {
+
+            if(dataFormat.contains(COMMA)) {
+                String param1 = dataFormat.split(COMMA)[0];
+                String param2 = dataFormat.split(COMMA)[1];
+                dataFormat = param1;
+
+                targetDate = transformYearWeek(date, dataFormat, calculate(param2));
+
+            } else {
+                targetDate = transformYearWeek(date, dataFormat, 1);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("expression not valid");
+        }
+
+        return targetDate;
+    }
+
+    /**
+     * transform week of year
+     * @param date date
+     * @param format date_format,for example: yyyy-MM-dd / yyyyMMdd
+     * @param weekDay day of week
+     * @return date_string
+     */
+    private static String transformYearWeek(Date date, String format, int weekDay) {
+        Calendar calendar = Calendar.getInstance();
+        //Minimum number of days required for the first week of the year
+        calendar.setMinimalDaysInFirstWeek(4);
+
+        //By default ,Set Monday as the first day of the week
+        switch (weekDay) {
+            case 2:
+                calendar.setFirstDayOfWeek(Calendar.TUESDAY);
+                break;
+            case 3:
+                calendar.setFirstDayOfWeek(Calendar.WEDNESDAY);
+                break;
+            case 4:
+                calendar.setFirstDayOfWeek(Calendar.THURSDAY);
+                break;
+            case 5:
+                calendar.setFirstDayOfWeek(Calendar.FRIDAY);
+                break;
+            case 6:
+                calendar.setFirstDayOfWeek(Calendar.SATURDAY);
+                break;
+            case 7:
+                calendar.setFirstDayOfWeek(Calendar.SUNDAY);
+                break;
+            default:
+                calendar.setFirstDayOfWeek(Calendar.MONDAY);
+                break;
+        }
+        calendar.setTimeInMillis(date.getTime());
+
+        int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+
+        int year = calendar.get(Calendar.YEAR);
+
+        String weekYearStr = "";
+        if (weekOfYear < 10 && format.contains(HYPHEN)) {
+            weekYearStr = String.format("%d%s0%d",year,HYPHEN,weekOfYear);
+        } else if (weekOfYear >= 10 && format.contains(HYPHEN)){
+            weekYearStr = String.format("%d%s%d",year,HYPHEN,weekOfYear);
+        } else if (weekOfYear < 10){
+            weekYearStr = String.format("%d0%d",year,weekOfYear);
+        } else {
+            weekYearStr = String.format("%d%d",year,weekOfYear);
+        }
+
+        return weekYearStr;
     }
 
     /**
@@ -383,6 +481,18 @@ public class TimePlaceholderUtils {
             resultEntry = calcWeekStart(expression, date);
         } else if (expression.startsWith(WEEK_END)) {
             resultEntry = calcWeekEnd(expression, date);
+        } else if (expression.startsWith(MONTH_FIRST_DAY)) {
+            resultEntry = calcCustomDay(expression,MONTH_FIRST_DAY, date);
+        } else if (expression.startsWith(MONTH_LAST_DAY)) {
+            resultEntry = calcCustomDay(expression,MONTH_LAST_DAY, date);
+        } else if (expression.startsWith(THIS_DAY)) {
+            resultEntry = calcCustomDay(expression,THIS_DAY, date);
+        } else if (expression.startsWith(LAST_DAY)) {
+            resultEntry = calcCustomDay(expression,LAST_DAY, date);
+        } else if (expression.startsWith(WEEK_FIRST_DAY)) {
+            resultEntry = calcCustomDay(expression,WEEK_FIRST_DAY, date);
+        } else if (expression.startsWith(WEEK_LAST_DAY)) {
+            resultEntry = calcCustomDay(expression,WEEK_LAST_DAY, date);
         } else {
             resultEntry = calcMinutes(expression, date);
         }
@@ -436,6 +546,90 @@ public class TimePlaceholderUtils {
         }
 
         throw new RuntimeException("expression not valid");
+    }
+
+    /**
+     * calculate time expression
+     * month first day month last day
+     * @param expression expression
+     * @param date       date
+     * @return calculate time expression with date,format
+     */
+    public static Map.Entry<Date, String> calcCustomDay(String expression,String keyDate, Date date) {
+        String dataFormat = "yyyy-MM-dd";
+        Date targetDate = new Date();
+
+        switch (keyDate) {
+            case MONTH_FIRST_DAY:
+                dataFormat = expression.substring(MONTH_FIRST_DAY.length() + 1, expression.length() - 1);
+
+                if(dataFormat.contains(COMMA)) {
+                    String param1 = dataFormat.split(COMMA)[0];
+                    String param2 = dataFormat.split(COMMA)[1];
+                    dataFormat = param1;
+
+                    targetDate = addMonths(DateUtils.getFirstDayOfMonth(date),calculate(param2));
+                } else {
+                    targetDate = DateUtils.getFirstDayOfMonth(date);
+                }
+
+                break;
+            case MONTH_LAST_DAY:
+                dataFormat = expression.substring(MONTH_LAST_DAY.length() + 1, expression.length() - 1);
+
+                if(dataFormat.contains(COMMA)) {
+                    String param1 = dataFormat.split(COMMA)[0];
+                    String param2 = dataFormat.split(COMMA)[1];
+                    dataFormat = param1;
+
+                    Date lastMonthDay = addMonths(date,calculate(param2));
+
+                    targetDate = DateUtils.getLastDayOfMonth(lastMonthDay);
+
+                } else {
+                    targetDate = DateUtils.getLastDayOfMonth(date);
+                }
+                break;
+            case THIS_DAY:
+                dataFormat = expression.substring(THIS_DAY.length() + 1, expression.length() - 1);
+                targetDate = addDays(date, 0);
+                break;
+            case LAST_DAY:
+                dataFormat = expression.substring(LAST_DAY.length() + 1, expression.length() - 1);
+                targetDate = addDays(date, -1);
+                break;
+            case WEEK_FIRST_DAY:
+                dataFormat = expression.substring(WEEK_FIRST_DAY.length() + 1, expression.length() - 1);
+
+                if(dataFormat.contains(COMMA)) {
+                    String param1 = dataFormat.split(COMMA)[0];
+                    String param2 = dataFormat.split(COMMA)[1];
+                    dataFormat = param1;
+
+                    targetDate = addWeeks(DateUtils.getMonday(date), calculate(param2));
+                } else {
+                    targetDate = addWeeks(DateUtils.getMonday(date), 0);
+                }
+                break;
+            case WEEK_LAST_DAY:
+                dataFormat = expression.substring(WEEK_LAST_DAY.length() + 1, expression.length() - 1);
+
+                if(dataFormat.contains(COMMA)) {
+                    String param1 = dataFormat.split(COMMA)[0];
+                    String param2 = dataFormat.split(COMMA)[1];
+                    dataFormat = param1;
+
+                    targetDate = addWeeks(DateUtils.getSunday(date), calculate(param2));
+                } else {
+                    targetDate = addWeeks(DateUtils.getSunday(date), 0);
+                }
+                break;
+            default:
+                break;
+        }
+
+        return new AbstractMap.SimpleImmutableEntry<>(targetDate, dataFormat);
+
     }
 
     /**
