@@ -295,4 +295,11 @@ public class TaskDefinition {
                 && Objects.equals(memoryMax, that.memoryMax)
                 && Objects.equals(taskExecuteType, that.taskExecuteType);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects
+            .hash(id, code, name, version, description, projectCode, userId, taskType, userName,
+                projectName, workerGroup, environmentCode);
+    }
 }

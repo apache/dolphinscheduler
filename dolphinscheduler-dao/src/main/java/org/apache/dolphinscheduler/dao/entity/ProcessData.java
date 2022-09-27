@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Objects;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -69,6 +70,11 @@ public class ProcessData {
 
     return CollectionUtils.equalLists(tasks, that.tasks) &&
         CollectionUtils.equalLists(globalParams, that.globalParams);
+  }
+
+  @Override
+  public int hashCode() {
+      return Objects.hash(tasks, globalParams, timeout, tenantId);
   }
 
   public List<TaskNode> getTasks() {

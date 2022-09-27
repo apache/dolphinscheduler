@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.util.Objects;
 
 /**
  * process definition log
@@ -88,4 +89,8 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         return super.equals(o);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), operator, operateTime);
+    }
 }
