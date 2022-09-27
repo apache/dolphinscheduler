@@ -31,17 +31,17 @@ from pydolphinscheduler.resources_plugin.gitlab import GitLab
                 "file_path": "union.sh",
                 "host": "https://gitlab.com",
                 "repo_name": "ds-gitlab",
-                "user": "chenruijie",
+                "user": "pydolphinscheduler",
             },
         ),
         (
-            "https://gitlab.com/chenruijie/ds/-/blob/dev/test/exc.sh",
+            "https://gitlab.com/pydolphinscheduler/ds/-/blob/dev/test/exc.sh",
             {
                 "branch": "dev",
                 "file_path": "test/exc.sh",
                 "host": "https://gitlab.com",
                 "repo_name": "ds",
-                "user": "chenruijie",
+                "user": "pydolphinscheduler",
             },
         ),
     ],
@@ -60,7 +60,7 @@ def test_gitlab_get_git_file_info(attr, expected):
         (
             {
                 "init": {
-                    "prefix": "http://10.170.33.18:82/chenruijie/ds-internal/-/blob/main",
+                    "prefix": "https://gitlab.com/pydolphinscheduler/ds-internal/-/blob/main",
                     "oauth_token": "24518bd4cf5bfe9xx",
                 },
                 "file_path": "union.sh",
@@ -70,7 +70,7 @@ def test_gitlab_get_git_file_info(attr, expected):
         (
             {
                 "init": {
-                    "prefix": "http://10.170.33.18:82/chenruijie/ds/-/blob/main",
+                    "prefix": "https://gitlab.com/pydolphinscheduler/ds/-/blob/main",
                     "private_token": "9TyTe2xx",
                 },
                 "file_path": "union.sh",
@@ -80,8 +80,8 @@ def test_gitlab_get_git_file_info(attr, expected):
         (
             {
                 "init": {
-                    "prefix": "http://10.170.33.18:82/chenrj/ds-gitlab/-/blob/main",
-                    "username": "chenrj",
+                    "prefix": "https://gitlab.com/pydolphinscheduler/ds-gitlab/-/blob/main",
+                    "username": "pydolphinscheduler",
                     "password": "4295xx",
                 },
                 "file_path": "union.sh",
@@ -91,7 +91,7 @@ def test_gitlab_get_git_file_info(attr, expected):
         (
             {
                 "init": {
-                    "prefix": "http://10.170.33.18:82/chenruijie/ds-public/-/blob/main",
+                    "prefix": "https://gitlab.com/pydolphinscheduler/ds-public/-/blob/main",
                 },
                 "file_path": "union.sh",
             },
@@ -100,8 +100,8 @@ def test_gitlab_get_git_file_info(attr, expected):
         (
             {
                 "init": {
-                    "prefix": "http://10.170.33.18:82/chenruijie/ds-internal/-/blob/main",
-                    "username": "chenruijie",
+                    "prefix": "https://gitlab.com/pydolphinscheduler/ds-internal/-/blob/main",
+                    "username": "pydolphinscheduler",
                     "password": "429xxx",
                 },
                 "file_path": "union.sh",

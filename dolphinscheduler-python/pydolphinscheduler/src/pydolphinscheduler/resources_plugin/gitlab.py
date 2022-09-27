@@ -30,9 +30,9 @@ class GitLab(ResourcePlugin, Git):
     """GitLab object, declare GitLab resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of GitLab.
-    :param private_token: A string used for identity authentication of GitLab private or Internal warehouse.
-    :param oauth_token: A string used for identity authentication of GitLab private or Internal warehouse.
-    :param username: A string representing the user of the warehouse.
+    :param private_token: A string used for identity authentication of GitLab private or Internal repository.
+    :param oauth_token: A string used for identity authentication of GitLab private or Internal repository.
+    :param username: A string representing the user of the repository.
     :param password: A string representing the user password.
     """
 
