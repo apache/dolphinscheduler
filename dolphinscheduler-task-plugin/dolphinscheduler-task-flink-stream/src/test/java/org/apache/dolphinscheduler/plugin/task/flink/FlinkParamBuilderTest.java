@@ -29,15 +29,15 @@ public class FlinkParamBuilderTest {
     @Test
     public void testRunJarInYarnPerMode() {
 
-        String runJarPath = "/usr/local/Cellar/apache-flink/1.15.1/libexec/examples/streaming/WindowJoin.jar";
+        String runJarPath = "/usr/local/Cellar/apache-flink/1.15.2/libexec/examples/streaming/WindowJoin.jar";
 
         String[] execArgs = new String[]{};
 
         String jobName = "Flink Submit";
 
-        String flinkConfDir = "/usr/local/Cellar/apache-flink/1.15.1/libexec/conf";
+        String flinkConfDir = "/usr/local/Cellar/apache-flink/1.15.2/libexec/conf";
 
-        String flinkJarPath = "/usr/local/Cellar/apache-flink/1.15.1/libexec/lib";
+        String flinkJarPath = "/usr/local/Cellar/apache-flink/1.15.2/libexec/lib";
 
         FlinkStreamDeployMode runMode = FlinkStreamDeployMode.YARN_PER_JOB;
 
