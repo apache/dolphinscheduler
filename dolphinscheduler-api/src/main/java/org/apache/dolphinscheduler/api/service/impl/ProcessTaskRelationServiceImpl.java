@@ -389,7 +389,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (processTaskRelations.size() != 1) {
             throw new ServiceException(Status.PROCESS_TASK_RELATION_NOT_EXPECT, 1, processTaskRelations.size());
         }
-        processTaskRelationMapper.deleteById(processTaskRelations.get(0).getId());
+
+        ProcessTaskRelation processTaskRelationDb = processTaskRelations.get(0);
+        Project project = projectMapper.queryByCode(processTaskRelationDb.getProjectCode());
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
+        processTaskRelationMapper.deleteById(processTaskRelationDb.getId());
     }
 
     /**
