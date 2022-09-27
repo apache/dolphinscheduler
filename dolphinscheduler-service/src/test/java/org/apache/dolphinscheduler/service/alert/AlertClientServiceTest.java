@@ -40,9 +40,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * alert client service test
- */
 @RunWith(MockitoJUnitRunner.class)
 public class AlertClientServiceTest {
 

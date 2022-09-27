@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO: powermock removed, need to fix it
 public class AlertClientService implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertClientService.class);
