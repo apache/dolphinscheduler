@@ -29,7 +29,7 @@ import org.junit.Test;
 public class HttpSenderTest {
 
     @Test
-    @Ignore("should not make a actual request")
+    @Ignore("should not make a actual request in unit test")
     public void sendTest() {
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put(HttpAlertConstants.NAME_URL, "http://www.baidu.com");

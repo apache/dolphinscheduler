@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpAlertChannelTest {
@@ -48,6 +49,7 @@ public class HttpAlertChannelTest {
     }
 
     @Test
+    @Ignore("should not make a actual request in unit test")
     public void processTest2() {
 
         HttpAlertChannel alertChannel = new HttpAlertChannel();
