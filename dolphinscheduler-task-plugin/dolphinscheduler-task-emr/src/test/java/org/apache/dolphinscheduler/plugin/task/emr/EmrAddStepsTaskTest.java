@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.emr;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-
 import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -42,7 +41,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
-import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsResult;
 import com.amazonaws.services.elasticmapreduce.model.AmazonElasticMapReduceException;
 import com.amazonaws.services.elasticmapreduce.model.DescribeStepResult;
@@ -96,7 +94,7 @@ public class EmrAddStepsTaskTest {
         Mockito.when(emrClient.addJobFlowSteps(any())).thenReturn(addJobFlowStepsResult);
         Mockito.when(addJobFlowStepsResult.getStepIds()).thenReturn(Collections.singletonList("step-xx"));
 
-//        Mockito.doReturn(emrClient).when(emrAddStepsTask, "createEmrClient");
+        Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
         DescribeStepResult describeStepResult = Mockito.mock(DescribeStepResult.class);
         Mockito.when(emrClient.describeStep(any())).thenReturn(describeStepResult);
 
@@ -109,8 +107,7 @@ public class EmrAddStepsTaskTest {
 
     @Test(expected = TaskException.class)
     public void testCanNotParseJson() throws Exception {
-        Mockito.mockStatic(JSONUtils.class);
-//        Mockito.when(emrAddStepsTask, "createAddJobFlowStepsRequest").thenThrow(new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
+        Mockito.when(emrAddStepsTask.createAddJobFlowStepsRequest()).thenThrow(new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
         emrAddStepsTask.handle(taskCallBack);
     }
 
@@ -122,7 +119,7 @@ public class EmrAddStepsTaskTest {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
         emrAddStepsTask = Mockito.spy(new EmrAddStepsTask(taskExecutionContext));
-//        Mockito.doReturn(emrClient).when(emrAddStepsTask, "createEmrClient");
+        Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
         emrAddStepsTask.init();
         emrAddStepsTask.handle(taskCallBack);
     }
