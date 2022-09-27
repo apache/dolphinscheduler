@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
@@ -37,8 +37,9 @@ import io.netty.channel.Channel;
 /**
  * task ack processor test
  */
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class CacheProcessorTest {
+
     @InjectMocks
     private CacheProcessor cacheProcessor = new CacheProcessor();
 

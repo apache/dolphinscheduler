@@ -642,8 +642,6 @@ export default {
     emr_flow_define_json_tips: '请输入工作流定义',
     emr_steps_define_json: 'stepsDefineJson',
     emr_steps_define_json_tips: '请输入EMR步骤定义',
-    segment_separator: '分段执行符号',
-    segment_separator_tips: '请输入分段执行符号',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
@@ -765,5 +763,14 @@ export default {
     pytorch_requirements: '依赖文件',
     pytorch_conda_python_version: 'python版本',
     pytorch_conda_python_version_tips: '请输入版本号，如 3.6, 3.7, 3.x等'
+  },
+  menu: {
+    fav: '收藏组件',
+    universal: '通用组件',
+    cloud: '云',
+    logic: '逻辑节点',
+    di: '数据集成',
+    dq: '数据质量',
+    other: '其他',
   }
 }

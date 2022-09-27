@@ -13,18 +13,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-delimiter d//
+import { axios } from '@/service/service'
 
-return 'Success!';
-exception when others then
-		---Raise EXCEPTION '(%)',SQLERRM;
-        return SQLERRM;
-END;
-$BODY$;
+export function getDagMenu(): any {
+  return axios({
+    url: '/favourite/taskTypes',
+    method: 'get'
+  })
+}
 
-select dolphin_insert_dq_initial_data();
+export function Collection(taskName: string): any {
+  return axios({
+    url: `/favourite/${taskName}`,
+    method: 'post'
+  })
+}
 
-d//
-
+export function CancelCollection(taskName: string): any {
+  return axios({
+    url: `/favourite/${taskName}`,
+    method: 'delete'
+  })
+}
