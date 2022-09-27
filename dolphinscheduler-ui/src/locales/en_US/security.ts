@@ -143,6 +143,7 @@ export default {
     delete_confirm: 'Are you sure to delete?',
     delete_confirm_tip:
       'Deleting user is a dangerous operation，please be careful',
+    tenant: 'Tenant',
     project: 'Project',
     resource: 'Resource',
     file_resource: 'File Resource',
@@ -150,6 +151,7 @@ export default {
     datasource: 'Datasource',
     udf: 'UDF Function',
     namespace: 'Namespace',
+    authorize_tenant: 'Tenant Authorize',
     authorize_project: 'Project Authorize',
     authorize_resource: 'Resource Authorize',
     authorize_namespace: 'Namespace Authorize',

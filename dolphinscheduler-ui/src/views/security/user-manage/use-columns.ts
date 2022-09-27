@@ -130,6 +130,10 @@ export function useColumns(onCallback: Function) {
                       key: 'authorize_project'
                     },
                     {
+                      label: t('security.user.tenant'),
+                      key: 'authorize_tenant'
+                    },
+                    {
                       label: t('security.user.resource'),
                       key: 'authorize_resource'
                     },

@@ -38,8 +38,15 @@ import {
   grantResource,
   grantDataSource,
   grantUDFFunc,
-  grantNamespaceFunc
+  grantNamespaceFunc,
+  grantTenant
 } from '@/service/modules/users'
+
+import {
+  queryAuthorizedTenant,
+  queryUnauthorizedTenant
+} from '@/service/modules/tenants'
+
 import utils from '@/utils'
 import type { TAuthType, IResourceOption, IOption } from '../types'
 
@@ -59,7 +66,9 @@ export function useAuthorize() {
     fileResources: [] as IResourceOption[],
     udfResources: [] as IResourceOption[],
     authorizedFileResources: [] as number[],
-    authorizedUdfResources: [] as number[]
+    authorizedUdfResources: [] as number[],
+    authorizedTenants: [] as number[],
+    unauthorizedTenants: [] as IOption[]
   })
 
   const getProjects = async (userId: number) => {
@@ -78,6 +87,26 @@ export function useAuthorize() {
         label: item.name,
         value: item.id
       })
+    )
+  }
+
+  const getTenants = async (userId: number) => {
+    if (state.loading) return
+    state.loading = true
+    const tenants = await Promise.all([
+      queryAuthorizedTenant({ userId }),
+      queryUnauthorizedTenant({ userId })
+    ])
+    state.loading = false
+    state.authorizedTenants = tenants[0].map(
+        (item: { tenantCode: string; id: number }) => item.id
+    )
+
+    state.unauthorizedTenants = [...tenants[0], ...tenants[1]].map(
+        (item: { tenantCode: string; id: number }) => ({
+          label: item.tenantCode,
+          value: item.id
+        })
     )
   }
 
@@ -181,6 +210,9 @@ export function useAuthorize() {
     if (type === 'authorize_namespace') {
       getNamespaces(userId)
     }
+    if (type === 'authorize_tenant') {
+      getTenants(userId)
+    }
   }
 
   /*
@@ -277,6 +309,16 @@ export function useAuthorize() {
         namespaceIds: state.authorizedNamespaces.join(',')
       })
     }
+
+    if (type === 'authorize_tenant') {
+      console.log('save....')
+      console.log(state.authorizedTenants.join(','))
+      await grantTenant({
+        userId,
+        tenantIds: state.authorizedTenants.join(',')
+      })
+    }
+
     state.saving = false
     return true
   }

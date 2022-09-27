@@ -17,6 +17,7 @@
 
 import { axios } from '@/service/service'
 import { ListReq, TenantCodeReq, TenantReq, IdReq } from './types'
+import {UserIdReq} from "@/service/modules/projects/types";
 
 export function queryTenantListPaging(params: ListReq): any {
   return axios({
@@ -61,5 +62,22 @@ export function deleteTenantById(id: number): any {
   return axios({
     url: `/tenants/${id}`,
     method: 'delete'
+  })
+}
+
+
+export function queryAuthorizedTenant(params: UserIdReq): any {
+  return axios({
+    url: '/tenants/authed-tenant',
+    method: 'get',
+    params
+  })
+}
+
+export function queryUnauthorizedTenant(params: UserIdReq): any {
+  return axios({
+    url: '/tenants/unauth-tenant',
+    method: 'get',
+    params
   })
 }

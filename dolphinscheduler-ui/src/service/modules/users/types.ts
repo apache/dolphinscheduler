@@ -70,6 +70,10 @@ interface GrantNamespaceReq {
   namespaceIds: string
 }
 
+interface GrantTenantReq extends UserIdReq {
+  tenantIds: string
+}
+
 interface ListAllReq extends UserReq {
   alertGroup?: string
   createTime?: string
@@ -137,5 +141,6 @@ export {
   ListReq,
   RegisterUserReq,
   UserInfoRes,
-  UserListRes
+  UserListRes,
+  GrantTenantReq
 }
