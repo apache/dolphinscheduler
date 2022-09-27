@@ -47,7 +47,6 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-dms</artifactId>
-            <version>1.12.297</version>
         </dependency>
 
     </dependencies>

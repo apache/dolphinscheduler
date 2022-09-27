@@ -239,7 +239,7 @@ public class DmsTask extends AbstractRemoteTask {
                 parameters = objectMapper.readValue(jsonData, DmsParameters.class);
                 parameters.setIsRestartTask(isRestartTask);
             } catch (Exception e) {
-                logger.error("Failed to convert json data to DmsParameters object, error message: {}", e.getMessage());
+                logger.error("Failed to convert json data to DmsParameters object.", e);
                 throw new TaskException(e.getMessage());
             }
         }
@@ -253,7 +253,6 @@ public class DmsTask extends AbstractRemoteTask {
     @Override
     public void cancelApplication() {
         dmsHook.stopReplicationTask();
-//        dmsHook.deleteReplicationTask();
     }
 
 }

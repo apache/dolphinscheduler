@@ -26,11 +26,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -56,6 +51,7 @@ import com.amazonaws.services.databasemigrationservice.model.StartReplicationTas
 @PowerMockIgnore({"javax.*"})
 public class DmsHookTest {
 
+    final String replicationTaskArn = "arn:aws:dms:ap-southeast-1:123456789012:task:task";
     AWSDatabaseMigrationService client;
 
     @Before
@@ -73,15 +69,16 @@ public class DmsHookTest {
         when(client.createReplicationTask(any())).thenReturn(createReplicationTaskResult);
 
         ReplicationTask replicationTask = mock(ReplicationTask.class);
-        when(replicationTask.getReplicationTaskArn()).thenReturn("arn:aws:dms:ap-southeast-1:123456789012:task:task");
-        when(replicationTask.getReplicationTaskIdentifier()).thenReturn("task");
+        final String taskIdentifier = "task";
+        when(replicationTask.getReplicationTaskArn()).thenReturn(replicationTaskArn);
+        when(replicationTask.getReplicationTaskIdentifier()).thenReturn(taskIdentifier);
         when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.READY);
         when(createReplicationTaskResult.getReplicationTask()).thenReturn(replicationTask);
 
         doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
         Assert.assertTrue(dmsHook.createReplicationTask());
-        Assert.assertEquals("arn:aws:dms:ap-southeast-1:123456789012:task:task", dmsHook.getReplicationTaskArn());
-        Assert.assertEquals("task", dmsHook.getReplicationTaskIdentifier());
+        Assert.assertEquals(replicationTaskArn, dmsHook.getReplicationTaskArn());
+        Assert.assertEquals(taskIdentifier, dmsHook.getReplicationTaskIdentifier());
     }
 
     @Test(timeout = 60000)
@@ -91,13 +88,13 @@ public class DmsHookTest {
         when(client.startReplicationTask(any())).thenReturn(startReplicationTaskResult);
 
         ReplicationTask replicationTask = mock(ReplicationTask.class);
-        when(replicationTask.getReplicationTaskArn()).thenReturn("arn:aws:dms:ap-southeast-1:123456789012:task:task");
+        when(replicationTask.getReplicationTaskArn()).thenReturn(replicationTaskArn);
         when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.RUNNING);
         when(startReplicationTaskResult.getReplicationTask()).thenReturn(replicationTask);
 
         doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
         Assert.assertTrue(dmsHook.startReplicationTask());
-        Assert.assertEquals("arn:aws:dms:ap-southeast-1:123456789012:task:task", dmsHook.getReplicationTaskArn());
+        Assert.assertEquals(replicationTaskArn, dmsHook.getReplicationTaskArn());
     }
 
     @Test(timeout = 60000)
@@ -176,16 +173,20 @@ public class DmsHookTest {
         ReplicationTask replicationTask = mock(ReplicationTask.class);
         when(replicationTask.getReplicationTaskArn()).thenReturn("arn:aws:dms:ap-southeast-1:123456789012:task:task");
         when(replicationTask.getReplicationTaskIdentifier()).thenReturn("task");
-        when(replicationTask.getSourceEndpointArn()).thenReturn("arn:aws:dms:ap-southeast-1:123456789012:endpoint:source");
-        when(replicationTask.getTargetEndpointArn()).thenReturn("arn:aws:dms:ap-southeast-1:123456789012:endpoint:target");
+
+        final String sourceArn = "arn:aws:dms:ap-southeast-1:123456789012:endpoint:source";
+        final String targetArn = "arn:aws:dms:ap-southeast-1:123456789012:endpoint:target";
+
+        when(replicationTask.getSourceEndpointArn()).thenReturn(sourceArn);
+        when(replicationTask.getTargetEndpointArn()).thenReturn(targetArn);
 
         when(describeReplicationTasksResult.getReplicationTasks()).thenReturn(Arrays.asList(replicationTask));
 
         ReplicationTask replicationTaskOut = dmsHook.describeReplicationTasks();
         Assert.assertNotEquals(dmsHook.getReplicationInstanceArn(), replicationTaskOut.getReplicationTaskArn());
         Assert.assertEquals("task", replicationTaskOut.getReplicationTaskIdentifier());
-        Assert.assertEquals("arn:aws:dms:ap-southeast-1:123456789012:endpoint:source", replicationTaskOut.getSourceEndpointArn());
-        Assert.assertEquals("arn:aws:dms:ap-southeast-1:123456789012:endpoint:target", replicationTaskOut.getTargetEndpointArn());
+        Assert.assertEquals(sourceArn, replicationTaskOut.getSourceEndpointArn());
+        Assert.assertEquals(targetArn, replicationTaskOut.getTargetEndpointArn());
 
     }
 
@@ -219,44 +220,6 @@ public class DmsHookTest {
         );
         Assert.assertFalse(dmsHook.awaitReplicationTaskStatus(DmsHook.STATUS.STOPPED, DmsHook.STATUS.RUNNING));
     }
-
-    @Test
-    public void testReplaceFileParameters() throws IOException {
-        String path = this.getClass().getResource("table_mapping.json").getPath();
-
-        String jsonData = loadJson("table_mapping.json");
-
-        DmsHook dmsHook = new DmsHook();
-
-        String pathParameter = "file://" + path;
-        Assert.assertEquals(jsonData, dmsHook.replaceFileParameters(pathParameter));
-
-//        String pathParameter2 = "file://" + "not_exist.json";
-//
-//        try {
-//            Assert.assertEquals(pathParameter2, dmsHook.replaceFileParameters(pathParameter2));
-//        }catch (Exception e) {
-//            Assert.assertTrue(e instanceof IOException);
-//        }
-
-        String pathParameter3 = "{}";
-        Assert.assertEquals(pathParameter3, dmsHook.replaceFileParameters(pathParameter3));
-
-    }
-
-//    this.getClass().getResourceAsStream("SagemakerRequestJson.json"))
-
-    private String loadJson(String fileName) {
-        String jsonData;
-        try (InputStream i = this.getClass().getResourceAsStream(fileName)) {
-            assert i != null;
-            jsonData = IOUtils.toString(i, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return jsonData;
-    }
-
 }
 
 

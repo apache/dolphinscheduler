@@ -54,7 +54,7 @@ public class DmsParameters extends AbstractParameters {
         if (isJsonFormat) {
             flag = jsonData != null;
         } else if (isRestartTask) {
-            flag = (replicationTaskArn != null);
+            flag = replicationTaskArn != null;
         } else {
             flag = sourceEndpointArn != null && targetEndpointArn != null && replicationInstanceArn != null
                 && migrationType != null && replicationTaskIdentifier != null && tableMappings != null;
