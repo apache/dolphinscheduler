@@ -492,10 +492,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        List<ResourcesTask> existResourcesList = resourceTaskMapper.selectByMap(
-            Collections.singletonMap("full_name", originFullName));
+        List<ResourcesTask> existResourcesList;
+        if (resource.isDirectory()) {
+            existResourcesList = resourceTaskMapper.selectSubfoldersFullNames(originFullName + FOLDER_SEPARATOR);
+        } else {
+            existResourcesList = resourceTaskMapper.selectByMap(
+                    Collections.singletonMap("full_name", originFullName));
+        }
 
-        if (existResourcesList.size() > 0 && !fullName.equals(originFullName) && !resource.isDirectory()) {
+        if (existResourcesList.size() > 0 && !fullName.equals(originFullName)) {
             // check if any related task is online. If it is, it can not be updated.
             for (ResourcesTask existResource : existResourcesList) {
                 int taskId = existResource.getTaskId();
@@ -513,46 +518,57 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
                 List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
                         Collections.singletonMap("post_task_code", taskCode));
-                long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
-                int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
-                List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
-                        processTaskRelation.get(0).getProjectCode(),
-                        processDefinitionCode);
+                if (processTaskRelation.size() > 0) {
+                    long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
+                    int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
+                    List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
+                            processTaskRelation.get(0).getProjectCode(),
+                            processDefinitionCode);
 
-                List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
+                    List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
 
-                if (taskRelationList.size() > 0) {
-                    ProcessDefinitionLog processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                            processDefinitionCode, processDefinitionVersion);
-                    for (ProcessTaskRelation taskRelation: taskRelationList) {
-                        long taskCodeInProcess = taskRelation.getPostTaskCode();
-                        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
-                        if (taskCodeInProcess == taskCode) {
-                            taskDefinition.setTaskParams(RemoveResourceFromResourceList(originFullName, taskDefinition.getTaskParams()));
-                            taskDefinition.setTaskParams(AddResourceToResourceList(fullName, taskDefinition.getTaskParams()));
+                    if (taskRelationList.size() > 0) {
+                        ProcessDefinitionLog processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                                processDefinitionCode, processDefinitionVersion);
+                        for (ProcessTaskRelation taskRelation: taskRelationList) {
+                            long taskCodeInProcess = taskRelation.getPostTaskCode();
+                            TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
+                            if (taskCodeInProcess == taskCode) {
+                                // originFullName is a prefix if isDirectory is true
+                                taskDefinition.setTaskParams(RemoveResourceFromResourceList(originFullName,
+                                        taskDefinition.getTaskParams(),
+                                        resource.isDirectory()));
+                                // if isDirectory is true, fullName is the new prefix. we replace old prefix
+                                // of resource fullname with the new prefix.
+                                // if isDirectory is false, fullName is the new path.
+                                taskDefinition.setTaskParams(AddResourceToResourceList(originFullName,
+                                        fullName,
+                                        existResource.getFullName(),
+                                        taskDefinition.getTaskParams(),
+                                        resource.isDirectory()));
+                            }
+                            taskDefinitionLogList.add(taskDefinition);
                         }
-                        taskDefinitionLogList.add(taskDefinition);
-                    }
 
-                    // update workflow & task definition associated to the resource
-                    if (processDefinition != null) {
-                        processDefinitionService.updateProcessDefinition(loginUser,
-                                processDefinition.getProjectCode(),
-                                processDefinition.getName(),
-                                processDefinition.getCode(),
-                                processDefinition.getDescription(),
-                                processDefinition.getGlobalParams(),
-                                processDefinition.getLocations(),
-                                processDefinition.getTimeout(),
-                                tenantCode,
-                                JSONUtils.toJsonString(taskRelationList.toArray()),
-                                JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
-                                "",
-                                processDefinition.getExecutionType()
-                                );
+                        // update workflow & task definition associated to the resource
+                        if (processDefinition != null) {
+                            processDefinitionService.updateProcessDefinition(loginUser,
+                                    processDefinition.getProjectCode(),
+                                    processDefinition.getName(),
+                                    processDefinition.getCode(),
+                                    processDefinition.getDescription(),
+                                    processDefinition.getGlobalParams(),
+                                    processDefinition.getLocations(),
+                                    processDefinition.getTimeout(),
+                                    tenantCode,
+                                    JSONUtils.toJsonString(taskRelationList.toArray()),
+                                    JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
+                                    "",
+                                    processDefinition.getExecutionType()
+                            );
+                        }
                     }
                 }
-
             }
         }
 
@@ -1019,42 +1035,44 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 // use taskCode to get processDefinitionCode, then get a list of processDefinitionLog.
                 List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
                         Collections.singletonMap("post_task_code", taskCode));
-                long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
-                int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
-                List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
-                        processTaskRelation.get(0).getProjectCode(),
-                        processDefinitionCode);
+                if (processTaskRelation.size() > 0) {
+                    long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
+                    int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
+                    List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
+                            processTaskRelation.get(0).getProjectCode(),
+                            processDefinitionCode);
 
-                List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
+                    List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
 
-                if (taskRelationList.size() > 0) {
-                    ProcessDefinitionLog processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                            processDefinitionCode, processDefinitionVersion);
-                    for (ProcessTaskRelation taskRelation: taskRelationList) {
-                        long taskCodeInProcess = taskRelation.getPostTaskCode();
-                        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
-                        if (taskCodeInProcess == taskCode) {
-                            taskDefinition.setTaskParams(RemoveResourceFromResourceList(existResource.getFullName(), taskDefinition.getTaskParams()));
+                    if (taskRelationList.size() > 0) {
+                        ProcessDefinitionLog processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                                processDefinitionCode, processDefinitionVersion);
+                        for (ProcessTaskRelation taskRelation: taskRelationList) {
+                            long taskCodeInProcess = taskRelation.getPostTaskCode();
+                            TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
+                            if (taskCodeInProcess == taskCode) {
+                                taskDefinition.setTaskParams(RemoveResourceFromResourceList(existResource.getFullName(), taskDefinition.getTaskParams(), false));
+                            }
+                            taskDefinitionLogList.add(taskDefinition);
                         }
-                        taskDefinitionLogList.add(taskDefinition);
-                    }
 
-                    // update workflow & task definition associated to the resource
-                    if (processDefinition != null) {
-                        processDefinitionService.updateProcessDefinition(loginUser,
-                                processDefinition.getProjectCode(),
-                                processDefinition.getName(),
-                                processDefinition.getCode(),
-                                processDefinition.getDescription(),
-                                processDefinition.getGlobalParams(),
-                                processDefinition.getLocations(),
-                                processDefinition.getTimeout(),
-                                tenantCode,
-                                JSONUtils.toJsonString(taskRelationList.toArray()),
-                                JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
-                                "",
-                                processDefinition.getExecutionType()
-                        );
+                        // update workflow & task definition associated to the resource
+                        if (processDefinition != null) {
+                            processDefinitionService.updateProcessDefinition(loginUser,
+                                    processDefinition.getProjectCode(),
+                                    processDefinition.getName(),
+                                    processDefinition.getCode(),
+                                    processDefinition.getDescription(),
+                                    processDefinition.getGlobalParams(),
+                                    processDefinition.getLocations(),
+                                    processDefinition.getTimeout(),
+                                    tenantCode,
+                                    JSONUtils.toJsonString(taskRelationList.toArray()),
+                                    JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
+                                    "",
+                                    processDefinition.getExecutionType()
+                            );
+                        }
                     }
                 }
             }
@@ -1068,7 +1086,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return result;
     }
 
-    private String RemoveResourceFromResourceList(String stringToDelete, String taskParameter) {
+    private String RemoveResourceFromResourceList(String stringToDelete, String taskParameter, boolean isDir) {
         Map<String, Object> taskParameters = JSONUtils.parseObject(
                 taskParameter,
                 new TypeReference<Map<String, Object>>() {
@@ -1076,18 +1094,28 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (taskParameters.containsKey("resourceList")) {
             String resourceListStr = JSONUtils.toJsonString(taskParameters.get("resourceList"));
             List<ResourceInfo> resourceInfoList = JSONUtils.toList(resourceListStr, ResourceInfo.class);
-            List<ResourceInfo> updatedResourceInfoList = resourceInfoList.stream()
-                    .filter(Objects::nonNull)
-                    .filter(resourceInfo -> !resourceInfo.getResourceName().equals(stringToDelete))
-                    .collect(Collectors.toList());
-
+            List<ResourceInfo> updatedResourceInfoList;
+            if (isDir) {
+                String stringToDeleteWSeparator = stringToDelete + FOLDER_SEPARATOR;
+                // use start with to identify any prefix matching folder path
+                updatedResourceInfoList = resourceInfoList.stream()
+                        .filter(Objects::nonNull)
+                        .filter(resourceInfo -> !resourceInfo.getResourceName().startsWith(stringToDeleteWSeparator))
+                        .collect(Collectors.toList());
+            } else {
+                updatedResourceInfoList = resourceInfoList.stream()
+                        .filter(Objects::nonNull)
+                        .filter(resourceInfo -> !resourceInfo.getResourceName().equals(stringToDelete))
+                        .collect(Collectors.toList());
+            }
             taskParameters.put("resourceList", updatedResourceInfoList);
             return JSONUtils.toJsonString(taskParameters);
         }
         return taskParameter;
     }
 
-    private String AddResourceToResourceList(String stringToAdd, String taskParameter) {
+    private String AddResourceToResourceList(String oldPrefix, String newPrefix, String resFullName,
+                                             String taskParameter, boolean isDir) {
         Map<String, Object> taskParameters = JSONUtils.parseObject(
                 taskParameter,
                 new TypeReference<Map<String, Object>>() {
@@ -1099,7 +1127,18 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             // add updated resource to replace the original resource.
             ResourceInfo newResource = new ResourceInfo();
-            newResource.setResourceName(stringToAdd);
+            if (isDir) {
+                // we add spearator here because we dont want rare cases like
+                // oldFullName: .../folderToDelete and a resource path: .../folderToDeleteAnotherFolder
+                // Therefore, we make sure the oldFullName has a format of .../folderToDelete/ when
+                // modifying resourceFullNames in taskDefinition.
+                String oldFullNameWSeparator = oldPrefix + FOLDER_SEPARATOR;
+                String newFullNameWSpearator = newPrefix + FOLDER_SEPARATOR;
+
+                newResource.setResourceName(resFullName.replace(oldFullNameWSeparator, newFullNameWSpearator));
+            } else {
+                newResource.setResourceName(newPrefix);
+            }
             resourceInfos.add(newResource);
 
             taskParameters.put("resourceList", resourceInfos);

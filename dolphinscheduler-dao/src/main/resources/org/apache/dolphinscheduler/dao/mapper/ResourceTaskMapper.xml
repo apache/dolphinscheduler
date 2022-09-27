@@ -48,4 +48,11 @@
             #{i}
         </foreach>
     </delete>
+
+    <select id="selectSubfoldersFullNames" resultType="org.apache.dolphinscheduler.dao.entity.ResourcesTask">
+        select
+        id, full_name, task_id, type
+        from t_ds_relation_resources_task
+        where full_name like concat(#{folderPath}, '%')
+    </select>
 </mapper>

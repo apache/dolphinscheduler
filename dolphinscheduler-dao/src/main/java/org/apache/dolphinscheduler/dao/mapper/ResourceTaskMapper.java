@@ -38,4 +38,6 @@ public interface ResourceTaskMapper extends BaseMapper<ResourcesTask> {
     int updateResource(@Param("id") int id, @Param("fullName") String fullName);
 
     List<ResourcesTask> selectBatchFullNames(@Param("fullNameArr") String[] fullNameArr);
+
+    List<ResourcesTask> selectSubfoldersFullNames(@Param("folderPath") String folderPath);
 }
