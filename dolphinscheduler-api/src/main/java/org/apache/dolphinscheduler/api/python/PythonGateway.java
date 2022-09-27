@@ -599,6 +599,10 @@ public class PythonGateway {
         return resourceService.queryResourcesFileInfo(userName, fullName);
     }
 
+    public String getGatewayVersion() {
+        return PythonGateway.class.getPackage().getImplementationVersion();
+    }
+
     /**
      * create or update resource.
      * If the folder is not already created, it will be
