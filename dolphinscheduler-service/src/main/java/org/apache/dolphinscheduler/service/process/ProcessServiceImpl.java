@@ -1153,7 +1153,7 @@ public class ProcessServiceImpl implements ProcessService {
             complementDate = CronUtils.getSelfScheduleDateList(cmdParam);
         }
 
-        if (complementDate != null && complementDate.size() > 0 && Flag.NO == processInstance
+        if (CollectionUtils.isNotEmpty(complementDate) && Flag.NO == processInstance
             .getIsSubProcess()) {
             processInstance.setScheduleTime(complementDate.get(0));
         }
