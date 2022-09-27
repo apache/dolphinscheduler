@@ -25,7 +25,7 @@ from pydolphinscheduler.resources_plugin.gitlab import GitLab
     "attr, expected",
     [
         (
-            "https://gitlab.com/chenruijie/ds-gitlab/-/blob/main/union.sh",
+            "https://gitlab.com/pydolphinscheduler/ds-gitlab/-/blob/main/union.sh",
             {
                 "branch": "main",
                 "file_path": "union.sh",
