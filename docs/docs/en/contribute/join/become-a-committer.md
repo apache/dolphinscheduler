@@ -18,7 +18,7 @@ Community involvement: Committers should have a constructive and friendly attitu
 
 In Dolphinscheduler, **new committer nomination** could only be officially started by existing PMC members. If a new committer feels that he/she is qualified, he/she should contact any existing PMC member and discuss. If this is agreed among some members of the PMC, the process will kick off.
 
-The following steps are recommended (to be initiated only by an existing 2PMC member):
+The following steps are recommended (to be initiated only by an existing PMC member):
 1. Send an email titled `[DISCUSS] Promote xxx as new committer` to `private@dolphinscheduler.apache.org`. List the important contributions of the candidate,
    so you could gather support from other PMC members for your proposal.
 2. Keep the discussion open for more than 3 days but no more than 1 week, unless there is any express objection or concern.
