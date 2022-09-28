@@ -42,6 +42,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
@@ -113,6 +114,7 @@ public class SubProcessTaskTest {
         testBasicInit(WorkflowExecutionStatus.SUCCESS);
     }
 
+    @Ignore
     @Test
     public void testFinish() {
         TaskInstance taskInstance = testBasicInit(WorkflowExecutionStatus.SUCCESS);
