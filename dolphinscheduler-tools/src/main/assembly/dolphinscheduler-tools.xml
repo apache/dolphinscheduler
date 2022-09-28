@@ -53,7 +53,7 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-aop/target/aop/libs</directory>
+            <directory>${basedir}/../dolphinscheduler-aop/target/</directory>
             <includes>
                 <include>dolphinscheduler-aop*.jar</include>
             </includes>
