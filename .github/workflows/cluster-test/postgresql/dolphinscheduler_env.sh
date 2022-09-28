@@ -44,3 +44,12 @@ export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+
+# applicationId auto collection related configuration
+export HADOOP_CLASSPATH=${DOLPHINSCHEDULER_HOME}/tools/libs/aop/*:$HADOOP_CLASSPATH
+export SPARK_DIST_CLASSPATH=${DOLPHINSCHEDULER_HOME}/tools/libs/aop/*:$SPARK_DIST_CLASS_PATH
+export HADOOP_CLIENT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$HADOOP_CLIENT_OPTS
+export SPARK_SUBMIT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$SPARK_SUBMIT_OPTS
+export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$FLINK_ENV_JAVA_OPTS
+# print detailed info of yarn application
+export PARA_NAME_ASPECTJ_DEBUG=false

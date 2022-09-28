@@ -75,14 +75,14 @@ public class TaskExecutionCheckerUtils {
     public static void createProcessLocalPathIfAbsent(TaskExecutionContext taskExecutionContext) throws TaskException {
         try {
             // local execute path
-            String execLocalPath = FileUtils.getProcessExecDir(
-                    taskExecutionContext.getProjectCode(),
-                    taskExecutionContext.getProcessDefineCode(),
-                    taskExecutionContext.getProcessDefineVersion(),
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId());
-            taskExecutionContext.setExecutePath(execLocalPath);
-            FileUtils.createWorkDirIfAbsent(execLocalPath);
+            // String execLocalPath = FileUtils.getProcessExecDir(
+            // taskExecutionContext.getProjectCode(),
+            // taskExecutionContext.getProcessDefineCode(),
+            // taskExecutionContext.getProcessDefineVersion(),
+            // taskExecutionContext.getProcessInstanceId(),
+            // taskExecutionContext.getTaskInstanbu iceId());
+            // taskExecutionContext.setExecutePath(execLocalPath);
+            FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }

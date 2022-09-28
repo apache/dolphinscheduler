@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * common utils
  */
 public class CommonUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
 
     private static final Base64 BASE64 = new Base64();
@@ -85,7 +86,8 @@ public class CommonUtils {
     public static boolean getKerberosStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-        Boolean kerberosStartupState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+        Boolean kerberosStartupState =
+                PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
         return resUploadType == ResUploadType.HDFS && kerberosStartupState;
     }
 
@@ -110,7 +112,8 @@ public class CommonUtils {
      * @param loginUserKeytabPath loginUserKeytabPath
      * @throws IOException errors
      */
-    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) throws IOException {
+    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername,
+                                        String loginUserKeytabPath) throws IOException {
         loadKerberosConf(javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath, new Configuration());
     }
 
@@ -124,13 +127,18 @@ public class CommonUtils {
      * @return load kerberos config return true
      * @throws IOException errors
      */
-    public static boolean loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath, Configuration configuration) throws IOException {
+    public static boolean loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername,
+                                           String loginUserKeytabPath, Configuration configuration) throws IOException {
         if (CommonUtils.getKerberosStartupState()) {
-            System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf, PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)));
+            System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf,
+                    PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)));
             configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, Constants.KERBEROS);
             UserGroupInformation.setConfiguration(configuration);
-            UserGroupInformation.loginUserFromKeytab(StringUtils.defaultIfBlank(loginUserKeytabUsername, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)),
-                    StringUtils.defaultIfBlank(loginUserKeytabPath, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)));
+            UserGroupInformation.loginUserFromKeytab(
+                    StringUtils.defaultIfBlank(loginUserKeytabUsername,
+                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)),
+                    StringUtils.defaultIfBlank(loginUserKeytabPath,
+                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)));
             return true;
         }
         return false;
@@ -143,14 +151,15 @@ public class CommonUtils {
         if (StringUtils.isEmpty(password)) {
             return StringUtils.EMPTY;
         }
-        //if encryption is not turned on, return directly
+        // if encryption is not turned on, return directly
         boolean encryptionEnable = PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE, false);
         if (!encryptionEnable) {
             return password;
         }
 
         // Using Base64 + salt to process password
-        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT, Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,
+                Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = salt + new String(BASE64.encode(password.getBytes(StandardCharsets.UTF_8)));
         return new String(BASE64.encode(passwordWithSalt.getBytes(StandardCharsets.UTF_8)));
     }
@@ -163,14 +172,15 @@ public class CommonUtils {
             return StringUtils.EMPTY;
         }
 
-        //if encryption is not turned on, return directly
+        // if encryption is not turned on, return directly
         boolean encryptionEnable = PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE, false);
         if (!encryptionEnable) {
             return password;
         }
 
         // Using Base64 + salt to process password
-        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT, Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,
+                Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8);
         if (!passwordWithSalt.startsWith(salt)) {
             logger.warn("There is a password and salt mismatch: {} ", password);

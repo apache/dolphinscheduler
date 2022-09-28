@@ -17,12 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
-import static org.apache.dolphinscheduler.common.Constants.UTF_8;
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 import org.apache.commons.io.IOUtils;
 
@@ -45,6 +40,8 @@ public class FileUtils {
     public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
+
+    public static final String APPINFO_PATH = PropertyUtils.getString(APPID_FILE_PATH, "appInfo.log");
 
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
@@ -106,6 +103,16 @@ public class FileUtils {
     }
 
     /**
+     * absolute path of appInfo file
+     *
+     * @param execPath  directory of process execution
+     * @return
+     */
+    public static String getAppInfoPath(String execPath) {
+        return String.format("%s/%s", execPath, APPINFO_PATH);
+    }
+
+    /**
      * @return get suffixes for resource files that support online viewing
      */
     public static String getResourceViewSuffixes() {
@@ -119,7 +126,7 @@ public class FileUtils {
      * @throws IOException errors
      */
     public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        //if work dir exists, first delete
+        // if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
         if (execLocalPathFile.exists()) {
@@ -134,7 +141,7 @@ public class FileUtils {
             }
         }
 
-        //create work dir
+        // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
         logger.info(mkdirLog);
@@ -230,7 +237,7 @@ public class FileUtils {
      * @param filename String type of filename
      * @return whether file path could be traversal or not
      */
-    public static boolean directoryTraversal(String filename){
+    public static boolean directoryTraversal(String filename) {
         if (filename.contains(FOLDER_SEPARATOR)) {
             return true;
         }

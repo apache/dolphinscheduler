@@ -52,6 +52,13 @@
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-aop/target/aop/libs</directory>
+            <includes>
+                <include>dolphinscheduler-aop*.jar</include>
+            </includes>
+            <outputDirectory>libs/aop</outputDirectory>
+        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>

@@ -26,12 +26,20 @@ import com.google.common.collect.Lists;
 
 public class LogUtilsTest {
 
-    private static final String APP_ID_FILE = LogUtilsTest.class.getResource("/appId.txt")
+    private static final String APP_ID_FILE = LogUtilsTest.class.getResource("/appId.log")
+            .getFile();
+    private static final String APP_INFO_FILE = LogUtilsTest.class.getResource("/appInfo.log")
             .getFile();
 
     @Test
     public void getAppIdsFromLogFile() {
-        List<String> appIds = LogUtils.getAppIdsFromLogFile(APP_ID_FILE);
+        List<String> appIds = LogUtils.getAppIds(APP_ID_FILE, APP_INFO_FILE, "log");
+        Assert.assertEquals(Lists.newArrayList("application_1548381669007_1234"), appIds);
+    }
+
+    @Test
+    public void getAppIdsFromAppInfoFile() {
+        List<String> appIds = LogUtils.getAppIds(APP_ID_FILE, APP_INFO_FILE, "log");
         Assert.assertEquals(Lists.newArrayList("application_1548381669007_1234"), appIds);
     }
 }

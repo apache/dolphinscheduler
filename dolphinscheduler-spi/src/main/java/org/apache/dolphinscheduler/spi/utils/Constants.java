@@ -44,7 +44,6 @@ public class Constants {
     /**plugin param emit string **/
     public static final String STRING_PLUGIN_PARAM_EMIT = "emit";
 
-
     /** string true */
     public static final String STRING_TRUE = "true";
     /** string false */
@@ -164,7 +163,6 @@ public class Constants {
     public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
     public static final String COM_ATHENA_JDBC_DRIVER = "com.simba.athena.jdbc.Driver";
 
-
     /**
      * validation Query
      */
@@ -205,6 +203,12 @@ public class Constants {
     public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
 
     /**
+     * fetch applicationId way
+     */
+    public static final String APPID_COLLECT = "appId.collect";
+    public static final String APPID_FILE_PATH = "appId.file.path";
+
+    /**
      * DOUBLE_SLASH //
      */
     public static final String DOUBLE_SLASH = "//";
@@ -224,7 +228,6 @@ public class Constants {
      */
     public static final String COLON = ":";
 
-
     /**
      * AT SIGN @
      */
@@ -234,7 +237,6 @@ public class Constants {
      * SEMICOLON ;
      */
     public static final String SEMICOLON = ";";
-
 
     /**
      * EQUAL_SIGN =

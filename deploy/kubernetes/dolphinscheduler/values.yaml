@@ -149,6 +149,10 @@ conf:
     alert.rpc.port: 50052
     # Url endpoint for zeppelin RESTful API
     zeppelin.rest.url: http://localhost:8080
+    # way to collect applicationId: log, aop
+    appId.collect: log
+    # appIds info log path
+    appId.file.path = appInfo.log
 
 common:
   ## Configmap

@@ -44,9 +44,37 @@ public class LogUtils {
 
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
-    public List<String> getAppIdsFromLogFile(@NonNull String logPath) {
-        return getAppIdsFromLogFile(logPath, log);
+    public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
+        switch (fetchWay) {
+            case "aop":
+                log.info("Start finding appId in {}, fetch way: {} ", appInfoPath);
+                return getAppIdsFromAppInfoFile(appInfoPath, log);
+            case "log":
+                log.info("Start finding appId in {}, fetch way: {} ", logPath);
+                return getAppIdsFromLogFile(logPath, log);
+            default:
+                log.info("Match No Way!!");
+                return null;
+        }
     }
+
+    public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath, Logger logger) {
+        File appInfoFile = new File(appInfoPath);
+        if (!appInfoFile.exists() || !appInfoFile.isFile()) {
+            return Collections.emptyList();
+        }
+        List<String> appIds = new ArrayList<>();
+        try (Stream<String> stream = Files.lines(Paths.get(appInfoPath))) {
+            stream.forEach(line -> {
+                appIds.add(line);
+            });
+            return new ArrayList<>(appIds);
+        } catch (IOException e) {
+            logger.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
+            return Collections.emptyList();
+        }
+    }
+
 
     public List<String> getAppIdsFromLogFile(@NonNull String logPath, Logger logger) {
         File logFile = new File(logPath);

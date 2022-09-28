@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.builder;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -124,6 +125,23 @@ public class TaskExecutionContextBuilder {
         return this;
     }
 
+    /**
+     * build execPath related info
+     *
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildExecPathRelatedInfo() {
+        String execPath = FileUtils.getProcessExecDir(
+                taskExecutionContext.getProjectCode(),
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId());
+        taskExecutionContext.setExecutePath(execPath);
+        taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execPath));
+        return this;
+    }
+
     public TaskExecutionContextBuilder buildDataQualityTaskExecutionContext(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         taskExecutionContext.setDataQualityTaskExecutionContext(dataQualityTaskExecutionContext);
         return this;
@@ -133,6 +151,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setResourceParametersHelper(parametersHelper);
         return this;
     }
+
     /**
      * build k8sTask related info
      *
@@ -147,6 +166,7 @@ public class TaskExecutionContextBuilder {
 
     /**
      * build global and local params
+     *
      * @param propertyMap
      * @return
      */
@@ -157,6 +177,7 @@ public class TaskExecutionContextBuilder {
 
     /**
      * build business params
+     *
      * @param businessParamsMap
      * @return
      */

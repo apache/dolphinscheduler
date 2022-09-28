@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -54,6 +55,7 @@ import java.nio.file.NoSuchFileException;
 import java.util.Date;
 import java.util.List;
 
+import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 
 public abstract class WorkerTaskExecuteRunnable implements Runnable {
@@ -123,7 +125,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (task != null) {
             try {
                 task.cancel();
-                List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
+                List<String> appIds = LogUtils.getAppIds(taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(), PropertyUtils.getString(APPID_COLLECT, "log"));
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
                 }
@@ -242,7 +244,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void clearTaskExecPathIfNeeded() {
-
         String execLocalPath = taskExecutionContext.getExecutePath();
         if (!CommonUtils.isDevelopMode()) {
             logger.info("The current execute mode isn't develop mode, will clear the task execute file: {}", execLocalPath);

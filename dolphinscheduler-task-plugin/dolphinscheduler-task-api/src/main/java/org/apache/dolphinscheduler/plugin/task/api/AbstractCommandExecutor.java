@@ -112,7 +112,7 @@ public abstract class AbstractCommandExecutor {
         // setting up user to run commands
         List<String> command = new LinkedList<>();
 
-        //init process builder
+        // init process builder
         ProcessBuilder processBuilder = new ProcessBuilder();
         // setting up a working directory
         processBuilder.directory(new File(taskRequest.getExecutePath()));
@@ -190,7 +190,7 @@ public abstract class AbstractCommandExecutor {
         // create command file if not exists
         createCommandFileIfNotExists(execCommand, commandFilePath);
 
-        //build process
+        // build process
         buildProcess(commandFilePath);
 
         // parse process output

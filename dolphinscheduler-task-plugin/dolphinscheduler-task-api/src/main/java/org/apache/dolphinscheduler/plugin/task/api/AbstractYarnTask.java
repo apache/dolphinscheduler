@@ -20,9 +20,12 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static org.apache.dolphinscheduler.spi.utils.Constants.APPID_COLLECT;
 
 /**
  * abstract yarn task
@@ -107,7 +110,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      */
     @Override
     public List<String> getApplicationIds() throws TaskException {
-        return LogUtils.getAppIdsFromLogFile(taskRequest.getLogPath(), logger);
+        return LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(), PropertyUtils.getString(APPID_COLLECT, "log"));
     }
 
     /**

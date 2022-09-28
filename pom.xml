@@ -41,6 +41,7 @@
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
+        <module>dolphinscheduler-aop</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
