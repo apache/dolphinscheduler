@@ -24,21 +24,16 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({OracleDataSourceClient.class, OracleDataSourceChannel.class})
+@RunWith(MockitoJUnitRunner.class)
 public class OracleDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        OracleDataSourceChannel sourceChannel = PowerMockito.mock(OracleDataSourceChannel.class);
-        OracleDataSourceClient dataSourceClient = PowerMockito.mock(OracleDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        OracleDataSourceChannel sourceChannel = Mockito.mock(OracleDataSourceChannel.class);
+        OracleDataSourceClient dataSourceClient = Mockito.mock(OracleDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new OracleConnectionParam(), DbType.ORACLE));
     }
 }

@@ -24,21 +24,16 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({PrestoDataSourceClient.class, PrestoDataSourceChannel.class})
+@RunWith(MockitoJUnitRunner.class)
 public class PrestoDataSourceChannelTest {
-    
+
     @Test
     public void testCreateDataSourceClient() {
-        PrestoDataSourceChannel sourceChannel = PowerMockito.mock(PrestoDataSourceChannel.class);
-        PrestoDataSourceClient dataSourceClient = PowerMockito.mock(PrestoDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        PrestoDataSourceChannel sourceChannel = Mockito.mock(PrestoDataSourceChannel.class);
+        PrestoDataSourceClient dataSourceClient = Mockito.mock(PrestoDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new PrestoConnectionParam(), DbType.PRESTO));
     }
 }
