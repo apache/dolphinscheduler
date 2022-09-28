@@ -34,6 +34,9 @@ spring:
       leak-detection-threshold: 0
       initialization-fail-timeout: 1
 
+create-demo:
+  tenant-code: default
+
 # Override by profile
 
 ---
