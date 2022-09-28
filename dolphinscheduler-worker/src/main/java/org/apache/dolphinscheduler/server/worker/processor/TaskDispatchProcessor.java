@@ -95,7 +95,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             return;
         }
         final String workflowMasterAddress = taskDispatchCommand.getMessageSenderAddress();
-        logger.info("task execute request message: {}", taskDispatchCommand);
+        logger.info("Receive task execute request message: {}", taskDispatchCommand);
 
         TaskExecutionContext taskExecutionContext = taskDispatchCommand.getTaskExecutionContext();
 
@@ -133,7 +133,8 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             if (!offer) {
                 logger.warn("submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master", workerManager.getWaitSubmitQueueSize());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress, CommandType.TASK_REJECT);
-            }
+            } else
+                logger.info("Submit task to wait queue success, current queue size is {}", workerManager.getWaitSubmitQueueSize());
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }

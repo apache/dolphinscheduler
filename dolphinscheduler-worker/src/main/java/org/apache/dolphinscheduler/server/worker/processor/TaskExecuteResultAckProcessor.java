@@ -54,7 +54,7 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
             logger.error("task execute response ack command is null");
             return;
         }
-        logger.info("task execute response ack command : {}", taskExecuteAckMessage);
+        logger.info("Receive task execute response ack command : {}", taskExecuteAckMessage);
 
         try {
             LoggerUtils.setTaskInstanceIdMDC(taskExecuteAckMessage.getTaskInstanceId());
