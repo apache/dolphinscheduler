@@ -221,6 +221,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |sudo.enable | true | 是否开启sudo|
 |alert.rpc.port | 50052 | Alert Server的RPC端口|
 |zeppelin.rest.url | http://localhost:8080 | zeppelin RESTful API 接口地址|
+|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop|
+|appId.file.path | appInfo.log | 采用aop方式，存取applicationId的日志文件相对路径，不建议修改，否则需要重新打包aop jar包|
 
 ## Api-server相关配置
 
