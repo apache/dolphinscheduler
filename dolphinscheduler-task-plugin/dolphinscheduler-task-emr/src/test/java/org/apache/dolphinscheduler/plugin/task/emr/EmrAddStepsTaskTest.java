@@ -20,13 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.emr;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -43,13 +37,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
-import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsResult;
 import com.amazonaws.services.elasticmapreduce.model.AmazonElasticMapReduceException;
 import com.amazonaws.services.elasticmapreduce.model.DescribeStepResult;
@@ -62,14 +53,7 @@ import com.amazonaws.services.elasticmapreduce.model.StepStatus;
  *
  * @since v3.1.0
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({
-    AmazonElasticMapReduceClientBuilder.class,
-    EmrAddStepsTask.class,
-    AmazonElasticMapReduce.class,
-    JSONUtils.class
-})
-@PowerMockIgnore({"javax.*"})
+@RunWith(MockitoJUnitRunner.class)
 public class EmrAddStepsTaskTest {
 
     private final StepStatus pendingState =
@@ -99,32 +83,31 @@ public class EmrAddStepsTaskTest {
         // mock EmrParameters and EmrAddStepsTask
         EmrParameters emrParameters = buildEmrTaskParameters();
         String emrParametersString = JSONUtils.toJsonString(emrParameters);
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
-        emrAddStepsTask = spy(new EmrAddStepsTask(taskExecutionContext));
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
+        emrAddStepsTask = Mockito.spy(new EmrAddStepsTask(taskExecutionContext));
 
         // mock emrClient and behavior
-        emrClient = mock(AmazonElasticMapReduce.class);
+        emrClient = Mockito.mock(AmazonElasticMapReduce.class);
 
-        AddJobFlowStepsResult addJobFlowStepsResult = mock(AddJobFlowStepsResult.class);
-        when(emrClient.addJobFlowSteps(any())).thenReturn(addJobFlowStepsResult);
-        when(addJobFlowStepsResult.getStepIds()).thenReturn(Collections.singletonList("step-xx"));
+        AddJobFlowStepsResult addJobFlowStepsResult = Mockito.mock(AddJobFlowStepsResult.class);
+        Mockito.when(emrClient.addJobFlowSteps(any())).thenReturn(addJobFlowStepsResult);
+        Mockito.when(addJobFlowStepsResult.getStepIds()).thenReturn(Collections.singletonList("step-xx"));
 
-        doReturn(emrClient).when(emrAddStepsTask, "createEmrClient");
-        DescribeStepResult describeStepResult = mock(DescribeStepResult.class);
-        when(emrClient.describeStep(any())).thenReturn(describeStepResult);
+        Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
+        DescribeStepResult describeStepResult = Mockito.mock(DescribeStepResult.class);
+        Mockito.when(emrClient.describeStep(any())).thenReturn(describeStepResult);
 
         // mock step
-        step = mock(Step.class);
-        when(describeStepResult.getStep()).thenReturn(step);
+        step = Mockito.mock(Step.class);
+        Mockito.when(describeStepResult.getStep()).thenReturn(step);
 
         emrAddStepsTask.init();
     }
 
     @Test(expected = TaskException.class)
     public void testCanNotParseJson() throws Exception {
-        mockStatic(JSONUtils.class);
-        when(emrAddStepsTask, "createAddJobFlowStepsRequest").thenThrow(new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
+        Mockito.when(emrAddStepsTask.createAddJobFlowStepsRequest()).thenThrow(new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
         emrAddStepsTask.handle(taskCallBack);
     }
 
@@ -133,17 +116,17 @@ public class EmrAddStepsTaskTest {
         // mock EmrParameters and EmrAddStepsTask
         EmrParameters emrParameters = buildErrorEmrTaskParameters();
         String emrParametersString = JSONUtils.toJsonString(emrParameters);
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
-        emrAddStepsTask = spy(new EmrAddStepsTask(taskExecutionContext));
-        doReturn(emrClient).when(emrAddStepsTask, "createEmrClient");
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
+        emrAddStepsTask = Mockito.spy(new EmrAddStepsTask(taskExecutionContext));
+        Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
         emrAddStepsTask.init();
         emrAddStepsTask.handle(taskCallBack);
     }
 
     @Test
     public void testHandle() throws Exception {
-        when(step.getStatus()).thenReturn(pendingState, runningState, completedState);
+        Mockito.when(step.getStatus()).thenReturn(pendingState, runningState, completedState);
 
         emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_SUCCESS, emrAddStepsTask.getExitStatusCode());
@@ -151,7 +134,7 @@ public class EmrAddStepsTaskTest {
 
     @Test
     public void testHandleUserRequestTerminate() throws Exception {
-        when(step.getStatus()).thenReturn(pendingState, runningState, cancelledState);
+        Mockito.when(step.getStatus()).thenReturn(pendingState, runningState, cancelledState);
 
         emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_KILL, emrAddStepsTask.getExitStatusCode());
@@ -159,11 +142,11 @@ public class EmrAddStepsTaskTest {
 
     @Test(expected = TaskException.class)
     public void testHandleError() throws Exception {
-        when(step.getStatus()).thenReturn(pendingState, runningState, failedState);
+        Mockito.when(step.getStatus()).thenReturn(pendingState, runningState, failedState);
         emrAddStepsTask.handle(taskCallBack);
         Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
 
-        when(emrClient.addJobFlowSteps(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
+        Mockito.when(emrClient.addJobFlowSteps(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
         emrAddStepsTask.handle(taskCallBack);
     }
 
