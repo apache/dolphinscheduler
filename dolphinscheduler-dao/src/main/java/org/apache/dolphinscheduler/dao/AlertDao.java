@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -66,6 +67,8 @@ public class AlertDao {
      * logger of AlertDao
      */
     private static final Logger logger = LoggerFactory.getLogger(AlertDao.class);
+  
+    private static final int QUERY_ALERT_THRESHOLD = 100;
 
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
@@ -151,12 +154,19 @@ public class AlertDao {
         return alertSendStatusMapper.insert(alertSendStatus);
     }
 
+    public int insertAlertSendStatus(List<AlertSendStatus> alertSendStatuses) {
+        if (CollectionUtils.isEmpty(alertSendStatuses)) {
+            return 0;
+        }
+        return alertSendStatusMapper.batchInsert(alertSendStatuses);
+    }
+
     /**
      * MasterServer or WorkerServer stopped
      *
      * @param alertGroupId alertGroupId
-     * @param host host
-     * @param serverType serverType
+     * @param host         host
+     * @param serverType   serverType
      */
     public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().type(serverType)
@@ -268,9 +278,7 @@ public class AlertDao {
      * List alerts that are pending for execution
      */
     public List<Alert> listPendingAlerts() {
-        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
-                .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
-        return alertMapper.selectList(wrapper);
+        return alertMapper.listingAlertByStatus(AlertStatus.WAIT_EXECUTION.getCode(), QUERY_ALERT_THRESHOLD);
     }
 
     public List<Alert> listAlerts(int processInstanceId) {

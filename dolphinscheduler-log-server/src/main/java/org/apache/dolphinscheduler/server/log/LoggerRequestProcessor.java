@@ -167,7 +167,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                     throw new IllegalArgumentException("Illegal path");
                 }
                 List<String> appIds = LogUtils.getAppIdsFromLogFile(logPath);
-                channel.writeAndFlush(new GetAppIdResponseCommand(appIds).convert2Command(command.getOpaque()));
+                channel.writeAndFlush(
+                        new GetAppIdResponseCommand(appIds).convert2Command(command.getOpaque()));
                 break;
             default:
                 throw new IllegalArgumentException("unknown commandType: " + commandType);

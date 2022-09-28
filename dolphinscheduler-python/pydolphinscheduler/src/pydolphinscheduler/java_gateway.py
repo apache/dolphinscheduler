@@ -17,14 +17,19 @@
 
 """Module java gateway, contain gateway behavior."""
 
+import contextlib
+from logging import getLogger
 from typing import Any, Optional
 
 from py4j.java_collections import JavaMap
 from py4j.java_gateway import GatewayParameters, JavaGateway
+from py4j.protocol import Py4JError
 
-from pydolphinscheduler import configuration
+from pydolphinscheduler import __version__, configuration
 from pydolphinscheduler.constants import JavaGatewayDefault
 from pydolphinscheduler.exceptions import PyDSJavaGatewayException
+
+logger = getLogger(__name__)
 
 
 def launch_gateway(
@@ -75,6 +80,22 @@ class JavaGate:
         auto_convert: Optional[bool] = True,
     ):
         self.java_gateway = launch_gateway(address, port, auto_convert)
+        gateway_version = "unknown"
+        with contextlib.suppress(Py4JError):
+            # 1. Java gateway version is too old: doesn't have method 'getGatewayVersion()'
+            # 2. Error connecting to Java gateway
+            gateway_version = self.get_gateway_version()
+        if gateway_version != __version__:
+            logger.warning(
+                f"Using unmatched version of pydolphinscheduler (version {__version__}) "
+                f"and Java gateway (version {gateway_version}) may cause errors. "
+                "We strongly recommend you to find the matched version "
+                "(check: https://pypi.org/project/apache-dolphinscheduler)"
+            )
+
+    def get_gateway_version(self):
+        """Get the java gateway version, expected to be equal with pydolphinscheduler."""
+        return self.java_gateway.entry_point.getGatewayVersion()
 
     def get_datasource_info(self, name: str):
         """Get datasource info through java gateway."""
@@ -98,6 +119,10 @@ class JavaGate:
         """Get resources file info through java gateway."""
         return self.java_gateway.entry_point.queryResourcesFileInfo(user_name, name)
 
+    def query_environment_info(self, name: str):
+        """Get environment info through java gateway."""
+        return self.java_gateway.entry_point.getEnvironmentInfo(name)
+
     def get_code_and_version(
         self, project_name: str, process_definition_name: str, task_name: str
     ):
@@ -114,6 +139,22 @@ class JavaGate:
             user, name, description
         )
 
+    def query_project_by_name(self, user: str, name: str):
+        """Query project through java gateway."""
+        return self.java_gateway.entry_point.queryProjectByName(user, name)
+
+    def update_project(
+        self, user: str, project_code: int, project_name: str, description: str
+    ):
+        """Update project through java gateway."""
+        return self.java_gateway.entry_point.updateProject(
+            user, project_code, project_name, description
+        )
+
+    def delete_project(self, user: str, code: int):
+        """Delete project through java gateway."""
+        return self.java_gateway.entry_point.deleteProject(user, code)
+
     def create_tenant(
         self, tenant_name: str, queue_name: str, description: Optional[str] = None
     ):
@@ -121,6 +162,31 @@ class JavaGate:
         return self.java_gateway.entry_point.createTenant(
             tenant_name, description, queue_name
         )
+
+    def query_tenant(self, tenant_code: str):
+        """Query tenant through java gateway."""
+        return self.java_gateway.entry_point.queryTenantByCode(tenant_code)
+
+    def grant_tenant_to_user(self, user_name: str, tenant_code: str):
+        """Grant tenant to user through java gateway."""
+        return self.java_gateway.entry_point.grantTenantToUser(user_name, tenant_code)
+
+    def update_tenant(
+        self,
+        user: str,
+        tenant_id: int,
+        code: str,
+        queue_id: int,
+        description: Optional[str] = None,
+    ):
+        """Update tenant through java gateway."""
+        return self.java_gateway.entry_point.updateTenant(
+            user, tenant_id, code, queue_id, description
+        )
+
+    def delete_tenant(self, user: str, tenant_id: int):
+        """Delete tenant through java gateway."""
+        return self.java_gateway.entry_point.deleteTenantById(user, tenant_id)
 
     def create_user(
         self,
@@ -136,6 +202,29 @@ class JavaGate:
         return self.java_gateway.entry_point.createUser(
             name, password, email, phone, tenant, queue, status
         )
+
+    def query_user(self, user_id: int):
+        """Query user through java gateway."""
+        return self.java_gateway.queryUser(user_id)
+
+    def update_user(
+        self,
+        name: str,
+        password: str,
+        email: str,
+        phone: str,
+        tenant: str,
+        queue: str,
+        status: int,
+    ):
+        """Update user through java gateway."""
+        return self.java_gateway.entry_point.updateUser(
+            name, password, email, phone, tenant, queue, status
+        )
+
+    def delete_user(self, name: str, user_id: int):
+        """Delete user through java gateway."""
+        return self.java_gateway.entry_point.deleteUser(name, user_id)
 
     def get_dependent_info(
         self,

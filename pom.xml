@@ -64,14 +64,15 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring.boot.version>2.6.1</spring.boot.version>
         <java.version>1.8</java.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>5.9.0</junit.version>
+        <mockito.version>3.9.0</mockito.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
@@ -84,7 +85,7 @@
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <powermock.version>2.0.9</powermock.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
-        <owasp-dependency-check-maven.version>7.0.4</owasp-dependency-check-maven.version>
+        <owasp-dependency-check-maven.version>7.1.2</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
@@ -130,12 +131,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-plugin</artifactId>
+                <artifactId>dolphinscheduler-alert-plugins</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-plugin</artifactId>
+                <artifactId>dolphinscheduler-registry-plugins</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -309,6 +310,13 @@
                 <artifactId>dolphinscheduler-tools</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
@@ -321,9 +329,25 @@
           of the submodules.
         -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -446,10 +470,15 @@
                             <phase>package</phase>
                             <configuration>
                                 <skip>${docker.build.skip}</skip>
+                                <environmentVariables>
+                                    <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
+                                </environmentVariables>
                                 <executable>docker</executable>
                                 <workingDirectory>${project.basedir}</workingDirectory>
                                 <arguments>
+                                    <argument>buildx</argument>
                                     <argument>build</argument>
+                                    <argument>--load</argument>
                                     <argument>--no-cache</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
@@ -576,13 +605,6 @@
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit4</artifactId>
-                        <version>${maven-surefire-plugin.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <!-- jenkins plugin jacoco report-->

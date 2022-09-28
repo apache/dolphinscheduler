@@ -18,30 +18,32 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.StringJoiner;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 /**
  * executive task
  */
 public abstract class AbstractTask {
 
-    /**
-     * rules for extracting application ID
-     */
-    protected static final Pattern YARN_APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
+    public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
+
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+
+    public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
     /**
      * varPool string
@@ -67,11 +69,6 @@ public abstract class AbstractTask {
      * other resource manager appId , for example : YARN etc
      */
     protected String appIds;
-
-    /**
-     * cancel flag
-     */
-    protected volatile boolean cancel = false;
 
     /**
      * exit code
@@ -101,60 +98,9 @@ public abstract class AbstractTask {
         return null;
     }
 
-    public abstract void handle() throws TaskException;
+    public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
-
-    /**
-     * cancel application
-     *
-     * @param status status
-     * @throws Exception exception
-     */
-    public void cancelApplication(boolean status) throws Exception {
-        this.cancel = status;
-    }
-
-    /**
-     * get application ids
-     * @return
-     * @throws IOException
-     */
-    public Set<String> getApplicationIds() throws IOException {
-        Set<String> appIds = new HashSet<>();
-
-        File file = new File(taskRequest.getLogPath());
-        if (!file.exists()) {
-            return appIds;
-        }
-
-        /*
-         * analysis log? get submitted yarn application id
-         */
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String appId = findAppId(line);
-                if (StringUtils.isNotEmpty(appId)) {
-                    appIds.add(appId);
-                }
-            }
-        }
-        return appIds;
-    }
-
-    /**
-     * find app id
-     *
-     * @param line line
-     * @return appid
-     */
-    protected String findAppId(String line) {
-        Matcher matcher = YARN_APPLICATION_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group();
-        }
-        return null;
-    }
+    public abstract void cancel() throws TaskException;
 
     public void setVarPool(String varPool) {
         this.varPool = varPool;
@@ -177,14 +123,6 @@ public abstract class AbstractTask {
         this.exitStatusCode = exitStatusCode;
     }
 
-    public String getAppIds() {
-        return appIds;
-    }
-
-    public void setAppIds(String appIds) {
-        this.appIds = appIds;
-    }
-
     public int getProcessId() {
         return processId;
     }
@@ -199,6 +137,14 @@ public abstract class AbstractTask {
 
     public void setResultString(String resultString) {
         this.resultString = resultString;
+    }
+
+    public String getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(String appIds) {
+        this.appIds = appIds;
     }
 
     public boolean getNeedAlert() {
@@ -245,4 +191,59 @@ public abstract class AbstractTask {
         return status;
     }
 
+    /**
+     * log handle
+     *
+     * @param logs log list
+     */
+    public void logHandle(LinkedBlockingQueue<String> logs) {
+        // note that the "new line" is added here to facilitate log parsing
+        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
+            logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
+        } else {
+            StringJoiner joiner = new StringJoiner("\n\t");
+            while (!logs.isEmpty()) {
+                joiner.add(logs.poll());
+            }
+            logger.info(" -> {}", joiner);
+        }
+    }
+
+    /**
+     * regular expressions match the contents between two specified strings
+     *
+     * @param content content
+     * @param rgex rgex
+     * @param sqlParamsMap sql params map
+     * @param paramsPropsMap params props map
+     */
+    public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
+                                Map<String, Property> paramsPropsMap, int taskInstanceId) {
+        if (paramsPropsMap == null) {
+            return;
+        }
+
+        Pattern pattern = Pattern.compile(rgex);
+        Matcher m = pattern.matcher(content);
+        int index = 1;
+        while (m.find()) {
+
+            String paramName = m.group(1);
+            Property prop = paramsPropsMap.get(paramName);
+
+            if (prop == null) {
+                logger.error(
+                        "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
+                                + " with id: {}. So couldn't put Property in sqlParamsMap.",
+                        paramName, taskInstanceId);
+            } else {
+                sqlParamsMap.put(index, prop);
+                index++;
+                logger.info(
+                        "setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.",
+                        paramName, content);
+            }
+
+        }
+    }
 }

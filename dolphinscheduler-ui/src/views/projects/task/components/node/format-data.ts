@@ -35,6 +35,17 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SUB_PROCESS') {
     taskParams.processDefinitionCode = data.processDefinitionCode
   }
+
+  if (data.taskType === 'JAVA') {
+    taskParams.runType = data.runType
+    taskParams.mainArgs = data.mainArgs
+    taskParams.jvmArgs = data.jvmArgs
+    taskParams.isModulePath = data.isModulePath
+    if (data.runType === 'JAR' && data.mainJar) {
+      taskParams.mainJar = { id: data.mainJar }
+    }
+  }
+
   if (
     data.taskType &&
     ['SPARK', 'MR', 'FLINK', 'FLINK_STREAM'].includes(data.taskType)
@@ -51,7 +62,6 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SPARK') {
-    taskParams.sparkVersion = data.sparkVersion
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
     taskParams.numExecutors = data.numExecutors
@@ -179,7 +189,6 @@ export function formatParams(data: INodeData): {
     taskParams.sqlType = data.sqlType
     taskParams.preStatements = data.preStatements
     taskParams.postStatements = data.postStatements
-    taskParams.segmentSeparator = data.segmentSeparator
     taskParams.sendEmail = data.sendEmail
     taskParams.displayRows = data.displayRows
     if (data.sqlType === '0' && data.sendEmail) {
@@ -369,8 +378,6 @@ export function formatParams(data: INodeData): {
     taskParams.deployModelKey = data.deployModelKey
     taskParams.mlflowProjectRepository = data.mlflowProjectRepository
     taskParams.mlflowProjectVersion = data.mlflowProjectVersion
-    taskParams.cpuLimit = data.cpuLimit
-    taskParams.memoryLimit = data.memoryLimit
   }
 
   if (data.taskType === 'DVC') {

@@ -65,8 +65,7 @@ public class FileUtils {
         if (resource.exists() || resource.isReadable()) {
             return resource;
         } else {
-            logger.error("file can not read : {}", filename);
-
+            logger.error("File can not be read, fileName:{}", filename);
         }
         return null;
     }

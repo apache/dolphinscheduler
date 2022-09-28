@@ -19,14 +19,14 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * t_ds_plugin_define
- */
+@Data
 @TableName("t_ds_plugin_define")
 public class PluginDefine {
 
@@ -34,7 +34,7 @@ public class PluginDefine {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * plugin name
@@ -73,53 +73,4 @@ public class PluginDefine {
         this.createTime = new Date();
         this.updateTime = new Date();
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    public void setPluginName(String pluginName) {
-        this.pluginName = pluginName;
-    }
-
-    public String getPluginType() {
-        return pluginType;
-    }
-
-    public void setPluginType(String pluginType) {
-        this.pluginType = pluginType;
-    }
-
-    public String getPluginParams() {
-        return pluginParams;
-    }
-
-    public void setPluginParams(String pluginParams) {
-        this.pluginParams = pluginParams;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }
-

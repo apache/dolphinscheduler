@@ -29,15 +29,16 @@ Drag from the toolbar <img src="../../../../img/tasks/icons/shell.png" width="15
 7. Click the `Confirm Add` button to save the task settings.
 
 ### Set dependencies between tasks
- 
+
 Click the plus sign on the right of the task node to connect the task; as shown in the figure below, task Node_B and task Node_C execute in parallel, When task Node_A finished execution, tasks Node_B and Node_C will execute simultaneously.
 
 ![workflow-dependent](../../../../img/new_ui/dev/project/workflow-dependent.png)
 
 ### Dependencies with stream task
+
 If the DAG contains stream tasks, the relationship between stream tasks is displayed as a dotted line, and the execution of stream tasks will be skipped when the workflow instance is executed.
 
-  ![workflow-dependent](../../../../img/new_ui/dev/project/workflow-definition-with-stream-task.png)
+![workflow-dependent](../../../../img/new_ui/dev/project/workflow-definition-with-stream-task.png)
 
 **Delete dependencies:** Using your mouse to select the connection line, and click the "Delete" icon in the upper right corner <img src= "../../../../img/delete.png" width="35"/>, delete dependencies between tasks.
 
@@ -49,6 +50,17 @@ Click the `Save` button, and the "Set DAG chart name" window pops up, as shown i
 
 ![workflow-save](../../../../img/new_ui/dev/project/workflow-save.png)
 
+### Configure workflow (process) execution type
+
+Click the `Save` button and configure `process execution type` in the pop-up window. There are four process execution types:
+
+- `Parallel`: If there are multiple instances of the same workflow definition, execute the instances in parallel.
+- `Serial Wait`: If there are multiple instances of the same workflow definition, execute the instances in serial.
+- `Serial Discard`: If there are multiple instances of the same workflow definition, discard the later ones and kill the current running ones.
+- `Serial Priority`: If there are multiple instances of the same workflow definition, execute the instances according to the priority in serial.
+
+![workflow-execution-type](../../../../img/new_ui/dev/project/workflow-execution-type.png)
+
 ## Workflow Definition Operation Function
 
 Click `Project Management -> Workflow -> Workflow Definition` to enter the workflow definition page, as shown below:
@@ -57,16 +69,51 @@ Click `Project Management -> Workflow -> Workflow Definition` to enter the workf
 
 Workflow running parameter description:
 
-* **Failure strategy**: When a task node fails to execute, other parallel task nodes need to execute the strategy. "Continue" means: After a task fails, other task nodes execute normally; "End" means: Terminate all tasks being executed, and terminate the entire process. 
-* **Notification strategy**: When the process ends, send process execution information notification emails according to the process status, including no status, success, failure, success or failure. 
-* **Process priority**: the priority of process operation, divided into five levels: the highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), the lowest (LOWEST). When the number of master threads is insufficient, processes with higher levels will be executed first in the execution queue, and processes with the same priority will be executed in the order of first-in, first-out. 
-* **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker. 
-* **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group. 
-* **Recipient**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or alarm email will be sent to the recipient list. 
-* **Cc**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, the process information or alarm email will be copied to the Cc list. 
-* **Startup parameters**: Set or override the value of global parameters when starting a new process instance. 
-* **Complement**: There are 2 modes of serial complement and parallel complement. Serial complement: within the specified time range, perform complements in sequence from the start date to the end date, and generate N process instances in turn; parallel complement: within the specified time range, perform multiple complements at the same time, and generate N process instances at the same time . 
-  * **Complement**: Execute the workflow definition of the specified date, you can select the time range of the supplement (currently only supports the supplement for consecutive days), for example, the data from May 1st to May 10th needs to be supplemented, as shown in the following figure:
+* **Failure strategy**: When a task node fails to execute, other parallel task nodes need to execute the strategy. "Continue" means: After a task fails, other task nodes execute normally; "End" means: Terminate all tasks being executed, and terminate the entire process.
+* **Notification strategy**: When the process ends, send process execution information notification emails according to the process status, including no status, success, failure, success or failure.
+* **Process priority**: The priority of process execution, there are five different priorities: the highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), the lowest (LOWEST). When the number of master threads is insufficient, processes with higher priorities in the execution queue will run first. Processes with the same priority will run in first-come-first-served fashion.
+* **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker.
+* **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group.
+* **Startup parameters**: Set or override the value of global parameters when starting a new process instance.
+* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement. You could select the time period or fill in it manually in UI.
+  * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
+
+  ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
+
+  * Parallel complement: Run the workflow from start date to end date according to the time period you set in parallel.
+
+  ![workflow-parallel](../../../../img/new_ui/dev/project/workflow-parallel.png)
+
+  * Parallelism: The max number of workflow instances of the workflow definition you choose for complement.
+    ![workflow-concurrency-from](../../../../img/new_ui/dev/project/workflow-concurrency-from.png)
+
+  ![workflow-concurrency](../../../../img/new_ui/dev/project/workflow-concurrency.png)
+
+  * Mode of dependent: Whether to trigger downstream workflow definition for complement.
+
+  ![workflow-dependency](../../../../img/new_ui/dev/project/workflow-dependency.png)
+
+  * Schedule date：
+
+    1. Select from pop-up window:
+
+    ![workflow-pageSelection](../../../../img/new_ui/dev/project/workflow-pageSelection.png)
+
+    2. Fill in the time period manually:
+
+    ![workflow-input](../../../../img/new_ui/dev/project/workflow-input.png)
+
+  * Complement with or without scheduling：
+
+    1. Without scheduling: Run workflow every day from start date to end date according to the time period you set. e.g. Do complement from July 7th to 10th without scheduling:
+
+    ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
+
+    2. With scheduling: Run workflow from start date to end date on schedule according to the time period and schedule you set. e.g. Do complement from July 7th to 10th with the schedule of 5 AM every day:
+
+    ![workflow-configuredTiming](../../../../img/new_ui/dev/project/workflow-configuredTiming.png)
+
+    ![workflow-configuredTimingResult](../../../../img/new_ui/dev/project/workflow-configuredTimingResult.png)
 
 The following are the operation functions of the workflow definition list:
 
@@ -91,58 +138,58 @@ The following are the operation functions of the workflow definition list:
 - Click the `Run` button to pop up the startup parameter setting window, as shown in the figure below, set the startup parameters, click the `Run` button in the pop-up box, the workflow starts running, and the workflow instance page generates a workflow instance.
 
 ![workflow-run](../../../../img/new_ui/dev/project/workflow-run.png)
- 
-  Description of workflow operating parameters: 
-       
-  * Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, other task nodes execute normally; "End" means: terminate all tasks execution, and terminate the entire process.
-  * Notification strategy: When the process is over, send the process execution result notification email according to the process status, options including no send, send if sucess, send of failure, send whatever result.
-  * Process priority: The priority of process operation, divide into five levels: highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), and lowest (LOWEST). When the number of master threads is insufficient, high priority processes will execute first in the execution queue, and processes with the same priority will execute in the order of first in, first out.
-  * Worker group: The process can only be executed in the specified worker machine group. The default is `Default`, which can execute on any worker.
-  * Notification group: select notification strategy||timeout alarm||when fault tolerance occurs, process result information or email will send to all members in the notification group.
-  * Recipient: select notification policy||timeout alarm||when fault tolerance occurs, process result information or alarm email will be sent to the recipient list.
-  * Cc: select notification policy||timeout alarm||when fault tolerance occurs, the process result information or warning email will be copied to the CC list.
-  * Startup parameter: Set or overwrite global parameter values when starting a new process instance.
-  * Complement: refers to running the workflow definition within the specified date range and generating the corresponding workflow instance according to the complement policy. The complement policy includes two modes: **serial complement** and **parallel complement**. The date can be selected on the page or entered manually.
-  
-    * Serial complement: within the specified time range, complement is executed from the start date to the end date, and multiple process instances are generated in turn; Click Run workflow and select the serial complement mode: for example, from July 9 to July 10, execute in sequence, and generate two process instances in sequence on the process instance page.
-        
-        ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
-    
-    * Parallel Replenishment: within the specified time range, replenishment is performed simultaneously for multiple days, and multiple process instances are generated at the same time. Enter date manually: manually enter a date in the comma separated date format of 'yyyy MM DD hh:mm:ss'.Click Run workflow and select the parallel complement mode: for example, execute the workflow definition from July 9 to July 10 at the same time, and generate two process instances on the process instance page at the same time.
-       
-        ![workflow-parallel](../../../../img/new_ui/dev/project/workflow-parallel.png)
-    
-    * Concurrency: refers to the maximum number of instances executed in parallel in the parallel complement mode.For example, if tasks from July 6 to July 10 are executed at the same time, and the concurrency is 2, then the process instance is:
-       
-        ![workflow-concurrency-from](../../../../img/new_ui/dev/project/workflow-concurrency-from.png)
-        
-        ![workflow-concurrency](../../../../img/new_ui/dev/project/workflow-concurrency.png)
-    
-    * Dependency mode: whether to trigger the replenishment of workflow instances that downstream dependent nodes depend on the current workflow (the timing status of workflow instances that require the current replenishment is online, which will only trigger the replenishment of downstream directly dependent on the current workflow).
-       
-        ![workflow-dependency](../../../../img/new_ui/dev/project/workflow-dependency.png)
-    
-    * Date selection:
-  
-         1. Select the date through the page:
-        
-         ![workflow-pageSelection](../../../../img/new_ui/dev/project/workflow-pageSelection.png)
-         
-         2. Manual input:
-         
-         ![workflow-input](../../../../img/new_ui/dev/project/workflow-input.png)
-    
-    * Relationship between complement and timing configuration:
-  
-         1. Unconfigured timing: When there is no timing configuration, the daily replenishment will be performed by default according to the selected time range. For example, the workflow scheduling date is July 7 to July 10. If timing is not configured, the process instance is:
-        
-         ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
-         
-         2. Configured timing: If there is a timing configuration, it will be supplemented according to the selected time range in combination with the timing configuration. For example, the workflow scheduling date is July 7 to July 10, and the timing is configured (running every 5 a.m.). The process example is:
-         
-         ![workflow-configuredTiming](../../../../img/new_ui/dev/project/workflow-configuredTiming.png)
-         
-         ![workflow-configuredTimingResult](../../../../img/new_ui/dev/project/workflow-configuredTimingResult.png)
+
+Description of workflow operating parameters:
+
+* Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, other task nodes execute normally; "End" means: terminate all tasks execution, and terminate the entire process.
+* Notification strategy: When the process is over, send the process execution result notification email according to the process status, options including no send, send if sucess, send of failure, send whatever result.
+* Process priority: The priority of process operation, divide into five levels: highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), and lowest (LOWEST). When the number of master threads is insufficient, high priority processes will execute first in the execution queue, and processes with the same priority will execute in the order of first in, first out.
+* Worker group: The process can only be executed in the specified worker machine group. The default is `Default`, which can execute on any worker.
+* Notification group: select notification strategy||timeout alarm||when fault tolerance occurs, process result information or email will send to all members in the notification group.
+* Recipient: select notification policy||timeout alarm||when fault tolerance occurs, process result information or alarm email will be sent to the recipient list.
+* Cc: select notification policy||timeout alarm||when fault tolerance occurs, the process result information or warning email will be copied to the CC list.
+* Startup parameter: Set or overwrite global parameter values when starting a new process instance.
+* Complement: refers to running the workflow definition within the specified date range and generating the corresponding workflow instance according to the complement policy. The complement policy includes two modes: **serial complement** and **parallel complement**. The date can be selected on the page or entered manually.
+  * Serial complement: within the specified time range, complement is executed from the start date to the end date, and multiple process instances are generated in turn; Click Run workflow and select the serial complement mode: for example, from July 9 to July 10, execute in sequence, and generate two process instances in sequence on the process instance page.
+
+    ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
+
+  * Parallel Replenishment: within the specified time range, replenishment is performed simultaneously for multiple days, and multiple process instances are generated at the same time. Enter date manually: manually enter a date in the comma separated date format of 'yyyy MM DD hh:mm:ss'.Click Run workflow and select the parallel complement mode: for example, execute the workflow definition from July 9 to July 10 at the same time, and generate two process instances on the process instance page at the same time.
+
+    ![workflow-parallel](../../../../img/new_ui/dev/project/workflow-parallel.png)
+
+  * Concurrency: refers to the maximum number of instances executed in parallel in the parallel complement mode.For example, if tasks from July 6 to July 10 are executed at the same time, and the concurrency is 2, then the process instance is:
+
+    ![workflow-concurrency-from](../../../../img/new_ui/dev/project/workflow-concurrency-from.png)
+
+    ![workflow-concurrency](../../../../img/new_ui/dev/project/workflow-concurrency.png)
+
+  * Dependency mode: whether to trigger the replenishment of workflow instances that downstream dependent nodes depend on the current workflow (the timing status of workflow instances that require the current replenishment is online, which will only trigger the replenishment of downstream directly dependent on the current workflow).
+
+    ![workflow-dependency](../../../../img/new_ui/dev/project/workflow-dependency.png)
+
+  * Date selection:
+
+    1. Select the date through the page:
+
+    ![workflow-pageSelection](../../../../img/new_ui/dev/project/workflow-pageSelection.png)
+
+    2. Manual input:
+
+    ![workflow-input](../../../../img/new_ui/dev/project/workflow-input.png)
+
+  * Relationship between complement and timing configuration:
+
+    1. Unconfigured timing: When there is no timing configuration, the daily replenishment will be performed by default according to the selected time range. For example, the workflow scheduling date is July 7 to July 10. If timing is not configured, the process instance is:
+
+    ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
+
+    2. Configured timing: If there is a timing configuration, it will be supplemented according to the selected time range in combination with the timing configuration. For example, the workflow scheduling date is July 7 to July 10, and the timing is configured (running every 5 a.m.). The process example is:
+
+    ![workflow-configuredTiming](../../../../img/new_ui/dev/project/workflow-configuredTiming.png)
+
+    ![workflow-configuredTimingResult](../../../../img/new_ui/dev/project/workflow-configuredTimingResult.png)
+
 ## Run the task alone
 
 - Right-click the task and click the `Start` button (only online tasks can be clicked to run).
@@ -160,12 +207,15 @@ The following are the operation functions of the workflow definition list:
   ![workflow-time01](../../../../img/new_ui/dev/project/workflow-time01.png)
 
 - Select a start and end time. Within the start and end time range, the workflow is run regularly; outside the start and end time range, no timed workflow instance will be generated.
+
 - Add a timing that execute 5 minutes once, as shown in the following figure:
 
   ![workflow-time02](../../../../img/new_ui/dev/project/workflow-time02.png)
 
 - Failure strategy, notification strategy, process priority, worker group, notification group, recipient, and CC are the same as workflow running parameters.
+
 - Click the "Create" button to create the timing. Now the timing status is "**Offline**" and the timing needs to be **Online** to make effect.
+
 - Schedule online: Click the `Timing Management` button <img src="../../../../img/timeManagement.png" width="35"/>, enter the timing management page, click the `online` button, the timing status will change to `online`, as shown in the below figure, the workflow makes effect regularly.
 
   ![workflow-time03](../../../../img/new_ui/dev/project/workflow-time03.png)

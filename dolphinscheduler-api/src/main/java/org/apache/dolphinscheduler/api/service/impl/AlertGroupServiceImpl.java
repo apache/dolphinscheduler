@@ -169,6 +169,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
         if(checkDescriptionLength(desc)){
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
@@ -189,11 +190,13 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
                 result.put(Constants.DATA_LIST, alertGroup);
                 putMsg(result, Status.SUCCESS);
                 permissionPostHandle(AuthorizationType.ALERT_GROUP, loginUser.getId(), Collections.singletonList(alertGroup.getId()), logger);
+                logger.info("Create alert group complete, groupName:{}", alertGroup.getGroupName());
             } else {
+                logger.error("Create alert group error, groupName:{}", alertGroup.getGroupName());
                 putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
             }
         } catch (DuplicateKeyException ex) {
-            logger.error("Create alert group error.", ex);
+            logger.error("Create alert group error, groupName:{}", alertGroup.getGroupName(), ex);
             putMsg(result, Status.ALERT_GROUP_EXIST);
         }
 
@@ -219,12 +222,14 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
         if(checkDescriptionLength(desc)){
+            logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
 
         if (alertGroup == null) {
+            logger.error("Alert group does not exist, id:{}.", id);
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
             return result;
 
@@ -241,9 +246,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         alertGroup.setAlertInstanceIds(alertInstanceIds);
         try {
             alertGroupMapper.updateById(alertGroup);
+            logger.info("Update alert group complete, groupName:{}", alertGroup.getGroupName());
             putMsg(result, Status.SUCCESS);
         } catch (DuplicateKeyException ex) {
-            logger.error("Update alert group error.", ex);
+            logger.error("Update alert group error, groupName:{}", alertGroup.getGroupName(), ex);
             putMsg(result, Status.ALERT_GROUP_EXIST);
         }
         return result;
@@ -270,6 +276,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
 
         // Not allow to delete the default alarm group ,because the module of service need to use it.
         if (id == 1) {
+            logger.warn("Not allow to delete the default alarm group.");
             putMsg(result, Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
             return result;
         }
@@ -277,11 +284,13 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         //check exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
+            logger.error("Alert group does not exist, id:{}.", id);
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
             return result;
         }
 
         alertGroupMapper.deleteById(id);
+        logger.info("Delete alert group complete, groupId:{}", id);
         putMsg(result, Status.SUCCESS);
         return result;
     }

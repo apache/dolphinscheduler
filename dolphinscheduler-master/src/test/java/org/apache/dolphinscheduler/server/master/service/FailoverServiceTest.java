@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.service;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
-
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
@@ -38,6 +37,7 @@ import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -51,19 +51,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Lists;
 
-/**
- * MasterRegistryClientTest
- */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({RegistryClient.class})
-@PowerMockIgnore({"javax.management.*"})
+@RunWith(MockitoJUnitRunner.class)
 public class FailoverServiceTest {
 
     private FailoverService failoverService;
@@ -89,6 +82,9 @@ public class FailoverServiceTest {
     @Mock
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
+    @Mock
+    private LogClient logClient;
+
     private static int masterPort = 5678;
     private static int workerPort = 1234;
 
@@ -100,23 +96,25 @@ public class FailoverServiceTest {
 
     @Before
     public void before() throws Exception {
-        // init spring context
         ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
 
         given(masterConfig.getListenPort()).willReturn(masterPort);
+        testMasterHost = NetUtils.getAddr(masterConfig.getListenPort());
+        given(masterConfig.getMasterAddress()).willReturn(testMasterHost);
         MasterFailoverService masterFailoverService =
-                new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager, processInstanceExecCacheManager);
+                new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager,
+                        processInstanceExecCacheManager, logClient);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
                 masterConfig,
                 processService,
                 workflowExecuteThreadPool,
-                cacheManager);
+                cacheManager,
+                logClient);
 
         failoverService = new FailoverService(masterFailoverService, workerFailoverService);
 
-        testMasterHost = NetUtils.getAddr(masterConfig.getListenPort());
         String ip = testMasterHost.split(":")[0];
         int port = Integer.valueOf(testMasterHost.split(":")[1]);
         Assert.assertEquals(masterPort, port);
@@ -125,10 +123,6 @@ public class FailoverServiceTest {
 
         given(registryClient.getLock(Mockito.anyString())).willReturn(true);
         given(registryClient.releaseLock(Mockito.anyString())).willReturn(true);
-        given(registryClient.getHostByEventDataPath(Mockito.anyString())).willReturn(testMasterHost);
-        given(registryClient.getStoppable()).willReturn(cause -> {
-        });
-        given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any())).willReturn(true);
 
         processInstance = new ProcessInstance();
         processInstance.setId(1);
@@ -150,15 +144,11 @@ public class FailoverServiceTest {
         workerTaskInstance.setHost(testWorkerHost);
         workerTaskInstance.setTaskType(COMMON_TASK_TYPE);
 
-        given(processService.queryNeedFailoverTaskInstances(Mockito.anyString()))
-                .willReturn(Arrays.asList(masterTaskInstance, workerTaskInstance));
-        given(processService.queryNeedFailoverProcessInstanceHost()).willReturn(Lists.newArrayList(testMasterHost));
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
-        given(processService.findValidTaskListByProcessId(Mockito.anyInt()))
+        given(processService.findValidTaskListByProcessId(Mockito.anyInt(), Mockito.anyInt()))
                 .willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
-        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(processInstance);
 
         Thread.sleep(1000);
         Server masterServer = new Server();

@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.dvc;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -29,12 +31,10 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-
 /**
  * shell task
  */
-public class DvcTask extends AbstractTaskExecutor {
+public class DvcTask extends AbstractTask {
 
     /**
      * dvc parameters
@@ -75,13 +75,12 @@ public class DvcTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // construct process
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             parameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
@@ -97,19 +96,23 @@ public class DvcTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     public String buildCommand() {
         String command = "";
-        TaskTypeEnum taskType = parameters.getDvcTaskType();
-        if (taskType == TaskTypeEnum.UPLOAD) {
+        String taskType = parameters.getDvcTaskType();
+        if (taskType.equals(DvcConstants.DVC_TASK_TYPE.UPLOAD)) {
             command = buildUploadCommond();
-        }else if (taskType == TaskTypeEnum.DOWNLOAD){
+        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.DOWNLOAD)) {
             command = buildDownCommond();
-        }else if (taskType == TaskTypeEnum.INIT){
+        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.INIT)) {
             command = buildInitDvcCommond();
         }
         logger.info("Run DVC task with command: \n{}", command);
@@ -159,12 +162,9 @@ public class DvcTask extends AbstractTaskExecutor {
 
     }
 
-
     @Override
     public AbstractParameters getParameters() {
         return parameters;
     }
 
-
 }
-

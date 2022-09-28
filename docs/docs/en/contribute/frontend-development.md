@@ -1,6 +1,7 @@
 # Front-end development documentation
 
 ### Technical selection
+
 ```
 Vue mvvm framework
 
@@ -17,10 +18,16 @@ Lodash high performance JavaScript utility library
 
 ### Development environment
 
-- #### Node installation
-Node package download (note version v12.20.2) `https://nodejs.org/download/release/v12.20.2/` 
+- 
 
-- #### Front-end project construction
+#### Node installation
+
+Node package download (note version v12.20.2) `https://nodejs.org/download/release/v12.20.2/`
+
+- 
+
+#### Front-end project construction
+
 Use the command line mode `cd`  enter the `dolphinscheduler-ui` project directory and execute `npm install` to pull the project dependency package.
 
 > If `npm install` is very slow, you can set the taobao mirror
@@ -36,13 +43,16 @@ npm config set registry http://registry.npm.taobao.org/
 API_BASE = http://127.0.0.1:12345
 ```
 
-> #####  ! ! ! Special attention here. If the project reports a "node-sass error" error while pulling the dependency package, execute the following command again after execution.
+##### ! ! ! Special attention here. If the project reports a "node-sass error" error while pulling the dependency package, execute the following command again after execution.
 
 ```bash
 npm install node-sass --unsafe-perm #Install node-sass dependency separately
 ```
 
-- #### Development environment operation
+- 
+
+#### Development environment operation
+
 - `npm start` project development environment (after startup address http://localhost:8888)
 
 #### Front-end project release
@@ -140,6 +150,7 @@ Public module and utill `src/js/module`
 Home  => `http://localhost:8888/#/home`
 
 Project Management => `http://localhost:8888/#/projects/list`
+
 ```
 | Project Home
 | Workflow
@@ -149,6 +160,7 @@ Project Management => `http://localhost:8888/#/projects/list`
 ```
 
 Resource Management => `http://localhost:8888/#/resource/file`
+
 ```
 | File Management
 | udf Management
@@ -159,6 +171,7 @@ Resource Management => `http://localhost:8888/#/resource/file`
 Data Source Management => `http://localhost:8888/#/datasource/list`
 
 Security Center => `http://localhost:8888/#/security/tenant`
+
 ```
 | Tenant Management
 | User Management
@@ -174,16 +187,19 @@ User Center => `http://localhost:8888/#/user/account`
 The project `src/js/conf/home` is divided into
 
 `pages` => route to page directory
+
 ```
- The page file corresponding to the routing address
+The page file corresponding to the routing address
 ```
 
 `router` => route management
+
 ```
 vue router, the entry file index.js in each page will be registered. Specific operations: https://router.vuejs.org/zh/
 ```
 
 `store` => status management
+
 ```
 The page corresponding to each route has a state management file divided into:
 
@@ -201,9 +217,13 @@ Specific action：https://vuex.vuejs.org/zh/
 ```
 
 ## specification
+
 ## Vue specification
+
 ##### 1.Component name
+
 The component is named multiple words and is connected with a wire (-) to avoid conflicts with HTML tags and a clearer structure.
+
 ```
 // positive example
 export default {
@@ -212,7 +232,9 @@ export default {
 ```
 
 ##### 2.Component files
+
 The internal common component of the `src/js/module/components` project writes the folder name with the same name as the file name. The subcomponents and util tools that are split inside the common component are placed in the internal `_source` folder of the component.
+
 ```
 └── components
     ├── header
@@ -228,6 +250,7 @@ The internal common component of the `src/js/module/components` project writes t
 ```
 
 ##### 3.Prop
+
 When you define Prop, you should always name it in camel format (camelCase) and use the connection line (-) when assigning values to the parent component.
 This follows the characteristics of each language, because it is case-insensitive in HTML tags, and the use of links is more friendly; in JavaScript, the more natural is the hump name.
 
@@ -270,7 +293,9 @@ props: {
 ```
 
 ##### 4.v-for
+
 When performing v-for traversal, you should always bring a key value to make rendering more efficient when updating the DOM.
+
 ```
 <ul>
     <li v-for="item in list" :key="item.id">
@@ -280,6 +305,7 @@ When performing v-for traversal, you should always bring a key value to make ren
 ```
 
 v-for should be avoided on the same element as v-if (`for example: <li>`) because v-for has a higher priority than v-if. To avoid invalid calculations and rendering, you should try to use v-if Put it on top of the container's parent element.
+
 ```
 <ul v-if="showList">
     <li v-for="item in list" :key="item.id">
@@ -289,7 +315,9 @@ v-for should be avoided on the same element as v-if (`for example: <li>`) becaus
 ```
 
 ##### 5.v-if / v-else-if / v-else
+
 If the elements in the same set of v-if logic control are logically identical, Vue reuses the same part for more efficient element switching, `such as: value`. In order to avoid the unreasonable effect of multiplexing, you should add key to the same element for identification.
+
 ```
 <div v-if="hasData" key="mazey-data">
     <span>{{ mazeyData }}</span>
@@ -300,12 +328,15 @@ If the elements in the same set of v-if logic control are logically identical, V
 ```
 
 ##### 6.Instruction abbreviation
+
 In order to unify the specification, the instruction abbreviation is always used. Using `v-bind`, `v-on` is not bad. Here is only a unified specification.
+
 ```
 <input :value="mazeyUser" @click="verifyUser">
 ```
 
 ##### 7.Top-level element order of single file components
+
 Styles are packaged in a file, all the styles defined in a single vue file, the same name in other files will also take effect. All will have a top class name before creating a component.
 Note: The sass plugin has been added to the project, and the sas syntax can be written directly in a single vue file.
 For uniformity and ease of reading, they should be placed in the order of  `<template>`、`<script>`、`<style>`.
@@ -357,25 +388,31 @@ For uniformity and ease of reading, they should be placed in the order of  `<tem
 ## JavaScript specification
 
 ##### 1.var / let / const
+
 It is recommended to no longer use var, but use let / const, prefer const. The use of any variable must be declared in advance, except that the function defined by function can be placed anywhere.
 
 ##### 2.quotes
+
 ```
 const foo = 'after division'
 const bar = `${foo}，ront-end engineer`
 ```
 
 ##### 3.function
+
 Anonymous functions use the arrow function uniformly. When multiple parameters/return values are used, the object's structure assignment is used first.
+
 ```
 function getPersonInfo ({name, sex}) {
     // ...
     return {name, gender}
 }
 ```
+
 The function name is uniformly named with a camel name. The beginning of the capital letter is a constructor. The lowercase letters start with ordinary functions, and the new operator should not be used to operate ordinary functions.
 
 ##### 4.object
+
 ```
 const foo = {a: 0, b: 1}
 const bar = JSON.parse(JSON.stringify(foo))
@@ -393,7 +430,9 @@ for (let [key, value] of myMap.entries()) {
 ```
 
 ##### 5.module
+
 Unified management of project modules using import / export.
+
 ```
 // lib.js
 export default {}
@@ -411,13 +450,16 @@ If the module has only one output value, use `export default`，otherwise no.
 ##### 1.Label
 
 Do not write the type attribute when referencing external CSS or JavaScript. The HTML5 default type is the text/css and text/javascript properties, so there is no need to specify them.
+
 ```
 <link rel="stylesheet" href="//www.test.com/css/test.css">
 <script src="//www.test.com/js/test.js"></script>
 ```
 
 ##### 2.Naming
+
 The naming of Class and ID should be semantic, and you can see what you are doing by looking at the name; multiple words are connected by a link.
+
 ```
 // positive example
 .test-header{
@@ -426,6 +468,7 @@ The naming of Class and ID should be semantic, and you can see what you are doin
 ```
 
 ##### 3.Attribute abbreviation
+
 CSS attributes use abbreviations as much as possible to improve the efficiency and ease of understanding of the code.
 
 ```
@@ -439,6 +482,7 @@ border: 1px solid #ccc;
 ```
 
 ##### 4.Document type
+
 The HTML5 standard should always be used.
 
 ```
@@ -446,7 +490,9 @@ The HTML5 standard should always be used.
 ```
 
 ##### 5.Notes
+
 A block comment should be written to a module file.
+
 ```
 /**
 * @module mazey/api
@@ -457,7 +503,8 @@ A block comment should be written to a module file.
 
 ## interface
 
-##### All interfaces are returned as Promise 
+##### All interfaces are returned as Promise
+
 Note that non-zero is wrong for catching catch
 
 ```
@@ -477,6 +524,7 @@ test.then(res => {
 ```
 
 Normal return
+
 ```
 {
   code:0,
@@ -486,6 +534,7 @@ Normal return
 ```
 
 Error return
+
 ```
 {
   code:10000, 
@@ -493,8 +542,10 @@ Error return
   msg:'failed'
 }
 ```
+
 If the interface is a post request, the Content-Type defaults to application/x-www-form-urlencoded; if the Content-Type is changed to application/json,
 Interface parameter transfer needs to be changed to the following way
+
 ```
 io.post('url', payload, null, null, { emulateJSON: false } res => {
   resolve(res)
@@ -524,6 +575,7 @@ User Center Related Interfaces `src/js/conf/home/store/user/actions.js`
 (1) First place the icon icon of the node in the `src/js/conf/home/pages/dag/img `folder, and note the English name of the node defined by the `toolbar_${in the background. For example: SHELL}.png`
 
 (2)  Find the `tasksType` object in `src/js/conf/home/pages/dag/_source/config.js` and add it to it.
+
 ```
 'DEPENDENT': {  //  The background definition node type English name is used as the key value
   desc: 'DEPENDENT',  // tooltip desc
@@ -532,6 +584,7 @@ User Center Related Interfaces `src/js/conf/home/store/user/actions.js`
 ```
 
 (3)  Add a `${node type (lowercase)}`.vue file in `src/js/conf/home/pages/dag/_source/formModel/tasks`. The contents of the components related to the current node are written here. Must belong to a node component must have a function _verification () After the verification is successful, the relevant data of the current component is thrown to the parent component.
+
 ```
 /**
  * Verification
@@ -566,6 +619,7 @@ User Center Related Interfaces `src/js/conf/home/store/user/actions.js`
 (4) Common components used inside the node component are under` _source`, and `commcon.js` is used to configure public data.
 
 ##### 2.Increase the status type
+
 (1) Find the `tasksState` object in `src/js/conf/home/pages/dag/_source/config.js` and add it to it.
 
 ```
@@ -579,7 +633,9 @@ User Center Related Interfaces `src/js/conf/home/store/user/actions.js`
 ```
 
 ##### 3.Add the action bar tool
+
 (1)  Find the `toolOper` object in `src/js/conf/home/pages/dag/_source/config.js` and add it to it.
+
 ```
 {
   code: 'pointer',  // tool identifier
@@ -599,13 +655,12 @@ User Center Related Interfaces `src/js/conf/home/store/user/actions.js`
 
 `util.js`  =>   belongs to the `plugIn` tool class
 
-
 The operation is handled in the `src/js/conf/home/pages/dag/_source/dag.js` => `toolbarEvent` event.
-
 
 ##### 3.Add a routing page
 
 (1) First add a routing address`src/js/conf/home/router/index.js` in route management
+
 ```
 routing address{
   path: '/test',  // routing address
@@ -619,12 +674,12 @@ routing address{
 
 (2)Create a `test` folder in `src/js/conf/home/pages` and create an `index.vue `entry file in the folder.
 
-    This will give you direct access to`http://localhost:8888/#/test`
-
+        This will give you direct access to`http://localhost:8888/#/test`
 
 ##### 4.Increase the preset mailbox
 
 Find the `src/lib/localData/email.js` startup and timed email address input to automatically pull down the match.
+
 ```
 export default ["test@analysys.com.cn","test1@analysys.com.cn","test3@analysys.com.cn"]
 ```
