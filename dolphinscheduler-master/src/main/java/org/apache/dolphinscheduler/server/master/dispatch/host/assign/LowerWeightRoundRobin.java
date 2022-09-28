@@ -49,7 +49,9 @@ public class LowerWeightRoundRobin extends AbstractSelector<HostWeight> {
                 lowWeight = hostWeight.getCurrentWeight();
             }
         }
-        lowerNode.setCurrentWeight(lowerNode.getCurrentWeight() + totalWeight);
+        if (lowerNode != null) {
+            lowerNode.setCurrentWeight(lowerNode.getCurrentWeight() + totalWeight);
+        }
         return lowerNode;
     }
 
