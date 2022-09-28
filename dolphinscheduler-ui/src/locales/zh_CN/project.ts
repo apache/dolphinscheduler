@@ -771,6 +771,7 @@ export default {
     logic: '逻辑节点',
     di: '数据集成',
     dq: '数据质量',
+    ml: '机器学习',
     other: '其他',
   }
 }
