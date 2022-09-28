@@ -98,7 +98,7 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
      *
      * @return AmazonElasticMapReduce
      */
-    private AmazonElasticMapReduce createEmrClient() {
+    protected AmazonElasticMapReduce createEmrClient() {
 
         final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
         final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
