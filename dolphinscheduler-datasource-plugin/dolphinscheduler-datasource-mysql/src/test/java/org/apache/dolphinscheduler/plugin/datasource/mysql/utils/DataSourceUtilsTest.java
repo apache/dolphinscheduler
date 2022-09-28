@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql.utils;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -33,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -42,7 +42,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DataSourceUtilsTest {
 
-    @Ignore
     @Test
     public void testCheckDatasourceParam() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
@@ -57,7 +56,6 @@ public class DataSourceUtilsTest {
         Assert.assertTrue(true);
     }
 
-    @Ignore
     @Test
     public void testBuildConnectionParams() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
@@ -74,7 +72,6 @@ public class DataSourceUtilsTest {
         Assert.assertNotNull(connectionParam);
     }
 
-    @Ignore
     @Test
     public void testBuildConnectionParams2() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
@@ -90,13 +87,11 @@ public class DataSourceUtilsTest {
 
     @Test
     public void testGetConnection() throws ExecutionException {
-        // TODO: refactor and fix this
-        // Mockito.mockStatic(PropertyUtils.class);
-        // Mockito.when(PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
-        // Mockito.mockStatic(DataSourceClientProvider.class);
-        // DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-        DataSourceClientProvider clientProvider = Mockito.spy(DataSourceClientProvider.getInstance());
-        // Mockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
+        Mockito.mockStatic(PropertyUtils.class);
+        Mockito.when(PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
+        Mockito.mockStatic(DataSourceClientProvider.class);
+        DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
+        Mockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
 
         Connection connection = Mockito.mock(Connection.class);
         Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
@@ -110,7 +105,6 @@ public class DataSourceUtilsTest {
 
     }
 
-    @Ignore
     @Test
     public void testGetJdbcUrl() {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
@@ -121,7 +115,6 @@ public class DataSourceUtilsTest {
                 jdbcUrl);
     }
 
-    @Ignore
     @Test
     public void testBuildDatasourceParamDTO() {
         MySQLConnectionParam connectionParam = new MySQLConnectionParam();
@@ -136,13 +129,11 @@ public class DataSourceUtilsTest {
 
     }
 
-    @Ignore
     @Test
     public void testGetDatasourceProcessor() {
         Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.MYSQL));
     }
 
-    @Ignore
     @Test(expected = Exception.class)
     public void testGetDatasourceProcessorError() {
         DataSourceUtils.getDatasourceProcessor(null);
