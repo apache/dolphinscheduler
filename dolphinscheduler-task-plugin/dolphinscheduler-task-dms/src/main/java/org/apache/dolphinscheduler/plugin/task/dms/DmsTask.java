@@ -84,13 +84,13 @@ public class DmsTask extends AbstractRemoteTask {
         if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
             exitStatusCode = startReplicationTask();
         } else {
-            throw new TaskException("DMS task failed to start");
+            throw new TaskException("Failed to create a ReplicationTask");
         }
 
         // if the task is not running, the task will be deleted
         if (exitStatusCode == TaskConstants.EXIT_CODE_FAILURE && !parameters.getIsRestartTask()) {
             dmsHook.deleteReplicationTask();
-        }else {
+        } else {
             appId = dmsHook.getApplicationIds();
             setAppIds(JSONUtils.toJsonString(appId));
         }
@@ -125,7 +125,7 @@ public class DmsTask extends AbstractRemoteTask {
             }
         }
         if (appId == null) {
-            throw new TaskException("sagemaker applicationID is null");
+            throw new TaskException("DMS applicationID is null");
         }
     }
 
@@ -214,7 +214,6 @@ public class DmsTask extends AbstractRemoteTask {
         } catch (Exception e) {
             throw new TaskException("DMS task init error", e);
         }
-
 
         if (!StringUtils.isNotEmpty(parameters.getStartReplicationTaskType())) {
             if (parameters.getIsRestartTask()) {

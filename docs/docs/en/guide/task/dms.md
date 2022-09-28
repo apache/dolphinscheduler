@@ -16,11 +16,11 @@ Contains two features:
 
 We can create DMS task and start DMS task in two ways:
 - Use interface
-- Use json data
+- Use JSON data
 
 DolphinScheduler will track the status of the DMS task and set the status to successfully completed when the DMS task is completed. Except for the CDC task without end time.
 
-So, if the `migrationType` is `cdc` or `full-load-and-cdc`, `cdcStopPosition` not be set, DolphinScheduler will set the status to successfully after the DMS task start successfully.
+So, if the `migrationType` is `cdc` or `full-load-and-cdc`, `cdcStopPosition` not be set, DolphinScheduler will set the status to successfully after the DMS task starts successfully.
 
 ## Create Task
 
@@ -41,11 +41,11 @@ The task plugin picture is as follows
 ![dms](../../../../img/tasks/demo/dms_restart.png)
 
 
-**Create and start DMS task by json data**
+**Create and start DMS task by JSON data**
 
 ![dms](../../../../img/tasks/demo/dms_create_and_start_json.png)
 
-**Restart DMS task by json data**
+**Restart DMS task by JSON data**
 
 ![dms](../../../../img/tasks/demo/dms_restart_json.png)
 
@@ -58,7 +58,7 @@ The task plugin picture is as follows
   the `prohibition execution`.
 - **Descriptive information**: Describe the function of the node.
 - **Task priority**: When the number of worker threads is insufficient, execute in the order of priority from high
-  to low, and tasks with the same priority will execute in a first-in first-out order.
+  to low, and tasks with the same priority will execute in a first-in-first-out order.
 - **Worker grouping**: Assign tasks to the machines of the worker group to execute. If `Default` is selected,
   randomly select a worker machine for execution.
 - **Environment Name**: Configure the environment name in which run the script.
@@ -77,7 +77,7 @@ The task plugin picture is as follows
 
 
 - **isRestartTask**：Whether to restart the task. If it is true, the task will be restarted. If it is false, the task will be created and started.
-- **isJsonFormat**：Whether to use json data to create and start the task. If it is true, the task will be created and started by json data. If it is false, the task will be created and started by interface.
+- **isJsonFormat**：Whether to use JSON data to create and start the task. If it is true, the task will be created and started by JSON data. If it is false, the task will be created and started by interface.
 - **jsonData**：Json data for creating and starting the task. Only when `isJsonFormat` is true, this parameter is valid.
 
 Parameters of creating and starting the task by interface
