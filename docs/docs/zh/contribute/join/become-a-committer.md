@@ -112,7 +112,7 @@ PMC成员应通过[花名册](https://whimsy.apache.org/roster/pmc/dolphinschedu
 
 1. 进入[Apache Account Utility Platform](https://id.apache.org/)，创建你的密码，设置你的个人邮箱(`Forwarding email address`)和GitHub账户(`Your GitHub Username`)。此后不久（2小时内），我们将通过电子邮件向你发出组织邀请。
 2. 如果你想使用`xxx@apache.org`电子邮件服务，请参考[这里](https://infra.apache.org/committer-email.html)。推荐使用`Gmail`，因为这种转发模式在大多数邮箱服务设置中都不容易被设置。
-3. 按照[授权的GitHub 2FA wiki](https://docs.github.com/cn/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication)，在[Github](http://github.com/)上启用双因素授权（2FA）。当你将2FA设置为关闭时，它将被相应的Apache committer写权限组除名，直到你再次开启。(**注意：对待你的恢复码要像对待你的密码一样严谨！**)
+3. 根据`GitHub 2FA wiki`，在[Github](http://github.com/)上启用双因素授权（2FA）。当你将2FA设置为关闭时，它将被相应的Apache committer写权限组除名，直到你再次开启。(**注意：对待你的恢复码要像对待你的密码一样严谨！**)
 4. 使用[GitBox Account Linking Utility](https://gitbox.apache.org/setup/)获得Dolphinscheduler项目的写入许可。
 
 如果你想在Apache GitHub组织中公开显示，你需要到[Apache GitHub组织人员页面](https://github.com/orgs/apache/people)搜索你自己，并选择 "组织可见性 "为 "公开"。
