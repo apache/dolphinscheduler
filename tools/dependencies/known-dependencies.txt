@@ -13,7 +13,7 @@ audience-annotations-0.12.0.jar
 automaton-1.11-8.jar
 avro-1.7.7.jar
 aws-java-sdk-core-1.12.300.jar
-aws-java-sdk-datasync-1.12.289.jar
+aws-java-sdk-datasync-1.12.300.jar
 aws-java-sdk-emr-1.12.300.jar
 aws-java-sdk-kms-1.12.300.jar
 aws-java-sdk-s3-1.12.300.jar
@@ -58,7 +58,7 @@ curvesapi-1.06.jar
 datanucleus-api-jdo-4.2.4.jar
 datanucleus-core-4.1.17.jar
 datanucleus-rdbms-4.1.19.jar
-datasync-2.17.260.jar
+datasync-2.17.282.jar
 derby-10.14.2.0.jar
 dnsjava-2.1.7.jar
 druid-1.2.4.jar
