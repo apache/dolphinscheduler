@@ -51,6 +51,7 @@ public class ProcessUtilsTest {
         int processId = 1;
         Mockito.mockStatic(OSUtils.class);
         Mockito.when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId))).thenReturn(null);
+        Mockito.when(OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId))).thenReturn(null);
         String pidListMac = ProcessUtils.getPidsStr(processId);
         Assert.assertEquals("", pidListMac);
     }
