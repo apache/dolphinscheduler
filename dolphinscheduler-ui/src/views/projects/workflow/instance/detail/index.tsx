@@ -33,6 +33,7 @@ import {
   Location
 } from '../../components/dag/types'
 import Styles from './index.module.scss'
+import { useGraphAutoLayout } from '../../components/dag/use-graph-auto-layout'
 
 interface SaveData {
   saveForm: SaveForm
@@ -53,10 +54,18 @@ export default defineComponent({
 
     const definition = ref<WorkflowDefinition>()
     const instance = ref<WorkflowInstance>()
+    const dagInstanceRef = ref()
 
     const refresh = () => {
       queryProcessInstanceById(id, projectCode).then((res: any) => {
         instance.value = res
+        if (!res.dagData.processDefinition.locations) {
+          setTimeout(() => {
+            const graph = dagInstanceRef.value
+            const { submit } = useGraphAutoLayout({ graph })
+            submit()
+          }, 1000)
+        }
         if (res.dagData) {
           definition.value = res.dagData
         }
@@ -109,6 +118,7 @@ export default defineComponent({
         ]}
       >
         <Dag
+          ref={dagInstanceRef}
           instance={instance.value}
           definition={definition.value}
           onRefresh={refresh}

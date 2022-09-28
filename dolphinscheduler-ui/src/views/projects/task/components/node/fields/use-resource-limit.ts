@@ -27,9 +27,9 @@ export function useResourceLimit(): IJsonItem[] {
       name: t('project.node.cpu_quota'),
       span: 12,
       slots: {
-        suffix: () => t('%')
+        suffix: () => '%'
       },
-      props: {min: -1}
+      props: { min: -1 }
     },
     {
       type: 'input-number',
@@ -37,9 +37,9 @@ export function useResourceLimit(): IJsonItem[] {
       name: t('project.node.memory_max'),
       span: 12,
       slots: {
-        suffix: () => t('MB')
+        suffix: () => t('project.node.mb')
       },
-      props: {min: -1}
+      props: { min: -1 }
     }
   ]
 }

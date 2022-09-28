@@ -27,6 +27,9 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'input-number',
       field: 'minCpuCores',
       span: 12,
+      props: {
+        min: 0
+      },
       name: t('project.node.min_cpu'),
       slots: {
         suffix: () => t('project.node.cores')
@@ -36,6 +39,9 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'input-number',
       field: 'minMemorySpace',
       span: 12,
+      props: {
+        min: 0
+      },
       name: t('project.node.min_memory'),
       slots: {
         suffix: () => t('project.node.mb')

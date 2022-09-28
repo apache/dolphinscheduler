@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.api.k8s;
 
-import org.apache.dolphinscheduler.dao.entity.K8s;
-import org.apache.dolphinscheduler.dao.mapper.K8sMapper;
+import org.apache.dolphinscheduler.dao.entity.Cluster;
+import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class K8sManagerTest {
     private K8sManager k8sManager;
 
     @Mock
-    private K8sMapper k8sMapper;
+    private ClusterMapper clusterMapper;
 
     @Before
     public void setUp() throws Exception {
@@ -53,26 +54,27 @@ public class K8sManagerTest {
     }
 
     @Test
-    public void getK8sClient() {
-        Mockito.when(k8sMapper.selectList(Mockito.any())).thenReturn(getK8sList());
+    public void getK8sClient() throws RemotingException {
+        Mockito.when(clusterMapper.selectList(Mockito.any())).thenReturn(getClusterList());
 
-        KubernetesClient result = k8sManager.getK8sClient("must null");
+        KubernetesClient result = k8sManager.getK8sClient(1L);
         Assert.assertNull(result);
         result = k8sManager.getK8sClient(null);
         Assert.assertNull(result);
     }
 
-    private K8s getK8s() {
-        K8s k8s = new K8s();
-        k8s.setId(1);
-        k8s.setK8sName("default");
-        k8s.setK8sConfig("k8s config");
-        return k8s;
+    private Cluster getCluster() {
+        Cluster cluster = new Cluster();
+        cluster.setId(1);
+        cluster.setCode(1L);
+        cluster.setName("cluster");
+        cluster.setConfig("{\"k8s\":\"k8s config yaml\"}");
+        return cluster;
     }
 
-    private List<K8s> getK8sList() {
-        List<K8s> k8sList = new ArrayList<>();
-        k8sList.add(getK8s());
-        return k8sList;
+    private List<Cluster> getClusterList() {
+        List<Cluster> clusterList = new ArrayList<>();
+        clusterList.add(getCluster());
+        return clusterList;
     }
 }

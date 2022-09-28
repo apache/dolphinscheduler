@@ -35,7 +35,7 @@ export function useMlflowModels(model: { [field: string]: any }): IJsonItem[] {
   }
 
   watch(
-    () => [model.mlflowTaskType, model.registerModel],
+    () => [model.mlflowTaskType],
     () => {
       setFlag()
       resetSpan()

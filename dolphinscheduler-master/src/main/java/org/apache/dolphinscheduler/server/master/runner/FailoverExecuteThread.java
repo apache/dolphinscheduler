@@ -18,18 +18,18 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.service.FailoverService;
-
+import org.apache.dolphinscheduler.server.master.service.MasterFailoverService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FailoverExecuteThread extends Thread {
+public class FailoverExecuteThread extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(FailoverExecuteThread.class);
 
@@ -40,29 +40,36 @@ public class FailoverExecuteThread extends Thread {
      * failover service
      */
     @Autowired
-    private FailoverService failoverService;
+    private MasterFailoverService masterFailoverService;
+
+    protected FailoverExecuteThread() {
+        super("FailoverExecuteThread");
+    }
 
     @Override
     public synchronized void start() {
-        super.setName("FailoverExecuteThread");
+        logger.info("Master failover thread staring");
         super.start();
+        logger.info("Master failover thread stared");
     }
 
     @Override
     public void run() {
         // when startup, wait 10s for ready
-        ThreadUtils.sleep((long) Constants.SLEEP_TIME_MILLIS * 10);
+        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 10);
 
-        logger.info("failover execute thread started");
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             try {
+                if (!ServerLifeCycleManager.isRunning()) {
+                    continue;
+                }
                 // todo: DO we need to schedule a task to do this kind of check
                 // This kind of check may only need to be executed when a master server start
-                failoverService.checkMasterFailover();
+                masterFailoverService.checkMasterFailover();
             } catch (Exception e) {
-                logger.error("failover execute error", e);
+                logger.error("Master failover thread execute error", e);
             } finally {
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * masterConfig.getFailoverInterval() * 60);
+                ThreadUtils.sleep(masterConfig.getFailoverInterval().toMillis());
             }
         }
     }

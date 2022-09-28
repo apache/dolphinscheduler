@@ -25,7 +25,8 @@ import {
   TaskDefinitionJsonObjReq,
   ReleaseStateReq,
   VersionReq,
-  ISingleSaveReq
+  ISingleSaveReq,
+  TaskDefinitionReq
 } from './types'
 
 export function queryTaskDefinitionListPaging(
@@ -70,10 +71,10 @@ export function queryTaskDefinitionByCode(
   })
 }
 
-export function update(
-  data: TaskDefinitionJsonObjReq,
-  code: CodeReq,
-  projectCode: ProjectCodeReq
+export function updateTask(
+  projectCode: number,
+  code: number,
+  data: TaskDefinitionJsonObjReq
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}`,
@@ -94,8 +95,8 @@ export function deleteTaskDefinition(
 
 export function releaseTaskDefinition(
   data: ReleaseStateReq,
-  code: CodeReq,
-  projectCode: ProjectCodeReq
+  code: number,
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/release`,
@@ -154,6 +155,18 @@ export function updateWithUpstream(
   return axios({
     url: `/projects/${projectCode}/task-definition/${code}/with-upstream`,
     method: 'put',
+    data
+  })
+}
+
+export function startTaskDefinition(
+  projectCode: number,
+  code: number,
+  data: TaskDefinitionReq
+) {
+  return axios({
+    url: `projects/${projectCode}/executors/task-instance/${code}/start`,
+    method: 'post',
     data
   })
 }

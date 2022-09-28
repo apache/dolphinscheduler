@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -60,10 +61,12 @@ public interface TaskDefinitionService {
      *
      * @param loginUser login user
      * @param projectCode project code
+     * @param processCode process code
      * @param taskName task name
      */
     Map<String, Object> queryTaskDefinitionByName(User loginUser,
                                                   long projectCode,
+                                                  long processCode,
                                                   String taskName);
 
     /**
@@ -169,6 +172,7 @@ public interface TaskDefinitionService {
      * @param searchWorkflowName searchWorkflowName
      * @param searchTaskName searchTaskName
      * @param taskType taskType
+     * @param taskExecuteType taskExecuteType
      * @param pageNo page number
      * @param pageSize page size
      * @return task definition page
@@ -178,6 +182,7 @@ public interface TaskDefinitionService {
                                          String searchWorkflowName,
                                          String searchTaskName,
                                          String taskType,
+                                         TaskExecuteType taskExecuteType,
                                          Integer pageNo,
                                          Integer pageSize);
 

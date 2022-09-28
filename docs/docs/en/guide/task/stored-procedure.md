@@ -2,12 +2,30 @@
 
 - Execute the stored procedure according to the selected DataSource.
 
-> Drag from the toolbar ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_PROCEDURE.png) task node into the canvas, as shown in the figure below:
+> Drag from the `PROCEDURE` task node into the canvas, as shown in the figure below:
 
 <p align="center">
-   <img src="../../../../img/procedure-en.png" width="80%" />
+   <img src="../../../../img/procedure_edit.png" width="80%" />
  </p>
 
-- DataSource: The DataSource type of the stored procedure supports MySQL and POSTGRESQL, select the corresponding DataSource.
-- Method: The method name of the stored procedure.
-- Custom parameters: The custom parameter types of the stored procedure support `IN` and `OUT`, and the data types support: VARCHAR, INTEGER, LONG, FLOAT, DOUBLE, DATE, TIME, TIMESTAMP and BOOLEAN.
+## Task Parameters
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+
+|   **Parameter**   |                                                                                 **Description**                                                                                  |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| DataSource        | The DataSource type of the stored procedure supports MySQL and POSTGRESQL, select the corresponding DataSource.                                                                  |
+| Method            | The method name of the stored procedure.                                                                                                                                         |
+| Custom parameters | The custom parameter types of the stored procedure support `IN` and `OUT`, and the data types support: VARCHAR, INTEGER, LONG, FLOAT, DOUBLE, DATE, TIME, TIMESTAMP and BOOLEAN. |
+
+## Remark
+
+- Prepare: Create a stored procedure in the database, e.g.
+
+  ```
+  CREATE PROCEDURE dolphinscheduler.test(in in1 INT, out out1 INT)
+  begin
+  set out1=in1;
+  END
+  ```
+

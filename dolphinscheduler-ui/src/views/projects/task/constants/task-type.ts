@@ -38,8 +38,21 @@ export type TaskType =
   | 'JUPYTER'
   | 'MLFLOW'
   | 'OPENMLDB'
+  | 'DVC'
+  | 'JAVA'
+  | 'DINKY'
+  | 'SAGEMAKER'
+  | 'CHUNJUN'
+  | 'FLINK_STREAM'
+  | 'PYTORCH'
+  | 'HIVECLI'
+
+export type TaskExecuteType = 'STREAM' | 'BATCH'
 
 export const TASK_TYPES_MAP = {
+  JAVA: {
+    alias: 'JAVA'
+  },
   SHELL: {
     alias: 'SHELL'
   },
@@ -118,5 +131,40 @@ export const TASK_TYPES_MAP = {
   OPENMLDB: {
     alias: 'OPENMLDB',
     helperLinkDisable: true
+  },
+  DVC: {
+    alias: 'DVC',
+    helperLinkDisable: true
+  },
+  DINKY: {
+    alias: 'DINKY',
+    helperLinkDisable: true
+  },
+  SAGEMAKER: {
+    alias: 'SageMaker',
+    helperLinkDisable: true
+  },
+  CHUNJUN: {
+    alias: 'CHUNJUN',
+    helperLinkDisable: true
+  },
+  FLINK_STREAM: {
+    alias: 'FLINK_STREAM',
+    helperLinkDisable: true,
+    taskExecuteType: 'STREAM'
+  },
+  PYTORCH: {
+    alias: 'Pytorch',
+    helperLinkDisable: true
+  },
+  HIVECLI: {
+    alias: 'HIVECLI',
+    helperLinkDisable: true
   }
-} as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }
+} as {
+  [key in TaskType]: {
+    alias: string
+    helperLinkDisable?: boolean
+    taskExecuteType?: TaskExecuteType
+  }
+}

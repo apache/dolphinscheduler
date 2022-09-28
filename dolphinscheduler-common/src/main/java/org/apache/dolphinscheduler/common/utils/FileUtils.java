@@ -17,14 +17,25 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
+import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
+import static org.apache.dolphinscheduler.common.Constants.UTF_8;
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+
 import org.apache.commons.io.IOUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.NoSuchFileException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * file utils
@@ -112,7 +123,15 @@ public class FileUtils {
         File execLocalPathFile = new File(execLocalPath);
 
         if (execLocalPathFile.exists()) {
-            org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
+            try {
+                org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
+            } catch (Exception ex) {
+                if (ex instanceof NoSuchFileException || ex.getCause() instanceof NoSuchFileException) {
+                    // this file is already be deleted.
+                } else {
+                    throw ex;
+                }
+            }
         }
 
         //create work dir

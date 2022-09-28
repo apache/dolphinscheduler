@@ -54,10 +54,12 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING == command.getType(), String.format("invalid command type : %s", command.getType()));
-        TaskExecuteRunningCommand taskExecuteRunningCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
-        logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningCommand);
+        TaskExecuteRunningCommand taskExecuteRunningMessage = JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
+        logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningMessage);
 
-        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningCommand, channel);
+        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
+                                                        channel,
+                                                        taskExecuteRunningMessage.getMessageSenderAddress());
         taskEventService.addEvent(taskEvent);
     }
 

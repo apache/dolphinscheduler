@@ -164,7 +164,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_project
-        where 1=1
+        where 1 = 1
         <if test="userId != 0">
             and user_id = #{userId}
         </if>
@@ -179,5 +179,10 @@
             and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
             union select id as project_id  from t_ds_project where user_id=#{userId})
         </if>
+    </select>
+
+    <select id="queryAllProjectForDependent" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select code, name
+        from t_ds_project
     </select>
 </mapper>

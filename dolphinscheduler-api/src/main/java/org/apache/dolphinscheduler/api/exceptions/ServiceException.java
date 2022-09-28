@@ -18,43 +18,38 @@ package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 
+import java.text.MessageFormat;
 
-/**
- * service exception
- */
+import lombok.Data;
+
+@Data
 public class ServiceException extends RuntimeException {
 
-    /**
-     * code
-     */
-    private Integer code;
+    private int code;
 
     public ServiceException() {
+        this(Status.INTERNAL_SERVER_ERROR_ARGS);
     }
 
     public ServiceException(Status status) {
-        super(status.getMsg());
-        this.code = status.getCode();
+        this(status.getCode(), status.getMsg());
     }
 
-    public ServiceException(Integer code,String message) {
-        super(message);
-        this.code = code;
+    public ServiceException(Status status, Object... formatter) {
+        this(status.getCode(), MessageFormat.format(status.getMsg(), formatter));
     }
 
     public ServiceException(String message) {
-        super(message);
+        this(Status.INTERNAL_SERVER_ERROR_ARGS, message);
     }
 
-    public ServiceException(String message, Exception cause) {
+    public ServiceException(int code, String message) {
+        this(code, message, null);
+    }
+
+    public ServiceException(int code, String message, Exception cause) {
         super(message, cause);
-    }
-
-    public Integer getCode() {
-        return this.code;
-    }
-
-    public void setCode(Integer code) {
         this.code = code;
     }
+
 }

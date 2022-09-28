@@ -155,8 +155,6 @@ public class ApiFuncIdentificationConstant {
     public static final String MONITOR_DATABASES_VIEW = "monitor:databases:view";
 
     public static final String MONITOR_STATISTICS_VIEW = "monitor:statistics:view";
-    public static final String MONITOR_EVENT_LIST_VIEW = "monitor:event:view";
-    public static final String MONITOR_ALERT_LIST_VIEW = "monitor:alert:view";
 
     public final static Map<ExecuteType,String> map = new HashMap<ExecuteType,String>();
 

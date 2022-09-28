@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -169,6 +170,30 @@ public interface ResourcesService {
     Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory);
 
     /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param loginUser user who create or update resource
+     * @param fileFullName The full name of resource.Includes path and suffix.
+     * @param desc description of resource
+     * @param content content of resource
+     * @return create result code
+     */
+    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content);
+
+    /**
+     * create or update resource.
+     * If the folder is not already created, it will be
+     *
+     * @param userName user who create or update resource
+     * @param fullName The fullname of resource.Includes path and suffix.
+     * @param description description of resource
+     * @param resourceContent content of resource
+     * @return id of resource
+     */
+    Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent);
+
+    /**
      * updateProcessInstance resource
      *
      * @param resourceId resource id
@@ -194,6 +219,15 @@ public interface ResourcesService {
      * @return unauthorized result code
      */
     Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
+
+    /**
+     * Get resource by given resource type and full name.
+     * Useful in Python API create task which need processDefinition information.
+     *
+     * @param userName user who query resource
+     * @param fullName full name of the resource
+     */
+    Resource queryResourcesFileInfo(String userName, String fullName);
 
     /**
      * unauthorized file

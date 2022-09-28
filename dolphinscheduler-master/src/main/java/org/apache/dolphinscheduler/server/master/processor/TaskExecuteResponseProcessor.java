@@ -18,9 +18,10 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -54,12 +55,22 @@ public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT == command.getType(),
+                                    String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteResponseCommand taskExecuteResponseCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteResponseCommand.class);
-        logger.info("received command : {}", taskExecuteResponseCommand);
+        TaskExecuteResultCommand taskExecuteResultMessage = JSONUtils.parseObject(command.getBody(),
+                                                                                  TaskExecuteResultCommand.class);
+        TaskEvent taskResultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
+                                                             channel,
+                                                             taskExecuteResultMessage.getMessageSenderAddress());
+        try {
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskResultEvent.getProcessInstanceId(),
+                                                        taskResultEvent.getTaskInstanceId());
+            logger.info("Received task execute result, event: {}", taskResultEvent);
 
-        TaskEvent taskResponseEvent = TaskEvent.newResultEvent(taskExecuteResponseCommand, channel);
-        taskEventService.addEvent(taskResponseEvent);
+            taskEventService.addEvent(taskResultEvent);
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        }
     }
 }

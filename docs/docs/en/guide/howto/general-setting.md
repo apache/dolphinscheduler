@@ -14,7 +14,7 @@ of to [language](#language) control button.
 
 ## Time Zone
 
-DolphinScheduler support time zone setting. 
+DolphinScheduler support time zone setting.
 
 Server Time Zone
 
@@ -26,5 +26,3 @@ User Time zone
 The user's default time zone is based on the time zone which you run the DolphinScheduler service.You could
 click the button on the right of the [language](#language) button and then click `Choose timeZone` to choose the time zone
 you want to switch. All time related components will adjust their time zone according to the time zone setting you select.
-
-

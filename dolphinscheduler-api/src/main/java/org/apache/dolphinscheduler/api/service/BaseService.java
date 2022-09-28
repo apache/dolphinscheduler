@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * base service
@@ -114,4 +114,13 @@ public interface BaseService {
      * @return map<status,startDate,endDate>
      */
     Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
+
+    /**
+     * check checkDescriptionLength
+     *
+     * @param description input String
+     * @return ture if Length acceptable, Length exceeds return false
+     */
+    boolean checkDescriptionLength(String description);
+
 }

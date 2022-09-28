@@ -17,11 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_DATA_SOURCE;
+import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -35,6 +43,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSour
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,22 +61,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_DATA_SOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * data source controller
@@ -81,7 +84,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
+     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2,"testFlag":0,"bindTestId":1}
      * @return create result code
      */
     @ApiOperation(value = "createDataSource", notes = "CREATE_DATA_SOURCE_NOTES")
@@ -90,8 +93,7 @@ public class DataSourceController extends BaseController {
     @ApiException(CREATE_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @ApiParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true)
-                                   @RequestBody String jsonStr) {
+                                   @ApiParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true) @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
         return dataSourceService.createDataSource(loginUser, dataSourceParam);
     }
@@ -102,13 +104,13 @@ public class DataSourceController extends BaseController {
      * @param loginUser login user
      * @param id        datasource id
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
+     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2,"testFlag":0,"bindTestId":1}
      * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataTypeClass = int.class),
+            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataTypeClass = BaseDataSourceParamDTO.class)
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -131,7 +133,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSource", notes = "QUERY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
 
     })
     @GetMapping(value = "/{id}")
@@ -146,7 +148,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * query datasource by type
+     * query online/testDatasource by type
      *
      * @param loginUser login user
      * @param type data source type
@@ -154,15 +156,17 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSourceList", notes = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType")
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType"),
+            @ApiImplicitParam(name = "testFlag", value = "DB_TEST_FLAG", required = true, dataType = "DbTestFlag")
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDataSourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("type") DbType type) {
-        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
+                                      @RequestParam("type") DbType type,
+                                      @RequestParam("testFlag") int testFlag) {
+        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal(), testFlag);
         return returnDataList(result);
     }
 
@@ -177,9 +181,9 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSourceListPaging", notes = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -206,15 +210,12 @@ public class DataSourceController extends BaseController {
      * @return connect result code
      */
     @ApiOperation(value = "connectDataSource", notes = "CONNECT_DATA_SOURCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO")
-    })
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CONNECT_DATASOURCE_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result connectDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestBody String jsonStr) {
+                                    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
         DataSourceUtils.checkDatasourceParam(dataSourceParam);
         ConnectionParam connectionParams = DataSourceUtils.buildConnectionParams(dataSourceParam);
@@ -230,7 +231,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "connectionTest", notes = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/{id}/connect-test")
     @ResponseStatus(HttpStatus.OK)
@@ -250,14 +251,14 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "deleteDataSource", notes = "DELETE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_DATA_SOURCE_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                         @PathVariable("id") int id) {
+                                   @PathVariable("id") int id) {
         return dataSourceService.delete(loginUser, id);
     }
 
@@ -270,15 +271,14 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "verifyDataSourceName", notes = "VERIFY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataTypeClass = String.class)
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_DATASOURCE_NAME_FAILURE)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyDataSourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "name") String name
-    ) {
+                                       @RequestParam(value = "name") String name) {
         return dataSourceService.verifyDataSourceName(name);
     }
 
@@ -291,7 +291,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "unauthDatasource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -313,7 +313,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "authedDatasource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -344,7 +344,7 @@ public class DataSourceController extends BaseController {
 
     @ApiOperation(value = "tables", notes = "GET_DATASOURCE_TABLES_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataTypeClass = int.class, example = "1")
     })
     @GetMapping(value = "/tables")
     @ResponseStatus(HttpStatus.OK)
@@ -356,15 +356,15 @@ public class DataSourceController extends BaseController {
 
     @ApiOperation(value = "tableColumns", notes = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
+            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataTypeClass = String.class, example = "test")
     })
     @GetMapping(value = "/tableColumns")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
     public Result getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
                                   @RequestParam("tableName") String tableName) {
-        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId,tableName);
+        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId, tableName);
         return returnDataList(result);
     }
 }

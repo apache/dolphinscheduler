@@ -48,8 +48,8 @@ public class ProcessScheduleTask extends QuartzJobBean {
     @Autowired
     private ProcessService processService;
 
-    @Counted(value = "quartz_job_executed")
-    @Timed(value = "quartz_job_execution", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
+    @Counted(value = "ds.master.quartz.job.executed")
+    @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     protected void executeInternal(JobExecutionContext context) {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();

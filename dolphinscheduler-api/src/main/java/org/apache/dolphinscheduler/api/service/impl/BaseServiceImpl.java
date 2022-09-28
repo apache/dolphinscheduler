@@ -17,20 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -38,6 +24,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.service.BaseService;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * base service impl
@@ -53,8 +53,8 @@ public class BaseServiceImpl implements BaseService {
         try{
             resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
         }catch (Exception e){
-            logger.error("post handle error", e);
-            throw new RuntimeException("resource association user error", e);
+            logger.error("Post handle error, userId:{}.", userId, e);
+            throw new RuntimeException("Resource association user error", e);
         }
     }
 
@@ -174,7 +174,7 @@ public class BaseServiceImpl implements BaseService {
      */
     @Override
     public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String permissionKey) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
+        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type, type.equals(AuthorizationType.PROJECTS) ? ids : null, user.getId(), permissionKey, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
     }
@@ -191,8 +191,9 @@ public class BaseServiceImpl implements BaseService {
         Map<String, Object> result = new HashMap<>();
         Date start = null;
         if (!StringUtils.isEmpty(startDateStr)) {
-            start = DateUtils.getScheduleDate(startDateStr);
+            start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
+                logger.warn("Parameter startDateStr is invalid.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
@@ -201,8 +202,9 @@ public class BaseServiceImpl implements BaseService {
 
         Date end = null;
         if (!StringUtils.isEmpty(endDateStr)) {
-            end = DateUtils.getScheduleDate(endDateStr);
+            end = DateUtils.stringToDate(endDateStr);
             if (Objects.isNull(end)) {
+                logger.warn("Parameter endDateStr is invalid.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
@@ -213,4 +215,8 @@ public class BaseServiceImpl implements BaseService {
         return result;
     }
 
+    @Override
+    public boolean checkDescriptionLength(String description) {
+        return description!=null && description.codePointCount(0, description.length()) > 255;
+    }
 }

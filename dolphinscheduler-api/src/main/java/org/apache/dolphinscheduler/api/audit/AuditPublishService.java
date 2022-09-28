@@ -63,7 +63,7 @@ public class AuditPublishService {
      */
     public void publish(AuditMessage message) {
         if (auditConfiguration.getEnabled() && !auditMessageQueue.offer(message)) {
-            logger.error("add audit message failed {}", message);
+            logger.error("Publish audit message failed, message:{}", message);
         }
     }
 
@@ -79,11 +79,11 @@ public class AuditPublishService {
                     try {
                         subscriber.execute(message);
                     } catch (Exception e) {
-                        logger.error("consume audit message {} failed, error detail {}", message, e);
+                        logger.error("Consume audit message failed, message:{}", message, e);
                     }
                 }
             } catch (InterruptedException e) {
-                logger.error("consume audit message failed {}.", message, e);
+                logger.error("Consume audit message failed, message:{}", message, e);
                 Thread.currentThread().interrupt();
                 break;
             }

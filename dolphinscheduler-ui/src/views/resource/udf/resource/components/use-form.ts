@@ -64,6 +64,15 @@ export const useForm = () => {
             return new Error(t('resource.udf.enter_name_tips'))
           }
         }
+      },
+      file: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (uploadState.uploadForm.file === '') {
+            return new Error(t('resource.file.enter_content_tips'))
+          }
+        }
       }
     } as FormRules
   })

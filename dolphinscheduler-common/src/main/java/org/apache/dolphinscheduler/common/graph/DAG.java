@@ -498,5 +498,16 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         return new AbstractMap.SimpleEntry<>(notZeroIndegreeNodeMap.size() == 0, topoResultList);
     }
 
+    @Override
+    public String toString() {
+        return "DAG{"
+            + "nodesMap="
+            + nodesMap
+            + ", edgesMap="
+            + edgesMap
+            + ", reverseEdgesMap="
+            + reverseEdgesMap
+            + '}';
+    }
 }
 

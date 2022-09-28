@@ -34,14 +34,12 @@ public interface ErrorCommandMapper extends BaseMapper<ErrorCommand> {
 
     /**
      * count command state
-     * @param userId
      * @param startTime startTime
      * @param endTime endTime
      * @param projectCodeArray projectCodeArray
      * @return CommandCount list
      */
     List<CommandCount> countCommandState(
-            @Param("userId") int userId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
             @Param("projectCodeArray") Long[] projectCodeArray);

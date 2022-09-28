@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { watch, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDeployMode, useResources, useCustomParams } from '.'
 import type { IJsonItem } from '../types'
@@ -22,80 +22,57 @@ import type { IJsonItem } from '../types'
 export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
-  const masterTypeOptions = [
-    {
-      label: 'yarn',
-      value: 'yarn'
-    },
-    {
-      label: 'local',
-      value: 'local'
-    },
-    {
-      label: 'spark://',
-      value: 'spark://'
-    },
-    {
-      label: 'mesos://',
-      value: 'mesos://'
-    }
-  ]
-
-  const queueOptions = [
-    {
-      label: 'default',
-      value: 'default'
-    }
-  ]
-
-  const masterSpan = computed(() => (model.deployMode === 'local' ? 0 : 12))
-  const queueSpan = computed(() =>
-    model.deployMode === 'local' || model.master != 'yarn' ? 0 : 12
+  const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
+  const resourceEditorSpan = computed(() => (model.useCustom ? 0 : 24))
+  const flinkSpan = computed(() => (model.engine === 'FLINK' ? 24 : 0))
+  const deployModeSpan = computed(() => (model.engine === 'SPARK' ? 24 : 0))
+  const masterSpan = computed(() =>
+    model.engine === 'SPARK' && model.deployMode !== 'local' ? 12 : 0
   )
   const masterUrlSpan = computed(() =>
-    model.deployMode === 'local' ||
-    (model.master != 'spark://' && model.master != 'mesos://')
-      ? 0
-      : 12
-  )
-
-  const baseScript = 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh'
-
-  const parseRawScript = () => {
-    if (model.rawScript) {
-      model.rawScript.split('\n').forEach((script: string) => {
-        const params = script.replace(baseScript, '').split('--')
-        params?.forEach((param: string) => {
-          const pair = param.split(' ')
-          if (pair && pair.length >= 2) {
-            if (pair[0] === 'master') {
-              const prefix = pair[1].substring(0, 8)
-              if (pair[1] && (prefix === 'mesos://' || prefix === 'spark://')) {
-                model.master = prefix
-                model.masterUrl = pair[1].substring(8, pair[1].length)
-              } else {
-                model.master = pair[1]
-              }
-            } else if (pair[0] === 'deploy-mode') {
-              model.deployMode = pair[1]
-            } else if (pair[0] === 'queue') {
-              model.queue = pair[1]
-            }
-          }
-        })
-      })
-    }
-  }
-
-  watch(
-    () => model.rawScript,
-    () => {
-      parseRawScript()
-    }
+    model.engine === 'SPARK' &&
+    model.deployMode !== 'local' &&
+    (model.master === 'SPARK' || model.master === 'MESOS')
+      ? 12
+      : 0
   )
 
   return [
-    useDeployMode(),
+    {
+      type: 'select',
+      field: 'engine',
+      span: 12,
+      name: t('project.node.engine'),
+      options: ENGINE,
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        message: t('project.node.engine_tips')
+      }
+    },
+
+    // SeaTunnel flink parameter
+    {
+      type: 'select',
+      field: 'runMode',
+      name: t('project.node.run_mode'),
+      options: FLINK_RUN_MODE,
+      value: model.runMode,
+      span: flinkSpan
+    },
+    {
+      type: 'input',
+      field: 'others',
+      name: t('project.node.option_parameters'),
+      span: flinkSpan,
+      props: {
+        type: 'textarea',
+        placeholder: t('project.node.option_parameters_tips')
+      }
+    },
+
+    // SeaTunnel spark parameter
+    useDeployMode(deployModeSpan),
     {
       type: 'select',
       field: 'master',
@@ -112,17 +89,81 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       span: masterUrlSpan,
       props: {
         placeholder: t('project.node.sea_tunnel_master_url_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: masterUrlSpan.value !== 0,
+        validator(validate: any, value: string) {
+          if (masterUrlSpan.value !== 0 && !value) {
+            return new Error(t('project.node.sea_tunnel_master_url_tips'))
+          }
+        }
       }
     },
+
+    // SeaTunnel config parameter
     {
-      type: 'select',
-      field: 'queue',
-      name: t('project.node.sea_tunnel_queue'),
-      options: queueOptions,
-      value: model.queue,
-      span: queueSpan
+      type: 'switch',
+      field: 'useCustom',
+      name: t('project.node.custom_config')
     },
-    useResources(),
+    {
+      type: 'editor',
+      field: 'rawScript',
+      name: t('project.node.script'),
+      span: configEditorSpan,
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: model.useCustom,
+        validator(validate: any, value: string) {
+          if (model.useCustom && !value) {
+            return new Error(t('project.node.script_tips'))
+          }
+        }
+      }
+    },
+    useResources(resourceEditorSpan, true, 1),
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }
+
+export const ENGINE = [
+  {
+    label: 'SPARK',
+    value: 'SPARK'
+  },
+  {
+    label: 'FLINK',
+    value: 'FLINK'
+  }
+]
+
+export const FLINK_RUN_MODE = [
+  {
+    label: 'run',
+    value: 'RUN'
+  },
+  {
+    label: 'run-application',
+    value: 'RUN_APPLICATION'
+  }
+]
+
+export const masterTypeOptions = [
+  {
+    label: 'yarn',
+    value: 'YARN'
+  },
+  {
+    label: 'local',
+    value: 'LOCAL'
+  },
+  {
+    label: 'spark://',
+    value: 'SPARK'
+  },
+  {
+    label: 'mesos://',
+    value: 'MESOS'
+  }
+]

@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,7 +29,7 @@ import org.junit.Test;
 public class TaskProcessorFactoryTest {
 
     @Test
-    public void testFactory() throws InstantiationException, IllegalAccessException {
+    public void testFactory() throws InvocationTargetException, InstantiationException, IllegalAccessException {
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("shell");

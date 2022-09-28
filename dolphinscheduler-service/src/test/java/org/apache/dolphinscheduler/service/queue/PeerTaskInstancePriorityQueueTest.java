@@ -36,6 +36,8 @@ public class PeerTaskInstancePriorityQueueTest {
         queue.put(taskInstanceHigPriority);
         queue.put(taskInstanceMediumPriority);
         Assert.assertEquals(2, queue.size());
+        Assert.assertTrue(queue.contains(taskInstanceHigPriority));
+        Assert.assertTrue(queue.contains(taskInstanceMediumPriority));
     }
 
     @Test
@@ -46,14 +48,11 @@ public class PeerTaskInstancePriorityQueueTest {
         Assert.assertTrue(queue.size() < peekBeforeLength);
     }
 
-    @Test
+
+    @Test(expected = TaskPriorityQueueException.class)
     public void poll() throws Exception {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
-        try {
-            queue.poll(1000, TimeUnit.MILLISECONDS);
-        } catch (TaskPriorityQueueException e) {
-            e.printStackTrace();
-        }
+        queue.poll(1000, TimeUnit.MILLISECONDS);
     }
 
     @Test
@@ -111,6 +110,9 @@ public class PeerTaskInstancePriorityQueueTest {
         TaskInstance taskInstanceMediumPriority = createTaskInstance("medium", Priority.MEDIUM, 1);
         queue.put(taskInstanceMediumPriority);
         Assert.assertTrue(queue.contains(taskInstanceMediumPriority));
+        TaskInstance taskInstance2 = createTaskInstance("medium2", Priority.MEDIUM, 1);
+        taskInstance2.setProcessInstanceId(2);
+        Assert.assertFalse(queue.contains(taskInstance2));
     }
 
     @Test
@@ -121,6 +123,7 @@ public class PeerTaskInstancePriorityQueueTest {
         int peekBeforeLength = queue.size();
         queue.remove(taskInstanceMediumPriority);
         Assert.assertNotEquals(peekBeforeLength, queue.size());
+        Assert.assertFalse(queue.contains(taskInstanceMediumPriority));
     }
 
     /**

@@ -86,9 +86,10 @@ public interface EnvironmentService {
     /**
      * query all environment
      *
+     * @param loginUser
      * @return all environment list
      */
-    Map<String, Object> queryAllEnvironmentList();
+    Map<String, Object> queryAllEnvironmentList(User loginUser);
 
     /**
      * verify environment name

@@ -37,8 +37,8 @@ public interface AccessTokenMapper extends BaseMapper<AccessToken> {
      * access token page
      *
      * @param page page
-     * @param userName userName
      * @param userId userId
+     * @param userName userName
      * @return access token Ipage
      */
     IPage<AccessToken> selectAccessTokenPage(Page page,

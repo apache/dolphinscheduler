@@ -45,7 +45,7 @@ provided. **Continue** refers to regardless of the status of the task running in
 failure. **End** means that once a failed task is found, Kill will also run the parallel task at the same time, and the
 process fails and ends
 
-**Complement**: Supplement historical data，Supports **interval parallel and serial** two complement methods
+**Complement**: Supplement historical data，supports **interval parallel and serial** two complement methods, and two types of date selection which include **date range** and **date enumeration**.
 
 ### 2.Module introduction
 
@@ -70,5 +70,4 @@ process fails and ends
 
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation
 ideas of the big data distributed workflow scheduling system-DolphinScheduler. To be continued
-
 

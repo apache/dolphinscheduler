@@ -11,7 +11,7 @@
 1. 登录调度系统，点击 "安全中心"，再点击左侧的 "令牌管理"，点击 "令牌管理" 创建令牌。
 
 ![create-token](../../../img/new_ui/dev/security/create-token.png)
- 
+
 2. 选择 "失效时间" (Token 有效期)，选择 "用户" (以指定的用户执行接口操作)，点击 "生成令牌" ，拷贝 Token 字符串，然后点击 "提交" 。
 
 ![token-expiration](../../../img/new_ui/dev/open-api/token_expiration.png)
@@ -22,22 +22,22 @@
 
 1. 打开 API 文档页面
 
-> 地址：http://{api server ip}:12345/dolphinscheduler/doc.html?language=zh_CN&lang=cn
+> 地址：http://{api server ip}:12345/dolphinscheduler/swagger-ui/index.html?language=zh_CN&lang=cn
 
 ![api-doc](../../../img/new_ui/dev/open-api/api_doc.png)
-    
+
 2. 选一个测试的接口，本次测试选取的接口是：查询所有项目
 
 > projects/list
 
 3. 打开 Postman，填写接口地址，并在 Headers 中填写 Token，发送请求后即可查看结果
 
-    ```
-    token: 刚刚生成的 Token
-    ```
-   
+   ```
+   token: 刚刚生成的 Token
+   ```
+
 ![api-test](../../../img/new_ui/dev/open-api/api_test.png)
- 
+
 #### 创建项目
 
 这里演示如何使用调用 api 来创建对应的项目。
@@ -63,5 +63,3 @@
 ![api-source01](../../../img/new_ui/dev/open-api/api_source01.png)
 
 ![api-source02](../../../img/new_ui/dev/open-api/api_source02.png)
-
-

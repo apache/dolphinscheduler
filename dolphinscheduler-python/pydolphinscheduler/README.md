@@ -1,20 +1,20 @@
 <!--
- Licensed to the Apache Software Foundation (ASF) under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  The ASF licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, either express or implied.  See the License for the
- specific language governing permissions and limitations
- under the License.
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
 -->
 
 # pydolphinscheduler
@@ -38,19 +38,22 @@ your workflow by python code, aka workflow-as-codes.
 
 ```shell
 # Install
-$ pip install apache-dolphinscheduler
+python -m pip install apache-dolphinscheduler
 
 # Verify installation is successful, it will show the version of apache-dolphinscheduler, here we use 0.1.0 as example
-$ pydolphinscheduler version
-0.1.0
+pydolphinscheduler version
+# 0.1.0
 ```
+
+> NOTE: package apache-dolphinscheduler not work on above Python version 3.10(including itself) in Window operating system
+> due to dependence [py4j](https://pypi.org/project/py4j/) not work on those environments.
 
 Here we show you how to install and run a simple example of pydolphinscheduler
 
 ### Start Server And Run Example
 
 Before you run an example, you have to start backend server. You could follow
-[development setup](https://dolphinscheduler.apache.org/en-us/development/development-environment-setup.html)
+[development setup](../../docs/docs/en/contribute/development-environment-setup.md)
 section "DolphinScheduler Standalone Quick Start" to set up developer environment. You have to start backend
 and frontend server in this step, which mean that you could view DolphinScheduler UI in your browser with URL
 http://localhost:12345/dolphinscheduler
@@ -68,10 +71,10 @@ python ./tutorial.py
 
 > **_NOTICE:_** Since Apache DolphinScheduler's tenant is requests while running command, you might need to change
 > tenant value in `example/tutorial.py`. For now the value is `tenant_exists`, please change it to username exists
-> in you environment. 
+> in you environment.
 
 After command execute, you could see a new project with single process definition named *tutorial* in the
-[UI-project list](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/project/project-list.html). 
+[UI-project list](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/project/project-list.html).
 
 ## Develop
 
@@ -84,4 +87,4 @@ If you are interested in how to release **PyDolphinScheduler**, you could go and
 
 ## What's more
 
-For more detail information, please go to see **PyDolphinScheduler** [document](https://dolphinscheduler.apache.org/python/index.html)
+For more detail information, please go to see **PyDolphinScheduler** latest(unreleased) [document](https://dolphinscheduler.apache.org/python/dev/index.html)

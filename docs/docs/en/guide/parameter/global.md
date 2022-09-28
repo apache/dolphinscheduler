@@ -8,6 +8,8 @@ Global parameters are parameters that are valid for all task nodes of the entire
 
 The specific use method can be determined according to the actual production situation. This example uses a shell task to print out the date value of yesterday.
 
+## Example
+
 ### Create a Shell task
 
 Create a shell task and enter `echo ${dt}` in the script content. In this case, dt is the global parameter we need to declare. As shown below:
@@ -16,7 +18,7 @@ Create a shell task and enter `echo ${dt}` in the script content. In this case, 
 
 ### Save the workflow and set global parameters
 
-You could follow this guide to set global parameter: On the workflow definition page, click the plus sign to the right of "Set Global", after filling in the variable name and value, then save it
+Set global parameter: On the workflow definition page, click the plus sign to the right of "Set Global", after filling in the variable name and value, save it.
 
 ![global-parameter02](../../../../img/new_ui/dev/parameter/global_parameter02.png)
 

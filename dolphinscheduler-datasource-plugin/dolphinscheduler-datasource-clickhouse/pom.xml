@@ -34,7 +34,6 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -64,7 +63,11 @@
                     <artifactId>jackson-core</artifactId>
                 </exclusion>
             </exclusions>
-            <version>${clickhouse.jdbc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
         </dependency>
 
         <dependency>

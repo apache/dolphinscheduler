@@ -24,9 +24,10 @@ import static com.cronutils.model.field.expression.FieldExpressionFactory.questi
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.service.corn.CronUtils;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 
-import java.text.ParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -59,15 +60,9 @@ public class CronUtilsTest {
      */
     @Test
     public void testCronAsString() {
-        Cron cron = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
-                .withYear(always())
-                .withDoW(questionMark())
-                .withMonth(always())
-                .withDoM(always())
-                .withHour(always())
-                .withMinute(every(5))
-                .withSecond(on(0))
-                .instance();
+        Cron cron = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ)).withYear(always())
+            .withDoW(questionMark()).withMonth(always()).withDoM(always()).withHour(always()).withMinute(every(5))
+            .withSecond(on(0)).instance();
         // Obtain the string expression
         String cronAsString = cron.asString();
 
@@ -78,11 +73,9 @@ public class CronUtilsTest {
 
     /**
      * cron parse test
-     *
-     * @throws ParseException if error throws ParseException
      */
     @Test
-    public void testCronParse() throws ParseException {
+    public void testCronParse() throws CronParseException {
         String strCrontab = "0 1 2 3 * ? *";
 
         Cron depCron = CronUtils.parse2Cron(strCrontab);
@@ -96,11 +89,9 @@ public class CronUtilsTest {
 
     /**
      * schedule type test
-     *
-     * @throws ParseException if error throws ParseException
      */
     @Test
-    public void testScheduleType() throws ParseException {
+    public void testScheduleType() throws CronParseException {
         CycleEnum cycleEnum = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 */1 * * * ? *"));
         Assert.assertEquals("MINUTE", cycleEnum.name());
 
@@ -129,23 +120,15 @@ public class CronUtilsTest {
      * test
      */
     @Test
-    public void test2() {
-        Cron cron1 = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
-                .withYear(always())
-                .withDoW(questionMark())
-                .withMonth(always())
-                .withDoM(always())
-                .withHour(always())
-                .withMinute(every(5))
-                .withSecond(on(0))
-                .instance();
+    public void test2() throws CronParseException {
+        Cron cron1 = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ)).withYear(always())
+            .withDoW(questionMark()).withMonth(always()).withDoM(always()).withHour(always()).withMinute(every(5))
+            .withSecond(on(0)).instance();
         // minute cycle
-        String[] cronArayy = new String[] {"* * * * * ? *", "* 0 * * * ? *",
-                "* 5 * * 3/5 ? *", "0 0 * * * ? *", "0 0 7 * 1 ? *", "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *", "0 0 7 * 1,2 ? *"};
+        String[] cronArayy =
+            new String[] {"* * * * * ? *", "* 0 * * * ? *", "* 5 * * 3/5 ? *", "0 0 * * * ? *", "0 0 7 * 1 ? *",
+                "0 0 7 * 1/1 ? *", "0 0 7 * 1-2 ? *", "0 0 7 * 1,2 ? *"};
         for (String minCrontab : cronArayy) {
-            if (!org.quartz.CronExpression.isValidExpression(minCrontab)) {
-                throw new RuntimeException(minCrontab + " verify failure, cron expression not valid");
-            }
             Cron cron = CronUtils.parse2Cron(minCrontab);
             CronField minField = cron.retrieve(CronFieldName.MINUTE);
             logger.info("minField instanceof Between:" + (minField.getExpression() instanceof Between));
@@ -166,7 +149,8 @@ public class CronUtilsTest {
             logger.info("dayOfMonthField instanceof Every:" + (dayOfMonthField.getExpression() instanceof Every));
             logger.info("dayOfMonthField instanceof On:" + (dayOfMonthField.getExpression() instanceof On));
             logger.info("dayOfMonthField instanceof And:" + (dayOfMonthField.getExpression() instanceof And));
-            logger.info("dayOfMonthField instanceof QuestionMark:" + (dayOfMonthField.getExpression() instanceof QuestionMark));
+            logger.info(
+                "dayOfMonthField instanceof QuestionMark:" + (dayOfMonthField.getExpression() instanceof QuestionMark));
 
             CronField monthField = cron.retrieve(CronFieldName.MONTH);
             logger.info("monthField instanceof Between:" + (monthField.getExpression() instanceof Between));
@@ -182,7 +166,8 @@ public class CronUtilsTest {
             logger.info("dayOfWeekField instanceof Every:" + (dayOfWeekField.getExpression() instanceof Every));
             logger.info("dayOfWeekField instanceof On:" + (dayOfWeekField.getExpression() instanceof On));
             logger.info("dayOfWeekField instanceof And:" + (dayOfWeekField.getExpression() instanceof And));
-            logger.info("dayOfWeekField instanceof QuestionMark:" + (dayOfWeekField.getExpression() instanceof QuestionMark));
+            logger.info(
+                "dayOfWeekField instanceof QuestionMark:" + (dayOfWeekField.getExpression() instanceof QuestionMark));
 
             CronField yearField = cron.retrieve(CronFieldName.YEAR);
             logger.info("yearField instanceof Between:" + (yearField.getExpression() instanceof Between));
@@ -203,27 +188,39 @@ public class CronUtilsTest {
     }
 
     @Test
-    public void getSelfFireDateList() throws ParseException {
-        Date from = DateUtils.stringToDate("2020-01-01 00:00:00");
-        Date to = DateUtils.stringToDate("2020-01-31 00:00:00");
+    public void getSelfFireDateList() throws CronParseException {
+        ZonedDateTime from =
+            ZonedDateTime.ofInstant(DateUtils.stringToDate("2020-01-01 00:00:00").toInstant(), ZoneId.systemDefault());
+        ZonedDateTime to =
+            ZonedDateTime.ofInstant(DateUtils.stringToDate("2020-01-31 00:00:00").toInstant(), ZoneId.systemDefault());
         // test date
-        Assert.assertEquals(0, CronUtils.getSelfFireDateList(to, from, "0 0 0 * * ? ").size());
-        // test error cron
-        Assert.assertEquals(0, CronUtils.getSelfFireDateList(from, to, "0 0 0 * *").size());
+        Assert.assertEquals(0, CronUtils.getFireDateList(to, from, "0 0 0 * * ? ").size());
+        try {
+            // test error cron
+            // should throw exception
+            CronUtils.getFireDateList(from, to, "0 0 0 * *").size();
+            Assert.assertTrue(false);
+        } catch (CronParseException cronParseException) {
+            Assert.assertTrue(true);
+        }
         // test cron
-        Assert.assertEquals(29, CronUtils.getSelfFireDateList(from, to, "0 0 0 * * ? ").size());
+        Assert.assertEquals(30, CronUtils.getFireDateList(from, to, "0 0 0 * * ? ").size());
         // test other
-        Assert.assertEquals(30, CronUtils.getFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? ")).size());
-        Assert.assertEquals(5, CronUtils.getSelfFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? "), 5).size());
-        from = DateUtils.stringToDate("2020-01-01 00:02:00");
-        to = DateUtils.stringToDate("2020-01-01 00:02:00");
-        Assert.assertEquals(1, CronUtils.getFireDateList(new Date(from.getTime() - 1000), to, CronUtils.parse2CronExpression("0 * * * * ? ")).size());
+        Assert.assertEquals(30, CronUtils.getFireDateList(from, to, CronUtils.parse2Cron("0 0 0 * * ? ")).size());
+        Assert.assertEquals(5, CronUtils.getSelfFireDateList(from, to, CronUtils.parse2Cron("0 0 0 * * ? "), 5).size());
+        from =
+            ZonedDateTime.ofInstant(DateUtils.stringToDate("2020-01-01 00:02:00").toInstant(), ZoneId.systemDefault());
+        to = ZonedDateTime.ofInstant(DateUtils.stringToDate("2020-01-01 00:02:00").toInstant(), ZoneId.systemDefault());
+        Assert.assertEquals(1,
+            CronUtils.getFireDateList(from.minusSeconds(1L), to, CronUtils.parse2Cron("0 * * * * ? ")).size());
 
-        from = DateUtils.stringToDate("2020-01-01 00:02:00");
-        to = DateUtils.stringToDate("2020-01-01 00:04:00");
-        Assert.assertEquals(2, CronUtils.getFireDateList(new Date(from.getTime() - 1000),
-                new Date(to.getTime() - 1000),
-                CronUtils.parse2CronExpression("0 * * * * ? ")).size());
+        from =
+            ZonedDateTime.ofInstant(DateUtils.stringToDate("2020-01-01 00:02:00").toInstant(), ZoneId.systemDefault());
+        to = ZonedDateTime.ofInstant(DateUtils.stringToDate("2020-01-01 00:04:00").toInstant(),
+            ZoneId.systemDefault());
+        Assert.assertEquals(2,
+            CronUtils.getFireDateList(from.minusSeconds(1L), to.minusSeconds(1L), CronUtils.parse2Cron("0 * * * * ? "))
+                .size());
     }
 
     @Test

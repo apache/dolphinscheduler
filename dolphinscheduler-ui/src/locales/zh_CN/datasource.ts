@@ -26,10 +26,16 @@ export default {
   datasource_parameter: '数据源参数',
   description: '描述',
   description_tips: '请输入描述',
+  test_datasource: '测试数据源',
+  online_datasource: '上线数据源',
+  bind_test_datasource: '绑定测试数据源',
   create_time: '创建时间',
   update_time: '更新时间',
   operation: '操作',
   click_to_view: '点击查看',
+  datasource_definition: '数据源定义',
+  on_line: '线上',
+  test: '测试',
   delete: '删除',
   confirm: '确定',
   delete_confirm: '删除？',
@@ -59,5 +65,9 @@ export default {
   user_name_tips: '请输入用户名',
   user_password: '密码',
   user_password_tips: '请输入密码',
-  jdbc_format_tips: 'jdbc连接参数不是一个正确的JSON格式'
+  aws_region: 'AwsRegion',
+  aws_region_tips: '请输入AwsRegion',
+  jdbc_format_tips: 'jdbc连接参数不是一个正确的JSON格式',
+  datasource_test_flag_tips: '请选择数据源定义',
+  datasource_bind_test_id_tips: '请绑定测试数据源'
 }

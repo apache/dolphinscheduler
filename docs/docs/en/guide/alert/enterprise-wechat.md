@@ -40,7 +40,6 @@ The following is the `query userId` API example:
 
 APP: https://work.weixin.qq.com/api/doc/90000/90135/90236
 
-
 ### Group Chat
 
 The Group Chat send type means to notify the alert results via group chat created by Enterprise WeChat API, sending messages to all members of the group and specified users are not supported.
@@ -66,6 +65,7 @@ The following is the `create new group chat` API and `query userId` API example:
 
 ![enterprise-wechat-create-group](../../../../img/alert/enterprise-wechat-query-userid.png)
 
-#### References
+## Reference
 
-Group Chat：https://work.weixin.qq.com/api/doc/90000/90135/90248
+- Group Chat：https://work.weixin.qq.com/api/doc/90000/90135/90248
+

@@ -1,9 +1,25 @@
-## Task Instance
+# Task Instance
 
-- Click Project Management -> Workflow -> Task Instance. Enter the task instance page, as shown in the figure below, click workflow instance name, you can jump to the workflow instance DAG chart to view the task status.
+## Batch Task Instance
 
-![task-instance](../../../../img/new_ui/dev/project/task-instance.png)
+### Create Task Instance
 
-- View log：Click the "view log" button in the operation column to view task execution log.
+Click `Project Management -> Workflow -> Task Instance` to enter the task instance page, as shown in the figure below, click the name of the workflow instance to jump to the DAG diagram of the workflow instance to view the task status.
+
+![task-instance](../../../../img/new_ui/dev/project/batch-task-instance.png)
+
+### View Log
+
+Click the `View Log` button in the operation column to view the log of the task execution
 
 ![task-log](../../../../img/new_ui/dev/project/task-log.png)
+
+## Stream Task Instance
+
+-Switch to the stream task instance page, as shown in the following figure:
+
+![task-instance](../../../../img/new_ui/dev/project/stream-task-instance.png)
+
+- SavePoint: Click the `SavePoint` button in the operation column to do stream task savepoint.
+- Stop: Click the `Stop` button in the operation column to stop the stream task.
+

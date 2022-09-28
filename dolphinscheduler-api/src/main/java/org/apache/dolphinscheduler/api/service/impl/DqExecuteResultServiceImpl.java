@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +43,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExecuteResultService {
+
+    private final Logger logger = LoggerFactory.getLogger(DqExecuteResultServiceImpl.class);
 
     @Autowired
     private DqExecuteResultMapper dqExecuteResultMapper;
@@ -66,16 +70,13 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
         Date end = null;
         try {
             if (StringUtils.isNotEmpty(startTime)) {
-                start = DateUtils.getScheduleDate(startTime);
+                start = DateUtils.stringToDate(startTime);
             }
             if (StringUtils.isNotEmpty(endTime)) {
-                end = DateUtils.getScheduleDate(endTime);
-            }
-            if(!canOperatorPermissions(loginUser,null, AuthorizationType.DATA_QUALITY,null)){
-                putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM);
-                return result;
+                end = DateUtils.stringToDate(endTime);
             }
         } catch (Exception e) {
+            logger.warn("Parameter startTime or endTime is invalid.");
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
             return result;
         }
@@ -91,7 +92,7 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
                 dqExecuteResultMapper.queryResultListPaging(
                         page,
                         searchVal,
-                        loginUser.getId(),
+                        loginUser,
                         statusArray,
                         ruleType,
                         start,
