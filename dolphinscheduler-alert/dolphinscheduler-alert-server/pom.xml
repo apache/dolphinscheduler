@@ -26,7 +26,6 @@
     <artifactId>dolphinscheduler-alert-server</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -158,4 +157,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>

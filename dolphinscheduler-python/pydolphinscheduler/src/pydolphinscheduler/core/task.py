@@ -16,7 +16,7 @@
 # under the License.
 
 """DolphinScheduler Task and TaskRelation object."""
-
+import copy
 from logging import getLogger
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
@@ -100,6 +100,17 @@ class Task(Base):
         "timeout",
     }
 
+    # task default attribute will into `task_params` property
+    _task_default_attr = {
+        "local_params",
+        "resource_list",
+        "dependence",
+        "wait_start_timeout",
+        "condition_result",
+    }
+    # task attribute ignore from _task_default_attr and will not into `task_params` property
+    _task_ignore_attr: set = set()
+    # task custom attribute define in sub class and will append to `task_params` property
     _task_custom_attr: set = set()
 
     ext: set = None
@@ -220,20 +231,24 @@ class Task(Base):
         """Set attribute condition_result."""
         self._condition_result = condition_result
 
+    def _get_attr(self) -> Set[str]:
+        """Get final task task_params attribute.
+
+        Base on `_task_default_attr`, append attribute from `_task_custom_attr` and subtract attribute from
+        `_task_ignore_attr`.
+        """
+        attr = copy.deepcopy(self._task_default_attr)
+        attr -= self._task_ignore_attr
+        attr |= self._task_custom_attr
+        return attr
+
     @property
     def task_params(self) -> Optional[Dict]:
         """Get task parameter object.
 
         Will get result to combine _task_custom_attr and custom_attr.
         """
-        custom_attr = {
-            "local_params",
-            "resource_list",
-            "dependence",
-            "wait_start_timeout",
-            "condition_result",
-        }
-        custom_attr |= self._task_custom_attr
+        custom_attr = self._get_attr()
         return self.get_define_custom(custom_attr=custom_attr)
 
     def get_plugin(self):

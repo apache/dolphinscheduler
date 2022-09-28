@@ -168,6 +168,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             start = DateUtils.stringToDate(startDate);
             end = DateUtils.stringToDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
+                logger.warn("Parameter startDate or endDate is invalid.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }

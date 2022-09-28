@@ -18,6 +18,7 @@
 task:
   universal:
     - 'SHELL'
+    - 'JAVA'
     - 'PYTHON'
     - 'PROCEDURE'
     - 'SQL'
@@ -36,8 +37,6 @@ task:
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'
-    - 'NEXT_LOOP'
-    - 'SURVEIL'
   dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'

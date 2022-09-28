@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.python;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -55,6 +57,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -89,6 +92,7 @@ public class PythonGateway {
     private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
     private static final int DEFAULT_DRY_RUN = 0;
+    private static final int DEFAULT_TEST_FLAG = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
     // We use admin user's user_id to skip some permission issue from python gateway service
     private static final int ADMIN_USER_ID = 1;
@@ -255,7 +259,7 @@ public class PythonGateway {
             processDefinitionCode = processDefinition.getCode();
         }
 
-        // Fresh process definition schedule 
+        // Fresh process definition schedule
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
@@ -357,6 +361,7 @@ public class PythonGateway {
                 null,
                 null,
                 DEFAULT_DRY_RUN,
+                DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE
         );
     }
@@ -398,7 +403,7 @@ public class PythonGateway {
 
     public Project queryProjectByName(String userName, String projectName) {
         User user = usersService.queryUser(userName);
-        return (Project) projectService.queryByName(user, projectName);
+        return (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
     }
 
     public void updateProject(String userName, Long projectCode, String projectName, String desc) {
@@ -415,9 +420,8 @@ public class PythonGateway {
         return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
     }
 
-    public Result queryTenantList(String userName, String searchVal, Integer pageNo, Integer pageSize) {
-        User user = usersService.queryUser(userName);
-        return tenantService.queryTenantList(user, searchVal, pageNo, pageSize);
+    public Tenant queryTenantByCode(String tenantCode) {
+        return (Tenant) tenantService.queryByTenantCode(tenantCode).get(Constants.DATA_LIST);
     }
 
     public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {
@@ -430,27 +434,32 @@ public class PythonGateway {
         tenantService.deleteTenantById(user, tenantId);
     }
 
-    public void createUser(String userName,
+    public User createUser(String userName,
                            String userPassword,
                            String email,
                            String phone,
                            String tenantCode,
                            String queue,
                            int state) throws IOException {
-        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
+        return usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
     }
 
     public User queryUser(int id) {
-        return usersService.queryUser(id);
+        User user = usersService.queryUser(id);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        return user;
     }
 
-    public void updateUser(String userName, String userPassword, String email, String phone, String tenantCode, String queue, int state) throws Exception {
-        usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
+    public User updateUser(String userName, String userPassword, String email, String phone, String tenantCode, String queue, int state) throws Exception {
+        return usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queue, state);
     }
 
-    public void deleteUser(String userName, int id) throws Exception {
+    public User deleteUser(String userName, int id) throws Exception {
         User user = usersService.queryUser(userName);
         usersService.deleteUserById(user, id);
+        return usersService.queryUser(userName);
     }
 
     /**
@@ -597,6 +606,10 @@ public class PythonGateway {
      */
     public Resource queryResourcesFileInfo(String userName, String fullName) {
         return resourceService.queryResourcesFileInfo(userName, fullName);
+    }
+
+    public String getGatewayVersion() {
+        return PythonGateway.class.getPackage().getImplementationVersion();
     }
 
     /**

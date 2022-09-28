@@ -183,6 +183,7 @@ public class TaskGroupServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_GROUP, null,
                 0, serviceLogger)).thenReturn(true);
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
+        Mockito.when(taskGroupMapper.updateById(taskGroup)).thenReturn(1);
         Map<String, Object> result = taskGroupService.updateTaskGroup(loginUser, 1, "newName", "desc", 100);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
