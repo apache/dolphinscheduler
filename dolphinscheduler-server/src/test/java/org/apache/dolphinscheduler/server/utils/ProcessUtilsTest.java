@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import static org.mockito.ArgumentMatchers.anyString;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -50,10 +52,9 @@ public class ProcessUtilsTest {
     public void getPidsStr() throws Exception {
         int processId = 1;
         Mockito.mockStatic(OSUtils.class);
-        Mockito.when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId))).thenReturn(null);
-        Mockito.when(OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId))).thenReturn(null);
-        String pidListMac = ProcessUtils.getPidsStr(processId);
-        Assert.assertEquals("", pidListMac);
+        Mockito.when(OSUtils.exeCmd(anyString())).thenReturn(null);
+        String pidList = ProcessUtils.getPidsStr(processId);
+        Assert.assertEquals("", pidList);
     }
 
     @Test
