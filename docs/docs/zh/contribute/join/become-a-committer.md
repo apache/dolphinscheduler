@@ -112,7 +112,7 @@ PMC成员应通过[花名册](https://whimsy.apache.org/roster/pmc/dolphinschedu
 
 1. 进入[Apache Account Utility Platform](https://id.apache.org/)，创建你的密码，设置你的个人邮箱(`Forwarding email address`)和GitHub账户(`Your GitHub Username`)。此后不久（2小时内），我们将通过电子邮件向你发出组织邀请。
 2. 如果你想使用`xxx@apache.org`电子邮件服务，请参考[这里](https://infra.apache.org/committer-email.html)。推荐使用`Gmail`，因为这种转发模式在大多数邮箱服务设置中都不容易被设置。
-3. 按照[授权的GitHub 2FA wiki](https://help.github.com/articles/configuring-two-factor-authentication-via-a-totp-mobile-app/)，在[Github](http://github.com/)上启用双因素授权（2FA）。当你将2FA设置为关闭时，它将被相应的Apache committer写权限组除名，直到你再次开启。(**注意：对待你的恢复码要像对待你的密码一样严谨！**)
+3. 按照[授权的GitHub 2FA wiki](https://docs.github.com/cn/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication)，在[Github](http://github.com/)上启用双因素授权（2FA）。当你将2FA设置为关闭时，它将被相应的Apache committer写权限组除名，直到你再次开启。(**注意：对待你的恢复码要像对待你的密码一样严谨！**)
 4. 使用[GitBox Account Linking Utility](https://gitbox.apache.org/setup/)获得Dolphinscheduler项目的写入许可。
 
 如果你想在Apache GitHub组织中公开显示，你需要到[Apache GitHub组织人员页面](https://github.com/orgs/apache/people)搜索你自己，并选择 "组织可见性 "为 "公开"。
@@ -126,7 +126,7 @@ Dolphinscheduler项目并不要求你在成为committer后继续做出贡献，�
 2. 创建并推送代码至项目中的新分支。
 3. 按照发布流程来准备一个新的版本，记住要与committer团队确认，发布版本之前与团队确认是必须要做的事情。
 
-PMC希望新的committer能够参与发布过程以及发布投票，尽管他们的投票将被视为 "+1无约束力"，熟悉发布过程是晋升为PMC成员的关键。
+PMC希望新的committer能够参与发布过程以及发布投票，尽管他们的投票将被视为"+1无约束力"，熟悉发布过程是晋升为PMC成员的关键。
 
 ## 项目管理委员会
 
@@ -142,7 +142,7 @@ PMC希望新的committer能够参与发布过程以及发布投票，尽管他�
 
 在大多数情况下，一个新的PMC成员是由committer团队提名的，但也有可能直接成为PMC成员，只要PMC同意提名并确信候选人有资格。例如，可以通过他/她曾经是Apache成员、Apache官员或其他项目的PMC成员来证明这一点。
 
-新的PMC投票过程也应遵循 新的PMC投票过程也应遵循`[讨论]`、`[投票]`和`[结果][投票]`程序，使用一个私人邮件列表，就像[新提交者的投票过程](#提名新的committer)，在发送邀请之前，PMC还必须向Apache董事会发送[NOTICE邮件](http://www.apache.org/dev/PMC.html#newPMC)；`[讨论]`、`[投票]`和`[结果][投票]`程序使用私人邮件列表，就像[新committer的投票过程](#提名新的committer)，在发送邀请之前，PMC还必须向Apache董事会发送一封[NOTICE邮件](http://www.apache.org/dev/PMC.html#newPMC)：
+新的PMC投票过程也应遵循 新的PMC投票过程也应遵循`[讨论]`、`[投票]`和`[结果][投票]`程序，使用一个私人邮件列表，就像新提交者的投票过程，在发送邀请之前，PMC还必须向Apache董事会发送NOTICE邮件；`[讨论]`、`[投票]`和`[结果][投票]`程序使用私人邮件列表，就像新committer的投票过程，在发送邀请之前，PMC还必须向Apache董事会发送一封NOTICE邮件：
 
 ```
 To: board@apache.org
