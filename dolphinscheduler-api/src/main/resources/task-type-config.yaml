@@ -37,8 +37,6 @@ task:
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'
-    - 'NEXT_LOOP'
-    - 'SURVEIL'
   dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'
