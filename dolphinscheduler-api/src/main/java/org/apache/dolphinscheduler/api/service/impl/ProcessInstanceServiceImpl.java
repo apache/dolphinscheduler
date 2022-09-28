@@ -724,7 +724,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         } else {
             logger.error("Delete process instance error, projectCode:{}, ProcessDefinitionCode{}, processInstanceId:{}.",
                     projectCode, processInstance.getProcessDefinitionCode(), processInstanceId);
-            putMsg(result, Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
             throw new ServiceException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
         }
 

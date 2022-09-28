@@ -49,6 +49,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.springframework.transaction.annotation.Transactional;
 import springfox.documentation.annotations.ApiIgnore;
 
 import org.apache.commons.lang3.StringUtils;
@@ -681,6 +682,7 @@ public class ProcessDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    @Transactional
     public Result batchDeleteProcessDefinitionByCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
@@ -700,7 +702,7 @@ public class ProcessDefinitionController extends BaseController {
         }
 
         if (!deleteFailedCodeSet.isEmpty()) {
-            putMsg(result, BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join("\n", deleteFailedCodeSet));
+            throw new ServiceException(BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR,String.join("\n", deleteFailedCodeSet));
         } else {
             putMsg(result, Status.SUCCESS);
         }
