@@ -17,15 +17,22 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_UPDATE;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
@@ -57,7 +64,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AccessTokenServiceTest {
-
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceTest.class);
 
     @InjectMocks
@@ -66,60 +73,63 @@ public class AccessTokenServiceTest {
     @Mock
     private AccessTokenMapper accessTokenMapper;
 
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
+
     @Test
     @SuppressWarnings("unchecked")
     public void testQueryAccessTokenList() {
         IPage<AccessToken> tokenPage = new Page<>();
         tokenPage.setRecords(getList());
-        tokenPage.setTotal(1L);
-        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
-
         User user = new User();
+        user.setId(1);
+        user.setUserType(UserType.ADMIN_USER);
+        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
         Result result = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
         PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.getData();
+        assertEquals(0, (int) pageInfo.getTotal());
+
+        tokenPage.setTotal(1L);
+        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
+        result = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
+        pageInfo = (PageInfo<AccessToken>) result.getData();
         logger.info(result.toString());
         Assert.assertTrue(pageInfo.getTotal() > 0);
     }
 
     @Test
     public void testQueryAccessTokenByUser() {
-        List<AccessToken> accessTokenList = Lists.newArrayList(this.getEntity());
-        Mockito.when(this.accessTokenMapper.queryAccessTokenByUser(1)).thenReturn(accessTokenList);
-
-        // USER_NO_OPERATION_PERM
         User user = this.getLoginUser();
-        user.setUserType(UserType.GENERAL_USER);
+        user.setUserType(UserType.ADMIN_USER);
+        List<AccessToken> accessTokenList = Lists.newArrayList(this.getEntity());
+        Mockito.when(this.accessTokenMapper.queryAccessTokenByUser(Mockito.anyInt())).thenReturn(accessTokenList);
         Map<String, Object> result = this.accessTokenService.queryAccessTokenByUser(user, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-
-        // SUCCESS
-        user.setUserType(UserType.ADMIN_USER);
-        result = this.accessTokenService.queryAccessTokenByUser(user, 1);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testCreateToken() {
         // Given Token
         when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
-        Map<String, Object> result = accessTokenService.createToken(getLoginUser(), 1, getDate(), "AccessTokenServiceTest");
+        Result result = accessTokenService.createToken(getLoginUser(), 1, getDate(), "AccessTokenServiceTest");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
         // Token is absent
         result = this.accessTokenService.createToken(getLoginUser(), 1, getDate(), null);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testGenerateToken() {
-
+        User user = new User();
+        user.setId(1);
+        user.setUserType(UserType.ADMIN_USER);
         Map<String, Object> result = accessTokenService.generateToken(getLoginUser(), Integer.MAX_VALUE,getDate());
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         String token = (String) result.get(Constants.DATA_LIST);
         Assert.assertNotNull(token);
     }
@@ -129,41 +139,53 @@ public class AccessTokenServiceTest {
 
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
         User userLogin = new User();
+        userLogin.setId(1);
+        userLogin.setUserType(UserType.ADMIN_USER);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1, ACCESS_TOKEN_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         // not exist
         Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin, 0);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST, result.get(Constants.STATUS));
+        assertEquals(Status.ACCESS_TOKEN_NOT_EXIST, result.get(Constants.STATUS));
         // no operate
+        userLogin.setId(2);
         result = accessTokenService.delAccessTokenById(userLogin, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         //success
         userLogin.setId(1);
         userLogin.setUserType(UserType.ADMIN_USER);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         result = accessTokenService.delAccessTokenById(userLogin, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testUpdateToken() {
+        User user = new User();
+        user.setId(1);
+        user.setUserType(UserType.ADMIN_USER);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1, ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         // Given Token
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
         Map<String, Object> result = accessTokenService.updateToken(getLoginUser(), 1,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         Assert.assertNotNull(result.get(Constants.DATA_LIST));
 
         // Token is absent
         result = accessTokenService.updateToken(getLoginUser(), 1, Integer.MAX_VALUE,getDate(),null);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         Assert.assertNotNull(result.get(Constants.DATA_LIST));
 
         // ACCESS_TOKEN_NOT_EXIST
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0, baseServiceLogger)).thenReturn(true);
         result = accessTokenService.updateToken(getLoginUser(), 2,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
-        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST, result.get(Constants.STATUS));
+        assertEquals(Status.ACCESS_TOKEN_NOT_EXIST, result.get(Constants.STATUS));
     }
 
     private User getLoginUser() {

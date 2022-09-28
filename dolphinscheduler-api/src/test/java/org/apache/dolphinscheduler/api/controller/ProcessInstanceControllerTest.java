@@ -17,23 +17,15 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -43,6 +35,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * process instance controller test
@@ -58,13 +56,14 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         mockResult.setCode(Status.SUCCESS.getCode());
         PowerMockito.when(processInstanceService
                 .queryProcessInstanceList(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(),
-                        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                        Mockito.any(), Mockito.any()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processDefineCode", "91");
         paramsMap.add("searchVal", "cxc");
-        paramsMap.add("stateType", String.valueOf(ExecutionStatus.SUCCESS));
+        paramsMap.add("stateType", WorkflowExecutionStatus.SUCCESS.name());
         paramsMap.add("host", "192.168.1.13");
         paramsMap.add("startDate", "2019-12-15 00:00:00");
         paramsMap.add("endDate", "2019-12-16 00:00:00");
@@ -86,7 +85,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testQueryTaskListByProcessId() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.PROJECT_NOT_FOUND);
-        PowerMockito.when(processInstanceService.queryTaskListByProcessId(Mockito.any(), Mockito.anyLong(), Mockito.any()))
+        PowerMockito
+                .when(processInstanceService.queryTaskListByProcessId(Mockito.any(), Mockito.anyLong(), Mockito.any()))
                 .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}/tasks", "1113", "123")
@@ -105,12 +105,15 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         PowerMockito.when(processInstanceService
-                .updateProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyInt(), Mockito.anyString())).thenReturn(mockResult);
+                .updateProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+                .thenReturn(mockResult);
 
-        String json = "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
-                + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
-                + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
+        String json =
+                "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
+                        + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
+                        + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
 
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
@@ -138,7 +141,9 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testQueryProcessInstanceById() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(processInstanceService.queryProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
+        PowerMockito.when(
+                processInstanceService.queryProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
@@ -154,11 +159,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.TASK_INSTANCE_NOT_EXISTS);
-        PowerMockito.when(processInstanceService.querySubProcessInstanceByTaskId(Mockito.any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
+        PowerMockito.when(processInstanceService.querySubProcessInstanceByTaskId(Mockito.any(), Mockito.anyLong(),
+                Mockito.anyInt())).thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/query-sub-by-parent", "1113")
-                .header(SESSION_ID, sessionId)
-                .param("taskId", "1203"))
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-instances/query-sub-by-parent", "1113")
+                        .header(SESSION_ID, sessionId)
+                        .param("taskId", "1203"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -172,11 +179,14 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testQueryParentInstanceBySubId() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE);
-        PowerMockito.when(processInstanceService.queryParentInstanceBySubId(Mockito.any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
+        PowerMockito.when(
+                processInstanceService.queryParentInstanceBySubId(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/query-parent-by-sub", "1113")
-                .header(SESSION_ID, sessionId)
-                .param("subId", "1204"))
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-instances/query-parent-by-sub", "1113")
+                        .header(SESSION_ID, sessionId)
+                        .param("subId", "1204"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -190,9 +200,10 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testViewVariables() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(processInstanceService.viewVariables(1113L,123)).thenReturn(mockResult);
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}/view-variables", "1113", "123")
-                .header(SESSION_ID, sessionId))
+        PowerMockito.when(processInstanceService.viewVariables(1113L, 123)).thenReturn(mockResult);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-instances/{id}/view-variables", "1113", "123")
+                        .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -205,7 +216,9 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     public void testDeleteProcessInstanceById() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(processInstanceService.deleteProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
+        PowerMockito.when(
+                processInstanceService.deleteProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/process-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId))
@@ -223,7 +236,9 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.PROCESS_INSTANCE_NOT_EXIST);
 
-        PowerMockito.when(processInstanceService.deleteProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
+        PowerMockito.when(
+                processInstanceService.deleteProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/process-instances/batch-delete", "1113")
                 .header(SESSION_ID, sessionId)
                 .param("processInstanceIds", "1205,1206"))

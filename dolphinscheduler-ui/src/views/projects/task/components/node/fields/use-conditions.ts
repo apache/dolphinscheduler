@@ -121,7 +121,7 @@ export function useConditions(model: { [field: string]: any }): IJsonItem[] {
         ]
       },
       childrenField: 'dependItemList',
-      name: 'custom_parameters'
+      name: 'add_pre_task_check_condition'
     })
   ]
 }

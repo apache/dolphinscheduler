@@ -25,6 +25,7 @@ import * as echarts from 'echarts'
 import 'echarts/theme/macarons'
 import 'echarts/theme/dark-bold'
 import './assets/styles/default.scss'
+import trim from './utils/trim'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -32,6 +33,7 @@ const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
 app.config.globalProperties.echarts = echarts
+app.config.globalProperties.trim = trim
 
 app.use(router)
 app.use(pinia)

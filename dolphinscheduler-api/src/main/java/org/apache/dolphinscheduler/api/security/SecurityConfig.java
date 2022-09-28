@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.security;
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,5 +71,9 @@ public class SecurityConfig {
         }
         beanFactory.autowireBean(authenticator);
         return authenticator;
+    }
+
+    public String getType() {
+        return type;
     }
 }

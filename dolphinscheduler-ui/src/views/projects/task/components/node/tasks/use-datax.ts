@@ -42,40 +42,30 @@ export function useDataX({
     failRetryInterval: 1,
     failRetryTimes: 0,
     workerGroup: 'default',
+    cpuQuota: -1,
+    memoryMax: -1,
     delayTime: 0,
     timeout: 30,
     customConfig: false,
     dsType: 'MYSQL',
     dtType: 'MYSQL',
     preStatements: [],
-    postStatements: []
+    postStatements: [],
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !model.id),
+      Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
+      ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
       ...Fields.useDataX(model),

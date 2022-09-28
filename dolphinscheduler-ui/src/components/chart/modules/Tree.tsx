@@ -62,7 +62,7 @@ const TreeChart = defineComponent({
           symbolSize: 18,
           edgeShape: 'polyline',
           edgeForkPosition: '63%',
-          initialTreeDepth: 3,
+          initialTreeDepth: 'auto',
           lineStyle: {
             width: 3
           },

@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM openjdk:8-jre-slim-buster
+FROM openjdk:8-jre-slim-bullseye
 
 ENV DOCKER true
 ENV TZ Asia/Shanghai
@@ -27,6 +27,7 @@ RUN apt update ; \
 
 WORKDIR $DOLPHINSCHEDULER_HOME
 
-ADD ./target/tools $DOLPHINSCHEDULER_HOME
+# see doc: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/upgrade.html
+ADD ./target/tools $DOLPHINSCHEDULER_HOME/tools
 
 ENTRYPOINT [ "/bin/bash" ]

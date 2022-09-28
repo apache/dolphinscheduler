@@ -19,11 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lombok.NonNull;
 
 public final class ProcessUtils {
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
@@ -46,13 +50,13 @@ public final class ProcessUtils {
     /**
      * kill tasks according to different task types.
      */
-    public static void kill(TaskExecutionContext request) {
+    public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
+            logger.info("Begin kill task instance, processId: {}", request.getProcessId());
             int processId = request.getProcessId();
             if (processId == 0) {
-                logger.error("process kill failed, process id :{}, task id:{}",
-                        processId, request.getTaskInstanceId());
-                return;
+                logger.error("Task instance kill failed, processId is not exist");
+                return false;
             }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
@@ -60,8 +64,11 @@ public final class ProcessUtils {
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
+            logger.info("Success kill task instance, processId: {}", request.getProcessId());
+            return true;
         } catch (Exception e) {
-            logger.error("kill task failed", e);
+            logger.error("Kill task instance error, processId: {}", request.getProcessId(), e);
+            return false;
         }
     }
 
@@ -76,7 +83,7 @@ public final class ProcessUtils {
         StringBuilder sb = new StringBuilder();
         Matcher mat = null;
         // pstree pid get sub pids
-        if (OSUtils.isMacOS()) {
+        if (SystemUtils.IS_OS_MAC) {
             String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
             if (null != pids) {
                 mat = MACPATTERN.matcher(pids);

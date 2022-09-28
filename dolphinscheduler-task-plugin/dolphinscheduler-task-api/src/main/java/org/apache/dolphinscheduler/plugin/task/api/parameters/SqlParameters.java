@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -25,11 +26,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +45,7 @@ import com.google.common.base.Strings;
  * Sql/Hql parameter
  */
 public class SqlParameters extends AbstractParameters {
+
     /**
      * data source type，eg  MYSQL, POSTGRES, HIVE ...
      */
@@ -112,15 +113,6 @@ public class SqlParameters extends AbstractParameters {
     private String title;
 
     private int limit;
-
-    /**
-     * segment separator
-     *
-     * <p>The segment separator is used
-     * when the data source does not support multi-segment SQL execution,
-     * and the client needs to split the SQL and execute it multiple times.</p>
-     */
-    private String segmentSeparator;
 
     public int getLimit() {
         return limit;
@@ -234,14 +226,6 @@ public class SqlParameters extends AbstractParameters {
         this.groupId = groupId;
     }
 
-    public String getSegmentSeparator() {
-        return segmentSeparator;
-    }
-
-    public void setSegmentSeparator(String segmentSeparator) {
-        this.segmentSeparator = segmentSeparator;
-    }
-
     @Override
     public boolean checkParameters() {
         return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
@@ -269,10 +253,10 @@ public class SqlParameters extends AbstractParameters {
         if (CollectionUtils.isEmpty(sqlResult)) {
             return;
         }
-        //if sql return more than one line
+        // if sql return more than one line
         if (sqlResult.size() > 1) {
             Map<String, List<String>> sqlResultFormat = new HashMap<>();
-            //init sqlResultFormat
+            // init sqlResultFormat
             Set<String> keySet = sqlResult.get(0).keySet();
             for (String key : keySet) {
                 sqlResultFormat.put(key, new ArrayList<>());
@@ -289,7 +273,7 @@ public class SqlParameters extends AbstractParameters {
                 }
             }
         } else {
-            //result only one line
+            // result only one line
             Map<String, String> firstRow = sqlResult.get(0);
             for (Property info : outProperty) {
                 info.setValue(String.valueOf(firstRow.get(info.getProp())));
@@ -309,7 +293,6 @@ public class SqlParameters extends AbstractParameters {
                 + ", sendEmail=" + sendEmail
                 + ", displayRows=" + displayRows
                 + ", limit=" + limit
-                + ", segmentSeparator=" + segmentSeparator
                 + ", udfs='" + udfs + '\''
                 + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''
@@ -346,7 +329,8 @@ public class SqlParameters extends AbstractParameters {
     public SQLTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
 
-        DataSourceParameters dbSource = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
+        DataSourceParameters dbSource =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
         sqlTaskExecutionContext.setConnectionParams(dbSource.getConnectionParams());
 
         // whether udf type
@@ -354,7 +338,8 @@ public class SqlParameters extends AbstractParameters {
                 && !StringUtils.isEmpty(this.getUdfs());
 
         if (udfTypeFlag) {
-            List<UdfFuncParameters> collect = parametersHelper.getResourceMap(ResourceType.UDF).entrySet().stream().map(entry -> (UdfFuncParameters) entry.getValue()).collect(Collectors.toList());
+            List<UdfFuncParameters> collect = parametersHelper.getResourceMap(ResourceType.UDF).entrySet().stream()
+                    .map(entry -> (UdfFuncParameters) entry.getValue()).collect(Collectors.toList());
             sqlTaskExecutionContext.setUdfFuncParametersList(collect);
         }
 

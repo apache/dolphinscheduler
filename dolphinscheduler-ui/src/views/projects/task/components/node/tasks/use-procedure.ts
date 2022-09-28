@@ -46,32 +46,19 @@ export function useProcedure({
     timeout: 30,
     type: data?.taskParams?.type ? data?.taskParams?.type : 'MYSQL',
     datasource: data?.taskParams?.datasource,
-    method: data?.taskParams?.method
+    method: data?.taskParams?.method,
+    timeoutNotifyStrategy: ['WARN']
   } as INodeData)
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !model.id),
+      Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(model),

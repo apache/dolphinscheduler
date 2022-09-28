@@ -19,21 +19,21 @@ DolphinScheduler 中所涉及的参数值的定义可能来自三种类型：
 
 1：先以 shell 节点解释第一种情况
 
-<img src="/img/globalParam/image-20210723102938239.png" alt="image-20210723102938239" style="zoom:50%;" />
+![priority-parameter01](../../../../img/new_ui/dev/parameter/priority_parameter01.png)
 
 节点 【useParam】可以使用到节点【createParam】中设置的变量。而节点 【useParam】与节点【noUseParam】中并没有依赖关系，所以并不会获取到节点【noUseParam】的变量。上图中只是以 shell 节点作为例子，其他类型节点具有相同的使用规则。
 
-<img src="/img/globalParam/image-20210723103316896.png" alt="image-20210723103316896" style="zoom:50%;" />
+![priority-parameter02](../../../../img/new_ui/dev/parameter/priority_parameter02.png)
 
 其中节点【createParam】在使用变量时直接使用即可。另外该节点设置了 "key" 和 "key1" 两个变量，这里用户用定义了一个与上游节点传递的变量名相同的变量 key1，并且赋值为 "12"，但是由于我们设置的优先级的关系，这里的值 "12" 会被使用，最终上游节点设置的变量值会被抛弃。
 
 2：我们再以 sql 节点来解释另外一种情况
 
-<img src="/img/globalParam/image-20210723103937052.png" alt="image-20210723103937052" style="zoom:50%;" />
+![priority-parameter03](../../../../img/new_ui/dev/parameter/priority_parameter03.png)
 
 节点【use_create】的定义如下：
 
-![image-20210723104411489](/img/globalParam/image-20210723104411489.png)
+![priority-parameter04](../../../../img/new_ui/dev/parameter/priority_parameter04.png)
 
 "status" 是当前节点设置的节点的自有变量。但是用户在保存工作流时也同样设置了 "status" 变量（全局参数），并且赋值为 -1。那在该 SQL 执行时，status 的值为优先级更高的 2。抛弃了全局变量中的值。
 

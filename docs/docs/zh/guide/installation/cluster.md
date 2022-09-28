@@ -14,7 +14,7 @@
 
 ### 修改相关配置
 
-这个是与[伪集群部署](pseudo-cluster.md)差异较大的一步，因为部署脚本会通过 `scp` 的方式将安装需要的资源传输到各个机器上，所以这一步我们仅需要修改运行`install.sh`脚本的所在机器的配置即可。配置文件在路径在`conf/config/install_config.conf`下，此处我们仅需修改**INSTALL MACHINE**，**DolphinScheduler ENV、Database、Registry Server**与伪集群部署保持一致，下面对必须修改参数进行说明
+这个是与[伪集群部署](pseudo-cluster.md)差异较大的一步，因为部署脚本会通过 `scp` 的方式将安装需要的资源传输到各个机器上，所以这一步我们仅需要修改运行`install.sh`脚本的所在机器的配置即可。配置文件在路径在`bin/env/install_env.sh`下，此处我们仅需修改**INSTALL MACHINE**，**DolphinScheduler ENV、Database、Registry Server**与伪集群部署保持一致，下面对必须修改参数进行说明
 
 ```shell
 # ---------------------------------------------------------

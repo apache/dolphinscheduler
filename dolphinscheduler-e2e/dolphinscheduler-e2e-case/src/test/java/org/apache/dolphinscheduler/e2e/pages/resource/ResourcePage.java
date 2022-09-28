@@ -35,10 +35,10 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content")
     private WebElement fileManageTab;
 
-    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(1) > .n-menu-item-content")
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) > .n-submenu-children > .n-menu-item:nth-of-type(1) > .n-menu-item-content")
     private WebElement udfManageTab;
 
-    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) > .n-submenu-children > .n-menu-item:nth-of-type(2) > .n-menu-item-content")
     private WebElement functionManageTab;
 
     public ResourcePage(RemoteWebDriver driver) {

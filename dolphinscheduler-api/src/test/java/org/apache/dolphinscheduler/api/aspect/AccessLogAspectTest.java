@@ -36,7 +36,6 @@ public class AccessLogAspectTest {
         String actual = accessLogAspect.handleSensitiveData(data);
 
         Assert.assertEquals(expected, actual);
-
     }
 
 }

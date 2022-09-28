@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +30,7 @@ public class SparkParametersTest {
     @Test
     public void getResourceFilesList() {
         SparkParameters sparkParameters = new SparkParameters();
-        Assert.assertTrue(CollectionUtils.isEmpty(sparkParameters.getResourceFilesList()));
+        Assert.assertTrue(sparkParameters.getResourceFilesList().isEmpty());
 
         ResourceInfo mainResource = new ResourceInfo();
         mainResource.setRes("testSparkMain-1.0.0-SNAPSHOT.jar\"");

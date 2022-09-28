@@ -20,64 +20,22 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NonNull;
 
 /**
- * task instance key, processInstanceId
+ * Used to identify a task instance.
  */
+@Data
+@AllArgsConstructor
 public class TaskInstanceKey {
-    private int processInstanceId;
-    private long taskCode;
-    private int taskVersion;
+    private final int processInstanceId;
+    private final long taskCode;
+    private final int taskVersion;
 
-    public TaskInstanceKey(int processInstanceId, long taskCode, int taskVersion) {
-        this.processInstanceId = processInstanceId;
-        this.taskCode = taskCode;
-        this.taskVersion = taskVersion;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public long getTaskCode() {
-        return taskCode;
-    }
-
-    public int getTaskVersion() {
-        return taskVersion;
-    }
-
-    public static TaskInstanceKey getTaskInstanceKey(ProcessInstance processInstance, TaskInstance taskInstance) {
-        if (processInstance == null || taskInstance == null) {
-            return null;
-        }
+    public static TaskInstanceKey getTaskInstanceKey(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         return new TaskInstanceKey(processInstance.getId(), taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
     }
 
-    @Override
-    public String toString() {
-        return "TaskKey{"
-                + "processInstanceId=" + processInstanceId
-                + ", taskCode=" + taskCode
-                + ", taskVersion=" + taskVersion
-                + '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TaskInstanceKey taskInstanceKey = (TaskInstanceKey) o;
-        return processInstanceId == taskInstanceKey.processInstanceId && taskCode == taskInstanceKey.taskCode && taskVersion == taskInstanceKey.taskVersion;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(processInstanceId, taskCode, taskVersion);
-    }
 }

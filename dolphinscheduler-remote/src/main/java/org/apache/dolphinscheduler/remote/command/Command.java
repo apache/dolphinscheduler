@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
 import java.io.Serializable;
@@ -24,6 +25,8 @@ import java.util.concurrent.atomic.AtomicLong;
  *  for netty data serializable transfer
  */
 public class Command implements Serializable {
+
+    private static final long serialVersionUID = -1L;
 
     private static final AtomicLong REQUEST_ID = new AtomicLong(1);
 

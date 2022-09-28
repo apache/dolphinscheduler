@@ -88,4 +88,34 @@ public class FileUtilsTest {
         Assert.assertEquals(content, fileContent);
     }
 
+    @Test
+    public void testDirectoryTraversal() {
+        // test case which do not directory traversal
+        String path;
+        path = "abc.txt";
+        Assert.assertFalse(FileUtils.directoryTraversal(path));
+
+        path = "abc...txt";
+        Assert.assertFalse(FileUtils.directoryTraversal(path));
+
+        path = "..abc.txt";
+        Assert.assertFalse(FileUtils.directoryTraversal(path));
+
+        // test case which will directory traversal
+        path = "../abc.txt";
+        Assert.assertTrue(FileUtils.directoryTraversal(path));
+
+        path = "../../abc.txt";
+        Assert.assertTrue(FileUtils.directoryTraversal(path));
+
+        path = "abc../def.txt";
+        Assert.assertTrue(FileUtils.directoryTraversal(path));
+
+        path = "abc./def.txt";
+        Assert.assertTrue(FileUtils.directoryTraversal(path));
+
+        path = "abc/def...txt";
+        Assert.assertTrue(FileUtils.directoryTraversal(path));
+    }
+
 }

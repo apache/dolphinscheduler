@@ -21,23 +21,22 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  *  kill task request command
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskKillRequestCommand implements Serializable {
 
     /**
      *  task id
      */
     private int taskInstanceId;
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
 
     /**
      *  package request command
@@ -50,12 +49,5 @@ public class TaskKillRequestCommand implements Serializable {
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskKillRequestCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + '}';
     }
 }

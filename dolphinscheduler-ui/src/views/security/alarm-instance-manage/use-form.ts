@@ -72,12 +72,16 @@ export function useForm() {
   const getUiPluginsByType = async () => {
     if (state.pluginsLoading) return
     state.pluginsLoading = true
-    const plugins = await queryUiPluginsByType({ pluginType: 'ALERT' })
-    state.uiPlugins = plugins.map((plugin: IPlugin) => ({
-      label: plugin.pluginName,
-      value: plugin.id
-    }))
-    state.pluginsLoading = false
+    try {
+      const plugins = await queryUiPluginsByType({ pluginType: 'ALERT' })
+      state.uiPlugins = plugins.map((plugin: IPlugin) => ({
+        label: plugin.pluginName,
+        value: plugin.id
+      }))
+      state.pluginsLoading = false
+    } catch (e) {
+      state.pluginsLoading = false
+    }
   }
 
   const changePlugin = async (pluginId: IPluginId) => {

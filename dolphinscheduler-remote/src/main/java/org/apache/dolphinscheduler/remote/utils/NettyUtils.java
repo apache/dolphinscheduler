@@ -33,27 +33,15 @@ public class NettyUtils {
     private NettyUtils() {
     }
 
-    public static boolean useEpoll() {
-        String osName = Constants.OS_NAME;
-        if (!osName.toLowerCase().contains("linux")) {
-            return false;
-        }
-        if (!Epoll.isAvailable()) {
-            return false;
-        }
-        String enableNettyEpoll = Constants.NETTY_EPOLL_ENABLE;
-        return Boolean.parseBoolean(enableNettyEpoll);
-    }
-
     public static Class<? extends ServerSocketChannel> getServerSocketChannelClass() {
-        if (useEpoll()) {
+        if (Epoll.isAvailable()) {
             return EpollServerSocketChannel.class;
         }
         return NioServerSocketChannel.class;
     }
 
     public static Class<? extends SocketChannel> getSocketChannelClass() {
-        if (useEpoll()) {
+        if (Epoll.isAvailable()) {
             return EpollSocketChannel.class;
         }
         return NioSocketChannel.class;

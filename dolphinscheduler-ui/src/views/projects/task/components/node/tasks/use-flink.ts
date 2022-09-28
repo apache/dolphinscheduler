@@ -52,27 +52,14 @@ export function useFlink({
     taskManagerMemory: '2G',
     slot: 1,
     taskManager: 2,
-    parallelism: 1
+    parallelism: 1,
+    timeoutNotifyStrategy: ['WARN']
   })
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
       Fields.useDescription(),
       Fields.useTaskPriority(),

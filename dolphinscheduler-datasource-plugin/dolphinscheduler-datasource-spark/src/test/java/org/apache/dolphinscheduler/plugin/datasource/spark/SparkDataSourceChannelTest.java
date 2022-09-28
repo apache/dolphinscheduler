@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.spark;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.spark.param.SparkConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

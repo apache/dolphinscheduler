@@ -35,14 +35,6 @@ export default defineConfig({
       deleteOriginFile: false
     })
   ],
-  build: {
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    }
-  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

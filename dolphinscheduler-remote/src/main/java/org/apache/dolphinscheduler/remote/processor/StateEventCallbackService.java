@@ -17,13 +17,16 @@
 
 package org.apache.dolphinscheduler.remote.processor;
 
+import static org.apache.dolphinscheduler.common.Constants.HTTP_CONNECTION_REQUEST_TIMEOUT;
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -71,22 +74,22 @@ public class StateEventCallbackService {
      * @param host
      * @return callback channel
      */
-    private NettyRemoteChannel newRemoteChannel(Host host) {
+    private Optional<NettyRemoteChannel> newRemoteChannel(Host host) {
         Channel newChannel;
         NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(host.getAddress());
         if (nettyRemoteChannel != null) {
             if (nettyRemoteChannel.isActive()) {
-                return nettyRemoteChannel;
+                return Optional.of(nettyRemoteChannel);
             }
         }
         newChannel = nettyRemotingClient.getChannel(host);
         if (newChannel != null) {
-            return newRemoteChannel(newChannel, host.getAddress());
+            return Optional.of(newRemoteChannel(newChannel, host.getAddress()));
         }
-        return null;
+        return Optional.empty();
     }
 
-    public int pause(int ntries) {
+    public long pause(int ntries) {
         return SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
     }
 
@@ -110,16 +113,38 @@ public class StateEventCallbackService {
     }
 
     /**
-     * send result
+     * Send the command to target host, this method doesn't guarantee the command send success.
      *
-     * @param command command
+     * @param host    target host
+     * @param command command need to send
      */
-    public void sendResult(String address, int port, Command command) {
-        logger.info("send result, host:{}, command:{}", address, command.toString());
-        Host host = new Host(address, port);
-        NettyRemoteChannel nettyRemoteChannel = newRemoteChannel(host);
-        if (nettyRemoteChannel != null) {
+    public void sendResult(Host host, Command command) {
+        logger.info("send result, host:{}, command:{}", host.getAddress(), command.toString());
+        newRemoteChannel(host).ifPresent(nettyRemoteChannel -> {
             nettyRemoteChannel.writeAndFlush(command);
+        });
+    }
+
+    /**
+     * send sync and return response command
+     * @param host
+     * @param requestCommand
+     * @return
+     * @throws RemotingException
+     * @throws InterruptedException
+     */
+    public Command sendSync(Host host, Command requestCommand) {
+        try {
+            return this.nettyRemotingClient.sendSync(host, requestCommand, HTTP_CONNECTION_REQUEST_TIMEOUT);
+        } catch (InterruptedException e) {
+            logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
+            Thread.currentThread().interrupt();
+        } catch (RemotingException e) {
+            logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
         }
+        finally {
+            this.nettyRemotingClient.closeChannel(host);
+        }
+        return null;
     }
 }

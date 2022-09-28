@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.spi.datasource;
 
-public interface DataSourceChannelFactory {
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
+import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
+
+public interface DataSourceChannelFactory extends PrioritySPI {
     /**
      * get datasource client
      */
@@ -27,4 +30,9 @@ public interface DataSourceChannelFactory {
      * get registry component name
      */
     String getName();
+
+    @Override
+    default SPIIdentify getIdentify() {
+        return SPIIdentify.builder().name(getName()).build();
+    }
 }

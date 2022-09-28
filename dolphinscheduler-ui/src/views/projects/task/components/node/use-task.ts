@@ -18,6 +18,7 @@ import { ref, Ref, unref } from 'vue'
 import nodes from './tasks'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import { useTaskNodeStore } from '@/store/project/task-node'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import type {
   IFormItem,
   IJsonItem,
@@ -66,6 +67,8 @@ export function useTask({
   jsonRef.value = json
   model.preTasks = taskStore.getPreTasks
   model.name = taskStore.getName
+  model.taskExecuteType =
+    TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType || 'BATCH'
 
   const getElements = () => {
     const { rules, elements } = getElementByJson(jsonRef.value, model)

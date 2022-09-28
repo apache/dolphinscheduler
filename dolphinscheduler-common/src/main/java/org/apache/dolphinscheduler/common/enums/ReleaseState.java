@@ -26,7 +26,7 @@ public enum ReleaseState {
 
     /**
      * 0 offline
-     * 1 on line
+     * 1 online
      */
     OFFLINE(0, "offline"),
     ONLINE(1, "online");

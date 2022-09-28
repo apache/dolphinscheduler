@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, onMounted } from 'vue'
+import {
+  defineComponent,
+  PropType,
+  toRefs,
+  onMounted,
+  getCurrentInstance
+} from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
@@ -63,7 +69,9 @@ const FormModal = defineComponent({
       emit('cancel')
     }
 
-    return { ...toRefs(state), t, onConfirm, onCancel }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
+    return { ...toRefs(state), t, onConfirm, onCancel, trim }
   },
   render() {
     const { t, onConfirm, onCancel, show } = this
@@ -80,7 +88,10 @@ const FormModal = defineComponent({
             label={t('resource.task_group_queue.priority')}
             path='priority'
           >
-            <NInput v-model:value={this.formData.priority} />
+            <NInput
+              allowInput={this.trim}
+              v-model:value={this.formData.priority}
+            />
           </NFormItem>
         </NForm>
       </Modal>

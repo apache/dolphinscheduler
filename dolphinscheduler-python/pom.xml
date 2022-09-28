@@ -92,6 +92,37 @@
                                     </arguments>
                                 </configuration>
                             </execution>
+                            <!-- Rename Python dist package to avoid confusion with dolphinscheduler main package -->
+                            <execution>
+                                <id>python-pkg-rename-tar</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <argument>mv dist/apache-dolphinscheduler-*.tar.gz dist/apache-dolphinscheduler-python-${project.version}.tar.gz</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>python-pkg-rename-whl</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <workingDirectory>${project.basedir}/pydolphinscheduler</workingDirectory>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <argument>mv dist/apache_dolphinscheduler-*py3-none-any.whl dist/apache_dolphinscheduler-python-${project.version}-py3-none-any.whl</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>sign-source</id>
                                 <phase>prepare-package</phase>

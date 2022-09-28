@@ -79,6 +79,10 @@ public class CommonGenerator {
             if (sqoopParameters.getConcurrency() > 0) {
                 commonSb.append(SPACE).append(SqoopConstants.SQOOP_PARALLELISM)
                     .append(SPACE).append(sqoopParameters.getConcurrency());
+                if (sqoopParameters.getConcurrency() > 1) {
+                    commonSb.append(SPACE).append(SqoopConstants.SPLIT_BY)
+                        .append(SPACE).append(sqoopParameters.getSplitBy());
+                }
             }
         } catch (Exception e) {
             logger.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));
