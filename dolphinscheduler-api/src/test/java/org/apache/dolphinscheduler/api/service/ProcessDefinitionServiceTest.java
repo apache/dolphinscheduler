@@ -444,7 +444,6 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    @Ignore
     public void testReleaseProcessDefinition() {
         long projectCode = 1L;
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));

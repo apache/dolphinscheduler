@@ -720,6 +720,45 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
+    @Override
+    @Transactional
+    public Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser, long projectCode, String codes) {
+        Map<String, Object> result = new HashMap<>();
+        if (StringUtils.isEmpty(codes)) {
+            logger.error("Parameter processDefinitionCodes is empty, projectCode is {}.", projectCode);
+            putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
+            return result;
+        }
+
+        Set<Long> definitionCodes = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
+                .collect(Collectors.toSet());
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
+        Set<Long> queryCodes =
+                processDefinitionList.stream().map(ProcessDefinition::getCode).collect(Collectors.toSet());
+        // definitionCodes - queryCodes
+        Set<Long> diffCode =
+                definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
+
+        if (!diffCode.isEmpty()) {
+            logger.error("Process definition does not exist, processCodes:{}.",
+                    diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA)));
+            throw new ServiceException(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR,
+                    diffCode.stream().map(code -> code + "[process definition not exist]")
+                            .collect(Collectors.joining(Constants.COMMA))
+            );
+        }
+
+        for (ProcessDefinition process : processDefinitionList) {
+            try {
+                this.deleteProcessDefinitionByCode(loginUser, process.getCode());
+            } catch (Exception e) {
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
+            }
+        }
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
     /**
      * Process definition want to delete whether used in other task, should throw exception when have be used.
      *
