@@ -492,7 +492,10 @@ public enum Status {
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
-    ;
+    DELETE_WORK_GROUP_ERROR_HAS_WORKFLOW_ASSOCIATED(1400005,
+            "failed to delete the work group, there is an workflow associated with this work group",
+            "删除Work group失败，存在与此Work group关联的工作流"),
+            ;
 
     private final int code;
     private final String enMsg;

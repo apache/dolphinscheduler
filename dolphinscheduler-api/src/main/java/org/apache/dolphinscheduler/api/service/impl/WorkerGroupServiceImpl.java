@@ -31,9 +31,13 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -75,6 +79,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private RegistryClient registryClient;
+
+    @Autowired
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     /**
      * create or update a worker group
@@ -364,17 +371,29 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
+
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);
         if (workerGroup == null) {
             logger.error("Worker group does not exist, workerGroupId:{}.", id);
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
+        List<ProcessTaskRelation> processTaskRelationList =
+                processTaskRelationMapper.queryByWorkGroupName(workerGroup.getName());
+        if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
+            logger.error("Worker group can not delete, work group have associated workflows, workerGroupName:{}.",
+                    workerGroup.getName());
+            putMsg(result, Status.DELETE_WORK_GROUP_ERROR_HAS_WORKFLOW_ASSOCIATED);
+            return result;
+        }
+
         List<ProcessInstance> processInstances = processInstanceMapper
                 .queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            List<Integer> processInstanceIds = processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
-            logger.warn("Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
+            List<Integer> processInstanceIds =
+                    processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
+            logger.warn(
+                    "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
                     processInstances.size(), processInstanceIds);
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;

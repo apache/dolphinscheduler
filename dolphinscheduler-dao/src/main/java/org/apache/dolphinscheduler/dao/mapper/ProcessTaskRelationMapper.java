@@ -197,5 +197,11 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      */
     List<ProcessTaskRelation> queryDownstreamByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
+    /**
+     * query process definition list by worker group
+     * @param workerGroupName
+     * @return processTaskRelation list
+     */
+    List<ProcessTaskRelation> queryByWorkGroupName(@Param("workerGroupName") String workerGroupName);
 
 }

@@ -200,4 +200,10 @@
             and post_task_code = #{postTaskCode}
         </if>
     </select>
+    <select id="queryByWorkGroupName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+            relation.id
+        from t_ds_process_task_relation relation, t_ds_task_definition_log log where
+        log.code = relation.post_task_code and log.worker_group = #{workerGroupName}
+    </select>
 </mapper>
