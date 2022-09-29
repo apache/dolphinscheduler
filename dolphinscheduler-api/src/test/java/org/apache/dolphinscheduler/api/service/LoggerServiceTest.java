@@ -45,7 +45,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,6 @@ import org.slf4j.LoggerFactory;
  * logger service test
  */
 @RunWith(MockitoJUnitRunner.class)
-@PrepareForTest({LoggerServiceImpl.class})
 public class LoggerServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerServiceTest.class);
