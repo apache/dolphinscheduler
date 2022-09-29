@@ -575,6 +575,12 @@ public final class DateUtils {
             return 0;
         }
         long usedTime = (System.currentTimeMillis() - baseTime.getTime()) / 1000;
+        // ignore worker's clock later than master nodes.
+        if (usedTime < 0L) {
+            logger.warn("The current server's clock is earlier than the Master server,"
+                + " so the time it takes to dispatch tasks will be ignored");
+            return intervalSeconds;
+        }
         return intervalSeconds - usedTime;
     }
 
