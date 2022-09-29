@@ -716,9 +716,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             checkSerialProcess(processDefinition);
         }
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        if (processAlertManager.isNeedToSendWarning(processInstance)) {
-            processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
-        }
+        processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
         if (processInstance.getState().isSuccess()) {
             processAlertManager.closeAlert(processInstance);
         }
