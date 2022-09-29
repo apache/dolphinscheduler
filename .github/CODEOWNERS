@@ -26,7 +26,6 @@
 /dolphinscheduler-dao/src/main/resources/sql/ @zhongjiajie
 /dolphinscheduler-common/ @caishunfeng
 /dolphinscheduler-standalone-server/ @kezhenxu94 @caishunfeng
-/dolphinscheduler-log-server/ @caishunfeng
 /dolphinscheduler-datasource-plugin/ @caishunfeng
 /dolphinscheduler-dist/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-meter/ @caishunfeng @kezhenxu94 @ruanwenjun @EricGao888

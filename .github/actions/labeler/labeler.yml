@@ -26,7 +26,6 @@ backend:
   - 'dolphinscheduler-data-quality/**/*'
   - 'dolphinscheduler-datasource-plugin/**/*'
   - 'dolphinscheduler-dist/**/*'
-  - 'dolphinscheduler-log-server/**/*'
   - 'dolphinscheduler-master/**/*'
   - 'dolphinscheduler-registry/**/*'
   - 'dolphinscheduler-remote/**/*'
