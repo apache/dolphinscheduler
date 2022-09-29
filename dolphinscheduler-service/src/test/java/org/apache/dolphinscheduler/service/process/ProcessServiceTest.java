@@ -102,7 +102,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -823,16 +822,12 @@ public class ProcessServiceTest {
     public void testUpdateResourceInfo() throws Exception {
         // test if input is null
         ResourceInfo resourceInfoNull = null;
-        ResourceInfo updatedResourceInfo1 = Whitebox.invokeMethod(processService,
-                "updateResourceInfo",
-                resourceInfoNull);
+        ResourceInfo updatedResourceInfo1 = processService.updateResourceInfo(resourceInfoNull);
         Assert.assertNull(updatedResourceInfo1);
 
         // test if resource id less than 1
         ResourceInfo resourceInfoVoid = new ResourceInfo();
-        ResourceInfo updatedResourceInfo2 = Whitebox.invokeMethod(processService,
-                "updateResourceInfo",
-                resourceInfoVoid);
+        ResourceInfo updatedResourceInfo2 = processService.updateResourceInfo(resourceInfoVoid);
         Assert.assertNull(updatedResourceInfo2);
 
         // test normal situation
@@ -843,9 +838,8 @@ public class ProcessServiceTest {
         resource.setFileName("test.txt");
         resource.setFullName("/test.txt");
         Mockito.when(resourceMapper.selectById(1)).thenReturn(resource);
-        ResourceInfo updatedResourceInfo3 = Whitebox.invokeMethod(processService,
-                "updateResourceInfo",
-                resourceInfoNormal);
+
+        ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(resourceInfoNormal);
 
         Assert.assertEquals(1, updatedResourceInfo3.getId().intValue());
         Assert.assertEquals("test.txt", updatedResourceInfo3.getRes());
@@ -911,13 +905,15 @@ public class ProcessServiceTest {
         DateInterval dateInterval = new DateInterval(new Date(), new Date());
         int testFlag = 1;
 
-        //find test lastManualProcessInterval
-        ProcessInstance lastManualProcessInterval = processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+        // find test lastManualProcessInterval
+        ProcessInstance lastManualProcessInterval =
+                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
         Assert.assertEquals(null, lastManualProcessInterval);
 
-        //find online lastManualProcessInterval
+        // find online lastManualProcessInterval
         testFlag = 0;
-        lastManualProcessInterval = processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+        lastManualProcessInterval =
+                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
         Assert.assertEquals(null, lastManualProcessInterval);
     }
 
@@ -925,12 +921,12 @@ public class ProcessServiceTest {
     public void testQueryTestDataSourceId() {
         Integer onlineDataSourceId = 1;
 
-        //unbound testDataSourceId
+        // unbound testDataSourceId
         Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
         Integer result = processService.queryTestDataSourceId(onlineDataSourceId);
         Assert.assertNull(result);
 
-        //bound testDataSourceId
+        // bound testDataSourceId
         Integer testDataSourceId = 2;
         Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(testDataSourceId);
         result = processService.queryTestDataSourceId(onlineDataSourceId);
