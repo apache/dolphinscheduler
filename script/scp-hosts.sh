@@ -19,7 +19,7 @@
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 
-source ${workDir}/env/install_env.sh
+source ${workDir}/env/install_config.sh
 
 workersGroup=(${workers//,/ })
 for workerGroup in ${workersGroup[@]}
