@@ -15,20 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.python;
+package org.apache.dolphinscheduler.service.factory;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 
-public class PythonTaskTest {
+import lombok.experimental.UtilityClass;
 
-    @Test
-    public void buildPythonExecuteCommand() throws Exception {
-        PythonTask pythonTask = createPythonTask();
-        Assert.assertEquals("${PYTHON_HOME} test.py", pythonTask.buildPythonExecuteCommand("test.py"));
-    }
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private PythonTask createPythonTask() {
-        return new PythonTask(null);
+@UtilityClass
+public class NettyRemotingClientFactory {
+
+    private final Logger logger = LoggerFactory.getLogger(NettyRemotingClientFactory.class);
+
+    public NettyRemotingClient buildNettyRemotingClient() {
+        NettyClientConfig nettyClientConfig = new NettyClientConfig();
+        logger.info("NettyRemotingClient initialized with config: {}", nettyClientConfig);
+        return new NettyRemotingClient(nettyClientConfig);
     }
 }
