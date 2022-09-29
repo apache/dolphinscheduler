@@ -13,18 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-delimiter d//
-
-return 'Success!';
-exception when others then
-		---Raise EXCEPTION '(%)',SQLERRM;
-        return SQLERRM;
-END;
-$BODY$;
-
-select dolphin_insert_dq_initial_data();
-
-d//
-
+export * from './task-node'
+export * from './task-type'

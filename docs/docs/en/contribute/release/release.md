@@ -491,11 +491,10 @@ the release version is `<VERSION>`, the following updates are required(note it w
 - Repository **apache/dolphinscheduler-website**:
   - `download/en-us/download.md` and `download/zh-cn/download.md`: add the download of the `<VERSION>` release package
   - `scripts/conf.sh`: Add new release version `<VERSION>` key-value pair to variable `DEV_RELEASE_DOCS_VERSIONS`
-- Repository **apache/dolphinscheduler**:
+- Repository **apache/dolphinscheduler** (dev branch):
   - `docs/configs/site.js`:
     - `docsLatest`: update to `<VERSION>`
     - `docs0`: The `text` of two places of `en-us/zh-cn` needs to be updated to `latest(<VERSION>)`
-    - `docsxyz`: Add a drop-down menu with `key` as `docsxyz` and `text` as `<VERSION>` in `children` of two places of `en-us/zh-cn`
   - `docs/configs/index.md.jsx`: Add `<VERSION>: docsxyzConfig`
   - `docs/docs/en/history-versions.md` and `docs/docs/zh/history-versions.md`: Add new `<VERSION>` release docs.
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler's GitHub [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml)

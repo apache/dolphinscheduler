@@ -173,7 +173,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    String cronTime, CommandType commandType,
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType,
-                                                   int warningGroupId, RunMode runMode,
+                                                   Integer warningGroupId, RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup,
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
@@ -195,11 +195,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // check process define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-        result = checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode,
+        this.checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode,
                 processDefinition.getVersion());
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
 
         if (!checkTenantSuitable(processDefinition)) {
             logger.error(
@@ -291,32 +288,23 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param projectCode       project code
      * @param processDefinition process definition
      * @param processDefineCode process definition code
-     * @param version           process instance verison
-     * @return check result code
+     * @param version           process instance version
      */
     @Override
-    public Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition,
-                                                           long processDefineCode, Integer version) {
-        Map<String, Object> result = new HashMap<>();
+    public void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition,
+                                            long processDefineCode, Integer version) {
+        // check process definition exists
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            // check process definition exists
-            logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
-                    processDefineCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
-        } else if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-            // check process definition online
-            logger.warn("Process definition is not {}, processDefinitionCode:{}, version:{}.",
-                    ReleaseState.ONLINE.getDescp(), processDefineCode, version);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(processDefineCode), version);
-        } else if (!checkSubProcessDefinitionValid(processDefinition)) {
-            // check sub process definition online
-            logger.warn("Subprocess definition of process definition is not {}, processDefinitionCode:{}.",
-                    ReleaseState.ONLINE.getDescp(), processDefineCode);
-            putMsg(result, Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
-        } else {
-            result.put(Constants.STATUS, Status.SUCCESS);
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
         }
-        return result;
+        // check process definition online
+        if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(processDefineCode), version);
+        }
+        // check sub process definition online
+        if (!checkSubProcessDefinitionValid(processDefinition)) {
+            throw new ServiceException(Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
+        }
     }
 
     /**
@@ -392,13 +380,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         processInstance.getProcessDefinitionVersion());
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
-            result =
-                    checkProcessDefinitionValid(projectCode, processDefinition,
-                            processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion());
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
+                    processInstance.getProcessDefinitionVersion());
         }
 
         result = checkExecuteType(processInstance, executeType);
@@ -731,7 +714,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     private int createCommand(CommandType commandType, long processDefineCode, TaskDependType nodeDep,
                               FailureStrategy failureStrategy, String startNodeList, String schedule,
-                              WarningType warningType, int executorId, int warningGroupId, RunMode runMode,
+                              WarningType warningType, int executorId, Integer warningGroupId, RunMode runMode,
                               Priority processInstancePriority, String workerGroup, Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
                               int testFlag, ComplementDependentMode complementDependentMode) {

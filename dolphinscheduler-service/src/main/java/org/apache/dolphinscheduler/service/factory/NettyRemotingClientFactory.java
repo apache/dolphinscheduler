@@ -13,44 +13,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-delimiter d//
+package org.apache.dolphinscheduler.service.factory;
 
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 
+import lombok.experimental.UtilityClass;
 
-CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
-    )
-    RETURNS character varying
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-AS $BODY$
-DECLARE
-v_schema varchar;
-BEGIN
-    ---get schema name
-    v_schema =current_schema();
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@UtilityClass
+public class NettyRemotingClientFactory {
 
+    private final Logger logger = LoggerFactory.getLogger(NettyRemotingClientFactory.class);
 
---- add column
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN IF NOT EXISTS other_params_json text DEFAULT NULL  ';
-
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_process_isntance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL  ';
-
-
-
-return 'Success!';
-exception when others then
-        ---Raise EXCEPTION '(%)',SQLERRM;
-
-        return SQLERRM;
-END;
-$BODY$;
-
-select dolphin_update_metadata();
-
-
-d//
-
+    public NettyRemotingClient buildNettyRemotingClient() {
+        NettyClientConfig nettyClientConfig = new NettyClientConfig();
+        logger.info("NettyRemotingClient initialized with config: {}", nettyClientConfig);
+        return new NettyRemotingClient(nettyClientConfig);
+    }
+}

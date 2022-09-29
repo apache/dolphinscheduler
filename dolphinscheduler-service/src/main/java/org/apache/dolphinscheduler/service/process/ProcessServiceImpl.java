@@ -938,6 +938,9 @@ public class ProcessServiceImpl implements ProcessService {
             throw new IllegalArgumentException("Cannot find the process definition for this workflowInstance");
         }
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
+        if (cmdParam == null) {
+            cmdParam = new HashMap<>();
+        }
         int processInstanceId = command.getProcessInstanceId();
         if (processInstanceId == 0) {
             processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
@@ -947,36 +950,37 @@ public class ProcessServiceImpl implements ProcessService {
                 return null;
             }
         }
-        if (cmdParam != null) {
-            CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
-            // reset global params while repeat running is needed by cmdParam
-            if (commandTypeIfComplement == CommandType.REPEAT_RUNNING) {
-                setGlobalParamIfCommanded(processDefinition, cmdParam);
-            }
 
-            // time zone
-            String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
-
-            // Recalculate global parameters after rerun.
-            String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    commandTypeIfComplement,
-                    processInstance.getScheduleTime(), timezoneId);
-            processInstance.setGlobalParams(globalParams);
-            processInstance.setProcessDefinition(processDefinition);
+        CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
+        // reset global params while repeat running is needed by cmdParam
+        if (commandTypeIfComplement == CommandType.REPEAT_RUNNING) {
+            setGlobalParamIfCommanded(processDefinition, cmdParam);
         }
+
+        // time zone
+        String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+
+        // Recalculate global parameters after rerun.
+        String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                commandTypeIfComplement,
+                processInstance.getScheduleTime(), timezoneId);
+        processInstance.setGlobalParams(globalParams);
+        processInstance.setProcessDefinition(processDefinition);
+
         // reset command parameter
         if (processInstance.getCommandParam() != null) {
             Map<String, String> processCmdParam = JSONUtils.toMap(processInstance.getCommandParam());
+            Map<String, String> finalCmdParam = cmdParam;
             processCmdParam.forEach((key, value) -> {
-                if (!cmdParam.containsKey(key)) {
-                    cmdParam.put(key, value);
+                if (!finalCmdParam.containsKey(key)) {
+                    finalCmdParam.put(key, value);
                 }
             });
         }
         // reset command parameter if sub process
-        if (cmdParam != null && cmdParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS)) {
+        if (cmdParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS)) {
             processInstance.setCommandParam(command.getCommandParam());
         }
         if (Boolean.FALSE.equals(checkCmdParam(command, cmdParam))) {
@@ -1027,7 +1031,7 @@ public class ProcessServiceImpl implements ProcessService {
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
                 cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
-                        String.join(",", convertIntListToString(stopNodeList)));
+                        String.join(Constants.COMMA, convertIntListToString(stopNodeList)));
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
                 break;
@@ -1812,7 +1816,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param res origin resource info
      * @return {@link ResourceInfo}
      */
-    private ResourceInfo updateResourceInfo(ResourceInfo res) {
+    protected ResourceInfo updateResourceInfo(ResourceInfo res) {
         ResourceInfo resourceInfo = null;
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {

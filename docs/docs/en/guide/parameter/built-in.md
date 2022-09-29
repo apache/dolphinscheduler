@@ -31,4 +31,13 @@
      - First N hours：`$[HHmmss-N/24]`
      - Next N minutes：`$[HHmmss+N/24/60]`
      - First N minutes：`$[HHmmss-N/24/60]`
+  3. Business Attribute Method
+     - Today:`$[this_day(yyyy-MM-dd)]`, Such as 2022-08-26 => 2022-08-26
+     - Yesterday:`$[last_day(yyyy-MM-dd)]`, Such as 2022-08-26 => 2022-08-25
+     - Week N of the year,start the week on Monday: `$[year_week(yyyy-MM-dd)]`,Such as 2022-08-26 => 2022-34
+     - Week N of the year，start the week on N:`$[year_week(yyyy-MM-dd,N)]` Such as when N=5, 2022-08-26 => 2022-35
+     - Before(-)/After(+) The first day of Month(The unit of N is month): `$[month_first_day(yyyy-MM-dd,-N)]`,Such as when N=1, 2022-08-26 => 2022-07-01
+     - Before(-)/After(+) The last day of Month(The unit of N is month): `$[month_last_day(yyyy-MM-dd,-N)]`,Such as when N=1, 2022-08-28 => 2022-07-31
+     - Before(-)/After(+) The first day of Week(The unit of N is week): `$[week_first_day(yyyy-MM-dd,-N)]`,Such as when N=1, 2022-08-26 => 2022-08-15
+     - Before(-)/After(+) The last day of Week(The unit of N is week): `$[week_last_day(yyyy-MM-dd,-N)]`, Such as when N=1, 2022-08-26 => 2022-08-21
 
