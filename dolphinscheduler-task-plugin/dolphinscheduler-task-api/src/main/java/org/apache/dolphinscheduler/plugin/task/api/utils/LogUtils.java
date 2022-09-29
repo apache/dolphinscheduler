@@ -44,14 +44,14 @@ public class LogUtils {
 
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
-    public Set<String> getAppIdsFromLogFile(@NonNull String logPath) {
+    public List<String> getAppIdsFromLogFile(@NonNull String logPath) {
         return getAppIdsFromLogFile(logPath, log);
     }
 
-    public Set<String> getAppIdsFromLogFile(@NonNull String logPath, Logger logger) {
+    public List<String> getAppIdsFromLogFile(@NonNull String logPath, Logger logger) {
         File logFile = new File(logPath);
         if (!logFile.exists() || !logFile.isFile()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         Set<String> appIds = new HashSet<>();
         try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
@@ -67,60 +67,10 @@ public class LogUtils {
                     }
                 }
             });
-            return appIds;
+            return new ArrayList<>(appIds);
         } catch (IOException e) {
             logger.error("Get appId from log file erro, logPath: {}", logPath, e);
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
-    }
-
-    /**
-     * processing log
-     * get yarn application id list
-     *
-     * @param log log content
-     * @param logger logger
-     * @return app id list
-     */
-    public static List<String> getAppIds(String log, Logger logger) {
-
-        List<String> appIds = new ArrayList<>();
-
-        Matcher matcher = APPLICATION_REGEX.matcher(log);
-
-        // analyse logs to get all submit yarn application id
-        while (matcher.find()) {
-            String appId = matcher.group();
-            if (!appIds.contains(appId)) {
-                logger.info("find app id: {}", appId);
-                appIds.add(appId);
-            }
-        }
-        return appIds;
-    }
-
-    /**
-     * processing log
-     * get yarn application id list
-     *
-     * @param log log content
-     * @param logger logger
-     * @return app id list
-     */
-    public static List<String> getAppIds(String log, Logger logger) {
-
-        List<String> appIds = new ArrayList<>();
-
-        Matcher matcher = APPLICATION_REGEX.matcher(log);
-
-        // analyse logs to get all submit yarn application id
-        while (matcher.find()) {
-            String appId = matcher.group();
-            if (!appIds.contains(appId)) {
-                logger.info("find app id: {}", appId);
-                appIds.add(appId);
-            }
-        }
-        return appIds;
     }
 }

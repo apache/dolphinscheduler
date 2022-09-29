@@ -18,12 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.hive.jdbc.HivePreparedStatement;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
@@ -36,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class HiveSqlLogThreadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(HiveSqlLogThreadTest.class);
 
-    private static volatile TaskExecutionContext taskExecutionContext;
+    private TaskExecutionContext taskExecutionContext;
 
     @Test
     public void testHiveSql() throws Exception {
@@ -44,22 +42,23 @@ public class HiveSqlLogThreadTest {
         taskExecutionContext.setTaskType("hive");
         taskExecutionContext.setTaskLogName("1-1-1-1-1");
 
-        String sql = "select count(*) from test.table";
-
         List<String> mockLog = new ArrayList<>();
         mockLog.add("1start hive sql log\napplication_1231_2323");
-        PreparedStatement statement = Mockito.mock(PreparedStatement.class);
-        HivePreparedStatement hivePreparedStatement = Mockito.mock(HivePreparedStatement.class);
-        Mockito.when(statement.unwrap(HivePreparedStatement.class)).thenReturn(hivePreparedStatement);
-        Mockito.when(hivePreparedStatement.isClosed()).thenReturn(false);
-        Mockito.when(hivePreparedStatement.hasMoreLogs()).thenReturn(true);
-        Mockito.when(hivePreparedStatement.getQueryLog(true, 500)).thenReturn(mockLog);
-        LOGGER.info("log thread starting");
-        HiveSqlLogThread queryThread = Mockito.spy(new HiveSqlLogThread(statement, LOGGER, taskExecutionContext));
-        queryThread.start();
+        PreparedStatement statement1 = Mockito.mock(PreparedStatement.class);
+        HivePreparedStatement hivePreparedStatement1 = Mockito.mock(HivePreparedStatement.class);
+        Mockito.when(statement1.unwrap(HivePreparedStatement.class)).thenReturn(hivePreparedStatement1);
+        Mockito.when(hivePreparedStatement1.isClosed()).thenReturn(false);
+        Mockito.when(hivePreparedStatement1.hasMoreLogs()).thenReturn(true);
+        Mockito.when(hivePreparedStatement1.getQueryLog(true, 500)).thenReturn(mockLog);
+        LOGGER.info("log thread1 starting");
+        HiveSqlLogThread queryThread1 = Mockito.spy(new HiveSqlLogThread(statement1, LOGGER, taskExecutionContext));
+        queryThread1.start();
 
-
-        Assert.assertTrue(queryThread.isAlive());
-
+        LOGGER.info("log thread2 starting");
+        PreparedStatement statement2 = Mockito.mock(PreparedStatement.class);
+        Mockito.when(statement2.unwrap(HivePreparedStatement.class)).thenReturn(null);
+        HiveSqlLogThread queryThread2 = Mockito.spy(new HiveSqlLogThread(statement2, LOGGER, taskExecutionContext));
+        queryThread2.start();
+        Assert.assertTrue(queryThread2.isAlive() && queryThread1.isAlive());
     }
 }

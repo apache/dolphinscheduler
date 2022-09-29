@@ -168,7 +168,7 @@ public class SqlTask extends AbstractTask {
             executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
 
             // get appIds
-            Set<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
+            List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
             logger.info("Resolve appIds: [{}] from task log: [{}]", appIds, taskExecutionContext.getLogPath());
             if (!appIds.isEmpty()) {
                 String appIdString = String.join(",", appIds);
