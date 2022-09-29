@@ -101,7 +101,13 @@ public class TaskUpdateRequest {
     @ApiModelProperty(example = "upstream-task-codes1,upstream-task-codes2", notes = "use , to split multiple upstream task codes")
     private String upstreamTasksCodes;
 
-    public TaskDefinition mergeIntoProcessDefinition(TaskDefinition taskDefinition) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
+    /**
+     * Merge taskUpdateRequest information into exists task definition object
+     *
+     * @param taskDefinition exists task definition object
+     * @return task definition
+     */
+    public TaskDefinition mergeIntoTaskDefinition(TaskDefinition taskDefinition) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
         TaskDefinition taskDefinitionDeepCopy = (TaskDefinition) BeanUtils.cloneBean(taskDefinition);
         assert taskDefinitionDeepCopy != null;
         if (this.name != null) {

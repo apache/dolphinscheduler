@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.common.Constants.COMMA;
 
 import java.util.stream.Stream;
 
-import lombok.Setter;
+import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,28 +32,20 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Setter
+@Data
 public class TaskRelationDeleteRequest {
 
+    private long upstreamCode;
+    private long downstreamCode;
     @ApiModelProperty(example = "12345678,87654321", required = true, notes = "relation pair want to delete relation, separated by comma")
     private String codePair;
 
-    private long[] parseCodePair(String codePair) {
-        return Stream.of(codePair.split(COMMA))
+    public TaskRelationDeleteRequest(String relationPair) {
+        long[] relations = Stream.of(relationPair.split(COMMA))
                 .map(String::trim)
                 .mapToLong(Long::parseLong)
                 .toArray();
-    }
-
-    public long getUpstreamCode() {
-        return this.parseCodePair(codePair)[0];
-    }
-
-    public long getDownstreamCode() {
-        return this.parseCodePair(codePair)[1];
-    }
-
-    public TaskRelationDeleteRequest(String codePair) {
-        this.codePair = codePair;
+        this.upstreamCode = relations[0];
+        this.downstreamCode = relations[1];
     }
 }

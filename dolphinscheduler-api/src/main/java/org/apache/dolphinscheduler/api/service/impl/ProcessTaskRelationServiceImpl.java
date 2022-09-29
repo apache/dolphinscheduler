@@ -174,7 +174,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         return result;
     }
 
-    private ProcessTaskRelationLog syncObj2Log(User user, ProcessTaskRelation processTaskRelation) {
+    private ProcessTaskRelationLog persist2ProcessTaskRelationLog(User user, ProcessTaskRelation processTaskRelation) {
         ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
         processTaskRelationLog.setOperator(user.getId());
         processTaskRelationLog.setOperateTime(new Date());
@@ -186,7 +186,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         return processTaskRelationLog;
     }
 
-    private List<ProcessTaskRelationLog> batchSyncObj2Log(User user, List<ProcessTaskRelation> processTaskRelations) {
+    private List<ProcessTaskRelationLog> batchPersist2ProcessTaskRelationLog(User user,
+                                                                             List<ProcessTaskRelation> processTaskRelations) {
         Date now = new Date();
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
 
@@ -247,7 +248,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR, processTaskRelation.getPreTaskCode(),
                     processTaskRelation.getPostTaskCode());
         }
-        this.syncObj2Log(loginUser, processTaskRelation);
+        this.persist2ProcessTaskRelationLog(loginUser, processTaskRelation);
 
         return processTaskRelation;
     }
@@ -472,7 +473,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
 
         // batch sync to process task relation log
-        this.batchSyncObj2Log(loginUser, processTaskRelations);
+        this.batchPersist2ProcessTaskRelationLog(loginUser, processTaskRelations);
         return processTaskRelations;
     }
 

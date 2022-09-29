@@ -181,7 +181,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return result;
     }
 
-    private TaskDefinitionLog syncObj2Log(User user, TaskDefinition taskDefinition) {
+    private TaskDefinitionLog persist2TaskDefinitionLog(User user, TaskDefinition taskDefinition) {
         TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
         taskDefinitionLog.setOperator(user.getId());
         taskDefinitionLog.setOperateTime(new Date());
@@ -192,7 +192,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return taskDefinitionLog;
     }
 
-    private void TaskDefinitionValid(User user, TaskDefinition taskDefinition, String permissions) {
+    private void checkTaskDefinitionValid(User user, TaskDefinition taskDefinition, String permissions) {
         // check user access for project
         Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(user, project, permissions);
@@ -242,7 +242,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (taskDefinition.getProjectCode() == 0L) {
             taskDefinition.setProjectCode(processDefinition.getProjectCode());
         }
-        this.TaskDefinitionValid(loginUser, taskDefinition, TASK_DEFINITION_CREATE);
+        this.checkTaskDefinitionValid(loginUser, taskDefinition, TASK_DEFINITION_CREATE);
 
         long taskDefinitionCode;
         try {
@@ -256,7 +256,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (create <= 0) {
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
-        this.syncObj2Log(loginUser, taskDefinition);
+        this.persist2TaskDefinitionLog(loginUser, taskDefinition);
 
         // update related objects: task relationship, workflow's location(need to set to null and front-end will auto
         // format it)
@@ -598,19 +598,19 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         TaskDefinition taskDefinitionUpdate;
         try {
-            taskDefinitionUpdate = taskUpdateRequest.mergeIntoProcessDefinition(taskDefinitionOriginal);
+            taskDefinitionUpdate = taskUpdateRequest.mergeIntoTaskDefinition(taskDefinitionOriginal);
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException
                 | NoSuchMethodException e) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, taskUpdateRequest.toString());
         }
-        this.TaskDefinitionValid(loginUser, taskDefinitionUpdate, TASK_DEFINITION_UPDATE);
+        this.checkTaskDefinitionValid(loginUser, taskDefinitionUpdate, TASK_DEFINITION_UPDATE);
         this.TaskDefinitionUpdateValid(taskDefinitionOriginal, taskDefinitionUpdate);
 
         int update = taskDefinitionMapper.updateById(taskDefinitionUpdate);
         if (update <= 0) {
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
-        TaskDefinitionLog taskDefinitionLog = this.syncObj2Log(loginUser, taskDefinitionUpdate);
+        TaskDefinitionLog taskDefinitionLog = this.persist2TaskDefinitionLog(loginUser, taskDefinitionUpdate);
 
         List<ProcessTaskRelation> taskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(taskDefinitionUpdate.getProjectCode(), taskCode);

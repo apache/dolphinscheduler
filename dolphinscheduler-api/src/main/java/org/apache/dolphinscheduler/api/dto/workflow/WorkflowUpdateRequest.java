@@ -65,6 +65,12 @@ public class WorkflowUpdateRequest {
     @ApiModelProperty(example = "[{\\\"taskCode\\\":7009653961024,\\\"x\\\":312,\\\"y\\\":196}]")
     private String location;
 
+    /**
+     * Merge workflowUpdateRequest information into exists processDefinition object
+     *
+     * @param processDefinition exists processDefinition object
+     * @return process definition
+     */
     public ProcessDefinition mergeIntoProcessDefinition(ProcessDefinition processDefinition) {
         ProcessDefinition processDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
