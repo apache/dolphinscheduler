@@ -30,7 +30,6 @@ backend:
   - 'dolphinscheduler-registry/**/*'
   - 'dolphinscheduler-remote/**/*'
   - 'dolphinscheduler-scheduler-plugin/**/*'
-  - 'dolphinscheduler-server/**/*'
   - 'dolphinscheduler-service/**/*'
   - 'dolphinscheduler-spi/**/*'
   - 'dolphinscheduler-standalone-server/**/*'
