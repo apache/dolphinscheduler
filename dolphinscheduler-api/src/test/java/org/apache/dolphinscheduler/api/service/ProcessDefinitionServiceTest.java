@@ -74,6 +74,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -502,6 +503,60 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
+    }
+
+    @Test
+    public void batchDeleteProcessDefinitionByCodeTest() {
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+
+        Project project = getProject(projectCode);
+
+        // process check exists
+        final String twoCodes = "11,12";
+        Set<Long> definitionCodes = Lists.newArrayList(twoCodes.split(Constants.COMMA)).stream()
+                .map(Long::parseLong).collect(Collectors.toSet());
+        ProcessDefinition process = getProcessDefinition();
+        List<ProcessDefinition> processDefinitionList = new ArrayList<>();
+        processDefinitionList.add(process);
+        Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
+        Throwable exception = Assertions.assertThrows(ServiceException.class,
+                () -> processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, twoCodes));
+        String formatter = MessageFormat.format(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(),
+                        "12[process definition not exist]");
+        Assertions.assertEquals(formatter, exception.getMessage());
+
+        // return the right data
+        Map<String, Object> result = new HashMap<>();
+        final String singleCodes = "11";
+        definitionCodes = Lists.newArrayList(singleCodes.split(Constants.COMMA)).stream().map(Long::parseLong)
+                .collect(Collectors.toSet());
+        Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(process);
+
+        // process definition online
+        user.setUserType(UserType.ADMIN_USER);
+        putMsg(result, Status.SUCCESS, projectCode);
+        process.setReleaseState(ReleaseState.ONLINE);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, singleCodes));
+        String subFormatter =
+                MessageFormat.format(Status.PROCESS_DEFINE_STATE_ONLINE.getMsg(), process.getName());
+        formatter =
+                MessageFormat.format(Status.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(), subFormatter);
+        Assertions.assertEquals(formatter, exception.getMessage());
+
+        // delete success
+        process.setReleaseState(ReleaseState.OFFLINE);
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(process);
+        Mockito.when(processDefinitionMapper.deleteById(process.getId())).thenReturn(1);
+        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), process.getCode()))
+                .thenReturn(1);
+        Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
+                .thenReturn(Collections.emptySet());
+        putMsg(result, Status.SUCCESS, projectCode);
+        Map<String, Object> deleteSuccess =
+                processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, singleCodes);
+        Assert.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
     }
 
     @Test
