@@ -22,6 +22,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.util.CollectionUtils;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -60,14 +62,17 @@ public class LowerWeightRoundRobin extends AbstractSelector<HostWeight> {
         if (!zeroWaitingTask.isEmpty()) {
             return zeroWaitingTask;
         }
-        HostWeight hostWeight = sources.stream().min(Comparator.comparing(HostWeight::getWaitingTaskCount)).get();
-        List<HostWeight> waitingTask = Lists.newArrayList(hostWeight);
-        List<HostWeight> equalWaitingTask = sources.stream().filter(h -> !h.getHost().equals(hostWeight.getHost()) && h.getWaitingTaskCount() == hostWeight.getWaitingTaskCount())
-            .collect(Collectors.toList());
-        if (!equalWaitingTask.isEmpty()) {
-            waitingTask.addAll(equalWaitingTask);
+        if (!CollectionUtils.isEmpty(sources)) {
+            HostWeight hostWeight = sources.stream().min(Comparator.comparing(HostWeight::getWaitingTaskCount)).get();
+            List<HostWeight> waitingTask = Lists.newArrayList(hostWeight);
+            List<HostWeight> equalWaitingTask = sources.stream().filter(h -> !h.getHost().equals(hostWeight.getHost()) && h.getWaitingTaskCount() == hostWeight.getWaitingTaskCount())
+                .collect(Collectors.toList());
+            if (!equalWaitingTask.isEmpty()) {
+                waitingTask.addAll(equalWaitingTask);
+            }
+            return waitingTask;
         }
-        return waitingTask;
+        return Lists.newArrayList();
     }
 }
 
