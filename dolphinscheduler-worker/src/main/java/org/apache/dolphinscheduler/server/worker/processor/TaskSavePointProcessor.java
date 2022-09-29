@@ -68,7 +68,7 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
             logger.error("task savepoint request command is null");
             return;
         }
-        logger.info("task savepoint command : {}", taskSavePointRequestCommand);
+        logger.info("Receive task savepoint command : {}", taskSavePointRequestCommand);
 
         int taskInstanceId = taskSavePointRequestCommand.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
@@ -78,7 +78,7 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
         }
 
         try {
-            LoggerUtils.setTaskInstanceIdMDC(taskSavePointRequestCommand.getTaskInstanceId());
+            LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
             doSavePoint(taskInstanceId);
 
             sendTaskSavePointResponseCommand(channel, taskExecutionContext);
