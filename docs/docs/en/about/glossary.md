@@ -51,7 +51,7 @@ process fails and ends
 
 - dolphinscheduler-master master module, provides workflow management and orchestration.
 
-- dolphinscheduler-worker WorkerServer services, provides task execution management.
+- dolphinscheduler-worker worker module, provides task execution management.
 
 - dolphinscheduler-alert alarm module, providing AlertServer service.
 
