@@ -40,8 +40,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * job params related class
  */
 public abstract class AbstractParameters implements IParameters {
-    @Override
-    public abstract boolean checkParameters();
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
