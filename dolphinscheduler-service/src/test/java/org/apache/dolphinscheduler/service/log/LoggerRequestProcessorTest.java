@@ -23,26 +23,37 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import io.netty.channel.Channel;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({LoggerUtils.class})
+@RunWith(MockitoJUnitRunner.class)
 public class LoggerRequestProcessorTest {
+
+    private MockedStatic<LoggerUtils> mockedStaticLoggerUtils;
+
+    @Before
+    public void setUp() {
+        mockedStaticLoggerUtils = Mockito.mockStatic(LoggerUtils.class);
+    }
+
+    @After
+    public void after() {
+        mockedStaticLoggerUtils.close();
+    }
 
     @Test
     public void testProcessViewWholeLogRequest() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
-        Channel channel = PowerMockito.mock(Channel.class);
-        PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
-        PowerMockito.mockStatic(LoggerUtils.class);
-        PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Channel channel = Mockito.mock(Channel.class);
+        Mockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
+        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
         String userDir = System.getProperty("user.dir");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(userDir + "/log/path/a.log");
 
@@ -57,10 +68,8 @@ public class LoggerRequestProcessorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testProcessViewWholeLogRequestError() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
-        Channel channel = PowerMockito.mock(Channel.class);
-        PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
-        PowerMockito.mockStatic(LoggerUtils.class);
-        PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Channel channel = Mockito.mock(Channel.class);
+        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
         String userDir = System.getProperty("user.dir");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(userDir + "/log/path/a");
 
@@ -75,10 +84,8 @@ public class LoggerRequestProcessorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testProcessViewWholeLogRequestErrorRelativePath() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
-        Channel channel = PowerMockito.mock(Channel.class);
-        PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
-        PowerMockito.mockStatic(LoggerUtils.class);
-        PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Channel channel = Mockito.mock(Channel.class);
+        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
         String userDir = System.getProperty("user.dir");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(userDir + "/log/../../a.log");
 
@@ -93,10 +100,8 @@ public class LoggerRequestProcessorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testProcessViewWholeLogRequestErrorStartWith() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
-        Channel channel = PowerMockito.mock(Channel.class);
-        PowerMockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
-        PowerMockito.mockStatic(LoggerUtils.class);
-        PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Channel channel = Mockito.mock(Channel.class);
+        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand("/log/a.log");
 
         Command command = new Command();
