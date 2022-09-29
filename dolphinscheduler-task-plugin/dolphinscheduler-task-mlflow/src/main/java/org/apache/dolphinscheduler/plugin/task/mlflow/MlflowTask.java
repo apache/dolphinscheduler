@@ -20,31 +20,31 @@ package org.apache.dolphinscheduler.plugin.task.mlflow;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * shell task
  */
-public class MlflowTask extends AbstractTaskExecutor {
+public class MlflowTask extends AbstractTask {
 
-    /**
-     * shell parameters
-     */
-    private MlflowParameters mlflowParameters;
-
+    private static final Pattern GIT_CHECK_PATTERN = Pattern.compile("^(git@|https?://)");
     /**
      * shell command executor
      */
@@ -54,6 +54,10 @@ public class MlflowTask extends AbstractTaskExecutor {
      * taskExecutionContext
      */
     private final TaskExecutionContext taskExecutionContext;
+    /**
+     * shell parameters
+     */
+    private MlflowParameters mlflowParameters;
 
     /**
      * constructor
@@ -65,6 +69,34 @@ public class MlflowTask extends AbstractTaskExecutor {
 
         this.taskExecutionContext = taskExecutionContext;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext, logger);
+    }
+
+    static public String getPresetRepository() {
+        String presetRepository = PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_KEY);
+        if (StringUtils.isEmpty(presetRepository)) {
+            presetRepository = MlflowConstants.PRESET_REPOSITORY;
+        }
+        return presetRepository;
+    }
+
+    static public String getPresetRepositoryVersion() {
+        String version = PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY);
+        if (StringUtils.isEmpty(version)) {
+            version = MlflowConstants.PRESET_REPOSITORY_VERSION;
+        }
+        return version;
+    }
+
+    static public String getVersionString(String version, String repository) {
+        String versionString;
+        if (StringUtils.isEmpty(version)) {
+            versionString = "";
+        } else if (GIT_CHECK_PATTERN.matcher(repository).find()) {
+            versionString = String.format("--version=%s", version);
+        } else {
+            versionString = "";
+        }
+        return versionString;
     }
 
     @Override
@@ -79,7 +111,7 @@ public class MlflowTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // construct process
             String command = buildCommand();
@@ -91,20 +123,28 @@ public class MlflowTask extends AbstractTaskExecutor {
                 exitCode = commandExecuteResult.getExitStatusCode();
             }
             setExitStatusCode(exitCode);
-            setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
-        } catch (Exception e) {
-            logger.error("shell task error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Mlflow task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("The current Mlflow task has been interrupted", e);
+        } catch (Exception e) {
+            logger.error("Mlflow task error", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("Execute Mlflow task failed", e);
         }
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     public String buildCommand() {
@@ -130,43 +170,59 @@ public class MlflowTask extends AbstractTaskExecutor {
         args.add(String.format(MlflowConstants.EXPORT_MLFLOW_TRACKING_URI_ENV, mlflowParameters.getMlflowTrackingUri()));
 
         String runCommand;
+        String versionString;
 
-        if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_BASIC_ALGORITHM)) {
-            args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
-            args.add(String.format(MlflowConstants.SET_REPOSITORY, MlflowConstants.PRESET_BASIC_ALGORITHM_PROJECT));
-            args.add(String.format(MlflowConstants.GIT_CLONE_REPO, MlflowConstants.PRESET_REPOSITORY, MlflowConstants.PRESET_PATH));
-
-            runCommand = MlflowConstants.MLFLOW_RUN_BASIC_ALGORITHM;
-            runCommand = String.format(runCommand, mlflowParameters.getAlgorithm(), mlflowParameters.getParams(), mlflowParameters.getSearchParams(), mlflowParameters.getModelName(),
-                mlflowParameters.getExperimentName());
-
-        } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_AUTOML)) {
-            args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
-            args.add(String.format(MlflowConstants.SET_REPOSITORY, MlflowConstants.PRESET_AUTOML_PROJECT));
-            args.add(String.format(MlflowConstants.GIT_CLONE_REPO, MlflowConstants.PRESET_REPOSITORY, MlflowConstants.PRESET_PATH));
-
-            runCommand = MlflowConstants.MLFLOW_RUN_AUTOML_PROJECT;
-            runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());
-
-        } else if (mlflowParameters.getMlflowJobType().equals(MlflowConstants.JOB_TYPE_CUSTOM_PROJECT)) {
-            args.add(String.format(MlflowConstants.SET_REPOSITORY, mlflowParameters.getMlflowProjectRepository()));
-
-            runCommand = MlflowConstants.MLFLOW_RUN_CUSTOM_PROJECT;
-            runCommand = String.format(runCommand, mlflowParameters.getParams(), mlflowParameters.getExperimentName(), mlflowParameters.getMlflowProjectVersion());
+        if (mlflowParameters.isCustomProject()) {
+            versionString = getVersionString(mlflowParameters.getMlflowProjectVersion(), mlflowParameters.getMlflowProjectRepository());
         } else {
-            runCommand = String.format("Cant not Support %s", mlflowParameters.getMlflowJobType());
+            versionString = getVersionString(getPresetRepositoryVersion(), getPresetRepository());
+        }
 
+
+        switch (mlflowParameters.getMlflowJobType()) {
+            case MlflowConstants.JOB_TYPE_BASIC_ALGORITHM:
+                args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
+
+                String repoBasicAlgorithm = getPresetRepository() + MlflowConstants.PRESET_BASIC_ALGORITHM_PROJECT;
+                args.add(String.format(MlflowConstants.SET_REPOSITORY, repoBasicAlgorithm));
+
+                runCommand = MlflowConstants.MLFLOW_RUN_BASIC_ALGORITHM;
+                runCommand = String.format(runCommand, mlflowParameters.getAlgorithm(), mlflowParameters.getParams(), mlflowParameters.getSearchParams(), mlflowParameters.getModelName(),
+                    mlflowParameters.getExperimentName());
+                break;
+
+            case MlflowConstants.JOB_TYPE_AUTOML:
+                args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));
+                String repoAutoML = getPresetRepository() + MlflowConstants.PRESET_AUTOML_PROJECT;
+                args.add(String.format(MlflowConstants.SET_REPOSITORY, repoAutoML));
+
+                runCommand = MlflowConstants.MLFLOW_RUN_AUTOML_PROJECT;
+                runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(), mlflowParameters.getModelName(), mlflowParameters.getExperimentName());
+                break;
+
+            case MlflowConstants.JOB_TYPE_CUSTOM_PROJECT:
+                args.add(String.format(MlflowConstants.SET_REPOSITORY, mlflowParameters.getMlflowProjectRepository()));
+                runCommand = MlflowConstants.MLFLOW_RUN_CUSTOM_PROJECT;
+                runCommand = String.format(runCommand, mlflowParameters.getParams(), mlflowParameters.getExperimentName());
+                break;
+
+            default:
+                throw new TaskException("Unsupported mlflow job type: " + mlflowParameters.getMlflowJobType());
+        }
+
+        // add version string to command if repository is local path
+        if (StringUtils.isNotEmpty(versionString)) {
+            runCommand = runCommand + " " + versionString;
         }
         args.add(runCommand);
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
-        return command;
+        return ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
     }
 
+    /**
+     * build mlflow models command
+     */
     protected String buildCommandForMlflowModels() {
-        /**
-         * build mlflow models command
-         */
 
         Map<String, Property> paramsMap = getParamsMap();
         List<String> args = new ArrayList<>();
@@ -183,20 +239,9 @@ public class MlflowTask extends AbstractTaskExecutor {
             args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
             args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));
             args.add(String.format(MlflowConstants.DOCKER_RUN, containerName, mlflowParameters.getDeployPort(), imageName));
-        } else if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE)) {
-            String templatePath = getTemplatePath(MlflowConstants.TEMPLATE_DOCKER_COMPOSE);
-            args.add(String.format("cp %s %s", templatePath, taskExecutionContext.getExecutePath()));
-            String imageName = "mlflow/" + mlflowParameters.getModelKeyName(":");
-            String containerName = mlflowParameters.getContainerName();
-
-            args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));
-            args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));
-            args.add(mlflowParameters.getDockerComposeEnvCommand());
-            args.add(MlflowConstants.DOCKER_COMPOSE_RUN);
         }
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
-        return command;
+        return ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
     }
 
     private Map<String, Property> getParamsMap() {
@@ -205,7 +250,7 @@ public class MlflowTask extends AbstractTaskExecutor {
 
     }
 
-    public int checkDockerHealth() throws Exception {
+    public int checkDockerHealth() {
         logger.info("checking container healthy ... ");
         int exitCode = -1;
         String[] command = {"sh", "-c", String.format(MlflowConstants.DOCKER_HEALTH_CHECK, mlflowParameters.getContainerName())};
@@ -233,13 +278,8 @@ public class MlflowTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public AbstractParameters getParameters() {
+    public MlflowParameters getParameters() {
         return mlflowParameters;
-    }
-
-    public String getTemplatePath(String template) {
-        String templatePath = MlflowTask.class.getClassLoader().getResource(template).getPath();
-        return templatePath;
     }
 
 }

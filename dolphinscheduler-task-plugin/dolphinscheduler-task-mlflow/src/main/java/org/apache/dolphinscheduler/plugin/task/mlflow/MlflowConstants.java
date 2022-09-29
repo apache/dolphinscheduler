@@ -28,15 +28,17 @@ public class MlflowConstants {
 
     public static final String JOB_TYPE_CUSTOM_PROJECT = "CustomProject";
 
-    public static final String PRESET_REPOSITORY = "https://github.com/apache/dolphinscheduler-mlflow";
+    public static final String PRESET_REPOSITORY_KEY = "ml.mlflow.preset_repository";
 
-    public static final String PRESET_PATH = "dolphinscheduler-mlflow";
+    public static final String PRESET_REPOSITORY_VERSION_KEY = "ml.mlflow.preset_repository_version";
+
+    public static final String PRESET_REPOSITORY = "https://github.com/apache/dolphinscheduler-mlflow";
 
     public static final String PRESET_REPOSITORY_VERSION = "main";
 
-    public static final String PRESET_AUTOML_PROJECT = PRESET_PATH + "#Project-AutoML";
+    public static final String PRESET_AUTOML_PROJECT = "#Project-AutoML";
 
-    public static final String PRESET_BASIC_ALGORITHM_PROJECT = PRESET_PATH + "#Project-BasicAlgorithm";
+    public static final String PRESET_BASIC_ALGORITHM_PROJECT = "#Project-BasicAlgorithm";
 
     public static final String MLFLOW_TASK_TYPE_PROJECTS = "MLflow Projects";
 
@@ -45,14 +47,6 @@ public class MlflowConstants {
     public static final String MLFLOW_MODELS_DEPLOY_TYPE_MLFLOW = "MLFLOW";
 
     public static final String MLFLOW_MODELS_DEPLOY_TYPE_DOCKER = "DOCKER";
-
-    public static final String MLFLOW_MODELS_DEPLOY_TYPE_DOCKER_COMPOSE = "DOCKER COMPOSE";
-
-    /**
-     * template file
-     */
-    public static final String TEMPLATE_DOCKER_COMPOSE = "docker-compose.yml";
-
 
     /**
      * mlflow command
@@ -81,8 +75,7 @@ public class MlflowConstants {
 
     public static final String MLFLOW_RUN_CUSTOM_PROJECT = "mlflow run $repo "
         + "%s "
-        + "--experiment-name=\"%s\" "
-        + "--version=\"%s\" ";
+        + "--experiment-name=\"%s\"";
 
     public static final String MLFLOW_MODELS_SERVE = "mlflow models serve -m %s --port %s -h 0.0.0.0";
 
@@ -94,20 +87,10 @@ public class MlflowConstants {
         + "--health-cmd \"curl --fail http://127.0.0.1:8080/ping || exit 1\" --health-interval 5s --health-retries 20"
         + " %s";
 
-    public static final String DOCKER_COMPOSE_RUN = "docker-compose up -d";
-
-    public static final String SET_DOCKER_COMPOSE_ENV = "export DS_TASK_MLFLOW_IMAGE_NAME=%s\n"
-        + "export DS_TASK_MLFLOW_CONTAINER_NAME=%s\n"
-        + "export DS_TASK_MLFLOW_DEPLOY_PORT=%s\n"
-        + "export DS_TASK_MLFLOW_CPU_LIMIT=%s\n"
-        + "export DS_TASK_MLFLOW_MEMORY_LIMIT=%s";
-
-
     public static final String DOCKER_HEALTH_CHECK = "docker inspect --format \"{{json .State.Health.Status }}\" %s";
 
     public static final int DOCKER_HEALTH_CHECK_TIMEOUT = 20;
 
     public static final int DOCKER_HEALTH_CHECK_INTERVAL = 5000;
 
-    public static final String GIT_CLONE_REPO  = "git clone %s %s";
 }

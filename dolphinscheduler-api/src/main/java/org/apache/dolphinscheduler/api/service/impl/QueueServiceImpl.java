@@ -116,15 +116,15 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return queue list
      */
     @Override
-    public Map<String, Object> queryList(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryList(User loginUser) {
+        Result result = new Result();
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
         if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
             ids = ids.isEmpty() ? new HashSet<>() : ids;
             ids.add(Constants.DEFAULT_QUEUE_ID);
         }
         List<Queue> queueList = queueMapper.selectBatchIds(ids);
-        result.put(Constants.DATA_LIST, queueList);
+        result.setData(queueList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -169,8 +169,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      */
     @Override
     @Transactional
-    public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>();
+    public Result createQueue(User loginUser, String queue, String queueName) {
+        Result result = new Result();
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -179,7 +179,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         createQueueValid(queueObj);
         queueMapper.insert(queueObj);
 
-        result.put(Constants.DATA_LIST, queueObj);
+        result.setData(queueObj);
+        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()), logger);
         return result;
@@ -195,8 +196,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>();
+    public Result updateQueue(User loginUser, int id, String queue, String queueName) {
+        Result result = new Result();
         if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -209,11 +210,11 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         if (checkIfQueueIsInUsing(existsQueue.getQueueName(), updateQueue.getQueueName())) {
             //update user related old queue
             Integer relatedUserNums = userMapper.updateUserQueue(existsQueue.getQueueName(), updateQueue.getQueueName());
-            logger.info("old queue have related {} user, exec update user success.", relatedUserNums);
+            logger.info("Old queue have related {} users, exec update user success.", relatedUserNums);
         }
 
         queueMapper.updateById(updateQueue);
-
+        result.setData(updateQueue);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -231,7 +232,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Queue queueValidator = new Queue(queueName, queue);
         createQueueValid(queueValidator);
-
+        result.setData(queueValidator);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -284,11 +285,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Queue createQueueIfNotExists(String queue, String queueName) {
         Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
         if (!Objects.isNull(existsQueue)) {
+            logger.info("Queue exists, so return it, queueName:{}.", queueName);
             return existsQueue;
         }
         Queue queueObj = new Queue(queueName, queue);
         createQueueValid(queueObj);
         queueMapper.insert(queueObj);
+        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         return queueObj;
     }
 

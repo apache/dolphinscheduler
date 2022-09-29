@@ -32,8 +32,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.Constants.COPY_SUFFIX;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_TASK_TYPES;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
@@ -41,6 +43,9 @@ import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -63,9 +68,9 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -98,6 +103,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.model.PageListingResult;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -127,6 +134,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -134,9 +142,12 @@ import java.util.zip.ZipInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,6 +185,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
+    @Autowired
+    private ProcessDefinitionDao processDefinitionDao;
+
+    @Lazy
     @Autowired
     private ProcessInstanceService processInstanceService;
 
@@ -243,152 +258,234 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String otherParamsJson,
                                                        ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_CREATE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-
+        if (checkDescriptionLength(description)) {
+            logger.warn("Parameter description is too long.");
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+        }
         // check whether the new process define name exist
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
         if (definition != null) {
-            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
-            return result;
+            logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                    definition.getName(), definition.getCode());
+            throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, name);
         }
-        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
-        Map<String, Object> checkTaskDefinitions = checkTaskDefinitionList(taskDefinitionLogs, taskDefinitionJson);
-        if (checkTaskDefinitions.get(Constants.STATUS) != Status.SUCCESS) {
-            return checkTaskDefinitions;
-        }
-        List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
-        Map<String, Object> checkRelationJson = checkTaskRelationList(taskRelationList, taskRelationJson, taskDefinitionLogs);
-        if (checkRelationJson.get(Constants.STATUS) != Status.SUCCESS) {
-            return checkRelationJson;
-        }
+        List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
+        List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
         int tenantId = -1;
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                putMsg(result, Status.TENANT_NOT_EXIST);
-                return result;
+                logger.error("Tenant does not exist.");
+                throw new ServiceException(Status.TENANT_NOT_EXIST);
             }
             tenantId = tenant.getId();
         }
-        long processDefinitionCode;
-        try {
-            processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
-        } catch (CodeGenerateException e) {
-            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
-            return result;
-        }
-        ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
-            globalParams, locations, timeout, loginUser.getId(), tenantId);
+        long processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+        ProcessDefinition processDefinition =
+                new ProcessDefinition(projectCode, name, processDefinitionCode, description,
+                        globalParams, locations, timeout, loginUser.getId(), tenantId);
         processDefinition.setExecutionType(executionType);
 
         return createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
     }
 
+    private void createWorkflowValid(User user, ProcessDefinition processDefinition) {
+        Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, processDefinition.getProjectCode());
+        }
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
+
+        if (checkDescriptionLength(processDefinition.getDescription())) {
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+        }
+
+        // check whether the new process define name exist
+        ProcessDefinition definition =
+                processDefinitionMapper.verifyByDefineName(project.getCode(), processDefinition.getName());
+        if (definition != null) {
+            throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, processDefinition.getName());
+        }
+
+        this.getTenantId(processDefinition);
+    }
+
+    private int getTenantId(ProcessDefinition processDefinition) {
+        int tenantId = -1;
+        if (!Constants.DEFAULT.equals(processDefinition.getTenantCode())) {
+            Tenant tenant = tenantMapper.queryByTenantCode(processDefinition.getTenantCode());
+            if (tenant == null) {
+                throw new ServiceException(Status.TENANT_NOT_EXIST);
+            }
+            tenantId = tenant.getId();
+        }
+        return tenantId;
+    }
+
+    private void syncObj2Log(User user, ProcessDefinition processDefinition) {
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
+        processDefinitionLog.setOperator(user.getId());
+        int result = processDefinitionLogMapper.insert(processDefinitionLog);
+        if (result <= 0) {
+            throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_LOG_ERROR);
+        }
+    }
+
+    /**
+     * create single process definition
+     *
+     * @param loginUser login user
+     * @param workflowCreateRequest the new workflow object will be created
+     * @return New ProcessDefinition object created just now
+     */
+    @Override
+    @Transactional
+    public ProcessDefinition createSingleProcessDefinition(User loginUser,
+                                                           WorkflowCreateRequest workflowCreateRequest) {
+        ProcessDefinition processDefinition = workflowCreateRequest.convert2ProcessDefinition();
+        this.createWorkflowValid(loginUser, processDefinition);
+
+        long processDefinitionCode;
+        try {
+            processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+        } catch (CodeGenerateException e) {
+            throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
+        }
+
+        processDefinition.setTenantId(this.getTenantId(processDefinition));
+        processDefinition.setCode(processDefinitionCode);
+        processDefinition.setUserId(loginUser.getId());
+
+        int create = processDefinitionMapper.insert(processDefinition);
+        if (create <= 0) {
+            throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
+        }
+        this.syncObj2Log(loginUser, processDefinition);
+        return processDefinition;
+    }
+
     protected Map<String, Object> createDagDefine(User loginUser,
-                                                List<ProcessTaskRelationLog> taskRelationList,
-                                                ProcessDefinition processDefinition,
-                                                List<TaskDefinitionLog> taskDefinitionLogs, String otherParamsJson) {
+                                                  List<ProcessTaskRelationLog> taskRelationList,
+                                                  ProcessDefinition processDefinition,
+                                                  List<TaskDefinitionLog> taskDefinitionLogs, String otherParamsJson) {
         Map<String, Object> result = new HashMap<>();
-        int saveTaskResult = processService.saveTaskDefine(loginUser, processDefinition.getProjectCode(), taskDefinitionLogs, Boolean.TRUE);
+        int saveTaskResult = processService.saveTaskDefine(loginUser, processDefinition.getProjectCode(),
+                taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
             logger.info("The task has not changed, so skip");
         }
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
-            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+            logger.error("Save task definition error.");
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion == 0) {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
+            logger.error("Save process definition error, processCode:{}.", processDefinition.getCode());
             throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
-        }
-        int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinition.getCode(),
-            insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
-        if (insertResult == Constants.EXIT_CODE_SUCCESS) {
-            putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, processDefinition);
-        } else {
-            putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+        } else
+            logger.info("Save process definition complete, processCode:{}, processVersion:{}.",
+                    processDefinition.getCode(), insertVersion);
+        int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
+                processDefinition.getCode(),
+                insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
+        if (insertResult != Constants.EXIT_CODE_SUCCESS) {
+            logger.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
+                    processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-        }
+        } else
+            logger.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+                    processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
+
         saveOtherRelation(loginUser, processDefinition, result, otherParamsJson);
+
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, processDefinition);
         return result;
     }
 
-    private Map<String, Object> checkTaskDefinitionList(List<TaskDefinitionLog> taskDefinitionLogs, String taskDefinitionJson) {
-        Map<String, Object> result = new HashMap<>();
+    private List<TaskDefinitionLog> generateTaskDefinitionList(String taskDefinitionJson) {
         try {
-            if (taskDefinitionLogs.isEmpty()) {
-                logger.error("taskDefinitionJson invalid: {}", taskDefinitionJson);
-                putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
-                return result;
+            List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+            if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
+                logger.error("Generate task definition list failed, the given taskDefinitionJson is invalided: {}",
+                        taskDefinitionJson);
+                throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             }
             for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-
                 if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
                         .taskType(taskDefinitionLog.getTaskType())
                         .taskParams(taskDefinitionLog.getTaskParams())
                         .dependence(taskDefinitionLog.getDependence())
                         .build())) {
-                    logger.error("task definition {} parameter invalid", taskDefinitionLog.getName());
-                    putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
-                    return result;
+                    logger.error(
+                            "Generate task definition list failed, the given task definition parameter is invalided, taskName: {}, taskDefinition: {}",
+                            taskDefinitionLog.getName(), taskDefinitionLog);
+                    throw new ServiceException(Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 }
             }
-            putMsg(result, Status.SUCCESS);
+            return taskDefinitionLogs;
+        } catch (ServiceException ex) {
+            throw ex;
         } catch (Exception e) {
-            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-            result.put(Constants.MSG, e.getMessage());
+            logger.error("Generate task definition list failed, meet an unknown exception", e);
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR);
         }
-        return result;
     }
 
-    private Map<String, Object> checkTaskRelationList(List<ProcessTaskRelationLog> taskRelationList, String taskRelationJson, List<TaskDefinitionLog> taskDefinitionLogs) {
-        Map<String, Object> result = new HashMap<>();
+    private List<ProcessTaskRelationLog> generateTaskRelationList(String taskRelationJson,
+                                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
         try {
-            if (taskRelationList == null || taskRelationList.isEmpty()) {
-                logger.error("task relation list is null");
-                putMsg(result, Status.DATA_IS_NOT_VALID, taskRelationJson);
-                return result;
+            List<ProcessTaskRelationLog> taskRelationList =
+                    JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
+            if (CollectionUtils.isEmpty(taskRelationList)) {
+                logger.error("Generate task relation list failed the taskRelation list is empty, taskRelationJson: {}",
+                        taskRelationJson);
+                throw new ServiceException(Status.DATA_IS_NOT_VALID);
             }
             List<ProcessTaskRelation> processTaskRelations = taskRelationList.stream()
-                .map(processTaskRelationLog -> JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class))
-                .collect(Collectors.toList());
+                    .map(processTaskRelationLog -> JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog),
+                            ProcessTaskRelation.class))
+                    .collect(Collectors.toList());
             List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
             if (taskNodeList.size() != taskRelationList.size()) {
-                Set<Long> postTaskCodes = taskRelationList.stream().map(ProcessTaskRelationLog::getPostTaskCode).collect(Collectors.toSet());
+                Set<Long> postTaskCodes = taskRelationList.stream().map(ProcessTaskRelationLog::getPostTaskCode)
+                        .collect(Collectors.toSet());
                 Set<Long> taskNodeCodes = taskNodeList.stream().map(TaskNode::getCode).collect(Collectors.toSet());
                 Collection<Long> codes = CollectionUtils.subtract(postTaskCodes, taskNodeCodes);
                 if (CollectionUtils.isNotEmpty(codes)) {
-                    logger.error("the task code is not exist");
-                    putMsg(result, Status.TASK_DEFINE_NOT_EXIST, org.apache.commons.lang.StringUtils.join(codes, Constants.COMMA));
-                    return result;
+                    String taskCodes = StringUtils.join(codes, Constants.COMMA);
+                    logger.error("Task definitions do not exist, taskCodes:{}.", taskCodes);
+                    throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCodes);
                 }
             }
             if (graphHasCycle(taskNodeList)) {
-                logger.error("process DAG has cycle");
-                putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
-                return result;
+                logger.error("Process DAG has cycle.");
+                throw new ServiceException(Status.PROCESS_NODE_HAS_CYCLE);
             }
 
             // check whether the task relation json is normal
             for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
                 if (processTaskRelationLog.getPostTaskCode() == 0) {
-                    logger.error("the post_task_code or post_task_version can't be zero");
-                    putMsg(result, Status.CHECK_PROCESS_TASK_RELATION_ERROR);
-                    return result;
+                    logger.error("The post_task_code or post_task_version of processTaskRelationLog can not be zero, " +
+                            "processTaskRelationLogId:{}.", processTaskRelationLog.getId());
+                    throw new ServiceException(Status.CHECK_PROCESS_TASK_RELATION_ERROR);
                 }
             }
-            putMsg(result, Status.SUCCESS);
+            return taskRelationList;
+        } catch (ServiceException ex) {
+            throw ex;
         } catch (Exception e) {
-            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-            result.put(Constants.MSG, e.getMessage());
+            logger.error("Check task relation list error, meet an unknown exception, given taskRelationJson: {}",
+                    taskRelationJson, e);
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR);
         }
-        return result;
     }
 
     /**
@@ -401,8 +498,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> queryProcessDefinitionList(User loginUser, long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -423,8 +521,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> queryProcessDefinitionSimpleList(User loginUser, long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -455,35 +554,84 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return process definition page
      */
     @Override
-    public Result queryProcessDefinitionListPaging(User loginUser, long projectCode, String searchVal, String otherParamsJson, Integer userId, Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public PageInfo<ProcessDefinition> queryProcessDefinitionListPaging(@NonNull User loginUser,
+                                                                        long projectCode,
+                                                                        String searchVal,
+                                                                        String otherParamsJson,
+                                                                        Integer userId,
+                                                                        Integer pageNo,
+                                                                        Integer pageSize) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            putMsg(result, resultStatus);
-            return result;
+
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+
+        PageListingResult<ProcessDefinition> processDefinitionsPageListingResult =
+                processDefinitionDao.listingProcessDefinition(
+                        pageNo, pageSize, searchVal, userId, projectCode);
+        List<ProcessDefinition> processDefinitions = processDefinitionsPageListingResult.getRecords();
+
+        List<Long> processDefinitionCodes =
+                processDefinitions.stream().map(ProcessDefinition::getCode).collect(Collectors.toList());
+        Map<Long, Schedule> scheduleMap = schedulerService.queryScheduleByProcessDefinitionCodes(processDefinitionCodes)
+                .stream()
+                .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
+
+        for (ProcessDefinition pd : processDefinitions) {
+            // todo: use batch query
+            ProcessDefinitionLog processDefinitionLog =
+                    processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
+            User user = userMapper.selectById(processDefinitionLog.getOperator());
+            pd.setModifyBy(user.getUserName());
+            Schedule schedule = scheduleMap.get(pd.getCode());
+            pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }
 
-        Page<ProcessDefinition> page = new Page<>(pageNo, pageSize);
-        IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(
-            page, searchVal, userId, project.getCode(), isAdmin(loginUser));
+        PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) processDefinitionsPageListingResult.getTotalCount());
+        pageInfo.setTotalList(processDefinitions);
+
+        return pageInfo;
+    }
+
+    /**
+     * Filter resource process definitions
+     *
+     * @param loginUser login user
+     * @param workflowFilterRequest workflow filter requests
+     * @return List process definition
+     */
+    @Override
+    public PageInfo<ProcessDefinition> filterProcessDefinition(User loginUser,
+                                                               WorkflowFilterRequest workflowFilterRequest) {
+        ProcessDefinition processDefinition = workflowFilterRequest.convert2ProcessDefinition();
+        if (workflowFilterRequest.getProjectName() != null) {
+            Project project = projectMapper.queryByName(workflowFilterRequest.getProjectName());
+            // check user access for project
+            projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+            processDefinition.setProjectCode(project.getCode());
+        }
+
+        Page<ProcessDefinition> page =
+                new Page<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
+        IPage<ProcessDefinition> processDefinitionIPage =
+                processDefinitionMapper.filterProcessDefinition(page, processDefinition);
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
         for (ProcessDefinition pd : records) {
-            ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
+            ProcessDefinitionLog processDefinitionLog =
+                    processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
             User user = userMapper.selectById(processDefinitionLog.getOperator());
             pd.setModifyBy(user.getUserName());
         }
+
         processDefinitionIPage.setRecords(records);
-        PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
+        PageInfo<ProcessDefinition> pageInfo =
+                new PageInfo<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
         pageInfo.setTotal((int) processDefinitionIPage.getTotal());
         pageInfo.setTotalList(processDefinitionIPage.getRecords());
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
 
-        return result;
+        return pageInfo;
     }
 
     /**
@@ -497,14 +645,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> queryProcessDefinitionByCode(User loginUser, long projectCode, long code) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+            logger.error("Process definition does not exist, processCode:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
         } else {
             Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
@@ -518,17 +668,45 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
+    /**
+     * query detail of process definition
+     *
+     * @param loginUser login user
+     * @param code process definition code
+     * @return process definition detail
+     */
+    @Override
+    public ProcessDefinition getProcessDefinition(User loginUser, long code) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
+        if (processDefinition == null) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
+        }
+
+        Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+
+        Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
+        if (tenant != null) {
+            processDefinition.setTenantCode(tenant.getTenantCode());
+        }
+
+        return processDefinition;
+    }
+
     @Override
     public Map<String, Object> queryProcessDefinitionByName(User loginUser, long projectCode, String name) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
 
         if (processDefinition == null) {
+            logger.error("Process definition does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, name);
         } else {
             DagData dagData = processService.genDagData(processDefinition);
@@ -571,27 +749,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String otherParamsJson,
                                                        ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_UPDATE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-
-        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
-        Map<String, Object> checkTaskDefinitions = checkTaskDefinitionList(taskDefinitionLogs, taskDefinitionJson);
-        if (checkTaskDefinitions.get(Constants.STATUS) != Status.SUCCESS) {
-            return checkTaskDefinitions;
+        if (checkDescriptionLength(description)) {
+            logger.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
         }
-        List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
-        Map<String, Object> checkRelationJson = checkTaskRelationList(taskRelationList, taskRelationJson, taskDefinitionLogs);
-        if (checkRelationJson.get(Constants.STATUS) != Status.SUCCESS) {
-            return checkRelationJson;
-        }
+        List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
+        List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
         int tenantId = -1;
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
+                logger.error("Tenant does not exist.");
                 putMsg(result, Status.TENANT_NOT_EXIST);
                 return result;
             }
@@ -601,11 +777,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         // check process definition exists
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+            logger.error("Process definition does not exist, processCode:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
             // online can not permit edit
+            logger.warn("Process definition is not allowed to be modified due to {}, processDefinitionCode:{}.",
+                    ReleaseState.ONLINE.getDescp(), processDefinition.getCode());
             putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefinition.getName());
             return result;
         }
@@ -613,14 +792,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // check whether the new process define name exist
             ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
+                logger.warn("Process definition with the same name already exists, processDefinitionCode:{}.",
+                        definition.getCode());
                 putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
             }
         }
-        ProcessDefinition processDefinitionDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
+        ProcessDefinition processDefinitionDeepCopy =
+                JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenantId);
         processDefinition.setExecutionType(executionType);
-        return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, taskDefinitionLogs, otherParamsJson);
+        return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
+                taskDefinitionLogs, otherParamsJson);
     }
 
     /**
@@ -631,44 +814,54 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param processDefinition ProcessDefinition you change task definition and task relation
      * @param taskRelationList All the latest task relation list from process definition
      */
-    private void taskUsedInOtherTaskValid(ProcessDefinition processDefinition, List<ProcessTaskRelationLog> taskRelationList) {
-        List<ProcessTaskRelation> oldProcessTaskRelationList = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
-        Set<ProcessTaskRelationLog> oldProcessTaskRelationSet = oldProcessTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toSet());
+    private void taskUsedInOtherTaskValid(ProcessDefinition processDefinition,
+                                          List<ProcessTaskRelationLog> taskRelationList) {
+        List<ProcessTaskRelation> oldProcessTaskRelationList = processTaskRelationMapper
+                .queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        Set<ProcessTaskRelationLog> oldProcessTaskRelationSet =
+                oldProcessTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toSet());
         StringBuilder sb = new StringBuilder();
-        for (ProcessTaskRelationLog oldProcessTaskRelation: oldProcessTaskRelationSet) {
-            boolean oldTaskExists = taskRelationList.stream().anyMatch(relation -> oldProcessTaskRelation.getPostTaskCode() == relation.getPostTaskCode());
+        for (ProcessTaskRelationLog oldProcessTaskRelation : oldProcessTaskRelationSet) {
+            boolean oldTaskExists = taskRelationList.stream()
+                    .anyMatch(relation -> oldProcessTaskRelation.getPostTaskCode() == relation.getPostTaskCode());
             if (!oldTaskExists) {
                 Optional<String> taskDepMsg = workFlowLineageService.taskDepOnTaskMsg(
-                        processDefinition.getProjectCode(), oldProcessTaskRelation.getProcessDefinitionCode(), oldProcessTaskRelation.getPostTaskCode());
+                        processDefinition.getProjectCode(), oldProcessTaskRelation.getProcessDefinitionCode(),
+                        oldProcessTaskRelation.getPostTaskCode());
                 taskDepMsg.ifPresent(sb::append);
             }
             if (sb.length() != 0) {
+                logger.error("Task cannot be deleted because it is dependent");
                 throw new ServiceException(sb.toString());
             }
         }
     }
 
     protected Map<String, Object> updateDagDefine(User loginUser,
-                                                List<ProcessTaskRelationLog> taskRelationList,
-                                                ProcessDefinition processDefinition,
-                                                ProcessDefinition processDefinitionDeepCopy,
-                                                List<TaskDefinitionLog> taskDefinitionLogs,
-                                                String otherParamsJson) {
+                                                  List<ProcessTaskRelationLog> taskRelationList,
+                                                  ProcessDefinition processDefinition,
+                                                  ProcessDefinition processDefinitionDeepCopy,
+                                                  List<TaskDefinitionLog> taskDefinitionLogs,
+                                                  String otherParamsJson) {
         Map<String, Object> result = new HashMap<>();
-        int saveTaskResult = processService.saveTaskDefine(loginUser, processDefinition.getProjectCode(), taskDefinitionLogs, Boolean.TRUE);
+        int saveTaskResult = processService.saveTaskDefine(loginUser, processDefinition.getProjectCode(),
+                taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
             logger.info("The task has not changed, so skip");
         }
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
+            logger.error("Update task definitions error, projectCode:{}, processCode:{}.",
+                    processDefinition.getProjectCode(), processDefinition.getCode());
             putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         boolean isChange = false;
         if (processDefinition.equals(processDefinitionDeepCopy) && saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
-            List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+            List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper
+                    .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
             if (taskRelationList.size() == processTaskRelationLogList.size()) {
-                Set<ProcessTaskRelationLog> taskRelationSet = taskRelationList.stream().collect(Collectors.toSet());
-                Set<ProcessTaskRelationLog> processTaskRelationLogSet = processTaskRelationLogList.stream().collect(Collectors.toSet());
+                Set<ProcessTaskRelationLog> taskRelationSet = new HashSet<>(taskRelationList);
+                Set<ProcessTaskRelationLog> processTaskRelationLogSet = new HashSet<>(processTaskRelationLogList);
                 if (taskRelationSet.size() == processTaskRelationLogSet.size()) {
                     taskRelationSet.removeAll(processTaskRelationLogSet);
                     if (!taskRelationSet.isEmpty()) {
@@ -684,25 +877,39 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             isChange = true;
         }
         if (isChange) {
+            logger.info("Process definition needs to be updated, projectCode:{}, processCode:{}, processVersion:{}.",
+                    processDefinition.getProjectCode(), processDefinition.getCode(), processDefinition.getVersion());
             processDefinition.setUpdateTime(new Date());
-            int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+            int insertVersion =
+                    processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
             if (insertVersion <= 0) {
+                logger.error("Update process definition error, processCode:{}.", processDefinition.getCode());
                 putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            }
+            } else
+                logger.info("Update process definition complete, processCode:{}, processVersion:{}.",
+                        processDefinition.getCode(), insertVersion);
 
             taskUsedInOtherTaskValid(processDefinition, taskRelationList);
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
-                processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
+                    processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
             if (insertResult == Constants.EXIT_CODE_SUCCESS) {
+                logger.info(
+                        "Update process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+                        processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
                 putMsg(result, Status.SUCCESS);
                 result.put(Constants.DATA_LIST, processDefinition);
             } else {
+                logger.error("Update process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
+                        processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
                 putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
             saveOtherRelation(loginUser, processDefinition, result, otherParamsJson);
         } else {
+            logger.info(
+                    "Process definition does not need to be updated because there is no change, projectCode:{}, processCode:{}, processVersion:{}.",
+                    processDefinition.getProjectCode(), processDefinition.getCode(), processDefinition.getVersion());
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
         }
@@ -718,19 +925,28 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return true if process definition name not exists, otherwise false
      */
     @Override
-    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name) {
+    public Map<String, Object> verifyProcessDefinitionName(User loginUser, long projectCode, String name,
+                                                           long processDefinitionCode) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_CREATE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
+        ProcessDefinition processDefinition =
+                processDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
+            return result;
         }
+        if (processDefinitionCode != 0 && processDefinitionCode == processDefinition.getCode()) {
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                processDefinition.getName(), processDefinition.getCode());
+        putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
         return result;
     }
 
@@ -748,16 +964,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         // check process instances is already running
-        List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
+        List<ProcessInstance> processInstances = processInstanceService
+                .queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processInstances.size());
         }
 
         // check process used by other task, including subprocess and dependent task type
-        Set<TaskMainInfo> taskDepOnProcess = workFlowLineageService.queryTaskDepOnProcess(processDefinition.getProjectCode(), processDefinition.getCode());
+        Set<TaskMainInfo> taskDepOnProcess = workFlowLineageService
+                .queryTaskDepOnProcess(processDefinition.getProjectCode(), processDefinition.getCode());
         if (CollectionUtils.isNotEmpty(taskDepOnProcess)) {
             String taskDepDetail = taskDepOnProcess.stream()
-                    .map(task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(), task.getTaskName()))
+                    .map(task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(),
+                            task.getTaskName()))
                     .collect(Collectors.joining(Constants.COMMA));
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL, taskDepDetail);
         }
@@ -767,29 +986,23 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * delete process definition by code
      *
      * @param loginUser login user
-     * @param projectCode project code
      * @param code process definition code
-     * @return delete result code
      */
     @Override
     @Transactional
-    public Map<String, Object> deleteProcessDefinitionByCode(User loginUser, long projectCode, long code) {
-        Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION_DELETE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+    public void deleteProcessDefinitionByCode(User loginUser, long code) {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
-        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
-            return result;
+        if (processDefinition == null) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
         }
+
+        Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION_DELETE);
 
         // Determine if the login user is the owner of the process definition
         if (loginUser.getId() != processDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         processDefinitionUsedInOtherTaskValid(processDefinition);
@@ -800,27 +1013,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
                 int delete = scheduleMapper.deleteById(scheduleObj.getId());
                 if (delete == 0) {
-                    putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
-                    throw new ServiceException(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
+                    throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
                 }
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
-                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, scheduleObj.getId());
-                return result;
+                throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleObj.getId());
             }
         }
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
-            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
+            logger.error("Delete process definition error, processDefinitionCode:{}.", code);
             throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
         }
         int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if (deleteRelation == 0) {
-            logger.warn("The process definition has not relation, it will be delete successfully");
+            logger.warn(
+                    "The process definition has not relation, it will be delete successfully, processDefinitionCode:{}.",
+                    code);
         }
-        deleteOtherRelation(project, result, processDefinition);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        deleteOtherRelation(project, new HashMap<>(), processDefinition);
     }
 
     /**
@@ -834,10 +1045,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     @Transactional
-    public Map<String, Object> releaseProcessDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+    public Map<String, Object> releaseProcessDefinition(User loginUser, long projectCode, long code,
+                                                        ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_ONLINE_OFFLINE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_ONLINE_OFFLINE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -850,33 +1063,46 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+            logger.error("Process definition does not exist, processDefinitionCode:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
         switch (releaseState) {
             case ONLINE:
-                List<ProcessTaskRelation> relationList = processService.findRelationByCode(code, processDefinition.getVersion());
+                List<ProcessTaskRelation> relationList =
+                        processService.findRelationByCode(code, processDefinition.getVersion());
                 if (CollectionUtils.isEmpty(relationList)) {
+                    logger.warn("Process definition has no task relation, processDefinitionCode:{}.", code);
                     putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
                     return result;
                 }
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
+                logger.info("Set process definition online, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                        code);
                 break;
             case OFFLINE:
                 processDefinition.setReleaseState(releaseState);
                 int updateProcess = processDefinitionMapper.updateById(processDefinition);
                 Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(code);
-                if (updateProcess > 0 && schedule != null) {
-                    logger.info("set schedule offline, project code: {}, schedule id: {}, process definition code: {}", projectCode, schedule.getId(), code);
-                    // set status
-                    schedule.setReleaseState(releaseState);
-                    int updateSchedule = scheduleMapper.updateById(schedule);
-                    if (updateSchedule == 0) {
-                        putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
-                        throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
+                if (updateProcess > 0) {
+                    logger.info("Set process definition offline, projectCode:{}, processDefinitionCode:{}.",
+                            projectCode, code);
+                    if (schedule != null) {
+                        // set status
+                        schedule.setReleaseState(releaseState);
+                        int updateSchedule = scheduleMapper.updateById(schedule);
+                        if (updateSchedule == 0) {
+                            logger.error(
+                                    "Set schedule offline error, projectCode:{}, processDefinitionCode:{}, scheduleId:{}",
+                                    projectCode, code, schedule.getId());
+                            putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
+                            throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
+                        } else
+                            logger.info("Set schedule offline, projectCode:{}, processDefinitionCode:{}, scheduleId:{}",
+                                    projectCode, code, schedule.getId());
+                        schedulerService.deleteSchedule(project.getId(), schedule.getId());
                     }
-                    schedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             default:
@@ -892,27 +1118,36 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * batch export process definition by codes
      */
     @Override
-    public void batchExportProcessDefinitionByCodes(User loginUser, long projectCode, String codes, HttpServletResponse response) {
-        if (org.apache.commons.lang.StringUtils.isEmpty(codes)) {
+    public void batchExportProcessDefinitionByCodes(User loginUser, long projectCode, String codes,
+                                                    HttpServletResponse response) {
+        if (StringUtils.isEmpty(codes)) {
+            logger.warn("Process definition codes to be exported is empty.");
             return;
         }
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION_EXPORT);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION_EXPORT);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return;
         }
-        Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
+        Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
+                .collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(defineCodeSet);
         if (CollectionUtils.isEmpty(processDefinitionList)) {
+            logger.error("Process definitions to be exported do not exist, processDefinitionCodes:{}.", defineCodeSet);
             return;
         }
         // check processDefinition exist in project
-        List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream().filter(o -> projectCode == o.getProjectCode()).collect(Collectors.toList());
-        List<DagDataSchedule> dagDataSchedules = processDefinitionListInProject.stream().map(this::exportProcessDagData).collect(Collectors.toList());
+        List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream()
+                .filter(o -> projectCode == o.getProjectCode()).collect(Collectors.toList());
+        List<DagDataSchedule> dagDataSchedules =
+                processDefinitionListInProject.stream().map(this::exportProcessDagData).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(dagDataSchedules)) {
+            logger.info("Start download process definition file, processDefinitionCodes:{}.", defineCodeSet);
             downloadProcessDefinitionFile(response, dagDataSchedules);
-        }
+        } else
+            logger.error("There is no exported process dag data.");
     }
 
     /**
@@ -929,20 +1164,20 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             buff.flush();
             buff.close();
         } catch (IOException e) {
-            logger.warn("export process fail", e);
+            logger.warn("Export process definition fail", e);
         } finally {
             if (null != buff) {
                 try {
                     buff.close();
                 } catch (Exception e) {
-                    logger.warn("export process buffer not close", e);
+                    logger.warn("Buffer does not close", e);
                 }
             }
             if (null != out) {
                 try {
                     out.close();
                 } catch (Exception e) {
-                    logger.warn("export process output stream not close", e);
+                    logger.warn("Output stream does not close", e);
                 }
             }
         }
@@ -975,16 +1210,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     @Transactional
     public Map<String, Object> importProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result;
         String dagDataScheduleJson = FileUtils.file2String(file);
         List<DagDataSchedule> dagDataScheduleList = JSONUtils.toList(dagDataScheduleJson, DagDataSchedule.class);
         Project project = projectMapper.queryByCode(projectCode);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_EXPORT);
+        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_EXPORT);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        //check file content
+        // check file content
         if (CollectionUtils.isEmpty(dagDataScheduleList)) {
+            logger.warn("Process definition file content is empty.");
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
             return result;
         }
@@ -999,9 +1235,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     @Transactional
     public Map<String, Object> importSqlProcessDefinition(User loginUser, long projectCode, MultipartFile file) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result;
         Project project = projectMapper.queryByCode(projectCode);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_IMPORT);
+        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_IMPORT);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -1010,7 +1246,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (index > 0) {
             processDefinitionName = processDefinitionName.substring(0, index);
         }
-        processDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
+        processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
 
         ProcessDefinition processDefinition;
         List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
@@ -1026,15 +1262,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, DataSource> dataSourceCache = new HashMap<>(1);
         Map<String, Long> taskNameToCode = new HashMap<>(16);
         Map<String, List<String>> taskNameToUpstream = new HashMap<>(16);
-        try (ZipInputStream zIn = new ZipInputStream(file.getInputStream());
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
+        try (
+                ZipInputStream zIn = new ZipInputStream(file.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
             // build process definition
             processDefinition = new ProcessDefinition(projectCode,
-                processDefinitionName,
-                CodeGenerateUtils.getInstance().genCode(),
-                "",
-                "[]", null,
-                0, loginUser.getId(), loginUser.getTenantId());
+                    processDefinitionName,
+                    CodeGenerateUtils.getInstance().genCode(),
+                    "",
+                    "[]", null,
+                    0, loginUser.getId(), loginUser.getTenantId());
 
             ZipEntry entry;
             while ((entry = zIn.getNextEntry()) != null) {
@@ -1052,7 +1289,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         totalSizeArchive += nBytes;
                         long compressionRatio = totalSizeEntry / entry.getCompressedSize();
                         if (compressionRatio > THRESHOLD_RATIO) {
-                            throw new IllegalStateException("ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack");
+                            throw new IllegalStateException(
+                                    "Ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack.");
                         }
                         int commentIndex = line.indexOf("-- ");
                         if (commentIndex >= 0) {
@@ -1067,7 +1305,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                         break;
                                     case "upstream":
                                         upstreams = Arrays.stream(value.split(",")).map(String::trim)
-                                            .filter(s -> !"".equals(s)).collect(Collectors.toList());
+                                                .filter(s -> !"".equals(s)).collect(Collectors.toList());
                                         line = line.substring(0, commentIndex);
                                         break;
                                     case "datasource":
@@ -1100,12 +1338,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         dataSource = queryDatasourceByNameAndUser(datasourceName, loginUser);
                     }
                     if (dataSource == null) {
+                        logger.error("Datasource does not found, may be its name is illegal.");
                         putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
                         return result;
                     }
                     dataSourceCache.put(datasourceName, dataSource);
 
-                    TaskDefinitionLog taskDefinition = buildNormalSqlTaskDefinition(taskName, dataSource, sql.substring(0, sql.length() - 1));
+                    TaskDefinitionLog taskDefinition =
+                            buildNormalSqlTaskDefinition(taskName, dataSource, sql.substring(0, sql.length() - 1));
 
                     taskDefinitionList.add(taskDefinition);
                     taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
@@ -1113,15 +1353,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
 
                 if (totalSizeArchive > THRESHOLD_SIZE) {
-                    throw new IllegalStateException("the uncompressed data size is too much for the application resource capacity");
+                    throw new IllegalStateException(
+                            "the uncompressed data size is too much for the application resource capacity");
                 }
 
                 if (totalEntryArchive > THRESHOLD_ENTRIES) {
-                    throw new IllegalStateException("too much entries in this archive, can lead to inodes exhaustion of the system");
+                    throw new IllegalStateException(
+                            "too much entries in this archive, can lead to inodes exhaustion of the system");
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.error("Import process definition error.", e);
             putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
             return result;
         }
@@ -1130,13 +1372,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         for (Map.Entry<String, Long> entry : taskNameToCode.entrySet()) {
             List<String> upstreams = taskNameToUpstream.get(entry.getKey());
             if (CollectionUtils.isEmpty(upstreams)
-                || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
+                    || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
                 ProcessTaskRelationLog processTaskRelation = buildNormalTaskRelation(0, entry.getValue());
                 processTaskRelationList.add(processTaskRelation);
                 continue;
             }
             for (String upstream : upstreams) {
-                ProcessTaskRelationLog processTaskRelation = buildNormalTaskRelation(taskNameToCode.get(upstream), entry.getValue());
+                ProcessTaskRelationLog processTaskRelation =
+                        buildNormalTaskRelation(taskNameToCode.get(upstream), entry.getValue());
                 processTaskRelationList.add(processTaskRelation);
             }
         }
@@ -1157,7 +1400,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     private DataSource queryDatasourceByNameAndUser(String datasourceName, User loginUser) {
         if (isAdmin(loginUser)) {
-            List<DataSource> dataSources  = dataSourceMapper.queryDataSourceByName(datasourceName);
+            List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(datasourceName);
             if (CollectionUtils.isNotEmpty(dataSources)) {
                 return dataSources.get(0);
             }
@@ -1167,7 +1410,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return null;
     }
 
-    private TaskDefinitionLog buildNormalSqlTaskDefinition(String taskName, DataSource dataSource, String sql) throws CodeGenerateException {
+    private TaskDefinitionLog buildNormalSqlTaskDefinition(String taskName, DataSource dataSource,
+                                                           String sql) throws CodeGenerateException {
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
         taskDefinition.setName(taskName);
         taskDefinition.setFlag(Flag.YES);
@@ -1198,7 +1442,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * check and import
      */
-    protected boolean checkAndImport(User loginUser, long projectCode, Map<String, Object> result, DagDataSchedule dagDataSchedule, String otherParamsJson) {
+    protected boolean checkAndImport(User loginUser, long projectCode, Map<String, Object> result,
+                                     DagDataSchedule dagDataSchedule, String otherParamsJson) {
         if (!checkImportanceParams(dagDataSchedule, result)) {
             return false;
         }
@@ -1206,10 +1451,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // generate import processDefinitionName
         String processDefinitionName = recursionProcessDefinitionName(projectCode, processDefinition.getName(), 1);
-        String importProcessDefinitionName = processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp();
-
-        //unique check
-        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName);
+        String importProcessDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
+        // unique check
+        Map<String, Object> checkResult =
+                verifyProcessDefinitionName(loginUser, projectCode, importProcessDefinitionName, 0);
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -1217,12 +1462,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return false;
         }
         processDefinition.setName(importProcessDefinitionName);
-        processDefinition.setId(0);
+        processDefinition.setId(null);
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
             processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
         } catch (CodeGenerateException e) {
+            logger.error(
+                    "Save process definition error because generate process definition code error, projectCode:{}.",
+                    projectCode, e);
             putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             return false;
         }
@@ -1245,7 +1493,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 taskCodeMap.put(taskDefinitionLog.getCode(), code);
                 taskDefinitionLog.setCode(code);
             } catch (CodeGenerateException e) {
-                logger.error("Task code get error, ", e);
+                logger.error("Generate task definition code error, projectCode:{}, processDefinitionCode:{}",
+                        projectCode, processDefinition.getCode(), e);
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return false;
             }
@@ -1254,6 +1503,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
+            logger.error("Save task definition error, projectCode:{}, processDefinitionCode:{}", projectCode,
+                    processDefinition.getCode());
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
@@ -1272,7 +1523,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
             taskRelationLogList.add(processTaskRelationLog);
         }
-        if (StringUtils.isNotEmpty(processDefinition.getLocations()) && JSONUtils.checkJsonValid(processDefinition.getLocations())) {
+        if (StringUtils.isNotEmpty(processDefinition.getLocations())
+                && JSONUtils.checkJsonValid(processDefinition.getLocations())) {
             ArrayNode arrayNode = JSONUtils.parseArray(processDefinition.getLocations());
             ArrayNode newArrayNode = JSONUtils.createArrayNode();
             for (int i = 0; i < arrayNode.size(); i++) {
@@ -1289,11 +1541,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         processDefinition.setCreateTime(new Date());
         processDefinition.setUpdateTime(new Date());
-        Map<String, Object> createDagResult = createDagDefine(loginUser, taskRelationLogList, processDefinition, Lists.newArrayList(), otherParamsJson);
+        Map<String, Object> createDagResult = createDagDefine(loginUser, taskRelationLogList, processDefinition,
+                Lists.newArrayList(), otherParamsJson);
         if (Status.SUCCESS.equals(createDagResult.get(Constants.STATUS))) {
             putMsg(createDagResult, Status.SUCCESS);
         } else {
             result.putAll(createDagResult);
+            logger.error("Import process definition error, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                    processDefinition.getCode());
             throw new ServiceException(Status.IMPORT_PROCESS_DEFINE_ERROR);
         }
 
@@ -1306,10 +1561,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             schedule.setUpdateTime(now);
             int scheduleInsert = scheduleMapper.insert(schedule);
             if (0 == scheduleInsert) {
+                logger.error(
+                        "Import process definition error due to save schedule fail, projectCode:{}, processDefinitionCode:{}.",
+                        projectCode, processDefinition.getCode());
                 putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
                 throw new ServiceException(Status.IMPORT_PROCESS_DEFINE_ERROR);
             }
         }
+
+        logger.info("Import process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                processDefinition.getCode());
         return true;
     }
 
@@ -1318,14 +1579,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     private boolean checkImportanceParams(DagDataSchedule dagDataSchedule, Map<String, Object> result) {
         if (dagDataSchedule.getProcessDefinition() == null) {
+            logger.warn("Process definition is null.");
             putMsg(result, Status.DATA_IS_NULL, "ProcessDefinition");
             return false;
         }
         if (CollectionUtils.isEmpty(dagDataSchedule.getTaskDefinitionList())) {
+            logger.warn("Task definition list is null.");
             putMsg(result, Status.DATA_IS_NULL, "TaskDefinitionList");
             return false;
         }
         if (CollectionUtils.isEmpty(dagDataSchedule.getProcessTaskRelationList())) {
+            logger.warn("Process task relation list is null.");
             putMsg(result, Status.DATA_IS_NULL, "ProcessTaskRelationList");
             return false;
         }
@@ -1333,7 +1597,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     private String recursionProcessDefinitionName(long projectCode, String processDefinitionName, int num) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
+        ProcessDefinition processDefinition =
+                processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
         if (processDefinition != null) {
             if (num > 1) {
                 String str = processDefinitionName.substring(0, processDefinitionName.length() - 3);
@@ -1354,28 +1619,30 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return check result code
      */
     @Override
-    public Map<String, Object> checkProcessNodeList(String processTaskRelationJson, List<TaskDefinitionLog> taskDefinitionLogsList) {
+    public Map<String, Object> checkProcessNodeList(String processTaskRelationJson,
+                                                    List<TaskDefinitionLog> taskDefinitionLogsList) {
         Map<String, Object> result = new HashMap<>();
         try {
             if (processTaskRelationJson == null) {
-                logger.error("process data is null");
+                logger.error("Process task relation data is null.");
                 putMsg(result, Status.DATA_IS_NOT_VALID, processTaskRelationJson);
                 return result;
             }
 
-            List<ProcessTaskRelation> taskRelationList = JSONUtils.toList(processTaskRelationJson, ProcessTaskRelation.class);
+            List<ProcessTaskRelation> taskRelationList =
+                    JSONUtils.toList(processTaskRelationJson, ProcessTaskRelation.class);
             // Check whether the task node is normal
             List<TaskNode> taskNodes = processService.transformTask(taskRelationList, taskDefinitionLogsList);
 
             if (CollectionUtils.isEmpty(taskNodes)) {
-                logger.error("process node info is empty");
+                logger.error("Task node data is empty.");
                 putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
                 return result;
             }
 
             // check has cycle
             if (graphHasCycle(taskNodes)) {
-                logger.error("process DAG has cycle");
+                logger.error("Process DAG has cycle.");
                 putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
                 return result;
             }
@@ -1388,7 +1655,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         .dependence(taskNode.getDependence())
                         .switchResult(taskNode.getSwitchResult())
                         .build())) {
-                    logger.error("task node {} parameter invalid", taskNode.getName());
+                    logger.error("Task node {} parameter invalid.", taskNode.getName());
                     putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskNode.getName());
                     return result;
                 }
@@ -1416,14 +1683,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> getTaskNodeListByDefinitionCode(User loginUser, long projectCode, long code) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
+        // check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            logger.info("process define not exists");
+            logger.error("Process definition does not exist, processDefinitionCode:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
@@ -1445,27 +1712,32 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser, long projectCode, String codes) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,null);
+        // check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 
-        Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
+        Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
+                .collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(defineCodeSet);
         if (CollectionUtils.isEmpty(processDefinitionList)) {
-            logger.info("process definition not exists");
+            logger.error("Process definitions do not exist, codes:{}.", defineCodeSet);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
-        HashMap<Long, Project> userProjects =  new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
+        HashMap<Long, Project> userProjects = new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
         projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
-            .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
+                .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
 
         // check processDefinition exist in project
         List<ProcessDefinition> processDefinitionListInProject = processDefinitionList.stream()
-            .filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
+                .filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(processDefinitionListInProject)) {
+            Set<Long> codesInProject = processDefinitionListInProject.stream()
+                    .map(ProcessDefinition::getCode).collect(Collectors.toSet());
+            logger.error("Process definitions do not exist in project, projectCode:{}, processDefinitionsCodes:{}.",
+                    processDefinitionListInProject.get(0).getProjectCode(), codesInProject);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
             return result;
         }
@@ -1492,13 +1764,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> queryAllProcessDefinitionByProjectCode(User loginUser, long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_DEFINITION);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
-        List<DagData> dagDataList = processDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
+        List<DagData> dagDataList =
+                processDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, dagDataList);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -1513,7 +1787,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> queryProcessDefinitionListByProjectCode(long projectCode) {
         Map<String, Object> result = new HashMap<>();
-        List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
+        List<DependentSimplifyDefinition> processDefinitions =
+                processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
         result.put(Constants.DATA_LIST, processDefinitions);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -1527,19 +1802,22 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return task definition list in the process definition
      */
     @Override
-    public Map<String, Object> queryTaskDefinitionListByProcessDefinitionCode(long projectCode, Long processDefinitionCode) {
+    public Map<String, Object> queryTaskDefinitionListByProcessDefinitionCode(long projectCode,
+                                                                              Long processDefinitionCode) {
         Map<String, Object> result = new HashMap<>();
 
         Set<Long> definitionCodesSet = new HashSet<>();
         definitionCodesSet.add(processDefinitionCode);
-        List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, definitionCodesSet);
+        List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper
+                .queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, definitionCodesSet);
 
-        //query process task relation
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(
-                processDefinitions.get(0).getCode(),
-                processDefinitions.get(0).getVersion());
+        // query process task relation
+        List<ProcessTaskRelation> processTaskRelations =
+                processTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(
+                        processDefinitions.get(0).getCode(),
+                        processDefinitions.get(0).getVersion());
 
-        //query task definition log
+        // query task definition log
         List<TaskDefinitionLog> taskDefinitionLogsList = processService.genTaskDefineList(processTaskRelations);
 
         List<DependentSimplifyDefinition> taskDefinitionList = new ArrayList<>();
@@ -1565,34 +1843,40 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return tree view json data
      */
     @Override
-    public Map<String, Object> viewTree(User loginUser,long projectCode, long code, Integer limit) {
+    public Map<String, Object> viewTree(User loginUser, long projectCode, long code, Integer limit) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_TREE_VIEW);
+        // check user access for project
+        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_TREE_VIEW);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (null == processDefinition || projectCode != processDefinition.getProjectCode()) {
-            logger.info("process define not exists");
+            logger.error("Process definition does not exist, code:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
         DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
-        // nodes that is running
+        // nodes that are running
         Map<String, List<TreeViewDto>> runningNodeMap = new ConcurrentHashMap<>();
 
-        //nodes that is waiting to run
+        // nodes that are waiting to run
         Map<String, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
 
         // List of process instances
         List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(code, limit);
-        processInstanceList.forEach(processInstance -> processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
-        List<TaskDefinitionLog> taskDefinitionList = processService.genTaskDefineList(processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode()));
+        processInstanceList.forEach(processInstance -> processInstance
+                .setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
+        List<TaskDefinitionLog> taskDefinitionList = processService.genTaskDefineList(processTaskRelationMapper
+                .queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode()));
         Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
-            .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
+                .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
 
+        if (limit < 0) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            return result;
+        }
         if (limit > processInstanceList.size()) {
             limit = processInstanceList.size();
         }
@@ -1605,9 +1889,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         for (int i = limit - 1; i >= 0; i--) {
             ProcessInstance processInstance = processInstanceList.get(i);
             Date endTime = processInstance.getEndTime() == null ? new Date() : processInstance.getEndTime();
-            parentTreeViewDto.getInstances().add(new Instance(processInstance.getId(), processInstance.getName(), processInstance.getProcessDefinitionCode(),
-                "", processInstance.getState().toString(), processInstance.getStartTime(), endTime, processInstance.getHost(),
-                DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
+            parentTreeViewDto.getInstances()
+                    .add(new Instance(processInstance.getId(), processInstance.getName(),
+                            processInstance.getProcessDefinitionCode(),
+                            "", processInstance.getState().toString(), processInstance.getStartTime(), endTime,
+                            processInstance.getHost(),
+                            DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
         }
 
         List<TreeViewDto> parentTreeViewDtoList = new ArrayList<>();
@@ -1617,7 +1904,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             runningNodeMap.put(startNode, parentTreeViewDtoList);
         }
 
-        while (Stopper.isRunning()) {
+        while (!ServerLifeCycleManager.isStopped()) {
             Set<String> postNodeList;
             Iterator<Map.Entry<String, List<TreeViewDto>>> iter = runningNodeMap.entrySet().iterator();
             while (iter.hasNext()) {
@@ -1630,10 +1917,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 treeViewDto.setType(taskNode.getType());
                 treeViewDto.setCode(taskNode.getCode());
                 treeViewDto.setName(taskNode.getName());
-                //set treeViewDto instances
+                // set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
                     ProcessInstance processInstance = processInstanceList.get(i);
-                    TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(processInstance.getId(), Long.parseLong(nodeCode));
+                    TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(processInstance.getId(),
+                            Long.parseLong(nodeCode));
                     if (taskInstance == null) {
                         treeViewDto.getInstances().add(new Instance(-1, "not running", 0, "null"));
                     } else {
@@ -1647,9 +1935,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                             subProcessCode = Long.parseLong(JSONUtils.parseObject(
                                     taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_CODE).asText());
                         }
-                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskCode(),
-                                taskInstance.getTaskType(), taskInstance.getState().toString(), taskInstance.getStartTime(), taskInstance.getEndTime(),
-                                taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessCode));
+                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(),
+                                taskInstance.getTaskCode(),
+                                taskInstance.getTaskType(), taskInstance.getState().toString(),
+                                taskInstance.getStartTime(), taskInstance.getEndTime(),
+                                taskInstance.getHost(),
+                                DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessCode));
                     }
                 }
                 for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {
@@ -1721,7 +2012,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                           long projectCode,
                                                           String codes,
                                                           long targetProjectCode) {
-        Map<String, Object> result = checkParams(loginUser, projectCode, codes, targetProjectCode,WORKFLOW_BATCH_COPY);
+        Map<String, Object> result = checkParams(loginUser, projectCode, codes, targetProjectCode, WORKFLOW_BATCH_COPY);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -1748,11 +2039,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                           long projectCode,
                                                           String codes,
                                                           long targetProjectCode) {
-        Map<String, Object> result = checkParams(loginUser, projectCode, codes, targetProjectCode,TASK_DEFINITION_MOVE);
+        Map<String, Object> result =
+                checkParams(loginUser, projectCode, codes, targetProjectCode, TASK_DEFINITION_MOVE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         if (projectCode == targetProjectCode) {
+            logger.warn("Project code is same as target project code, projectCode:{}.", projectCode);
             return result;
         }
 
@@ -1765,23 +2058,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private Map<String, Object> checkParams(User loginUser,
                                             long projectCode,
                                             String processDefinitionCodes,
-                                            long targetProjectCode,String perm) {
+                                            long targetProjectCode, String perm) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,perm);
+        // check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, perm);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 
-        if (org.apache.commons.lang.StringUtils.isEmpty(processDefinitionCodes)) {
+        if (StringUtils.isEmpty(processDefinitionCodes)) {
+            logger.error("Parameter processDefinitionCodes is empty, projectCode is {}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY, processDefinitionCodes);
             return result;
         }
 
         if (projectCode != targetProjectCode) {
             Project targetProject = projectMapper.queryByCode(targetProjectCode);
-            //check user access for project
-            Map<String, Object> targetResult = projectService.checkProjectAndAuth(loginUser, targetProject, targetProjectCode,perm);
+            // check user access for project
+            Map<String, Object> targetResult =
+                    projectService.checkProjectAndAuth(loginUser, targetProject, targetProjectCode, perm);
             if (targetResult.get(Constants.STATUS) != Status.SUCCESS) {
                 return targetResult;
             }
@@ -1790,28 +2085,35 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     protected void doBatchOperateProcessDefinition(User loginUser,
-                                                 long targetProjectCode,
-                                                 List<String> failedProcessList,
-                                                 String processDefinitionCodes,
-                                                 Map<String, Object> result,
-                                                 boolean isCopy) {
-        Set<Long> definitionCodes = Arrays.stream(processDefinitionCodes.split(Constants.COMMA)).map(Long::parseLong).collect(Collectors.toSet());
+                                                   long targetProjectCode,
+                                                   List<String> failedProcessList,
+                                                   String processDefinitionCodes,
+                                                   Map<String, Object> result,
+                                                   boolean isCopy) {
+        Set<Long> definitionCodes = Arrays.stream(processDefinitionCodes.split(Constants.COMMA)).map(Long::parseLong)
+                .collect(Collectors.toSet());
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
-        Set<Long> queryCodes = processDefinitionList.stream().map(ProcessDefinition::getCode).collect(Collectors.toSet());
+        Set<Long> queryCodes =
+                processDefinitionList.stream().map(ProcessDefinition::getCode).collect(Collectors.toSet());
         // definitionCodes - queryCodes
-        Set<Long> diffCode = definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
+        Set<Long> diffCode =
+                definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
         diffCode.forEach(code -> failedProcessList.add(code + "[null]"));
         for (ProcessDefinition processDefinition : processDefinitionList) {
             List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
-            List<ProcessTaskRelationLog> taskRelationList = processTaskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
+                    processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(),
+                            processDefinition.getCode());
+            List<ProcessTaskRelationLog> taskRelationList =
+                    processTaskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
             processDefinition.setProjectCode(targetProjectCode);
             String otherParamsJson = doOtherOperateProcess(loginUser, processDefinition);
             if (isCopy) {
+                logger.info("Copy process definition...");
                 List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                     if (COMPLEX_TASK_TYPES.contains(taskDefinitionLog.getTaskType())) {
+                        logger.error("Task types {} do not support copy.", taskDefinitionLog.getTaskType());
                         putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
                         return;
                     }
@@ -1820,6 +2122,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
                         taskDefinitionLog.setCode(taskCode);
                     } catch (CodeGenerateException e) {
+                        logger.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
                         putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                         throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                     }
@@ -1832,19 +2135,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
                     }
                     if (processTaskRelationLog.getPostTaskCode() > 0) {
-                        processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
+                        processTaskRelationLog
+                                .setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
                     }
                 }
                 final long oldProcessDefinitionCode = processDefinition.getCode();
                 try {
                     processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
                 } catch (CodeGenerateException e) {
+                    logger.error("Generate process definition code error, projectCode:{}.", targetProjectCode, e);
                     putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                     throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                 }
-                processDefinition.setId(0);
+                processDefinition.setId(null);
                 processDefinition.setUserId(loginUser.getId());
-                processDefinition.setName(processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                processDefinition.setName(getNewName(processDefinition.getName(), COPY_SUFFIX));
                 final Date date = new Date();
                 processDefinition.setCreateTime(date);
                 processDefinition.setUpdateTime(date);
@@ -1858,7 +2163,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
                     processDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
                 }
-                //copy timing configuration
+                // copy timing configuration
                 Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
                 if (scheduleObj != null) {
                     scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
@@ -1867,20 +2172,28 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     scheduleObj.setUpdateTime(date);
                     int insertResult = scheduleMapper.insert(scheduleObj);
                     if (insertResult != 1) {
+                        logger.error("Schedule create error, processDefinitionCode:{}.", processDefinition.getCode());
                         putMsg(result, Status.CREATE_SCHEDULE_ERROR);
                         throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
                     }
                 }
                 try {
-                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson));
+                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs,
+                            otherParamsJson));
                 } catch (Exception e) {
+                    logger.error("Copy process definition error, processDefinitionCode from {} to {}.",
+                            oldProcessDefinitionCode, processDefinition.getCode(), e);
                     putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);
                 }
             } else {
+                logger.info("Move process definition...");
                 try {
-                    result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null, Lists.newArrayList(), otherParamsJson));
+                    result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null,
+                            Lists.newArrayList(), otherParamsJson));
                 } catch (Exception e) {
+                    logger.error("Move process definition error, processDefinitionCode:{}.",
+                            processDefinition.getCode(), e);
                     putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR);
                     throw new ServiceException(Status.MOVE_PROCESS_DEFINITION_ERROR);
                 }
@@ -1889,6 +2202,28 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 failedProcessList.add(processDefinition.getCode() + "[" + processDefinition.getName() + "]");
             }
         }
+    }
+
+    /**
+     * get new Task name or Process name when copy or import operate
+     * @param originalName Task or Process original name
+     * @param suffix "_copy_" or "_import_"
+     * @return new name
+     */
+    public String getNewName(String originalName, String suffix) {
+        StringBuilder newName = new StringBuilder();
+        String regex = String.format(".*%s\\d{17}$", suffix);
+        if (originalName.matches(regex)) {
+            // replace timestamp of originalName
+            return newName.append(originalName, 0, originalName.lastIndexOf(suffix))
+                    .append(suffix)
+                    .append(DateUtils.getCurrentTimeStamp())
+                    .toString();
+        }
+        return newName.append(originalName)
+                .append(suffix)
+                .append(DateUtils.getCurrentTimeStamp())
+                .toString();
     }
 
     /**
@@ -1902,30 +2237,45 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     @Transactional
-    public Map<String, Object> switchProcessDefinitionVersion(User loginUser, long projectCode, long code, int version) {
+    public Map<String, Object> switchProcessDefinitionVersion(User loginUser, long projectCode, long code,
+                                                              int version) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_SWITCH_TO_THIS_VERSION);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_SWITCH_TO_THIS_VERSION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (Objects.isNull(processDefinition) || projectCode != processDefinition.getProjectCode()) {
+            logger.error(
+                    "Switch process definition error because it does not exist, projectCode:{}, processDefinitionCode:{}.",
+                    projectCode, code);
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_ERROR, code);
             return result;
         }
 
-        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
+        ProcessDefinitionLog processDefinitionLog =
+                processDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
         if (Objects.isNull(processDefinitionLog)) {
-            putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR, processDefinition.getCode(), version);
+            logger.error(
+                    "Switch process definition error because version does not exist, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    projectCode, code, version);
+            putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR,
+                    processDefinition.getCode(), version);
             return result;
         }
         int switchVersion = processService.switchVersion(processDefinition, processDefinitionLog);
         if (switchVersion <= 0) {
+            logger.error(
+                    "Switch process definition version error, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    projectCode, code, version);
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
             throw new ServiceException(Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
         }
+        logger.info("Switch process definition version complete, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                projectCode, code, version);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -1942,12 +2292,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private void checkBatchOperateResult(long srcProjectCode, long targetProjectCode,
                                          Map<String, Object> result, List<String> failedProcessList, boolean isCopy) {
         if (!failedProcessList.isEmpty()) {
+            String failedProcess = String.join(",", failedProcessList);
             if (isCopy) {
-                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, String.join(",", failedProcessList));
+                logger.error(
+                        "Copy process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
+                        srcProjectCode, targetProjectCode, failedProcess);
+                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
             } else {
-                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, String.join(",", failedProcessList));
+                logger.error(
+                        "Move process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
+                        srcProjectCode, targetProjectCode, failedProcess);
+                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
             }
         } else {
+            logger.info("Batch {} process definition complete, srcProjectCode:{}, targetProjectCode:{}.",
+                    isCopy ? "copy" : "move", srcProjectCode, targetProjectCode);
             putMsg(result, Status.SUCCESS);
         }
     }
@@ -1963,11 +2322,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return the pagination process definition versions info of the certain process definition
      */
     @Override
-    public Result queryProcessDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize, long code) {
+    public Result queryProcessDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize,
+                                                 long code) {
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode,VERSION_LIST);
+        Map<String, Object> checkResult =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_LIST);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
             putMsg(result, resultStatus);
@@ -1975,7 +2336,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         PageInfo<ProcessDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<ProcessDefinitionLog> page = new Page<>(pageNo, pageSize);
-        IPage<ProcessDefinitionLog> processDefinitionVersionsPaging = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, code, projectCode);
+        IPage<ProcessDefinitionLog> processDefinitionVersionsPaging =
+                processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, code, projectCode);
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionVersionsPaging.getRecords();
 
         pageInfo.setTotalList(processDefinitionLogs);
@@ -1984,7 +2346,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
 
     /**
      * delete one certain process definition by version number and process definition code
@@ -1997,29 +2358,41 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     @Transactional
-    public Map<String, Object> deleteProcessDefinitionVersion(User loginUser, long projectCode, long code, int version) {
+    public Map<String, Object> deleteProcessDefinitionVersion(User loginUser, long projectCode, long code,
+                                                              int version) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,VERSION_DELETE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_DELETE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
 
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+            logger.error("Process definition does not exist, code:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
         } else {
             if (processDefinition.getVersion() == version) {
+                logger.warn(
+                        "Process definition can not be deleted due to version is being used, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                        projectCode, code, version);
                 putMsg(result, Status.MAIN_TABLE_USING_VERSION);
                 return result;
             }
             int deleteLog = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
             int deleteRelationLog = processTaskRelationLogMapper.deleteByCode(code, version);
             if (deleteLog == 0 || deleteRelationLog == 0) {
+                logger.error(
+                        "Delete process definition version error, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                        projectCode, code, version);
                 putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
             }
             deleteOtherRelation(project, result, processDefinition);
+            logger.info(
+                    "Delete process definition version complete, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    projectCode, code, version);
             putMsg(result, Status.SUCCESS);
         }
         return result;
@@ -2050,15 +2423,22 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                             String scheduleJson,
                                                             ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_CREATE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-
+        if (checkDescriptionLength(description)) {
+            logger.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         // check whether the new process define name exist
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
         if (definition != null) {
+            logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                    definition.getName(), definition.getCode());
             putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
             return result;
         }
@@ -2067,6 +2447,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
+                logger.error("Tenant does not exist.");
                 putMsg(result, Status.TENANT_NOT_EXIST);
                 return result;
             }
@@ -2076,14 +2457,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
         } catch (CodeGenerateException e) {
+            logger.error("Generate process definition code error, projectCode:{}.", projectCode, e);
             putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
             return result;
         }
-        ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
-            globalParams, "", timeout, loginUser.getId(), tenantId);
+        ProcessDefinition processDefinition =
+                new ProcessDefinition(projectCode, name, processDefinitionCode, description,
+                        globalParams, "", timeout, loginUser.getId(), tenantId);
         processDefinition.setExecutionType(executionType);
         result = createEmptyDagDefine(loginUser, processDefinition);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            logger.error("Create empty process definition error.");
             return result;
         }
 
@@ -2105,6 +2489,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> result = new HashMap<>();
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion == 0) {
+            logger.error("Save process definition error, processDefinitionCode:{}.", processDefinition.getCode());
             putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
         }
@@ -2113,7 +2498,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
-    protected Map<String, Object> createDagSchedule(User loginUser, ProcessDefinition processDefinition, String scheduleJson) {
+    protected Map<String, Object> createDagSchedule(User loginUser, ProcessDefinition processDefinition,
+                                                    String scheduleJson) {
         Map<String, Object> result = new HashMap<>();
         Schedule scheduleObj = JSONUtils.parseObject(scheduleJson, Schedule.class);
         if (scheduleObj == null) {
@@ -2123,25 +2509,30 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Date now = new Date();
         scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
         if (DateUtils.differSec(scheduleObj.getStartTime(), scheduleObj.getEndTime()) == 0) {
-            logger.warn("The start time must not be the same as the end");
+            logger.warn("The schedule start time must not be the same as the end, processDefinitionCode:{}.",
+                    processDefinition.getCode());
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
             return result;
         }
         if (!org.quartz.CronExpression.isValidExpression(scheduleObj.getCrontab())) {
-            logger.error("{} verify failure", scheduleObj.getCrontab());
+            logger.error("CronExpression verify failure, cron:{}.", scheduleObj.getCrontab());
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleObj.getCrontab());
             return result;
         }
-        scheduleObj.setWarningType(scheduleObj.getWarningType() == null ? WarningType.NONE : scheduleObj.getWarningType());
+        scheduleObj
+                .setWarningType(scheduleObj.getWarningType() == null ? WarningType.NONE : scheduleObj.getWarningType());
         scheduleObj.setWarningGroupId(scheduleObj.getWarningGroupId() == 0 ? 1 : scheduleObj.getWarningGroupId());
-        scheduleObj.setFailureStrategy(scheduleObj.getFailureStrategy() == null ? FailureStrategy.CONTINUE : scheduleObj.getFailureStrategy());
+        scheduleObj.setFailureStrategy(
+                scheduleObj.getFailureStrategy() == null ? FailureStrategy.CONTINUE : scheduleObj.getFailureStrategy());
         scheduleObj.setCreateTime(now);
         scheduleObj.setUpdateTime(now);
         scheduleObj.setUserId(loginUser.getId());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
-        scheduleObj.setProcessInstancePriority(scheduleObj.getProcessInstancePriority() == null ? Priority.MEDIUM : scheduleObj.getProcessInstancePriority());
+        scheduleObj.setProcessInstancePriority(scheduleObj.getProcessInstancePriority() == null ? Priority.MEDIUM
+                : scheduleObj.getProcessInstancePriority());
         scheduleObj.setWorkerGroup(scheduleObj.getWorkerGroup() == null ? "default" : scheduleObj.getWorkerGroup());
-        scheduleObj.setEnvironmentCode(scheduleObj.getEnvironmentCode() == null ? -1 : scheduleObj.getEnvironmentCode());
+        scheduleObj
+                .setEnvironmentCode(scheduleObj.getEnvironmentCode() == null ? -1 : scheduleObj.getEnvironmentCode());
         scheduleMapper.insert(scheduleObj);
 
         putMsg(result, Status.SUCCESS);
@@ -2179,16 +2570,22 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                 String otherParamsJson,
                                                                 ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_UPDATE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-
+        if (checkDescriptionLength(description)) {
+            logger.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         int tenantId = -1;
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
+                logger.error("Tenant does not exist.");
                 putMsg(result, Status.TENANT_NOT_EXIST);
                 return result;
             }
@@ -2198,11 +2595,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         // check process definition exists
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+            logger.error("Process definition does not exist, code:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
             // online can not permit edit
+            logger.warn("Process definition is not allowed to be modified due to {}, processDefinitionCode:{}.",
+                    ReleaseState.ONLINE.getDescp(), processDefinition.getCode());
             putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefinition.getName());
             return result;
         }
@@ -2210,16 +2610,22 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // check whether the new process define name exist
             ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
+                logger.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+                        definition.getName(), definition.getCode());
                 putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
             }
         }
-        ProcessDefinition processDefinitionDeepCopy = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
+        ProcessDefinition processDefinitionDeepCopy =
+                JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, "", timeout, tenantId);
         processDefinition.setExecutionType(executionType);
-        List<ProcessTaskRelationLog> taskRelationList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
-        result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy, Lists.newArrayList(), otherParamsJson);
+        List<ProcessTaskRelationLog> taskRelationList = processTaskRelationLogMapper
+                .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+        result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
+                Lists.newArrayList(), otherParamsJson);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            logger.error("Update process definition basic info error.");
             return result;
         }
 
@@ -2236,10 +2642,72 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
+    private void updateWorkflowValid(User user, ProcessDefinition oldProcessDefinition,
+                                     ProcessDefinition newProcessDefinition) {
+        // online can not permit edit
+        if (oldProcessDefinition.getReleaseState() == ReleaseState.ONLINE) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, oldProcessDefinition.getName());
+        }
+
+        Project project = projectMapper.queryByCode(oldProcessDefinition.getProjectCode());
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(user, project, WORKFLOW_UPDATE);
+
+        if (checkDescriptionLength(newProcessDefinition.getDescription())) {
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+        }
+
+        // check whether the new process define name exist
+        if (!oldProcessDefinition.getName().equals(newProcessDefinition.getName())) {
+            ProcessDefinition definition = processDefinitionMapper
+                    .verifyByDefineName(newProcessDefinition.getProjectCode(), newProcessDefinition.getName());
+            if (definition != null) {
+                throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, newProcessDefinition.getName());
+            }
+        }
+    }
+
+    /**
+     * update single resource workflow
+     *
+     * @param loginUser     login user
+     * @param workflowCode     workflow resource code want to update
+     * @param workflowUpdateRequest   workflow update resource object
+     * @return Process definition
+     */
+    @Override
+    @Transactional
+    public ProcessDefinition updateSingleProcessDefinition(User loginUser,
+                                                           long workflowCode,
+                                                           WorkflowUpdateRequest workflowUpdateRequest) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(workflowCode);
+        // check process definition exists
+        if (processDefinition == null) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowCode);
+        }
+
+        ProcessDefinition processDefinitionUpdate = workflowUpdateRequest.mergeIntoProcessDefinition(processDefinition);
+        this.updateWorkflowValid(loginUser, processDefinition, processDefinitionUpdate);
+
+        if (processDefinitionUpdate.getTenantCode() != null) {
+            Tenant tenant = tenantMapper.queryByTenantCode(processDefinitionUpdate.getTenantCode());
+            if (tenant == null) {
+                throw new ServiceException(Status.TENANT_NOT_EXIST);
+            }
+            processDefinitionUpdate.setTenantId(tenant.getId());
+        }
+        int update = processDefinitionMapper.updateById(processDefinitionUpdate);
+        if (update <= 0) {
+            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+        }
+        this.syncObj2Log(loginUser, processDefinition);
+        return processDefinition;
+    }
+
     protected Map<String, Object> updateDagSchedule(User loginUser,
-                                                  long projectCode,
-                                                  long processDefinitionCode,
-                                                  String scheduleJson) {
+                                                    long projectCode,
+                                                    long processDefinitionCode,
+                                                    String scheduleJson) {
         Map<String, Object> result = new HashMap<>();
         Schedule schedule = JSONUtils.parseObject(scheduleJson, Schedule.class);
         if (schedule == null) {
@@ -2247,9 +2715,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             throw new ServiceException(Status.DATA_IS_NOT_VALID);
         }
         // set default value
-        FailureStrategy failureStrategy = schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy();
+        FailureStrategy failureStrategy =
+                schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy();
         WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType();
-        Priority processInstancePriority = schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority();
+        Priority processInstancePriority =
+                schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority();
         int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId();
         String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup();
         long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode();
@@ -2261,16 +2731,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         param.setTimezoneId(schedule.getTimezoneId());
 
         return schedulerService.updateScheduleByProcessDefinitionCode(
-            loginUser,
-            projectCode,
-            processDefinitionCode,
-            JSONUtils.toJsonString(param),
-            warningType,
-            warningGroupId,
-            failureStrategy,
-            processInstancePriority,
-            workerGroup,
-            environmentCode);
+                loginUser,
+                projectCode,
+                processDefinitionCode,
+                JSONUtils.toJsonString(param),
+                warningType,
+                warningGroupId,
+                failureStrategy,
+                processInstancePriority,
+                workerGroup,
+                environmentCode);
     }
 
     /**
@@ -2284,10 +2754,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Transactional
     @Override
-    public Map<String, Object> releaseWorkflowAndSchedule(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+    public Map<String, Object> releaseWorkflowAndSchedule(User loginUser, long projectCode, long code,
+                                                          ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,WORKFLOW_ONLINE_OFFLINE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_ONLINE_OFFLINE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -2299,18 +2771,22 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (processDefinition == null) {
+            logger.error("Process definition does not exist, code:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
         Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(code);
         if (scheduleObj == null) {
+            logger.error("Schedule cron does not exist, processDefinitionCode:{}.", code);
             putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, "processDefinitionCode:" + code);
             return result;
         }
         switch (releaseState) {
             case ONLINE:
-                List<ProcessTaskRelation> relationList = processService.findRelationByCode(code, processDefinition.getVersion());
+                List<ProcessTaskRelation> relationList =
+                        processService.findRelationByCode(code, processDefinition.getVersion());
                 if (CollectionUtils.isEmpty(relationList)) {
+                    logger.warn("Process definition has no task relation, processDefinitionCode:{}.", code);
                     putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
                     return result;
                 }
@@ -2322,11 +2798,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setReleaseState(releaseState);
                 int updateProcess = processDefinitionMapper.updateById(processDefinition);
                 if (updateProcess > 0) {
-                    logger.info("set schedule offline, project code: {}, schedule id: {}, process definition code: {}", projectCode, scheduleObj.getId(), code);
+                    logger.info("Set schedule offline, projectCode:{}, processDefinitionCode:{}, scheduleId:{}.",
+                            projectCode, code, scheduleObj.getId());
                     // set status
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     int updateSchedule = scheduleMapper.updateById(scheduleObj);
                     if (updateSchedule == 0) {
+                        logger.error(
+                                "Set schedule offline error, projectCode:{}, processDefinitionCode:{}, scheduleId:{}",
+                                projectCode, code, scheduleObj.getId());
                         putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
                         throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
                     }
@@ -2349,7 +2829,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param otherParamsJson
      */
     @Override
-    public void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result, String otherParamsJson) {
+    public void saveOtherRelation(User loginUser, ProcessDefinition processDefinition, Map<String, Object> result,
+                                  String otherParamsJson) {
 
     }
 

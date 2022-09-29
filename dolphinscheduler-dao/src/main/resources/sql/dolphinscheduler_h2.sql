@@ -331,12 +331,13 @@ CREATE TABLE t_ds_command
     start_time                 datetime DEFAULT NULL,
     executor_id                int(11) DEFAULT NULL,
     update_time                datetime DEFAULT NULL,
-    process_instance_priority  int(11) DEFAULT NULL,
+    process_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(64),
     environment_code           bigint(20) DEFAULT '-1',
     dry_run                    int NULL DEFAULT 0,
     process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id),
     KEY                        priority_id_index (process_instance_priority, id)
 );
@@ -359,6 +360,8 @@ CREATE TABLE t_ds_datasource
     connection_params text        NOT NULL,
     create_time       datetime    NOT NULL,
     update_time       datetime     DEFAULT NULL,
+    test_flag           int DEFAULT NULL,
+    bind_test_id        int DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_datasource_name_un (name, type)
 );
@@ -385,13 +388,14 @@ CREATE TABLE t_ds_error_command
     schedule_time              datetime DEFAULT NULL,
     start_time                 datetime DEFAULT NULL,
     update_time                datetime DEFAULT NULL,
-    process_instance_priority  int(11) DEFAULT NULL,
+    process_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(64),
     environment_code           bigint(20) DEFAULT '-1',
     message                    text,
     dry_run                    int NULL DEFAULT 0,
     process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -473,9 +477,10 @@ CREATE TABLE t_ds_task_definition
     project_code            bigint(20) NOT NULL,
     user_id                 int(11) DEFAULT NULL,
     task_type               varchar(50) NOT NULL,
+    task_execute_type       int(11) DEFAULT '0',
     task_params             longtext,
     flag                    tinyint(2) DEFAULT NULL,
-    task_priority           tinyint(4) DEFAULT NULL,
+    task_priority           tinyint(4) DEFAULT '2',
     worker_group            varchar(200) DEFAULT NULL,
     environment_code        bigint(20) DEFAULT '-1',
     fail_retry_times        int(11) DEFAULT NULL,
@@ -508,9 +513,10 @@ CREATE TABLE t_ds_task_definition_log
     project_code            bigint(20) NOT NULL,
     user_id                 int(11) DEFAULT NULL,
     task_type               varchar(50) NOT NULL,
+    task_execute_type       int(11) DEFAULT '0',
     task_params             text,
     flag                    tinyint(2) DEFAULT NULL,
-    task_priority           tinyint(4) DEFAULT NULL,
+    task_priority           tinyint(4) DEFAULT '2',
     worker_group            varchar(200) DEFAULT NULL,
     environment_code        bigint(20) DEFAULT '-1',
     fail_retry_times        int(11) DEFAULT NULL,
@@ -588,6 +594,7 @@ CREATE TABLE t_ds_process_instance
     process_definition_version int(11) DEFAULT NULL,
     process_definition_code    bigint(20) not NULL,
     state                      tinyint(4) DEFAULT NULL,
+    state_history              text,
     recovery                   tinyint(4) DEFAULT NULL,
     start_time                 datetime     DEFAULT NULL,
     end_time                   datetime     DEFAULT NULL,
@@ -608,7 +615,7 @@ CREATE TABLE t_ds_process_instance
     is_sub_process             int(11) DEFAULT '0',
     executor_id                int(11) NOT NULL,
     history_cmd                text,
-    process_instance_priority  int(11) DEFAULT NULL,
+    process_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(64)  DEFAULT NULL,
     environment_code           bigint(20) DEFAULT '-1',
     timeout                    int(11) DEFAULT '0',
@@ -617,6 +624,7 @@ CREATE TABLE t_ds_process_instance
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -633,7 +641,7 @@ CREATE TABLE t_ds_project
     id          int(11) NOT NULL AUTO_INCREMENT,
     name        varchar(100) DEFAULT NULL,
     code        bigint(20) NOT NULL,
-    description varchar(200) DEFAULT NULL,
+    description varchar(255) DEFAULT NULL,
     user_id     int(11) DEFAULT NULL,
     flag        tinyint(4) DEFAULT '1',
     create_time datetime NOT NULL,
@@ -801,7 +809,7 @@ CREATE TABLE t_ds_schedules
     release_state             tinyint(4) NOT NULL,
     warning_type              tinyint(4) NOT NULL,
     warning_group_id          int(11) DEFAULT NULL,
-    process_instance_priority int(11) DEFAULT NULL,
+    process_instance_priority int(11) DEFAULT '2',
     worker_group              varchar(64) DEFAULT '',
     environment_code          bigint(20) DEFAULT '-1',
     create_time               datetime     NOT NULL,
@@ -839,6 +847,7 @@ CREATE TABLE t_ds_task_instance
     id                      int(11) NOT NULL AUTO_INCREMENT,
     name                    varchar(255) DEFAULT NULL,
     task_type               varchar(50) NOT NULL,
+    task_execute_type       int(11) DEFAULT '0',
     task_code               bigint(20) NOT NULL,
     task_definition_version int(11) DEFAULT NULL,
     process_instance_id     int(11) DEFAULT NULL,
@@ -848,7 +857,7 @@ CREATE TABLE t_ds_task_instance
     end_time                datetime     DEFAULT NULL,
     host                    varchar(135) DEFAULT NULL,
     execute_path            varchar(200) DEFAULT NULL,
-    log_path                varchar(200) DEFAULT NULL,
+    log_path                longtext DEFAULT NULL,
     alert_flag              tinyint(4) DEFAULT NULL,
     retry_times             int(4) DEFAULT '0',
     pid                     int(4) DEFAULT NULL,
@@ -869,8 +878,8 @@ CREATE TABLE t_ds_task_instance
     dry_run                 int NULL DEFAULT 0,
     cpu_quota               int(11) DEFAULT '-1' NOT NULL,
     memory_max              int(11) DEFAULT '-1' NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (process_instance_id) REFERENCES t_ds_process_instance (id) ON DELETE CASCADE
+    test_flag               int NULL DEFAULT 0,
+    PRIMARY KEY (id)
 );
 
 -- ----------------------------
@@ -960,6 +969,8 @@ CREATE TABLE t_ds_worker_group
     addr_list   text NULL DEFAULT NULL,
     create_time datetime NULL DEFAULT NULL,
     update_time datetime NULL DEFAULT NULL,
+    description text NULL DEFAULT NULL,
+    other_params_json text NULL DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY name_unique (name)
 );
@@ -1866,7 +1877,7 @@ CREATE TABLE t_ds_task_group
 (
    id          int(11)  NOT NULL AUTO_INCREMENT ,
    name        varchar(100) DEFAULT NULL ,
-   description varchar(200) DEFAULT NULL ,
+   description varchar(255) DEFAULT NULL ,
    group_size  int(11) NOT NULL ,
    project_code  bigint(20) DEFAULT '0',
    use_size    int(11) DEFAULT '0' ,
@@ -1988,5 +1999,17 @@ CREATE TABLE t_ds_cluster
 );
 
 INSERT INTO `t_ds_cluster`
-(`id`,`code`,`name`,`config`,`description`,`operator`,`create_time`,`update_time`)
+(`id`, `code`, `name`, `config`, `description`, `operator`, `create_time`, `update_time`)
 VALUES (100, 0, 'ds_null_k8s', '{"k8s":"ds_null_k8s"}', 'test', 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+
+--
+-- Table structure for t_ds_fav_task
+--
+DROP TABLE IF EXISTS t_ds_fav_task CASCADE;
+CREATE TABLE t_ds_fav_task
+(
+    id        bigint(20) NOT NULL AUTO_INCREMENT,
+    task_name varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
+);

@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.spi.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.google.common.base.Functions;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static java.util.stream.Collectors.toMap;
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.google.common.base.Functions;
 
 public enum DbType {
     MYSQL(0, "mysql"),
@@ -38,6 +38,7 @@ public enum DbType {
     PRESTO(8, "presto"),
     H2(9, "h2"),
     REDSHIFT(10,"redshift"),
+    ATHENA(11,"athena"),
     ;
 
     @EnumValue
@@ -73,5 +74,13 @@ public enum DbType {
 
     public boolean isHive() {
         return this == DbType.HIVE;
+    }
+
+    /**
+     * support execute multiple segmented statements at a time
+     * @return
+     */
+    public boolean isSupportMultipleStatement() {
+        return isHive() || this == DbType.SPARK;
     }
 }

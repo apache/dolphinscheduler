@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils;
 
 import java.util.Date;
 import java.util.TimeZone;

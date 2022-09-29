@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * dependent item execute
  */
 public class DependentExecute {
+
     /**
      * process service
      */
@@ -90,9 +91,10 @@ public class DependentExecute {
      * @param currentTime   current time
      * @return DependResult
      */
-    private DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime) {
-        List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
-        return calculateResultForTasks(dependentItem, dateIntervals);
+    private DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime, int testFlag) {
+        List<DateInterval> dateIntervals =
+                DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
+        return calculateResultForTasks(dependentItem, dateIntervals, testFlag);
     }
 
     /**
@@ -103,12 +105,13 @@ public class DependentExecute {
      * @return dateIntervals
      */
     private DependResult calculateResultForTasks(DependentItem dependentItem,
-                                                 List<DateInterval> dateIntervals) {
+                                                 List<DateInterval> dateIntervals,
+                                                 int testFlag) {
 
         DependResult result = DependResult.FAILED;
         for (DateInterval dateInterval : dateIntervals) {
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(),
-                    dateInterval);
+                    dateInterval, testFlag);
             if (processInstance == null) {
                 return DependResult.WAITING;
             }
@@ -116,7 +119,7 @@ public class DependentExecute {
             if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
                 result = dependResultByProcessInstance(processInstance);
             } else {
-                result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance);
+                result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance, testFlag);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -131,10 +134,10 @@ public class DependentExecute {
      * @return
      */
     private DependResult dependResultByProcessInstance(ProcessInstance processInstance) {
-        if (!processInstance.getState().typeIsFinished()) {
+        if (!processInstance.getState().isFinished()) {
             return DependResult.WAITING;
         }
-        if (processInstance.getState().typeIsSuccess()) {
+        if (processInstance.getState().isSuccess()) {
             return DependResult.SUCCESS;
         }
         return DependResult.FAILED;
@@ -147,10 +150,10 @@ public class DependentExecute {
      * @param processInstance
      * @return
      */
-    private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance) {
+    private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance, int testFlag) {
         DependResult result;
         TaskInstance taskInstance = null;
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
+        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId(), testFlag);
 
         for (TaskInstance task : taskInstanceList) {
             if (task.getTaskCode() == taskCode) {
@@ -162,7 +165,7 @@ public class DependentExecute {
         if (taskInstance == null) {
             // cannot find task in the process instance
             // maybe because process instance is running or failed.
-            if (processInstance.getState().typeIsFinished()) {
+            if (processInstance.getState().isFinished()) {
                 result = DependResult.FAILED;
             } else {
                 return DependResult.WAITING;
@@ -183,16 +186,12 @@ public class DependentExecute {
      * @param dateInterval   date interval
      * @return ProcessInstance
      */
-    private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
+    private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
 
-        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionCode, dateInterval.getStartTime(), dateInterval.getEndTime());
-        if (runningProcess != null) {
-            return runningProcess;
-        }
+        ProcessInstance lastSchedulerProcess =
+                processService.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
-        ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
-
-        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval);
+        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;
@@ -201,7 +200,8 @@ public class DependentExecute {
             return lastManualProcess;
         }
 
-        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess : lastSchedulerProcess;
+        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess
+                : lastSchedulerProcess;
     }
 
     /**
@@ -210,30 +210,12 @@ public class DependentExecute {
      * @param state state
      * @return DependResult
      */
-    private DependResult getDependResultByState(ExecutionStatus state) {
+    private DependResult getDependResultByState(TaskExecutionStatus state) {
 
-        if (!state.typeIsFinished()) {
+        if (!state.isFinished()) {
             return DependResult.WAITING;
-        } else if (state.typeIsSuccess()) {
+        } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
-        } else {
-            return DependResult.FAILED;
-        }
-    }
-
-    /**
-     * get dependent result by task instance state when task instance is null
-     *
-     * @param state state
-     * @return DependResult
-     */
-    private DependResult getDependResultByProcessStateWhenTaskNull(ExecutionStatus state) {
-
-        if (state.typeIsRunning()
-                || state == ExecutionStatus.SUBMITTED_SUCCESS
-                || state == ExecutionStatus.DISPATCH
-                || state == ExecutionStatus.WAITING_THREAD) {
-            return DependResult.WAITING;
         } else {
             return DependResult.FAILED;
         }
@@ -245,9 +227,9 @@ public class DependentExecute {
      * @param currentTime current time
      * @return boolean
      */
-    public boolean finish(Date currentTime) {
+    public boolean finish(Date currentTime, int testFlag) {
         if (modelDependResult == DependResult.WAITING) {
-            modelDependResult = getModelDependResult(currentTime);
+            modelDependResult = getModelDependResult(currentTime, testFlag);
             return false;
         }
         return true;
@@ -259,12 +241,12 @@ public class DependentExecute {
      * @param currentTime current time
      * @return DependResult
      */
-    public DependResult getModelDependResult(Date currentTime) {
+    public DependResult getModelDependResult(Date currentTime, int testFlag) {
 
         List<DependResult> dependResultList = new ArrayList<>();
 
         for (DependentItem dependentItem : dependItemList) {
-            DependResult dependResult = getDependResultForItem(dependentItem, currentTime);
+            DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
             if (dependResult != DependResult.WAITING) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
             }
@@ -281,12 +263,12 @@ public class DependentExecute {
      * @param currentTime current time
      * @return DependResult
      */
-    private DependResult getDependResultForItem(DependentItem item, Date currentTime) {
+    private DependResult getDependResultForItem(DependentItem item, Date currentTime, int testFlag) {
         String key = item.getKey();
         if (dependResultMap.containsKey(key)) {
             return dependResultMap.get(key);
         }
-        return getDependentResultForItem(item, currentTime);
+        return getDependentResultForItem(item, currentTime, testFlag);
     }
 
     public Map<String, DependResult> getDependResultMap() {

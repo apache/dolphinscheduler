@@ -37,7 +37,6 @@ import {
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
 import { ITaskStateConfig } from './types'
-
 /**
  * Intelligent display kb m
  */
@@ -137,6 +136,34 @@ export const stateType = (t: any) => [
     value: key,
     label: item.desc
   }))
+]
+
+/**
+ * Stream task state
+ */
+const streamTaskState = [
+  'SUBMITTED_SUCCESS',
+  'RUNNING_EXECUTION',
+  'FAILURE',
+  'STOP',
+  'KILL',
+  'SUCCESS'
+]
+
+/**
+ * Stream task State code table
+ */
+export const streamStateType = (t: any) => [
+  {
+    value: '',
+    label: `${t('project.workflow.all_status')}`
+  },
+  ...Object.entries(tasksState(t))
+    .filter(([key]) => streamTaskState.includes(key))
+    .map(([key, item]) => ({
+      value: key,
+      label: item.desc
+    }))
 ]
 
 /**

@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -141,7 +147,7 @@ const EnvironmentModal = defineComponent({
                   path='name'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-environment-name'
                     placeholder={t(
                       'security.environment.environment_name_tips'
@@ -154,7 +160,6 @@ const EnvironmentModal = defineComponent({
                   path='config'
                 >
                   <NInput
-                  allowInput={this.trim}
                     class='input-environment-config'
                     placeholder={envConfigPlaceholder}
                     type='textarea'
@@ -167,7 +172,7 @@ const EnvironmentModal = defineComponent({
                   path='description'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-environment-desc'
                     placeholder={t(
                       'security.environment.environment_description_tips'

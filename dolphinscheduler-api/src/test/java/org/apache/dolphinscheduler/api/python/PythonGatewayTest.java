@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.api.python;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
-import org.apache.dolphinscheduler.api.service.UsersService;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -62,9 +59,6 @@ public class PythonGatewayTest {
 
     @Mock
     private ResourcesService resourcesService;
-
-    @Mock
-    private UsersService usersService;
 
     @Test
     public void testGetCodeAndVersion() throws CodeGenerateUtils.CodeGenerateException {
@@ -120,16 +114,10 @@ public class PythonGatewayTest {
     @Test
     public void testQueryResourcesFileInfo() {
         User user = getTestUser();
-        Mockito.when(usersService.queryUser(user.getUserName())).thenReturn(user);
-
-        Result<Object> mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
         Resource resource = getTestResource();
-        mockResult.setData(resource);
-        Mockito.when(resourcesService.queryResource(user, resource.getFullName(), null, ResourceType.FILE)).thenReturn(mockResult);
-
-        Map<String, Object> result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
-        Assert.assertEquals((int) result.get("id"), resource.getId());
+        Mockito.when(resourcesService.queryResourcesFileInfo(user.getUserName(), resource.getFullName())).thenReturn(resource);
+        Resource result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
+        Assert.assertEquals(result.getId(), resource.getId());
     }
 
     private Resource getTestResource() {

@@ -28,8 +28,6 @@ server:
     max-http-form-post-size: 5000000
 
 spring:
-  application:
-    name: api-server
   banner:
     charset: UTF-8
   jackson:
@@ -63,9 +61,9 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.threadPool:threadPriority: 5
+      org.quartz.threadPool.threadPriority: 5
       org.quartz.jobStore.isClustered: true
-      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.jobStore.class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
       org.quartz.scheduler.instanceId: AUTO
       org.quartz.jobStore.tablePrefix: QRTZ_
       org.quartz.jobStore.acquireTriggersWithinLock: true
@@ -78,6 +76,10 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
 management:
   endpoints:

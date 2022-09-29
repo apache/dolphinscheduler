@@ -111,6 +111,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     private void updateTenantValid(Tenant existsTenant, Tenant updateTenant) throws ServiceException {
         // Check the exists tenant
         if (Objects.isNull(existsTenant)) {
+            logger.error("Tenant does not exist.");
             throw new ServiceException(Status.TENANT_NOT_EXIST);
         }
         // Check the update tenant parameters
@@ -146,7 +147,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT, TENANT_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-
+        if(checkDescriptionLength(desc)){
+            logger.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         Tenant tenant = new Tenant(tenantCode, desc, queueId);
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
@@ -211,7 +216,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-
+        if(checkDescriptionLength(desc)){
+            logger.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
         Tenant existsTenant = tenantMapper.queryById(id);
         updateTenantValid(existsTenant, updateTenant);
@@ -223,9 +232,14 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode()) && PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
-        tenantMapper.updateById(updateTenant);
-
-        putMsg(result, Status.SUCCESS);
+        int update = tenantMapper.updateById(updateTenant);
+        if (update > 0) {
+            logger.info("Tenant is updated and id is {}.", updateTenant.getId());
+            putMsg(result, Status.SUCCESS);
+        } else {
+            logger.error("Tenant update error, id:{}.", updateTenant.getId());
+            putMsg(result, Status.UPDATE_TENANT_ERROR);
+        }
         return result;
     }
 
@@ -248,22 +262,26 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Tenant tenant = tenantMapper.queryById(id);
         if (Objects.isNull(tenant)) {
+            logger.error("Tenant does not exist, userId:{}.", id);
             throw new ServiceException(Status.TENANT_NOT_EXIST);
         }
 
         List<ProcessInstance> processInstances = getProcessInstancesByTenant(tenant);
         if (CollectionUtils.isNotEmpty(processInstances)) {
+            logger.warn("Delete tenant failed, because there are {} executing process instances using it.", processInstances.size());
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
         }
 
         List<ProcessDefinition> processDefinitions =
                 processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(processDefinitions)) {
+            logger.warn("Delete tenant failed, because there are {} process definitions using it.", processDefinitions.size());
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
         }
 
         List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(userList)) {
+            logger.warn("Delete tenant failed, because there are {} users using it.", userList.size());
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
         }
 
@@ -272,10 +290,16 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
           storageOperate.deleteTenant(tenant.getTenantCode());
         }
 
-        tenantMapper.deleteById(id);
-        processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
+        int delete = tenantMapper.deleteById(id);
+        if (delete > 0) {
+            processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
+            logger.info("Tenant is deleted and id is {}.", id);
+            putMsg(result, Status.SUCCESS);
+        } else {
+            logger.error("Tenant delete failed, tenantId:{}.", id);
+            putMsg(result, Status.DELETE_TENANT_BY_ID_ERROR);
+        }
 
-        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -309,7 +333,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * verify tenant code
      *
      * @param tenantCode tenant code
-     * @return true if tenant code can user, otherwise return false
+     * @return true if tenant code can use, otherwise return false
      */
     @Override
     public Result<Object> verifyTenantCode(String tenantCode) {
@@ -365,7 +389,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (checkTenantExists(tenantCode)) {
             return tenantMapper.queryByTenantCode(tenantCode);
         }
-
         Queue queueObj = queueService.createQueueIfNotExists(queue, queueName);
         Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId());
         createTenantValid(tenant);

@@ -18,84 +18,59 @@
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
 import com.amazonaws.services.sagemaker.model.DescribePipelineExecutionResult;
-import com.amazonaws.services.sagemaker.model.ListPipelineExecutionStepsResult;
-import com.amazonaws.services.sagemaker.model.PipelineExecutionStep;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionResult;
 import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({JSONUtils.class, PropertyUtils.class,})
-@PowerMockIgnore({"javax.*"})
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
+@RunWith(MockitoJUnitRunner.class)
 public class SagemakerTaskTest {
 
     private final String pipelineExecutionArn = "test-pipeline-arn";
+    private final String clientRequestToken = "test-pipeline-token";
     private SagemakerTask sagemakerTask;
     private AmazonSageMaker client;
-    private PipelineUtils pipelineUtils;
+    private PipelineUtils pipelineUtils = new PipelineUtils();
 
     @Before
     public void before() {
-        PowerMockito.mockStatic(PropertyUtils.class);
         String parameters = buildParameters();
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+
+        client = Mockito.mock(AmazonSageMaker.class);
         sagemakerTask = new SagemakerTask(taskExecutionContext);
         sagemakerTask.init();
-        client = mock(AmazonSageMaker.class);
-        pipelineUtils = new PipelineUtils(client);
 
-        StartPipelineExecutionResult startPipelineExecutionResult = mock(StartPipelineExecutionResult.class);
-        when(startPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
+        StartPipelineExecutionResult startPipelineExecutionResult = Mockito.mock(StartPipelineExecutionResult.class);
+        Mockito.when(startPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
 
-        StopPipelineExecutionResult stopPipelineExecutionResult = mock(StopPipelineExecutionResult.class);
-        when(stopPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
+        StopPipelineExecutionResult stopPipelineExecutionResult = Mockito.mock(StopPipelineExecutionResult.class);
+        Mockito.when(stopPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
 
-        DescribePipelineExecutionResult describePipelineExecutionResult = mock(DescribePipelineExecutionResult.class);
-        when(describePipelineExecutionResult.getPipelineExecutionStatus()).thenReturn("Executing", "Succeeded");
+        DescribePipelineExecutionResult describePipelineExecutionResult = Mockito.mock(DescribePipelineExecutionResult.class);
+        Mockito.when(describePipelineExecutionResult.getPipelineExecutionStatus()).thenReturn("Executing", "Succeeded");
 
-        ListPipelineExecutionStepsResult listPipelineExecutionStepsResult = mock(ListPipelineExecutionStepsResult.class);
-        PipelineExecutionStep pipelineExecutionStep = mock(PipelineExecutionStep.class);
-        List<PipelineExecutionStep> pipelineExecutionSteps = new ArrayList<>();
-        pipelineExecutionSteps.add(pipelineExecutionStep);
-        pipelineExecutionSteps.add(pipelineExecutionStep);
-
-        when(pipelineExecutionStep.toString()).thenReturn("Test Step1", "Test Step2");
-        when(listPipelineExecutionStepsResult.getPipelineExecutionSteps()).thenReturn(pipelineExecutionSteps);
-
-        when(client.startPipelineExecution(any())).thenReturn(startPipelineExecutionResult);
-        when(client.stopPipelineExecution(any())).thenReturn(stopPipelineExecutionResult);
-        when(client.describePipelineExecution(any())).thenReturn(describePipelineExecutionResult);
-        when(client.listPipelineExecutionSteps(any())).thenReturn(listPipelineExecutionStepsResult);
-
+        Mockito.when(client.startPipelineExecution(any())).thenReturn(startPipelineExecutionResult);
+        Mockito.when(client.stopPipelineExecution(any())).thenReturn(stopPipelineExecutionResult);
+        Mockito.when(client.describePipelineExecution(any())).thenReturn(describePipelineExecutionResult);
     }
 
     @Test
@@ -110,10 +85,11 @@ public class SagemakerTaskTest {
 
     @Test
     public void testPipelineExecution() throws Exception {
-        pipelineUtils.startPipelineExecution(sagemakerTask.createStartPipelineRequest());
-        Assert.assertEquals(pipelineExecutionArn, pipelineUtils.getPipelineExecutionArn());
-        Assert.assertEquals(0, pipelineUtils.checkPipelineExecutionStatus());
-        pipelineUtils.stopPipelineExecution();
+        PipelineUtils.PipelineId pipelineId =
+                pipelineUtils.startPipelineExecution(client, sagemakerTask.createStartPipelineRequest());
+        Assert.assertEquals(pipelineExecutionArn, pipelineId.getPipelineExecutionArn());
+        Assert.assertEquals(0, pipelineUtils.checkPipelineExecutionStatus(client, pipelineId));
+        pipelineUtils.stopPipelineExecution(client, pipelineId);
     }
 
     private String buildParameters() {

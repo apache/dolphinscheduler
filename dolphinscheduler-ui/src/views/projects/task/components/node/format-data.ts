@@ -35,10 +35,20 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SUB_PROCESS') {
     taskParams.processDefinitionCode = data.processDefinitionCode
   }
+
+  if (data.taskType === 'JAVA') {
+    taskParams.runType = data.runType
+    taskParams.mainArgs = data.mainArgs
+    taskParams.jvmArgs = data.jvmArgs
+    taskParams.isModulePath = data.isModulePath
+    if (data.runType === 'JAR' && data.mainJar) {
+      taskParams.mainJar = { id: data.mainJar }
+    }
+  }
+
   if (
-    data.taskType === 'SPARK' ||
-    data.taskType === 'MR' ||
-    data.taskType === 'FLINK'
+    data.taskType &&
+    ['SPARK', 'MR', 'FLINK', 'FLINK_STREAM'].includes(data.taskType)
   ) {
     taskParams.programType = data.programType
     taskParams.mainClass = data.mainClass
@@ -52,7 +62,6 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SPARK') {
-    taskParams.sparkVersion = data.sparkVersion
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
     taskParams.numExecutors = data.numExecutors
@@ -60,7 +69,7 @@ export function formatParams(data: INodeData): {
     taskParams.executorCores = data.executorCores
   }
 
-  if (data.taskType === 'FLINK') {
+  if (data.taskType === 'FLINK' || data.taskType === 'FLINK_STREAM') {
     taskParams.flinkVersion = data.flinkVersion
     taskParams.jobManagerMemory = data.jobManagerMemory
     taskParams.taskManagerMemory = data.taskManagerMemory
@@ -180,7 +189,6 @@ export function formatParams(data: INodeData): {
     taskParams.sqlType = data.sqlType
     taskParams.preStatements = data.preStatements
     taskParams.postStatements = data.postStatements
-    taskParams.segmentSeparator = data.segmentSeparator
     taskParams.sendEmail = data.sendEmail
     taskParams.displayRows = data.displayRows
     if (data.sqlType === '0' && data.sendEmail) {
@@ -212,7 +220,6 @@ export function formatParams(data: INodeData): {
         taskParams.deployMode = data.deployMode
         taskParams.master = data.master
         taskParams.masterUrl = data.masterUrl
-        taskParams.queue = data.queue
         break
       default:
         break
@@ -371,8 +378,6 @@ export function formatParams(data: INodeData): {
     taskParams.deployModelKey = data.deployModelKey
     taskParams.mlflowProjectRepository = data.mlflowProjectRepository
     taskParams.mlflowProjectVersion = data.mlflowProjectVersion
-    taskParams.cpuLimit = data.cpuLimit
-    taskParams.memoryLimit = data.memoryLimit
   }
 
   if (data.taskType === 'DVC') {
@@ -387,6 +392,16 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'SAGEMAKER') {
     taskParams.sagemakerRequestJson = data.sagemakerRequestJson
+  }
+  if (data.taskType === 'PYTORCH') {
+    taskParams.script = data.script
+    taskParams.scriptParams = data.scriptParams
+    taskParams.pythonPath = data.pythonPath
+    taskParams.isCreateEnvironment = data.isCreateEnvironment
+    taskParams.pythonCommand = data.pythonCommand
+    taskParams.pythonEnvTool = data.pythonEnvTool
+    taskParams.requirements = data.requirements
+    taskParams.condaPythonVersion = data.condaPythonVersion
   }
 
   if (data.taskType === 'DINKY') {
@@ -411,6 +426,12 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'PIGEON') {
     taskParams.targetJobName = data.targetJobName
+  }
+
+  if (data.taskType === 'HIVECLI') {
+    taskParams.hiveCliTaskExecutionType = data.hiveCliTaskExecutionType
+    taskParams.hiveSqlScript = data.hiveSqlScript
+    taskParams.hiveCliOptions = data.hiveCliOptions
   }
 
   let timeoutNotifyStrategy = ''
@@ -457,7 +478,8 @@ export function formatParams(data: INodeData): {
       timeoutNotifyStrategy: data.timeoutFlag ? timeoutNotifyStrategy : '',
       workerGroup: data.workerGroup,
       cpuQuota: data.cpuQuota || -1,
-      memoryMax: data.memoryMax || -1
+      memoryMax: data.memoryMax || -1,
+      taskExecuteType: data.taskExecuteType
     }
   } as {
     processDefinitionCode: string
@@ -649,5 +671,6 @@ export function formatModel(data: ITaskData) {
   if (data.taskParams?.jobType) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
+
   return params
 }

@@ -50,6 +50,9 @@ class Shell(Task):
         "raw_script",
     }
 
+    ext: set = {".sh", ".zsh"}
+    ext_attr: str = "_raw_script"
+
     def __init__(self, name: str, command: str, *args, **kwargs):
+        self._raw_script = command
         super().__init__(name, TaskType.SHELL, *args, **kwargs)
-        self.raw_script = command
