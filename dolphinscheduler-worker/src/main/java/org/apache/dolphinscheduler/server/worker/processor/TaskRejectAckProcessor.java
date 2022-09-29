@@ -47,10 +47,13 @@ public class TaskRejectAckProcessor implements NettyRequestProcessor {
         TaskRejectAckCommand taskRejectAckMessage = JSONUtils.parseObject(command.getBody(),
                 TaskRejectAckCommand.class);
         if (taskRejectAckMessage == null) {
+            logger.error("Receive task reject response, the response message is null");
             return;
         }
+
         try {
             LoggerUtils.setTaskInstanceIdMDC(taskRejectAckMessage.getTaskInstanceId());
+            logger.info("Receive task reject response ack command: {}", taskRejectAckMessage);
             if (taskRejectAckMessage.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskRejectAckMessage.getTaskInstanceId(),
                         CommandType.TASK_REJECT);

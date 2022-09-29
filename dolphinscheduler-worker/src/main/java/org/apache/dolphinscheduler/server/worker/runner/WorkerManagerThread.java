@@ -93,6 +93,7 @@ public class WorkerManagerThread implements Runnable {
 
     public boolean offer(WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable) {
         if (waitSubmitQueue.size() > workerExecThreads) {
+            logger.warn("Wait submit queue is full, will retry submit task later");
             WorkerServerMetrics.incWorkerSubmitQueueIsFullCount();
             // if waitSubmitQueue is full, it will wait 1s, then try add
             ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
