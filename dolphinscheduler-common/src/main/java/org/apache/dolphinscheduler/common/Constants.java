@@ -727,6 +727,7 @@ public final class Constants {
     public static final String OTHER = "other";
     public static final String USER = "user";
     public static final String JDBC_URL = "jdbcUrl";
+    public static final String SCHEMA = "schema";
 
     /**
      * session timeout

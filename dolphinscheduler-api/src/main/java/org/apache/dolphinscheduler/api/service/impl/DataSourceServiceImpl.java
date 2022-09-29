@@ -650,7 +650,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 schemaPattern = connectionParam.getDatabase();
                 break;
             case ORACLE:
-                schemaPattern = connectionParam.getUser();
+                Map<String, String> props = connectionParam.getProps();
+                String tempSchema = props.get(Constants.SCHEMA);
+                schemaPattern = StringUtils.isEmpty(tempSchema) ? connectionParam.getUser() : tempSchema;
                 if (null != schemaPattern) {
                     schemaPattern = schemaPattern.toUpperCase();
                 }
