@@ -260,4 +260,24 @@ public class DateUtilsTest {
         String utcNowStr = DateUtils.dateToString(asiaShNow, utc);
         Assert.assertEquals(asiaShNowStr, utcNowStr);
     }
+
+    @Test
+    public void testDateToTimeStamp() {
+        Date date = DateUtils.stringToDate("2022-09-29 21:00:00");
+        long timeStamp = DateUtils.dateToTimeStamp(date);
+        Assert.assertEquals(1664456400000L, timeStamp);
+
+        date = null;
+        Assert.assertEquals(0L, DateUtils.dateToTimeStamp(date));
+    }
+
+    @Test
+    public void testTimeStampToDate() {
+        long timeStamp = 1664456400000L;
+        Date date = DateUtils.timeStampToLocalDate(timeStamp);
+        Assert.assertEquals("2022-09-29 21:00:00", DateUtils.dateToString(date));
+
+        date = DateUtils.timeStampToLocalDate(0L);
+        Assert.assertNull(date);
+    }
 }

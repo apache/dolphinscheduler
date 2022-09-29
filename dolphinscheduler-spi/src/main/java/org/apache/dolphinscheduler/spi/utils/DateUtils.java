@@ -437,4 +437,14 @@ public class DateUtils {
     public static String getTimestampString() {
         return String.valueOf(System.currentTimeMillis());
     }
+
+    /**
+     * transform timestamp to date
+     *
+     * @param timeStamp timeStamp
+     * @return date
+     */
+    public static Date timeStampToLocalDate(long timeStamp) {
+        return timeStamp == 0L ? null : new Date(Long.parseLong(String.valueOf(timeStamp)));
+    }
 }

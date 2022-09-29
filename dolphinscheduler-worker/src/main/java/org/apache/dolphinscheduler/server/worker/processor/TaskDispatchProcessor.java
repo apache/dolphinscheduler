@@ -116,8 +116,9 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
             // delay task process
-            long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
-                    taskExecutionContext.getDelayTime() * 60L);
+            long remainTime = DateUtils.getRemainTime(
+                DateUtils.timeStampToLocalDate(taskExecutionContext.getFirstSubmitTime()),
+                taskExecutionContext.getDelayTime() * 60L);
             if (remainTime > 0) {
                 logger.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);

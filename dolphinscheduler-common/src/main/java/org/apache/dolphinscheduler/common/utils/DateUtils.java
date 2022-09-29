@@ -646,4 +646,23 @@ public final class DateUtils {
 
     }
 
+    /**
+     * transform timeStamp to local date
+     *
+     * @param timeStamp time stamp (milliseconds)
+     * @return local date
+     */
+    public static Date timeStampToLocalDate(long timeStamp) {
+        return timeStamp == 0L ? null : new Date(Long.parseLong(String.valueOf(timeStamp)));
+    }
+
+    /**
+     * transform date to timeStamp
+     * @param date date
+     * @return time stamp (milliseconds)
+     */
+    public static long dateToTimeStamp(Date date) {
+        return date == null ? 0L : date.getTime();
+    }
+
 }

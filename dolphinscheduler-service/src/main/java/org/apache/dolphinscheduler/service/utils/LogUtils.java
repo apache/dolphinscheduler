@@ -44,8 +44,7 @@ public class LogUtils {
     /**
      * get task log path
      */
-    public static String getTaskLogPath(Date firstSubmitTime, Long processDefineCode, int processDefineVersion,
-                                        int processInstanceId, int taskInstanceId) {
+    public static String getTaskLogPath(Date firstSubmitTime, Long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
         // format /logs/YYYYMMDD/defintion-code_defintion_version-processInstanceId-taskInstanceId.log
         final String taskLogFileName = new StringBuilder(String.valueOf(processDefineCode))
                 .append(Constants.UNDERLINE)
@@ -74,10 +73,12 @@ public class LogUtils {
      * get task log path by TaskExecutionContext
      */
     public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+        return getTaskLogPath(
+            DateUtils.timeStampToLocalDate(taskExecutionContext.getFirstSubmitTime()),
+            taskExecutionContext.getProcessDefineCode(),
+            taskExecutionContext.getProcessDefineVersion(),
+            taskExecutionContext.getProcessInstanceId(),
+            taskExecutionContext.getTaskInstanceId());
     }
 
 }
