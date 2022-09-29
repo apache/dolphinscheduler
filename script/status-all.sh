@@ -19,9 +19,9 @@
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 
-source ${workDir}/env/install_env.sh
+source ${workDir}/env/install_config.sh
 
-# install_env.sh info
+# install_config.sh info
 echo -e '\n'
 echo "====================== dolphinscheduler server config ============================="
 echo -e "1.dolphinscheduler server node config hosts:[ \033[1;32m ${ips} \033[0m ]"
