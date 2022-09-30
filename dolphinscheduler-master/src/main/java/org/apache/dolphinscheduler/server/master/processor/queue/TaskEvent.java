@@ -111,7 +111,7 @@ public class TaskEvent {
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
         event.setState(command.getStatus());
-        event.setStartTime(DateUtils.timeStampToLocalDate(command.getStartTime()));
+        event.setStartTime(DateUtils.timeStampToDate(command.getStartTime()));
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());
         event.setAppIds(command.getAppIds());
@@ -126,10 +126,10 @@ public class TaskEvent {
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
         event.setState(TaskExecutionStatus.of(command.getStatus()));
-        event.setStartTime(DateUtils.timeStampToLocalDate(command.getStartTime()));
+        event.setStartTime(DateUtils.timeStampToDate(command.getStartTime()));
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());
-        event.setEndTime(DateUtils.timeStampToLocalDate(command.getEndTime()));
+        event.setEndTime(DateUtils.timeStampToDate(command.getEndTime()));
         event.setProcessId(command.getProcessId());
         event.setAppIds(command.getAppIds());
         event.setVarPool(command.getVarPool());

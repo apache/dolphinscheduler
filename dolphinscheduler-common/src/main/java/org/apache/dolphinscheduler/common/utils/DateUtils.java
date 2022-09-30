@@ -652,8 +652,8 @@ public final class DateUtils {
      * @param timeStamp time stamp (milliseconds)
      * @return local date
      */
-    public static Date timeStampToLocalDate(long timeStamp) {
-        return timeStamp == 0L ? null : new Date(Long.parseLong(String.valueOf(timeStamp)));
+    public static @Nullable Date timeStampToDate(long timeStamp) {
+        return timeStamp <= 0L ? null : new Date(timeStamp);
     }
 
     /**

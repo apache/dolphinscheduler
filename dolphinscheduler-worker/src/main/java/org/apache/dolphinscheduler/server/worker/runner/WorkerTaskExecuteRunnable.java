@@ -92,7 +92,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
         String taskLogName = LoggerUtils
-            .buildTaskId(DateUtils.timeStampToLocalDate(taskExecutionContext.getFirstSubmitTime()),
+            .buildTaskId(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                 taskExecutionContext.getProcessDefineCode(),
                 taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),

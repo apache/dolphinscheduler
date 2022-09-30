@@ -47,7 +47,7 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext();
         return unit.convert(
             DateUtils.getRemainTime(
-                DateUtils.timeStampToLocalDate(taskExecutionContext.getFirstSubmitTime()),
+                DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                 taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
     }
 

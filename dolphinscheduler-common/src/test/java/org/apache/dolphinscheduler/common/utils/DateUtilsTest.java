@@ -274,10 +274,10 @@ public class DateUtilsTest {
     @Test
     public void testTimeStampToDate() {
         long timeStamp = 1664456400000L;
-        Date date = DateUtils.timeStampToLocalDate(timeStamp);
+        Date date = DateUtils.timeStampToDate(timeStamp);
         Assert.assertEquals("2022-09-29 21:00:00", DateUtils.dateToString(date));
 
-        date = DateUtils.timeStampToLocalDate(0L);
+        date = DateUtils.timeStampToDate(0L);
         Assert.assertNull(date);
     }
 }

@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -444,7 +445,7 @@ public class DateUtils {
      * @param timeStamp timeStamp
      * @return date
      */
-    public static Date timeStampToLocalDate(long timeStamp) {
-        return timeStamp == 0L ? null : new Date(Long.parseLong(String.valueOf(timeStamp)));
+    public static @Nullable Date timeStampToDate(long timeStamp) {
+        return timeStamp <= 0L ? null : new Date(timeStamp);
     }
 }
