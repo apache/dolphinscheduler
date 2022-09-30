@@ -178,7 +178,7 @@ export default {
           },
           {
             key: 'docs1',
-            text: '3.0.1)',
+            text: '3.0.1',
             link: '/zh-cn/docs/3.0.1/user_doc/about/introduction.html',
           },
           {
