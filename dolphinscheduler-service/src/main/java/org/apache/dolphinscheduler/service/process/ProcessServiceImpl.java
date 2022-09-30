@@ -169,7 +169,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
 import io.micrometer.core.annotation.Counted;
 
 /**
@@ -941,7 +940,7 @@ public class ProcessServiceImpl implements ProcessService {
             throw new IllegalArgumentException("Cannot find the process definition for this workflowInstance");
         }
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
-        if(cmdParam == null){
+        if (cmdParam == null) {
             cmdParam = new HashMap<>();
         }
         int processInstanceId = command.getProcessInstanceId();
@@ -965,10 +964,10 @@ public class ProcessServiceImpl implements ProcessService {
 
         // Recalculate global parameters after rerun.
         String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-            processDefinition.getGlobalParamMap(),
-            processDefinition.getGlobalParamList(),
-            commandTypeIfComplement,
-            processInstance.getScheduleTime(), timezoneId);
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                commandTypeIfComplement,
+                processInstance.getScheduleTime(), timezoneId);
         processInstance.setGlobalParams(globalParams);
         processInstance.setProcessDefinition(processDefinition);
 
@@ -1017,8 +1016,9 @@ public class ProcessServiceImpl implements ProcessService {
                 }
                 if (cmdParam != null) {
                     cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
-                            String.join(Constants.COMMA, convertIntListToString(failedList)));
+                        String.join(Constants.COMMA, convertIntListToString(failedList)));
                 }
+
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
                 break;
@@ -1035,7 +1035,7 @@ public class ProcessServiceImpl implements ProcessService {
                 }
                 if (cmdParam != null) {
                     cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
-                            String.join(Constants.COMMA, convertIntListToString(stopNodeList)));
+                        String.join(Constants.COMMA, convertIntListToString(stopNodeList)));
                 }
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
@@ -1819,7 +1819,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param res origin resource info
      * @return {@link ResourceInfo}
      */
-    private ResourceInfo updateResourceInfo(ResourceInfo res) {
+    protected ResourceInfo updateResourceInfo(ResourceInfo res) {
         ResourceInfo resourceInfo = null;
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {

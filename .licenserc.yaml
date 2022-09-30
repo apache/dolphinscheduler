@@ -46,5 +46,6 @@ header:
     - '.github/actions/comment-on-issue/**'
     - '.github/actions/translate-on-issue/**'
     - '**/.gitkeep'
+    - 'org.mockito.plugins.MockMaker'
 
   comment: on-failure
