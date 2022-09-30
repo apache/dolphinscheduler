@@ -14,12 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useResources } from '.'
 import type { IJsonItem } from '../types'
 
 export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
+  const hiveSqlScriptSpan = computed(() => (model.hiveCliTaskExecutionType === 'SCRIPT' ? 24 : 0))
 
   return [
     {
@@ -27,7 +29,11 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
       field: 'hiveCliTaskExecutionType',
       span: 12,
       name: t('project.node.hive_cli_task_execution_type'),
-      options: HIVE_CLI_TASK_EXECUTION_TYPES
+      options: HIVE_CLI_TASK_EXECUTION_TYPES,
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true
+      }
     },
     {
       type: 'editor',
@@ -35,7 +41,12 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.hive_sql_script'),
       props: {
         language: 'sql'
-      }
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true
+      },
+      span: hiveSqlScriptSpan
     },
     {
       type: 'input',
