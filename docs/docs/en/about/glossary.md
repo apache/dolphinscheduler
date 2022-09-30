@@ -49,6 +49,10 @@ process fails and ends
 
 ### 2.Module introduction
 
+- dolphinscheduler-master master module, provides workflow management and orchestration.
+
+- dolphinscheduler-worker worker module, provides task execution management.
+
 - dolphinscheduler-alert alarm module, providing AlertServer service.
 
 - dolphinscheduler-api web application module, providing ApiServer service.
@@ -58,8 +62,6 @@ process fails and ends
 - dolphinscheduler-dao provides operations such as database access.
 
 - dolphinscheduler-remote client and server based on netty
-
-- dolphinscheduler-server MasterServer and WorkerServer services
 
 - dolphinscheduler-service service module, including Quartz, Zookeeper, log client access service, easy to call server
   module and api module

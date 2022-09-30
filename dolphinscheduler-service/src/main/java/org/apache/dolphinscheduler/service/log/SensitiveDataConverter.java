@@ -15,15 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.Constants;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.google.common.base.Strings;
+
 import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+
+import com.google.common.base.Strings;
 
 /**
  * sensitive data log converter
@@ -34,7 +36,6 @@ public class SensitiveDataConverter extends MessageConverter {
      * password pattern
      */
     private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
-
 
     @Override
     public String convert(ILoggingEvent event) {
@@ -84,6 +85,5 @@ public class SensitiveDataConverter extends MessageConverter {
 
         return sb.toString();
     }
-
 
 }
