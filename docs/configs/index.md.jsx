@@ -45,6 +45,7 @@ import docs205Config from '../../../site_config/docs2-0-5';
 import docs206Config from '../../../site_config/docs2-0-6';
 import docs300Config from '../../../site_config/docs3-0-0';
 import docs301Config from '../../../site_config/docs3-0-1';
+import docs310Config from '../../../site_config/docs3-1-0';
 import docsDevConfig from '../../../site_config/docsdev';
 
 const docsSource = {
