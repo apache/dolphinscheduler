@@ -19,16 +19,14 @@ package org.apache.dolphinscheduler.service.utils;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
@@ -64,13 +62,13 @@ public class ProcessUtilsTest {
     @Test
     public void testGetKerberosInitCommand() {
         Mockito.mockStatic(PropertyUtils.class);
-        Mockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+        Mockito.when(PropertyUtils.getBoolean(TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
                 .thenReturn(true);
-        Mockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
-        Mockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
-        Mockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
-        Assert.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
-        Mockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+        Mockito.when(PropertyUtils.getString(TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
+        Mockito.when(PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
+        Mockito.when(PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
+        Assert.assertNotEquals("", LogUtils.getKerberosInitCommand());
+        Mockito.when(PropertyUtils.getBoolean(TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
                 .thenReturn(false);
         Assert.assertEquals("", LogUtils.getKerberosInitCommand());
     }
@@ -81,7 +79,7 @@ public class ProcessUtilsTest {
         appIds.add("application_1585532379175_228491");
         appIds.add("application_1598885606600_3677");
         String tenantCode = "dev";
-        String executePath = "/ds-exec/1/1/1";
+        String executePath = "~/ds-exec/1/1/1";
         TaskExecutionStatus running = TaskExecutionStatus.RUNNING_EXECUTION;
 
         Mockito.mockStatic(HadoopUtils.class);

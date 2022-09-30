@@ -21,8 +21,6 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
-import org.apache.commons.lang3.SystemUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,16 +28,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({PropertyUtils.class})
+@RunWith(MockitoJUnitRunner.class)
 public class LogUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LogUtilsTest.class);
@@ -67,14 +62,14 @@ public class LogUtilsTest {
 
     @Test
     public void testGetKerberosInitCommand() {
-        PowerMockito.mockStatic(PropertyUtils.class);
+        Mockito.mockStatic(PropertyUtils.class);
         Mockito.when(PropertyUtils.getBoolean(TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
             .thenReturn(true);
-        PowerMockito.when(PropertyUtils.getString(TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
-        PowerMockito.when(PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
-        PowerMockito.when(PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
+        Mockito.when(PropertyUtils.getString(TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
+        Mockito.when(PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
+        Mockito.when(PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
         Assert.assertNotEquals("", LogUtils.getKerberosInitCommand());
-        PowerMockito.when(PropertyUtils.getBoolean(TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+        Mockito.when(PropertyUtils.getBoolean(TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
             .thenReturn(false);
         Assert.assertEquals("", LogUtils.getKerberosInitCommand());
     }
