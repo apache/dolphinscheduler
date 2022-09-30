@@ -13,18 +13,35 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-delimiter d//
 
-return 'Success!';
-exception when others then
-		---Raise EXCEPTION '(%)',SQLERRM;
-        return SQLERRM;
-END;
-$BODY$;
+package org.apache.dolphinscheduler.plugin.task.dms;
 
-select dolphin_insert_dq_initial_data();
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-d//
+import java.util.Collections;
+import java.util.List;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(TaskChannelFactory.class)
+public class DmsTaskChannelFactory implements TaskChannelFactory {
+
+    @Override
+    public TaskChannel create() {
+        return new DmsTaskChannel();
+    }
+
+    @Override
+    public String getName() {
+        return "DMS";
+    }
+
+    @Override
+    public List<PluginParams> getParams() {
+        return Collections.emptyList();
+    }
+}

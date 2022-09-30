@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.api.mockito.PowerMockito;
+import org.mockito.Mockito;
 
 import io.netty.channel.Channel;
 
@@ -45,7 +45,7 @@ public class TaskKillResponseProcessorTest {
     @Before
     public void before() {
         taskKillResponseProcessor = new TaskKillResponseProcessor();
-        channel = PowerMockito.mock(Channel.class);
+        channel = Mockito.mock(Channel.class);
         taskKillResponseCommand = new TaskKillResponseCommand();
         taskKillResponseCommand.setAppIds(
                 new ArrayList<String>() {

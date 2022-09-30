@@ -46,6 +46,7 @@ import { userSagemaker } from './use-sagemaker'
 import { useChunjun } from './use-chunjun'
 import { usePytorch } from './use-pytorch'
 import { useHiveCli } from './use-hive-cli'
+import { useDms } from './use-dms'
 import {useDatasync} from "./use-datasync";
 
 export default {
@@ -80,5 +81,6 @@ export default {
   JAVA: useJava,
   PYTORCH: usePytorch,
   HIVECLI: useHiveCli,
+  DMS: useDms,
   DATASYNC: useDatasync
 }

@@ -333,7 +333,7 @@ public class PythonGateway {
                                     String cronTime,
                                     String workerGroup,
                                     String warningType,
-                                    int warningGroupId,
+                                    Integer warningGroupId,
                                     Integer timeout
     ) {
         User user = usersService.queryUser(userName);
@@ -606,6 +606,10 @@ public class PythonGateway {
      */
     public Resource queryResourcesFileInfo(String userName, String fullName) {
         return resourceService.queryResourcesFileInfo(userName, fullName);
+    }
+
+    public String getGatewayVersion() {
+        return PythonGateway.class.getPackage().getImplementationVersion();
     }
 
     /**

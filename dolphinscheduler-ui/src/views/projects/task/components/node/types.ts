@@ -373,6 +373,16 @@ interface ITaskParams {
   pythonEnvTool?: string
   requirements?: string
   condaPythonVersion?: string
+  isRestartTask?: boolean
+  isJsonFormat?: boolean
+  jsonData?: string
+  migrationType?: string
+  replicationTaskIdentifier?: string
+  sourceEndpointArn?: string
+  targetEndpointArn?: string
+  replicationInstanceArn?: string
+  tableMappings?: string
+  replicationTaskArn?: string
   jsonFormat?: boolean
   destinationLocationArn?: string
   sourceLocationArn?: string

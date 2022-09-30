@@ -52,6 +52,7 @@ type TaskType =
   | 'FLINK_STREAM'
   | 'PYTORCH'
   | 'HIVECLI'
+  | 'DMS'
   | 'DATASYNC'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'

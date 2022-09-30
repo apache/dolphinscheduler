@@ -18,6 +18,7 @@ aws-java-sdk-emr-1.12.300.jar
 aws-java-sdk-kms-1.12.300.jar
 aws-java-sdk-s3-1.12.300.jar
 aws-java-sdk-sagemaker-1.12.300.jar
+aws-java-sdk-dms-1.12.300.jar
 bcpkix-jdk15on-1.68.jar
 bcprov-jdk15on-1.68.jar
 bonecp-0.8.0.RELEASE.jar
