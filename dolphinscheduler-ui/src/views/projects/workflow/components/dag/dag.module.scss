@@ -192,6 +192,9 @@ $bgLight: #ffffff;
     &.icon-pytorch {
       background-image: url('/images/task-icons/pytorch.png');
     }
+    &.icon-dms {
+      background-image: url('/images/task-icons/dms.png');
+    }
   }
 
   &:hover {
@@ -286,6 +289,9 @@ $bgLight: #ffffff;
       }
       &.icon-pytorch {
         background-image: url('/images/task-icons/pytorch_hover.png');
+      }
+      &.icon-dms {
+        background-image: url('/images/task-icons/dms_hover.png');
       }
     }
   }
