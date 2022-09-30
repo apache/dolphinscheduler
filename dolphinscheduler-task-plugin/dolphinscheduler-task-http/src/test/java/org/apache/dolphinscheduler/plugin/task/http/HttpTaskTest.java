@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -43,7 +42,9 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Test HttpTask
  */
+@RunWith(MockitoJUnitRunner.class)
 public class HttpTaskTest {
 
     private static final String CONTENT_TYPE = "Content-Type";
@@ -203,7 +205,7 @@ public class HttpTaskTest {
 
     private HttpTask generateHttpTaskFromParamData(String paramData, Map<String, String> prepareParamsMap) {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
         if (prepareParamsMap != null) {
             Map<String, Property> propertyParamsMap = new HashMap<>();
             prepareParamsMap.forEach((k, v) -> {
@@ -212,7 +214,7 @@ public class HttpTaskTest {
                 property.setValue(v);
                 propertyParamsMap.put(k, property);
             });
-            when(taskExecutionContext.getPrepareParamsMap()).thenReturn(propertyParamsMap);
+            Mockito.when(taskExecutionContext.getPrepareParamsMap()).thenReturn(propertyParamsMap);
         }
         HttpTask httpTask = new HttpTask(taskExecutionContext);
         httpTask.init();

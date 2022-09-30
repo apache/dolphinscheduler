@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { FormRules, FormItemRule } from './types'
+import type { FormRules, IFormItemRule } from './types'
 
 export function formatLabel(label?: string): string {
   if (!label) return ''
@@ -23,11 +23,11 @@ export function formatLabel(label?: string): string {
 }
 
 export function formatValidate(
-  validate?: FormItemRule | FormRules
-): FormItemRule {
+  validate?: IFormItemRule | FormRules
+): IFormItemRule {
   if (!validate) return {}
   if (Array.isArray(validate)) {
-    validate.forEach((item: FormItemRule) => {
+    validate.forEach((item: IFormItemRule) => {
       if (!item?.message) delete item.message
       return item
     })
