@@ -132,7 +132,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 task.cancel();
                 List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
                 if (CollectionUtils.isNotEmpty(appIds)) {
-                    ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
+                    LogUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
                             taskExecutionContext.getExecutePath());
                 }
             } catch (Exception e) {
