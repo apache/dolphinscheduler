@@ -158,12 +158,17 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             ProcessInstance processInstance = entry.getKey();
             TaskInstance taskInstance = entry.getValue();
             String address = NetUtils.getAddr(masterConfig.getListenPort());
-            if (processInstance.getHost().equalsIgnoreCase(address)) {
-                logger.info("Process host is local master, will notify it");
-                this.notifyMyself(processInstance, taskInstance);
-            } else {
-                logger.info("Process host is remote master, will notify it");
-                this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
+            try {
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstance.getId());
+                if (processInstance.getHost().equalsIgnoreCase(address)) {
+                    logger.info("Process host is local master, will notify it");
+                    this.notifyMyself(processInstance, taskInstance);
+                } else {
+                    logger.info("Process host is remote master, will notify it");
+                    this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
+                }
+            } finally {
+                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }

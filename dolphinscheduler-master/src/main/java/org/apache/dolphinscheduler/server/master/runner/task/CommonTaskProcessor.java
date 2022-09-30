@@ -132,7 +132,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             logger.info("Task {} is submitted to priority queue success by master", taskInstance.getName());
             return true;
         } catch (Exception e) {
-            logger.info("Task {} is submitted to priority queue error", taskInstance.getName(), e);
+            logger.error("Task {} is submitted to priority queue error", taskInstance.getName(), e);
             return false;
         }
     }
