@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.service.utils;
 
 import static org.powermock.api.mockito.PowerMockito.when;
 import org.apache.commons.lang3.SystemUtils;
