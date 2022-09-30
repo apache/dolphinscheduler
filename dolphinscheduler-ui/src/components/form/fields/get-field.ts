@@ -16,8 +16,7 @@
  */
 import * as Field from './index'
 import { camelCase, upperFirst, isFunction } from 'lodash'
-import type { FormRules, FormItemRule } from 'naive-ui'
-import type { IJsonItem } from '../types'
+import type { IJsonItem, IFormRules, IFormItemRule } from '../types'
 
 const TYPES = [
   'input',
@@ -37,7 +36,7 @@ const TYPES = [
 const getField = (
   item: IJsonItem,
   fields: { [field: string]: any },
-  rules?: FormRules
+  rules?: IFormRules
 ) => {
   const { type = 'input', widget, field } = isFunction(item) ? item() : item
   if (!TYPES.includes(type)) return null
@@ -47,7 +46,7 @@ const getField = (
   }
   // TODO Support other widgets later
   if (type === 'custom-parameters') {
-    let fieldRules: { [key: string]: FormItemRule }[] = []
+    let fieldRules: { [key: string]: IFormItemRule }[] = []
     if (rules && !rules[field]) fieldRules = rules[field] = []
     // @ts-ignore
     return Field[renderTypeName](item, fields, fieldRules)
