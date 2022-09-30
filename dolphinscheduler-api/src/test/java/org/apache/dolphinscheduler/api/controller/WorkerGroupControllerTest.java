@@ -67,7 +67,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("192.168.0.1", "192.168.0.1");
         serverMaps.put("192.168.0.2", "192.168.0.2");
-        PowerMockito.when(registryClient.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
+        Mockito.when(registryClient.getServerMaps(NodeType.WORKER)).thenReturn(serverMaps);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","cxc_work_group");
