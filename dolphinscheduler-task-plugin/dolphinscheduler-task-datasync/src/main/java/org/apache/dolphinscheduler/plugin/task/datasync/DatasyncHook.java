@@ -51,11 +51,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
-import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
-
 @Data
 public class DatasyncHook {
 
@@ -71,13 +66,10 @@ public class DatasyncHook {
     }
 
     protected static DataSyncClient createClient() {
-        //final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        //final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        //final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
+        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
+        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
 
-        final String awsAccessKeyId ="AKIAXOIBKUQT265M7J5H";
-        final String awsSecretAccessKey ="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";
-        final String awsRegion ="ap-southeast-1";
         final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
@@ -225,12 +217,12 @@ public class DatasyncHook {
     }
 
     private static void castParamPropertyPackage(DatasyncParameters parameters, CreateTaskRequest.Builder builder){
-        List<com.amazonaws.services.datasync.model.TagListEntry> tags = parameters.getTags();
+        List<DatasyncParameters.TagListEntry> tags = parameters.getTags();
         if (tags != null && tags.size() > 0) {
             List<TagListEntry> collect = tags.stream().map(e -> TagListEntry.builder().key(e.getKey()).value(e.getValue()).build()).collect(Collectors.toList());
             builder.tags(collect);
         }
-        com.amazonaws.services.datasync.model.Options options = parameters.getOptions();
+        DatasyncParameters.Options options = parameters.getOptions();
         if (options != null) {
             Options option = Options.builder().build();
             try {
@@ -242,12 +234,12 @@ public class DatasyncHook {
             }
             builder.options(option);
         }
-        List<com.amazonaws.services.datasync.model.FilterRule> excludes = parameters.getExcludes();
+        List<DatasyncParameters.FilterRule> excludes = parameters.getExcludes();
         if (excludes != null && excludes.size() > 0) {
             List<FilterRule> collect = excludes.stream().map(e->FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build()).collect(Collectors.toList());
             builder.excludes(collect);
         }
-        List<com.amazonaws.services.datasync.model.FilterRule> includes = parameters.getIncludes();
+        List<DatasyncParameters.FilterRule> includes = parameters.getIncludes();
         if (includes != null && includes.size() > 0) {
             List<FilterRule> collect = includes.stream().map(e->FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build()).collect(Collectors.toList());
             builder.excludes(collect);

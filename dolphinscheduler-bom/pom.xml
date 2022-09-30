@@ -749,7 +749,7 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>datasync</artifactId>
                 <version>${datasync.version}</version>
-                <exclusions>
+               <!-- <exclusions>
                     <exclusion>
                         <groupId>software.amazon.awssdk</groupId>
                         <artifactId>sdk-core</artifactId>
@@ -838,27 +838,7 @@
                         <groupId>io.netty</groupId>
                         <artifactId>netty-resolver</artifactId>
                     </exclusion>
-                </exclusions>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-datasync -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-datasync</artifactId>
-                <version>${aws-sdk.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-databind</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-core</artifactId>
-                    </exclusion>
-                </exclusions>
+                </exclusions>-->
             </dependency>
         </dependencies>
     </dependencyManagement>

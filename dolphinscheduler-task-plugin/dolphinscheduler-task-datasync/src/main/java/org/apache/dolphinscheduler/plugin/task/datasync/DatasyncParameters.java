@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import com.amazonaws.services.datasync.model.FilterRule;
-import com.amazonaws.services.datasync.model.Options;
-import com.amazonaws.services.datasync.model.TagListEntry;
-import com.amazonaws.services.datasync.model.TaskSchedule;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -64,4 +60,48 @@ public class DatasyncParameters extends AbstractParameters {
         }
     }
 
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public class Options{
+        private String verifyMode;
+        private String overwriteMode;
+        private String atime;
+        private String mtime;
+        private String uid;
+        private String gid;
+        private String preserveDeletedFiles;
+        private String preserveDevices;
+        private String posixPermissions;
+        private Long bytesPerSecond;
+        private String taskQueueing;
+        private String logLevel;
+        private String transferMode;
+        private String securityDescriptorCopyFlags;
+        private String objectTags;
+    }
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class TaskSchedule{
+        private String scheduleExpression;
+    }
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class FilterRule{
+        private String filterType;
+        private String value;
+    }
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class TagListEntry{
+        private String key;
+        private String value;
+    }
 }
