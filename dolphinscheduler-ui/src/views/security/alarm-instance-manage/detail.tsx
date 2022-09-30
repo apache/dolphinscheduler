@@ -24,7 +24,7 @@ import { useDetail } from './use-detail'
 import Modal from '@/components/modal'
 import Form from '@/components/form'
 import getElementByJson from '@/components/form/get-elements-by-json'
-import type { IRecord, FormRules, IFormItem } from './types'
+import type { IRecord, IFormRules, IFormItem } from './types'
 import type { PropType, Ref } from 'vue'
 
 interface IElements extends Omit<Ref, 'value'> {
@@ -48,7 +48,7 @@ const DetailModal = defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
 
-    const rules = ref<FormRules>({})
+    const rules = ref<IFormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
 
     const {
