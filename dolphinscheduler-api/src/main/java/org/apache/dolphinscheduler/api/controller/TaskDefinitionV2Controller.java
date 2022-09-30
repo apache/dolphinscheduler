@@ -157,11 +157,11 @@ public class TaskDefinitionV2Controller extends BaseController {
      * @return PageResourceResponse from condition
      */
     @ApiOperation(value = "get", notes = "FILTER_TASK_DEFINITION_NOTES")
-    @GetMapping(consumes = {"application/json"})
+    @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<PageInfo<TaskDefinition>> filterTaskDefiniiton(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<TaskDefinition>> filterTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestBody TaskFilterRequest taskFilterRequest) {
         PageInfo<TaskDefinition> taskDefinitions =
                 taskDefinitionService.filterTaskDefinition(loginUser, taskFilterRequest);
