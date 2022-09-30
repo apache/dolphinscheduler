@@ -72,4 +72,19 @@ public class LowerWeightRoundRobinTest {
         result = roundRobin.select(sources);
         Assert.assertEquals("192.158.2.1", result.getHost().getIp());
     }
+
+    @Test
+    public void testDoSelect() {
+        Collection<HostWeight> sources = new ArrayList<>();
+        LowerWeightRoundRobin roundRobin = new LowerWeightRoundRobin();
+        HostWeight result;
+        result = roundRobin.doSelect(sources);
+        Assert.assertEquals(null, result);
+
+        sources.add(new HostWeight(HostWorker.of("192.158.2.1:11", 100, "default"), 0.06, 0.44, 3.14, 1, System.currentTimeMillis() - 60 * 8 * 1000));
+        sources.add(new HostWeight(HostWorker.of("192.158.2.2:22", 100, "default"), 0.06, 0.56, 3.24, 2, System.currentTimeMillis() - 60 * 5 * 1000));
+        sources.add(new HostWeight(HostWorker.of("192.158.2.3:33", 100, "default"), 0.06, 0.80, 3.15, 1, System.currentTimeMillis() - 60 * 2 * 1000));
+        result = roundRobin.doSelect(sources);
+        Assert.assertEquals("192.158.2.1", result.getHost().getIp());
+    }
 }
