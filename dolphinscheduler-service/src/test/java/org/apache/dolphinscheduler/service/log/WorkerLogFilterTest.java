@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.service.log;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.common.Constants;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,17 +25,17 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.spi.FilterReply;
 
-public class TaskLogFilterTest {
+public class WorkerLogFilterTest {
 
     @Test
     public void decide() {
-        TaskLogFilter taskLogFilter = new TaskLogFilter();
+        WorkerLogFilter workerLogFilter = new WorkerLogFilter();
 
-        FilterReply filterReply = taskLogFilter.decide(new LoggingEvent() {
+        FilterReply filterReply = workerLogFilter.decide(new LoggingEvent() {
 
             @Override
             public String getThreadName() {
-                return TaskConstants.TASK_APPID_LOG_FORMAT;
+                return Constants.THREAD_NAME_WORKER_SERVER;
             }
 
             @Override
@@ -45,7 +45,7 @@ public class TaskLogFilterTest {
 
             @Override
             public String getMessage() {
-                return "raw script : echo 222";
+                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
             }
 
             @Override
@@ -55,13 +55,9 @@ public class TaskLogFilterTest {
 
             @Override
             public String getFormattedMessage() {
-                return "raw script : echo 222";
+                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
             }
 
-            @Override
-            public String getLoggerName() {
-                return TaskConstants.TASK_LOG_LOGGER_NAME;
-            }
         });
 
         Assert.assertEquals(FilterReply.ACCEPT, filterReply);

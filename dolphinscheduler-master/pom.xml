@@ -56,10 +56,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-registry-all</artifactId>
         </dependency>
         <dependency>
@@ -266,10 +262,6 @@
             <artifactId>dolphinscheduler-worker</artifactId>
             <scope>test</scope>
             <!-- master should never depend on worker, this is only for tests -->
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-log-server</artifactId>
         </dependency>
 
         <dependency>

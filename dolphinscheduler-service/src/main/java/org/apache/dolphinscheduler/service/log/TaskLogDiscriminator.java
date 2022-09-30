@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -52,7 +52,8 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
         if (event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME)) {
             String threadName = event.getThreadName();
             if (threadName.endsWith(TaskConstants.GET_OUTPUT_LOG_SERVICE)) {
-                threadName = threadName.substring(0, threadName.length() - TaskConstants.GET_OUTPUT_LOG_SERVICE.length());
+                threadName =
+                        threadName.substring(0, threadName.length() - TaskConstants.GET_OUTPUT_LOG_SERVICE.length());
             }
             String part1 = threadName.split(Constants.EQUAL_SIGN)[1];
             String prefix = TaskConstants.TASK_LOGGER_INFO_PREFIX + "-";
@@ -60,7 +61,8 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
                 key = part1.substring(prefix.length()).replaceFirst("-", "/");
             }
         }
-        logger.debug("task log discriminator end, key is:{}, thread name:{}, loggerName:{}", key, event.getThreadName(), event.getLoggerName());
+        logger.debug("task log discriminator end, key is:{}, thread name:{}, loggerName:{}", key, event.getThreadName(),
+                event.getLoggerName());
         return key;
     }
 

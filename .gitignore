@@ -43,7 +43,6 @@ dolphinscheduler-dao/src/main/resources/dao/data_source.properties
 dolphinscheduler-alert/logs/
 dolphinscheduler-alert/src/main/resources/alert.properties_bak
 dolphinscheduler-alert/src/main/resources/logback.xml
-dolphinscheduler-server/src/main/resources/logback.xml
 dolphinscheduler-ui/dist
 dolphinscheduler-ui/node
 dolphinscheduler-common/sql

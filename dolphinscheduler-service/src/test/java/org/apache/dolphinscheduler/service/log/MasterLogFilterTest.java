@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
+package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.Constants;
 
@@ -25,17 +25,17 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.spi.FilterReply;
 
-public class WorkerLogFilterTest {
+public class MasterLogFilterTest {
 
     @Test
     public void decide() {
-        WorkerLogFilter workerLogFilter = new WorkerLogFilter();
+        MasterLogFilter masterLogFilter = new MasterLogFilter();
 
-        FilterReply filterReply = workerLogFilter.decide(new LoggingEvent() {
+        FilterReply filterReply = masterLogFilter.decide(new LoggingEvent() {
 
             @Override
             public String getThreadName() {
-                return Constants.THREAD_NAME_WORKER_SERVER;
+                return Constants.THREAD_NAME_MASTER_SERVER;
             }
 
             @Override
@@ -45,17 +45,7 @@ public class WorkerLogFilterTest {
 
             @Override
             public String getMessage() {
-                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
-            }
-
-            @Override
-            public Object[] getArgumentArray() {
-                return new Object[0];
-            }
-
-            @Override
-            public String getFormattedMessage() {
-                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
+                return "master insert into queue success, task : shell2";
             }
 
         });

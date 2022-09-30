@@ -43,10 +43,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-server</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
