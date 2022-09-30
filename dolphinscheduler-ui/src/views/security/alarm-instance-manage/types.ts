@@ -17,8 +17,12 @@
 
 import type { IPluginId } from '@/service/modules/ui-plugins/types'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import type { IMeta, IJsonItem, IFormItem } from '@/components/form/types'
-import type { FormRules } from 'naive-ui'
+import type {
+  IMeta,
+  IJsonItem,
+  IFormItem,
+  IFormRules
+} from '@/components/form/types'
 
 interface IRecord {
   alertPluginName?: string
@@ -47,5 +51,5 @@ export {
   IMeta,
   IFormItem,
   TableColumns,
-  FormRules
+  IFormRules
 }
