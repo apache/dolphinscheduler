@@ -42,7 +42,7 @@ import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQL
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 

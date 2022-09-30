@@ -14,13 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.dolphinscheduler.server.log;
-
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.apache.dolphinscheduler.service.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -28,36 +22,29 @@ import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
 
 /**
- * task log filter
+ * master log filter
  */
-public class TaskLogFilter extends Filter<ILoggingEvent> {
-
-    private static Logger logger = LoggerFactory.getLogger(TaskLogFilter.class);
+public class MasterLogFilter extends Filter<ILoggingEvent> {
 
     /**
-     * level
+     * log level
      */
-    private Level level;
-
-    public void setLevel(String level) {
-        this.level = Level.toLevel(level);
-    }
+    Level level;
 
     /**
      * Accept or reject based on thread name
-     *
      * @param event event
      * @return FilterReply
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        FilterReply filterReply = FilterReply.DENY;
-        if ((event.getThreadName().startsWith(TaskConstants.TASK_APPID_LOG_FORMAT)
-                && event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME))
-                || event.getLevel().isGreaterOrEqual(level)) {
-            filterReply = FilterReply.ACCEPT;
+        if (event.getThreadName().startsWith("Master-")) {
+            return FilterReply.ACCEPT;
         }
-        logger.debug("task log filter, thread name:{}, loggerName:{}, filterReply:{}, level:{}", event.getThreadName(), event.getLoggerName(), filterReply.name(), level);
-        return filterReply;
+        return FilterReply.DENY;
+    }
+
+    public void setLevel(String level) {
+        this.level = Level.toLevel(level);
     }
 }
