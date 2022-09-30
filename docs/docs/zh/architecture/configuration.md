@@ -19,7 +19,7 @@ DolphinScheduler的目录结构如下：
 │   ├── dolphinscheduler-daemon.sh              启动/关闭DolphinScheduler服务脚本
 │   ├── env                                     环境变量配置存放目录
 │   │   ├── dolphinscheduler_env.sh             当使用`dolphinscheduler-daemon.sh`脚本起停服务时，运行此脚本加载环境变量配置文件 [如：JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
-│   │   └── install_env.sh                      当使用`install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`脚本时，运行此脚本为DolphinScheduler安装加载环境变量配置
+│   │   └── install_config.sh                      当使用`install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`脚本时，运行此脚本为DolphinScheduler安装加载环境变量配置
 │   ├── install.sh                              当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本自动安装服务
 │   ├── remove-zk-node.sh                       清理zookeeper缓存文件脚本
 │   ├── scp-hosts.sh                            安装文件传输脚本

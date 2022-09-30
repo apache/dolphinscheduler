@@ -69,11 +69,11 @@ chmod 600 ~/.ssh/authorized_keys
 
 ## 修改相关配置
 
-完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env` 中找到，他们分别是 并命名为 `install_env.sh` 和 `dolphinscheduler_env.sh`。
+完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env` 中找到，他们分别是 并命名为 `install_config.sh` 和 `dolphinscheduler_env.sh`。
 
-### 修改 `install_env.sh` 文件
+### 修改 `install_config.sh` 文件
 
-文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，可通过以下方式更改env变量,export <ENV_NAME>=<VALUE>，配置详情如下。
+文件 `install_config.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_config.sh` 中找到此文件，可通过以下方式更改env变量,export <ENV_NAME>=<VALUE>，配置详情如下。
 
 ```shell
 # ---------------------------------------------------------

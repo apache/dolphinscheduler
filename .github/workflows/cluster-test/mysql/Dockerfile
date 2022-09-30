@@ -28,7 +28,7 @@ RUN mv /root/apache-dolphinscheduler-*-SNAPSHOT-bin /root/apache-dolphinschedule
 ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
 #Setting install.sh
-COPY .github/workflows/cluster-test/mysql/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+COPY .github/workflows/cluster-test/mysql/install_config.sh $DOLPHINSCHEDULER_HOME/bin/env/install_config.sh
 
 #Setting dolphinscheduler_env.sh
 COPY .github/workflows/cluster-test/mysql/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
