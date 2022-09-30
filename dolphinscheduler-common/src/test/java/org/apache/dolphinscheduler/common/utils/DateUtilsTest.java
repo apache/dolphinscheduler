@@ -262,9 +262,20 @@ public class DateUtilsTest {
     }
 
     @Test
-    public void testDateToTimeStamp() {
-        Date date = DateUtils.stringToDate("2022-09-29 21:00:00");
+    public void testDateToTimeStamp() throws ParseException {
+        // Beijing Date
+        String timeString = "2022-09-29 21:00:00";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+        Date date = sdf.parse(timeString);
         long timeStamp = DateUtils.dateToTimeStamp(date);
+        Assert.assertEquals(1664456400000L, timeStamp);
+
+        // Tokyo Date
+        String tokyoTime = "2022-09-29 22:00:00";
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+        date = sdf.parse(tokyoTime);
+        timeStamp = DateUtils.dateToTimeStamp(date);
         Assert.assertEquals(1664456400000L, timeStamp);
 
         date = null;
@@ -274,10 +285,16 @@ public class DateUtilsTest {
     @Test
     public void testTimeStampToDate() {
         long timeStamp = 1664456400000L;
-        Date date = DateUtils.timeStampToDate(timeStamp);
-        Assert.assertEquals("2022-09-29 21:00:00", DateUtils.dateToString(date));
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+        String sd = sdf.format(new Date(timeStamp));
+        Assert.assertEquals("2022-09-29 21:00:00", sd);
 
-        date = DateUtils.timeStampToDate(0L);
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+        sd = sdf.format(new Date(timeStamp));
+        Assert.assertEquals("2022-09-29 22:00:00", sd);
+
+        Date date = DateUtils.timeStampToDate(0L);
         Assert.assertNull(date);
     }
 }
