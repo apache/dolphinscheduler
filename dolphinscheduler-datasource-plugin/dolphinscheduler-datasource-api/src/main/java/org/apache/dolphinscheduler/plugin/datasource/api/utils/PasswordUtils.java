@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOUR
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT;
 
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.codec.binary.Base64;
@@ -48,7 +48,7 @@ public class PasswordUtils {
         if (StringUtils.isEmpty(password)) {
             return StringUtils.EMPTY;
         }
-        //if encryption is not turned on, return directly
+        // if encryption is not turned on, return directly
         boolean encryptionEnable = PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false);
         if (!encryptionEnable) {
             return password;
@@ -57,7 +57,7 @@ public class PasswordUtils {
         // Using Base64 + salt to process password
         String salt = PropertyUtils.getString(DATASOURCE_ENCRYPTION_SALT, DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = salt + new String(BASE64.encode(password.getBytes(
-            StandardCharsets.UTF_8)));
+                StandardCharsets.UTF_8)));
         return new String(BASE64.encode(passwordWithSalt.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -69,7 +69,7 @@ public class PasswordUtils {
             return StringUtils.EMPTY;
         }
 
-        //if encryption is not turned on, return directly
+        // if encryption is not turned on, return directly
         boolean encryptionEnable = PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false);
         if (!encryptionEnable) {
             return password;

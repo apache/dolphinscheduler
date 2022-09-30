@@ -24,21 +24,16 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({ClickHouseDataSourceClient.class, ClickHouseDataSourceChannel.class})
+@RunWith(MockitoJUnitRunner.class)
 public class ClickHouseDataSourceChannelTest {
-    
+
     @Test
     public void testCreateDataSourceClient() {
-        ClickHouseDataSourceChannel sourceChannel = PowerMockito.mock(ClickHouseDataSourceChannel.class);
-        ClickHouseDataSourceClient dataSourceClient = PowerMockito.mock(ClickHouseDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        ClickHouseDataSourceChannel sourceChannel = Mockito.mock(ClickHouseDataSourceChannel.class);
+        ClickHouseDataSourceClient dataSourceClient = Mockito.mock(ClickHouseDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new ClickHouseConnectionParam(), DbType.CLICKHOUSE));
     }
 }

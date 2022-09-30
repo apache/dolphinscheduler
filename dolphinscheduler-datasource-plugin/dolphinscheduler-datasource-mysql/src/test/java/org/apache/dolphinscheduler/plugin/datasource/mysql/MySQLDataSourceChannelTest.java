@@ -24,21 +24,16 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({MySQLDataSourceClient.class, MySQLDataSourceChannel.class})
+@RunWith(MockitoJUnitRunner.class)
 public class MySQLDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        MySQLDataSourceChannel sourceChannel = PowerMockito.mock(MySQLDataSourceChannel.class);
-        MySQLDataSourceClient dataSourceClient = PowerMockito.mock(MySQLDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        MySQLDataSourceChannel sourceChannel = Mockito.mock(MySQLDataSourceChannel.class);
+        MySQLDataSourceClient dataSourceClient = Mockito.mock(MySQLDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new MySQLConnectionParam(), DbType.MYSQL));
     }
 }

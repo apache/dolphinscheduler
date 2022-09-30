@@ -21,14 +21,16 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_S
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.hive.utils.CommonUtil;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import sun.security.krb5.Config;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -45,8 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import sun.security.krb5.Config;
 
 public class HiveDataSourceClient extends CommonDataSourceClient {
 
@@ -150,7 +150,8 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
-            boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+            boolean kerberosStartupState =
+                    PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
             if (retryGetConnection && kerberosStartupState) {
                 retryGetConnection = false;
                 createUserGroupInformation(baseConnectionParam.getUser());
