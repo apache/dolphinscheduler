@@ -133,6 +133,10 @@ export const TASK_TYPES_MAP = {
   HIVECLI: {
     alias: 'HIVECLI',
     helperLinkDisable: true
+  },
+  DMS: {
+    alias: 'DMS',
+    helperLinkDisable: true
   }
 } as {
   [key in TaskType]: {

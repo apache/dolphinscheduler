@@ -627,6 +627,11 @@
                 <artifactId>aws-java-sdk-sagemaker</artifactId>
                 <version>${aws-sdk.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-dms</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
