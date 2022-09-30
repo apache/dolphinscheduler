@@ -52,6 +52,7 @@ type TaskType =
   | 'FLINK_STREAM'
   | 'PYTORCH'
   | 'HIVECLI'
+  | 'DMS'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type DependentResultType = {
