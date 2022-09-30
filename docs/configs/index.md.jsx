@@ -66,6 +66,7 @@ const docsSource = {
   '2.0.6': docs206Config,
   '3.0.0': docs300Config,
   '3.0.1': docs301Config,
+  '3.1.0': docs310Config,
   dev: docsDevConfig,
 };
 
