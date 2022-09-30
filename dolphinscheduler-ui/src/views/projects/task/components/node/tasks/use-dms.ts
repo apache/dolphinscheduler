@@ -19,7 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function useHiveCli({
+export function useDms({
   projectCode,
   from = 0,
   readonly,
@@ -32,7 +32,7 @@ export function useHiveCli({
 }) {
   const model = reactive({
     name: '',
-    taskType: 'HIVECLI',
+    taskType: 'DMS',
     flag: 'YES',
     description: '',
     timeoutFlag: false,
@@ -43,7 +43,8 @@ export function useHiveCli({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    hiveCliTaskExecutionType: 'SCRIPT'
+    timeoutNotifyStrategy: ['WARN'],
+    isRestartTask: false,
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -68,12 +69,13 @@ export function useHiveCli({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !model.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
+      ...Fields.useResourceLimit(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useHiveCli(model),
+      ...Fields.useDms(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model
