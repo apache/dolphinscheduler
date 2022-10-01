@@ -36,10 +36,7 @@ import {
   NDynamicInput,
   NCheckbox
 } from 'naive-ui'
-import {
-  queryAuthorizedTenant,
-  queryTenantList
-} from '@/service/modules/tenants'
+import { queryAuthorizedTenant } from '@/service/modules/tenants'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
 import { verifyName } from '@/service/modules/process-definition'
