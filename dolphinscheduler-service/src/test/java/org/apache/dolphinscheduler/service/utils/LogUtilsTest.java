@@ -47,7 +47,7 @@ public class LogUtilsTest {
         taskExecutionContext.setTaskInstanceId(1000);
         taskExecutionContext.setProcessDefineCode(1L);
         taskExecutionContext.setProcessDefineVersion(1);
-        taskExecutionContext.setFirstSubmitTime(firstSubmitTime);
+        taskExecutionContext.setFirstSubmitTime(firstSubmitTime.getTime());
 
         Logger rootLogger = (Logger) LoggerFactory.getILoggerFactory().getLogger("ROOT");
         Assert.assertNotNull(rootLogger);
