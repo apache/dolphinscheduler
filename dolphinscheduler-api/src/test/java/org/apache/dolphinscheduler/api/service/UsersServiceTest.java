@@ -184,10 +184,6 @@ public class UsersServiceTest {
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             phone = "13456432345";
-            // tenantId not exists
-            result = usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
-            logger.info(result.toString());
-            Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
             // success
             Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
             result = usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
