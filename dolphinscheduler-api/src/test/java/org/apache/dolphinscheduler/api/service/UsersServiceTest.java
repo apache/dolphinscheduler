@@ -153,45 +153,44 @@ public class UsersServiceTest {
         String userName = "userTest0001~";
         String userPassword = "userTest";
         String email = "123@qq.com";
-        int tenantId = Integer.MAX_VALUE;
         String phone = "13456432345";
         int state = 1;
         try {
             // userName error
             Map<String, Object> result =
-                    usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+                    usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userName = "userTest0001";
             userPassword = "userTest000111111111111111";
             // password error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userPassword = "userTest0001";
             email = "1q.com";
             // email error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             email = "122222@qq.com";
             phone = "2233";
             // phone error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             phone = "13456432345";
             // tenantId not exists
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
             // success
             Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-            result = usersService.createUser(user, userName, userPassword, email, 1, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, phone, queueName, state);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -300,14 +299,14 @@ public class UsersServiceTest {
         try {
             // user not exist
             Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword,
-                    "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
+                    "3443@qq.com", "13457864543", "queue", 1, "Asia/Shanghai");
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
             logger.info(result.toString());
 
             // success
             when(userMapper.selectById(1)).thenReturn(getUser());
             when(userMapper.updateById(getUser())).thenReturn(1);
-            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
+            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com",
                     "13457864543", "queue", 1, "Asia/Shanghai");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -324,7 +323,7 @@ public class UsersServiceTest {
             when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
             when(userMapper.selectById(1)).thenReturn(getUser());
             when(userMapper.deleteById(1)).thenReturn(1);
-            //no operate
+            // no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
             Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
@@ -742,20 +741,17 @@ public class UsersServiceTest {
         String userPassword = "userTest";
         String email = "abc@x.com";
         String phone = "123456789";
-        String tenantCode = "tenantCode";
         int stat = 1;
 
         // User exists
         Mockito.when(userMapper.existUser(userName)).thenReturn(true);
         Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
-        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
+        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, queueName, stat);
         Assert.assertEquals(getUser(), user);
 
         // User not exists
         Mockito.when(userMapper.existUser(userName)).thenReturn(false);
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
-        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
+        user = usersService.createUserIfNotExists(userName, userPassword, email, phone, queueName, stat);
         Assert.assertNotNull(user);
     }
 

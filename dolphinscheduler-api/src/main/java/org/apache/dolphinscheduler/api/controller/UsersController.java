@@ -87,7 +87,6 @@ public class UsersController extends BaseController {
      * @param userName user name
      * @param userPassword user password
      * @param email email
-     * @param tenantId tenant id
      * @param phone phone
      * @param queue queue
      * @return create result code
@@ -96,7 +95,6 @@ public class UsersController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "queue", value = "QUEUE", dataTypeClass = String.class),
             @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "phone", value = "PHONE", dataTypeClass = String.class),
@@ -109,13 +107,12 @@ public class UsersController extends BaseController {
     public Result createUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "userName") String userName,
                              @RequestParam(value = "userPassword") String userPassword,
-                             @RequestParam(value = "tenantId") int tenantId,
                              @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
         Map<String, Object> result =
-                usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone, queue, state);
+                usersService.createUser(loginUser, userName, userPassword, email, phone, queue, state);
         return returnDataList(result);
     }
 
@@ -160,7 +157,6 @@ public class UsersController extends BaseController {
      * @param userName user name
      * @param userPassword user password
      * @param email email
-     * @param tenantId tennat id
      * @param phone phone
      * @param queue queue
      * @return update result code
@@ -170,7 +166,6 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "id", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "queue", value = "QUEUE", dataTypeClass = String.class),
             @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "phone", value = "PHONE", dataTypeClass = String.class),
@@ -186,11 +181,10 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "userPassword") String userPassword,
                              @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
                              @RequestParam(value = "email") String email,
-                             @RequestParam(value = "tenantId") int tenantId,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state,
                              @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
-        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId,
+        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email,
                 phone, queue, state, timeZone);
         return returnDataList(result);
     }
@@ -580,16 +574,16 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "grantTenant", notes = "GRANT_TENANT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100"),
-        @ApiImplicitParam(name = "tenantIds", value = "TENANT_IDS", required = true, dataTypeClass = String.class)
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "tenantIds", value = "TENANT_IDS", required = true, dataTypeClass = String.class)
     })
     @PostMapping(value = "/grant-tenant")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GRANT_TENANT_ERROR)
     @AccessLogAnnotation
     public Result grantTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-        @RequestParam(value = "userId") Integer userId,
-        @RequestParam(value = "tenantIds") String tenantIds) {
+                              @RequestParam(value = "userId") Integer userId,
+                              @RequestParam(value = "tenantIds") String tenantIds) {
         Map<String, Object> result = usersService.grantTenant(loginUser, userId, tenantIds);
         return returnDataList(result);
     }

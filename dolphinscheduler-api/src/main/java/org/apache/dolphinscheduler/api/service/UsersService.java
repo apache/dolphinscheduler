@@ -37,17 +37,16 @@ public interface UsersService {
      * @param userName user name
      * @param userPassword user password
      * @param email email
-     * @param tenantId tenant id
      * @param phone phone
      * @param queue queue
      * @return create result code
      * @throws Exception exception
      */
     Map<String, Object> createUser(User loginUser, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws Exception;
+                                   String phone, String queue, int state) throws Exception;
 
     User createUser(String userName, String userPassword, String email,
-                    int tenantId, String phone, String queue, int state);
+                    String phone, String queue, int state);
 
     /***
      * create User for ldap login
@@ -123,14 +122,13 @@ public interface UsersService {
      * @param userName user name
      * @param userPassword user password
      * @param email email
-     * @param tenantId tennat id
      * @param phone phone
      * @param queue queue
      * @return update result code
      * @throws Exception exception
      */
     Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state, String timeZone) throws IOException;
+                                   String phone, String queue, int state, String timeZone) throws IOException;
 
     /**
      * delete user
@@ -151,7 +149,6 @@ public interface UsersService {
      * @return grant result code
      */
     Map<String, Object> grantProject(User loginUser, int userId, String projectIds);
-
 
     /**
      * grant project by code
@@ -182,7 +179,6 @@ public interface UsersService {
      */
     Map<String, Object> grantResources(User loginUser, int userId, String resourceIds);
 
-
     /**
      * grant udf function
      *
@@ -193,7 +189,6 @@ public interface UsersService {
      */
     Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds);
 
-
     /**
      * grant namespace
      *
@@ -203,7 +198,6 @@ public interface UsersService {
      * @return grant result code
      */
     Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds);
-
 
     /**
      * grant datasource
@@ -231,7 +225,6 @@ public interface UsersService {
      */
     Map<String, Object> queryAllGeneralUsers(User loginUser);
 
-
     /**
      * query user list
      *
@@ -248,7 +241,6 @@ public interface UsersService {
      */
     Result<Object> verifyUserName(String userName);
 
-
     /**
      * unauthorized user
      *
@@ -257,7 +249,6 @@ public interface UsersService {
      * @return unauthorize result code
      */
     Map<String, Object> unauthorizedUser(User loginUser, Integer alertGroupId);
-
 
     /**
      * authorized user
@@ -269,7 +260,7 @@ public interface UsersService {
     Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId);
 
     /**
-     * registry user, default state is 0, default tenant_id is 1, no phone, no queue
+     * registry user, default state is 0, no phone, no queue
      *
      * @param userName user name
      * @param userPassword user password
@@ -307,14 +298,12 @@ public interface UsersService {
      * @param userPassword user password
      * @param email        user email
      * @param phone        user phone
-     * @param tenantCode   tenant code
      * @param queue        queue
      * @param state        state
      * @return create result code
      */
-    User createUserIfNotExists(String userName, String userPassword, String email, String phone, String tenantCode,
-                               String queue,
-                               int state) throws IOException;
+    User createUserIfNotExists(String userName, String userPassword, String email, String phone,
+                               String queue, int state) throws IOException;
 
     /**
      * grant tenant
@@ -325,14 +314,5 @@ public interface UsersService {
      * @return grant result code
      */
     Map<String, Object> grantTenant(User loginUser, Integer userId, String tenantIds);
-
-    /**
-     * revoke several tenants' permission for specified user.
-     * @param loginUser     Login user
-     * @param userId        User id
-     * @param tenantIds   tenant ids
-     * @return
-     */
-    Map<String, Object> revokeTenant(User loginUser, Integer userId, String tenantIds);
 
 }

@@ -19,10 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
-import com.google.common.base.Splitter;
-import org.apache.commons.collections4.SetUtils;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -36,7 +32,6 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
@@ -44,7 +39,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.TenantUser;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -64,6 +58,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -86,8 +81,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.base.Splitter;
 
 /**
  * users service impl
@@ -146,7 +143,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userName     user name
      * @param userPassword user password
      * @param email        email
-     * @param tenantId     tenant id
      * @param phone        phone
      * @param queue        queue
      * @return create result code
@@ -158,7 +154,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           String userName,
                                           String userPassword,
                                           String email,
-                                          int tenantId,
                                           String phone,
                                           String queue,
                                           int state) throws Exception {
@@ -181,19 +176,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        if (!checkTenantExists(tenantId)) {
-            logger.warn("Tenant does not exist, tenantId:{}.", tenantId);
-            putMsg(result, Status.TENANT_NOT_EXIST);
-            return result;
-        }
-
-        User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
-
-        Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
-            storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
-        }
+        User user = createUser(userName, userPassword, email, phone, queue, state);
 
         logger.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);
@@ -207,7 +190,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public User createUser(String userName,
                            String userPassword,
                            String email,
-                           int tenantId,
                            String phone,
                            String queue,
                            int state) {
@@ -217,7 +199,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setUserName(userName);
         user.setUserPassword(EncryptionUtils.getMd5(userPassword));
         user.setEmail(email);
-        user.setTenantId(tenantId);
         user.setPhone(phone);
         user.setState(state);
         // create general users, administrator users are currently built-in
@@ -350,7 +331,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         if (!isAdmin(loginUser)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -375,7 +357,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userName     user name
      * @param userPassword user password
      * @param email        email
-     * @param tenantId     tenant id
      * @param phone        phone
      * @param queue        queue
      * @param state        state
@@ -388,7 +369,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           String userName,
                                           String userPassword,
                                           String email,
-                                          int tenantId,
                                           String phone,
                                           String queue,
                                           int state,
@@ -401,7 +381,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -452,7 +433,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (state == 0 && user.getState() != state && Objects.equals(loginUser.getId(), user.getId())) {
-            logger.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(), user.getUserName());
+            logger.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(),
+                    user.getUserName());
             putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
             return result;
         }
@@ -471,7 +453,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(state);
         Date now = new Date();
         user.setUpdateTime(now);
-        user.setTenantId(tenantId);
         // updateProcessInstance user
         int update = userMapper.updateById(user);
         if (update > 0) {
@@ -503,7 +484,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
         // only admin can operate
         if (!isAdmin(loginUser)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
             return result;
         }
@@ -519,7 +501,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (CollectionUtils.isNotEmpty(projects)) {
             String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
             putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
-            logger.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id, projectNames);
+            logger.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id,
+                    projectNames);
             return result;
         }
         // delete user
@@ -621,7 +604,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // 3. only project owner can operate
         if (!this.canOperator(loginUser, project.getUserId())) {
-            logger.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.", loginUser.getId(), loginUser.getUserName(), projectCode);
+            logger.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.",
+                    loginUser.getId(), loginUser.getUserName(), projectCode);
             this.putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -788,7 +772,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         }
 
-        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(), needAuthorizeResIds);
+        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(),
+                needAuthorizeResIds);
 
         putMsg(result, Status.SUCCESS);
 
@@ -1237,7 +1222,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
+        User user = createUser(userName, userPassword, email, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, user);
         return result;
@@ -1353,7 +1338,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userPassword user password
      * @param email        user email
      * @param phone        user phone
-     * @param tenantCode   tenant code
      * @param queue        queue
      * @param state        state
      * @return create result code
@@ -1361,17 +1345,16 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     @Transactional
     public User createUserIfNotExists(String userName, String userPassword, String email, String phone,
-                                      String tenantCode,
                                       String queue,
                                       int state) throws IOException {
+
         User user = userMapper.queryByUserNameAccurately(userName);
         if (Objects.isNull(user)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
+            user = createUser(userName, userPassword, email, phone, queue, state);
             return user;
         }
 
-        updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
+        updateUser(user, user.getId(), userName, userPassword, email, phone, queue, state, null);
         return user;
     }
 
@@ -1395,61 +1378,52 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (isAdmin(user)) {
-            putMsg(result, Status.GRANT_TENANT_NOT_FOUND_USER_ERROR);
+            putMsg(result, Status.GRANT_TENANT_FOR_ADMIN_USER_ERROR);
             return result;
         }
-
-        if (!StringUtils.isNotBlank(tenantIds)) {
-            putMsg(result, Status.GRANT_TENANT_NOT_EXISTS_ERROR);
-            return result;
-        }
-
-        Set<Integer> tenantIdList = Splitter.on(",")
-            .omitEmptyStrings()
-            .splitToStream(tenantIds)
-            .map(Integer::parseInt)
-            .collect(Collectors.toSet());
-
-        if (CollectionUtils.isEmpty(tenantIdList)) {
-            putMsg(result, Status.GRANT_TENANT_NOT_EXISTS_ERROR);
-            return result;
-        }
-
-        Set<Integer> existedTenantSet = tenantUserMapper
-            .selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, user.getId()))
-            .stream()
-            .map(TenantUser::getTenantId).collect(Collectors.toSet());
 
         try {
-            SetUtils.difference(tenantIdList, existedTenantSet)
-                .stream()
-                .forEach(tenantId -> {
-                    TenantUser tenantUser = new TenantUser();
-                    tenantUser.setUserId(userId);
-                    tenantUser.setTenantId(tenantId);
-                    tenantUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-                    tenantUserMapper.insert(tenantUser);
-                });
+            if (!StringUtils.isNotBlank(tenantIds)) {
+                tenantUserMapper
+                        .delete(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, user.getId()));
+            } else {
+                Set<Integer> tenantIdList = Splitter.on(",")
+                        .omitEmptyStrings()
+                        .splitToStream(tenantIds)
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toSet());
 
-            SetUtils.difference(existedTenantSet, tenantIdList)
-                .stream()
-                .forEach(tenantId -> {
-                    tenantUserMapper.delete(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId).eq(TenantUser::getTenantId, tenantId));
-                });
+                if (CollectionUtils.isEmpty(tenantIdList)) {
+                    putMsg(result, Status.GRANT_TENANT_NOT_EXISTS_ERROR);
+                    return result;
+                }
+
+                Set<Integer> existedTenantSet = tenantUserMapper
+                        .selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, user.getId()))
+                        .stream()
+                        .map(TenantUser::getTenantId).collect(Collectors.toSet());
+
+                SetUtils.difference(tenantIdList, existedTenantSet)
+                        .stream()
+                        .forEach(tenantId -> {
+                            TenantUser tenantUser = new TenantUser();
+                            tenantUser.setUserId(userId);
+                            tenantUser.setTenantId(tenantId);
+                            tenantUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+                            tenantUserMapper.insert(tenantUser);
+                        });
+
+                SetUtils.difference(existedTenantSet, tenantIdList)
+                        .stream()
+                        .forEach(tenantId -> {
+                            tenantUserMapper.delete(new QueryWrapper<TenantUser>().lambda()
+                                    .eq(TenantUser::getUserId, userId).eq(TenantUser::getTenantId, tenantId));
+                        });
+            }
             putMsg(result, Status.SUCCESS);
         } catch (Exception ex) {
             logger.error("Failed to grant tenants to the user {}, error:{}", user.getUserName(), ex.getMessage());
             putMsg(result, Status.GRANT_TENANT_ERROR);
-        }
-        return result;
-    }
-
-    @Override
-    public Map<String, Object> revokeTenant(User loginUser, Integer userId, String tenantIds) {
-        Map<String, Object> result = new HashMap<>();
-        if (!isAdmin((loginUser))) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
         }
         return result;
     }

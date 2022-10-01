@@ -311,8 +311,6 @@ export function useAuthorize() {
     }
 
     if (type === 'authorize_tenant') {
-      console.log('save....')
-      console.log(state.authorizedTenants.join(','))
       await grantTenant({
         userId,
         tenantIds: state.authorizedTenants.join(',')

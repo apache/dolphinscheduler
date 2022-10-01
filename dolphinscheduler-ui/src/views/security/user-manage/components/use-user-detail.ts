@@ -17,7 +17,6 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { pick } from 'lodash'
-import { queryTenantList } from '@/service/modules/tenants'
 import { queryList } from '@/service/modules/queues'
 import { verifyUserName, createUser, updateUser } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
@@ -32,7 +31,6 @@ export function useUserDetail() {
   const initialValues = {
     userName: '',
     userPassword: '',
-    tenantId: null,
     email: '',
     queue: '',
     phone: '',
@@ -47,7 +45,6 @@ export function useUserDetail() {
     saving: false,
     loading: false,
     queues: [] as { label: string; value: string }[],
-    tenants: [] as { label: string; value: number }[]
   })
 
   const formRules = {
@@ -71,15 +68,6 @@ export function useUserDetail() {
           )
         ) {
           return new Error(t('security.user.user_password_tips'))
-        }
-      }
-    },
-    tenantId: {
-      trigger: ['input', 'blur'],
-      required: true,
-      validator(validator: any, value: string) {
-        if (IS_ADMIN && !value) {
-          return new Error(t('security.user.tenant_id_tips'))
         }
       }
     },
@@ -120,19 +108,7 @@ export function useUserDetail() {
       state.formData.queue = state.queues[0].value
     }
   }
-  const getTenants = async () => {
-    const result = await queryTenantList()
-    state.tenants = result.map(
-      (tenant: { tenantCode: string; id: number }) => ({
-        label: tenant.tenantCode,
-        value: tenant.id
-      })
-    )
-    if (state.tenants.length) {
-      initialValues.tenantId = state.tenants[0].value
-      state.formData.tenantId = state.tenants[0].value
-    }
-  }
+
   const onReset = () => {
     state.formData = { ...initialValues }
   }
@@ -160,7 +136,6 @@ export function useUserDetail() {
     state.formData = {
       ...pick(record, [
         'userName',
-        'tenantId',
         'email',
         'queue',
         'phone',
@@ -174,7 +149,6 @@ export function useUserDetail() {
   onMounted(async () => {
     if (IS_ADMIN) {
       getQueues()
-      getTenants()
     }
   })
 

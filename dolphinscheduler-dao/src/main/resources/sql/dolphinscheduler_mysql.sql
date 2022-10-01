@@ -1989,3 +1989,20 @@ CREATE TABLE `t_ds_fav_task`
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8;
+
+
+--
+-- Table structure for table t_ds_relation_tenant_user
+--
+
+DROP TABLE IF EXISTS `t_ds_relation_tenant_user`;
+CREATE TABLE `t_ds_relation_tenant_user` (
+     `id` int(11) NOT NULL AUTO_INCREMENT,
+     `user_id` int(11) NOT NULL COMMENT 'user id',
+     `tenant_id` int(11) NOT NULL COMMENT 'tenant id',
+     `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
+     `create_time` datetime DEFAULT NULL COMMENT 'create time',
+     `update_time` datetime DEFAULT NULL COMMENT 'update time',
+     PRIMARY KEY (`id`),
+     UNIQUE KEY `t_ds_relation_tenant_user_unique` (`user_id`, `tenant_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

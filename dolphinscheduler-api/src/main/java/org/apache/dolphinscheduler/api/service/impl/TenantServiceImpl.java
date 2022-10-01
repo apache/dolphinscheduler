@@ -17,12 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
+import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.QueueService;
@@ -36,7 +33,6 @@ import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.TenantUser;
@@ -46,23 +42,28 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
-import static org.apache.dolphinscheduler.common.Constants.TENANT_FULL_NAME_MAX_LENGTH;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * tenant service impl
@@ -129,7 +130,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
         } else if (!RegexUtils.isValidLinuxUserName(updateTenant.getTenantCode())) {
             throw new ServiceException(Status.CHECK_OS_TENANT_CODE_ERROR);
-        } else if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode()) && checkTenantExists(updateTenant.getTenantCode())) {
+        } else if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())
+                && checkTenantExists(updateTenant.getTenantCode())) {
             throw new ServiceException(Status.OS_TENANT_CODE_EXIST, updateTenant.getTenantCode());
         }
     }
@@ -152,10 +154,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                                             String desc) throws Exception {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT, TENANT_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
@@ -168,7 +170,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
-        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()), logger);
+        permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()),
+                logger);
         result.put(Constants.DATA_LIST, tenant);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -188,7 +191,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Result<Object> result = new Result<>();
         PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, loginUser.getId(), logger);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT,
+                loginUser.getId(), logger);
         if (ids.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -221,10 +225,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Map<String, Object> result = new HashMap<>();
 
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
@@ -237,7 +241,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         /**
          * if the tenant code is modified, the original resource needs to be copied to the new tenant.
          */
-        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode()) && PropertyUtils.getResUploadStartupState()) {
+        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())
+                && PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
         int update = tenantMapper.updateById(updateTenant);
@@ -264,7 +269,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.TENANT,TENANT_DELETE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
@@ -276,14 +281,16 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         List<ProcessInstance> processInstances = getProcessInstancesByTenant(tenant);
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            logger.warn("Delete tenant failed, because there are {} executing process instances using it.", processInstances.size());
+            logger.warn("Delete tenant failed, because there are {} executing process instances using it.",
+                    processInstances.size());
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
         }
 
         List<ProcessDefinition> processDefinitions =
                 processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(processDefinitions)) {
-            logger.warn("Delete tenant failed, because there are {} process definitions using it.", processDefinitions.size());
+            logger.warn("Delete tenant failed, because there are {} process definitions using it.",
+                    processDefinitions.size());
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
         }
 
@@ -295,7 +302,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         // if resource upload startup
         if (PropertyUtils.getResUploadStartupState()) {
-          storageOperate.deleteTenant(tenant.getTenantCode());
+            storageOperate.deleteTenant(tenant.getTenantCode());
         }
 
         int delete = tenantMapper.deleteById(id);
@@ -325,7 +332,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> queryTenantList(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT, loginUser.getId(), logger);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT,
+                loginUser.getId(), logger);
         if (ids.isEmpty()) {
             result.put(Constants.DATA_LIST, Collections.emptyList());
             putMsg(result, Status.SUCCESS);
@@ -426,14 +434,17 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (isAdmin(user)) {
             tenants = tenantMapper.queryAll();
         } else {
-            Set<Integer> tenantIds = tenantUserMapper.selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId))
-                .stream()
-                .map(TenantUser::getTenantId)
-                .collect(Collectors.toSet());
+            Set<Integer> tenantIds = tenantUserMapper
+                    .selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId))
+                    .stream()
+                    .map(TenantUser::getTenantId)
+                    .collect(Collectors.toSet());
 
-            // add the default tenant of the user to the set.
-            tenantIds.add(user.getTenantId());
-            tenants = tenantMapper.selectBatchIds(tenantIds);
+            if (CollectionUtils.isNotEmpty(tenantIds)) {
+                tenants = tenantMapper.selectBatchIds(tenantIds);
+            } else {
+                tenants = new ArrayList<>();
+            }
         }
 
         result.setData(tenants);
@@ -464,15 +475,17 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (isAdmin(user)) {
             tenants = new ArrayList<>();
         } else {
-            Set<Integer> tenantIds = tenantUserMapper.selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId))
-                .stream()
-                .map(TenantUser::getTenantId)
-                .collect(Collectors.toSet());
+            Set<Integer> tenantIds = tenantUserMapper
+                    .selectList(new QueryWrapper<TenantUser>().lambda().eq(TenantUser::getUserId, userId))
+                    .stream()
+                    .map(TenantUser::getTenantId)
+                    .collect(Collectors.toSet());
 
-            // add the default tenant of the user to the set.
-            tenantIds.add(user.getTenantId());
-
-            tenants = tenantMapper.selectList(new QueryWrapper<Tenant>().lambda().notIn(Tenant::getId, tenantIds));
+            if (CollectionUtils.isNotEmpty(tenantIds)) {
+                tenants = tenantMapper.selectList(new QueryWrapper<Tenant>().lambda().notIn(Tenant::getId, tenantIds));
+            } else {
+                tenants = tenantMapper.queryAll();
+            }
         }
 
         result.setData(tenants);

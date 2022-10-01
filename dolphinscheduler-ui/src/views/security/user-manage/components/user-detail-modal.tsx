@@ -137,15 +137,6 @@ export const UserModal = defineComponent({
             </NFormItem>
           )}
           {this.IS_ADMIN && (
-            <NFormItem label={t('security.user.tenant_code')} path='tenantId'>
-              <NSelect
-                class='select-tenant'
-                options={this.tenants}
-                v-model:value={this.formData.tenantId}
-              />
-            </NFormItem>
-          )}
-          {this.IS_ADMIN && (
             <NFormItem label={t('security.user.queue')} path='queue'>
               <NSelect
                 class='select-queue'

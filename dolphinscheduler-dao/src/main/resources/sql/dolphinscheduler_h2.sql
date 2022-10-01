@@ -2013,3 +2013,19 @@ CREATE TABLE t_ds_fav
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );
+
+--
+-- Table structure for table t_ds_relation_tenant_user
+--
+
+DROP TABLE IF EXISTS t_ds_relation_tenant_user CASCADE;
+CREATE TABLE t_ds_relation_tenant_user (
+   id int(11) NOT NULL AUTO_INCREMENT,
+   user_id int(11) NOT NULL,
+   tenant_id int(11) NOT NULL,
+   perm int(11) DEFAULT '1',
+   create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (id),
+   UNIQUE KEY t_ds_relation_tenant_user_unique (user_id, tenant_id)
+);

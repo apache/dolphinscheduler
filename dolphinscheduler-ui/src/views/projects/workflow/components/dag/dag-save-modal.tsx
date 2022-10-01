@@ -36,12 +36,14 @@ import {
   NDynamicInput,
   NCheckbox
 } from 'naive-ui'
-import { queryTenantList } from '@/service/modules/tenants'
+import {queryAuthorizedTenant, queryTenantList} from '@/service/modules/tenants'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/store/user/user'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 const props = {
   visible: {
@@ -72,6 +74,9 @@ export default defineComponent({
     const route = useRoute()
     const { t } = useI18n()
 
+    const userStore = useUserStore()
+    const userInfo = userStore.getUserInfo as UserInfoRes
+
     const projectCode = Number(route.params.projectCode)
     const tenants = ref<Tenant[]>([])
     const tenantsDropdown = computed(() => {
@@ -81,12 +86,11 @@ export default defineComponent({
             label: t.tenantCode,
             value: t.tenantCode
           }))
-          .concat({ label: 'default', value: 'default' })
       }
       return []
     })
     onMounted(() => {
-      queryTenantList().then((res: any) => {
+      queryAuthorizedTenant({userId: userInfo.id}).then((res: any) => {
         tenants.value = res
       })
     })
@@ -94,7 +98,7 @@ export default defineComponent({
     const formValue = ref<SaveForm>({
       name: '',
       description: '',
-      tenantCode: 'default',
+      tenantCode: '',
       executionType: 'PARALLEL',
       timeoutFlag: false,
       timeout: 0,
@@ -168,7 +172,7 @@ export default defineComponent({
       if (process) {
         formValue.value.name = process.name
         formValue.value.description = process.description
-        formValue.value.tenantCode = process.tenantCode || 'default'
+        formValue.value.tenantCode = process.tenantCode
         formValue.value.executionType = process.executionType || 'PARALLEL'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true

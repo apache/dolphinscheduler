@@ -66,11 +66,6 @@ export function useColumns(onCallback: Function) {
         ...COLUMN_WIDTH_CONFIG['type']
       },
       {
-        title: t('security.user.tenant_code'),
-        key: 'tenantCode',
-        ...COLUMN_WIDTH_CONFIG['name']
-      },
-      {
         title: t('security.user.queue'),
         key: 'queue',
         width: 120
