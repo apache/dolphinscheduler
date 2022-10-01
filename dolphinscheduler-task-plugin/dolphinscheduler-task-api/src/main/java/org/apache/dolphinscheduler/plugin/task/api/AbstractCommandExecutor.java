@@ -403,7 +403,7 @@ public abstract class AbstractCommandExecutor {
      * @return remain time
      */
     private long getRemainTime() {
-        long usedTime = (System.currentTimeMillis() - taskRequest.getStartTime().getTime()) / 1000;
+        long usedTime = (System.currentTimeMillis() - taskRequest.getStartTime()) / 1000;
         long remainTime = taskRequest.getTaskTimeout() - usedTime;
 
         if (remainTime < 0) {

@@ -97,7 +97,7 @@ public class TaskDispatchProcessorTest {
         taskExecutionContext.setProcessDefineCode(1L);
         taskExecutionContext.setProcessDefineVersion(1);
         taskExecutionContext.setTaskType("SQL");
-        taskExecutionContext.setFirstSubmitTime(new Date());
+        taskExecutionContext.setFirstSubmitTime(System.currentTimeMillis());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");
         taskExecutionContext.setHost("localhost");

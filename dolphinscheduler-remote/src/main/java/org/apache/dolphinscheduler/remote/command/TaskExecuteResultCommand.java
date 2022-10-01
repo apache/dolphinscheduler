@@ -57,7 +57,7 @@ public class TaskExecuteResultCommand extends BaseCommand {
     /**
      * startTime
      */
-    private Date startTime;
+    private long startTime;
 
     /**
      * host
@@ -78,7 +78,7 @@ public class TaskExecuteResultCommand extends BaseCommand {
     /**
      * end time
      */
-    private Date endTime;
+    private long endTime;
 
 
     /**

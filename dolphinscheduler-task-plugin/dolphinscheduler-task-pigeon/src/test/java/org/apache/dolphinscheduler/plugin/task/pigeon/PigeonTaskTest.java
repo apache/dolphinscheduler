@@ -61,7 +61,7 @@ public class PigeonTaskTest {
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
         Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
         Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
-        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
+        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(System.currentTimeMillis());
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
         // Mockito.when(taskExecutionContext.getVarPool())

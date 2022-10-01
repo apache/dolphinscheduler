@@ -82,7 +82,7 @@ public class TaskResponseServiceTest {
         taskExecuteRunningMessage.setExecutePath("path");
         taskExecuteRunningMessage.setLogPath("logPath");
         taskExecuteRunningMessage.setHost("127.*.*.*");
-        taskExecuteRunningMessage.setStartTime(new Date());
+        taskExecuteRunningMessage.setStartTime(System.currentTimeMillis());
 
         ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
                 channel,
@@ -94,7 +94,7 @@ public class TaskResponseServiceTest {
         taskExecuteResultMessage.setProcessInstanceId(1);
         taskExecuteResultMessage.setTaskInstanceId(22);
         taskExecuteResultMessage.setStatus(TaskExecutionStatus.SUCCESS.getCode());
-        taskExecuteResultMessage.setEndTime(new Date());
+        taskExecuteResultMessage.setEndTime(System.currentTimeMillis());
         taskExecuteResultMessage.setVarPool("varPol");
         taskExecuteResultMessage.setAppIds("ids");
         taskExecuteResultMessage.setProcessId(1);
