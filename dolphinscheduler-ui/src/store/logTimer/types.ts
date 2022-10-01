@@ -14,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-type logTimer = number
-
 interface LogTimerStore {
-  logTimer: logTimer
+  logTimer: number
 }
 
-export { LogTimerStore, logTimer }
+export { LogTimerStore }

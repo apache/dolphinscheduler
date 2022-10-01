@@ -19,14 +19,11 @@ import { useI18n } from 'vue-i18n'
 import { NForm, NFormItem, NSelect } from "naive-ui";
 import { defineComponent } from "vue";
 import { useLogTimerStore } from '@/store/logTimer/logTimer'
-import type { logTimer } from '@/store/logTimer/types'
-import cookies from 'js-cookie'
  
 // Update LogTimer store when select value is updated
-const handleUpdateValue = (logTimer: logTimer) => {
+const handleUpdateValue = (logTimer: number) => {
     const logTimerStore = useLogTimerStore()
     logTimerStore.setLogTimer(logTimer)
-    cookies.set('logTimer', String(logTimer), { path: '/' })
 }
 
 const setting = defineComponent({
