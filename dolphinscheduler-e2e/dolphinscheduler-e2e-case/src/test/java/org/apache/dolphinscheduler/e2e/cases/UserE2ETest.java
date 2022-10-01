@@ -85,7 +85,7 @@ class UserE2ETest {
     void testCreateUser() {
         final UserPage page = new UserPage(browser);
 
-        page.create(user, password, email, phone, tenant);
+        page.create(user, password, email, phone);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -102,7 +102,7 @@ class UserE2ETest {
     void testCreateDuplicateUser() {
         final UserPage page = new UserPage(browser);
 
-        page.create(user, password, email, phone, tenant);
+        page.create(user, password, email, phone);
 
         await().untilAsserted(() ->
             assertThat(browser.findElement(By.tagName("body")).getText())
@@ -122,7 +122,7 @@ class UserE2ETest {
 
         browser.navigate().refresh();
 
-        page.update(user, editUser, editEmail, editPhone, tenant);
+        page.update(user, editUser, editEmail, editPhone);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();

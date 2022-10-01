@@ -58,23 +58,11 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         super(driver);
     }
 
-    public UserPage create(String user, String password, String email, String phone, String tenant) {
+    public UserPage create(String user, String password, String email, String phone) {
         buttonCreateUser().click();
 
         createUserForm().inputUserName().sendKeys(user);
         createUserForm().inputUserPassword().sendKeys(password);
-
-        createUserForm().btnSelectTenantDropdown().click();
-
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
-
-        createUserForm().selectTenant()
-            .stream()
-            .filter(it -> it.getText().contains(tenant))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
-            .click();
 
         createUserForm().inputEmail().sendKeys(email);
         createUserForm().inputPhone().sendKeys(phone);
@@ -83,8 +71,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public UserPage update(String user, String editUser, String editEmail, String editPhone,
-                           String tenant) {
+    public UserPage update(String user, String editUser, String editEmail, String editPhone) {
         userList().stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
@@ -96,18 +83,6 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         editUserForm().inputUserName().sendKeys(Keys.CONTROL+"a");
         editUserForm().inputUserName().sendKeys(Keys.BACK_SPACE);
         editUserForm().inputUserName().sendKeys(editUser);
-
-        createUserForm().btnSelectTenantDropdown().click();
-
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
-
-        createUserForm().selectTenant()
-                .stream()
-                .filter(it -> it.getText().contains(tenant))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
-                .click();
 
         editUserForm().inputEmail().sendKeys(Keys.CONTROL+"a");
         editUserForm().inputEmail().sendKeys(Keys.BACK_SPACE);
@@ -154,12 +129,6 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
             @FindBy(tagName = "input"),
         })
         private WebElement inputUserPassword;
-
-        @FindBys({
-            @FindBy(className = "select-tenant"),
-            @FindBy(className = "n-base-selection"),
-        })
-        private WebElement btnSelectTenantDropdown;
 
         @FindBy(className = "n-base-select-option__content")
         private List<WebElement> selectTenant;
