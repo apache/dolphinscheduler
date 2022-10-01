@@ -245,14 +245,21 @@ svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/dev/dolphin
 cd ~/ds_svn/dev/dolphinscheduler
 ```
 
-### Add gpg Public Key
+### Export your new gpg KEYS to release(optional)
 
-Only the account in its first deployment needs to add that.
-It is alright for `KEYS` to only include the public key of the deployed account.
+Only if the first time you release with this gpg KEY, including it is you first release, or you change your KEY. You should
+change working directory to another one because this step need checkout and change KEYS in release directory.
 
 ```shell
+mkdir -p ~/ds_svn/release/
+cd ~/ds_svn/release/
+svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/release/dolphinscheduler
 gpg -a --export <YOUR-GPG-KEY-ID> >> KEYS
+svn add *
+svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 ```
+
+> NOTE: it may take a few minutes to sync to the mirror in your first time checkout, because it will download all the files
 
 ### Add the Release Content to SVN Directory
 
@@ -312,7 +319,7 @@ First, import releaser's public key.
 Import KEYS from SVN repository to local. (The releaser does not need to import again; the checking assistant needs to import it, with the user name filled as the releaser's. )
 
 ```shell
-curl https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS >> KEYS
+curl https://dist.apache.org/repos/dist/release/dolphinscheduler/KEYS >> KEYS
 gpg --import KEYS
 gpg --edit-key "${A_USERNAME}"
   > trust
@@ -419,7 +426,7 @@ Git tag for the release: https://github.com/apache/dolphinscheduler/tree/<VERSIO
 
 Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
-Keys to verify the Release Candidate: https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS
+Keys to verify the Release Candidate: https://downloads.apache.org/dolphinscheduler/KEYS
 
 Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/contribute/release/release.html
 
@@ -467,19 +474,6 @@ Thanks everyone for taking time to check this release and help us.
 
 ```shell
 svn mv https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
-```
-
-### Export you new gpg KEYS from dev to release(optional)
-
-Only if the first time you release with this gpg KEY, including it is you first release or you change your KEY
-
-```shell
-mkdir -p ~/ds_svn/release/
-cd ~/ds_svn/release/
-svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/release/dolphinscheduler
-gpg -a --export <YOUR-GPG-KEY-ID> >> KEYS
-svn add *
-svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 ```
 
 ### Update Document
