@@ -1958,11 +1958,11 @@ CREATE TABLE t_ds_cluster(
 );
 
 --
--- Table structure for t_ds_fav
+-- Table structure for t_ds_fav_task
 --
 
-DROP TABLE IF EXISTS t_ds_fav;
-CREATE TABLE t_ds_fav
+DROP TABLE IF EXISTS t_ds_fav_task;
+CREATE TABLE t_ds_fav_task
 (
     id        serial      NOT NULL,
     task_name varchar(64) NOT NULL,

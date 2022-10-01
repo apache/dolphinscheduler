@@ -105,7 +105,9 @@ const DetailModal = defineComponent({
             datasourceType[state.detailForm.type]
           ))
         props.show && props.id && setFieldsValue(await queryById(props.id))
-        props.show && state.detailForm.testFlag == 0 && await getSameTypeTestDataSource()
+        props.show &&
+          state.detailForm.testFlag == 0 &&
+          (await getSameTypeTestDataSource())
       }
     )
 
@@ -308,17 +310,17 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                    v-show={showAwsRegion}
-                    label={t('datasource.aws_region')}
-                    path='awsRegion'
-                    show-require-mark
+                  v-show={showAwsRegion}
+                  label={t('datasource.aws_region')}
+                  path='awsRegion'
+                  show-require-mark
                 >
                   <NInput
-                      allowInput={this.trim}
-                      v-model={[detailForm.awsRegion, 'value']}
-                      type='text'
-                      maxlength={60}
-                      placeholder={t('datasource.aws_region_tips')}
+                    allowInput={this.trim}
+                    v-model={[detailForm.awsRegion, 'value']}
+                    type='text'
+                    maxlength={60}
+                    placeholder={t('datasource.aws_region_tips')}
                   />
                 </NFormItem>
                 <NFormItem

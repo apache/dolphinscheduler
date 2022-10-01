@@ -44,7 +44,7 @@ export function useUserDetail() {
     formData: { ...initialValues },
     saving: false,
     loading: false,
-    queues: [] as { label: string; value: string }[],
+    queues: [] as { label: string; value: string }[]
   })
 
   const formRules = {
@@ -134,13 +134,7 @@ export function useUserDetail() {
   }
   const onSetValues = (record: IRecord) => {
     state.formData = {
-      ...pick(record, [
-        'userName',
-        'email',
-        'queue',
-        'phone',
-        'state'
-      ]),
+      ...pick(record, ['userName', 'email', 'queue', 'phone', 'state']),
       userPassword: ''
     } as UserReq
     PREV_NAME = state.formData.userName

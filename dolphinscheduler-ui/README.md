@@ -63,4 +63,3 @@ vue-tsc --noEmit
 ```
 
 ---
-

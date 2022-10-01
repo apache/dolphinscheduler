@@ -99,14 +99,14 @@ export function useAuthorize() {
     ])
     state.loading = false
     state.authorizedTenants = tenants[0].map(
-        (item: { tenantCode: string; id: number }) => item.id
+      (item: { tenantCode: string; id: number }) => item.id
     )
 
     state.unauthorizedTenants = [...tenants[0], ...tenants[1]].map(
-        (item: { tenantCode: string; id: number }) => ({
-          label: item.tenantCode,
-          value: item.id
-        })
+      (item: { tenantCode: string; id: number }) => ({
+        label: item.tenantCode,
+        value: item.id
+      })
     )
   }
 

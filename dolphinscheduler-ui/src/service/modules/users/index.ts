@@ -31,7 +31,8 @@ import {
   GrantNamespaceReq,
   ListAllReq,
   ListReq,
-  RegisterUserReq, GrantTenantReq
+  RegisterUserReq,
+  GrantTenantReq
 } from './types'
 
 export function activateUser(data: UserNameReq): any {
@@ -191,7 +192,6 @@ export function verifyUserName(params: UserNameReq) {
     params
   })
 }
-
 
 export function grantTenant(data: GrantTenantReq) {
   return axios({

@@ -34,7 +34,7 @@ import {
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+import { renderEnvironmentalDistinctionCell } from '@/utils/environmental-distinction'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinler.plugin.task.mlflow;
 
-import static org.powermock.api.mockito.PowerMockito.when;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowConstants;
@@ -27,53 +25,39 @@ import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowTask;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
-import java.util.Date;
-import java.util.UUID;
-
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({
-    JSONUtils.class,
-    PropertyUtils.class,
-})
-@PowerMockIgnore({"javax.*"})
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
+@RunWith(MockitoJUnitRunner.class)
 public class MlflowTaskTest {
+
     private static final Logger logger = LoggerFactory.getLogger(MlflowTask.class);
+    private MockedStatic<PropertyUtils> propertyUtilsMockedStatic;
 
     @Before
-    public void before() throws Exception {
-        PowerMockito.mockStatic(PropertyUtils.class);
+    public void init() {
+        propertyUtilsMockedStatic = Mockito.mockStatic(PropertyUtils.class);
+        propertyUtilsMockedStatic.when(() -> PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY))
+                .thenReturn("main");
+    }
+
+    @After
+    public void clean() {
+        propertyUtilsMockedStatic.close();
     }
 
     public TaskExecutionContext createContext(MlflowParameters mlflowParameters) {
         String parameters = JSONUtils.toJsonString(mlflowParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("MLflowTest");
-        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/dolphinscheduler_test");
-        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
-        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
-        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
-        Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dolphinscheduler_test/log");
-        Mockito.when(taskExecutionContext.getEnvironmentConfig()).thenReturn("export PATH=$HOME/anaconda3/bin:$PATH");
-
-        String userName = System.getenv().get("USER");
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn(userName);
-
         TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
         return taskExecutionContext;
     }
@@ -85,20 +69,26 @@ public class MlflowTaskTest {
         Assert.assertEquals("main", MlflowTask.getPresetRepositoryVersion());
 
         String definedRepository = "https://github.com/<MY-ID>/dolphinscheduler-mlflow";
-        when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_KEY)).thenAnswer(invocation -> definedRepository);
+        Mockito.when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_KEY))
+                .thenAnswer(invocation -> definedRepository);
         Assert.assertEquals(definedRepository, MlflowTask.getPresetRepository());
 
         String definedRepositoryVersion = "dev";
-        when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY)).thenAnswer(invocation -> definedRepositoryVersion);
+        Mockito.when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY))
+                .thenAnswer(invocation -> definedRepositoryVersion);
         Assert.assertEquals(definedRepositoryVersion, MlflowTask.getPresetRepositoryVersion());
     }
 
     @Test
     public void testGetVersionString() {
-        Assert.assertEquals("--version=main", MlflowTask.getVersionString("main", "https://github.com/apache/dolphinscheduler-mlflow"));
-        Assert.assertEquals("--version=master", MlflowTask.getVersionString("master", "https://github.com/apache/dolphinscheduler-mlflow"));
-        Assert.assertEquals("--version=main", MlflowTask.getVersionString("main", "git@github.com:apache/dolphinscheduler-mlflow.git"));
-        Assert.assertEquals("--version=master", MlflowTask.getVersionString("master", "git@github.com:apache/dolphinscheduler-mlflow.git"));
+        Assert.assertEquals("--version=main",
+                MlflowTask.getVersionString("main", "https://github.com/apache/dolphinscheduler-mlflow"));
+        Assert.assertEquals("--version=master",
+                MlflowTask.getVersionString("master", "https://github.com/apache/dolphinscheduler-mlflow"));
+        Assert.assertEquals("--version=main",
+                MlflowTask.getVersionString("main", "git@github.com:apache/dolphinscheduler-mlflow.git"));
+        Assert.assertEquals("--version=master",
+                MlflowTask.getVersionString("master", "git@github.com:apache/dolphinscheduler-mlflow.git"));
         Assert.assertEquals("", MlflowTask.getVersionString("main", "/tmp/dolphinscheduler-mlflow"));
         Assert.assertEquals("", MlflowTask.getVersionString("master", "/tmp/dolphinscheduler-mlflow"));
     }
@@ -107,33 +97,33 @@ public class MlflowTaskTest {
     public void testInitBasicAlgorithmTask() {
         MlflowTask mlflowTask = initTask(createBasicAlgorithmParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
-            "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
-                + "data_path=/data/iris.csv\n"
-                + "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-BasicAlgorithm\n"
-                + "mlflow run $repo "
-                + "-P algorithm=xgboost "
-                + "-P data_path=$data_path "
-                + "-P params=\"n_estimators=100\" "
-                + "-P search_params=\"\" "
-                + "-P model_name=\"BasicAlgorithm\" "
-                + "--experiment-name=\"BasicAlgorithm\" "
-                + "--version=main");
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
+                        + "data_path=/data/iris.csv\n"
+                        + "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-BasicAlgorithm\n"
+                        + "mlflow run $repo "
+                        + "-P algorithm=xgboost "
+                        + "-P data_path=$data_path "
+                        + "-P params=\"n_estimators=100\" "
+                        + "-P search_params=\"\" "
+                        + "-P model_name=\"BasicAlgorithm\" "
+                        + "--experiment-name=\"BasicAlgorithm\" "
+                        + "--version=main");
     }
 
     @Test
     public void testInitAutoMLTask() {
         MlflowTask mlflowTask = initTask(createAutoMLParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
-            "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
-                + "data_path=/data/iris.csv\n"
-                + "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-AutoML\n"
-                + "mlflow run $repo "
-                + "-P tool=autosklearn "
-                + "-P data_path=$data_path "
-                + "-P params=\"time_left_for_this_task=30\" "
-                + "-P model_name=\"AutoML\" "
-                + "--experiment-name=\"AutoML\" "
-                + "--version=main");
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
+                        + "data_path=/data/iris.csv\n"
+                        + "repo=https://github.com/apache/dolphinscheduler-mlflow#Project-AutoML\n"
+                        + "mlflow run $repo "
+                        + "-P tool=autosklearn "
+                        + "-P data_path=$data_path "
+                        + "-P params=\"time_left_for_this_task=30\" "
+                        + "-P model_name=\"AutoML\" "
+                        + "--experiment-name=\"AutoML\" "
+                        + "--version=main");
     }
 
     @Test
@@ -142,36 +132,36 @@ public class MlflowTaskTest {
 
         // Version will be set if parameter.mlflowProjectVersion is empty
         Assert.assertEquals(mlflowTask.buildCommand(),
-            "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
-                + "repo=https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native\n"
-                + "mlflow run $repo "
-                + "-P learning_rate=0.2 "
-                + "-P colsample_bytree=0.8 "
-                + "-P subsample=0.9 "
-                + "--experiment-name=\"custom_project\"");
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
+                        + "repo=https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native\n"
+                        + "mlflow run $repo "
+                        + "-P learning_rate=0.2 "
+                        + "-P colsample_bytree=0.8 "
+                        + "-P subsample=0.9 "
+                        + "--experiment-name=\"custom_project\"");
 
         // Version will be set if repository is remote path
         mlflowTask.getParameters().setMlflowProjectVersion("dev");
         Assert.assertEquals(mlflowTask.buildCommand(),
-            "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
-                + "repo=https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native\n"
-                + "mlflow run $repo "
-                + "-P learning_rate=0.2 "
-                + "-P colsample_bytree=0.8 "
-                + "-P subsample=0.9 "
-                + "--experiment-name=\"custom_project\" "
-                + "--version=dev");
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
+                        + "repo=https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native\n"
+                        + "mlflow run $repo "
+                        + "-P learning_rate=0.2 "
+                        + "-P colsample_bytree=0.8 "
+                        + "-P subsample=0.9 "
+                        + "--experiment-name=\"custom_project\" "
+                        + "--version=dev");
 
         // Version will not be set if repository is local path
         mlflowTask.getParameters().setMlflowProjectRepository("/tmp/dolphinscheduler-mlflow");
         Assert.assertEquals(mlflowTask.buildCommand(),
-            "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
-                + "repo=/tmp/dolphinscheduler-mlflow\n"
-                + "mlflow run $repo "
-                + "-P learning_rate=0.2 "
-                + "-P colsample_bytree=0.8 "
-                + "-P subsample=0.9 "
-                + "--experiment-name=\"custom_project\"");
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
+                        + "repo=/tmp/dolphinscheduler-mlflow\n"
+                        + "mlflow run $repo "
+                        + "-P learning_rate=0.2 "
+                        + "-P colsample_bytree=0.8 "
+                        + "-P subsample=0.9 "
+                        + "--experiment-name=\"custom_project\"");
 
     }
 
@@ -179,20 +169,20 @@ public class MlflowTaskTest {
     public void testModelsDeployMlflow() {
         MlflowTask mlflowTask = initTask(createModelDeplyMlflowParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
-            "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
-                + "mlflow models serve -m models:/model/1 --port 7000 -h 0.0.0.0");
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
+                        + "mlflow models serve -m models:/model/1 --port 7000 -h 0.0.0.0");
     }
 
     @Test
     public void testModelsDeployDocker() {
         MlflowTask mlflowTask = initTask(createModelDeplyDockerParameters());
         Assert.assertEquals(mlflowTask.buildCommand(),
-            "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
-                + "mlflow models build-docker -m models:/model/1 -n mlflow/model:1 --enable-mlserver\n"
-                + "docker rm -f ds-mlflow-model-1\n"
-                + "docker run -d --name=ds-mlflow-model-1 -p=7000:8080 "
-                + "--health-cmd \"curl --fail http://127.0.0.1:8080/ping || exit 1\" --health-interval 5s --health-retries 20 "
-                + "mlflow/model:1");
+                "export MLFLOW_TRACKING_URI=http://127.0.0.1:5000\n"
+                        + "mlflow models build-docker -m models:/model/1 -n mlflow/model:1 --enable-mlserver\n"
+                        + "docker rm -f ds-mlflow-model-1\n"
+                        + "docker run -d --name=ds-mlflow-model-1 -p=7000:8080 "
+                        + "--health-cmd \"curl --fail http://127.0.0.1:8080/ping || exit 1\" --health-interval 5s --health-retries 20 "
+                        + "mlflow/model:1");
     }
 
     private MlflowTask initTask(MlflowParameters mlflowParameters) {

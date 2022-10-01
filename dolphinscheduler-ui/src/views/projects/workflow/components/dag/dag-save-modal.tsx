@@ -36,7 +36,10 @@ import {
   NDynamicInput,
   NCheckbox
 } from 'naive-ui'
-import {queryAuthorizedTenant, queryTenantList} from '@/service/modules/tenants'
+import {
+  queryAuthorizedTenant,
+  queryTenantList
+} from '@/service/modules/tenants'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
 import { verifyName } from '@/service/modules/process-definition'
@@ -81,16 +84,15 @@ export default defineComponent({
     const tenants = ref<Tenant[]>([])
     const tenantsDropdown = computed(() => {
       if (tenants.value) {
-        return tenants.value
-          .map((t) => ({
-            label: t.tenantCode,
-            value: t.tenantCode
-          }))
+        return tenants.value.map((t) => ({
+          label: t.tenantCode,
+          value: t.tenantCode
+        }))
       }
       return []
     })
     onMounted(() => {
-      queryAuthorizedTenant({userId: userInfo.id}).then((res: any) => {
+      queryAuthorizedTenant({ userId: userInfo.id }).then((res: any) => {
         tenants.value = res
       })
     })

@@ -323,17 +323,19 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          <NFormItem
-            label={t('project.workflow.alarm_group')}
-            path='warningGroupId'
-          >
-            <NSelect
-              options={this.alertGroups}
-              placeholder={t('project.workflow.please_choose')}
-              v-model:value={this.startForm.warningGroupId}
-              clearable
-            />
-          </NFormItem>
+          {this.startForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.startForm.warningGroupId}
+                clearable
+              />
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.complement_data')}
             path='complement_data'

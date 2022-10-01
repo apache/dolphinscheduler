@@ -89,13 +89,13 @@ export const AuthorizeModal = defineComponent({
         cancelClassName='btn-cancel'
       >
         {type === 'authorize_tenant' && (
-            <NTransfer
-                virtualScroll
-                options={this.unauthorizedTenants}
-                filterable
-                v-model={[this.authorizedTenants, 'value']}
-                class={styles.transfer}
-            />
+          <NTransfer
+            virtualScroll
+            options={this.unauthorizedTenants}
+            filterable
+            v-model={[this.authorizedTenants, 'value']}
+            class={styles.transfer}
+          />
         )}
         {type === 'authorize_project' && (
           <NTransfer

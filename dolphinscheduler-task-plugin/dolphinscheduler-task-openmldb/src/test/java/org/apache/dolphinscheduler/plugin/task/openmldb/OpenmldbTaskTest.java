@@ -20,16 +20,19 @@ package org.apache.dolphinscheduler.plugin.task.openmldb;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
+import org.mockito.Mockito;
 
 public class OpenmldbTaskTest {
+
     static class MockOpenmldbTask extends OpenmldbTask {
+
         /**
          * constructor
          *
@@ -59,31 +62,34 @@ public class OpenmldbTaskTest {
 
     @Test
     public void buildSQLWithComment() throws Exception {
-        OpenmldbTask openmldbTask = createOpenmldbTask();
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         OpenmldbParameters openmldbParameters = new OpenmldbParameters();
         openmldbParameters.setExecuteMode("offline");
+        openmldbParameters.setZk("localhost:2181");
+        openmldbParameters.setZkPath("dolphinscheduler");
         String rawSQLScript = "select * from users\r\n"
                 + "-- some comment\n"
                 + "inner join order on users.order_id = order.id; \n\n;"
                 + "select * from users;";
         openmldbParameters.setSql(rawSQLScript);
-        Whitebox.setInternalState(openmldbTask, "openmldbParameters", openmldbParameters);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(JSONUtils.toJsonString(openmldbParameters));
+        OpenmldbTask openmldbTask = new OpenmldbTask(taskExecutionContext);
+        openmldbTask.init();
         OpenmldbParameters internal = (OpenmldbParameters) openmldbTask.getParameters();
         Assert.assertNotNull(internal);
         Assert.assertEquals(internal.getExecuteMode(), "offline");
 
         String result1 = openmldbTask.buildPythonScriptContent();
         Assert.assertEquals("import openmldb\n"
-                        + "import sqlalchemy as db\n"
-                        + "engine = db.create_engine('openmldb:///?zk=null&zkPath=null')\n"
-                        + "con = engine.connect()\n"
-                        + "con.execute(\"set @@execute_mode='offline';\")\n"
-                        + "con.execute(\"set @@sync_job=true\")\n"
-                        + "con.execute(\"set @@job_timeout=1800000\")\n"
-                        + "con.execute(\"select * from users\\n-- some comment\\ninner join order on users.order_id = "
-                        + "order.id\")\n"
-                        + "con.execute(\"select * from users\")\n"
-                , result1);
+                + "import sqlalchemy as db\n"
+                + "engine = db.create_engine('openmldb:///?zk=localhost:2181&zkPath=dolphinscheduler')\n"
+                + "con = engine.connect()\n"
+                + "con.execute(\"set @@execute_mode='offline';\")\n"
+                + "con.execute(\"set @@sync_job=true\")\n"
+                + "con.execute(\"set @@job_timeout=1800000\")\n"
+                + "con.execute(\"select * from users\\n-- some comment\\ninner join order on users.order_id = "
+                + "order.id\")\n"
+                + "con.execute(\"select * from users\")\n", result1);
     }
 
 }
