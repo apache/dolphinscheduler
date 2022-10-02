@@ -26,11 +26,12 @@ def get_user(
     password="test-password",
     email="test-email@abc.com",
     phone="17366637777",
+    tenant="test-tenant",
     queue="test-queue",
     status=1,
 ):
     """Get a test user."""
-    user = User(name, password, email, phone, queue, status)
+    user = User(name, password, email, phone, tenant, queue, status)
     user.create_if_not_exists()
     return user
 
@@ -46,6 +47,7 @@ def get_tenant(
     tenant = Tenant(name, queue, description, code=tenant_code, user_name=user_name)
     tenant.create_if_not_exists(name)
     return tenant
+
 
 def test_create_tenant():
     """Test create tenant from java gateway."""

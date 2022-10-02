@@ -95,6 +95,7 @@ public class UsersController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = false, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "queue", value = "QUEUE", dataTypeClass = String.class),
             @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "phone", value = "PHONE", dataTypeClass = String.class),
@@ -107,6 +108,7 @@ public class UsersController extends BaseController {
     public Result createUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "userName") String userName,
                              @RequestParam(value = "userPassword") String userPassword,
+                             @RequestParam(value = "tenantId", required = false, defaultValue = "0") int tenantId,
                              @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
@@ -157,6 +159,7 @@ public class UsersController extends BaseController {
      * @param userName user name
      * @param userPassword user password
      * @param email email
+     * @param tenantId tennat id
      * @param phone phone
      * @param queue queue
      * @return update result code
@@ -166,6 +169,7 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "id", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", required = false, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "queue", value = "QUEUE", dataTypeClass = String.class),
             @ApiImplicitParam(name = "email", value = "EMAIL", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "phone", value = "PHONE", dataTypeClass = String.class),
@@ -181,6 +185,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "userPassword") String userPassword,
                              @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
                              @RequestParam(value = "email") String email,
+                             @RequestParam(value = "tenantId", required = false, defaultValue = "0") int tenantId,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state,
                              @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
