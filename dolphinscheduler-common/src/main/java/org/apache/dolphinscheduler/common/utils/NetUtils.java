@@ -76,7 +76,7 @@ public class NetUtils {
      */
     public static String getHost(InetAddress inetAddress) {
         if (inetAddress != null) {
-            if (Constants.KUBERNETES_MODE) {
+            if (KubernetesUtils.isKubernetesMode()) {
                 String canonicalHost = inetAddress.getCanonicalHostName();
                 String[] items = canonicalHost.split("\\.");
                 if (items.length == 6 && "svc".equals(items[3])) {
@@ -99,7 +99,7 @@ public class NetUtils {
             HOST_ADDRESS = getHost(address);
             return HOST_ADDRESS;
         }
-        return Constants.KUBERNETES_MODE ? "localhost" : "127.0.0.1";
+        return KubernetesUtils.isKubernetesMode() ? "localhost" : "127.0.0.1";
     }
 
     private static InetAddress getLocalAddress() {

@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.common;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Duration;
@@ -796,10 +795,6 @@ public final class Constants {
      * pstree, get pud and sub pid
      */
     public static final String PSTREE = "pstree";
-
-    // ReflectionTestUtils.setField cannot modify final field in unit test
-    public static boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
-            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag

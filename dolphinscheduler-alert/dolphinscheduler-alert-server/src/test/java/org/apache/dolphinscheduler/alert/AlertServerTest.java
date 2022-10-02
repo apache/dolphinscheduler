@@ -78,7 +78,9 @@ public class AlertServerTest {
 
     @Test
     public void alertServerServerStartWithExpectedListeningPort() {
-        try (MockedStatic mockedNettyRemotingServerFactory = mockStatic(NettyRemotingServerFactory.class)) {
+        try (
+                MockedStatic<NettyRemotingServerFactory> mockedNettyRemotingServerFactory =
+                        mockStatic(NettyRemotingServerFactory.class)) {
             mockedNettyRemotingServerFactory.when(() -> NettyRemotingServerFactory.buildNettyRemotingServer(anyInt()))
                     .thenReturn(nettyRemotingServer);
             alertServer.startServer();
