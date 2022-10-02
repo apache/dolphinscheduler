@@ -85,7 +85,7 @@ class UserE2ETest {
     void testCreateUser() {
         final UserPage page = new UserPage(browser);
 
-        page.create(user, password, email, phone);
+        page.create(user, password, email, phone, tenant);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -122,7 +122,7 @@ class UserE2ETest {
 
         browser.navigate().refresh();
 
-        page.update(user, editUser, editEmail, editPhone);
+        page.update(user, editUser, editEmail, editPhone, tenant);
 
         await().untilAsserted(() -> {
             browser.navigate().refresh();
