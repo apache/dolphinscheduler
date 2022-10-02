@@ -39,13 +39,13 @@ def get_tenant(
     name="test-name-1",
     queue="test-queue-1",
     description="test-description",
+    tenant_code="test-tenant-code",
     user_name=None,
 ):
     """Get a test tenant."""
     tenant = Tenant(name, queue, description, code=tenant_code, user_name=user_name)
     tenant.create_if_not_exists(name)
     return tenant
-
 
 def test_create_tenant():
     """Test create tenant from java gateway."""
