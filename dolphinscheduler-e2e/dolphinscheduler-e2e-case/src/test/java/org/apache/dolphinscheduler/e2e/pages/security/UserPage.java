@@ -58,7 +58,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         super(driver);
     }
 
-    public UserPage create(String user, String password, String email, String phone) {
+    public UserPage create(String user, String password, String email, String phone, String tenant) {
         buttonCreateUser().click();
 
         createUserForm().inputUserName().sendKeys(user);
@@ -71,7 +71,8 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public UserPage update(String user, String editUser, String editEmail, String editPhone) {
+    public UserPage update(String user, String editUser, String editEmail, String editPhone,
+                           String tenant) {
         userList().stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
             .flatMap(it -> it.findElements(By.className("edit")).stream())
