@@ -17,18 +17,26 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.junit.jupiter.api.Assertions;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingServerFactory;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.powermock.reflect.Whitebox;
 
 @ExtendWith(MockitoExtension.class)
 public class AlertServerTest {
@@ -42,7 +50,11 @@ public class AlertServerTest {
     @Mock
     private AlertSenderService alertSenderService;
 
+    @Mock
+    private NettyRemotingServer nettyRemotingServer;
+
     @InjectMocks
+    @Spy
     private AlertServer alertServer;
 
     @BeforeEach
@@ -50,20 +62,29 @@ public class AlertServerTest {
         Mockito.lenient().when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
 
         Mockito.lenient().when(alertConfig.getPort()).thenReturn(50052);
-
-        Mockito.doNothing().when(alertSenderService).start();
-
     }
+
     @Test
-    public void alertServerStartSuccessfully() {
+    public void alertServerRunSuccessfully() {
+        doNothing().when(alertServer).checkTable();
+        doNothing().when(alertServer).startServer();
 
         alertServer.run(null);
 
-        NettyRemotingServer nettyRemotingServer = Whitebox.getInternalState(alertServer, "nettyRemotingServer");
+        Mockito.verify(alertServer, times(1)).checkTable();
+        Mockito.verify(alertServer, times(1)).startServer();
+        Mockito.verify(alertSenderService, times(1)).start();
+    }
 
-        NettyServerConfig nettyServerConfig = Whitebox.getInternalState(nettyRemotingServer, "serverConfig");
-
-        Assertions.assertEquals(50052, nettyServerConfig.getListenPort());
-
+    @Test
+    public void alertServerServerStartWithExpectedListeningPort() {
+        try (MockedStatic mockedNettyRemotingServerFactory = mockStatic(NettyRemotingServerFactory.class)) {
+            mockedNettyRemotingServerFactory.when(() -> NettyRemotingServerFactory.buildNettyRemotingServer(anyInt()))
+                    .thenReturn(nettyRemotingServer);
+            alertServer.startServer();
+            mockedNettyRemotingServerFactory.verify(() -> NettyRemotingServerFactory.buildNettyRemotingServer(50052));
+            verify(nettyRemotingServer, times(1)).registerProcessor(any(), any());
+            verify(nettyRemotingServer, times(1)).start();
+        }
     }
 }
