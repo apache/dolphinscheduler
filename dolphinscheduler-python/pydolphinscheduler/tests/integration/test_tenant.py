@@ -26,12 +26,11 @@ def get_user(
     password="test-password",
     email="test-email@abc.com",
     phone="17366637777",
-    tenant="test-tenant",
     queue="test-queue",
     status=1,
 ):
     """Get a test user."""
-    user = User(name, password, email, phone, tenant, queue, status)
+    user = User(name, password, email, phone, queue, status)
     user.create_if_not_exists()
     return user
 
@@ -40,7 +39,6 @@ def get_tenant(
     name="test-name-1",
     queue="test-queue-1",
     description="test-description",
-    tenant_code="test-tenant-code",
     user_name=None,
 ):
     """Get a test tenant."""

@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
@@ -93,6 +94,7 @@ import com.google.common.base.Splitter;
 public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceImpl.class);
+    private static final String DEFAULT_TENANT_CODE = "default";
 
     @Autowired
     private AccessTokenMapper accessTokenMapper;
@@ -177,6 +179,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         User user = createUser(userName, userPassword, email, phone, queue, state);
+
+        // resource upload startup
+        if (PropertyUtils.getResUploadStartupState()) {
+            storageOperate.createTenantDirIfNotExists(DEFAULT_TENANT_CODE);
+        }
 
         logger.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);

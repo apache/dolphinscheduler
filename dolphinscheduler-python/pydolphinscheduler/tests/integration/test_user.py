@@ -36,7 +36,6 @@ def get_user(
     password="test-password",
     email="test-email@abc.com",
     phone="17366637777",
-    tenant="test-tenant",
     queue="test-queue",
     status=1,
 ):
@@ -46,7 +45,6 @@ def get_user(
         password=password,
         email=email,
         phone=phone,
-        tenant=tenant,
         queue=queue,
         status=status,
     )
@@ -61,7 +59,6 @@ def test_create_user():
         password="test-password",
         email="test-email@abc.com",
         phone="17366637777",
-        tenant="test-tenant",
         queue="test-queue",
         status=1,
     )
@@ -86,7 +83,6 @@ def test_update_user():
         password="test-password-",
         email="test-email-updated@abc.com",
         phone="17366637766",
-        tenant="test-tenant-updated",
         queue="test-queue-updated",
         status=2,
     )

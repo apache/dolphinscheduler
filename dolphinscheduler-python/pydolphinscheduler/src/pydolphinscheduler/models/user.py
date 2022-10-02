@@ -32,7 +32,6 @@ class User(BaseSide):
         "password",
         "email",
         "phone",
-        "tenant",
         "queue",
         "status",
     }
@@ -43,7 +42,6 @@ class User(BaseSide):
         password: Optional[str] = configuration.USER_PASSWORD,
         email: Optional[str] = configuration.USER_EMAIL,
         phone: Optional[str] = configuration.USER_PHONE,
-        tenant: Optional[str] = configuration.WORKFLOW_TENANT,
         queue: Optional[str] = configuration.WORKFLOW_QUEUE,
         status: Optional[int] = configuration.USER_STATE,
     ):
@@ -52,7 +50,6 @@ class User(BaseSide):
         self.password = password
         self.email = email
         self.phone = phone
-        self.tenant = tenant
         self.queue = queue
         self.status = status
 
@@ -70,7 +67,6 @@ class User(BaseSide):
             self.password,
             self.email,
             self.phone,
-            self.tenant,
             self.queue,
             self.status,
         )
@@ -90,7 +86,6 @@ class User(BaseSide):
             password=user.getUserPassword(),
             email=user.getEmail(),
             phone=user.getPhone(),
-            tenant=user.getTenantCode(),
             queue=user.getQueueName(),
             status=user.getState(),
         )
@@ -102,7 +97,6 @@ class User(BaseSide):
         password=None,
         email=None,
         phone=None,
-        tenant=None,
         queue=None,
         status=None,
     ) -> None:
@@ -112,7 +106,6 @@ class User(BaseSide):
             password,
             email,
             phone,
-            tenant,
             queue,
             status,
         )
