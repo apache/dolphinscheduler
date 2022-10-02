@@ -89,10 +89,6 @@ public class NetUtils {
         return null;
     }
 
-    public static boolean isKubernetesMode() {
-        return Constants.KUBERNETES_MODE;
-    }
-
     public static String getHost() {
         if (HOST_ADDRESS != null) {
             return HOST_ADDRESS;
