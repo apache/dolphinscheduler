@@ -241,6 +241,8 @@ export default defineComponent({
       getLogs(logTimer)
     }
 
+    var getLogsID: number
+
     const getLogs = (logTimer: number) => {
       const { state } = useAsyncState(
         queryLog({
@@ -256,11 +258,16 @@ export default defineComponent({
             getLogs(logTimer)
           } else {
             nodeVariables.logLoadingRef = false
-            setTimeout(() => {
-              nodeVariables.limit += 1000
-              nodeVariables.skipLineNum += 1000
-              getLogs(logTimer)
-            }, logTimer * 1000)
+            if (logTimer !== 0) {
+              if (typeof getLogsID === 'number') {
+                clearTimeout(getLogsID)
+              }
+              getLogsID = setTimeout(() => {
+                nodeVariables.limit += 1000
+                nodeVariables.skipLineNum += 1000
+                getLogs(logTimer)
+              }, logTimer * 1000)
+            }
           }
         }),
         {}
