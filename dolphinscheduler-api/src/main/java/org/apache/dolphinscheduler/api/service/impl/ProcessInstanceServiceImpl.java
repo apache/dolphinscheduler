@@ -347,6 +347,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @return result
      */
     private boolean isFinish(ProcessInstance processInstance){
+        if (processInstance.getState() == null) {
+            return false;
+        }
         return !processInstance.getState().equals(WorkflowExecutionStatus.RUNNING_EXECUTION)
                 && !processInstance.getState().equals(WorkflowExecutionStatus.SERIAL_WAIT);
     }
