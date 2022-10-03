@@ -320,9 +320,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         for (ProcessInstance processInstance : processInstances) {
-            // if processInstance is running or serial wait, the val of duration should be null
+            // if processInstance is running, the val of duration should be current time - last start time
+            // if finished, the val of duration should be end time - start time
             String duration = isFinish(processInstance) ?
-                    DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()) : null;
+                DateUtils
+                    .format2Duration(processInstance.getStartTime(), processInstance.getEndTime())
+                : DateUtils.format2Duration(processInstance.getStartTime(), new Date());
+
             processInstance.setDuration(duration);
             User executor = idToUserMap.get(processInstance.getExecutorId());
             if (null != executor) {
