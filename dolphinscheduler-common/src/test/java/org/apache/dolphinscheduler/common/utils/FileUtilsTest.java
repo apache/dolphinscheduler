@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -35,10 +36,11 @@ public class FileUtilsTest {
 
     @Test
     public void testGetDownloadFilename() {
-        Mockito.mockStatic(DateUtils.class);
-        Mockito.when(DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
-        Assert.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
-                FileUtils.getDownloadFilename("test"));
+        try (MockedStatic<DateUtils> mockedDateUtils = Mockito.mockStatic(DateUtils.class)) {
+            mockedDateUtils.when(() -> DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
+            Assert.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
+                    FileUtils.getDownloadFilename("test"));
+        }
     }
 
     @Test

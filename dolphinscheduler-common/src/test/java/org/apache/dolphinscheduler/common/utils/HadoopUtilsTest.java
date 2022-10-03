@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
@@ -61,11 +62,12 @@ public class HadoopUtilsTest {
 
     @Test
     public void getAppAddress() {
-        Mockito.mockStatic(HttpUtils.class);
-        Mockito.when(HttpUtils.get("http://ds1:8088/ws/v1/cluster/info"))
-                .thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
-        logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
-        Assert.assertTrue(true);
+        try (MockedStatic<HttpUtils> mockedHttpUtils = Mockito.mockStatic(HttpUtils.class)) {
+            mockedHttpUtils.when(() -> HttpUtils.get("http://ds1:8088/ws/v1/cluster/info"))
+                    .thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
+            logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
+            Assert.assertTrue(true);
+        }
     }
 
 }
