@@ -20,6 +20,8 @@ on:
   push:
     branches:
       - dev
+    tags:
+      - "*"
 
 env:
   HUB: ghcr.io/apache/dolphinscheduler
@@ -51,7 +53,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Build and push docker images
+      - name: Build and push docker images based on commit sha
         run: |
           ./mvnw -B clean deploy \
           -Dmaven.test.skip \
@@ -59,5 +61,16 @@ jobs:
           -Dcheckstyle.skip=true \
           -Dmaven.deploy.skip \
           -Ddocker.tag=${{ github.sha }} \
+          -Ddocker.hub=${{ env.HUB }} \
+          -Pdocker,release
+      - name: Build and push docker images based on tags
+        if: ${{ github.ref_type == 'tag' }}
+        run: |
+          ./mvnw -B clean deploy \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dcheckstyle.skip=true \
+          -Dmaven.deploy.skip \
+          -Ddocker.tag=${{ github.ref_name }} \
           -Ddocker.hub=${{ env.HUB }} \
           -Pdocker,release
