@@ -26,8 +26,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class TimePlaceholderUtilsTest {
+
     Date date = DateUtils.parse("2022-08-26 00:00:00", "yyyy-MM-dd HH:mm:ss");
 
     Map<String, String> timeParams = BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, date);
@@ -120,9 +120,9 @@ public class TimePlaceholderUtilsTest {
         String weekLastDay = "$[week_last_day(yyyyMMdd,0)]";
 
         String weekLastDateTime = ParameterUtils.convertParameterPlaceholders(weekLastDate, timeParams);
-        Assert.assertEquals(weekLastDateTime,"2022-08-28");
+        Assert.assertEquals(weekLastDateTime, "2022-08-28");
 
         String weekLastDayTime = ParameterUtils.convertParameterPlaceholders(weekLastDay, timeParams);
-        Assert.assertEquals(weekLastDayTime,"20220828");
+        Assert.assertEquals(weekLastDayTime, "20220828");
     }
 }
