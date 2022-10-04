@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -83,9 +84,8 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
                                         .setPlaceholder("if enable use authentication, you need input user")
                                         .build();
 
-        InputParam mailPassword = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, MailParamsConstants.MAIL_PASSWD)
+        PasswordParam mailPassword = PasswordParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, MailParamsConstants.MAIL_PASSWD)
                                                   .setPlaceholder("if enable use authentication, you need input password")
-                                                  .setType("password")
                                                   .build();
 
         RadioParam enableTls = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE, MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE)
