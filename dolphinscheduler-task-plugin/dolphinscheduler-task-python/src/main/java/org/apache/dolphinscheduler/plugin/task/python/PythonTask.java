@@ -85,6 +85,7 @@ public class PythonTask extends AbstractTask {
 
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), PythonParameters.class);
 
+        // A null pointer exception may be raised here
         if (!pythonParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
         }
