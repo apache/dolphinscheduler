@@ -1277,6 +1277,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * view resource file online
      *
      * @param resourceId  resource id
+     * @param fullName  resource fullName
+     * @param resTenantCode  resource tenant owner
      * @param skipLineNum skip line number
      * @param limit       limit
      * @return resource content

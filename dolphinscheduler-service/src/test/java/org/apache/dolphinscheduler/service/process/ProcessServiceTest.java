@@ -822,12 +822,12 @@ public class ProcessServiceTest {
     public void testUpdateResourceInfo() throws Exception {
         // test if input is null
         ResourceInfo resourceInfoNull = null;
-        ResourceInfo updatedResourceInfo1 = processService.updateResourceInfo(resourceInfoNull);
+        ResourceInfo updatedResourceInfo1 = processService.updateResourceInfo(0, resourceInfoNull);
         Assert.assertNull(updatedResourceInfo1);
 
         // test if resource id less than 1
         ResourceInfo resourceInfoVoid = new ResourceInfo();
-        ResourceInfo updatedResourceInfo2 = processService.updateResourceInfo(resourceInfoVoid);
+        ResourceInfo updatedResourceInfo2 = processService.updateResourceInfo(0, resourceInfoVoid);
         Assert.assertNull(updatedResourceInfo2);
 
         // test normal situation
@@ -839,7 +839,7 @@ public class ProcessServiceTest {
         resource.setFullName("/test.txt");
         Mockito.when(resourceMapper.selectById(1)).thenReturn(resource);
 
-        ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(resourceInfoNormal);
+        ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
 
         Assert.assertEquals(1, updatedResourceInfo3.getId().intValue());
         Assert.assertEquals("test.txt", updatedResourceInfo3.getRes());

@@ -65,7 +65,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testQuerytResourceList() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(resourcesService.queryResourceList(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn(mockResult);
+        Mockito.when(resourcesService.queryResourceList(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/list")
                 .header(SESSION_ID, sessionId)
@@ -84,7 +84,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testQueryResourceListPaging() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(resourcesService.queryResourceListPaging(
+        Mockito.when(resourcesService.queryResourceListPaging(
                 Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
                 Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(mockResult);
@@ -137,7 +137,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testViewResource() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.HDFS_NOT_STARTUP.getCode());
-        PowerMockito.when(resourcesService.readResource(Mockito.any(), Mockito.anyString(),
+        Mockito.when(resourcesService.readResource(Mockito.any(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 
@@ -193,7 +193,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testUpdateResourceContent() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyInt(),
+        Mockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyInt(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
@@ -217,7 +217,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     @Test
     public void testDownloadResource() throws Exception {
 
-        PowerMockito.when(resourcesService.downloadResource(Mockito.any(), Mockito.anyInt(),
+        Mockito.when(resourcesService.downloadResource(Mockito.any(), Mockito.anyInt(),
                     Mockito.anyString()))
                 .thenReturn(null);
 
@@ -233,7 +233,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testCreateUdfFunc() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(udfFuncService
+        Mockito.when(udfFuncService
                 .createUdfFunction(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(mockResult);
@@ -284,7 +284,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testUpdateUdfFunc() throws Exception {
         Result<Object> mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(udfFuncService
+        Mockito.when(udfFuncService
                 .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt(), Mockito.anyString()))
                 .thenReturn(mockResult);
@@ -469,7 +469,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testDeleteResource() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(resourcesService.delete(Mockito.any(), Mockito.anyInt(), Mockito.anyString(),
+        Mockito.when(resourcesService.delete(Mockito.any(), Mockito.anyInt(), Mockito.anyString(),
                     Mockito.anyString()))
                 .thenReturn(mockResult);
 

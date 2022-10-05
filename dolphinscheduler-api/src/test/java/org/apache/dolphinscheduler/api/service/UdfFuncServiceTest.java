@@ -105,21 +105,21 @@ public class UdfFuncServiceTest {
         // hdfs not start
         Result result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, Integer.MAX_VALUE);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE, Integer.MAX_VALUE);
         logger.info(result.toString());
         Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
         // resource not exist
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, Integer.MAX_VALUE);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "",UdfType.HIVE, Integer.MAX_VALUE);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
         // success
         Mockito.when(resourceMapper.selectById(1)).thenReturn(getResource());
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "",UdfType.HIVE, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
@@ -160,7 +160,7 @@ public class UdfFuncServiceTest {
                 serviceLogger)).thenReturn(true);
         Result<Object> result = udfFuncService.updateUdfFunc(getLoginUser(), 12, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
         logger.info(result.toString());
         Assert.assertTrue(Status.UDF_FUNCTION_NOT_EXIST.getCode() == result.getCode());
 
@@ -169,7 +169,7 @@ public class UdfFuncServiceTest {
                 serviceLogger)).thenReturn(true);
         result = udfFuncService.updateUdfFunc(getLoginUser(), 1, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
         logger.info(result.toString());
         Assert.assertTrue(Status.HDFS_NOT_STARTUP.getCode() == result.getCode());
 
@@ -182,7 +182,7 @@ public class UdfFuncServiceTest {
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 12);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 12, "");
         logger.info(result.toString());
         Assert.assertTrue(Status.RESOURCE_NOT_EXIST.getCode() == result.getCode());
 
@@ -191,7 +191,7 @@ public class UdfFuncServiceTest {
                 ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
         logger.info(result.toString());
         Assert.assertTrue(Status.SUCCESS.getCode() == result.getCode());
 
