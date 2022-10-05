@@ -24,7 +24,7 @@ import type { IJsonItem, IResource } from '../types'
 
 export function useResources(
   span: number | Ref<number> = 24,
-  required = false,
+  required: boolean | Ref<boolean> = false,
   limit: number | Ref<number> = -1
 ): IJsonItem {
   const { t } = useI18n()

@@ -445,6 +445,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-java-sdk-core-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.300  Apache 2.0
     aws-java-sdk-kms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.300  Apache 2.0
     aws-java-sdk-sagemaker-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sagemaker/1.12.300  Apache 2.0
+    aws-java-sdk-dms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dms/1.12.300  Apache 2.0
     commons-text 1.8: https://mvnrepository.com/artifact/org.apache.commons/commons-text/1.8, Apache 2.0
     httpasyncclient 4.1.5: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient/4.1.4, Apache 2.0
     httpcore-nio 4.4.15: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio/4.4.15, Apache 2.0
@@ -481,6 +482,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     opentracing-util 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
     jettison 1.1: https://github.com/jettison-json/jettison/blob/master/LICENSE, Apache 2.0
     stax-api 1.0.1: https://mvnrepository.com/artifact/stax/stax-api/1.0.1, Apache 2.0
+    hbase-noop-htrace 4.1.1: https://mvnrepository.com/artifact/org.apache.hbase.thirdparty/hbase-noop-htrace/4.1.1, Apache 2.0
 
 ========================================================================
 BSD licenses

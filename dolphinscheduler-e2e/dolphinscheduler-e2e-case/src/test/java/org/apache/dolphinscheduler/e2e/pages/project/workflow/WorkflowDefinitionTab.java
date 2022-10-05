@@ -59,12 +59,22 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     @FindBy(className = "items")
     private List<WebElement> workflowList;
 
+    @FindBy(className = "task-cate-logic")
+    private WebElement subProcessList;
+
     public WorkflowDefinitionTab(RemoteWebDriver driver) {
         super(driver);
     }
 
     public WorkflowForm createWorkflow() {
         buttonCreateProcess().click();
+
+        return new WorkflowForm(driver);
+    }
+
+    public WorkflowForm createSubProcessWorkflow() {
+        buttonCreateProcess().click();
+        subProcessList().click();
 
         return new WorkflowForm(driver);
     }

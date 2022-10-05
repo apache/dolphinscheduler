@@ -191,10 +191,24 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.hbase.thirdparty</groupId>
+            <artifactId>hbase-noop-htrace</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>3.12.4</version>
+            <!-- TODO: move this dependency to root pom after removing powermock in the whole project -->
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <testResources>

@@ -96,11 +96,6 @@ public class SparkParameters extends AbstractParameters {
     private ProgramType programType;
 
     /**
-     * spark version
-     */
-    private String sparkVersion;
-
-    /**
      * resource list
      */
     private List<ResourceInfo> resourceList = new ArrayList<>();
@@ -215,14 +210,6 @@ public class SparkParameters extends AbstractParameters {
 
     public void setProgramType(ProgramType programType) {
         this.programType = programType;
-    }
-
-    public String getSparkVersion() {
-        return sparkVersion;
-    }
-
-    public void setSparkVersion(String sparkVersion) {
-        this.sparkVersion = sparkVersion;
     }
 
     @Override

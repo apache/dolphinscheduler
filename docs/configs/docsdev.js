@@ -205,6 +205,10 @@ export default {
                                 title: 'Pytorch',
                                 link: '/en-us/docs/dev/user_doc/guide/task/pytorch.html',
                             },
+                            {
+                                title: 'Amazon DMS',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dms.html',
+                            },
                         ],
                     },
                     {
@@ -840,6 +844,10 @@ export default {
                             {
                                 title: 'Pytorch',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
+                            {
+                                title: 'Amazon DMS',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dms.html',
                             },
                         ],
                     },

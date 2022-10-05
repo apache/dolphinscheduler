@@ -396,7 +396,6 @@ export default {
     value_required_tips: 'value(必填)',
     pre_tasks: '前置任务',
     program_type: '程序类型',
-    spark_version: 'Spark版本',
     main_class: '主函数的Class',
     main_class_tips: '请填写主函数的Class',
     main_package: '主程序包',
@@ -643,8 +642,6 @@ export default {
     emr_flow_define_json_tips: '请输入工作流定义',
     emr_steps_define_json: 'stepsDefineJson',
     emr_steps_define_json_tips: '请输入EMR步骤定义',
-    segment_separator: '分段执行符号',
-    segment_separator_tips: '请输入分段执行符号',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
@@ -704,7 +701,7 @@ export default {
     mlflow_deployModelKey: '部署的模型URI',
     mlflow_deployPort: '监听端口',
     mlflowProjectRepository: '运行仓库',
-    mlflowProjectRepository_tips: '可以为github仓库或worker上的路径',
+    mlflowProjectRepository_tips: '可以为git仓库或worker上的路径',
     mlflowProjectVersion: '项目版本',
     mlflowProjectVersion_tips: '项目git版本',
     mlflow_cpuLimit: '最大cpu限制',
@@ -766,5 +763,15 @@ export default {
     pytorch_requirements: '依赖文件',
     pytorch_conda_python_version: 'python版本',
     pytorch_conda_python_version_tips: '请输入版本号，如 3.6, 3.7, 3.x等'
+  },
+  menu: {
+    fav: '收藏组件',
+    universal: '通用组件',
+    cloud: '云',
+    logic: '逻辑节点',
+    di: '数据集成',
+    dq: '数据质量',
+    ml: '机器学习',
+    other: '其他',
   }
 }

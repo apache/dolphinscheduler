@@ -50,6 +50,17 @@ Click the `Save` button, and the "Set DAG chart name" window pops up, as shown i
 
 ![workflow-save](../../../../img/new_ui/dev/project/workflow-save.png)
 
+### Configure workflow (process) execution type
+
+Click the `Save` button and configure `process execution type` in the pop-up window. There are four process execution types:
+
+- `Parallel`: If there are multiple instances of the same workflow definition, execute the instances in parallel.
+- `Serial Wait`: If there are multiple instances of the same workflow definition, execute the instances in serial.
+- `Serial Discard`: If there are multiple instances of the same workflow definition, discard the later ones and kill the current running ones.
+- `Serial Priority`: If there are multiple instances of the same workflow definition, execute the instances according to the priority in serial.
+
+![workflow-execution-type](../../../../img/new_ui/dev/project/workflow-execution-type.png)
+
 ## Workflow Definition Operation Function
 
 Click `Project Management -> Workflow -> Workflow Definition` to enter the workflow definition page, as shown below:
@@ -60,14 +71,49 @@ Workflow running parameter description:
 
 * **Failure strategy**: When a task node fails to execute, other parallel task nodes need to execute the strategy. "Continue" means: After a task fails, other task nodes execute normally; "End" means: Terminate all tasks being executed, and terminate the entire process.
 * **Notification strategy**: When the process ends, send process execution information notification emails according to the process status, including no status, success, failure, success or failure.
-* **Process priority**: the priority of process operation, divided into five levels: the highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), the lowest (LOWEST). When the number of master threads is insufficient, processes with higher levels will be executed first in the execution queue, and processes with the same priority will be executed in the order of first-in, first-out.
+* **Process priority**: The priority of process execution, there are five different priorities: the highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), the lowest (LOWEST). When the number of master threads is insufficient, processes with higher priorities in the execution queue will run first. Processes with the same priority will run in first-come-first-served fashion.
 * **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker.
 * **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group.
-* **Recipient**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or alarm email will be sent to the recipient list.
-* **Cc**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, the process information or alarm email will be copied to the Cc list.
 * **Startup parameters**: Set or override the value of global parameters when starting a new process instance.
-* **Complement**: There are 2 modes of serial complement and parallel complement. Serial complement: within the specified time range, perform complements in sequence from the start date to the end date, and generate N process instances in turn; parallel complement: within the specified time range, perform multiple complements at the same time, and generate N process instances at the same time .
-  * **Complement**: Execute the workflow definition of the specified date, you can select the time range of the supplement (currently only supports the supplement for consecutive days), for example, the data from May 1st to May 10th needs to be supplemented, as shown in the following figure:
+* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement. You could select the time period or fill in it manually in UI.
+  * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
+
+  ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
+
+  * Parallel complement: Run the workflow from start date to end date according to the time period you set in parallel.
+
+  ![workflow-parallel](../../../../img/new_ui/dev/project/workflow-parallel.png)
+
+  * Parallelism: The max number of workflow instances of the workflow definition you choose for complement.
+    ![workflow-concurrency-from](../../../../img/new_ui/dev/project/workflow-concurrency-from.png)
+
+  ![workflow-concurrency](../../../../img/new_ui/dev/project/workflow-concurrency.png)
+
+  * Mode of dependent: Whether to trigger downstream workflow definition for complement.
+
+  ![workflow-dependency](../../../../img/new_ui/dev/project/workflow-dependency.png)
+
+  * Schedule date：
+
+    1. Select from pop-up window:
+
+    ![workflow-pageSelection](../../../../img/new_ui/dev/project/workflow-pageSelection.png)
+
+    2. Fill in the time period manually:
+
+    ![workflow-input](../../../../img/new_ui/dev/project/workflow-input.png)
+
+  * Complement with or without scheduling：
+
+    1. Without scheduling: Run workflow every day from start date to end date according to the time period you set. e.g. Do complement from July 7th to 10th without scheduling:
+
+    ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
+
+    2. With scheduling: Run workflow from start date to end date on schedule according to the time period and schedule you set. e.g. Do complement from July 7th to 10th with the schedule of 5 AM every day:
+
+    ![workflow-configuredTiming](../../../../img/new_ui/dev/project/workflow-configuredTiming.png)
+
+    ![workflow-configuredTimingResult](../../../../img/new_ui/dev/project/workflow-configuredTimingResult.png)
 
 The following are the operation functions of the workflow definition list:
 

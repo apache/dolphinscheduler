@@ -17,12 +17,19 @@
 
 import { defineComponent, h, unref, renderSlot } from 'vue'
 import { useFormItem } from 'naive-ui/es/_mixins'
-import { NFormItemGi, NSpace, NButton, NGrid, NGridItem } from 'naive-ui'
+import {
+  NFormItemGi,
+  NSpace,
+  NButton,
+  NGrid,
+  NGridItem,
+  FormItemRule
+} from 'naive-ui'
 import { isFunction } from 'lodash'
 import { PlusOutlined, DeleteOutlined } from '@vicons/antd'
 import getField from './get-field'
 import { formatValidate } from '../utils'
-import type { IJsonItem, FormItemRule } from '../types'
+import type { IJsonItem, IFormItemRule } from '../types'
 
 const CustomParameters = defineComponent({
   name: 'CustomParameters',
@@ -66,11 +73,11 @@ const CustomParameters = defineComponent({
 
 const getDefaultValue = (children: IJsonItem[]) => {
   const defaultValue: { [field: string]: any } = {}
-  const ruleItem: { [key: string]: FormItemRule[] | FormItemRule } = {}
+  const ruleItem: { [key: string]: IFormItemRule[] | IFormItemRule } = {}
   const loop = (
     children: IJsonItem[],
     parent: { [field: string]: any },
-    ruleParent: { [key: string]: FormItemRule[] | FormItemRule }
+    ruleParent: { [key: string]: IFormItemRule[] | IFormItemRule }
   ) => {
     children.forEach((child) => {
       const mergedChild = isFunction(child) ? child() : child
@@ -102,7 +109,7 @@ const getDefaultValue = (children: IJsonItem[]) => {
 export function renderCustomParameters(
   item: IJsonItem,
   fields: { [field: string]: any },
-  rules: { [key: string]: FormItemRule | FormItemRule[] }[]
+  rules: { [key: string]: IFormItemRule | IFormItemRule[] }[]
 ) {
   const mergedItem = isFunction(item) ? item() : item
   const { field, children = [] } = mergedItem
@@ -119,7 +126,7 @@ export function renderCustomParameters(
           label: mergedChild.name,
           span: unref(mergedChild.span),
           class: mergedChild.class,
-          rule: mergedChild.rule
+          rule: mergedChild.rule as FormItemRule
         },
         () => getField(mergedChild, item)
       )

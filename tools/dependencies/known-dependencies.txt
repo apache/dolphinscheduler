@@ -17,6 +17,7 @@ aws-java-sdk-emr-1.12.300.jar
 aws-java-sdk-kms-1.12.300.jar
 aws-java-sdk-s3-1.12.300.jar
 aws-java-sdk-sagemaker-1.12.300.jar
+aws-java-sdk-dms-1.12.300.jar
 bcpkix-jdk15on-1.68.jar
 bcprov-jdk15on-1.68.jar
 bonecp-0.8.0.RELEASE.jar
@@ -78,6 +79,7 @@ hadoop-mapreduce-client-jobclient-3.2.4.jar
 hadoop-yarn-api-3.2.4.jar
 hadoop-yarn-client-3.2.4.jar
 hadoop-yarn-common-3.2.4.jar
+hbase-noop-htrace-4.1.1.jar
 hibernate-validator-6.2.2.Final.jar
 hive-common-2.3.9.jar
 hive-jdbc-2.3.9.jar

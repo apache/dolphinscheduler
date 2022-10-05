@@ -97,6 +97,7 @@ export function useModal(
     if (variables.saving) return
     variables.saving = true
 
+    variables.model.config = variables.model.config.trim()
     try {
       statusRef === 0
         ? await submitEnvironmentModal()
