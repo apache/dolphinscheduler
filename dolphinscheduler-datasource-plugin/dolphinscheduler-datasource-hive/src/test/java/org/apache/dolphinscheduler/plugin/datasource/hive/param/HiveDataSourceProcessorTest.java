@@ -17,14 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive.param;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
-import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,12 +29,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@RunWith(MockitoJUnitRunner.class)
 public class HiveDataSourceProcessorTest {
 
     private HiveDataSourceProcessor hiveDatasourceProcessor = new HiveDataSourceProcessor();
@@ -52,10 +46,10 @@ public class HiveDataSourceProcessorTest {
         hiveDataSourceParamDTO.setUserName("default");
         hiveDataSourceParamDTO.setDatabase("default");
         hiveDataSourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PowerMockito.mockStatic(CommonUtils.class);
-        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
+        Mockito.mockStatic(PasswordUtils.class);
+        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+        Mockito.mockStatic(CommonUtils.class);
+        Mockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
         HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
                 .createConnectionParams(hiveDataSourceParamDTO);
         Assert.assertNotNull(connectionParams);
