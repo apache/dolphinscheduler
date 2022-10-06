@@ -112,7 +112,7 @@ export function createDirectory(
   })
 }
 
-export function queryResourceList(params: ResourceTypeReq & fullName): any {
+export function queryResourceList(params: ResourceTypeReq & FullNameReq): any {
   return axios({
     url: '/resources/list',
     method: 'get',
@@ -210,7 +210,7 @@ export function updateResource(
   })
 }
 
-export function deleteResource(id: number, params): any {
+export function deleteResource(id: number, params: FullNameReq & TenantCodeReq): any {
   return axios({
     url: `/resources/${id}`,
     method: 'delete',

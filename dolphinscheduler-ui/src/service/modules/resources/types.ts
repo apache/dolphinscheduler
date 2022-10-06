@@ -130,6 +130,7 @@ export {
   NameReq,
   FileNameReq,
   FullNameReq,
+  TenantCodeReq,
   IdReq,
   ContentReq,
   DescriptionReq,

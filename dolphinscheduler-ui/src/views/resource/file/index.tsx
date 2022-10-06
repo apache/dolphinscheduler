@@ -57,8 +57,8 @@ export default defineComponent({
   name: 'File',
   setup() {
     const router: Router = useRouter()
-    const fileId = ref(router.currentRoute.value.query.prefix || "")
-    const tenantCode = ref(router.currentRoute.value.query.tenantCode || "")
+    const fileId = ref(String(router.currentRoute.value.query.prefix) || "")
+    const tenantCode = ref(String(router.currentRoute.value.query.tenantCode) || "")
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
@@ -142,7 +142,7 @@ export default defineComponent({
       handleShowModal(uploadShowRef)
     }
 
-    const handleRenameFile: IRenameFile = (id, name, description, fullName, user_name) => {
+    const handleRenameFile: IRenameFile = (id: number, name: string, description: string, fullName: string, user_name: string) => {
       renameInfo.fullName = fullName
       renameInfo.id = id
       renameInfo.name = name
@@ -174,22 +174,25 @@ export default defineComponent({
     const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([
       {
         id: 1,
-        fullName: 'l1'
+        fullName: 'l1',
+        userName: 'u1'
       },
       {
         id: 2,
-        fullName: 'l2'
+        fullName: 'l2',
+        userName: 'u2'
       },
       {
         id: 4,
-        fullName: 'l3'
+        fullName: 'l3',
+        userName: 'u3'
       }
     ])
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
-      const currFileId = router.currentRoute.value.query.prefix || ""
+      const currFileId = String(router.currentRoute.value.query.prefix) || ""
       if (currFileId === "") {
         fileStore.setCurrentDir('/')
       } else {
@@ -220,7 +223,7 @@ export default defineComponent({
     onMounted(() => {
       breadcrumbItemsRef.value = []
       if (fileId.value != "") {
-        breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root' })
+        breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root', userName: '' })
         const id = 0
         queryCurrentResourceById(
           {
@@ -232,10 +235,9 @@ export default defineComponent({
           id
         ).then((res: ResourceFile) => {
           if (res.fileName) {
-            console.log("fileName", res.fileName)
             const dirs = res.fileName.split('/')
             if (dirs && dirs.length > 1) {
-              dirs.pop(-1)
+              dirs.shift()
               initBreadcrumb(dirs)
             }
           }

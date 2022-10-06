@@ -17,6 +17,7 @@
 
 export interface IUdfResourceParam {
   fullName: string
+  tenantCode: string
   id: number
   pageSize: number
   pageNo: number

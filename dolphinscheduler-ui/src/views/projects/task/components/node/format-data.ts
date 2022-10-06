@@ -42,7 +42,7 @@ export function formatParams(data: INodeData): {
     taskParams.jvmArgs = data.jvmArgs
     taskParams.isModulePath = data.isModulePath
     if (data.runType === 'JAR' && data.mainJar) {
-      taskParams.mainJar = { id: data.mainJar }
+      taskParams.mainJar = { resourceName: data.mainJar }
     }
   }
 
@@ -53,7 +53,7 @@ export function formatParams(data: INodeData): {
     taskParams.programType = data.programType
     taskParams.mainClass = data.mainClass
     if (data.mainJar) {
-      taskParams.mainJar = { id: data.mainJar }
+      taskParams.mainJar = { resourceName: data.mainJar }
     }
     taskParams.deployMode = data.deployMode
     taskParams.appName = data.appName
@@ -531,7 +531,7 @@ export function formatModel(data: ITaskData) {
     )
   }
   if (data.taskParams?.mainJar) {
-    params.mainJar = data.taskParams?.mainJar.id
+    params.mainJar = data.taskParams?.mainJar.resourceName
   }
 
   if (data.taskParams?.method) {

@@ -63,8 +63,8 @@ export function useTable() {
     row: {},
     tableData: [],
     breadList: [],
-    fileId: ref(router.currentRoute.value.query.prefix || ""),
-    tenantCode: ref(router.currentRoute.value.query.tenantCode || ""),
+    fileId: ref(String(router.currentRoute.value.query.prefix) || ""),
+    tenantCode: ref(String(router.currentRoute.value.query.tenantCode) || ""),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
@@ -188,7 +188,7 @@ export function useTable() {
                         size: 'tiny',
                         class: 'btn-download',
                         disabled: row?.directory ? true : false,
-                        onClick: () => downloadResource(row.id)
+                        onClick: () => downloadResource(row.id, {fullName: row.fullName})
                       },
                       {
                         icon: () => h(DownloadOutlined)
@@ -245,11 +245,6 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
-//         const breadList =
-//           variables.fileId == ""
-// //           variables.fileId === ""
-//             ? []
-//             : (fileStore.getCurrentDir.split('/') as Array<never>)
         if (variables.fileId != ""){
             const id = -1
             queryCurrentResourceById(
@@ -263,7 +258,7 @@ export function useTable() {
             ).then((res: ResourceFile) => {
                 if (res.fileName) {
                   const breadList = res.fileName.split('/') as Array<never>
-                  breadList.pop(-1)
+                  breadList.shift()
                   variables.breadList = breadList
                 }
             })
@@ -286,7 +281,7 @@ export function useTable() {
     variables.row = row
   }
 
-  const handleDelete = (id: number, fullNameObj: FullNameReq & TenantCodeReq) => {
+  const handleDelete = (id: number, fullNameObj: {fullName: string, tenantCode: string}) => {
     /* after deleting data from the current page, you need to jump forward when the page is empty. */
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1

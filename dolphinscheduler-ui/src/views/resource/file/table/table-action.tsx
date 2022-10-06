@@ -28,7 +28,6 @@ import {
 import _ from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { ResourceFileTableData, IRenameFile, IRtDisb } from '../types'
-import { FullNameReq } from '@/service/modules/resources/types.ts'
 import { fileTypeArr } from '@/common/common'
 import { downloadResource, deleteResource } from '@/service/modules/resources'
 import type { Router } from 'vue-router'
@@ -68,11 +67,11 @@ export default defineComponent({
       router.push({ name: 'resource-file-edit', params: { id: item.id }, query: {prefix: item.fullName, tenantCode: item.user_name} })
     }
 
-    const handleDeleteFile = (id: number, fullNameObj: FullNameReq & TenantCodeReq) => {
+    const handleDeleteFile = (id: number, fullNameObj: {fullName: string, tenantCode: string}) => {
       deleteResource(id, fullNameObj).then(() => emit('updateList'))
     }
 
-    const handleRenameFile: IRenameFile = (id, name, description, fullName, user_name) => {
+    const handleRenameFile: IRenameFile = (id: number, name: string, description: string, fullName: string, user_name: string) => {
       emit('renameResource', id, name, description, fullName, user_name)
     }
 
@@ -99,7 +98,7 @@ export default defineComponent({
                 disabled={this.rtDisb(this.row.name, this.row.size)}
                 tag='div'
                 onClick={() => {
-                  this.handleEditFile(this.row)
+                  this.handleEditFile({id:this.row.id, fullName:this.row.fullName, user_name:this.row.user_name})
                 }}
                 style={{ marginRight: '-5px' }}
                 circle

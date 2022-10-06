@@ -1751,7 +1751,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             List<StorageEntity> transformedResourceList = resourceList.stream()
                     .map(resource -> new StorageEntity.Builder()
                             .fullName(resource.getFullName())
-                            .pfullName(resourcesMapper.selectById(resource.getPid()).getFullName())
+                            .pfullName(resource.getPid() == -1 ?
+                                    "" : resourcesMapper.selectById(resource.getPid()).getFullName())
                             .isDirectory(resource.isDirectory())
                             .alias(resource.getAlias())
                             .id(resource.getId())

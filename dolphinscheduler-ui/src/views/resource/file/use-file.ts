@@ -70,7 +70,7 @@ export function useFileState(
     return state
   }
 
-  const getResourceView = (fullName: string, tenantCode: string, id: string) => {
+  const getResourceView = (fullName: string, tenantCode: string, id: number) => {
     const params = {
       skipLineNum: 0,
       limit: 3000,

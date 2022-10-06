@@ -91,7 +91,9 @@ interface ISwitchResult {
 }
 
 interface ISourceItem {
-  id: number
+  id?: number,
+  resourceName: string,
+  res?: string
 }
 
 interface ISqoopTargetData {
@@ -424,8 +426,8 @@ interface INodeData
   preTasks?: number[]
   preTaskOptions?: []
   postTaskOptions?: []
-  resourceList?: number[]
-  mainJar?: number
+  resourceList?: string[]
+  mainJar?: string
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string
