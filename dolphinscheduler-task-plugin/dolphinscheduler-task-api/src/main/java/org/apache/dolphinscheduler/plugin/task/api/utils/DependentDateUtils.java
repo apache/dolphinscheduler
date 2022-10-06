@@ -134,7 +134,7 @@ public class DependentDateUtils {
      * @return DateInterval list
      */
     public static List<DateInterval> getNeededMonthBeginInterval(Date businessDate,
-                                                               boolean isBeginDay,
+                                                                 boolean isBeginDay,
                                                                  int neededMonth) {
 
         Date firstDayThisMonth = DateUtils.getFirstDayOfMonth(businessDate);
