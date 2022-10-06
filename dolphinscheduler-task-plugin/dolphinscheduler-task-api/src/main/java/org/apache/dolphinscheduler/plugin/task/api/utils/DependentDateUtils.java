@@ -128,35 +128,17 @@ public class DependentDateUtils {
     }
 
     /**
-     * get interval on first/last day of the last month
+     * get interval on first/last day of the needed month
      * @param businessDate businessDate
      * @param isBeginDay isBeginDay
      * @return DateInterval list
      */
-    public static List<DateInterval> getLastMonthBeginInterval(Date businessDate,
-                                                               boolean isBeginDay) {
+    public static List<DateInterval> getNeededMonthBeginInterval(Date businessDate,
+                                                               boolean isBeginDay,
+                                                                 int neededMonth) {
 
         Date firstDayThisMonth = DateUtils.getFirstDayOfMonth(businessDate);
-        Date lastDay = DateUtils.getSomeDay(firstDayThisMonth, -1);
-        Date firstDay = DateUtils.getFirstDayOfMonth(lastDay);
-        if (isBeginDay) {
-            return getDateIntervalListBetweenTwoDates(firstDay, firstDay);
-        } else {
-            return getDateIntervalListBetweenTwoDates(lastDay, lastDay);
-        }
-    }
-
-    /**
-     * get interval on first/last day of the current month
-     * @param businessDate businessDate
-     * @param isBeginDay isBeginDay
-     * @return DateInterval list
-     */
-    public static List<DateInterval> getThisMonthBeginInterval(Date businessDate,
-                                                               boolean isBeginDay) {
-
-        Date firstDayThisMonth = DateUtils.getFirstDayOfMonth(businessDate);
-        Date lastDay = DateUtils.getSomeDay(firstDayThisMonth, 0);
+        Date lastDay = DateUtils.getSomeDay(firstDayThisMonth, neededMonth);
         Date firstDay = DateUtils.getFirstDayOfMonth(lastDay);
         if (isBeginDay) {
             return getDateIntervalListBetweenTwoDates(firstDay, firstDay);
