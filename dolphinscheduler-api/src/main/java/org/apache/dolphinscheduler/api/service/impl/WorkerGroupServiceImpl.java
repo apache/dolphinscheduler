@@ -360,7 +360,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     public List<String> getAllWorkerGroupNames() {
-        List<WorkerGroup> workerGroups = getWorkerGroups(false, null);
+        List<WorkerGroup> workerGroups = getWorkerGroups( null);
         List<String> availableWorkerGroupList = workerGroups.stream()
             .map(WorkerGroup::getName)
             .collect(Collectors.toList());

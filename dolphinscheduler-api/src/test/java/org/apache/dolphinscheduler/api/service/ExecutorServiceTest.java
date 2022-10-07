@@ -123,6 +123,9 @@ public class ExecutorServiceTest {
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
 
+    @Mock
+    private WorkerGroupService workerGroupService;
+
     private int processDefinitionId = 1;
 
     private long processDefinitionCode = 1L;
@@ -172,6 +175,7 @@ public class ExecutorServiceTest {
         processInstance.setTenantId(tenantId);
         processInstance.setProcessDefinitionVersion(1);
         processInstance.setProcessDefinitionCode(1L);
+        processInstance.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
 
         // project
         project.setCode(projectCode);
@@ -403,9 +407,18 @@ public class ExecutorServiceTest {
         Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
+        List<String> workerGroups = new ArrayList<>();
+        workerGroups.add(Constants.DEFAULT_WORKER_GROUP);
+        Mockito.when(workerGroupService.getAllWorkerGroupNames()).thenReturn(workerGroups);
         Map<String, Object> result =
                 executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        workerGroups.clear();
+        Mockito.when(workerGroupService.getAllWorkerGroupNames()).thenReturn(workerGroups);
+        result =
+            executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
+        Assert.assertEquals(Status.WORKER_GROUP_NOT_EXISTS_PROCESSING, result.get(Constants.STATUS));
     }
 
     @Test
@@ -413,6 +426,9 @@ public class ExecutorServiceTest {
         Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
+        List<String> workerGroups = new ArrayList<>();
+        workerGroups.add(Constants.DEFAULT_WORKER_GROUP);
+        Mockito.when(workerGroupService.getAllWorkerGroupNames()).thenReturn(workerGroups);
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
