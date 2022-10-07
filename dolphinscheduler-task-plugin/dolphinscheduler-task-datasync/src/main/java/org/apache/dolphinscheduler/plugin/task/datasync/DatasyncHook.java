@@ -190,7 +190,7 @@ public class DatasyncHook {
         return false;
     }
 
-    public Boolean doubleCheckFinishStatus(TaskExecutionStatus exceptStatus, TaskExecutionStatus[] stopStatus) {
+    public Boolean doubleCheckFinishStatus(TaskExecutionStatus expectStatus, TaskExecutionStatus[] stopStatus) throws InterruptedException {
 
         List<TaskExecutionStatus> stopStatusSet = Arrays.asList(stopStatus);
         while (true) {
@@ -200,17 +200,14 @@ public class DatasyncHook {
                 continue;
             }
 
-            if (exceptStatus.equals(status)) {
-                logger.info("double check success");
+            if (expectStatus.equals(status)) {
+                logger.info("double check finish status success");
                 return true;
             } else if (stopStatusSet.contains(status)) {
                 break;
             }
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            logger.debug("wait 10s to recheck finish status....");
+            Thread.sleep(10000);
         }
         logger.warn("double check error");
         return false;

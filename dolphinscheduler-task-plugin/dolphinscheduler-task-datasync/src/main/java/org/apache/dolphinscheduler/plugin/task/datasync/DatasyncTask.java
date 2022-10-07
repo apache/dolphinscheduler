@@ -112,7 +112,12 @@ public class DatasyncTask extends AbstractRemoteTask {
     @Override
     public void trackApplicationStatus() throws TaskException {
         checkApplicationId();
-        Boolean isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
+        Boolean isFinishedSuccessfully = null;
+        try {
+            isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         if (!isFinishedSuccessfully) {
             exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
         } else {
