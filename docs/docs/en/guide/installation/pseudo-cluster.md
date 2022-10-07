@@ -37,6 +37,7 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 # Modify directory permissions and grant permissions for user you created above
 chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
+chmod -R 755 apache-dolphinscheduler-*-bin
 ```
 
 > **_NOTICE:_**

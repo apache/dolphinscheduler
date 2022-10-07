@@ -37,6 +37,7 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 # 修改目录权限，使得部署用户对二进制包解压后的 apache-dolphinscheduler-*-bin 目录有操作权限
 chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
+chmod -R 755 apache-dolphinscheduler-*-bin
 ```
 
 > **_注意:_**

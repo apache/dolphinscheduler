@@ -23,6 +23,7 @@ There is a standalone startup script in the binary compressed package, which can
 ```shell
 # Extract and start Standalone Server
 tar -xvzf apache-dolphinscheduler-*-bin.tar.gz
+chmod -R 755 apache-dolphinscheduler-*-bin
 cd apache-dolphinscheduler-*-bin
 bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 ```
