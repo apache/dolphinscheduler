@@ -15,28 +15,29 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { NTabPane, NTabs } from 'naive-ui'
-import BatchTaskInstance from './batch-task'
-import StreamTaskInstance from './stream-task'
+import type { Component } from 'vue'
+import utils from '@/utils'
 
+// All TSX files under the views folder automatically generate mapping relationship
+const modules = import.meta.glob('/src/views/**/**.tsx')
+const components: { [key: string]: Component } = utils.mapping(modules)
 
-const TaskDefinition = defineComponent({
-  name: 'task-instance',
-  setup() {
-    const { t } = useI18n()
-    return () => (
-      <NTabs type='line' animated>
-        <NTabPane name='Batch' tab={t('project.task.batch_task')}>
-          <BatchTaskInstance />
-        </NTabPane>
-        <NTabPane name='Stream' tab={t('project.task.stream_task')}>
-          <StreamTaskInstance />
-        </NTabPane>
-      </NTabs>
-    )
-  }
-})
-
-export default TaskDefinition
+export default {
+  path: '/ui-setting',
+  name: 'ui-setting',
+  meta: { title: '设置' },
+  component: () => import('@/layouts/content'),
+  children: [
+    {
+      path: '',
+      name: 'ui-setting',
+      component: components['ui-setting'],
+      meta: {
+        title: '设置',
+        activeMenu: 'ui-setting',
+        showSide: false,
+        auth: []
+      }
+    }
+  ]
+}
