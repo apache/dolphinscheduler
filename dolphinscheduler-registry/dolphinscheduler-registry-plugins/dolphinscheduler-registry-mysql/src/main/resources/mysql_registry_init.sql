@@ -22,7 +22,7 @@ CREATE TABLE `t_ds_mysql_registry_data`
 (
     `id`               bigint(11)   NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `key`              varchar(200) NOT NULL COMMENT 'key, like zookeeper node path',
-    `data`             varchar(200) NOT NULL COMMENT 'data, like zookeeper node value',
+    `data`             text         NOT NULL COMMENT 'data, like zookeeper node value',
     `type`             tinyint(4)   NOT NULL COMMENT '1: ephemeral node, 2: persistent node',
     `last_update_time` timestamp    NULL COMMENT 'last update time',
     `create_time`      timestamp    NULL COMMENT 'create time',
