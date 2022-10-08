@@ -22,6 +22,7 @@ export default {
   datasource: '数据源中心',
   monitor: '监控中心',
   security: '安全中心',
+  ui_setting: '界面设置',
   project_overview: '项目概览',
   workflow_relation: '工作流关系',
   workflow: '工作流',

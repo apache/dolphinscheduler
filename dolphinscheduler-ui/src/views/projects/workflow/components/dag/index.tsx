@@ -54,6 +54,7 @@ import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
 import utils from '@/utils'
+import { useLogTimerStore } from '@/store/logTimer/logTimer'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -83,6 +84,9 @@ export default defineComponent({
     const { t } = useI18n()
     const route = useRoute()
     const theme = useThemeStore()
+
+    const logTimerStore = useLogTimerStore()
+    const logTimer = logTimerStore.getLogTimer
 
     // Whether the graph can be operated
     provide('readonly', toRef(props, 'readonly'))
@@ -233,23 +237,37 @@ export default defineComponent({
     const handleViewLog = (taskId: number, taskType: string) => {
       taskModalVisible.value = false
       viewLog(taskId, taskType)
-      getLogs()
+
+      getLogs(logTimer)
     }
 
-    const getLogs = () => {
+    var getLogsID: number
+
+    const getLogs = (logTimer: number) => {
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: nodeVariables.logTaskId,
           limit: nodeVariables.limit,
           skipLineNum: nodeVariables.skipLineNum
         }).then((res: any) => {
-          if (res.message) {
-            nodeVariables.logRef += res.message
+
+          nodeVariables.logRef += res.message || ''
+          if (res && res.message !== '') {
             nodeVariables.limit += 1000
             nodeVariables.skipLineNum += res.lineNum
-            getLogs()
+            getLogs(logTimer)
           } else {
             nodeVariables.logLoadingRef = false
+            if (logTimer !== 0) {
+              if (typeof getLogsID === 'number') {
+                clearTimeout(getLogsID)
+              }
+              getLogsID = setTimeout(() => {
+                nodeVariables.limit += 1000
+                nodeVariables.skipLineNum += 1000
+                getLogs(logTimer)
+              }, logTimer * 1000)
+            }
           }
         }),
         {}
@@ -258,11 +276,11 @@ export default defineComponent({
       return state
     }
 
-    const refreshLogs = () => {
+    const refreshLogs = (logTimer: number) => {
       nodeVariables.logRef = ''
       nodeVariables.limit = 1000
       nodeVariables.skipLineNum = 0
-      getLogs()
+      getLogs(logTimer)
     }
 
     const downloadLogs = () => {

@@ -33,6 +33,7 @@ const Timezone = defineComponent({
     }
   },
   setup(props) {
+    // console.log(prosp.timezoneOptions);
     const { t } = useI18n()
     const reload: any = inject('reload')
     const timezoneStore = useTimezoneStore()
