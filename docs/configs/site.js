@@ -45,11 +45,16 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.0.0)',
+            text: 'latest(3.1.1)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
+            text: '3.0.1',
+            link: '/en-us/docs/3.0.1/user_doc/about/introduction.html',
+          },
+          {
+            key: 'docs2',
             text: '2.0.6',
             link: '/en-us/docs/2.0.6/user_doc/guide/quick-start.html',
           },
