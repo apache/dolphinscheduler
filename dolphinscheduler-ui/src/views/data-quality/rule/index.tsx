@@ -20,7 +20,8 @@ import {
   getCurrentInstance,
   onMounted,
   ref,
-  toRefs
+  toRefs,
+  withKeys
 } from 'vue'
 import {
   NSpace,
@@ -120,6 +121,7 @@ const TaskResult = defineComponent({
               v-model={[this.searchVal, 'value']}
               size='small'
               placeholder={t('data_quality.rule.name')}
+              onKeydown={withKeys(onSearch,["enter"])}
               clearable
             />
             <NButton size='small' type='primary' onClick={onSearch}>

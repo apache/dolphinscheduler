@@ -21,7 +21,8 @@ import {
   onMounted,
   ref,
   toRefs,
-  watch
+  watch,
+  withKeys
 } from 'vue'
 import {
   NButton,
@@ -126,6 +127,7 @@ const list = defineComponent({
                 v-model={[this.searchVal, 'value']}
                 size='small'
                 placeholder={`${t('datasource.search_input_tips')}`}
+                onKeydown={withKeys(onUpdatedList,["enter"])}
               />
               <NButton type='primary' size='small' onClick={onUpdatedList}>
                 <NIcon>

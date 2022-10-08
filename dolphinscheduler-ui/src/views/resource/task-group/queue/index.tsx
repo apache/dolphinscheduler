@@ -21,7 +21,8 @@ import {
   toRefs,
   reactive,
   onMounted,
-  getCurrentInstance
+  getCurrentInstance,
+  withKeys
 } from 'vue'
 import {
   NButton,
@@ -183,12 +184,14 @@ const taskGroupQueue = defineComponent({
               placeholder={t(
                 'resource.task_group_queue.workflow_instance_name'
               )}
+              onKeydown={withKeys(onSearch,['enter'])}
             ></NInput>
             <NInput
               allowInput={this.trim}
               size='small'
               v-model={[this.searchParamRef.instanceName, 'value']}
               placeholder={t('resource.task_group_queue.task_instance_name')}
+              onKeydown={withKeys(onSearch,['enter'])}
             ></NInput>
             <NButton size='small' type='primary' onClick={onSearch}>
               <NIcon>

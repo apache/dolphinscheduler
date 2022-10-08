@@ -21,7 +21,8 @@ import {
   toRefs,
   reactive,
   onMounted,
-  getCurrentInstance
+  getCurrentInstance,
+  withKeys
 } from 'vue'
 import {
   NButton,
@@ -170,6 +171,7 @@ const taskGroupOption = defineComponent({
                 placeholder={t(
                   'resource.task_group_option.please_enter_keywords'
                 )}
+                onKeydown={withKeys(this.onSearch, ['enter'])}
               ></NInput>
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>

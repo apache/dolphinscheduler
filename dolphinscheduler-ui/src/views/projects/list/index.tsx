@@ -29,7 +29,8 @@ import {
   getCurrentInstance,
   onMounted,
   toRefs,
-  watch
+  watch,
+  withKeys
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
@@ -117,6 +118,7 @@ const list = defineComponent({
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('project.list.project_tips')}
+                onKeydown={withKeys(this.handleSearch,["enter"])}
                 clearable
               />
               <NButton size='small' type='primary' onClick={this.handleSearch}>

@@ -20,7 +20,8 @@ import {
   getCurrentInstance,
   onMounted,
   toRefs,
-  watch
+  watch,
+  withKeys
 } from 'vue'
 import {
   NButton,
@@ -123,6 +124,7 @@ const k8sNamespaceManage = defineComponent({
                 clearable
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('security.k8s_namespace.search_tips')}
+                onKeydown={withKeys(onSearch, ['enter'])}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>

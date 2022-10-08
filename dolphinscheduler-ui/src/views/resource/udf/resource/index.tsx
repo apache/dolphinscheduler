@@ -22,7 +22,8 @@ import {
   onMounted,
   toRef,
   watch,
-  getCurrentInstance
+  getCurrentInstance,
+  withKeys
 } from 'vue'
 import {
   NIcon,
@@ -151,6 +152,7 @@ export default defineComponent({
                 size='small'
                 placeholder={t('resource.udf.enter_keyword_tips')}
                 v-model={[this.searchVal, 'value']}
+                onKeydown={withKeys(this.handleSearch, ['enter'])}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>

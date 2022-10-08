@@ -21,7 +21,8 @@ import {
   onMounted,
   ref,
   toRefs,
-  watch
+  watch,
+  withKeys
 } from 'vue'
 import {
   NButton,
@@ -136,6 +137,7 @@ const AlarmInstanceManage = defineComponent({
                     placeholder={`${t(
                       'security.alarm_instance.search_input_tips'
                     )}`}
+                    onKeydown={withKeys(onUpdatedList, ['enter'])}
                   />
                   <NButton type='primary' size='small' onClick={onUpdatedList}>
                     <NIcon>

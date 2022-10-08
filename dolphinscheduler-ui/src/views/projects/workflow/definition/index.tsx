@@ -31,7 +31,8 @@ import {
   getCurrentInstance,
   onMounted,
   toRefs,
-  watch
+  watch,
+  withKeys
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
@@ -149,6 +150,7 @@ export default defineComponent({
                 size='small'
                 placeholder={t('resource.function.enter_keyword_tips')}
                 v-model={[this.searchVal, 'value']}
+                onKeydown={withKeys(this.handleSearch, ['enter'])}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>
