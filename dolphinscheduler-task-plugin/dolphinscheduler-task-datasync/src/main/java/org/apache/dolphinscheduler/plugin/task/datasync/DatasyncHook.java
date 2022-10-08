@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
@@ -190,7 +191,8 @@ public class DatasyncHook {
         return false;
     }
 
-    public Boolean doubleCheckFinishStatus(TaskExecutionStatus expectStatus, TaskExecutionStatus[] stopStatus) throws InterruptedException {
+    @SneakyThrows
+    public Boolean doubleCheckFinishStatus(TaskExecutionStatus expectStatus, TaskExecutionStatus[] stopStatus) {
 
         List<TaskExecutionStatus> stopStatusSet = Arrays.asList(stopStatus);
         while (true) {

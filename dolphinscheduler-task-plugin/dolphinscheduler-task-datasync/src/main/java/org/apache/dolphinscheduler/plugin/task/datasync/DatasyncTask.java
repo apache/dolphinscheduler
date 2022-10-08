@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.datasync;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -39,11 +40,11 @@ import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_G
 public class DatasyncTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
-            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            JsonMapper.builder().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
                     .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
                     .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+                    .propertyNamingStrategy(new PropertyNamingStrategies.UpperCamelCaseStrategy()).build();
 
     private final TaskExecutionContext taskExecutionContext;
     private DatasyncParameters parameters;
@@ -76,10 +77,11 @@ public class DatasyncTask extends AbstractRemoteTask {
         if (parameters.isJsonFormat() && StringUtils.isNotEmpty(parameters.getJson())) {
             try {
                 parameters = objectMapper.readValue(parameters.getJson(), DatasyncParameters.class);
-                logger.info("Datasync convert task params {}", parameters);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
+            //parameters = JSONUtils.parseObject(parameters.getJson(), DatasyncParameters.class);
+                logger.info("Datasync convert task params {}", parameters);
         }
     }
 
@@ -113,11 +115,7 @@ public class DatasyncTask extends AbstractRemoteTask {
     public void trackApplicationStatus() throws TaskException {
         checkApplicationId();
         Boolean isFinishedSuccessfully = null;
-        try {
-            isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        isFinishedSuccessfully = hook.doubleCheckFinishStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus);
         if (!isFinishedSuccessfully) {
             exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
         } else {
