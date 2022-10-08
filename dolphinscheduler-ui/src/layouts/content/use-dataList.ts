@@ -88,7 +88,6 @@ export function useDataList() {
   })
 
   const changeMenuOption = (state: any) => {
-    console.log('state', state);
     const projectCode = route.params.projectCode || ''
     state.menuOptions = [
       {

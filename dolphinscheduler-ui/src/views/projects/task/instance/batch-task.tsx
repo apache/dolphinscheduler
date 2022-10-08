@@ -86,7 +86,6 @@ const BatchTaskInstance = defineComponent({
           limit: variables.limit,
           skipLineNum: variables.skipLineNum
         }).then((res: any) => {
-          console.log('hi', res.message);
           variables.logRef += res.message || ''
           if (res && res.message !== '') {
             variables.limit += 1000
