@@ -320,8 +320,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         for (ProcessInstance processInstance : processInstances) {
-            processInstance.setDuration(
-                    DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));
+            // if processInstance is running, the val of duration should be current time - last start time
+            // if finished, the val of duration should be end time - start time
+            String duration = isFinish(processInstance) ?
+                    DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()) :
+                    DateUtils.format2Duration(processInstance.getStartTime(), new Date());
+            processInstance.setDuration(duration);
             User executor = idToUserMap.get(processInstance.getExecutorId());
             if (null != executor) {
                 processInstance.setExecutorName(executor.getUserName());
@@ -333,6 +337,19 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * check if the processInstance is finish
+     * @param processInstance processInstance
+     * @return result
+     */
+    private boolean isFinish(ProcessInstance processInstance){
+        if (processInstance.getState() == null) {
+            return false;
+        }
+        return !processInstance.getState().equals(WorkflowExecutionStatus.RUNNING_EXECUTION)
+            && !processInstance.getState().equals(WorkflowExecutionStatus.SERIAL_WAIT);
     }
 
     /**

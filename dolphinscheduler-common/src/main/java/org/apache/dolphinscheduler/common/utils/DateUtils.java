@@ -353,6 +353,9 @@ public final class DateUtils {
         if (end == null) {
             end = new Date();
         }
+        if (start.after(end)) {
+            return null;
+        }
         return format2Duration(differMs(start, end));
     }
 
