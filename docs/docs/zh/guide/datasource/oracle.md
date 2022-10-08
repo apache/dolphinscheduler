@@ -1,4 +1,6 @@
-![image](https://user-images.githubusercontent.com/48941586/193031878-d7c35140-fe12-4d45-a0b9-a70dc018d25f.png)
+# Oracle数据源
+
+![oracle-choose-schema](../../../../img/new_ui/dev/datasource/oracle-choose-schema.png)
 
 - 数据源：选择 ORACLE
 - 数据源名称：输入数据源的名称
