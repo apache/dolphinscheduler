@@ -20,7 +20,8 @@ import {
   getCurrentInstance,
   onMounted,
   toRefs,
-  watch
+  watch,
+  withKeys
 } from 'vue'
 import {
   NButton,
@@ -128,6 +129,7 @@ const workerGroupManage = defineComponent({
                 clearable
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('security.worker_group.search_tips')}
+                onKeydown={withKeys(onSearch, ['enter'])}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>

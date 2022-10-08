@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, toRefs } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  toRefs,
+  withKeys
+} from 'vue'
 import {
   NButton,
   NInput,
@@ -83,6 +88,7 @@ const UsersManage = defineComponent({
                 allowInput={this.trim}
                 v-model:value={this.searchVal}
                 size='small'
+                onKeydown={withKeys(this.onUpdatedList, ['enter'])}
                 clearable
               />
               <NButton type='primary' size='small' onClick={this.onUpdatedList}>

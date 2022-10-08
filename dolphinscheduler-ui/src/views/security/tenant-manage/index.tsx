@@ -20,7 +20,8 @@ import {
   toRefs,
   onMounted,
   watch,
-  getCurrentInstance
+  getCurrentInstance,
+  withKeys
 } from 'vue'
 import {
   NButton,
@@ -117,6 +118,7 @@ const tenementManage = defineComponent({
                 size='small'
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('security.tenant.search_tips')}
+                onKeydown={withKeys(this.handleSearch,['enter'])}
                 clearable
               />
               <NButton size='small' type='primary' onClick={this.handleSearch}>

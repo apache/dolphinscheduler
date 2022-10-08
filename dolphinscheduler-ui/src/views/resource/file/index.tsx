@@ -22,7 +22,8 @@ import {
   ref,
   reactive,
   Ref,
-  getCurrentInstance
+  getCurrentInstance,
+  withKeys
 } from 'vue'
 import {
   NIcon,
@@ -290,6 +291,7 @@ export default defineComponent({
                 allowInput={this.trim}
                 placeholder={t('resource.file.enter_keyword_tips')}
                 v-model={[this.searchRef, 'value']}
+                onKeydown={withKeys(handleConditions,['enter'])}
               />
               <NButton size='small' type='primary' onClick={handleConditions}>
                 <NIcon>
