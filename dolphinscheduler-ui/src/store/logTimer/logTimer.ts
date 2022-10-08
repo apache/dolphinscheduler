@@ -16,7 +16,7 @@
  */
 
 import { defineStore } from 'pinia'
-import { LogTimerStore, logTimer } from './types'
+import { LogTimerStore } from './types'
 
 export const useLogTimerStore = defineStore({
   id: 'logTimer',
@@ -25,12 +25,12 @@ export const useLogTimerStore = defineStore({
   }),
   persist: true,
   getters: {
-    getLogTimer(): logTimer {
+    getLogTimer(): number {
       return this.logTimer
     }
   },
   actions: {
-    setLogTimer(timer: logTimer): void {
+    setLogTimer(timer: number): void {
       this.logTimer = timer
     }
   }
