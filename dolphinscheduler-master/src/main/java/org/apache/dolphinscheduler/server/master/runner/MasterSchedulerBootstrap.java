@@ -136,12 +136,14 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
                     // the current server is not at running status, cannot consume command.
+                    logger.warn("The current server {} is not at running status, cannot consumes commands.", this.masterAddress);
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 boolean isOverload =
                         OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
                 if (isOverload) {
+                    logger.warn("The current server {} is overload, cannot consumes commands.", this.masterAddress);
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
