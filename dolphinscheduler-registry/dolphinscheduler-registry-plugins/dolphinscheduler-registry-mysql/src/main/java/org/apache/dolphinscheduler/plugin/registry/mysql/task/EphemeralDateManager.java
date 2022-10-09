@@ -148,6 +148,7 @@ public class EphemeralDateManager implements AutoCloseable {
                 mysqlOperator.clearExpireEphemeralDate();
                 return ConnectionState.CONNECTED;
             } catch (Exception ex) {
+                LOGGER.error("Get connection state error, meet an unknown exception", ex);
                 return ConnectionState.DISCONNECTED;
             }
         }
