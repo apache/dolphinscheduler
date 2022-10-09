@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,9 +29,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FavTaskDto implements Cloneable {
 
+    @TableField("taskType")
     private String taskName;
     private boolean isCollection;
-    private String taskType;
+    @TableField(exist = false)
+    private String taskType;//task category the task type belongs to
 
     @Override
     public boolean equals(Object obj) {

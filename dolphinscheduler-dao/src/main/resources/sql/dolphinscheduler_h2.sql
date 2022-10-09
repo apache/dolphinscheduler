@@ -2009,7 +2009,7 @@ DROP TABLE IF EXISTS t_ds_fav_task CASCADE;
 CREATE TABLE t_ds_fav_task
 (
     id        bigint(20) NOT NULL AUTO_INCREMENT,
-    task_name varchar(64) NOT NULL,
+    task_type varchar(64) NOT NULL,
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );
