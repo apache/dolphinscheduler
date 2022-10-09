@@ -53,7 +53,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .dryRun(Constants.DRY_RUN_FLAG_YES)
                 .taskInstanceId(0)
                 .processDefineId(0)
-                .firstSubmitTime(new Date())
+                .firstSubmitTime(System.currentTimeMillis())
                 .taskLogName("TestLogName")
                 .build();
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
@@ -77,7 +77,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .testFlag(Constants.TEST_FLAG_YES)
                 .taskInstanceId(0)
                 .processDefineId(0)
-                .firstSubmitTime(new Date())
+                .firstSubmitTime(System.currentTimeMillis())
                 .taskLogName("TestLogName")
                 .taskType("SQL")
                 .taskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"POSTGRESQL\",\"datasource\":null,\"sql\":\"select * from t_ds_user\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}")

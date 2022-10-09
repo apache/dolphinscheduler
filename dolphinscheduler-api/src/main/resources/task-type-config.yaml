@@ -32,6 +32,7 @@ task:
   cloud:
     - 'EMR'
     - 'K8S'
+    - 'DMS'
   logic:
     - 'SUB_PROCESS'
     - 'DEPENDENT'
@@ -54,3 +55,4 @@ task:
     - 'PIGEON'
     - 'ZEPPELIN'
     - 'CHUNJUN'
+    - 'DATASYNC'

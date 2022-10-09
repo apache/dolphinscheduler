@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -24,7 +25,6 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.sql.Connection;
 import java.util.Map;
@@ -39,18 +39,19 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
 public class DataSourceClientProvider {
+
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
     private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(duration, TimeUnit.HOURS)
-        .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
-            try (DataSourceClient closedClient = notification.getValue()) {
-                logger.info("Datasource: {} is removed from cache due to expire", notification.getKey());
-            }
-        })
-        .maximumSize(100)
-        .build();
+            .expireAfterWrite(duration, TimeUnit.HOURS)
+            .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
+                try (DataSourceClient closedClient = notification.getValue()) {
+                    logger.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                }
+            })
+            .maximumSize(100)
+            .build();
     private DataSourcePluginManager dataSourcePluginManager;
 
     private DataSourceClientProvider() {
@@ -58,6 +59,7 @@ public class DataSourceClientProvider {
     }
 
     private static class DataSourceClientProviderHolder {
+
         private static final DataSourceClientProvider INSTANCE = new DataSourceClientProvider();
     }
 
