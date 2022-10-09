@@ -47,6 +47,7 @@ export type TaskType =
   | 'PYTORCH'
   | 'HIVECLI'
   | 'DMS'
+  | 'DATASYNC'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -164,6 +165,10 @@ export const TASK_TYPES_MAP = {
   },
   DMS: {
     alias: 'DMS',
+    helperLinkDisable: true
+  },
+  DATASYNC: {
+    alias: 'DATASYNC',
     helperLinkDisable: true
   }
 } as {

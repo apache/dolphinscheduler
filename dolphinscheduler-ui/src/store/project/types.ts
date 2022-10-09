@@ -53,6 +53,7 @@ type TaskType =
   | 'PYTORCH'
   | 'HIVECLI'
   | 'DMS'
+  | 'DATASYNC'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type DependentResultType = {
