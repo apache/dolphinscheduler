@@ -60,13 +60,13 @@ public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskServic
     }
 
     @Override
-    public boolean deleteFavTask(User loginUser, String taskName) {
-        return favMapper.deleteUserFavTask(loginUser.getId(), taskName);
+    public boolean deleteFavTask(User loginUser, String taskType) {
+        return favMapper.deleteUserFavTask(loginUser.getId(), taskType);
     }
 
     @Override
-    public int addFavTask(User loginUser, String taskName) {
-        favMapper.deleteUserFavTask(loginUser.getId(), taskName);
-        return favMapper.insert(new FavTask(null, taskName, loginUser.getId()));
+    public int addFavTask(User loginUser, String taskType) {
+        favMapper.deleteUserFavTask(loginUser.getId(), taskType);
+        return favMapper.insert(new FavTask(null, taskType, loginUser.getId()));
     }
 }

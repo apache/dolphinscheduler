@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,8 @@ public class FavTask {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+    //task type name
+    @TableField("task_type")
     private String taskName;
     private int userId;
 
