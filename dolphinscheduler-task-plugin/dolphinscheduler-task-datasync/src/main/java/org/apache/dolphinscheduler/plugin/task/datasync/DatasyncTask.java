@@ -17,26 +17,31 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 
 import java.util.Collections;
 import java.util.List;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
-import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import lombok.Setter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+
+@Setter
 public class DatasyncTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
@@ -80,8 +85,8 @@ public class DatasyncTask extends AbstractRemoteTask {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-            //parameters = JSONUtils.parseObject(parameters.getJson(), DatasyncParameters.class);
-                logger.info("Datasync convert task params {}", parameters);
+            // parameters = JSONUtils.parseObject(parameters.getJson(), DatasyncParameters.class);
+            logger.info("Datasync convert task params {}", parameters);
         }
     }
 
@@ -90,18 +95,18 @@ public class DatasyncTask extends AbstractRemoteTask {
         try {
             int exitStatusCode = checkCreateTask();
             if (exitStatusCode == TaskConstants.EXIT_CODE_FAILURE) {
-                //if create task failure go end
+                // if create task failure go end
                 setExitStatusCode(exitStatusCode);
                 return;
             }
-            //start task
+            // start task
             exitStatusCode = startDatasyncTask();
             setExitStatusCode(exitStatusCode);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("datasync task error", e);
         }
-        //set taskExecArn to the appIds if start success
+        // set taskExecArn to the appIds if start success
         setAppIds(hook.getTaskExecArn());
     }
 
