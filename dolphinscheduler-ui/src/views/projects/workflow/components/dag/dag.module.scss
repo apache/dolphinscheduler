@@ -195,6 +195,9 @@ $bgLight: #ffffff;
     &.icon-dms {
       background-image: url('/images/task-icons/dms.png');
     }
+    &.icon-datasync {
+      background-image: url('/images/task-icons/datasync_hover.png');
+    }
   }
 
   &:hover {
@@ -292,6 +295,9 @@ $bgLight: #ffffff;
       }
       &.icon-dms {
         background-image: url('/images/task-icons/dms_hover.png');
+      }
+      &.icon-datasync {
+        background-image: url('/images/task-icons/datasync.png');
       }
     }
   }

@@ -446,6 +446,15 @@ export function formatParams(data: INodeData): {
     taskParams.replicationTaskArn = data.replicationTaskArn
   }
 
+  if (data.taskType === 'DATASYNC') {
+    taskParams.jsonFormat = data.jsonFormat
+    taskParams.json = data.json
+    taskParams.destinationLocationArn = data.destinationLocationArn
+    taskParams.sourceLocationArn = data.sourceLocationArn
+    taskParams.name = data.name
+    taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
+  }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {

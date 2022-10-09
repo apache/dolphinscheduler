@@ -383,6 +383,11 @@ interface ITaskParams {
   replicationInstanceArn?: string
   tableMappings?: string
   replicationTaskArn?: string
+  jsonFormat?: boolean
+  destinationLocationArn?: string
+  sourceLocationArn?: string
+  name?: string
+  cloudWatchLogGroupArn?: string
 }
 
 interface INodeData
