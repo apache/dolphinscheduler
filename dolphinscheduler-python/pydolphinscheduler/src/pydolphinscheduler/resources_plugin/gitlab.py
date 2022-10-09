@@ -17,7 +17,7 @@
 
 """DolphinScheduler gitlab resource plugin."""
 from typing import Optional
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import gitlab
 import requests
@@ -54,25 +54,16 @@ class GitLab(ResourcePlugin, Git):
 
     def get_git_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
-        elements = path.split("/")
         self.get_index(path, "/", 8)
-        for i in range(0, len(elements)):
-            if (
-                i + 3 < len(elements)
-                and elements[i + 1] == "-"
-                and elements[i + 2] == "blob"
-            ):
-                host_end = self.get_index(path, "/", 3)
-                self._git_file_info = GitLabFileInfo(
-                    host=path[0:host_end],
-                    repo_name=elements[i],
-                    branch=elements[i + 3],
-                    file_path="/".join(
-                        str(elements[j]) for j in range(i + 4, len(elements))
-                    ),
-                    user="/".join(str(elements[j]) for j in range(3, i)),
-                )
-                break
+        result = urlparse(path)
+        elements = result.path.split("/")
+        self._git_file_info = GitLabFileInfo(
+            host=result.scheme + "://" + result.hostname,
+            repo_name=elements[2],
+            branch=elements[5],
+            file_path="/".join(str(elements[i]) for i in range(6, len(elements))),
+            user=elements[1],
+        )
 
     def authentication(self):
         """Gitlab authentication."""
