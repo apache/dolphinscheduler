@@ -44,17 +44,6 @@ public class RpcTest {
         userService = rpcClient.create(IUserService.class, host);
     }
 
-    @Test
-    public void sendTest() {
-        Integer result = userService.hi(3);
-        Assert.assertSame(4, result);
-        result = userService.hi(4);
-        Assert.assertSame(5, result);
-        userService.say("sync");
-        userService.callBackIsFalse("async no call back");
-        userService.hi(999999);
-    }
-
     @After
     public void after() {
         NettyClient.getInstance().close();

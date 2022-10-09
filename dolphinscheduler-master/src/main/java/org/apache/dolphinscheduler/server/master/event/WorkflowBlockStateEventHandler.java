@@ -38,6 +38,7 @@ public class WorkflowBlockStateEventHandler implements StateEventHandler {
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
         throws StateEventHandleError {
+        logger.info("Handle workflow instance state block event");
         Optional<TaskInstance> taskInstanceOptional =
             workflowExecuteRunnable.getTaskInstance(stateEvent.getTaskInstanceId());
         if (!taskInstanceOptional.isPresent()) {

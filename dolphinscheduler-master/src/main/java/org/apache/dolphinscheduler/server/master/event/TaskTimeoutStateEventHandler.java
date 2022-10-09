@@ -50,6 +50,8 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
                     "Cannot find the task instance from workflow execute runnable, taskInstanceId: %s",
                     taskStateEvent.getTaskInstanceId())));
 
+        logger.info("Handle task instance state timout event, taskInstanceId: {}", taskStateEvent.getTaskInstanceId());
+
         if (TimeoutFlag.CLOSE == taskInstance.getTaskDefine().getTimeoutFlag()) {
             return true;
         }
