@@ -120,13 +120,13 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
 
     public void addProcess4TimeoutCheck(ProcessInstance processInstance) {
         processInstanceTimeoutCheckList.add(processInstance.getId());
-        logger.info("Success add workflow instance into timeout check list");
+        logger.info("Success add workflow instance {} into timeout check list", processInstance.getId());
     }
 
     public void removeProcess4TimeoutCheck(int processInstanceId) {
         boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstanceId);
         if (removeFlag) {
-            logger.info("Success remove workflow instance from timeout check list");
+            logger.info("Success remove workflow instance {} from timeout check list", processInstanceId);
         }
     }
 
@@ -154,7 +154,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                         (long) processInstance.getTimeout()
                                 * Constants.SEC_2_MINUTES_TIME_UNIT);
                 if (timeRemain < 0) {
-                    logger.info("Workflow instance timeout, adding timeout event");
+                    logger.info("Workflow instance {} timeout, adding timeout event", processInstance.getId());
                     addProcessTimeoutEvent(processInstance);
                     processInstanceTimeoutCheckList.remove(processInstance.getId());
                     logger.info("Workflow instance timeout, added timeout event");
