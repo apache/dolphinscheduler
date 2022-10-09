@@ -77,7 +77,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <springfox.version>3.0.0</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
-        <reflections.version>0.9.12</reflections.version>
+        <reflections.version>0.10.2</reflections.version>
         <py4j.version>0.10.9</py4j.version>
         <jsr305.version>3.0.0</jsr305.version>
         <commons-compress.version>1.21</commons-compress.version>
