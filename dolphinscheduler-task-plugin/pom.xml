@@ -63,6 +63,7 @@
         <module>dolphinscheduler-task-pytorch</module>
         <module>dolphinscheduler-task-hivecli</module>
         <module>dolphinscheduler-task-dms</module>
+        <module>dolphinscheduler-task-datasync</module>
     </modules>
 
     <dependencyManagement>

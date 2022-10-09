@@ -446,6 +446,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-java-sdk-kms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.300  Apache 2.0
     aws-java-sdk-sagemaker-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sagemaker/1.12.300  Apache 2.0
     aws-java-sdk-dms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dms/1.12.300  Apache 2.0
+    datasync-2.17.282 https://mvnrepository.com/artifact/software.amazon.awssdk/datasync/2.17.282  Apache 2.0
     commons-text 1.8: https://mvnrepository.com/artifact/org.apache.commons/commons-text/1.8, Apache 2.0
     httpasyncclient 4.1.5: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient/4.1.4, Apache 2.0
     httpcore-nio 4.4.15: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio/4.4.15, Apache 2.0
@@ -483,6 +484,25 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jettison 1.1: https://github.com/jettison-json/jettison/blob/master/LICENSE, Apache 2.0
     stax-api 1.0.1: https://mvnrepository.com/artifact/stax/stax-api/1.0.1, Apache 2.0
     hbase-noop-htrace 4.1.1: https://mvnrepository.com/artifact/org.apache.hbase.thirdparty/hbase-noop-htrace/4.1.1, Apache 2.0
+    annotations 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/annotations/2.17.282, Apache 2.0
+    apache-client 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/apache-client/2.17.282, Apache 2.0
+    auth 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/auth/2.17.282, Apache 2.0
+    aws-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/aws-core/2.17.282, Apache 2.0
+    aws-json-protocol 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/aws-json-protocol/2.17.282, Apache 2.0
+    eventstream 1.0.1: https://mvnrepository.com/artifact/software.amazon.eventstream/eventstream/1.0.1, Apache 2.0
+    http-client-spi 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/http-client-spi/2.17.282, Apache 2.0
+    json-utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/json-utils/2.17.282, Apache 2.0
+    metrics-spi 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/metrics-spi/2.17.282, Apache 2.0
+    netty-codec-http 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http/4.1.53.Final, Apache 2.0
+    netty-codec-http2 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http2/4.1.53.Final, Apache 2.0
+    netty-nio-client 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/netty-nio-client/2.17.282, Apache 2.0
+    netty-transport-classes-epoll 4.1.79.Final: https://mvnrepository.com/artifact/io.netty/netty-transport-classes-epoll/4.1.79.Final, Apache 2.0
+    profiles 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/profiles/2.17.282, Apache 2.0
+    protocol-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/protocol-core/2.17.282, Apache 2.0
+    regions 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/regions/2.17.282, Apache 2.0
+    sdk-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core/2.17.282, Apache 2.0
+    third-party-jackson-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/third-party-jackson-core/2.17.282, Apache 2.0
+    utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/utils/2.17.282, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -561,12 +581,13 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     slf4j-api 1.7.36: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.36, MIT
     animal-sniffer-annotations 1.19 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.19, MIT
     checker-qual 3.12.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.12.0, MIT + GPLv2
-    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket  MIT
+    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket,  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
     classgraph 4.8.83: https://mvnrepository.com/artifact/io.github.classgraph/classgraph, MIT
-    bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on MIT
-    bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on MIT
+    bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on, MIT
+    bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on, MIT
+    reactive-streams 1.0.4: https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams/1.0.4, MIT
 
 ========================================================================
 MPL 1.1 licenses
