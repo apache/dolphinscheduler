@@ -286,27 +286,6 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        projectAuthFailRes = processInstanceService
-            .queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, endTime, startTime);
-        Assert.assertEquals(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, projectAuthFailRes.get(Constants.STATUS));
-
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        projectAuthFailRes = processInstanceService
-            .queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, null, endTime);
-        Assert.assertEquals(Status.DATA_IS_NULL, projectAuthFailRes.get(Constants.STATUS));
-
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        projectAuthFailRes = processInstanceService
-            .queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, startTime, null);
-        Assert.assertEquals(Status.DATA_IS_NULL, projectAuthFailRes.get(Constants.STATUS));
-
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
@@ -314,6 +293,39 @@ public class ProcessInstanceServiceTest {
             projectCode, size, startTime, endTime);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testTopNLongestRunningProcessInstanceFailure() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        Project project = getProject(projectCode);
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        int size = 10;
+        String startTime = "2020-01-01 00:00:00";
+        String endTime = "2020-08-02 00:00:00";
+
+        putMsg(result, Status.SUCCESS, projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Map<String, Object> startTimeBiggerFailRes = processInstanceService
+            .queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, endTime, startTime);
+        Assert.assertEquals(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, startTimeBiggerFailRes.get(Constants.STATUS));
+
+        putMsg(result, Status.SUCCESS, projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Map<String, Object> dataNullFailRes = processInstanceService
+            .queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, null, endTime);
+        Assert.assertEquals(Status.DATA_IS_NULL, dataNullFailRes.get(Constants.STATUS));
+
+        putMsg(result, Status.SUCCESS, projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        dataNullFailRes = processInstanceService
+            .queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, startTime, null);
+        Assert.assertEquals(Status.DATA_IS_NULL, dataNullFailRes.get(Constants.STATUS));
     }
 
     @Test
@@ -630,8 +642,7 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.ofNullable(processInstance));
         try {
-            Map<String, Object> processNotFinished =
-                processInstanceService.deleteProcessInstanceById(loginUser, projectCode, 1);
+            processInstanceService.deleteProcessInstanceById(loginUser, projectCode, 1);
             Assert.fail();
         } catch (ServiceException ex) {
             Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR.getCode(), ex.getCode());
@@ -649,8 +660,7 @@ public class ProcessInstanceServiceTest {
         processDefinition.setProjectCode(0L);
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         try {
-            Map<String, Object> processNotExist =
-                processInstanceService.deleteProcessInstanceById(loginUser, projectCode, 1);
+            processInstanceService.deleteProcessInstanceById(loginUser, projectCode, 1);
             Assert.fail();
         } catch (ServiceException ex) {
             Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST.getCode(), ex.getCode());
@@ -664,8 +674,7 @@ public class ProcessInstanceServiceTest {
 
         when(processService.deleteWorkProcessInstanceById(1)).thenReturn(0);
         try {
-            Map<String, Object> deleteFailed =
-                processInstanceService.deleteProcessInstanceById(loginUser, projectCode, 1);
+            processInstanceService.deleteProcessInstanceById(loginUser, projectCode, 1);
             Assert.fail();
         } catch (ServiceException ex) {
             Assert.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), ex.getCode());
