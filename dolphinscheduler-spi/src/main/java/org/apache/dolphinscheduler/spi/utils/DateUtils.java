@@ -45,7 +45,8 @@ public class DateUtils {
     /**
      * a default datetime formatter for the timestamp
      */
-    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
@@ -192,7 +193,6 @@ public class DateUtils {
         calendar.setTime(date);
         return calendar.get(Calendar.HOUR_OF_DAY);
     }
-
 
     /**
      * compare two dates
@@ -431,10 +431,6 @@ public class DateUtils {
         return TimeZone.getTimeZone(timezoneId);
     }
 
-    /**
-     * get timestamp in String
-     * PowerMock 2.0.9 fails to mock System.currentTimeMillis(), this method helps in UT
-     */
     public static String getTimestampString() {
         return String.valueOf(System.currentTimeMillis());
     }
