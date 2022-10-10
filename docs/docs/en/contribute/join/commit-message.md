@@ -29,7 +29,7 @@ The header part has only one line, including three fields: type (required), scop
 
 (1) Type is used to indicate the category of commit, and only the following 7 types are allowed.
 
-- feat：New features
+- feat：features
 - fix：Bug fixes
 - docs：Documentation
 - style： Format (does not affect changes in code operation)
