@@ -15,21 +15,22 @@
    specific language governing permissions and limitations
    under the License.
 
-GitHub
-======
+S3
+==
 
-`GitHub` is a github resource plugin for pydolphinscheduler.
+`S3` is a Amazon S3 resource plugin for pydolphinscheduler.
 
-When using a github resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
-such as `resource_plugin=GitHub(prefix="https://github.com/xxx", access_token="ghpxx")`.
-The token parameter is optional. You need to add it when your repository is a private repository.
+When using a Amazon S3 resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
+such as `resource_plugin=S3(prefix="xxx")`, if the file is publicly readable.
 
-You can view this `document <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token>`_
-when creating a token.
+When the file is private, using `resource_plugin=S3(prefix="xxx", access_key_id="xxx", access_key_secret="xxx")`
+
+You can view this `document <https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html>`_
+when creating a pair `AccessKey`.
 
 For the specific use of resource plugins, you can see `How to use` in :doc:`resource-plugin`
 
 Dive Into
 ---------
 
-.. automodule:: pydolphinscheduler.resources_plugin.github
+.. automodule:: pydolphinscheduler.resources_plugin.S3
