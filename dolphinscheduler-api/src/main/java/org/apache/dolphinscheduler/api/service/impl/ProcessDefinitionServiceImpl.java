@@ -314,7 +314,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     return result;
                 }
             }
-            if (graphHasCycle(taskNodeList)) {
+            if (processService.graphHasCycle(taskNodeList)) {
                 logger.error("process DAG has cycle");
                 putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
                 return result;
@@ -1096,7 +1096,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
 
             // check has cycle
-            if (graphHasCycle(taskNodes)) {
+            if (processService.graphHasCycle(taskNodes)) {
                 logger.error("process DAG has cycle");
                 putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
                 return result;
@@ -1346,32 +1346,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         result.put(Constants.STATUS, Status.SUCCESS);
         result.put(Constants.MSG, Status.SUCCESS.getMsg());
         return result;
-    }
-
-    /**
-     * whether the graph has a ring
-     *
-     * @param taskNodeResponseList task node response list
-     * @return if graph has cycle flag
-     */
-    private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
-        DAG<String, TaskNode, String> graph = new DAG<>();
-        // Fill the vertices
-        for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            graph.addNode(Long.toString(taskNodeResponse.getCode()), taskNodeResponse);
-        }
-        // Fill edge relations
-        for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            List<String> preTasks = JSONUtils.toList(taskNodeResponse.getPreTasks(), String.class);
-            if (CollectionUtils.isNotEmpty(preTasks)) {
-                for (String preTask : preTasks) {
-                    if (!graph.addEdge(preTask, Long.toString(taskNodeResponse.getCode()))) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return graph.hasCycle();
     }
 
     /**

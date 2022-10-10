@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
@@ -147,6 +148,13 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             processTaskRelation.setPreTaskVersion(0);
         }
         processTaskRelations.add(processTaskRelation);
+
+        List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, null);
+        if (processService.graphHasCycle(taskNodeList)) {
+            putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
+            return result;
+        }
+
         updateRelation(loginUser, result, processDefinition, processTaskRelations);
         return result;
     }
