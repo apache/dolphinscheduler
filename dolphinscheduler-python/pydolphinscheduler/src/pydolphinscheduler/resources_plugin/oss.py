@@ -17,10 +17,11 @@
 
 """DolphinScheduler oss resource plugin."""
 from typing import Optional
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import oss2
 
+from pydolphinscheduler.constants import Symbol
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.base.bucket import Bucket, OSSFileInfo
 
@@ -29,13 +30,8 @@ class OSS(ResourcePlugin, Bucket):
     """OSS object, declare OSS resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of OSS.
-    :param access_key_id: A string representing the ID of AccessKey for AliCloud OSS
-
-    to access private files.
-
-    :param access_key_secret: A string representing the secret of AccessKey for AliCloud OSS
-
-    to access private files.
+    :param access_key_id: A string representing the ID of AccessKey for AliCloud OSS.
+    :param access_key_secret: A string representing the secret of AccessKey for AliCloud OSS.
     """
 
     def __init__(
@@ -44,7 +40,7 @@ class OSS(ResourcePlugin, Bucket):
         access_key_id: Optional[str] = None,
         access_key_secret: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(prefix, *args, **kwargs)
         self.access_key_id = access_key_id
@@ -54,12 +50,15 @@ class OSS(ResourcePlugin, Bucket):
 
     def get_bucket_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
-        elements = path.split("/")
-        self.get_index(path, "/", 3)
+        self.get_index(path, Symbol.SLASH, 3)
+        result = urlparse(path)
+        hostname = result.hostname
+        elements = hostname.split(Symbol.POINT)
         self._bucket_file_info = OSSFileInfo(
-            endpoint="https://" + elements[2].split(".")[1] + ".aliyuncs.com",
-            bucket=elements[2].split(".")[0],
-            file_path="/".join(str(elements[i]) for i in range(3, len(elements))),
+            endpoint=f"{result.scheme}://"
+            f"{Symbol.POINT.join(str(elements[i]) for i in range(1, len(elements)))}",
+            bucket=hostname.split(Symbol.POINT)[0],
+            file_path=result.path[1:],
         )
 
     def read_file(self, suf: str):

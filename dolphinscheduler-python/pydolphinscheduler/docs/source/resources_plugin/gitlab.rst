@@ -23,7 +23,7 @@ GitLab
 When using a gitlab resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
 such as `resource_plugin=GitLab(prefix="xxx")`, if it is a public repository.
 
-If it is a private or Internal warehouse, you can use three ways to obtain authentication.
+If it is a private or Internal repository, you can use three ways to obtain authentication.
 
 The first is `Personal Access Tokens`, using `resource_plugin=GitLab(prefix="xxx", private_token="xxx")`.
 

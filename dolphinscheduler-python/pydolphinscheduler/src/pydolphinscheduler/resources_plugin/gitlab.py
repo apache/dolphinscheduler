@@ -17,11 +17,12 @@
 
 """DolphinScheduler gitlab resource plugin."""
 from typing import Optional
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import gitlab
 import requests
 
+from pydolphinscheduler.constants import Symbol
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.base.git import Git, GitLabFileInfo
 
@@ -30,9 +31,9 @@ class GitLab(ResourcePlugin, Git):
     """GitLab object, declare GitLab resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of GitLab.
-    :param private_token: A string used for identity authentication of GitLab private or Internal warehouse.
-    :param oauth_token: A string used for identity authentication of GitLab private or Internal warehouse.
-    :param username: A string representing the user of the warehouse.
+    :param private_token: A string used for identity authentication of GitLab private or Internal repository.
+    :param oauth_token: A string used for identity authentication of GitLab private or Internal repository.
+    :param username: A string representing the user of the repository.
     :param password: A string representing the user password.
     """
 
@@ -44,7 +45,7 @@ class GitLab(ResourcePlugin, Git):
         username: Optional[str] = None,
         password: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(prefix, *args, **kwargs)
         self.private_token = private_token
@@ -54,25 +55,18 @@ class GitLab(ResourcePlugin, Git):
 
     def get_git_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
-        elements = path.split("/")
-        self.get_index(path, "/", 8)
-        for i in range(0, len(elements)):
-            if (
-                i + 3 < len(elements)
-                and elements[i + 1] == "-"
-                and elements[i + 2] == "blob"
-            ):
-                host_end = self.get_index(path, "/", 3)
-                self._git_file_info = GitLabFileInfo(
-                    host=path[0:host_end],
-                    repo_name=elements[i],
-                    branch=elements[i + 3],
-                    file_path="/".join(
-                        str(elements[j]) for j in range(i + 4, len(elements))
-                    ),
-                    user="/".join(str(elements[j]) for j in range(3, i)),
-                )
-                break
+        self.get_index(path, Symbol.SLASH, 8)
+        result = urlparse(path)
+        elements = result.path.split(Symbol.SLASH)
+        self._git_file_info = GitLabFileInfo(
+            host=f"{result.scheme}://{result.hostname}",
+            repo_name=elements[2],
+            branch=elements[5],
+            file_path=Symbol.SLASH.join(
+                str(elements[i]) for i in range(6, len(elements))
+            ),
+            user=elements[1],
+        )
 
     def authentication(self):
         """Gitlab authentication."""
