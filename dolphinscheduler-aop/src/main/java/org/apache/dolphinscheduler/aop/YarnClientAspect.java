@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.aop;
 
+import static org.apache.dolphinscheduler.common.Constants.*;
+
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
@@ -33,10 +37,7 @@ import org.aspectj.lang.annotation.Aspect;
 @Aspect
 public class YarnClientAspect {
 
-    /**
-     * flag to indicate whether print debug logs
-     */
-    private static final String PARA_NAME_ASPECTJ_DEBUG = "PARA_NAME_ASPECTJ_DEBUG";
+    // public static final Logger logger = LoggerFactory.getLogger(YarnClientAspect.class);
 
     /**
      * The current application report when application submitted successfully
@@ -47,8 +48,9 @@ public class YarnClientAspect {
     private boolean debug;
 
     public YarnClientAspect() {
-        appInfoFilePath = System.getProperty("user.dir") + "/appInfo.log";
-        debug = Boolean.parseBoolean(System.getenv(PARA_NAME_ASPECTJ_DEBUG));
+        appInfoFilePath = String.format("%s/%s", System.getProperty("user.dir"),
+                PropertyUtils.getString(APPID_FILE_PATH, DEFAULT_APPID_FILE_PATH));
+        debug = Boolean.parseBoolean(PropertyUtils.getString(AOP_DEBUG, "false"));
     }
 
     /**
@@ -59,8 +61,7 @@ public class YarnClientAspect {
      * @throws Throwable exceptions
      */
     @AfterReturning(pointcut = "execution(ApplicationId org.apache.hadoop.yarn.client.api.impl.YarnClientImpl." +
-            "submitApplication(ApplicationSubmissionContext)) && args(appContext)",
-            returning = "submittedAppId", argNames = "appContext,submittedAppId")
+            "submitApplication(ApplicationSubmissionContext)) && args(appContext)", returning = "submittedAppId", argNames = "appContext,submittedAppId")
     public void registerApplicationInfo(ApplicationSubmissionContext appContext, ApplicationId submittedAppId) {
         if (appInfoFilePath != null) {
             try {

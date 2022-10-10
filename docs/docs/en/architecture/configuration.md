@@ -226,6 +226,7 @@ The default configuration is as follows:
 |zeppelin.rest.url | http://localhost:8080 | the RESTful API url of zeppelin|
 |appId.collect | log | way to collect applicationId, if use aop, alter the configuration from log to aop|
 |appId.file.path | appInfo.log | if use aop way，the relative log path to store applicationId (suggest not to change, need to re-package aop jar file)|
+|aop.debug | false | whether to print aop debug info
 
 ### Api-server related configuration
 
@@ -354,19 +355,15 @@ export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
-export SEATUNNEL_HOME=${SEATUNNEL_HOME:-/opt/soft/seatunnel}
-export CHUNJUN_HOME=${CHUNJUN_HOME:-/opt/soft/chunjun}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 
 # applicationId auto collection related configuration
-export HADOOP_CLASSPATH=${DOLPHINSCHEDULER_HOME}/tools/libs/aop/*:$HADOOP_CLASSPATH
-export SPARK_DIST_CLASSPATH=${DOLPHINSCHEDULER_HOME}/tools/libs/aop/*:$SPARK_DIST_CLASS_PATH
+export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/conf:${DOLPHINSCHEDULER_HOME}/tools/libs/*
+export SPARK_DIST_CLASSPATH=$HADOOP_CLASSPATH:$SPARK_DIST_CLASS_PATH
 export HADOOP_CLIENT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$HADOOP_CLIENT_OPTS
 export SPARK_SUBMIT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$SPARK_SUBMIT_OPTS
 export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$FLINK_ENV_JAVA_OPTS
-# print detailed info of yarn application
-export PARA_NAME_ASPECTJ_DEBUG=false
 ```
 
 ### Log related configuration

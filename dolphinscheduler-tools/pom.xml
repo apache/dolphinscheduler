@@ -35,6 +35,10 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-dao</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-aop</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -65,10 +69,10 @@
                 <executions>
                     <execution>
                         <id>dolphinscheduler-tools</id>
-                        <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                             <finalName>tools</finalName>
                             <descriptors>

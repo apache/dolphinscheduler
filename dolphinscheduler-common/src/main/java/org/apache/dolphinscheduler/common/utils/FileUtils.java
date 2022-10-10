@@ -41,7 +41,7 @@ public class FileUtils {
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
-    public static final String APPINFO_PATH = PropertyUtils.getString(APPID_FILE_PATH, "appInfo.log");
+    public static final String APPINFO_PATH = PropertyUtils.getString(APPID_FILE_PATH, DEFAULT_APPID_FILE_PATH);
 
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");

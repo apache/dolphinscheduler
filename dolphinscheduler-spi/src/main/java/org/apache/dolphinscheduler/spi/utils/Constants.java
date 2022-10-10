@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.spi.utils;
  * constants
  */
 public class Constants {
+
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
@@ -121,7 +122,8 @@ public class Constants {
     /**
      * hadoop.security.authentication
      */
-    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+            "hadoop.security.authentication.startup.state";
 
     /**
      * loginUserFromKeytab user
@@ -207,6 +209,9 @@ public class Constants {
      */
     public static final String APPID_COLLECT = "appId.collect";
     public static final String APPID_FILE_PATH = "appId.file.path";
+    public static final String AOP_DEBUG = "aop.debug";
+    public static final String DEFAULT_COLLECT_WAY = "log";
+    public static final String DEFAULT_APPID_FILE_PATH = "appInfo.log";
 
     /**
      * DOUBLE_SLASH //

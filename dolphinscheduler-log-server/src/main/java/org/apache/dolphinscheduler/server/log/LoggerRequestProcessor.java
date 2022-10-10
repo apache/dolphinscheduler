@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.server.log;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_COLLECT_WAY;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -170,7 +171,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 if (!checkPathSecurity(appInfoPath) || !checkPathSecurity(logPath)) {
                     throw new IllegalArgumentException("Illegal path");
                 }
-                List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath, PropertyUtils.getString(APPID_COLLECT, "log"));
+                List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath, PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 channel.writeAndFlush(
                         new GetAppIdResponseCommand(appIds).convert2Command(command.getOpaque()));
                 break;

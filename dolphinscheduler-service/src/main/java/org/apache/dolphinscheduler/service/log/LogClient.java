@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.service.log;
 
 import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_COLLECT_WAY;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -209,7 +211,8 @@ public class LogClient implements AutoCloseable {
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
         if (NetUtils.getHost().equals(host)) {
-            appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath, PropertyUtils.getString(APPID_COLLECT, "log"));
+            appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath,
+                    PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
         } else {
             final Command command = new GetAppIdRequestCommand(taskLogFilePath, taskAppInfoPath).convert2Command();
             Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
