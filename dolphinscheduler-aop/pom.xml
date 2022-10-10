@@ -57,21 +57,6 @@
             <artifactId>hadoop-yarn-client</artifactId>
             <version>${yarn.version}</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.hadoop</groupId>-->
-        <!--            <artifactId>hadoop-yarn-common</artifactId>-->
-        <!--            <version>${yarn.version}</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.hadoop</groupId>-->
-        <!--            <artifactId>hadoop-common</artifactId>-->
-        <!--            <version>${yarn.version}</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.aspectj</groupId>-->
-        <!--            <artifactId>aspectjtools</artifactId>-->
-        <!--            <version>${aspectj.version}</version>-->
-        <!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -98,35 +83,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-jar-plugin</artifactId>-->
-            <!--                <configuration>-->
-            <!--                    <excludes>-->
-            <!--                        <exclude>*.yaml</exclude>-->
-            <!--                        <exclude>*.xml</exclude>-->
-            <!--                    </excludes>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
-            <!--            <plugin>-->
-            <!--                <artifactId>maven-assembly-plugin</artifactId>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>dolphinscheduler-aop</id>-->
-            <!--                        <goals>-->
-            <!--                            <goal>single</goal>-->
-            <!--                        </goals>-->
-            <!--                        <phase>package</phase>-->
-            <!--                        <configuration>-->
-            <!--                            <finalName>aop</finalName>-->
-            <!--                            <descriptors>-->
-            <!--                                <descriptor>src/main/assembly/dolphinscheduler-aop.xml</descriptor>-->
-            <!--                            </descriptors>-->
-            <!--                            <appendAssemblyId>false</appendAssemblyId>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
         </plugins>
     </build>
 
