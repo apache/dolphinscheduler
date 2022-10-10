@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -64,12 +65,16 @@ public class DataSourceUtilsTest {
         mysqlDatasourceParamDTO.setUserName("root");
         mysqlDatasourceParamDTO.setPort(3306);
         mysqlDatasourceParamDTO.setPassword("123456");
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
-        Mockito.mockStatic(CommonUtils.class);
-        Mockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
-        Assert.assertNotNull(connectionParam);
+
+        try (
+                MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
+                MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString()))
+                    .thenReturn("123456");
+            mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
+            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
+            Assert.assertNotNull(connectionParam);
+        }
     }
 
     @Test
@@ -87,22 +92,24 @@ public class DataSourceUtilsTest {
 
     @Test
     public void testGetConnection() throws ExecutionException {
-        Mockito.mockStatic(PropertyUtils.class);
-        Mockito.when(PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
-        Mockito.mockStatic(DataSourceClientProvider.class);
-        DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-        Mockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
+        try (
+                MockedStatic<PropertyUtils> mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
+                MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
+                        Mockito.mockStatic(DataSourceClientProvider.class)) {
+            mockedStaticPropertyUtils.when(() -> PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
+            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
+            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
-        Connection connection = Mockito.mock(Connection.class);
-        Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            Connection connection = Mockito.mock(Connection.class);
+            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
-        MySQLConnectionParam connectionParam = new MySQLConnectionParam();
-        connectionParam.setUser("root");
-        connectionParam.setPassword("123456");
-        connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
+            MySQLConnectionParam connectionParam = new MySQLConnectionParam();
+            connectionParam.setUser("root");
+            connectionParam.setPassword("123456");
+            connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
 
-        Assert.assertNotNull(connection);
-
+            Assert.assertNotNull(connection);
+        }
     }
 
     @Test
