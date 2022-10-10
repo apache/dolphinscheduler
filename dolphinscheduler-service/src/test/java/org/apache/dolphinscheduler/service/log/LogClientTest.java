@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.factory.NettyRemotingClientFactory;
 
 import java.nio.charset.StandardCharsets;
 

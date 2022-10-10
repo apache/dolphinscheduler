@@ -22,20 +22,18 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * hadoop utils test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {HadoopUtils.class})
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.common.utils.HttpUtils")
+@RunWith(MockitoJUnitRunner.class)
 public class HadoopUtilsTest {
+
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtilsTest.class);
 
     @Test
@@ -64,10 +62,12 @@ public class HadoopUtilsTest {
 
     @Test
     public void getAppAddress() {
-        PowerMockito.mockStatic(HttpUtils.class);
-        PowerMockito.when(HttpUtils.get("http://ds1:8088/ws/v1/cluster/info")).thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
-        logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
-        Assert.assertTrue(true);
+        try (MockedStatic<HttpUtils> mockedHttpUtils = Mockito.mockStatic(HttpUtils.class)) {
+            mockedHttpUtils.when(() -> HttpUtils.get("http://ds1:8088/ws/v1/cluster/info"))
+                    .thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
+            logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
+            Assert.assertTrue(true);
+        }
     }
 
 }

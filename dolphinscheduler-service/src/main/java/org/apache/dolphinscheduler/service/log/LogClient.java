@@ -34,8 +34,8 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.factory.NettyRemotingClientFactory;
 
 import java.util.List;
 
