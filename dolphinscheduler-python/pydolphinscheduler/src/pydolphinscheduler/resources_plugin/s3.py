@@ -22,6 +22,7 @@ from urllib.parse import urljoin
 
 import boto3
 
+from pydolphinscheduler.constants import Symbol
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.base.bucket import Bucket, S3FileInfo
 
@@ -50,11 +51,13 @@ class S3(ResourcePlugin, Bucket):
 
     def get_bucket_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
-        elements = path.split("/")
-        self.get_index(path, "/", 3)
+        elements = path.split(Symbol.SLASH)
+        self.get_index(path, Symbol.SLASH, 3)
         self._bucket_file_info = S3FileInfo(
-            bucket=elements[2].split(".")[0],
-            file_path="/".join(str(elements[i]) for i in range(3, len(elements))),
+            bucket=elements[2].split(Symbol.POINT)[0],
+            file_path=Symbol.SLASH.join(
+                str(elements[i]) for i in range(3, len(elements))
+            ),
         )
 
     def read_file(self, suf: str):

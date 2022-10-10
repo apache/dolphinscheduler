@@ -22,6 +22,7 @@ from urllib.parse import urljoin, urlparse
 import gitlab
 import requests
 
+from pydolphinscheduler.constants import Symbol
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.base.git import Git, GitLabFileInfo
 
@@ -44,7 +45,7 @@ class GitLab(ResourcePlugin, Git):
         username: Optional[str] = None,
         password: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(prefix, *args, **kwargs)
         self.private_token = private_token
@@ -54,14 +55,16 @@ class GitLab(ResourcePlugin, Git):
 
     def get_git_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
-        self.get_index(path, "/", 8)
+        self.get_index(path, Symbol.SLASH, 8)
         result = urlparse(path)
-        elements = result.path.split("/")
+        elements = result.path.split(Symbol.SLASH)
         self._git_file_info = GitLabFileInfo(
-            host=result.scheme + "://" + result.hostname,
+            host=f"{result.scheme}://{result.hostname}",
             repo_name=elements[2],
             branch=elements[5],
-            file_path="/".join(str(elements[i]) for i in range(6, len(elements))),
+            file_path=Symbol.SLASH.join(
+                str(elements[i]) for i in range(6, len(elements))
+            ),
             user=elements[1],
         )
 

@@ -22,6 +22,7 @@ from urllib.parse import urljoin
 
 import requests
 
+from pydolphinscheduler.constants import Symbol
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.base.git import Git, GitHubFileInfo
 
@@ -56,8 +57,8 @@ class GitHub(ResourcePlugin, Git):
 
     def get_git_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
-        elements = path.split("/")
-        index = self.get_index(path, "/", 7)
+        elements = path.split(Symbol.SLASH)
+        index = self.get_index(path, Symbol.SLASH, 7)
         index = index + 1
         file_info = GitHubFileInfo(
             user=elements[3],

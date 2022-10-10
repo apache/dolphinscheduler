@@ -21,6 +21,7 @@ from urllib.parse import urljoin, urlparse
 
 import oss2
 
+from pydolphinscheduler.constants import Symbol
 from pydolphinscheduler.core.resource_plugin import ResourcePlugin
 from pydolphinscheduler.resources_plugin.base.bucket import Bucket, OSSFileInfo
 
@@ -39,7 +40,7 @@ class OSS(ResourcePlugin, Bucket):
         access_key_id: Optional[str] = None,
         access_key_secret: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(prefix, *args, **kwargs)
         self.access_key_id = access_key_id
@@ -49,13 +50,14 @@ class OSS(ResourcePlugin, Bucket):
 
     def get_bucket_file_info(self, path: str):
         """Get file information from the file url, like repository name, user, branch, and file path."""
-        self.get_index(path, "/", 3)
+        self.get_index(path, Symbol.SLASH, 3)
         result = urlparse(path)
         hostname = result.hostname
-        elements = hostname.split('.')
+        elements = hostname.split(Symbol.POINT)
         self._bucket_file_info = OSSFileInfo(
-            endpoint=result.scheme + "://" + ".".join(str(elements[i]) for i in range(1, len(elements))),
-            bucket=hostname.split(".")[0],
+            endpoint=f"{result.scheme}://"
+            f"{Symbol.POINT.join(str(elements[i]) for i in range(1, len(elements)))}",
+            bucket=hostname.split(Symbol.POINT)[0],
             file_path=result.path[1:],
         )
 
