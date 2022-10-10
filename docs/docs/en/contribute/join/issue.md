@@ -30,7 +30,7 @@ The `Issue Type` is as follows:
     <tbody>
         <tr>
             <td style="text-align: center;">Feature</td>
-            <td style="text-align: center;">Include expected new features and functions</td>
+            <td style="text-align: center;">Include expected features and functions</td>
             <td style="text-align: center;">[Feature][api] Add xxx api in xxx controller</td>
         </tr>
         <tr>
