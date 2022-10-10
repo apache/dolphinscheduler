@@ -137,6 +137,10 @@ export const TASK_TYPES_MAP = {
   DMS: {
     alias: 'DMS',
     helperLinkDisable: true
+  },
+  DATASYNC: {
+    alias: 'DATASYNC',
+    helperLinkDisable: true
   }
 } as {
   [key in TaskType]: {
