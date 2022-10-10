@@ -38,6 +38,7 @@ import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import { useForm, datasourceType, datasourceTypeList } from './use-form'
 import { useDetail } from './use-detail'
+import styles from './index.module.scss'
 
 const props = {
   show: {
@@ -46,13 +47,17 @@ const props = {
   },
   id: {
     type: Number as PropType<number>
+  },
+  selectType: {
+    type: String as PropType<any>,
+    default: 'MYSQL'
   }
 }
 
 const DetailModal = defineComponent({
   name: 'DetailModal',
   props,
-  emits: ['cancel', 'update'],
+  emits: ['cancel', 'update', 'open'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -95,9 +100,14 @@ const DetailModal = defineComponent({
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
+    const handleSourceModalOpen = () => {
+      ctx.emit('open')
+    }
+
     watch(
       () => props.show,
       async () => {
+        state.detailForm.type = props.selectType
         props.show &&
           state.detailForm.type &&
           (await changeType(
@@ -106,6 +116,18 @@ const DetailModal = defineComponent({
           ))
         props.show && props.id && setFieldsValue(await queryById(props.id))
         props.show && state.detailForm.testFlag == 0 && await getSameTypeTestDataSource()
+      }
+    )
+
+    watch(
+      () => props.selectType,
+      async () => {
+        state.detailForm.type = props.selectType
+        state.detailForm.type &&
+        (await changeType(
+          state.detailForm.type,
+          datasourceType[state.detailForm.type]
+        ))
       }
     )
 
@@ -119,7 +141,8 @@ const DetailModal = defineComponent({
       onSubmit,
       onTest,
       onCancel,
-      trim
+      trim,
+      handleSourceModalOpen
     }
   },
   render() {
@@ -138,12 +161,12 @@ const DetailModal = defineComponent({
       loading,
       saving,
       testing,
-      onChangeType,
       onChangeTestFlag,
       onChangePort,
       onCancel,
       onTest,
-      onSubmit
+      onSubmit,
+      handleSourceModalOpen
     } = this
     return (
       <Modal
@@ -172,13 +195,10 @@ const DetailModal = defineComponent({
                   path='type'
                   show-require-mark
                 >
-                  <NSelect
-                    class='btn-data-source-type-drop-down'
-                    v-model={[detailForm.type, 'value']}
-                    options={datasourceTypeList}
-                    disabled={!!id}
-                    on-update:value={onChangeType}
-                  />
+                  <div class={[styles.typeBox, !!id && styles.disabledBox]}>
+                    <div>{detailForm.type}</div>
+                    <div class={styles['text-color']} onClick={handleSourceModalOpen}>更换</div>
+                  </div>
                 </NFormItem>
                 <NFormItem
                   label={t('datasource.datasource_name')}
