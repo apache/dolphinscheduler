@@ -181,7 +181,7 @@ DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeep
 
 ## common.properties [hadoop、s3、yarn配置]
 
-common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置，配置文件位置：
+common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId收集相关的配置，配置文件位置：
 |服务名称| 配置文件 |
 |--|--|
 |Master Server | `master-server/conf/common.properties`|
@@ -221,7 +221,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |sudo.enable | true | 是否开启sudo|
 |alert.rpc.port | 50052 | Alert Server的RPC端口|
 |zeppelin.rest.url | http://localhost:8080 | zeppelin RESTful API 接口地址|
-|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop|
+|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop，注意：如果用户环境覆盖了dolphinscheduler_env.sh收集applicationId相关环境变量配置，aop方法会失效|
 |appId.file.path | appInfo.log | 采用aop方式，存取applicationId的日志文件相对路径，不建议修改，否则需要重新打包aop jar包|
 |aop.debug | false | 是否输出aop debug信息
 

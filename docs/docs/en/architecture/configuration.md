@@ -224,7 +224,7 @@ The default configuration is as follows:
 |sudo.enable | true | whether to enable sudo|
 |alert.rpc.port | 50052 | the RPC port of Alert Server|
 |zeppelin.rest.url | http://localhost:8080 | the RESTful API url of zeppelin|
-|appId.collect | log | way to collect applicationId, if use aop, alter the configuration from log to aop|
+|appId.collect | log | way to collect applicationId, if use aop, alter the configuration from log to aop. Note: Aop way will failure if override applicationId collection-related environment configuration in dolphinscheduler_env.sh.|
 |appId.file.path | appInfo.log | if use aop way，the relative log path to store applicationId (suggest not to change, need to re-package aop jar file)|
 |aop.debug | false | whether to print aop debug info
 
