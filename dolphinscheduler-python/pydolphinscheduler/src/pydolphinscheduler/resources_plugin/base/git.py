@@ -73,19 +73,43 @@ class GitHubFileInfo(GitFileInfo):
         )
 
 
-# [start Git]
+class GitLabFileInfo(GitFileInfo):
+    """A class that defines the details of GitLab files.
+
+    :param host: A string representing the domain name the GitLab file belongs to.
+    :param user: A string representing the user the GitLab file belongs to.
+    :param repo_name: A string representing the repository to which the GitLab file belongs.
+    :param branch: A string representing the branch to which the GitHub file belongs.
+    :param file_path: A string representing the GitHub file path.
+    """
+
+    def __init__(
+        self,
+        host: Optional[str] = None,
+        user: Optional[str] = None,
+        repo_name: Optional[str] = None,
+        branch: Optional[str] = None,
+        file_path: Optional[str] = None,
+        *args,
+        **kwargs
+    ):
+        super().__init__(
+            user=user,
+            repo_name=repo_name,
+            branch=branch,
+            file_path=file_path,
+            *args,
+            **kwargs
+        )
+        self.host = host
+
+
 class Git(object, metaclass=ABCMeta):
-    """An abstract class of online code warehouse based on git implementation."""
+    """An abstract class of online code repository based on git implementation."""
 
-    _git_file_info: Optional[GitFileInfo] = None
+    _git_file_info: Optional = None
 
-    # [start abstractmethod git_file_info]
     @abstractmethod
     def get_git_file_info(self, path: str):
         """Get the detailed information of GIT file according to the file URL."""
         raise NotImplementedError
-
-    # [end abstractmethod git_file_info]
-
-
-# [end Git]

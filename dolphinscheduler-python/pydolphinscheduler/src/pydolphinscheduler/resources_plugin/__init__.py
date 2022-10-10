@@ -17,9 +17,9 @@
 
 """Init resources_plugin package."""
 from pydolphinscheduler.resources_plugin.github import GitHub
+from pydolphinscheduler.resources_plugin.gitlab import GitLab
 from pydolphinscheduler.resources_plugin.local import Local
+from pydolphinscheduler.resources_plugin.oss import OSS
+from pydolphinscheduler.resources_plugin.s3 import S3
 
-__all__ = [
-    "Local",
-    "GitHub",
-]
+__all__ = ["Local", "GitHub", "GitLab", "OSS", "S3"]
