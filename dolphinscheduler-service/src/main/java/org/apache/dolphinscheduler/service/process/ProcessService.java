@@ -2587,6 +2587,32 @@ public class ProcessService {
         return processTaskMap;
     }
 
+    /**
+     * whether the graph has a ring
+     *
+     * @param taskNodeResponseList task node response list
+     * @return if graph has cycle flag
+     */
+    public boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
+        DAG<String, TaskNode, String> graph = new DAG<>();
+        // Fill the vertices
+        for (TaskNode taskNodeResponse : taskNodeResponseList) {
+            graph.addNode(Long.toString(taskNodeResponse.getCode()), taskNodeResponse);
+        }
+        // Fill edge relations
+        for (TaskNode taskNodeResponse : taskNodeResponseList) {
+            List<String> preTasks = JSONUtils.toList(taskNodeResponse.getPreTasks(), String.class);
+            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(preTasks)) {
+                for (String preTask : preTasks) {
+                    if (!graph.addEdge(preTask, Long.toString(taskNodeResponse.getCode()))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return graph.hasCycle();
+    }
+
     private void deleteCommandWithCheck(int commandId) {
         int delete = this.commandMapper.deleteById(commandId);
         if (delete != 1) {
