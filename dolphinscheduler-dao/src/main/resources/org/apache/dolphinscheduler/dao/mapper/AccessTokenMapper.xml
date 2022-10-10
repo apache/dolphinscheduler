@@ -33,13 +33,31 @@
     </select>
 
     <select id="queryAccessTokenByUser" resultType="org.apache.dolphinscheduler.dao.entity.AccessToken">
-        select `id`, `user_id`, `token`, `expire_time`, `create_time`, `update_time`
-        from `t_ds_access_token`
-        where `user_id` = #{userId}
+        select id, user_id, token, expire_time, create_time, update_time
+        from t_ds_access_token
+        where 1 = 1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
     </select>
 
     <delete id="deleteAccessTokenByUserId">
         delete from t_ds_access_token
         where user_id = #{userId}
     </delete>
+
+    <select id="listAuthorizedAccessToken" resultType="org.apache.dolphinscheduler.dao.entity.AccessToken">
+        select id, user_id, token, expire_time, create_time, update_time
+        from t_ds_access_token t
+        where 1=1
+        <if test="userId != 0">
+            and t.user_id = #{userId}
+        </if>
+        <if test="accessTokensIds != null and accessTokensIds.size() > 0">
+            and t.id  in
+            <foreach item="id" index="index" collection="accessTokensIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
 </mapper>

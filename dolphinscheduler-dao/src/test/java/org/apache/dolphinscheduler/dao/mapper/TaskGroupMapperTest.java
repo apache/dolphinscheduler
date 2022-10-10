@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         Page<TaskGroup> page = new Page(1, 3);
         IPage<TaskGroup> taskGroupIPage = taskGroupMapper.queryTaskGroupPaging(
                 page,
-                taskGroup.getUserId(),
+                Mockito.anyList(),
                 taskGroup.getName(), taskGroup.getStatus());
 
         Assert.assertEquals(taskGroupIPage.getTotal(), 1);

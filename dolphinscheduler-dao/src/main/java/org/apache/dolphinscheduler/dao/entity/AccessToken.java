@@ -19,18 +19,22 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+@Data
 @TableName("t_ds_access_token")
 public class AccessToken {
+
     /**
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * user_id
      */
@@ -58,62 +62,6 @@ public class AccessToken {
     private Date updateTime;
     @TableField(exist = false)
     private String userName;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Date getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(Date expireTime) {
-        this.expireTime = expireTime;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -159,18 +107,5 @@ public class AccessToken {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "AccessToken{"
-                + "id=" + id
-                + ", userId=" + userId
-                + ", token='" + token + '\''
-                + ", userName='" + userName + '\''
-                + ", expireTime=" + expireTime
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
     }
 }

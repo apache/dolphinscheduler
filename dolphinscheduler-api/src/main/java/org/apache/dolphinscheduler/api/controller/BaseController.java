@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -46,6 +46,7 @@ public class BaseController {
      * @param pageSize page size
      * @return check result code
      */
+    // todo: directly throw exception
     public Result checkPageParams(int pageNo, int pageSize) {
         Result result = new Result();
         Status resultEnum = Status.SUCCESS;

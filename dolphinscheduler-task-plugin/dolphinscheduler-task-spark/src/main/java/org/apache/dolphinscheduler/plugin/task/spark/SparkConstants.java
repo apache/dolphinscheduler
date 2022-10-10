@@ -40,6 +40,8 @@ public class SparkConstants {
 
     public static final String DEPLOY_MODE = "--deploy-mode";
 
+    public static final String DEPLOY_MODE_LOCAL = "local";
+
     /**
      * --driver-cores NUM
      */
@@ -55,6 +57,8 @@ public class SparkConstants {
      */
     public static final String MASTER = "--master";
 
+    public static final String SPARK_ON_YARN = "yarn";
+
     /**
      * --num-executors NUM
      */
@@ -69,5 +73,20 @@ public class SparkConstants {
      * --executor-memory MEM
      */
     public static final String EXECUTOR_MEMORY = "--executor-memory";
+
+    /**
+     * -f <filename> SQL from files
+     */
+    public static final String SQL_FROM_FILE = "-f";
+
+    /**
+     * spark submit command for sql
+     */
+    public static final String SPARK_SQL_COMMAND = "${SPARK_HOME}/bin/spark-sql";
+
+    /**
+     * spark submit command
+     */
+    public static final String SPARK_SUBMIT_COMMAND = "${SPARK_HOME}/bin/spark-submit";
 
 }

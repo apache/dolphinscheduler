@@ -19,20 +19,52 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.flink.SeatunnelFlinkParameters;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.spark.SeatunnelSparkParameters;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = "engine")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = SeatunnelFlinkParameters.class, name = "FLINK"),
+    @JsonSubTypes.Type(value = SeatunnelSparkParameters.class, name = "SPARK")
+})
 public class SeatunnelParameters extends AbstractParameters {
 
-    /**
-     * shell script
-     */
+    private EngineEnum engine;
+
+    private Boolean useCustom;
+
     private String rawScript;
 
     /**
      * resource list
      */
     private List<ResourceInfo> resourceList;
+
+    public EngineEnum getEngine() {
+        return engine;
+    }
+
+    public void setEngine(EngineEnum engine) {
+        this.engine = engine;
+    }
+
+    public Boolean getUseCustom() {
+        return useCustom;
+    }
+
+    public void setUseCustom(Boolean useCustom) {
+        this.useCustom = useCustom;
+    }
 
     public String getRawScript() {
         return rawScript;
@@ -52,7 +84,9 @@ public class SeatunnelParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return rawScript != null && !rawScript.isEmpty();
+        return Objects.nonNull(engine)
+                && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
+                || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList) && resourceList.size() == 1));
     }
 
     @Override

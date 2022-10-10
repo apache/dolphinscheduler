@@ -22,10 +22,15 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import java.util.Date;
 import java.util.Map;
 
+import lombok.Data;
+
 /**
  * task main info
  */
+@Data
 public class TaskMainInfo {
+
+    private long id;
 
     /**
      * task name
@@ -91,108 +96,4 @@ public class TaskMainInfo {
      * upstreamTaskName
      */
     private String upstreamTaskName;
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public long getTaskCode() {
-        return taskCode;
-    }
-
-    public void setTaskCode(long taskCode) {
-        this.taskCode = taskCode;
-    }
-
-    public int getTaskVersion() {
-        return taskVersion;
-    }
-
-    public void setTaskVersion(int taskVersion) {
-        this.taskVersion = taskVersion;
-    }
-
-    public String getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
-    }
-
-    public Date getTaskCreateTime() {
-        return taskCreateTime;
-    }
-
-    public void setTaskCreateTime(Date taskCreateTime) {
-        this.taskCreateTime = taskCreateTime;
-    }
-
-    public Date getTaskUpdateTime() {
-        return taskUpdateTime;
-    }
-
-    public void setTaskUpdateTime(Date taskUpdateTime) {
-        this.taskUpdateTime = taskUpdateTime;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
-
-    public String getProcessDefinitionName() {
-        return processDefinitionName;
-    }
-
-    public void setProcessDefinitionName(String processDefinitionName) {
-        this.processDefinitionName = processDefinitionName;
-    }
-
-    public ReleaseState getProcessReleaseState() {
-        return processReleaseState;
-    }
-
-    public void setProcessReleaseState(ReleaseState processReleaseState) {
-        this.processReleaseState = processReleaseState;
-    }
-
-    public Map<Long, String> getUpstreamTaskMap() {
-        return upstreamTaskMap;
-    }
-
-    public void setUpstreamTaskMap(Map<Long, String> upstreamTaskMap) {
-        this.upstreamTaskMap = upstreamTaskMap;
-    }
-
-    public long getUpstreamTaskCode() {
-        return upstreamTaskCode;
-    }
-
-    public void setUpstreamTaskCode(long upstreamTaskCode) {
-        this.upstreamTaskCode = upstreamTaskCode;
-    }
-
-    public String getUpstreamTaskName() {
-        return upstreamTaskName;
-    }
-
-    public void setUpstreamTaskName(String upstreamTaskName) {
-        this.upstreamTaskName = upstreamTaskName;
-    }
 }

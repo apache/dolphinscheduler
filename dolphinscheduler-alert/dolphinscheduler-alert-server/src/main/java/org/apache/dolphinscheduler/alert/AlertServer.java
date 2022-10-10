@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingServerFactory;
 
 import java.io.Closeable;
 
@@ -31,7 +31,6 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -41,6 +40,7 @@ import org.springframework.context.event.EventListener;
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
 public class AlertServer implements Closeable {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
     private final PluginDao pluginDao;
@@ -49,30 +49,29 @@ public class AlertServer implements Closeable {
     private final AlertConfig alertConfig;
     private NettyRemotingServer nettyRemotingServer;
 
-    public AlertServer(PluginDao pluginDao, AlertSenderService alertSenderService, AlertRequestProcessor alertRequestProcessor, AlertConfig alertConfig) {
+    public AlertServer(PluginDao pluginDao,
+                       AlertSenderService alertSenderService,
+                       AlertRequestProcessor alertRequestProcessor,
+                       AlertConfig alertConfig) {
         this.pluginDao = pluginDao;
         this.alertSenderService = alertSenderService;
         this.alertRequestProcessor = alertRequestProcessor;
         this.alertConfig = alertConfig;
     }
 
-    /**
-     * alert server startup, not use web service
-     *
-     * @param args arguments
-     */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
-        new SpringApplicationBuilder(AlertServer.class).web(WebApplicationType.NONE).run(args);
+        new SpringApplicationBuilder(AlertServer.class).run(args);
     }
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
-        logger.info("alert server starting...");
+        logger.info("Alert server is staring ...");
 
         checkTable();
         startServer();
         alertSenderService.start();
+        logger.info("Alert server is started ...");
     }
 
     @Override
@@ -89,41 +88,36 @@ public class AlertServer implements Closeable {
     public void destroy(String cause) {
 
         try {
+            // set stop signal is true
             // execute only once
-            if (Stopper.isStopped()) {
+            if (!ServerLifeCycleManager.toStopped()) {
+                logger.warn("AlterServer is already stopped");
                 return;
             }
 
-            logger.info("alert server is stopping ..., cause : {}", cause);
-
-            // set stop signal is true
-            Stopper.stop();
+            logger.info("Alert server is stopping, cause: {}", cause);
 
             // thread sleep 3 seconds for thread quietly stop
-            ThreadUtils.sleep(3000L);
+            ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
             // close
             this.nettyRemotingServer.close();
-
+            logger.info("Alter server stopped, cause: {}", cause);
         } catch (Exception e) {
-            logger.error("alert server stop exception ", e);
+            logger.error("Alert server stop failed, cause: {}", cause, e);
         }
     }
 
-    private void checkTable() {
+    protected void checkTable() {
         if (!pluginDao.checkPluginDefineTableExist()) {
             logger.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
             System.exit(1);
         }
     }
 
-    private void startServer() {
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(alertConfig.getPort());
-
-        nettyRemotingServer = new NettyRemotingServer(serverConfig);
+    protected void startServer() {
+        nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(alertConfig.getPort());
         nettyRemotingServer.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);
         nettyRemotingServer.start();
     }
-
 }

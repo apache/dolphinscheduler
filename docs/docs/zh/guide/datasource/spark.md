@@ -1,6 +1,6 @@
 # Spark数据源
 
-![sparksql](/img/new_ui/dev/datasource/sparksql.png)
+![sparksql](../../../../img/new_ui/dev/datasource/sparksql.png)
 
 - 数据源：选择 Spark
 - 数据源名称：输入数据源的名称
@@ -15,5 +15,9 @@
 注意：如果开启了**kerberos**，则需要填写 **Principal**
 
 <p align="center">
-    <img src="/img/sparksql_kerberos.png" width="80%" />
+    <img src="../../../../img/sparksql_kerberos.png" width="80%" />
   </p>
+
+## 是否原生支持
+
+是，数据源不需要任务附加操作即可使用。

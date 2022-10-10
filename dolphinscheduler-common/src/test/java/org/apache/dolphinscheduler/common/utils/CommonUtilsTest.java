@@ -17,37 +17,34 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-
-import org.apache.hadoop.security.UserGroupInformation;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * configuration test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(value = { PropertyUtils.class, UserGroupInformation.class})
+@RunWith(MockitoJUnitRunner.class)
 public class CommonUtilsTest {
+
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
+
     @Test
     public void getSystemEnvPath() {
-        logger.info(CommonUtils.getSystemEnvPath());
-        Assert.assertTrue(true);
+        String envPath;
+        envPath = CommonUtils.getSystemEnvPath();
+        Assert.assertEquals("/etc/profile", envPath);
     }
 
     @Test
     public void isDevelopMode() {
-        logger.info("develop mode: {}",CommonUtils.isDevelopMode());
+        logger.info("develop mode: {}", CommonUtils.isDevelopMode());
         Assert.assertTrue(true);
     }
 

@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.remote.processor;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 
 /**
  *  callback channel
@@ -72,7 +73,7 @@ public class NettyRemoteChannel {
         return this.channel.isActive();
     }
 
-    public ChannelFuture writeAndFlush(Command command){
+    public ChannelFuture writeAndFlush(Command command) {
         return this.channel.writeAndFlush(command);
     }
 

@@ -50,6 +50,7 @@ services:
     image: apache/dolphinscheduler-api
     ports:
       - 12345:12345
+      - 25333:25333
     env_file: .env
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]

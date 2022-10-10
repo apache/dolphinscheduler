@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
 import org.apache.dolphinscheduler.registry.api.Event;
-import org.apache.dolphinscheduler.registry.api.RegistryProperties;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.curator.test.TestingServer;
@@ -28,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -48,7 +48,7 @@ public class ZookeeperRegistryTest {
     public void before() throws Exception {
         server = new TestingServer(true);
 
-        RegistryProperties p = new RegistryProperties();
+        ZookeeperRegistryProperties p = new ZookeeperRegistryProperties();
         p.getZookeeper().setConnectString(server.getConnectString());
         registry = new ZookeeperRegistry(p);
         registry.start();
@@ -87,7 +87,7 @@ public class ZookeeperRegistryTest {
                 allCountDownLatch.countDown();
             }
         }).start();
-        preCountDownLatch.await();
+        preCountDownLatch.await(5, TimeUnit.SECONDS);
         new Thread(() -> {
             try {
                 logger.info(Thread.currentThread().getName() + " :I am trying to acquire the lock");
@@ -101,7 +101,7 @@ public class ZookeeperRegistryTest {
             }
 
         }).start();
-        allCountDownLatch.await();
+        allCountDownLatch.await(5, TimeUnit.SECONDS);
         Assert.assertEquals(testData, Arrays.asList("thread1", "thread2"));
 
     }

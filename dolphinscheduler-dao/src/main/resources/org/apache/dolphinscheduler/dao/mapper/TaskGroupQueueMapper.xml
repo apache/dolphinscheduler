@@ -134,22 +134,26 @@
         left join t_ds_process_definition p_f on process.process_definition_code = p_f.code
         and process.process_definition_version = p_f.version
         join t_ds_project as p on p_f.project_code = p.code
-        where queue.group_id = #{groupId}
-        <if test="taskName != null and taskName != ''">
-            and task_name =#{taskName}
-        </if>
-        <if test="processName != null and processName != ''">
-            and process.name =#{processName}
-        </if>
-        <if test="status != null">
-            and queue.status =#{status}
-        </if>
-        <if test="projects != null and projects.size() > 0">
-            and p.code in
-            <foreach collection="projects" index="index" item="i" open="(" separator="," close=")">
-                #{i.code}
-            </foreach>
-        </if>
+        <where>
+            <if test="groupId != null and groupId != -1">
+                queue.group_id = #{groupId}
+            </if>
+            <if test="taskName != null and taskName != ''">
+                and task_name like concat('%', #{taskName}, '%')
+            </if>
+            <if test="processName != null and processName != ''">
+                and process.name like concat('%', #{processName}, '%')
+            </if>
+            <if test="status != null">
+                and queue.status =#{status}
+            </if>
+            <if test="projects != null and projects.size() > 0">
+                and p.code in
+                <foreach collection="projects" index="index" item="i" open="(" separator="," close=")">
+                    #{i.code}
+                </foreach>
+            </if>
+        </where>
         order by queue.update_time desc
     </select>
 

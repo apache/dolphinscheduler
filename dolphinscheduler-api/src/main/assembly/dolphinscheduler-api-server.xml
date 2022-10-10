@@ -41,7 +41,7 @@
         </fileSet>
         <fileSet>
             <directory>${basedir}/../script/env</directory>
-            <outputDirectory>bin</outputDirectory>
+            <outputDirectory>conf</outputDirectory>
             <includes>
                 <include>dolphinscheduler_env.sh</include>
             </includes>
@@ -56,7 +56,7 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-ui-next/dist</directory>
+            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
     </fileSets>

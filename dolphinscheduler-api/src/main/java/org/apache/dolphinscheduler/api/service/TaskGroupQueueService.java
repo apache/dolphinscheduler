@@ -28,10 +28,13 @@ public interface TaskGroupQueueService {
 
     /**
      * query tasks in task group queue by group id
-     * @param loginUser login user
-     * @param groupId group id
-     * @param pageNo page no
-     * @param pageSize page size
+     * @param loginUser   login user
+     * @param groupId     group id
+     * @param taskName    Task Name
+     * @param processName Process instance name
+     * @param status      Task queue status
+     * @param pageNo      page no
+     * @param pageSize    page size
 
      * @return tasks list
      */

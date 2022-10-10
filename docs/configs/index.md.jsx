@@ -42,7 +42,10 @@ import docs201Config from '../../../site_config/docs2-0-1';
 import docs202Config from '../../../site_config/docs2-0-2';
 import docs203Config from '../../../site_config/docs2-0-3';
 import docs205Config from '../../../site_config/docs2-0-5';
+import docs206Config from '../../../site_config/docs2-0-6';
 import docs300Config from '../../../site_config/docs3-0-0';
+import docs301Config from '../../../site_config/docs3-0-1';
+import docs310Config from '../../../site_config/docs3-1-0';
 import docsDevConfig from '../../../site_config/docsdev';
 
 const docsSource = {
@@ -61,7 +64,10 @@ const docsSource = {
   '2.0.2': docs202Config,
   '2.0.3': docs203Config,
   '2.0.5': docs205Config,
+  '2.0.6': docs206Config,
   '3.0.0': docs300Config,
+  '3.0.1': docs301Config,
+  '3.1.0': docs310Config,
   dev: docsDevConfig,
 };
 

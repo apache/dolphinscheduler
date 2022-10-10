@@ -22,7 +22,7 @@ from typing import Dict
 from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.task import Task
 from pydolphinscheduler.exceptions import PyDSProcessDefinitionNotAssignException
-from pydolphinscheduler.java_gateway import launch_gateway
+from pydolphinscheduler.java_gateway import JavaGate
 
 
 class SubProcess(Task):
@@ -47,8 +47,7 @@ class SubProcess(Task):
             raise PyDSProcessDefinitionNotAssignException(
                 "ProcessDefinition must be provider for task SubProcess."
             )
-        gateway = launch_gateway()
-        return gateway.entry_point.getProcessDefinitionInfo(
+        return JavaGate().get_process_definition_info(
             self.process_definition.user.name,
             self.process_definition.project.name,
             process_definition_name,

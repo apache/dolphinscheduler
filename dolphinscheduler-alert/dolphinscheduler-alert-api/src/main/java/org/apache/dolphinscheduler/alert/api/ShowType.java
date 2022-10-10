@@ -19,6 +19,11 @@
 
 package org.apache.dolphinscheduler.alert.api;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum ShowType {
     /**
      * 0 TABLE;
@@ -31,21 +36,11 @@ public enum ShowType {
     TEXT(1, "text"),
     ATTACHMENT(2, "attachment"),
     TABLE_ATTACHMENT(3, "table attachment"),
-    MARKDOWN(4, "markdown"),;
+    MARKDOWN(4, "markdown"),
+    ;
 
     private final int code;
+
     private final String descp;
 
-    ShowType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }

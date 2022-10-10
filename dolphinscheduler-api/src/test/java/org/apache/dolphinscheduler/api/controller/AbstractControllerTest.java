@@ -22,11 +22,12 @@ import org.apache.dolphinscheduler.api.controller.AbstractControllerTest.Registr
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.test.TestingServer;
 
 import java.text.MessageFormat;
@@ -104,6 +105,15 @@ public abstract class AbstractControllerTest {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
         } else {
             result.put(Constants.MSG, status.getMsg());
+        }
+    }
+
+    public void putMsg(Result<Object> result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
         }
     }
 

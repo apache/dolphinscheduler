@@ -38,7 +38,7 @@ public class ConfigurationParserTest {
         try {
             String parameterStr = "{\"name\":\"data quality test\",\"env\":{\"type\":\"batch\",\"config\":null},"
                     + "\"readers\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"Test@123!\","
-                    + "\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"output_table\":\"test1\",\"table\":\"test1\","
+                    + "\"driver\":\"com.mysql.cj.jdbc.Driver\",\"user\":\"test\",\"output_table\":\"test1\",\"table\":\"test1\","
                     + "\"url\":\"jdbc:mysql://172.16.100.199:3306/test\"} }],\"transformers\":[{\"type\":\"sql\",\"config\":"
                     + "{\"index\":1,\"output_table\":\"miss_count\",\"sql\":\"SELECT COUNT(*) AS miss FROM test1 WHERE (c1 is null or c1 = '') \"} },"
                     + "{\"type\":\"sql\",\"config\":{\"index\":2,\"output_table\":\"total_count\",\"sql\":\"SELECT COUNT(*) AS total FROM test1 \"} }],"

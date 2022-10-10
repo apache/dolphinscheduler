@@ -30,10 +30,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RateLimitInterceptorTest {
 
     @Test
@@ -48,7 +47,7 @@ public class RateLimitInterceptorTest {
     @Test
     public void testPreHandleWithTenantLevenControl() throws ExecutionException {
         TrafficConfiguration trafficConfiguration = new TrafficConfiguration();
-        trafficConfiguration.setTrafficTenantControlSwitch(true);
+        trafficConfiguration.setTenantSwitch(true);
         Map<String, Integer> map = new HashMap<>();
         map.put("tenant1", 2);
         map.put("tenant2", 2);
@@ -58,8 +57,8 @@ public class RateLimitInterceptorTest {
 
         HttpServletRequest tenant1Request = Mockito.mock(HttpServletRequest.class);
         HttpServletRequest tenant2Request = Mockito.mock(HttpServletRequest.class);
-        PowerMockito.when(tenant1Request.getHeader(Mockito.any())).thenReturn("tenant1");
-        PowerMockito.when(tenant2Request.getHeader(Mockito.any())).thenReturn("tenant2");
+        Mockito.when(tenant1Request.getHeader(Mockito.any())).thenReturn("tenant1");
+        Mockito.when(tenant2Request.getHeader(Mockito.any())).thenReturn("tenant2");
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         for (int i = 0; i < 2; i++) {
@@ -72,8 +71,8 @@ public class RateLimitInterceptorTest {
     @Test
     public void testPreHandleWithGlobalControl() throws ExecutionException {
         TrafficConfiguration trafficConfiguration = new TrafficConfiguration();
-        trafficConfiguration.setTrafficTenantControlSwitch(true);
-        trafficConfiguration.setTrafficGlobalControlSwitch(true);
+        trafficConfiguration.setTenantSwitch(true);
+        trafficConfiguration.setGlobalSwitch(true);
         trafficConfiguration.setMaxGlobalQpsRate(3);
 
         RateLimitInterceptor rateLimitInterceptor = new RateLimitInterceptor(trafficConfiguration);

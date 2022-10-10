@@ -21,9 +21,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_SHECDULE_TIME;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.spi.enums.CommandType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -34,7 +33,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +49,8 @@ public class ParameterUtils {
     private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\$\\]]+)]";
 
     private static final String DATE_START_PATTERN = "^[0-9]";
+
+    private static final char PARAM_REPLACE_CHAR = '?';
 
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
@@ -152,56 +152,62 @@ public class ParameterUtils {
         }
     }
 
-    /**
-     * curing user define parameters
-     *
-     * @param globalParamMap  global param map
-     * @param globalParamList global param list
-     * @param commandType     command type
-     * @param scheduleTime    schedule time
-     * @return curing user define parameters
-     */
-    public static String curingGlobalParams(Map<String, String> globalParamMap, List<Property> globalParamList,
-                                            CommandType commandType, Date scheduleTime) {
-
-        if (globalParamList == null || globalParamList.isEmpty()) {
-            return null;
+    public static String expandListParameter(Map<Integer, Property> params, String sql) {
+        Map<Integer, Property> expandMap = new HashMap<>();
+        if (params == null || params.isEmpty()) {
+            return sql;
         }
-
-        Map<String, String> globalMap = new HashMap<>();
-        if (globalParamMap != null) {
-            globalMap.putAll(globalParamMap);
+        String[] split = sql.split("\\?");
+        if (split.length == 0) {
+            return sql;
         }
-        Map<String, String> allParamMap = new HashMap<>();
-        //If it is a complement, a complement time needs to be passed in, according to the task type
-        Map<String, String> timeParams = BusinessTimeUtils
-            .getBusinessTime(commandType, scheduleTime);
-
-        if (timeParams != null) {
-            allParamMap.putAll(timeParams);
-        }
-
-        allParamMap.putAll(globalMap);
-
-        Set<Map.Entry<String, String>> entries = allParamMap.entrySet();
-
-        Map<String, String> resolveMap = new HashMap<>();
-        for (Map.Entry<String, String> entry : entries) {
-            String val = entry.getValue();
-            if (val.startsWith("$")) {
-                String str = ParameterUtils.convertParameterPlaceholders(val, allParamMap);
-                resolveMap.put(entry.getKey(), str);
+        StringBuilder ret = new StringBuilder(split[0]);
+        int index = 1;
+        for (int i = 1; i < split.length; i++) {
+            Property property = params.get(i);
+            String value = property.getValue();
+            if (DataType.LIST.equals(property.getType())) {
+                List<Object> valueList = JSONUtils.toList(value, Object.class);
+                if (valueList.isEmpty() && StringUtils.isNotBlank(value)) {
+                    valueList.add(value);
+                }
+                for (int j = 0; j < valueList.size(); j++) {
+                    ret.append(PARAM_REPLACE_CHAR);
+                    if (j != valueList.size() - 1) {
+                        ret.append(",");
+                    }
+                }
+                for (Object v : valueList ) {
+                    Property newProperty = new Property();
+                     if (v instanceof Integer) {
+                        newProperty.setType(DataType.INTEGER);
+                    } else if (v instanceof Long) {
+                        newProperty.setType(DataType.LONG);
+                    } else if (v instanceof Float) {
+                        newProperty.setType(DataType.FLOAT);
+                    } else if (v instanceof Double) {
+                        newProperty.setType(DataType.DOUBLE);
+                    } else {
+                        newProperty.setType(DataType.VARCHAR);
+                    }
+                    newProperty.setValue(v.toString());
+                    newProperty.setProp(property.getProp());
+                    newProperty.setDirect(property.getDirect());
+                    expandMap.put(index++, newProperty);
+                }
+            } else {
+                ret.append(PARAM_REPLACE_CHAR);
+                expandMap.put(index++, property);
             }
+            ret.append(split[i]);
         }
-        globalMap.putAll(resolveMap);
-
-        for (Property property : globalParamList) {
-            String val = globalMap.get(property.getProp());
-            if (val != null) {
-                property.setValue(val);
-            }
+        if (PARAM_REPLACE_CHAR == sql.charAt(sql.length() - 1)) {
+            ret.append(PARAM_REPLACE_CHAR);
+            expandMap.put(index, params.get(split.length));
         }
-        return JSONUtils.toJsonString(globalParamList);
+        params.clear();
+        params.putAll(expandMap);
+        return ret.toString();
     }
 
     /**

@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 
 public enum StateEventType {
 
-    PROCESS_STATE_CHANGE(0, "process statechange"),
+    PROCESS_STATE_CHANGE(0, "process state change"),
     TASK_STATE_CHANGE(1, "task state change"),
     PROCESS_TIMEOUT(2, "process timeout"),
     TASK_TIMEOUT(3, "task timeout"),

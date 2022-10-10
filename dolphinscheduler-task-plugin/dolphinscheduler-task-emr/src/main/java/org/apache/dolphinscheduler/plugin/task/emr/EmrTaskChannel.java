@@ -33,7 +33,15 @@ public class EmrTaskChannel implements TaskChannel {
 
     @Override
     public AbstractTask createTask(TaskExecutionContext taskRequest) {
-        return new EmrTask(taskRequest);
+        EmrParameters emrParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), EmrParameters.class);
+        assert emrParameters != null;
+        if (ProgramType.RUN_JOB_FLOW.equals(emrParameters.getProgramType())) {
+            return new EmrJobFlowTask(taskRequest);
+        } else if (ProgramType.ADD_JOB_FLOW_STEPS.equals(emrParameters.getProgramType())) {
+            return new EmrAddStepsTask(taskRequest);
+        } else {
+            throw new IllegalArgumentException("Unsupported program type: " + emrParameters.getProgramType());
+        }
     }
 
     @Override

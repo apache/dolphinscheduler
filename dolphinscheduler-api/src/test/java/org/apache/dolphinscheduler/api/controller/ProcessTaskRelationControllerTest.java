@@ -33,7 +33,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -42,6 +41,7 @@ import org.springframework.test.web.servlet.MvcResult;
  * process task relation controller test
  */
 public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
+
     @MockBean(name = "processTaskRelationServiceImpl")
     private ProcessTaskRelationService processTaskRelationService;
 
@@ -49,11 +49,13 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
     public void testQueryDownstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(processTaskRelationService.queryDownstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
+        Mockito.when(
+                processTaskRelationService.queryDownstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/downstream", "1113", "123")
-                .header(SESSION_ID, sessionId))
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/downstream", "1113", "123")
+                        .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -67,11 +69,13 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
     public void testQueryUpstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(processTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
+        Mockito.when(
+                processTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/upstream", "1113", "123")
-                .header(SESSION_ID, sessionId))
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/upstream", "1113", "123")
+                        .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

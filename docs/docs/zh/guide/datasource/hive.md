@@ -2,7 +2,7 @@
 
 ## 使用HiveServer2
 
-![hive](/img/new_ui/dev/datasource/hive.png)
+![hive](../../../../img/new_ui/dev/datasource/hive.png)
 
 - 数据源：选择 HIVE
 - 数据源名称：输入数据源的名称
@@ -19,7 +19,7 @@
 
 ## 使用 HiveServer2 HA Zookeeper
 
-![hive-server2](/img/new_ui/dev/datasource/hiveserver2.png)
+![hive-server2](../../../../img/new_ui/dev/datasource/hiveserver2.png)
 
 注意：如果没有开启 kerberos,请保证参数 `hadoop.security.authentication.startup.state` 值为 `false`,
 参数 `java.security.krb5.conf.path` 值为空. 开启了 **kerberos**，则需要在 `common.properties` 配置以下参数
@@ -38,3 +38,6 @@ login.user.keytab.username=hdfs-mycluster@ESZ.COM
 login.user.keytab.path=/opt/hdfs.headless.keytab
 ```
 
+## 是否原生支持
+
+是，数据源不需要任务附加操作即可使用。

@@ -37,8 +37,8 @@ public interface AccessTokenMapper extends BaseMapper<AccessToken> {
      * access token page
      *
      * @param page page
-     * @param userName userName
      * @param userId userId
+     * @param userName userName
      * @return access token Ipage
      */
     IPage<AccessToken> selectAccessTokenPage(Page page,
@@ -61,4 +61,12 @@ public interface AccessTokenMapper extends BaseMapper<AccessToken> {
      * @return delete result
      */
     int deleteAccessTokenByUserId(@Param("userId") int userId);
+
+    /**
+     * list authorized Projects
+     * @param userId
+     * @param accessTokensIds
+     * @return access token for specified user
+     */
+    List<AccessToken> listAuthorizedAccessToken(@Param("userId") int userId, @Param("accessTokensIds")List<Integer> accessTokensIds);
 }

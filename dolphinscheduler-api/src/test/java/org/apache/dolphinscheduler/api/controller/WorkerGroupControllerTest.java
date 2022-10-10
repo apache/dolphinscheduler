@@ -38,7 +38,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -51,6 +50,7 @@ import org.springframework.util.MultiValueMap;
  * worker group controller test
  */
 public class WorkerGroupControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
 
     @MockBean(name = "workerGroupMapper")
@@ -67,11 +67,13 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("192.168.0.1", "192.168.0.1");
         serverMaps.put("192.168.0.2", "192.168.0.2");
-        PowerMockito.when(registryClient.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
+        Mockito.when(registryClient.getServerMaps(NodeType.WORKER)).thenReturn(serverMaps);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","cxc_work_group");
-        paramsMap.add("addrList","192.168.0.1,192.168.0.2");
+        paramsMap.add("name", "cxc_work_group");
+        paramsMap.add("addrList", "192.168.0.1,192.168.0.2");
+        paramsMap.add("description", "");
+        paramsMap.add("otherParamsJson", "");
         MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -86,9 +88,9 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryAllWorkerGroupsPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","2");
-        paramsMap.add("searchVal","cxc");
-        paramsMap.add("pageSize","2");
+        paramsMap.add("pageNo", "2");
+        paramsMap.add("searchVal", "cxc");
+        paramsMap.add("pageSize", "2");
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -117,7 +119,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void queryWorkerAddressList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
-                        .header("sessionId", sessionId))
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -132,7 +134,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         workerGroup.setId(12);
         workerGroup.setName("测试");
         Mockito.when(workerGroupMapper.selectById(12)).thenReturn(workerGroup);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", Constants.NOT_TERMINATED_STATES)).thenReturn(null);
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", Constants.NOT_TERMINATED_STATES))
+                .thenReturn(null);
         Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
         Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
 

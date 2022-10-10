@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -25,13 +26,13 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * command
- */
+@Data
 @TableName("t_ds_error_command")
 public class ErrorCommand {
 
@@ -39,7 +40,7 @@ public class ErrorCommand {
      * id
      */
     @TableId(value = "id", type = IdType.INPUT)
-    private int id;
+    private Integer id;
 
     /**
      * command type
@@ -121,8 +122,14 @@ public class ErrorCommand {
      */
     private int dryRun;
 
-    public ErrorCommand() {}
+    /**
+     * test flag
+     */
+    @TableField("test_flag")
+    private int testFlag;
 
+    public ErrorCommand() {
+    }
     public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
@@ -140,164 +147,6 @@ public class ErrorCommand {
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
         this.dryRun = command.getDryRun();
-    }
-
-    public TaskDependType getTaskDependType() {
-        return taskDependType;
-    }
-
-    public void setTaskDependType(TaskDependType taskDependType) {
-        this.taskDependType = taskDependType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public CommandType getCommandType() {
-        return commandType;
-    }
-
-    public void setCommandType(CommandType commandType) {
-        this.commandType = commandType;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public FailureStrategy getFailureStrategy() {
-        return failureStrategy;
-    }
-
-    public void setFailureStrategy(FailureStrategy failureStrategy) {
-        this.failureStrategy = failureStrategy;
-    }
-
-    public void setCommandParam(String commandParam) {
-        this.commandParam = commandParam;
-    }
-
-    public String getCommandParam() {
-        return commandParam;
-    }
-
-    public WarningType getWarningType() {
-        return warningType;
-    }
-
-    public void setWarningType(WarningType warningType) {
-        this.warningType = warningType;
-    }
-
-    public Integer getWarningGroupId() {
-        return warningGroupId;
-    }
-
-    public void setWarningGroupId(Integer warningGroupId) {
-        this.warningGroupId = warningGroupId;
-    }
-
-    public Date getScheduleTime() {
-        return scheduleTime;
-    }
-
-    public void setScheduleTime(Date scheduleTime) {
-        this.scheduleTime = scheduleTime;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public int getExecutorId() {
-        return executorId;
-    }
-
-    public void setExecutorId(int executorId) {
-        this.executorId = executorId;
-    }
-
-    public Priority getProcessInstancePriority() {
-        return processInstancePriority;
-    }
-
-    public void setProcessInstancePriority(Priority processInstancePriority) {
-        this.processInstancePriority = processInstancePriority;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getWorkerGroup() {
-        return workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Long getEnvironmentCode() {
-        return this.environmentCode;
-    }
-
-    public void setEnvironmentCode(Long environmentCode) {
-        this.environmentCode = environmentCode;
-    }
-
-    public int getDryRun() {
-        return dryRun;
-    }
-
-    public void setDryRun(int dryRun) {
-        this.dryRun = dryRun;
-    }
-
-    @Override
-    public String toString() {
-        return "ErrorCommand{"
-                + "id=" + id
-                + ", commandType=" + commandType
-                + ", processDefinitionCode=" + processDefinitionCode
-                + ", executorId=" + executorId
-                + ", commandParam='" + commandParam + '\''
-                + ", taskDependType=" + taskDependType
-                + ", failureStrategy=" + failureStrategy
-                + ", warningType=" + warningType
-                + ", warningGroupId=" + warningGroupId
-                + ", scheduleTime=" + scheduleTime
-                + ", startTime=" + startTime
-                + ", processInstancePriority=" + processInstancePriority
-                + ", updateTime=" + updateTime
-                + ", message='" + message + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode='" + environmentCode + '\''
-                + ", dryRun='" + dryRun + '\''
-                + '}';
+        this.testFlag = command.getTestFlag();
     }
 }

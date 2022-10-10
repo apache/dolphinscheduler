@@ -23,8 +23,8 @@ from pydolphinscheduler.core.process_definition import ProcessDefinition
 from pydolphinscheduler.core.task import Task
 
 __all__ = [
+    "Database",
     "Engine",
     "ProcessDefinition",
     "Task",
-    "Database",
 ]

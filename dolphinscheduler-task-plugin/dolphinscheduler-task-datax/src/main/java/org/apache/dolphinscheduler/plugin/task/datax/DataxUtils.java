@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.datax;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.alibaba.druid.sql.dialect.clickhouse.parser.ClickhouseStatementParser;
+import com.alibaba.druid.sql.dialect.hive.parser.HiveStatementParser;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
 import com.alibaba.druid.sql.dialect.oracle.parser.OracleStatementParser;
 import com.alibaba.druid.sql.dialect.postgresql.parser.PGSQLStatementParser;
@@ -38,6 +39,8 @@ public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_CLICKHOUSE = "clickhousereader";
 
+    public static final String DATAX_READER_PLUGIN_HIVE = "rdbmsreader";
+
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
     public static final String DATAX_WRITER_PLUGIN_POSTGRESQL = "postgresqlwriter";
@@ -47,6 +50,8 @@ public class DataxUtils {
     public static final String DATAX_WRITER_PLUGIN_SQLSERVER = "sqlserverwriter";
 
     public static final String DATAX_WRITER_PLUGIN_CLICKHOUSE = "clickhousewriter";
+
+    public static final String DATAX_WRITER_PLUGIN_HIVE = "rdbmswriter";
 
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
@@ -60,6 +65,8 @@ public class DataxUtils {
                 return DATAX_READER_PLUGIN_SQLSERVER;
             case CLICKHOUSE:
                 return DATAX_READER_PLUGIN_CLICKHOUSE;
+            case HIVE:
+                return DATAX_READER_PLUGIN_HIVE;
             default:
                 return null;
         }
@@ -77,6 +84,8 @@ public class DataxUtils {
                 return DATAX_WRITER_PLUGIN_SQLSERVER;
             case CLICKHOUSE:
                 return DATAX_WRITER_PLUGIN_CLICKHOUSE;
+            case HIVE:
+                return DATAX_WRITER_PLUGIN_HIVE;
             default:
                 return null;
         }
@@ -94,6 +103,8 @@ public class DataxUtils {
                 return new SQLServerStatementParser(sql);
             case CLICKHOUSE:
                 return new ClickhouseStatementParser(sql);
+            case HIVE:
+                return new HiveStatementParser(sql);
             default:
                 return null;
         }
@@ -130,6 +141,8 @@ public class DataxUtils {
             case ORACLE:
                 return String.format("\"%s\"", column);
             case SQLSERVER:
+                return String.format("`%s`", column);
+            case CLICKHOUSE:
                 return String.format("`%s`", column);
             default:
                 return column;

@@ -23,9 +23,12 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -55,7 +58,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -65,6 +71,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DqRuleServiceTest {
+
+    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @InjectMocks
     private DqRuleServiceImpl dqRuleService;
@@ -81,6 +89,9 @@ public class DqRuleServiceTest {
     @Mock
     DataSourceMapper dataSourceMapper;
 
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
+
     @Test
     public void testGetRuleFormCreateJsonById() {
         String json = "[{\"field\":\"src_connector_type\",\"name\":\"源数据类型\",\"props\":{\"placeholder\":"
@@ -95,22 +106,22 @@ public class DqRuleServiceTest {
                 + "\"statistics_execute_sql\",\"name\":\"统计值计算SQL\",\"type\":\"input\",\"title\":"
                 + "\"统计值计算SQL\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
-        Map<String,Object> result = dqRuleService.getRuleFormCreateJsonById(1);
-        Assert.assertEquals(json,result.get(Constants.DATA_LIST));
+        Map<String, Object> result = dqRuleService.getRuleFormCreateJsonById(1);
+        Assert.assertEquals(json, result.get(Constants.DATA_LIST));
     }
 
     @Test
     public void testQueryAllRuleList() {
         when(dqRuleMapper.selectList(new QueryWrapper<>())).thenReturn(getRuleList());
-        Map<String,Object> result = dqRuleService.queryAllRuleList();
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Map<String, Object> result = dqRuleService.queryAllRuleList();
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testGetDatasourceOptionsById() {
         when(dataSourceMapper.listAllDataSourceByType(DbType.MYSQL.getCode())).thenReturn(dataSourceList());
-        Map<String,Object> result = dqRuleService.queryAllRuleList();
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Map<String, Object> result = dqRuleService.queryAllRuleList();
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -118,13 +129,16 @@ public class DqRuleServiceTest {
 
         String searchVal = "";
         int ruleType = 0;
-        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
+        Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
 
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, null,
+                loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_QUALITY, null, 0,
+                baseServiceLogger)).thenReturn(true);
         Page<DqRule> page = new Page<>(1, 10);
         page.setTotal(1);
         page.setRecords(getRuleList());
@@ -136,11 +150,11 @@ public class DqRuleServiceTest {
         when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
 
         Result result = dqRuleService.queryRuleListPaging(
-                loginUser,searchVal,0,"2020-01-01 00:00:00","2020-01-02 00:00:00",1,10);
-        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()),result.getCode());
+                loginUser, searchVal, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
+        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
     }
 
-    private  List<DataSource> dataSourceList() {
+    private List<DataSource> dataSourceList() {
         List<DataSource> dataSourceList = new ArrayList<>();
         DataSource dataSource = new DataSource();
         dataSource.setId(1);
@@ -180,40 +194,41 @@ public class DqRuleServiceTest {
         srcConnectorType.setField("src_connector_type");
         srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
-        srcConnectorType.setShow(true);
+        srcConnectorType.setIsShow(true);
         srcConnectorType.setValue("JDBC");
         srcConnectorType.setPlaceholder("Please select the source connector type");
         srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        srcConnectorType.setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
+        srcConnectorType
+                .setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
         srcConnectorType.setInputType(InputType.DEFAULT.getCode());
         srcConnectorType.setValueType(ValueType.NUMBER.getCode());
-        srcConnectorType.setEmit(true);
-        srcConnectorType.setValidate(true);
+        srcConnectorType.setIsEmit(true);
+        srcConnectorType.setIsValidate(true);
 
         DqRuleInputEntry statisticsName = new DqRuleInputEntry();
         statisticsName.setTitle("统计值名");
         statisticsName.setField("statistics_name");
         statisticsName.setType(FormType.INPUT.getFormType());
         statisticsName.setCanEdit(true);
-        statisticsName.setShow(true);
+        statisticsName.setIsShow(true);
         statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsName.setInputType(InputType.DEFAULT.getCode());
         statisticsName.setValueType(ValueType.STRING.getCode());
-        statisticsName.setEmit(false);
-        statisticsName.setValidate(true);
+        statisticsName.setIsEmit(false);
+        statisticsName.setIsValidate(true);
 
         DqRuleInputEntry statisticsExecuteSql = new DqRuleInputEntry();
         statisticsExecuteSql.setTitle("统计值计算SQL");
         statisticsExecuteSql.setField("statistics_execute_sql");
         statisticsExecuteSql.setType(FormType.TEXTAREA.getFormType());
         statisticsExecuteSql.setCanEdit(true);
-        statisticsExecuteSql.setShow(true);
+        statisticsExecuteSql.setIsShow(true);
         statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
         statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
-        statisticsExecuteSql.setEmit(false);
-        statisticsExecuteSql.setValidate(true);
+        statisticsExecuteSql.setIsEmit(false);
+        statisticsExecuteSql.setIsValidate(true);
 
         list.add(srcConnectorType);
         list.add(statisticsName);

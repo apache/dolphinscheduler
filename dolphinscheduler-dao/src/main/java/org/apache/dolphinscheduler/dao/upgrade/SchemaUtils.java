@@ -19,11 +19,10 @@ package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +80,7 @@ public class SchemaUtils {
      * @return Determine whether schemaVersion is higher than version
      */
     public static boolean isAGreatVersion(String schemaVersion, String version) {
-        if (StringUtils.isEmpty(schemaVersion) || StringUtils.isEmpty(version)) {
+        if (Strings.isNullOrEmpty(schemaVersion) || Strings.isNullOrEmpty(version)) {
             throw new RuntimeException("schemaVersion or version is empty");
         }
 
@@ -108,8 +107,8 @@ public class SchemaUtils {
     public static String getSoftVersion() throws IOException {
         final ClassPathResource softVersionFile = new ClassPathResource("sql/soft_version");
         String softVersion;
-        try {
-            softVersion = FileUtils.readFile2Str(softVersionFile.getInputStream());
+        try (InputStream inputStream = softVersionFile.getInputStream()) {
+            softVersion = FileUtils.readFile2Str(inputStream);
             softVersion = Strings.nullToEmpty(softVersion).replaceAll("\\s+|\r|\n", "");
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);

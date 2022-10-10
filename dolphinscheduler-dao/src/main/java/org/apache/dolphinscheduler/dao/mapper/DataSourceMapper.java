@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -32,12 +34,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface DataSourceMapper extends BaseMapper<DataSource> {
 
     /**
-     * query datasource by type
+     * query online/testDatasource by type
      * @param userId userId
      * @param type type
      * @return datasource list
      */
-    List<DataSource> queryDataSourceByType(@Param("userId") int userId, @Param("type") Integer type);
+    List<DataSource> queryDataSourceByType(@Param("userId") int userId, @Param("type") Integer type, @Param("testFlag") int testFlag);
 
     /**
      * datasource page
@@ -88,7 +90,7 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      * @param <T> T
      * @return UDF function list
      */
-    <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId,@Param("dataSourceIds")T[] dataSourceIds);
+    <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId, @Param("dataSourceIds") T[] dataSourceIds);
 
     /**
      * query datasource by name and user id
@@ -98,4 +100,27 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      * @return If the name does not exist or the user does not have permission, it will return null
      */
     DataSource queryDataSourceByNameAndUserId(@Param("userId") int userId, @Param("name") String name);
+
+    /**
+     * selectPagingByIds
+     * @param dataSourcePage
+     * @param ids
+     * @param searchVal
+     * @return
+     */
+    IPage<DataSource> selectPagingByIds(Page<DataSource> dataSourcePage, @Param("dataSourceIds") List<Integer> dataSourceIds, @Param("name") String name);
+
+    /**
+     * clearBindTestId
+     * @param bindTestId
+     * @return
+     */
+    void clearBindTestId(@Param("bindTestId") Integer bindTestId);
+
+    /**
+     * queryTestDataSourceId
+     * @param onlineDataSourceId
+     * @return Integer
+     */
+    Integer queryTestDataSourceId(@Param("dataSourceId") Integer onlineDataSourceId);
 }

@@ -1,27 +1,31 @@
-# 依赖节点
+# Dependent 节点
 
-- 依赖节点，就是**依赖检查节点**。比如A流程依赖昨天的B流程执行成功，依赖节点会去检查B流程在昨天是否有执行成功的实例。
+## 综述
 
-> 拖动工具栏中的![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_DEPENDENT.png)任务节点到画板中，如下图所示：
+Dependent 节点，就是**依赖检查节点**。比如 A 流程依赖昨天的 B 流程执行成功，依赖节点会去检查 B 流程在昨天是否有执行成功的实例。
 
-<p align="center">
-   <img src="/img/dependent_edit.png" width="80%" />
- </p>
+## 创建任务
 
-  > 依赖节点提供了逻辑判断功能，比如检查昨天的B流程是否成功，或者C流程是否执行成功。
+- 点击项目管理 -> 项目名称 -> 工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；
+- 拖动工具栏的<img src="../../../../img/tasks/icons/dependent.png" width="15"/> 任务节点到画板中。
 
-  <p align="center">
-   <img src="/img/depend-node.png" width="80%" />
- </p>
+## 任务参数
 
-  > 例如，A流程为周报任务，B、C流程为天任务，A任务需要B、C任务在上周的每一天都执行成功，如图示：
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+- 此任务除上述链接中的默认参数外无其他参数。
 
- <p align="center">
-   <img src="/img/depend-node2.png" width="80%" />
- </p>
+## 任务样例
 
-  > 假如，周报A同时还需要自身在上周二执行成功：
+Dependent 节点提供了逻辑判断功能，可以按照逻辑来检测所依赖节点的执行情况。
 
- <p align="center">
-   <img src="/img/depend-node3.png" width="80%" />
- </p>
+例如，A 流程为周报任务，B、C 流程为天任务，A 任务需要 B、C 任务在上周的每一天都执行成功，如图示：
+
+![dependent_task01](../../../../img/tasks/demo/dependent_task01.png)
+
+例如，A 流程为周报任务，B、C 流程为天任务，A 任务需要 B 或 C 任务在上周的每一天都执行成功，如图示：
+
+![dependent_task02](../../../../img/tasks/demo/dependent_task02.png)
+
+假如，周报 A 同时还需要自身在上周二执行成功：
+
+![dependent_task03](../../../../img/tasks/demo/dependent_task03.png)

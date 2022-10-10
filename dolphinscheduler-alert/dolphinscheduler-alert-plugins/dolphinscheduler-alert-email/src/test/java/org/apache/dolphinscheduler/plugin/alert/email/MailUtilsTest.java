@@ -30,10 +30,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore("The test case makes no sense")
 public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
     static MailSender mailSender;

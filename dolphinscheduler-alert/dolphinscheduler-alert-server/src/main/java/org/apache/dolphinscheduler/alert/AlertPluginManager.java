@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import static java.lang.String.format;
-
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
@@ -31,21 +29,20 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
-
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static java.lang.String.format;
 
 @Component
 public final class AlertPluginManager {
@@ -74,20 +71,17 @@ public final class AlertPluginManager {
 
     @EventListener
     public void installPlugin(ApplicationReadyEvent readyEvent) {
-        final Set<String> names = new HashSet<>();
 
-        ServiceLoader.load(AlertChannelFactory.class).forEach(factory -> {
-            final String name = factory.name();
+        PrioritySPIFactory<AlertChannelFactory> prioritySPIFactory = new PrioritySPIFactory<>(AlertChannelFactory.class);
+        for (Map.Entry<String, AlertChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
+            String name = entry.getKey();
+            AlertChannelFactory factory = entry.getValue();
 
-            logger.info("Registering alert plugin: {}", name);
-
-            if (!names.add(name)) {
-                throw new IllegalStateException(format("Duplicate alert plugins named '%s'", name));
-            }
+            logger.info("Registering alert plugin: {} - {}", name, factory.getClass());
 
             final AlertChannel alertChannel = factory.create();
 
-            logger.info("Registered alert plugin: {}", name);
+            logger.info("Registered alert plugin: {} - {}", name, factory.getClass());
 
             final List<PluginParams> params = new ArrayList<>(factory.params());
             params.add(0, warningTypeParams);
@@ -98,7 +92,7 @@ public final class AlertPluginManager {
             final int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
 
             channelKeyedById.put(id, alertChannel);
-        });
+        }
     }
 
     public Optional<AlertChannel> getAlertChannel(int id) {
