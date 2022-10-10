@@ -21,8 +21,7 @@ import {
   toRefs
 } from 'vue'
 import {
-  NSpace,
-  NSpin
+  NSpace
 } from 'naive-ui'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
@@ -48,7 +47,7 @@ const SourceModal = defineComponent({
 
     const { state } = useForm(props.id)
 
-    const handleTypeSelect = (value: string, defaultPort: number) => {
+    const handleTypeSelect = (value: string) => {
       ctx.emit('change', value)
     }
 
@@ -76,7 +75,7 @@ const SourceModal = defineComponent({
             <div class={styles.content}>
               <NSpace>
                 {datasourceTypeList.map((item) => (
-                  <div class={styles.itemBox} onClick={() => handleTypeSelect(item.value, item.defaultPort)}>
+                  <div class={styles.itemBox} onClick={() => handleTypeSelect(item.value)}>
                     {item.label}
                   </div>
                 ))}
