@@ -2,7 +2,7 @@
 
 ## Preface
 
-Pull Request is a way of software cooperation, which is a process of bringing code involving different functions into the trunk. During this process, the code can be discussed, reviewed, and modified.
+Pull Request is a way of software cooperation, which is a workflow of bringing code involving different functions into the trunk. During this workflow, the code can be discussed, reviewed, and modified.
 
 In Pull Request, we try not to discuss the implementation of the code. The general implementation of the code and its logic should be determined in Issue. In the Pull Request, we only focus on the code format and code specification, so as to avoid wasting time caused by different opinions on implementation.
 

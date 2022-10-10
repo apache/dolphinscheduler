@@ -28,7 +28,7 @@ All the load algorithms above are weighted based on weights, which affect the ro
 
 ### Preheating
 
-Consider JIT optimization, worker runs at low power for a period of time after startup, so that it can gradually reach its optimal state, a process we call preheating. If you are interested, you can read some articles about JIT.
+Consider JIT optimization, worker runs at low power for a period of time after startup, so that it can gradually reach its optimal state, a workflow we call preheating. If you are interested, you can read some articles about JIT.
 
 So the worker gradually reaches its maximum weight with time after starts up ( by default ten minutes, there is no configuration about the pre-heating duration, it's recommend to submit a PR if have needs to change the duration).
 

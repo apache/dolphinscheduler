@@ -37,6 +37,6 @@ The following shows the definition of the [use_create] node:
 
 ![priority-parameter04](../../../../img/new_ui/dev/parameter/priority_parameter04.png)
 
-"status" is own parameter of the node set by the current node. However, the user also sets the "status" parameter (global parameter) when saving the process definition and assign its value to -1. Then the value of status will be 2, with higher priority when the SQL executes. The global parameter value is discarded.
+"status" is own parameter of the node set by the current node. However, the user also sets the "status" parameter (global parameter) when saving the workflow definition and assign its value to -1. Then the value of status will be 2, with higher priority when the SQL executes. The global parameter value is discarded.
 
 The "ID" here is the parameter set by the upstream node. The user sets the parameters of the same parameter name "ID" for the [createparam1] node and [createparam2] node. And the [use_create] node uses the value of [createParam1] which is finished first.

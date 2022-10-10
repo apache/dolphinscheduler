@@ -499,7 +499,7 @@ the release version is `<VERSION>`, the following updates are required(note it w
 
 ### Send Announcement E-mail Community
 
-You should send announcement E-mail after release process finished. The E-mail should send to `dev@dolphinscheduler.apache.org`
+You should send announcement E-mail after release workflow finished. The E-mail should send to `dev@dolphinscheduler.apache.org`
 and cc to `announce@apache.org`.
 
 Announcement e-mail template as below：

@@ -86,7 +86,7 @@ Execute `pm2 start npm -- run dev` to start the project in the project `dolphins
 [root@localhost dolphinscheduler-ui]# pm2 start npm -- run dev
 [PM2] Applying action restartProcessId on app [npm](ids: 0)
 [PM2] [npm](0) ✓
-[PM2] Process successfully started
+[PM2] Workflow successfully started
 ┌──────────┬────┬─────────┬──────┬──────┬────────┬─────────┬────────┬─────┬──────────┬──────┬──────────┐
 │ App name │ id │ version │ mode │ pid  │ status │ restart │ uptime │ cpu │ mem      │ user │ watching │
 ├──────────┼────┼─────────┼──────┼──────┼────────┼─────────┼────────┼─────┼──────────┼──────┼──────────┤

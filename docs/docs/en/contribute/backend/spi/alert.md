@@ -32,13 +32,13 @@ AlertChannelFactory
 Alarm plug-in factory interface. All alarm plug-ins need to implement this interface. This interface is used to define the name of the alarm plug-in and the required parameters. The create method is used to create a specific alarm plug-in instance.
 
 AlertChannel
-The interface of the alert plug-in. The alert plug-in needs to implement this interface. There is only one method process in this interface. The upper-level alert system will call this method and obtain the return information of the alert through the AlertResult returned by this method.
+The interface of the alert plug-in. The alert plug-in needs to implement this interface. There is only one method workflow in this interface. The upper-level alert system will call this method and obtain the return information of the alert through the AlertResult returned by this method.
 
 AlertData
 Alarm content information, including id, title, content, log.
 
 AlertInfo
-For alarm-related information, when the upper-level system calls an instance of the alarm plug-in, the instance of this class is passed to the specific alarm plug-in through the process method. It contains the alert content AlertData and the parameter information filled in by the front end of the called alert plug-in instance.
+For alarm-related information, when the upper-level system calls an instance of the alarm plug-in, the instance of this class is passed to the specific alarm plug-in through the workflow method. It contains the alert content AlertData and the parameter information filled in by the front end of the called alert plug-in instance.
 
 AlertResult
 The alarm plug-in sends alarm return information.

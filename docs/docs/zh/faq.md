@@ -614,7 +614,7 @@ A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EM
 
 ---
 
-## Q：Update process definition error: Duplicate key TaskDefinition
+## Q：Update workflow definition error: Duplicate key TaskDefinition
 
 A：在DS 2.0.4之前（2.0.0-alpha之后），可能存在版本切换的重复键问题，导致更新工作流失败；可参考如下SQL进行重复数据的删除，以MySQL为例：（注意：操作前请务必备份原数据，SQL来源于pr [#8408](https://github.com/apache/dolphinscheduler/pull/8408)）
 

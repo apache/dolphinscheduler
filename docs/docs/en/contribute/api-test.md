@@ -42,9 +42,9 @@ public final class LoginPage {
 }
 ```
 
-During the test process, we only test the interfaces we need to focus on, not all interfaces in the page. Therefore, we only declare the user name, password and interface path on the login page.
+During the test workflow, we only test the interfaces we need to focus on, not all interfaces in the page. Therefore, we only declare the user name, password and interface path on the login page.
 
-In addition, during the testing process, the interface are not requested directly. The general choice is to package the corresponding methods to achieve the effect of reuse. For example, if you want to log in, you input your username and password through the `public LoginPage login()` method to manipulate the elements you pass in to achieve the effect of logging in. That is, when the user finishes logging in, he or she achieve the effect of login.
+In addition, during the testing workflow, the interface are not requested directly. The general choice is to package the corresponding methods to achieve the effect of reuse. For example, if you want to log in, you input your username and password through the `public LoginPage login()` method to manipulate the elements you pass in to achieve the effect of logging in. That is, when the user finishes logging in, he or she achieve the effect of login.
 
 On the login page, only the input parameter specification of the interface request is defined. For the output parameter of the interface request, only the unified basic response structure is defined. The data actually returned by the interface is tested in the actual test case. Whether the input and output of main test interfaces can meet the requirements of test cases.
 

@@ -24,14 +24,14 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
 ```
 
 > Note: Do not use apache/dolphinscheduler-standalone-server Docker image in production, it should only for you to taste
-> DolphinScheduler at the first time. Not only because it runs all services in one single process, but also it uses H2 as
+> DolphinScheduler at the first time. Not only because it runs all services in one single workflow, but also it uses H2 as
 > its database which will lose metadata after it stops (could be changed to another database to avoid it). In addition,
 > apache/dolphinscheduler-standalone-server only contains DolphinScheduler core services, some tasks such as Spark and Flink,
 > require external components or environment to run it.
 
 ### Using docker-compose to Start Server
 
-The difference between start services by docker-compose and standalone-server are servers running in one single process
+The difference between start services by docker-compose and standalone-server are servers running in one single workflow
 or not. Services start with docker-compose running in separate containers, as well as different processes. Metadata could
 be stored on disks after you change docker-compose configuration, and it is robust and stable for someone who wants to run
 DolphinScheduler in a long term. You have to install [docker-compose](https://docs.docker.com/compose/install/) before you

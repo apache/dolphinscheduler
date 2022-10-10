@@ -9,15 +9,15 @@ The following shows the `t_ds_process_definition` table structure:
 | No. |          field          |     type     |                                 description                                  |
 |-----|-------------------------|--------------|------------------------------------------------------------------------------|
 | 1   | id                      | int(11)      | primary key                                                                  |
-| 2   | name                    | varchar(255) | process definition name                                                      |
-| 3   | version                 | int(11)      | process definition version                                                   |
-| 4   | release_state           | tinyint(4)   | release status of process definition: 0 not released, 1 released             |
+| 2   | name                    | varchar(255) | workflow definition name                                                      |
+| 3   | version                 | int(11)      | workflow definition version                                                   |
+| 4   | release_state           | tinyint(4)   | release status of workflow definition: 0 not released, 1 released             |
 | 5   | project_id              | int(11)      | project id                                                                   |
-| 6   | user_id                 | int(11)      | user id of the process definition                                            |
-| 7   | process_definition_json | longtext     | process definition JSON                                                      |
-| 8   | description             | text         | process definition description                                               |
+| 6   | user_id                 | int(11)      | user id of the workflow definition                                            |
+| 7   | process_definition_json | longtext     | workflow definition JSON                                                      |
+| 8   | description             | text         | workflow definition description                                               |
 | 9   | global_params           | text         | global parameters                                                            |
-| 10  | flag                    | tinyint(4)   | specify whether the process is available: 0 is not available, 1 is available |
+| 10  | flag                    | tinyint(4)   | specify whether the workflow is available: 0 is not available, 1 is available |
 | 11  | locations               | text         | node location information                                                    |
 | 12  | connects                | text         | node connectivity info                                                       |
 | 13  | receivers               | text         | receivers                                                                    |
@@ -35,7 +35,7 @@ The following table describes the common data structure.
 No. | field  | type  |  description
 -------- | ---------| -------- | ---------
 1|globalParams|Array|global parameters
-2|tasks|Array|task collections in the process [for the structure of each type, please refer to the following sections]
+2|tasks|Array|task collections in the workflow [for the structure of each type, please refer to the following sections]
 3|tenantId|int|tenant ID
 4|timeout|int|timeout
 

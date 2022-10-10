@@ -264,7 +264,7 @@ Location: `master-server/conf/application.yaml`
 |master.listen-port|5678|master listen port|
 |master.fetch-command-num|10|the number of commands fetched by master|
 |master.pre-exec-threads|10|master prepare execute thread number to limit handle commands in parallel|
-|master.exec-threads|100|master execute thread number to limit process instances in parallel|
+|master.exec-threads|100|master execute thread number to limit workflow instances in parallel|
 |master.dispatch-task-number|3|master dispatch task number per batch|
 |master.host-selector|lower_weight|master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight|
 |master.heartbeat-interval|10|master heartbeat interval, the unit is second|

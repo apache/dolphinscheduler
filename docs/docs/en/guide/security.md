@@ -45,7 +45,7 @@ After logging in as an ordinary user, click the user information in the user nam
 
 ## Create Alarm Group
 
-The alarm group is a parameter set at startup. After the process ends, the status of the process and other information will be sent to the alarm group by email.
+The alarm group is a parameter set at startup. After the workflow ends, the status of the workflow and other information will be sent to the alarm group by email.
 
 The administrator enters the `Security Center -> Alarm Group Management` page and clicks the `Create Alarm Group` button to create an alarm group.
 
@@ -164,7 +164,7 @@ Create a task node in the workflow definition, select the worker group and the e
 ## Cluster Management
 
 > Add or update cluster
-> - Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
+> - Each workflow can be related to zero or several clusters to support multiple environment, now just support k8s.
 >
 > Usage cluster
 > - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.

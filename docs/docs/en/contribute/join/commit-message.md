@@ -9,7 +9,7 @@ The purpose of the changes before and after the submission, as Peter Hutterer sa
 
 #### 1：Clearly modify the content
 
-A commit message should clearly state what issues (bug fixes, function enhancements, etc.) the submission solves, so that other developers can better track the issues and clarify the optimization during the version iteration process.
+A commit message should clearly state what issues (bug fixes, function enhancements, etc.) the submission solves, so that other developers can better track the issues and clarify the optimization during the version iteration workflow.
 
 #### 2：Associate the corresponding Pull Request or Issue
 
@@ -35,7 +35,7 @@ The header part has only one line, including three fields: type (required), scop
 - style： Format (does not affect changes in code operation)
 - refactor：Refactoring (It is not a new feature or a code change to fix a bug)
 - test：Add test
-- chore：Changes in the build process or auxiliary tools
+- chore：Changes in the build workflow or auxiliary tools
 
 If the type is feat and fix, the commit will definitely appear in the change log. Other types (docs, chore, style, refactor, test) are not recommended.
 

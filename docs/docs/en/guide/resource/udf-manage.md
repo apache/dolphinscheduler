@@ -35,7 +35,7 @@ Before configuring UDF functions, you need to upload the required function jar p
 
 ### Use UDF functions
 
-In the process of using UDF functions, users only need to pay attention to the specific function writing, and upload the configuration through the resource center. The system will automatically configure the create function statement, refer to the following: [SqlTask](https://github.com/apache/dolphinscheduler/blob/923f3f38e3271d7f1d22b3abc3497cecb6957e4a/dolphinscheduler-task-plugin/dolphinscheduler-task-sql/src/main/java/org/apache/dolphinscheduler/plugin/task/sql/SqlTask.java#L507-L531)
+In the workflow of using UDF functions, users only need to pay attention to the specific function writing, and upload the configuration through the resource center. The system will automatically configure the create function statement, refer to the following: [SqlTask](https://github.com/apache/dolphinscheduler/blob/923f3f38e3271d7f1d22b3abc3497cecb6957e4a/dolphinscheduler-task-plugin/dolphinscheduler-task-sql/src/main/java/org/apache/dolphinscheduler/plugin/task/sql/SqlTask.java#L507-L531)
 
 Enter the workflow to define an SQL node, the data source type is HIVE, and the data source instance type is HIVE/IMPALA.
 

@@ -155,8 +155,8 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - jvm.threads.live: the current number of live threads including both daemon and non-daemon threads
 - jvm.threads.daemon: the current number of live daemon threads
 - jvm.classes.unloaded: the total number of classes unloaded since the JVM started
-- process.cpu.usage: the `recent cpu usage` for the JVM process
-- process.start.time: start time of the process since unix epoch
+- process.cpu.usage: the `recent cpu usage` for the JVM workflow
+- process.start.time: start time of the workflow since unix epoch
 - process.uptime: the uptime of the JVM
 
 ### Others (Default)

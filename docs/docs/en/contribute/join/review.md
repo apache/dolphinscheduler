@@ -91,9 +91,9 @@ When an Issue need to create Pull Requests, you could also labeled it from below
 Review Pull mean discussing in [Pull Requests][all-PRs] in GitHub and giving suggestions to it. DolphinScheduler's 
 Pull Requests reviewing are the same as [GitHub's reviewing changes in pull requests][gh-review-pr]. You can give your
 suggestions in Pull Reque-->
-* When you think the Pull Request is OK to be merged, you can agree to the Pull Request according to the "Approve" process
+* When you think the Pull Request is OK to be merged, you can agree to the Pull Request according to the "Approve" workflow
   in [GitHub's reviewing changes in pull requests][gh-review-pr].
-* When you think Pull Request needs to be changed, you can comment it according to the "Comment" process in
+* When you think Pull Request needs to be changed, you can comment it according to the "Comment" workflow in
   [GitHub's reviewing changes in pull requests][gh-review-pr]. And when you think issues that must be fixed before they
   merged, please follow "Request changes" in [GitHub's reviewing changes in pull requests][gh-review-pr] to ask contributors
   modify it.

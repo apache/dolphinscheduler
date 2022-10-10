@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Due to the large database read operations during the master-server scheduling process. Such as read tables like `tenant`, `user`, `processDefinition`, etc. Operations stress read pressure to the DB, and slow down the entire core scheduling process.
+Due to the large database read operations during the master-server scheduling workflow. Such as read tables like `tenant`, `user`, `processDefinition`, etc. Operations stress read pressure to the DB, and slow down the entire core scheduling workflow.
 
-By considering this part of the business data is a high-read and low-write scenario, a cache module is introduced to reduce the DB read pressure and speed up the core scheduling process.
+By considering this part of the business data is a high-read and low-write scenario, a cache module is introduced to reduce the DB read pressure and speed up the core scheduling workflow.
 
 ## Cache Settings
 

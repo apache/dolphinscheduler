@@ -56,9 +56,9 @@ It is generally recommended to provide static methods only in some utility class
 
 ### 6. Completeness
 
-Test coverage, this is a very difficult problem. For the core process, we hope to achieve 90% coverage, non-core process requirements more than 60%.
+Test coverage, this is a very difficult problem. For the core workflow, we hope to achieve 90% coverage, non-core workflow requirements more than 60%.
 
-High enough coverage will reduce the probability of bugs and also reduce the cost of our regression tests. This is a long process, and whenever developers add or modify code, test cases need to be refined at the same time. We hope developers and relevant code reviewer will pay enough attention to this point.
+High enough coverage will reduce the probability of bugs and also reduce the cost of our regression tests. This is a long workflow, and whenever developers add or modify code, test cases need to be refined at the same time. We hope developers and relevant code reviewer will pay enough attention to this point.
 
 ### 7. Refusion invalid assertion
 

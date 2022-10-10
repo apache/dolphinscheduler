@@ -19,11 +19,11 @@ In each issue, we list the content to be tested and the expected results, which 
 - function module: Functional modules to be tested, a functional module containing multiple test cases.
 - test point: Specific examples of what needs to be tested. For example button click actions on pages, page jump functions.
 - priority: The priority of the test case, **which is recommended to find a high priority**.
-- service: The service that needs to be started during the test process.
+- service: The service that needs to be started during the test workflow.
 - test steps: The test steps to be performed for each test case.
 - expected results: The expected test results.
 - actual results: The actual results.
-- remarks: The precautions needed during the test process.
+- remarks: The precautions needed during the test workflow.
 
 ![e2e-security](../../../../img/contribute/join/e2e/e2e-security.png)
 
@@ -33,4 +33,4 @@ After taking up the corresponding task, the next step is to get to the crux of w
 
 ### How to submit a Pull Request?
 
-Participation in the open source community can take many forms, including issue, pull request and translation. To participate in the E2E testing process, contributors are first required to understand the simple process of submitting a pull request, see: [Pull Request](./pull-request.md).
+Participation in the open source community can take many forms, including issue, pull request and translation. To participate in the E2E testing workflow, contributors are first required to understand the simple workflow of submitting a pull request, see: [Pull Request](./pull-request.md).

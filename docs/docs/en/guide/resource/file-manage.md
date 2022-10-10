@@ -1,6 +1,6 @@
 # File Management
 
-When the third-party jar needs to be used in the scheduling process or the user needs to customize the script, the related operations can be completed on this page. The file types that can be created include: `txt`, `log`, `sh`, `conf`, `py`, `java` etc. And you can edit, rename, download and delete files.
+When the third-party jar needs to be used in the scheduling workflow or the user needs to customize the script, the related operations can be completed on this page. The file types that can be created include: `txt`, `log`, `sh`, `conf`, `py`, `java` etc. And you can edit, rename, download and delete files.
 
 ![file-manage](../../../../img/new_ui/dev/resource/file-manage.png)
 

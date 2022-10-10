@@ -2,7 +2,7 @@
 
 ## Overview
 
-Dependent nodes are **dependency check nodes**. For example, process A depends on the successful execution of process B from yesterday, and the dependent node will check whether process B run successful yesterday.
+Dependent nodes are **dependency check nodes**. For example, workflow A depends on the successful execution of workflow B from yesterday, and the dependent node will check whether workflow B run successful yesterday.
 
 ## Create Task
 
@@ -21,11 +21,11 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 
 The Dependent node provides a logical judgment function, which can detect the execution of the dependent node according to the logic.
 
-For example, process A is a weekly task, processes B and C are daily tasks, and task A requires tasks B and C to be successfully executed every day of the last week.
+For example, workflow A is a weekly task, processes B and C are daily tasks, and task A requires tasks B and C to be successfully executed every day of the last week.
 
 ![dependent_task01](../../../../img/tasks/demo/dependent_task01.png)
 
-And another example is that process A is a weekly report task, processes B and C are daily tasks, and task A requires tasks B or C to be successfully executed every day of the last week:
+And another example is that workflow A is a weekly report task, processes B and C are daily tasks, and task A requires tasks B or C to be successfully executed every day of the last week:
 
 ![dependent_task02](../../../../img/tasks/demo/dependent_task02.png)
 

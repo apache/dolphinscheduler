@@ -5,7 +5,7 @@
 This article describes how to add a new master service or worker service to an existing DolphinScheduler cluster.
 
 ```
-Attention: There cannot be more than one master service process or worker service process on a physical machine.
+Attention: There cannot be more than one master service workflow or worker service workflow on a physical machine.
       If the physical machine which locate the expansion master or worker node has already installed the scheduled service, check the [1.4 Modify configuration] and edit the configuration file `conf/config/install_config.conf` on ** all ** nodes, add masters or workers parameter, and restart the scheduling cluster.
 ```
 

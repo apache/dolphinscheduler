@@ -9,11 +9,11 @@ We encourage any form of participation in the community that will eventually bec
 * Help your project add test cases.
 * Add comments to the code.
 * Submit a PR that fixes the bug or Feature.
-* Publish application case practice, scheduling process analysis, or technical articles related to scheduling.
+* Publish application case practice, scheduling workflow analysis, or technical articles related to scheduling.
 * Help promote DolphinScheduler, participate in technical conferences or meetup, sharing and more.
 
 Welcome to the contributing team and join open source starting with submitting your first PR.
-- For example, add code comments or find "easy to fix" tags or some very simple issue (misspellings, etc.) and so on, first familiarize yourself with the submission process through the first simple PR.
+- For example, add code comments or find "easy to fix" tags or some very simple issue (misspellings, etc.) and so on, first familiarize yourself with the submission workflow through the first simple PR.
 
 Note: Contributions are not limited to PR Only, but contribute to the development of the project.
 

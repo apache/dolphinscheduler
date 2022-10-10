@@ -43,14 +43,14 @@ A: This is the python connection Zookeeper needs to use, it is used to delete th
 
 ## Q: How to specify the machine running task
 
-A: version 1.2 and berfore, Use **the administrator** to create a Worker group, **specify the Worker group** when the **process definition starts**, or **specify the Worker group on the task node**. If not specified, use Default, **Default is to select one of all the workers in the cluster to use for task submission and execution.**
+A: version 1.2 and berfore, Use **the administrator** to create a Worker group, **specify the Worker group** when the **workflow definition starts**, or **specify the Worker group on the task node**. If not specified, use Default, **Default is to select one of all the workers in the cluster to use for task submission and execution.**
 version 1.3, you can set worker group for the worker
 
 ---
 
 ## Q: Priority of the task
 
-A: We also support **the priority of processes and tasks**. Priority We have five levels of **HIGHEST, HIGH, MEDIUM, LOW and LOWEST**. **You can set the priority between different process instances, or you can set the priority of different task instances in the same process instance.** For details, please refer to the task priority design in the architecture-design.
+A: We also support **the priority of processes and tasks**. Priority We have five levels of **HIGHEST, HIGH, MEDIUM, LOW and LOWEST**. **You can set the priority between different workflow instances, or you can set the priority of different task instances in the same workflow instance.** For details, please refer to the task priority design in the architecture-design.
 
 ---
 
@@ -89,7 +89,7 @@ A:   1, if it is node startup, check whether the .env API_BASE configuration und
 
 ---
 
-## Q: After the process definition is manually started or scheduled, no process instance is generated.
+## Q: After the workflow definition is manually started or scheduled, no workflow instance is generated.
 
 A:   1, first **check whether the MasterServer service exists through jps**, or directly check whether there is a master service in zk from the service monitoring.
 
@@ -133,7 +133,7 @@ A:   1, if the replacement variable contains special characters, **use the \ tra
 
 ---
 
-## Q : Process definition and process instance offline exception
+## Q : Workflow definition and workflow instance offline exception
 
 A : For **versions prior to 1.0.4**, modify the code under the escheduler-api cn.escheduler.api.quartz package.
 
@@ -170,7 +170,7 @@ A: No. Because the tenant created by HDFS is not started, the tenant directory w
 
 A: **Note:** **Master monitors Master and Worker services.**
 
-​    1，If the Master service is lost, other Masters will take over the process of the hanged Master and continue to monitor the Worker task status.
+​    1，If the Master service is lost, other Masters will take over the workflow of the hanged Master and continue to monitor the Worker task status.
 
 ​    2，If the Worker service is lost, the Master will monitor that the Worker service is gone. If there is a Yarn task, the Kill Yarn task will be retried.
 
@@ -180,7 +180,7 @@ Please see the fault-tolerant design in the architecture for details.
 
 ## Q : Fault tolerance for a machine distributed by Master and Worker
 
-A: The 1.0.3 version only implements the fault tolerance of the Master startup process, and does not take the Worker Fault Tolerance. That is to say, if the Worker hangs, no Master exists. There will be problems with this process. We will add Master and Worker startup fault tolerance in version **1.1.0** to fix this problem. If you want to manually modify this problem, you need to **modify the running task for the running worker task that is running the process across the restart and has been dropped. The running process is set to the failed state across the restart**. Then resume the process from the failed node.
+A: The 1.0.3 version only implements the fault tolerance of the Master startup workflow, and does not take the Worker Fault Tolerance. That is to say, if the Worker hangs, no Master exists. There will be problems with this workflow. We will add Master and Worker startup fault tolerance in version **1.1.0** to fix this problem. If you want to manually modify this problem, you need to **modify the running task for the running worker task that is running the workflow across the restart and has been dropped. The running workflow is set to the failed state across the restart**. Then resume the workflow from the failed node.
 
 ---
 
@@ -200,21 +200,21 @@ A: Yes, **if the timing start and end time is the same time, then this timing wi
 
 A:	1, the task dependency between **DAG**, is **from the zero degree** of the DAG segmentation
 
-​		2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual.
+​		2, there are **task dependent nodes**, you can achieve cross-process tasks or workflow dependencies, please refer to the (DEPENDENT) node design in the system-manual.
 
 ​	Note: **Cross-project processes or task dependencies are not supported**
 
 ---
 
-## Q: There are several ways to start the process definition.
+## Q: There are several ways to start the workflow definition.
 
-A:   1, in **the process definition list**, click the **Start** button.
+A:   1, in **the workflow definition list**, click the **Start** button.
 
-​       2, **the process definition list adds a timer**, scheduling start process definition.
+​       2, **the workflow definition list adds a timer**, scheduling start workflow definition.
 
-​       3, process definition **view or edit** the DAG page, any **task node right click** Start process definition.
+​       3, workflow definition **view or edit** the DAG page, any **task node right click** Start workflow definition.
 
-​       4, you can define DAG editing for the process, set the running flag of some tasks to **prohibit running**, when the process definition is started, the connection of the node will be removed from the DAG.
+​       4, you can define DAG editing for the workflow, set the running flag of some tasks to **prohibit running**, when the workflow definition is started, the connection of the node will be removed from the DAG.
 
 ---
 
@@ -236,7 +236,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_H
 
 ---
 
-## Q：Worker Task will generate a child process through sudo -u tenant sh xxx.command, will kill when kill
+## Q：Worker Task will generate a child workflow through sudo -u tenant sh xxx.command, will kill when kill
 
 A：  We will add the kill task in 1.0.4 and kill all the various child processes generated by the task.
 
@@ -314,7 +314,7 @@ A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluste
 
 ## Q : When DolphinScheduler release a new version, and the change between current version and latest, and how to upgrade, and version number specification
 
-A: 1, The release process of Apache Project happens in the mailing list. You can subscribe DolphinScheduler's mailing list and then when the release is in process, you'll receive release emails. Please follow this [introduction](https://github.com/apache/dolphinscheduler#get-help) to subscribe DolphinScheduler's mailing list.
+A: 1, The release workflow of Apache Project happens in the mailing list. You can subscribe DolphinScheduler's mailing list and then when the release is in workflow, you'll receive release emails. Please follow this [introduction](https://github.com/apache/dolphinscheduler#get-help) to subscribe DolphinScheduler's mailing list.
 
 2, When new version published, there would be release note which describe the change log, and there also have upgrade document for the previous version to new's.
 
@@ -646,7 +646,7 @@ A：By deploying different worker in different yarn clusters，the steps are as 
 
 ---
 
-## Q：Update process definition error: Duplicate key TaskDefinition
+## Q：Update workflow definition error: Duplicate key TaskDefinition
 
 A：Before DS 2.0.4 (after 2.0.0-alpha), there may be a problem of duplicate keys TaskDefinition due to version switching, which may cause the update workflow to fail; you can refer to the following SQL to delete duplicate data, taking MySQL as an example: (Note: Before operating, be sure to back up the original data, the SQL from pr[#8408](https://github.com/apache/dolphinscheduler/pull/8408))
 

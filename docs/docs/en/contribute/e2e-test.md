@@ -70,9 +70,9 @@ public final class LoginPage extends NavBarPage {
 }
 ```
 
-During the test process, we only test the elements we need to focus on, not all elements of the page. So on the login page only the username, password and login button elements are declared. The FindBy interface is provided by the Selenium test framework to find the corresponding id or class in a Vue file.
+During the test workflow, we only test the elements we need to focus on, not all elements of the page. So on the login page only the username, password and login button elements are declared. The FindBy interface is provided by the Selenium test framework to find the corresponding id or class in a Vue file.
 
-In addition, during the testing process, the elements are not manipulated directly. The general choice is to package the corresponding methods to achieve the effect of reuse. For example, if you want to log in, you input your username and password through the `public TenantPage login()` method to manipulate the elements you pass in to achieve the effect of logging in. That is, when the user finishes logging in, he or she jumps to the Security Centre (which goes to the Tenant Management page by default).
+In addition, during the testing workflow, the elements are not manipulated directly. The general choice is to package the corresponding methods to achieve the effect of reuse. For example, if you want to log in, you input your username and password through the `public TenantPage login()` method to manipulate the elements you pass in to achieve the effect of logging in. That is, when the user finishes logging in, he or she jumps to the Security Centre (which goes to the Tenant Management page by default).
 
 The SecurityPage provides goToTab methods to test the corresponding sidebar jumps, mainly including TenantPage, UserPage, WorkerGroupPage and QueuePage. These pages are implemented in the same way, mainly to test whether the input, add and delete buttons of the form can return to the corresponding page.
 

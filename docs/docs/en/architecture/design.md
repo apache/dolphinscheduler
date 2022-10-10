@@ -11,12 +11,12 @@
   </p>
 </p>
 
-### Start Process Activity Diagram
+### Start Workflow Activity Diagram
 
 <p align="center">
-  <img src="../../../img/process-start-flow-1.3.0.png" alt="Start process activity diagram"  width="70%" />
+  <img src="../../../img/process-start-flow-1.3.0.png" alt="Start workflow activity diagram"  width="70%" />
   <p align="center">
-        <em>Start process activity diagram</em>
+        <em>Start workflow activity diagram</em>
   </p>
 </p>
 
@@ -36,11 +36,11 @@
 
   - **WorkflowExecuteRunnable** is mainly responsible for DAG task segmentation, task submission monitoring, and logical processing of different event types;
 
-  - **TaskExecuteRunnable** is mainly responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the process instance;
+  - **TaskExecuteRunnable** is mainly responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the workflow instance;
 
-  - **EventExecuteService** is mainly responsible for the polling of the event queue of the process instances;
+  - **EventExecuteService** is mainly responsible for the polling of the event queue of the workflow instances;
 
-  - **StateWheelExecuteThread** is mainly responsible for process instance and task timeout, task retry, task-dependent polling, and generates the corresponding process instance or task event and submits it to the event queue of the process instance;
+  - **StateWheelExecuteThread** is mainly responsible for workflow instance and task timeout, task retry, task-dependent polling, and generates the corresponding workflow instance or task event and submits it to the event queue of the workflow instance;
 
   - **FailoverExecuteThread** is mainly responsible for the logic of Master fault tolerance and Worker fault tolerance;
 
@@ -55,7 +55,7 @@
 
   - **WorkerManagerThread** is mainly responsible for the submission of the task queue, continuously receives tasks from the task queue, and submits them to the thread pool for processing;
 
-  - **TaskExecuteThread** is mainly responsible for the process of task execution, and the actual processing of tasks according to different task types;
+  - **TaskExecuteThread** is mainly responsible for the workflow of task execution, and the actual processing of tasks according to different task types;
 
   - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
 
@@ -119,7 +119,7 @@ The service fault-tolerance design relies on ZooKeeper's Watcher mechanism, and 
  <p align="center">
    <img src="https://analysys.github.io/easyscheduler_docs_cn/images/fault-tolerant.png" alt="DolphinScheduler fault-tolerant design"  width="40%" />
  </p>
-Among them, the Master monitors the directories of other Masters and Workers. If the remove event is triggered, perform fault tolerance of the process instance or task instance according to the specific business logic.
+Among them, the Master monitors the directories of other Masters and Workers. If the remove event is triggered, perform fault tolerance of the workflow instance or task instance according to the specific business logic.
 
 - Master fault tolerance：
 
@@ -127,9 +127,9 @@ Among them, the Master monitors the directories of other Masters and Workers. If
    <img src="../../../img/failover-master.jpg" alt="failover-master"  width="50%" />
  </p>
 
-Fault tolerance range: From the perspective of host, the fault tolerance range of Master includes: own host and node host that does not exist in the registry, and the entire process of fault tolerance will be locked;
+Fault tolerance range: From the perspective of host, the fault tolerance range of Master includes: own host and node host that does not exist in the registry, and the entire workflow of fault tolerance will be locked;
 
-Fault-tolerant content: Master's fault-tolerant content includes: fault-tolerant process instances and task instances. Before fault-tolerant, compares the start time of the instance with the server start-up time, and skips fault-tolerance if after the server start time;
+Fault-tolerant content: Master's fault-tolerant content includes: fault-tolerant workflow instances and task instances. Before fault-tolerant, compares the start time of the instance with the server start-up time, and skips fault-tolerance if after the server start time;
 
 Fault-tolerant post-processing: After the fault tolerance of ZooKeeper Master completed, then re-schedule by the Scheduler thread in DolphinScheduler, traverses the DAG to find the "running" and "submit successful" tasks. Monitor the status of its task instances for the "running" tasks, and for the "commits successful" tasks, it is necessary to find out whether the task queue already exists. If exists, monitor the status of the task instance. Otherwise, resubmit the task instance.
 
@@ -139,7 +139,7 @@ Fault-tolerant post-processing: After the fault tolerance of ZooKeeper Master co
    <img src="../../../img/failover-worker.jpg" alt="failover-worker"  width="50%" />
  </p>
 
-Fault tolerance range: From the perspective of process instance, each Master is only responsible for fault tolerance of its own process instance; it will lock only when `handleDeadServer`;
+Fault tolerance range: From the perspective of workflow instance, each Master is only responsible for fault tolerance of its own workflow instance; it will lock only when `handleDeadServer`;
 
 Fault-tolerant content: When sending the remove event of the Worker node, the Master only fault-tolerant task instances. Before fault-tolerant, compares the start time of the instance with the server start-up time, and skips fault-tolerance if after the server start time;
 
@@ -149,32 +149,32 @@ Note: Due to "network jitter", the node may lose heartbeat with ZooKeeper in a s
 
 ##### Task Failed and Try Again
 
-Here we must first distinguish the concepts of task failure retry, process failure recovery, and process failure re-run:
+Here we must first distinguish the concepts of task failure retry, workflow failure recovery, and workflow failure re-run:
 
 - Task failure retry is at the task level and is automatically performed by the schedule system. For example, if a Shell task sets to retry for 3 times, it will try to run it again up to 3 times after the Shell task fails.
-- Process failure recovery is at the process level and is performed manually. Recovery can only perform **from the failed node** or **from the current node**.
-- Process failure re-run is also at the process level and is performed manually, re-run perform from the beginning node.
+- Workflow failure recovery is at the workflow level and is performed manually. Recovery can only perform **from the failed node** or **from the current node**.
+- Workflow failure re-run is also at the workflow level and is performed manually, re-run perform from the beginning node.
 
 Next to the main point, we divide the task nodes in the workflow into two types.
 
-- One is a business task, which corresponds to an actual script or process command, such as Shell task, SQL task, and Spark task.
+- One is a business task, which corresponds to an actual script or workflow command, such as Shell task, SQL task, and Spark task.
 
-- Another is a logical task, which does not operate actual script or process command, but only logical processing to the entire process flow, such as sub-process task, dependent task.
+- Another is a logical task, which does not operate actual script or workflow command, but only logical processing to the entire workflow flow, such as sub-process task, dependent task.
 
 **Business node** can configure the number of failed retries. When the task node fails, it will automatically retry until it succeeds or exceeds the retry times. **Logical node** failure retry is not supported.
 
-If there is a task failure in the workflow that reaches the maximum retry times, the workflow will fail and stop, and the failed workflow can be manually re-run or process recovery operations.
+If there is a task failure in the workflow that reaches the maximum retry times, the workflow will fail and stop, and the failed workflow can be manually re-run or workflow recovery operations.
 
 #### Task Priority Design
 
-In the early schedule design, if there is no priority design and use the fair scheduling, the task submitted first may complete at the same time with the task submitted later, thus invalid the priority of process or task. So we have re-designed this, and the following is our current design:
+In the early schedule design, if there is no priority design and use the fair scheduling, the task submitted first may complete at the same time with the task submitted later, thus invalid the priority of workflow or task. So we have re-designed this, and the following is our current design:
 
-- According to **the priority of different process instances** prior over **priority of the same process instance** prior over **priority of tasks within the same process** prior over **tasks within the same process**, process task submission order from highest to Lowest.
-  - The specific implementation is to parse the priority according to the JSON of the task instance, and then save the **process instance priority_process instance id_task priority_task id** information to the ZooKeeper task queue. When obtain from the task queue, we can get the highest priority task by comparing string.
-    - The priority of the process definition is to consider that some processes need to process before other processes. Configure the priority when the process starts or schedules. There are 5 levels in total, which are HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
+- According to **the priority of different workflow instances** prior over **priority of the same workflow instance** prior over **priority of tasks within the same workflow** prior over **tasks within the same workflow**, workflow task submission order from highest to Lowest.
+  - The specific implementation is to parse the priority according to the JSON of the task instance, and then save the **workflow instance priority_process instance id_task priority_task id** information to the ZooKeeper task queue. When obtain from the task queue, we can get the highest priority task by comparing string.
+    - The priority of the workflow definition is to consider that some processes need to workflow before other processes. Configure the priority when the workflow starts or schedules. There are 5 levels in total, which are HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
 
       <p align="center">
-         <img src="https://user-images.githubusercontent.com/10797147/146744784-eb351b14-c94a-4ed6-8ba4-5132c2a3d116.png" alt="Process priority configuration"  width="40%" />
+         <img src="https://user-images.githubusercontent.com/10797147/146744784-eb351b14-c94a-4ed6-8ba4-5132c2a3d116.png" alt="Workflow priority configuration"  width="40%" />
        </p>
 
     - The priority of the task is also divides into 5 levels, ordered by HIGHEST, HIGH, MEDIUM, LOW, LOWEST. As shown below:

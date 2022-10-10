@@ -27,7 +27,7 @@ Current DSIPs including all DSIP still work-in-progress, you could see in [curre
 
 Past DSIPs including all DSIP already done or retired for some reason, you could see in [past DSIPs][past-DSIPs]
 
-## DSIP Process
+## DSIP Workflow
 
 ### Create GitHub Issue
 

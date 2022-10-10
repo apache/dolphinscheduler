@@ -10,20 +10,20 @@ Apache DolphinScheduler uses the Logback logging framework to print logs accordi
 
 ### Log level specification
 
-Different levels of logs play different roles in the business process, and failure to use reasonable log levels for printing can cause great difficulties for system operations and maintenance.
+Different levels of logs play different roles in the business workflow, and failure to use reasonable log levels for printing can cause great difficulties for system operations and maintenance.
 
-- DEBUG level is used in the development and testing process to output debugging information. Developers should print parameter information, process details, and result information during debugging as much as possible using this level to facilitate locating and analyzing problems during the development and testing phases. In addition, it is prohibited to use this level to print logs in the production environment.
+- DEBUG level is used in the development and testing workflow to output debugging information. Developers should print parameter information, workflow details, and result information during debugging as much as possible using this level to facilitate locating and analyzing problems during the development and testing phases. In addition, it is prohibited to use this level to print logs in the production environment.
 - INFO level is used to record information during system operation. The logs printed using this level should be able to reflect the behavior of the system, such as status changes of workflows, tasks, etc.
 - WARN level is used to warn of problems that will occur during operation. For example, the checksum of API module parameters, etc.
-- ERROR level is used to record some unpredictable errors and exceptions that will affect the system process. For example, errors and exceptions that cause workflows and tasks to fail to complete properly.
+- ERROR level is used to record some unpredictable errors and exceptions that will affect the system workflow. For example, errors and exceptions that cause workflows and tasks to fail to complete properly.
 
 ### Log content specification
 
 The content of the logs determines whether the logs can completely restore the system behavior or state.
 
-- DEBUG-level logs record debugging information during the development process, and appear at critical programs that need to be debugged, covering detailed site information, parameters, results, etc.
+- DEBUG-level logs record debugging information during the development workflow, and appear at critical programs that need to be debugged, covering detailed site information, parameters, results, etc.
 
-- INFO-level logs need to record the status information or operation information of the current program calls, and play the role of describing the system operation process. Therefore, the logs at this level need to appear at the critical point of the system operation, and their contents need to cover the description of the critical point, parameters and results. For example, when a workflow instance is scheduled, the status change of each key link is printed.
+- INFO-level logs need to record the status information or operation information of the current program calls, and play the role of describing the system operation workflow. Therefore, the logs at this level need to appear at the critical point of the system operation, and their contents need to cover the description of the critical point, parameters and results. For example, when a workflow instance is scheduled, the status change of each key link is printed.
 
 - WARN-level logs record information about tolerable errors that occur in current program calls that do not affect the normal operation of the system or functionality, but the content of this level log also needs to cover detailed site descriptions, parameters, and results. For example, when the API module interface parameter verification fails, the description of the verification failure and the parameters are recorded.
 

@@ -48,15 +48,15 @@ Click `Project Management -> Workflow -> Workflow Instance`, enter the workflow 
        <img src="../../../../img/editDag-en.png" width="80%" />
      </p>
 
-- **Rerun：** Re-execute the terminated process
+- **Rerun：** Re-execute the terminated workflow
 
 - **Recovery Failed:** For failed processes, you can perform failure recovery operations, starting from the failed node
 
-- **Stop:** **Stop** the running process, the background code will first `kill` the worker process, and then execute `kill -9` operation
+- **Stop:** **Stop** the running workflow, the background code will first `kill` the worker workflow, and then execute `kill -9` operation
 
-- **Pause:** **Pause** the running process, the system status will change to **waiting for execution**, it will wait for the task to finish, and pause the next sequence task.
+- **Pause:** **Pause** the running workflow, the system status will change to **waiting for execution**, it will wait for the task to finish, and pause the next sequence task.
 
-- **Resume pause:** Resume the paused process, start running directly from the **paused node**
+- **Resume pause:** Resume the paused workflow, start running directly from the **paused node**
 
 - **Delete:** Delete the workflow instance and the task instance under the workflow instance
 
