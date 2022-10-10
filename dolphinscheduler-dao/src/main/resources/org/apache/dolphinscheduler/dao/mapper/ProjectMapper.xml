@@ -105,7 +105,7 @@
             OR p.description LIKE concat('%', #{searchName}, '%')
             )
         </if>
-        order by p.create_time desc
+        order by p.update_time desc
     </select>
     <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
