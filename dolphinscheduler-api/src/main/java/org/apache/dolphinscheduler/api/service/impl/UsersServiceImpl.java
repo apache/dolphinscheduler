@@ -137,7 +137,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createUser(User loginUser,
                                           String userName,
                                           String userPassword,
@@ -177,7 +177,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.DATA_LIST, user);
         putMsg(result, Status.SUCCESS);
         return result;
-
     }
 
     @Override
