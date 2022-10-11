@@ -15,20 +15,23 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import os
-import argparse
+"""Main function for releasing."""
 
-from github.pull_request import PullRequest
+import argparse
+import os
+
 from github.changelog import Changelog
-from github.user import User
 from github.git import Git
+from github.pull_request import PullRequest
+from github.user import User
 
 
 def get_changelog(access_token: str, milestone: str) -> str:
+    """Get changelog in specific milestone from GitHub Restful API."""
     pr = PullRequest(token=access_token)
     pr_merged = pr.search_merged_by_milestone(milestone)
     # Sort according to merged time ascending
-    pr_merged_sort = sorted(pr_merged, key=lambda p: p['closed_at'])
+    pr_merged_sort = sorted(pr_merged, key=lambda p: p["closed_at"])
 
     changelog = Changelog(pr_merged_sort)
     changelog_text = changelog.generate()
@@ -36,6 +39,7 @@ def get_changelog(access_token: str, milestone: str) -> str:
 
 
 def get_contributor(access_token: str, milestone: str) -> str:
+    """Get contributor in specific milestone from GitHub Restful API."""
     pr = PullRequest(token=access_token)
     pr_merged = pr.search_merged_by_milestone(milestone)
 
@@ -46,13 +50,14 @@ def get_contributor(access_token: str, milestone: str) -> str:
 
 
 def auto_cherry_pick(access_token: str, milestone: str) -> None:
+    """Do git cherry-pick in specific milestone, require update dev branch."""
     pr = PullRequest(token=access_token)
     pr_merged = pr.search_merged_by_milestone(milestone)
     # Sort according to merged time ascending
-    pr_merged_sort = sorted(pr_merged, key=lambda p: p['closed_at'])
+    pr_merged_sort = sorted(pr_merged, key=lambda p: p["closed_at"])
 
     for p in pr_merged_sort:
-        pr_detail = pr.get_merged_detail(p['number'])
+        pr_detail = pr.get_merged_detail(p["number"])
         print(f"git cherry-pick -x {pr_detail['merge_commit_sha']}")
         Git().cherry_pick_pr(pr_detail)
 
@@ -77,7 +82,8 @@ def build_argparse() -> argparse.ArgumentParser:
     parser_prune.set_defaults(func=get_contributor)
 
     parser_prune = subparsers.add_parser(
-        "cherry-pick", help="Auto cherry pick pr to current branch from specific milestone."
+        "cherry-pick",
+        help="Auto cherry pick pr to current branch from specific milestone.",
     )
     parser_prune.set_defaults(func=auto_cherry_pick)
 
@@ -86,12 +92,15 @@ def build_argparse() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     arg_parser = build_argparse()
+    # args = arg_parser.parse_args(["cherry-pick"])
     args = arg_parser.parse_args()
 
     ENV_ACCESS_TOKEN = os.environ.get("GH_ACCESS_TOKEN", None)
     ENV_MILESTONE = os.environ.get("GH_REPO_MILESTONE", None)
 
     if ENV_ACCESS_TOKEN is None or ENV_MILESTONE is None:
-        raise RuntimeError("Environment variable `GH_ACCESS_TOKEN` and `GH_REPO_MILESTONE` must provider")
+        raise RuntimeError(
+            "Environment variable `GH_ACCESS_TOKEN` and `GH_REPO_MILESTONE` must provider"
+        )
 
     print(args.func(ENV_ACCESS_TOKEN, ENV_MILESTONE))

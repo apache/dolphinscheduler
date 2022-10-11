@@ -15,21 +15,24 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"""Github utils get HTTP response."""
+
 import copy
 import json
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
 import requests
 
 
 class RespGet:
-    """
+    """Get response from GitHub restful API.
+
     :param url: URL to requests GET method.
     :param headers: headers for HTTP requests.
     :param param:  param for HTTP requests.
     """
 
-    def __init__(self, url: str, headers: dict, param: Optional[dict]= None):
+    def __init__(self, url: str, headers: dict, param: Optional[dict] = None):
         self.url = url
         self.headers = headers
         self.param = param
@@ -47,12 +50,17 @@ class RespGet:
         return self.get(url=self.url, headers=self.headers, params=self.param)
 
     def get_total(self) -> List[Dict]:
-        """Get all response dict from HTTP requests by given condition, change page number until no data return."""
+        """Get all response dict from HTTP requests by given condition.
+
+        Will change page number until no data return.
+        """
         total = []
         curr_param = copy.deepcopy(self.param)
         while True:
             curr_param["page"] = curr_param.setdefault("page", 0) + 1
-            content_dict = self.get(url=self.url, headers=self.headers, params=curr_param)
+            content_dict = self.get(
+                url=self.url, headers=self.headers, params=curr_param
+            )
             data = content_dict.get("items")
             if not data:
                 return total

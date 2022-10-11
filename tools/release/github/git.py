@@ -15,33 +15,41 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from typing import Optional, Iterator, Dict
+"""Github utils for git operations."""
 
-from git import Repo, Commit
 from pathlib import Path
+from typing import Dict, Optional
+
+from git import Repo
 
 git_dir_path: Path = Path(__file__).parent.parent.parent.parent.joinpath(".git")
 
 
 class Git:
-    def __init__(self, path: Optional[str] = git_dir_path, branch: Optional[str] = None):
+    """Operator to handle git object.
+
+    :param path: git repository path
+    :param branch: branch you want to query
+    """
+
+    def __init__(
+        self, path: Optional[str] = git_dir_path, branch: Optional[str] = None
+    ):
         self.path = path
         self.branch = branch
 
     @property
     def repo(self) -> Repo:
+        """Get git repo object."""
         return Repo(self.path)
 
-    def commits(self) -> Iterator[Commit]:
-        if self.branch:
-            return self.repo.iter_commits(self.branch)
-        return self.repo.iter_commits()
-
     def has_commit_current(self, sha: str) -> bool:
-        branches = self.repo.git.branch('--contains', sha)
+        """Whether SHA in current branch."""
+        branches = self.repo.git.branch("--contains", sha)
         return f"* {self.repo.active_branch.name}" in branches
 
     def has_commit_global(self, sha: str) -> bool:
+        """Whether SHA in all branches."""
         try:
             self.repo.commit(sha)
             return True
@@ -49,9 +57,14 @@ class Git:
             return False
 
     def cherry_pick_pr(self, pr: Dict) -> None:
-        sha = pr['merge_commit_sha']
+        """Run command `git cherry-pick -x <SHA>`."""
+        sha = pr["merge_commit_sha"]
         if not self.has_commit_global(sha):
-            raise RuntimeError("Cherry-pick SHA %s error beacuse SHA not exists, please make sure you local default branch is up-to-date", sha)
+            raise RuntimeError(
+                "Cherry-pick SHA %s error because SHA not exists,"
+                "please make sure you local default branch is up-to-date",
+                sha,
+            )
         if self.has_commit_current(sha):
             print("SHA %s already in current active branch, skip it.", sha)
-        self.repo.git.cherry_pick('-x', sha)
+        self.repo.git.cherry_pick("-x", sha)

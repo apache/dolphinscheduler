@@ -15,7 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from typing import List, Dict
+"""Github utils for release changelog."""
+
+from typing import Dict, List
 
 
 class Changelog:
@@ -25,16 +27,19 @@ class Changelog:
     will classify to high priority label type, currently priority is
     `feature > bug > improvement > document > chore`. pr will into feature section if it with both `feature`,
     `improvement`, `document` label.
-    """
-    key_number = 'number'
-    key_labels = 'labels'
-    key_name = 'name'
 
-    label_feature = 'feature'
-    label_bug = 'bug'
-    label_improvement = 'improvement'
-    label_document = 'document'
-    label_chore = 'chore'
+    :param prs: pull requests list.
+    """
+
+    key_number = "number"
+    key_labels = "labels"
+    key_name = "name"
+
+    label_feature = "feature"
+    label_bug = "bug"
+    label_improvement = "improvement"
+    label_document = "document"
+    label_chore = "chore"
 
     changelog_prefix = "\n\n<details><summary>Click to expand</summary>\n\n"
     changelog_suffix = "\n\n</details>\n"
@@ -48,19 +53,26 @@ class Changelog:
         self.chores = []
 
     def generate(self) -> str:
+        """Generate changelog."""
         self.classify()
         final = []
         if self.features:
             detail = f"## Feature{self.changelog_prefix}{self._convert(self.features)}{self.changelog_suffix}"
             final.append(detail)
         if self.improvements:
-            detail = f"## Improvement{self.changelog_prefix}{self._convert(self.improvements)}{self.changelog_suffix}"
+            detail = (
+                f"## Improvement{self.changelog_prefix}"
+                f"{self._convert(self.improvements)}{self.changelog_suffix}"
+            )
             final.append(detail)
         if self.bugfixs:
             detail = f"## Bugfix{self.changelog_prefix}{self._convert(self.bugfixs)}{self.changelog_suffix}"
             final.append(detail)
         if self.documents:
-            detail = f"## Document{self.changelog_prefix}{self._convert(self.documents)}{self.changelog_suffix}"
+            detail = (
+                f"## Document{self.changelog_prefix}"
+                f"{self._convert(self.documents)}{self.changelog_suffix}"
+            )
             final.append(detail)
         if self.chores:
             detail = f"## Chore{self.changelog_prefix}{self._convert(self.chores)}{self.changelog_suffix}"
@@ -69,9 +81,16 @@ class Changelog:
 
     @staticmethod
     def _convert(prs: List[Dict]) -> str:
-        return "\n".join([f"- {pr['title']} (#{pr['number']}) @{pr['user']['login']}" for pr in prs])
+        """Convert pull requests into changelog item text."""
+        return "\n".join(
+            [f"- {pr['title']} (#{pr['number']}) @{pr['user']['login']}" for pr in prs]
+        )
 
     def classify(self) -> None:
+        """Classify pull requests different kinds of section in changelog.
+
+        Each pull requests only belongs to one single classification.
+        """
         for pr in self.prs:
             if self.key_labels not in pr:
                 raise KeyError("PR %s do not have labels", pr[self.key_number])
@@ -86,19 +105,47 @@ class Changelog:
             elif self._is_chore(pr):
                 self.chores.append(pr)
             else:
-                raise KeyError("There must at least one of labels `feature|bug|improvement|document|chore` but it do not, pr: %s", pr['html_url'])
+                raise KeyError(
+                    "There must at least one of labels `feature|bug|improvement|document|chore`"
+                    "but it do not, pr: %s",
+                    pr["html_url"],
+                )
 
     def _is_feature(self, pr: Dict) -> bool:
-        return any([label[self.key_name] == self.label_feature for label in pr[self.key_labels]])
+        """Belong to feature pull requests."""
+        return any(
+            [
+                label[self.key_name] == self.label_feature
+                for label in pr[self.key_labels]
+            ]
+        )
 
     def _is_bugfix(self, pr: Dict) -> bool:
-        return any([label[self.key_name] == self.label_bug for label in pr[self.key_labels]])
+        """Belong to bugfix pull requests."""
+        return any(
+            [label[self.key_name] == self.label_bug for label in pr[self.key_labels]]
+        )
 
     def _is_improvement(self, pr: Dict) -> bool:
-        return any([label[self.key_name] == self.label_improvement for label in pr[self.key_labels]])
+        """Belong to improvement pull requests."""
+        return any(
+            [
+                label[self.key_name] == self.label_improvement
+                for label in pr[self.key_labels]
+            ]
+        )
 
     def _is_document(self, pr: Dict) -> bool:
-        return any([label[self.key_name] == self.label_document for label in pr[self.key_labels]])
+        """Belong to document pull requests."""
+        return any(
+            [
+                label[self.key_name] == self.label_document
+                for label in pr[self.key_labels]
+            ]
+        )
 
     def _is_chore(self, pr: Dict) -> bool:
-        return any([label[self.key_name] == self.label_chore for label in pr[self.key_labels]])
+        """Belong to chore pull requests."""
+        return any(
+            [label[self.key_name] == self.label_chore for label in pr[self.key_labels]]
+        )

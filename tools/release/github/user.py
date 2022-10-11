@@ -15,21 +15,29 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from typing import List, Dict, Set
+"""Github utils for user."""
+
+from typing import Dict, List, Set
 
 
 class User:
-    """Get users according specific pull requests list"""
+    """Get users according specific pull requests list.
+
+    :param prs: pull requests list.
+    """
+
     def __init__(self, prs: List[Dict]):
         self.prs = prs
 
     def contribution_num(self) -> Dict:
+        """Get unique contributor with name and commit number."""
         res = dict()
         for pr in self.prs:
-            user_id = pr['user']['login']
+            user_id = pr["user"]["login"]
             res[user_id] = res.setdefault(user_id, 0) + 1
         return res
 
     def contributors(self) -> Set[str]:
+        """Get unique contributor with name."""
         cn = self.contribution_num()
         return {contributor for contributor in cn}
