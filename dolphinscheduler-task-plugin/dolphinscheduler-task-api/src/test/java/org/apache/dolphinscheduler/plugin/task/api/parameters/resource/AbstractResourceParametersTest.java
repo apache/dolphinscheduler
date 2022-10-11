@@ -22,17 +22,19 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AbstractResourceParametersTest {
 
     @Test
     public void testDataSource() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        String taskParam = "{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":\"1\",\"sql\":\"select now();\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}";
+        String taskParam =
+                "{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":\"1\",\"sql\":\"select now();\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}";
 
-        ResourceParametersHelper resourceParametersHelper = JSONUtils.parseObject(taskParam, SqlParameters.class).getResources();
+        ResourceParametersHelper resourceParametersHelper =
+                JSONUtils.parseObject(taskParam, SqlParameters.class).getResources();
 
         resourceParametersHelper.getResourceMap().forEach((type, map) -> {
             map.forEach((code, parameters) -> {
@@ -49,8 +51,6 @@ public class AbstractResourceParametersTest {
 
         taskExecutionContext = JSONUtils.parseObject(json, TaskExecutionContext.class);
 
-        Assert.assertNotNull(taskExecutionContext);
+        Assertions.assertNotNull(taskExecutionContext);
     }
 }
-
-
