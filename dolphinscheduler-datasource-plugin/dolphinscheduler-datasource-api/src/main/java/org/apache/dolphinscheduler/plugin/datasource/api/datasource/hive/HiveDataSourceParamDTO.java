@@ -32,6 +32,7 @@ public class HiveDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
                 + ", userName='" + userName + '\''
                 + ", password='" + password + '\''
                 + ", other='" + other + '\''
+                + ", hdfsPath='" + hdfsPath + '\''
                 + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
                 + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
                 + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''

@@ -83,6 +83,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         hiveConnectionParam.setPassword(PasswordUtils.encodePassword(hiveParam.getPassword()));
         hiveConnectionParam.setDriverClassName(getDatasourceDriver());
         hiveConnectionParam.setValidationQuery(getValidationQuery());
+        hiveConnectionParam.setHdfsPath(hiveParam.getHdfsPath());
 
         if (CommonUtils.getKerberosStartupState()) {
             hiveConnectionParam.setPrincipal(hiveParam.getPrincipal());

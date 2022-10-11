@@ -25,6 +25,8 @@ public class BaseHDFSConnectionParam extends BaseConnectionParam {
     protected String loginUserKeytabUsername;
     protected String loginUserKeytabPath;
 
+    protected String hdfsPath;
+
     public String getPrincipal() {
         return principal;
     }
@@ -56,4 +58,8 @@ public class BaseHDFSConnectionParam extends BaseConnectionParam {
     public void setLoginUserKeytabPath(String loginUserKeytabPath) {
         this.loginUserKeytabPath = loginUserKeytabPath;
     }
+
+    public String getHdfsPath() { return hdfsPath; }
+
+    public void setHdfsPath(String hdfsPath) { this.hdfsPath = hdfsPath; }
 }
