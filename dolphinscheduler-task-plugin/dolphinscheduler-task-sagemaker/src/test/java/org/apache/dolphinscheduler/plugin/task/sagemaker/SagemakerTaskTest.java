@@ -82,7 +82,8 @@ public class SagemakerTaskTest {
         Assertions.assertEquals("test Pipeline", request.getPipelineExecutionDescription());
         Assertions.assertEquals("AbalonePipeline", request.getPipelineExecutionDisplayName());
         Assertions.assertEquals("AbalonePipeline", request.getPipelineName());
-        Assertions.assertEquals(new Integer(1), request.getParallelismConfiguration().getMaxParallelExecutionSteps());
+        Assertions.assertEquals(Integer.valueOf(1),
+                request.getParallelismConfiguration().getMaxParallelExecutionSteps());
     }
 
     @Test
