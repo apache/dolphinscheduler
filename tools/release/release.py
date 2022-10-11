@@ -53,6 +53,7 @@ def auto_cherry_pick(access_token: str, milestone: str) -> None:
 
     for p in pr_merged_sort:
         pr_detail = pr.get_merged_detail(p['number'])
+        print(f"git cherry-pick -x {pr_detail['merge_commit_sha']}")
         Git().cherry_pick_pr(pr_detail)
 
 
