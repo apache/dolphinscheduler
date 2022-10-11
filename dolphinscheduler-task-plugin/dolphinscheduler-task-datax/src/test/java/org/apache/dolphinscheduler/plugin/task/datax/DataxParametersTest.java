@@ -18,11 +18,12 @@
 package org.apache.dolphinscheduler.plugin.task.datax;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DataxParametersTest {
 
@@ -32,27 +33,27 @@ public class DataxParametersTest {
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
 
     @Test
-    public void testLoadJvmEnv()   {
+    public void testLoadJvmEnv() {
 
         DataxParameters dataxParameters = new DataxParameters();
         dataxParameters.setXms(0);
         dataxParameters.setXmx(-100);
 
-        String actual =  loadJvmEnvTest(dataxParameters);
+        String actual = loadJvmEnvTest(dataxParameters);
 
         String except = " --jvm=\"-Xms1G -Xmx1G\" ";
-        Assert.assertEquals(except,actual);
+        Assertions.assertEquals(except, actual);
 
         dataxParameters.setXms(13);
         dataxParameters.setXmx(14);
-        actual =  loadJvmEnvTest(dataxParameters);
+        actual = loadJvmEnvTest(dataxParameters);
         except = " --jvm=\"-Xms13G -Xmx14G\" ";
-        Assert.assertEquals(except,actual);
+        Assertions.assertEquals(except, actual);
 
     }
 
     @Test
-    public void testToString()   {
+    public void testToString() {
 
         DataxParameters dataxParameters = new DataxParameters();
         List<ResourceInfo> resourceInfoList = new ArrayList<>();
@@ -92,7 +93,7 @@ public class DataxParametersTest {
                 + "resourceList=[{\"id\":2,\"resourceName\":\"/hdfs.keytab\",\"res\":null}]"
                 + "}";
 
-        Assert.assertEquals(expected,dataxParameters.toString());
+        Assertions.assertEquals(expected, dataxParameters.toString());
     }
 
     public String loadJvmEnvTest(DataxParameters dataXParameters) {
