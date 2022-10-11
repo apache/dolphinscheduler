@@ -52,7 +52,7 @@ class Git:
 
     def cherry_pick_pr(self, pr: Dict) -> None:
         sha = pr['merge_commit_sha']
-        if self.has_commit_global(sha):
+        if not self.has_commit_global(sha):
             raise RuntimeError("Cherry-pick SHA %s error beacuse SHA not exists, please make sure you local default branch is up-to-date", sha)
         if self.has_commit_current(sha):
             print("SHA %s already in current active branch, skip it.", sha)
