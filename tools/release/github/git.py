@@ -41,7 +41,7 @@ class Git:
 
     def has_commit_current(self, sha: str) -> bool:
         branches = self.repo.git.branch('--contains', sha)
-        return self.repo.active_branch in branches
+        return f"* {self.repo.active_branch.name}" in branches
 
     def has_commit_global(self, sha: str) -> bool:
         try:

@@ -86,6 +86,7 @@ def build_argparse() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     arg_parser = build_argparse()
+    # TODO
     args = arg_parser.parse_args(["cherry-pick"])
     # args = arg_parser.parse_args()
 
