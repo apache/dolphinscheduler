@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -42,7 +43,6 @@ import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQL
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -390,27 +390,27 @@ public class DataSourceServiceTest {
                         + "\"driverClassName\":\"oracle.jdbc.OracleDriver\",\"validationQuery\":\"select 1 from dual\",\"connectType\":\"ORACLE_SERVICE_NAME\"}";
         Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
-        Mockito.mockStatic(CommonUtils.class);
-        Mockito.when(CommonUtils.getKerberosStartupState()).thenReturn(true);
-        HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
-        hiveDataSourceParamDTO.setHost("192.168.9.1");
-        hiveDataSourceParamDTO.setPort(10000);
-        hiveDataSourceParamDTO.setDatabase("im");
-        hiveDataSourceParamDTO.setPrincipal("hive/hdfs-mycluster@ESZ.COM");
-        hiveDataSourceParamDTO.setUserName("test");
-        hiveDataSourceParamDTO.setPassword("test");
-        hiveDataSourceParamDTO.setJavaSecurityKrb5Conf("/opt/krb5.conf");
-        hiveDataSourceParamDTO.setLoginUserKeytabPath("/opt/hdfs.headless.keytab");
-        hiveDataSourceParamDTO.setLoginUserKeytabUsername("test2/hdfs-mycluster@ESZ.COM");
-        connectionParam = DataSourceUtils.buildConnectionParams(hiveDataSourceParamDTO);
+        try (MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+            mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(true);
+            HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
+            hiveDataSourceParamDTO.setHost("192.168.9.1");
+            hiveDataSourceParamDTO.setPort(10000);
+            hiveDataSourceParamDTO.setDatabase("im");
+            hiveDataSourceParamDTO.setPrincipal("hive/hdfs-mycluster@ESZ.COM");
+            hiveDataSourceParamDTO.setUserName("test");
+            hiveDataSourceParamDTO.setPassword("test");
+            hiveDataSourceParamDTO.setJavaSecurityKrb5Conf("/opt/krb5.conf");
+            hiveDataSourceParamDTO.setLoginUserKeytabPath("/opt/hdfs.headless.keytab");
+            hiveDataSourceParamDTO.setLoginUserKeytabUsername("test2/hdfs-mycluster@ESZ.COM");
+            connectionParam = DataSourceUtils.buildConnectionParams(hiveDataSourceParamDTO);
 
-        expected =
-                "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:hive2://192.168.9.1:10000\",\"database\":\"im\","
-                        + "\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im\",\"driverClassName\":\"org.apache.hive.jdbc.HiveDriver\",\"validationQuery\":\"select 1\","
-                        + "\"principal\":\"hive/hdfs-mycluster@ESZ.COM\",\"javaSecurityKrb5Conf\":\"/opt/krb5.conf\",\"loginUserKeytabUsername\":\"test2/hdfs-mycluster@ESZ.COM\","
-                        + "\"loginUserKeytabPath\":\"/opt/hdfs.headless.keytab\"}";
-        Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
-
+            expected =
+                    "{\"user\":\"test\",\"password\":\"test\",\"address\":\"jdbc:hive2://192.168.9.1:10000\",\"database\":\"im\","
+                            + "\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im\",\"driverClassName\":\"org.apache.hive.jdbc.HiveDriver\",\"validationQuery\":\"select 1\","
+                            + "\"principal\":\"hive/hdfs-mycluster@ESZ.COM\",\"javaSecurityKrb5Conf\":\"/opt/krb5.conf\",\"loginUserKeytabUsername\":\"test2/hdfs-mycluster@ESZ.COM\","
+                            + "\"loginUserKeytabPath\":\"/opt/hdfs.headless.keytab\"}";
+            Assert.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
+        }
     }
 
     @Test
@@ -481,18 +481,21 @@ public class DataSourceServiceTest {
         postgreSqlDatasourceParam.setPassword("");
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
 
-        Mockito.mockStatic(DataSourceClientProvider.class);
-        DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-        Mockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
+        try (
+                MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
+                        Mockito.mockStatic(DataSourceClientProvider.class)) {
+            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
+            Mockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
+            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
-        Result result = dataSourceService.checkConnection(dataSourceType, connectionParam);
-        Assert.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
+            Result result = dataSourceService.checkConnection(dataSourceType, connectionParam);
+            Assert.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
 
-        Connection connection = Mockito.mock(Connection.class);
-        Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
-        result = dataSourceService.checkConnection(dataSourceType, connectionParam);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-
+            Connection connection = Mockito.mock(Connection.class);
+            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            result = dataSourceService.checkConnection(dataSourceType, connectionParam);
+            Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        }
     }
 
 }

@@ -24,11 +24,11 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventServic
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.Date;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -47,15 +47,19 @@ public class TaskAckProcessorTest {
     private TaskEvent taskResponseEvent;
     private Channel channel;
 
+    private MockedStatic<SpringApplicationContext> mockedStaticSpringApplicationContext;
+
     @Before
     public void before() {
-        Mockito.mockStatic(SpringApplicationContext.class);
+        mockedStaticSpringApplicationContext = Mockito.mockStatic(SpringApplicationContext.class);
 
         taskEventService = Mockito.mock(TaskEventService.class);
-        Mockito.when(SpringApplicationContext.getBean(TaskEventService.class)).thenReturn(taskEventService);
+        mockedStaticSpringApplicationContext.when(() -> SpringApplicationContext.getBean(TaskEventService.class))
+                .thenReturn(taskEventService);
 
         processService = Mockito.mock(ProcessService.class);
-        Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        mockedStaticSpringApplicationContext.when(() -> SpringApplicationContext.getBean(ProcessService.class))
+                .thenReturn(processService);
 
         taskExecuteRunningProcessor = new TaskExecuteRunningProcessor();
 
@@ -72,6 +76,11 @@ public class TaskAckProcessorTest {
         taskExecuteRunningMessage.setStartTime(System.currentTimeMillis());
         taskExecuteRunningMessage.setTaskInstanceId(1);
         taskExecuteRunningMessage.setProcessInstanceId(1);
+    }
+
+    @After
+    public void after() {
+        mockedStaticSpringApplicationContext.close();
     }
 
     @Test

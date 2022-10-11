@@ -28,6 +28,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -48,13 +49,15 @@ public class OracleDataSourceProcessorTest {
         oracleDatasourceParamDTO.setPassword("123456");
         oracleDatasourceParamDTO.setDatabase("default");
         oracleDatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
-                .createConnectionParams(oracleDatasourceParamDTO);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default", connectionParams.getJdbcUrl());
+
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
+                    .createConnectionParams(oracleDatasourceParamDTO);
+            Assert.assertNotNull(connectionParams);
+            Assert.assertEquals("jdbc:oracle:thin:@localhost:3308", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test

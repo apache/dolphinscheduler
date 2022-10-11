@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -46,14 +47,15 @@ public class Db2DataSourceProcessorTest {
         db2DatasourceParamDTO.setPort(5142);
         db2DatasourceParamDTO.setDatabase("default");
         db2DatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
 
-        Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
-                .createConnectionParams(db2DatasourceParamDTO);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
+            Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
+                    .createConnectionParams(db2DatasourceParamDTO);
+            Assert.assertNotNull(connectionParams);
+            Assert.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test

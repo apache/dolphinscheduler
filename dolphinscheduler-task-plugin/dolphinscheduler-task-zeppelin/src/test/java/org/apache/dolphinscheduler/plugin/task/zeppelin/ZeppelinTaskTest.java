@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -169,28 +170,29 @@ public class ZeppelinTaskTest {
     public void testHandleWithNoteExecutionSuccessWithProductionSetting() throws Exception {
         String zeppelinParametersWithNoParagraphId = buildZeppelinTaskParametersWithProductionSetting();
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        Mockito.mockStatic(DateUtils.class);
-        when(DateUtils.getTimestampString()).thenReturn("123456789");
-        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
-        this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
-        this.zClient = mock(ZeppelinClient.class);
-        this.noteResult = mock(NoteResult.class);
 
-        doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
-        when(this.zClient.cloneNote(any(String.class), any(String.class))).thenReturn(MOCK_CLONE_NOTE_ID);
-        when(this.zClient.executeNote(any(), any(Map.class))).thenReturn(this.noteResult);
+        try (MockedStatic<DateUtils> mockedStaticDateUtils = Mockito.mockStatic(DateUtils.class)) {
+            when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
+            this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
-        this.zeppelinTask.init();
-        this.zeppelinTask.handle(taskCallBack);
+            this.zClient = mock(ZeppelinClient.class);
+            this.noteResult = mock(NoteResult.class);
 
-        Mockito.verify(this.zClient).cloneNote(
-                MOCK_NOTE_ID,
-                String.format("%s%s_%s", MOCK_PRODUCTION_DIRECTORY, MOCK_NOTE_ID, "123456789"));
-        Mockito.verify(this.zClient).executeNote(MOCK_CLONE_NOTE_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
-        Mockito.verify(this.noteResult).getParagraphResultList();
-        Mockito.verify(this.zClient).deleteNote(MOCK_CLONE_NOTE_ID);
-        Assertions.assertEquals(EXIT_CODE_SUCCESS, this.zeppelinTask.getExitStatusCode());
+            doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
+            when(this.zClient.cloneNote(any(String.class), any(String.class))).thenReturn(MOCK_CLONE_NOTE_ID);
+            when(this.zClient.executeNote(any(), any(Map.class))).thenReturn(this.noteResult);
+            this.zeppelinTask.init();
+            when(DateUtils.getTimestampString()).thenReturn("123456789");
+            this.zeppelinTask.handle(taskCallBack);
+            Mockito.verify(this.zClient).cloneNote(
+                    MOCK_NOTE_ID,
+                    String.format("%s%s_%s", MOCK_PRODUCTION_DIRECTORY, MOCK_NOTE_ID, "123456789"));
+            Mockito.verify(this.zClient).executeNote(MOCK_CLONE_NOTE_ID,
+                    (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+            Mockito.verify(this.noteResult).getParagraphResultList();
+            Mockito.verify(this.zClient).deleteNote(MOCK_CLONE_NOTE_ID);
+            Assertions.assertEquals(EXIT_CODE_SUCCESS, this.zeppelinTask.getExitStatusCode());
+        }
     }
 
     private String buildZeppelinTaskParameters() {

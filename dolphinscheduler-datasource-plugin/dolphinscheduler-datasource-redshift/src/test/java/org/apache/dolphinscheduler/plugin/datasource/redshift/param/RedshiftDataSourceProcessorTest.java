@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -46,12 +47,14 @@ public class RedshiftDataSourceProcessorTest {
         redshiftDatasourceParamDTO.setUserName("awsuser");
         redshiftDatasourceParamDTO.setPassword("123456");
         redshiftDatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
-                .createConnectionParams(redshiftDatasourceParamDTO);
-        Assert.assertEquals("jdbc:redshift://localhost:5439", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:redshift://localhost:5439/dev", connectionParams.getJdbcUrl());
+
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
+                    .createConnectionParams(redshiftDatasourceParamDTO);
+            Assert.assertEquals("jdbc:redshift://localhost:5439", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:redshift://localhost:5439/dev", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test
