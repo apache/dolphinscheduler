@@ -25,13 +25,13 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JupyterTaskTest {
 
     private static final String EXPECTED_JUPYTER_TASK_COMMAND_USE_LOCAL_CONDA_ENV =
@@ -93,7 +93,7 @@ public class JupyterTaskTest {
         String jupyterTaskParameters = buildJupyterTaskUseLocalCondaEnvCommand();
         JupyterTask jupyterTask = prepareJupyterTaskForTest(jupyterTaskParameters);
         jupyterTask.init();
-        Assert.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_LOCAL_CONDA_ENV);
+        Assertions.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_LOCAL_CONDA_ENV);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class JupyterTaskTest {
         String jupyterTaskParameters = buildJupyterTaskUsePackedCondaEnvCommand();
         JupyterTask jupyterTask = prepareJupyterTaskForTest(jupyterTaskParameters);
         jupyterTask.init();
-        Assert.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PACKED_CONDA_ENV);
+        Assertions.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PACKED_CONDA_ENV);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class JupyterTaskTest {
         Mockito.mockStatic(DateUtils.class);
         when(DateUtils.getTimestampString()).thenReturn("123456789");
         jupyterTask.init();
-        Assert.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PIP_REQUIREMENTS);
+        Assertions.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PIP_REQUIREMENTS);
     }
 
     private JupyterTask prepareJupyterTaskForTest(final String jupyterTaskParameters) {

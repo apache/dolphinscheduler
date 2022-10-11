@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -32,6 +32,6 @@ public class LogUtilsTest {
     @Test
     public void getAppIdsFromLogFile() {
         List<String> appIds = LogUtils.getAppIdsFromLogFile(APP_ID_FILE);
-        Assert.assertEquals(Lists.newArrayList("application_1548381669007_1234"), appIds);
+        Assertions.assertEquals(Lists.newArrayList("application_1548381669007_1234"), appIds);
     }
 }

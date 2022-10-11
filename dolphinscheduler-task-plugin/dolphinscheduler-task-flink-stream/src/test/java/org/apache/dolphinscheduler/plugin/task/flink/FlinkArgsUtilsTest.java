@@ -19,10 +19,11 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class FlinkArgsUtilsTest {
 
@@ -60,7 +61,7 @@ public class FlinkArgsUtilsTest {
         FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "flink run-application -t yarn-application -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine));
     }
@@ -69,23 +70,26 @@ public class FlinkArgsUtilsTest {
     public void testRunJarInClusterMode() throws Exception {
         FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
         flinkParameters.setFlinkVersion("1.11");
-        List<String> commandLine1 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine1 =
+                FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine1));
 
         flinkParameters.setFlinkVersion("<1.10");
-        List<String> commandLine2 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine2 =
+                FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine2));
 
         flinkParameters.setFlinkVersion(">=1.12");
-        List<String> commandLine3 = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
+        List<String> commandLine3 =
+                FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "flink run -t yarn-per-job -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine3));
     }
@@ -95,7 +99,7 @@ public class FlinkArgsUtilsTest {
         FlinkStreamParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "flink run -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine));
     }
@@ -106,27 +110,29 @@ public class FlinkArgsUtilsTest {
         flinkParameters.setProgramType(ProgramType.SQL);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
-        Assert.assertEquals("sql-client.sh -i /tmp/execution/app-id_init.sql -f /tmp/execution/app-id_node.sql",
+        Assertions.assertEquals("sql-client.sh -i /tmp/execution/app-id_init.sql -f /tmp/execution/app-id_node.sql",
                 joinStringListWithSpace(commandLine));
     }
 
     @Test
     public void testInitOptionsInClusterMode() throws Exception {
-        List<String> initOptions = FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
-        Assert.assertEquals(2, initOptions.size());
-        Assert.assertTrue(initOptions.contains("set execution.target=local"));
-        Assert.assertTrue(initOptions.contains("set parallelism.default=4"));
+        List<String> initOptions =
+                FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
+        Assertions.assertEquals(2, initOptions.size());
+        Assertions.assertTrue(initOptions.contains("set execution.target=local"));
+        Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
     }
 
     @Test
     public void testInitOptionsInApplicationMode() throws Exception {
-        List<String> initOptions = FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION));
-        Assert.assertEquals(6, initOptions.size());
-        Assert.assertTrue(initOptions.contains("set execution.target=yarn-per-job"));
-        Assert.assertTrue(initOptions.contains("set taskmanager.numberOfTaskSlots=4"));
-        Assert.assertTrue(initOptions.contains("set yarn.application.name=demo-app-name"));
-        Assert.assertTrue(initOptions.contains("set jobmanager.memory.process.size=1024m"));
-        Assert.assertTrue(initOptions.contains("set taskmanager.memory.process.size=1024m"));
-        Assert.assertTrue(initOptions.contains("set parallelism.default=4"));
+        List<String> initOptions = FlinkArgsUtils
+                .buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION));
+        Assertions.assertEquals(6, initOptions.size());
+        Assertions.assertTrue(initOptions.contains("set execution.target=yarn-per-job"));
+        Assertions.assertTrue(initOptions.contains("set taskmanager.numberOfTaskSlots=4"));
+        Assertions.assertTrue(initOptions.contains("set yarn.application.name=demo-app-name"));
+        Assertions.assertTrue(initOptions.contains("set jobmanager.memory.process.size=1024m"));
+        Assertions.assertTrue(initOptions.contains("set taskmanager.memory.process.size=1024m"));
+        Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
     }
 }

@@ -17,30 +17,29 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums.dp;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ExecuteSqlTypeTest {
 
     @Test
     public void testGetCode() {
-        assertEquals(0, ExecuteSqlType.MIDDLE.getCode());
-        assertEquals(1, ExecuteSqlType.STATISTICS.getCode());
-        assertEquals(2, ExecuteSqlType.COMPARISON.getCode());
+        Assertions.assertEquals(0, ExecuteSqlType.MIDDLE.getCode());
+        Assertions.assertEquals(1, ExecuteSqlType.STATISTICS.getCode());
+        Assertions.assertEquals(2, ExecuteSqlType.COMPARISON.getCode());
     }
 
     @Test
     public void testGetDescription() {
-        assertEquals("middle", ExecuteSqlType.MIDDLE.getDescription());
-        assertEquals("statistics", ExecuteSqlType.STATISTICS.getDescription());
-        assertEquals("comparison", ExecuteSqlType.COMPARISON.getDescription());
+        Assertions.assertEquals("middle", ExecuteSqlType.MIDDLE.getDescription());
+        Assertions.assertEquals("statistics", ExecuteSqlType.STATISTICS.getDescription());
+        Assertions.assertEquals("comparison", ExecuteSqlType.COMPARISON.getDescription());
     }
 
     @Test
     public void testOf() {
-        assertEquals(ExecuteSqlType.MIDDLE, ExecuteSqlType.of(0));
-        assertEquals(ExecuteSqlType.STATISTICS, ExecuteSqlType.of(1));
-        assertEquals(ExecuteSqlType.COMPARISON, ExecuteSqlType.of(2));
+        Assertions.assertEquals(ExecuteSqlType.MIDDLE, ExecuteSqlType.of(0));
+        Assertions.assertEquals(ExecuteSqlType.STATISTICS, ExecuteSqlType.of(1));
+        Assertions.assertEquals(ExecuteSqlType.COMPARISON, ExecuteSqlType.of(2));
     }
 }

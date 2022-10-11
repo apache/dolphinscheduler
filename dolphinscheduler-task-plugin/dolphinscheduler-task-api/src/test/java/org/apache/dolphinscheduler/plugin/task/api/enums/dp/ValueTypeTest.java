@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums.dp;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ValueTypeTest {
+
     /**
      * 0-string
      * 1-list
@@ -30,25 +30,25 @@ public class ValueTypeTest {
      */
     @Test
     public void testGetCode() {
-        assertEquals(0, ValueType.STRING.getCode());
-        assertEquals(1, ValueType.LIST.getCode());
-        assertEquals(2, ValueType.NUMBER.getCode());
-        assertEquals(3, ValueType.LIKE_SQL.getCode());
+        Assertions.assertEquals(0, ValueType.STRING.getCode());
+        Assertions.assertEquals(1, ValueType.LIST.getCode());
+        Assertions.assertEquals(2, ValueType.NUMBER.getCode());
+        Assertions.assertEquals(3, ValueType.LIKE_SQL.getCode());
     }
- 
+
     @Test
     public void testGetDescription() {
-        assertEquals("string", ValueType.STRING.getDescription());
-        assertEquals("list", ValueType.LIST.getDescription());
-        assertEquals("number", ValueType.NUMBER.getDescription());
-        assertEquals("sql", ValueType.LIKE_SQL.getDescription());
+        Assertions.assertEquals("string", ValueType.STRING.getDescription());
+        Assertions.assertEquals("list", ValueType.LIST.getDescription());
+        Assertions.assertEquals("number", ValueType.NUMBER.getDescription());
+        Assertions.assertEquals("sql", ValueType.LIKE_SQL.getDescription());
     }
 
     @Test
     public void testOf() {
-        assertEquals(ValueType.STRING, ValueType.of(0));
-        assertEquals(ValueType.LIST, ValueType.of(1));
-        assertEquals(ValueType.NUMBER, ValueType.of(2));
-        assertEquals(ValueType.LIKE_SQL, ValueType.of(3));
+        Assertions.assertEquals(ValueType.STRING, ValueType.of(0));
+        Assertions.assertEquals(ValueType.LIST, ValueType.of(1));
+        Assertions.assertEquals(ValueType.NUMBER, ValueType.of(2));
+        Assertions.assertEquals(ValueType.LIKE_SQL, ValueType.of(3));
     }
 }

@@ -22,14 +22,15 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class FlinkParametersTest {
+
     @Test
     public void getResourceFilesList() {
         FlinkStreamParameters flinkParameters = new FlinkStreamParameters();
-        Assert.assertTrue(flinkParameters.getResourceFilesList().isEmpty());
+        Assertions.assertTrue(flinkParameters.getResourceFilesList().isEmpty());
 
         ResourceInfo mainResource = new ResourceInfo();
         mainResource.setRes("testFlinkMain-1.0.0-SNAPSHOT.jar");
@@ -42,8 +43,8 @@ public class FlinkParametersTest {
 
         flinkParameters.setResourceList(resourceInfos);
         List<ResourceInfo> resourceFilesList = flinkParameters.getResourceFilesList();
-        Assert.assertNotNull(resourceFilesList);
-        Assert.assertEquals(2, resourceFilesList.size());
+        Assertions.assertNotNull(resourceFilesList);
+        Assertions.assertEquals(2, resourceFilesList.size());
 
         ResourceInfo resourceInfo2 = new ResourceInfo();
         resourceInfo2.setRes("testFlinkParameters2.jar");
@@ -51,7 +52,7 @@ public class FlinkParametersTest {
 
         flinkParameters.setResourceList(resourceInfos);
         resourceFilesList = flinkParameters.getResourceFilesList();
-        Assert.assertNotNull(resourceFilesList);
-        Assert.assertEquals(3, resourceFilesList.size());
+        Assertions.assertNotNull(resourceFilesList);
+        Assertions.assertEquals(3, resourceFilesList.size());
     }
 }

@@ -17,26 +17,25 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums.dp;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ConnectorTypeTest {
 
     @Test
     public void testGetCode() {
-        assertEquals(0, ConnectorType.JDBC.getCode());
-        assertEquals(1, ConnectorType.HIVE.getCode());
+        Assertions.assertEquals(0, ConnectorType.JDBC.getCode());
+        Assertions.assertEquals(1, ConnectorType.HIVE.getCode());
     }
 
     @Test
     public void testGetDescription() {
-        assertEquals("JDBC", ConnectorType.JDBC.getDescription());
-        assertEquals("HIVE", ConnectorType.HIVE.getDescription());
+        Assertions.assertEquals("JDBC", ConnectorType.JDBC.getDescription());
+        Assertions.assertEquals("HIVE", ConnectorType.HIVE.getDescription());
     }
 
     @Test
     public void testOf() {
-        assertEquals(ConnectorType.JDBC, ConnectorType.of(0));
+        Assertions.assertEquals(ConnectorType.JDBC, ConnectorType.of(0));
     }
 }

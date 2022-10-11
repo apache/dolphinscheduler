@@ -25,14 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AbstractParametersTest {
 
     @Test
     public void testGetInputLocalParametersMap() {
         AbstractParameters parameters = new AbstractParameters() {
+
             @Override
             public boolean checkParameters() {
                 return false;
@@ -47,8 +48,8 @@ public class AbstractParametersTest {
         // should return property key1 and key2 (direct null and IN)
         Map<String, Property> inputLocalParametersMap = parameters.getInputLocalParametersMap();
 
-        Assert.assertEquals(2, inputLocalParametersMap.size());
-        Assert.assertTrue(inputLocalParametersMap.containsKey("key1"));
-        Assert.assertTrue(inputLocalParametersMap.containsKey("key2"));
+        Assertions.assertEquals(2, inputLocalParametersMap.size());
+        Assertions.assertTrue(inputLocalParametersMap.containsKey("key1"));
+        Assertions.assertTrue(inputLocalParametersMap.containsKey("key2"));
     }
 }

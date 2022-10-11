@@ -17,33 +17,32 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums.dp;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class OptionSourceTypeTest {
 
     @Test
     public void testGetCode() {
-        assertEquals(0, OptionSourceType.DEFAULT.getCode());
-        assertEquals(1, OptionSourceType.DATASOURCE_ID.getCode());
-        assertEquals(2, OptionSourceType.DATASOURCE_TYPE.getCode());
-        assertEquals(3, OptionSourceType.COMPARISON_TYPE.getCode());
+        Assertions.assertEquals(0, OptionSourceType.DEFAULT.getCode());
+        Assertions.assertEquals(1, OptionSourceType.DATASOURCE_ID.getCode());
+        Assertions.assertEquals(2, OptionSourceType.DATASOURCE_TYPE.getCode());
+        Assertions.assertEquals(3, OptionSourceType.COMPARISON_TYPE.getCode());
     }
 
     @Test
     public void testGetDescription() {
-        assertEquals("default", OptionSourceType.DEFAULT.getDescription());
-        assertEquals("datasource_id", OptionSourceType.DATASOURCE_ID.getDescription());
-        assertEquals("datasource_type", OptionSourceType.DATASOURCE_TYPE.getDescription());
-        assertEquals("comparison_type", OptionSourceType.COMPARISON_TYPE.getDescription());
+        Assertions.assertEquals("default", OptionSourceType.DEFAULT.getDescription());
+        Assertions.assertEquals("datasource_id", OptionSourceType.DATASOURCE_ID.getDescription());
+        Assertions.assertEquals("datasource_type", OptionSourceType.DATASOURCE_TYPE.getDescription());
+        Assertions.assertEquals("comparison_type", OptionSourceType.COMPARISON_TYPE.getDescription());
     }
 
     @Test
     public void testOf() {
-        assertEquals(OptionSourceType.DEFAULT, OptionSourceType.of(0));
-        assertEquals(OptionSourceType.DATASOURCE_ID, OptionSourceType.of(1));
-        assertEquals(OptionSourceType.DATASOURCE_TYPE, OptionSourceType.of(2));
-        assertEquals(OptionSourceType.COMPARISON_TYPE, OptionSourceType.of(3));
+        Assertions.assertEquals(OptionSourceType.DEFAULT, OptionSourceType.of(0));
+        Assertions.assertEquals(OptionSourceType.DATASOURCE_ID, OptionSourceType.of(1));
+        Assertions.assertEquals(OptionSourceType.DATASOURCE_TYPE, OptionSourceType.of(2));
+        Assertions.assertEquals(OptionSourceType.COMPARISON_TYPE, OptionSourceType.of(3));
     }
 }
