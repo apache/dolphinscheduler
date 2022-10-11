@@ -36,6 +36,9 @@ version = "dev"
 
 # Start package required
 prod = [
+    "boto3>=1.23.10",
+    "oss2>=2.16.0",
+    "python-gitlab>=2.10.1",
     "click>=8.0.0",
     "py4j~=0.10",
     "ruamel.yaml",

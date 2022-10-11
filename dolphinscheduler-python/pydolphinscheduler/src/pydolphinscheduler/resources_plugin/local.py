@@ -28,7 +28,6 @@ class Local(ResourcePlugin):
     """Local object, declare local resource plugin for task and workflow to dolphinscheduler.
 
     :param prefix: A string representing the prefix of Local.
-
     """
 
     # [start init_method]

@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
-import org.apache.dolphinscheduler.service.factory.NettyRemotingClientFactory;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 
 import java.util.ArrayList;
 import java.util.List;

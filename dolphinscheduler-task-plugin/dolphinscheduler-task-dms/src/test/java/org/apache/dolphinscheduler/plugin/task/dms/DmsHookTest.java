@@ -23,15 +23,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.amazonaws.services.databasemigrationservice.AWSDatabaseMigrationService;
 import com.amazonaws.services.databasemigrationservice.model.CreateReplicationTaskResult;
@@ -40,92 +41,99 @@ import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTaskStats;
 import com.amazonaws.services.databasemigrationservice.model.StartReplicationTaskResult;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DmsHookTest {
 
     final String replicationTaskArn = "arn:aws:dms:ap-southeast-1:123456789012:task:task";
     AWSDatabaseMigrationService client;
 
-    @Before
+    @BeforeEach
     public void before() {
         client = mock(AWSDatabaseMigrationService.class);
     }
 
-    @Test(timeout = 60000)
+    @Test
     public void testCreateReplicationTask() throws Exception {
         try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
-            mockHook.when(DmsHook::createClient).thenReturn(client);
+            Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
 
-            DmsHook dmsHook = spy(new DmsHook());
-            CreateReplicationTaskResult createReplicationTaskResult = mock(CreateReplicationTaskResult.class);
-            when(client.createReplicationTask(any())).thenReturn(createReplicationTaskResult);
+                DmsHook dmsHook = spy(new DmsHook());
+                CreateReplicationTaskResult createReplicationTaskResult = mock(CreateReplicationTaskResult.class);
+                when(client.createReplicationTask(any())).thenReturn(createReplicationTaskResult);
 
-            ReplicationTask replicationTask = mock(ReplicationTask.class);
-            final String taskIdentifier = "task";
-            when(replicationTask.getReplicationTaskArn()).thenReturn(replicationTaskArn);
-            when(replicationTask.getReplicationTaskIdentifier()).thenReturn(taskIdentifier);
-            when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.READY);
-            when(createReplicationTaskResult.getReplicationTask()).thenReturn(replicationTask);
+                ReplicationTask replicationTask = mock(ReplicationTask.class);
+                final String taskIdentifier = "task";
+                when(replicationTask.getReplicationTaskArn()).thenReturn(replicationTaskArn);
+                when(replicationTask.getReplicationTaskIdentifier()).thenReturn(taskIdentifier);
+                when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.READY);
+                when(createReplicationTaskResult.getReplicationTask()).thenReturn(replicationTask);
 
-            doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
-            Assert.assertTrue(dmsHook.createReplicationTask());
-            Assert.assertEquals(replicationTaskArn, dmsHook.getReplicationTaskArn());
-            Assert.assertEquals(taskIdentifier, dmsHook.getReplicationTaskIdentifier());
+                doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
+                Assertions.assertTrue(dmsHook.createReplicationTask());
+                Assertions.assertEquals(replicationTaskArn, dmsHook.getReplicationTaskArn());
+                Assertions.assertEquals(taskIdentifier, dmsHook.getReplicationTaskIdentifier());
+            });
         }
     }
 
-    @Test(timeout = 60000)
+    @Test
     public void testStartReplicationTask() {
-        try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
-            mockHook.when(DmsHook::createClient).thenReturn(client);
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
 
-            DmsHook dmsHook = spy(new DmsHook());
-            StartReplicationTaskResult startReplicationTaskResult = mock(StartReplicationTaskResult.class);
-            when(client.startReplicationTask(any())).thenReturn(startReplicationTaskResult);
+                DmsHook dmsHook = spy(new DmsHook());
+                StartReplicationTaskResult startReplicationTaskResult = mock(StartReplicationTaskResult.class);
+                when(client.startReplicationTask(any())).thenReturn(startReplicationTaskResult);
 
-            ReplicationTask replicationTask = mock(ReplicationTask.class);
-            when(replicationTask.getReplicationTaskArn()).thenReturn(replicationTaskArn);
-            when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.RUNNING);
-            when(startReplicationTaskResult.getReplicationTask()).thenReturn(replicationTask);
+                ReplicationTask replicationTask = mock(ReplicationTask.class);
+                when(replicationTask.getReplicationTaskArn()).thenReturn(replicationTaskArn);
+                when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.RUNNING);
+                when(startReplicationTaskResult.getReplicationTask()).thenReturn(replicationTask);
 
-            doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
-            Assert.assertTrue(dmsHook.startReplicationTask());
-            Assert.assertEquals(replicationTaskArn, dmsHook.getReplicationTaskArn());
-        }
+                doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
+                Assertions.assertTrue(dmsHook.startReplicationTask());
+                Assertions.assertEquals(replicationTaskArn, dmsHook.getReplicationTaskArn());
+            }
+        });
     }
 
-    @Test(timeout = 60000)
+    @Test
     public void testCheckFinishedReplicationTask() {
-        try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
-            mockHook.when(DmsHook::createClient).thenReturn(client);
-            DmsHook dmsHook = spy(new DmsHook());
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
+                DmsHook dmsHook = spy(new DmsHook());
 
-            ReplicationTask replicationTask = mock(ReplicationTask.class);
-            when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.STOPPED);
+                ReplicationTask replicationTask = mock(ReplicationTask.class);
+                when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.STOPPED);
 
-            doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
+                doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
 
-            when(replicationTask.getStopReason()).thenReturn("*_FINISHED");
-            Assert.assertTrue(dmsHook.checkFinishedReplicationTask());
+                when(replicationTask.getStopReason()).thenReturn("*_FINISHED");
+                Assertions.assertTrue(dmsHook.checkFinishedReplicationTask());
 
-            when(replicationTask.getStopReason()).thenReturn("*_ERROR");
-            Assert.assertFalse(dmsHook.checkFinishedReplicationTask());
-        }
+                when(replicationTask.getStopReason()).thenReturn("*_ERROR");
+                Assertions.assertFalse(dmsHook.checkFinishedReplicationTask());
+            }
+        });
     }
 
-    @Test(timeout = 60000)
+    @Test
     public void testDeleteReplicationTask() {
-        try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
-            mockHook.when(DmsHook::createClient).thenReturn(client);
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
 
-            DmsHook dmsHook = spy(new DmsHook());
+                DmsHook dmsHook = spy(new DmsHook());
 
-            ReplicationTask replicationTask = mock(ReplicationTask.class);
-            when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.DELETE);
-            doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
-            Assert.assertTrue(dmsHook.deleteReplicationTask());
-        }
-
+                ReplicationTask replicationTask = mock(ReplicationTask.class);
+                when(replicationTask.getStatus()).thenReturn(DmsHook.STATUS.DELETE);
+                doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
+                Assertions.assertTrue(dmsHook.deleteReplicationTask());
+            }
+        });
     }
 
     @Test
@@ -145,28 +153,26 @@ public class DmsHookTest {
             doReturn(false).when(dmsHook).testConnection(replicationInstanceArn, falseSourceEndpointArn);
             doReturn(false).when(dmsHook).testConnection(replicationInstanceArn, falseTargetEndpointArn);
 
-
             dmsHook.setReplicationInstanceArn(replicationInstanceArn);
 
             dmsHook.setSourceEndpointArn(trueSourceEndpointArn);
             dmsHook.setTargetEndpointArn(trueTargetEndpointArn);
-            Assert.assertTrue(dmsHook.testConnectionEndpoint());
+            Assertions.assertTrue(dmsHook.testConnectionEndpoint());
 
             dmsHook.setSourceEndpointArn(falseSourceEndpointArn);
             dmsHook.setTargetEndpointArn(falseTargetEndpointArn);
-            Assert.assertFalse(dmsHook.testConnectionEndpoint());
+            Assertions.assertFalse(dmsHook.testConnectionEndpoint());
 
             dmsHook.setSourceEndpointArn(trueSourceEndpointArn);
             dmsHook.setTargetEndpointArn(falseTargetEndpointArn);
-            Assert.assertFalse(dmsHook.testConnectionEndpoint());
+            Assertions.assertFalse(dmsHook.testConnectionEndpoint());
 
             dmsHook.setSourceEndpointArn(falseSourceEndpointArn);
             dmsHook.setTargetEndpointArn(trueTargetEndpointArn);
-            Assert.assertFalse(dmsHook.testConnectionEndpoint());
+            Assertions.assertFalse(dmsHook.testConnectionEndpoint());
         }
 
     }
-
 
     @Test
     public void testDescribeReplicationTasks() {
@@ -180,7 +186,8 @@ public class DmsHookTest {
             when(client.describeReplicationTasks(any())).thenReturn(describeReplicationTasksResult);
 
             ReplicationTask replicationTask = mock(ReplicationTask.class);
-            when(replicationTask.getReplicationTaskArn()).thenReturn("arn:aws:dms:ap-southeast-1:123456789012:task:task");
+            when(replicationTask.getReplicationTaskArn())
+                    .thenReturn("arn:aws:dms:ap-southeast-1:123456789012:task:task");
             when(replicationTask.getReplicationTaskIdentifier()).thenReturn("task");
 
             final String sourceArn = "arn:aws:dms:ap-southeast-1:123456789012:endpoint:source";
@@ -192,46 +199,43 @@ public class DmsHookTest {
             when(describeReplicationTasksResult.getReplicationTasks()).thenReturn(Arrays.asList(replicationTask));
 
             ReplicationTask replicationTaskOut = dmsHook.describeReplicationTasks();
-            Assert.assertNotEquals(dmsHook.getReplicationInstanceArn(), replicationTaskOut.getReplicationTaskArn());
-            Assert.assertEquals("task", replicationTaskOut.getReplicationTaskIdentifier());
-            Assert.assertEquals(sourceArn, replicationTaskOut.getSourceEndpointArn());
-            Assert.assertEquals(targetArn, replicationTaskOut.getTargetEndpointArn());
+            Assertions.assertNotEquals(dmsHook.getReplicationInstanceArn(), replicationTaskOut.getReplicationTaskArn());
+            Assertions.assertEquals("task", replicationTaskOut.getReplicationTaskIdentifier());
+            Assertions.assertEquals(sourceArn, replicationTaskOut.getSourceEndpointArn());
+            Assertions.assertEquals(targetArn, replicationTaskOut.getTargetEndpointArn());
         }
 
     }
 
-
-    @Test(timeout = 60000)
+    @Test
     public void testAwaitReplicationTaskStatus() {
-        try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
-            mockHook.when(DmsHook::createClient).thenReturn(client);
-            DmsHook dmsHook = spy(new DmsHook());
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
+                DmsHook dmsHook = spy(new DmsHook());
 
-            ReplicationTask replicationTask = mock(ReplicationTask.class);
-            doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
+                ReplicationTask replicationTask = mock(ReplicationTask.class);
+                doReturn(replicationTask).when(dmsHook).describeReplicationTasks();
 
-            ReplicationTaskStats taskStats = mock(ReplicationTaskStats.class);
-            when(replicationTask.getReplicationTaskStats()).thenReturn(taskStats);
-            when(taskStats.getFullLoadProgressPercent()).thenReturn(100);
+                ReplicationTaskStats taskStats = mock(ReplicationTaskStats.class);
+                when(replicationTask.getReplicationTaskStats()).thenReturn(taskStats);
+                when(taskStats.getFullLoadProgressPercent()).thenReturn(100);
 
-            when(replicationTask.getStatus()).thenReturn(
-                DmsHook.STATUS.STOPPED
-            );
-            Assert.assertTrue(dmsHook.awaitReplicationTaskStatus(DmsHook.STATUS.STOPPED));
+                when(replicationTask.getStatus()).thenReturn(
+                        DmsHook.STATUS.STOPPED);
+                Assertions.assertTrue(dmsHook.awaitReplicationTaskStatus(DmsHook.STATUS.STOPPED));
 
-            when(replicationTask.getStatus()).thenReturn(
-                DmsHook.STATUS.RUNNING,
-                DmsHook.STATUS.STOPPED
-            );
-            Assert.assertTrue(dmsHook.awaitReplicationTaskStatus(DmsHook.STATUS.STOPPED));
+                when(replicationTask.getStatus()).thenReturn(
+                        DmsHook.STATUS.RUNNING,
+                        DmsHook.STATUS.STOPPED);
+                Assertions.assertTrue(dmsHook.awaitReplicationTaskStatus(DmsHook.STATUS.STOPPED));
 
-            when(replicationTask.getStatus()).thenReturn(
-                DmsHook.STATUS.RUNNING,
-                DmsHook.STATUS.STOPPED
-            );
-            Assert.assertFalse(dmsHook.awaitReplicationTaskStatus(DmsHook.STATUS.STOPPED, DmsHook.STATUS.RUNNING));
-        }
+                when(replicationTask.getStatus()).thenReturn(
+                        DmsHook.STATUS.RUNNING,
+                        DmsHook.STATUS.STOPPED);
+                Assertions.assertFalse(
+                        dmsHook.awaitReplicationTaskStatus(DmsHook.STATUS.STOPPED, DmsHook.STATUS.RUNNING));
+            }
+        });
     }
 }
-
-
