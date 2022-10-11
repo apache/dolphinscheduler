@@ -423,9 +423,10 @@ end;
 d//
 delimiter ;
 
+-- ALTER TABLE t_ds_worker_group ADD COLUMN description varchar(255) DEFAULT NULL COMMENT 'ds worker group description';
+call add_column_safety('t_ds_worker_group','description', 'varchar(255)' , "DEFAULT NULL COMMENT 'ds worker group description'");
 call add_column_safety('t_ds_worker_group','other_params_json', 'text' , "DEFAULT NULL COMMENT 'other params json'");
 call add_column_safety('t_ds_process_instance','state_history', 'text' , "DEFAULT NULL COMMENT 'state history desc' AFTER `state`");
-
 drop procedure if exists add_column_safety;
 
 alter table t_ds_process_instance alter column process_instance_priority set default 2;
