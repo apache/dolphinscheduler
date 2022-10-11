@@ -17,8 +17,6 @@
 
 package org.apache.dolphinler.plugin.task.mlflow;
 
-import static org.powermock.api.mockito.PowerMockito.when;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowConstants;
@@ -27,53 +25,37 @@ import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowTask;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
-import java.util.Date;
-import java.util.UUID;
-
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({
-    JSONUtils.class,
-    PropertyUtils.class,
-})
-@PowerMockIgnore({"javax.*"})
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
+@RunWith(MockitoJUnitRunner.class)
 public class MlflowTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(MlflowTask.class);
+    private MockedStatic<PropertyUtils> propertyUtilsMockedStatic;
 
     @Before
-    public void before() throws Exception {
-        PowerMockito.mockStatic(PropertyUtils.class);
+    public void init() {
+        propertyUtilsMockedStatic = Mockito.mockStatic(PropertyUtils.class);
+        propertyUtilsMockedStatic.when(() -> PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY)).thenReturn("main");
+    }
+
+    @After
+    public void clean() {
+        propertyUtilsMockedStatic.close();
     }
 
     public TaskExecutionContext createContext(MlflowParameters mlflowParameters) {
         String parameters = JSONUtils.toJsonString(mlflowParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("MLflowTest");
-        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/dolphinscheduler_test");
-        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
-        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
-        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
-        Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dolphinscheduler_test/log");
-        Mockito.when(taskExecutionContext.getEnvironmentConfig()).thenReturn("export PATH=$HOME/anaconda3/bin:$PATH");
-
-        String userName = System.getenv().get("USER");
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn(userName);
-
         TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
         return taskExecutionContext;
     }
@@ -85,11 +67,11 @@ public class MlflowTaskTest {
         Assert.assertEquals("main", MlflowTask.getPresetRepositoryVersion());
 
         String definedRepository = "https://github.com/<MY-ID>/dolphinscheduler-mlflow";
-        when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_KEY)).thenAnswer(invocation -> definedRepository);
+        Mockito.when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_KEY)).thenAnswer(invocation -> definedRepository);
         Assert.assertEquals(definedRepository, MlflowTask.getPresetRepository());
 
         String definedRepositoryVersion = "dev";
-        when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY)).thenAnswer(invocation -> definedRepositoryVersion);
+        Mockito.when(PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY)).thenAnswer(invocation -> definedRepositoryVersion);
         Assert.assertEquals(definedRepositoryVersion, MlflowTask.getPresetRepositoryVersion());
     }
 

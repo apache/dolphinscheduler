@@ -120,7 +120,7 @@ public class EmrAddStepsTask extends AbstractEmrTask {
      *
      * @return AddJobFlowStepsRequest
      */
-    private AddJobFlowStepsRequest createAddJobFlowStepsRequest() {
+    protected AddJobFlowStepsRequest createAddJobFlowStepsRequest() {
 
         final AddJobFlowStepsRequest addJobFlowStepsRequest;
         try {

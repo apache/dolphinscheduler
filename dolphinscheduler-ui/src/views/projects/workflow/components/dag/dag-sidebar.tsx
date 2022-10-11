@@ -38,6 +38,7 @@ export default defineComponent({
       logic: [],
       di: [],
       dq: [],
+      ml: [],
       other: [],
       fav: []
     })
@@ -67,6 +68,9 @@ export default defineComponent({
         )
         variables.dq = variables.dataList.filter(
           (item: any) => item.taskType === 'DataQuality'
+        )
+        variables.ml = variables.dataList.filter(
+          (item: any) => item.taskType === 'MachineLearning'
         )
         variables.other = variables.dataList.filter(
           (item: any) => item.taskType === 'Other'
@@ -368,6 +372,59 @@ export default defineComponent({
               v-slots={{
                 default: () => {
                   return variables.dq.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit('dragStart', e, task.type as TaskType)
+                      }}
+                    >
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                      />
+                      <span>{task.taskName}</span>
+                      <div
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
+                        }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
+                      >
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
+                        >
+                          {task.collection ? (
+                            <StarFilled />
+                          ) : (
+                            <StarOutlined />
+                          )}
+                        </NIcon>
+                      </div>
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.ml.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.ml')}
+              name='5'
+              class='task-cate-ml'
+              v-slots={{
+                default: () => {
+                  return variables.ml.map((task: any) => (
                     <div
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'

@@ -17,26 +17,28 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
+import javax.annotation.PostConstruct;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -55,7 +57,6 @@ public class WorkerRegistryClient implements AutoCloseable {
     private WorkerConnectStrategy workerConnectStrategy;
 
     private WorkerHeartBeatTask workerHeartBeatTask;
-
 
     @PostConstruct
     public void initWorkRegistry() {
@@ -80,21 +81,18 @@ public class WorkerRegistryClient implements AutoCloseable {
      */
     private void registry() {
         WorkerHeartBeat workerHeartBeat = workerHeartBeatTask.getHeartBeat();
+        String workerZKPath = workerConfig.getWorkerRegistryPath();
+        // remove before persist
+        registryClient.remove(workerZKPath);
+        registryClient.persistEphemeral(workerZKPath, JSONUtils.toJsonString(workerHeartBeat));
+        log.info("Worker node: {} registry to ZK {} successfully", workerConfig.getWorkerAddress(), workerZKPath);
 
-        for (String workerZKPath : workerConfig.getWorkerGroupRegistryPaths()) {
-            // remove before persist
-            registryClient.remove(workerZKPath);
-            registryClient.persistEphemeral(workerZKPath, JSONUtils.toJsonString(workerHeartBeat));
-            log.info("Worker node: {} registry to ZK {} successfully", workerConfig.getWorkerAddress(), workerZKPath);
-        }
-
-        while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.WORKER)) {
+        while (!registryClient.checkNodeExists(workerConfig.getWorkerAddress(), NodeType.WORKER)) {
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
         // sleep 1s, waiting master failover remove
         ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-
 
         workerHeartBeatTask.start();
         log.info("Worker node: {} registry finished", workerConfig.getWorkerAddress());

@@ -33,18 +33,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * base service test
  */
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"sun.security.*", "javax.net.*"})
-@PrepareForTest({HadoopUtils.class})
+@RunWith(MockitoJUnitRunner.class)
 public class BaseServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
@@ -92,22 +88,6 @@ public class BaseServiceTest {
         // has params
         baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
     }
-
-    // @Test
-    // public void testCreateTenantDirIfNotExists() {
-    //
-    // PowerMockito.mockStatic(HadoopUtils.class);
-    // PowerMockito.when(HadoopUtils.getInstance()).thenReturn(hadoopUtils);
-    //
-    // try {
-    // baseService.createTenantDirIfNotExists("test");
-    // } catch (Exception e) {
-    // Assert.fail();
-    // logger.error("CreateTenantDirIfNotExists error ",e);
-    // e.printStackTrace();
-    // }
-    //
-    // }
 
     @Test
     public void testHasPerm() {

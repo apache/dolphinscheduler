@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.http;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,9 +30,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,7 +39,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public final class HttpSender {
+
     private static final Logger logger = LoggerFactory.getLogger(HttpSender.class);
     private static final String URL_SPLICE_CHAR = "?";
     /**
@@ -87,10 +92,7 @@ public final class HttpSender {
         }
 
         try {
-            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-            CloseableHttpResponse response = httpClient.execute(httpRequest);
-            HttpEntity entity = response.getEntity();
-            String resp = EntityUtils.toString(entity, DEFAULT_CHARSET);
+            String resp = this.getResponseString(httpRequest);
             alertResult.setStatus("true");
             alertResult.setMessage(resp);
         } catch (Exception e) {
@@ -102,17 +104,25 @@ public final class HttpSender {
         return alertResult;
     }
 
+    public String getResponseString(HttpRequestBase httpRequest) throws IOException {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        CloseableHttpResponse response = httpClient.execute(httpRequest);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, DEFAULT_CHARSET);
+    }
+
     private void createHttpRequest(String msg) throws MalformedURLException, URISyntaxException {
         if (REQUEST_TYPE_POST.equals(requestType)) {
             httpRequest = new HttpPost(url);
             setHeader();
-            //POST request add param in request body
+            // POST request add param in request body
             setMsgInRequestBody(msg);
         } else if (REQUEST_TYPE_GET.equals(requestType)) {
-            //GET request add param in url
+            // GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
-            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost(), unencodeUrl.getPath(), unencodeUrl.getQuery(), null);
+            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost(), unencodeUrl.getPath(),
+                    unencodeUrl.getQuery(), null);
 
             httpRequest = new HttpGet(uri);
             setHeader();
@@ -126,7 +136,7 @@ public final class HttpSender {
 
         if (StringUtils.isNotBlank(contentField)) {
             String type = "&";
-            //check splice char is & or ?
+            // check splice char is & or ?
             if (!url.contains(URL_SPLICE_CHAR)) {
                 type = URL_SPLICE_CHAR;
             }
@@ -155,7 +165,7 @@ public final class HttpSender {
     private void setMsgInRequestBody(String msg) {
         try {
             ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
-            //set msg content field
+            // set msg content field
             objectNode.put(contentField, msg);
             StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
             ((HttpPost) httpRequest).setEntity(entity);

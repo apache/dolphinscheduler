@@ -33,8 +33,8 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.util.List;
@@ -59,9 +59,7 @@ public class LogClient implements AutoCloseable {
     private static final long LOG_REQUEST_TIMEOUT = 10 * 1000L;
 
     public LogClient() {
-        NettyClientConfig nettyClientConfig = new NettyClientConfig();
-        this.client = new NettyRemotingClient(nettyClientConfig);
-        logger.info("Initialized LogClientService with config: {}", nettyClientConfig);
+        client = NettyRemotingClientFactory.buildNettyRemotingClient();
     }
 
     /**
