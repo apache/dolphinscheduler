@@ -64,7 +64,7 @@ Please refer to the commit message section.
 ### Pull Request Code Style
 
 DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors,
-see [Code Style](../development-environment-setup.md#code-style) for details.
+see [Code Style](../development-environment-setup.md#Code Style) for details.
 
 ### Question
 
