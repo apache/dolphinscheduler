@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.chunjun;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ChunJunParametersTest {
 
     private ChunJunParameters chunJunParameters = new ChunJunParameters();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         chunJunParameters.setCustomConfig(0);
         chunJunParameters.setDataSource(1);
@@ -41,38 +41,38 @@ public class ChunJunParametersTest {
     public void testToString() {
 
         String expected = "ChunJunParameters"
-            + "{"
-            + "customConfig=0, "
-            + "json='json', "
-            + "dsType='MYSQL', "
-            + "dataSource=1, "
-            + "dtType='MYSQL', "
-            + "dataTarget=1, "
-            + "sql='null', "
-            + "targetTable='null', "
-            + "preStatements=null, "
-            + "postStatements=null, "
-            + "jobSpeedByte=1, "
-            + "jobSpeedRecord=1, "
-            + "others=xx, "
-            + "deployMode=local"
-            + "}";
+                + "{"
+                + "customConfig=0, "
+                + "json='json', "
+                + "dsType='MYSQL', "
+                + "dataSource=1, "
+                + "dtType='MYSQL', "
+                + "dataTarget=1, "
+                + "sql='null', "
+                + "targetTable='null', "
+                + "preStatements=null, "
+                + "postStatements=null, "
+                + "jobSpeedByte=1, "
+                + "jobSpeedRecord=1, "
+                + "others=xx, "
+                + "deployMode=local"
+                + "}";
 
-        Assert.assertNotEquals(expected, chunJunParameters.toString());
+        Assertions.assertNotEquals(expected, chunJunParameters.toString());
     }
 
     @Test
     public void testCheckParameters() {
-        Assert.assertFalse(chunJunParameters.checkParameters());
+        Assertions.assertFalse(chunJunParameters.checkParameters());
     }
 
     @Test
     public void testGetResourceFilesList() {
-        Assert.assertNotNull(chunJunParameters.getResourceFilesList());
+        Assertions.assertNotNull(chunJunParameters.getResourceFilesList());
     }
 
     @Test
     public void testGetResources() {
-        Assert.assertNotNull(chunJunParameters.getResources());
+        Assertions.assertNotNull(chunJunParameters.getResources());
     }
 }
