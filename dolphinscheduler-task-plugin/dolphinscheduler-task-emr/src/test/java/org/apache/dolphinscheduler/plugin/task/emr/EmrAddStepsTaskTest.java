@@ -33,12 +33,12 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsResult;
@@ -53,23 +53,23 @@ import com.amazonaws.services.elasticmapreduce.model.StepStatus;
  *
  * @since v3.1.0
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EmrAddStepsTaskTest {
 
     private final StepStatus pendingState =
-        new StepStatus().withState(StepState.PENDING);
+            new StepStatus().withState(StepState.PENDING);
 
     private final StepStatus runningState =
-        new StepStatus().withState(StepState.RUNNING);
+            new StepStatus().withState(StepState.RUNNING);
 
     private final StepStatus completedState =
-        new StepStatus().withState(StepState.COMPLETED);
+            new StepStatus().withState(StepState.COMPLETED);
 
     private final StepStatus cancelledState =
-        new StepStatus().withState(StepState.CANCELLED);
+            new StepStatus().withState(StepState.CANCELLED);
 
     private final StepStatus failedState =
-        new StepStatus().withState(StepState.FAILED);
+            new StepStatus().withState(StepState.FAILED);
 
     private EmrAddStepsTask emrAddStepsTask;
     private AmazonElasticMapReduce emrClient;
@@ -78,7 +78,7 @@ public class EmrAddStepsTaskTest {
 
     };
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         // mock EmrParameters and EmrAddStepsTask
         EmrParameters emrParameters = buildEmrTaskParameters();
@@ -91,27 +91,30 @@ public class EmrAddStepsTaskTest {
         emrClient = Mockito.mock(AmazonElasticMapReduce.class);
 
         AddJobFlowStepsResult addJobFlowStepsResult = Mockito.mock(AddJobFlowStepsResult.class);
-        Mockito.when(emrClient.addJobFlowSteps(any())).thenReturn(addJobFlowStepsResult);
-        Mockito.when(addJobFlowStepsResult.getStepIds()).thenReturn(Collections.singletonList("step-xx"));
+        Mockito.lenient().when(emrClient.addJobFlowSteps(any())).thenReturn(addJobFlowStepsResult);
+        Mockito.lenient().when(addJobFlowStepsResult.getStepIds()).thenReturn(Collections.singletonList("step-xx"));
 
         Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
         DescribeStepResult describeStepResult = Mockito.mock(DescribeStepResult.class);
-        Mockito.when(emrClient.describeStep(any())).thenReturn(describeStepResult);
+        Mockito.lenient().when(emrClient.describeStep(any())).thenReturn(describeStepResult);
 
         // mock step
         step = Mockito.mock(Step.class);
-        Mockito.when(describeStepResult.getStep()).thenReturn(step);
+        Mockito.lenient().when(describeStepResult.getStep()).thenReturn(step);
 
         emrAddStepsTask.init();
     }
 
-    @Test(expected = TaskException.class)
+    @Test
     public void testCanNotParseJson() throws Exception {
-        Mockito.when(emrAddStepsTask.createAddJobFlowStepsRequest()).thenThrow(new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
-        emrAddStepsTask.handle(taskCallBack);
+        Mockito.when(emrAddStepsTask.createAddJobFlowStepsRequest()).thenThrow(
+                new EmrTaskException("can not parse AddJobFlowStepsRequest from json", new Exception("error")));
+        Assertions.assertThrows(TaskException.class, () -> {
+            emrAddStepsTask.handle(taskCallBack);
+        });
     }
 
-    @Test(expected = TaskException.class)
+    @Test
     public void testDefineJsonStepNotOne() throws Exception {
         // mock EmrParameters and EmrAddStepsTask
         EmrParameters emrParameters = buildErrorEmrTaskParameters();
@@ -120,8 +123,11 @@ public class EmrAddStepsTaskTest {
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
         emrAddStepsTask = Mockito.spy(new EmrAddStepsTask(taskExecutionContext));
         Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
-        emrAddStepsTask.init();
-        emrAddStepsTask.handle(taskCallBack);
+        Assertions.assertThrows(TaskException.class, () -> {
+            emrAddStepsTask.init();
+            emrAddStepsTask.handle(taskCallBack);
+        });
+
     }
 
     @Test
@@ -129,7 +135,7 @@ public class EmrAddStepsTaskTest {
         Mockito.when(step.getStatus()).thenReturn(pendingState, runningState, completedState);
 
         emrAddStepsTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_SUCCESS, emrAddStepsTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, emrAddStepsTask.getExitStatusCode());
     }
 
     @Test
@@ -137,17 +143,20 @@ public class EmrAddStepsTaskTest {
         Mockito.when(step.getStatus()).thenReturn(pendingState, runningState, cancelledState);
 
         emrAddStepsTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_KILL, emrAddStepsTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_KILL, emrAddStepsTask.getExitStatusCode());
     }
 
-    @Test(expected = TaskException.class)
+    @Test
     public void testHandleError() throws Exception {
         Mockito.when(step.getStatus()).thenReturn(pendingState, runningState, failedState);
         emrAddStepsTask.handle(taskCallBack);
-        Assert.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_FAILURE, emrAddStepsTask.getExitStatusCode());
 
-        Mockito.when(emrClient.addJobFlowSteps(any())).thenThrow(new AmazonElasticMapReduceException("error"), new EmrTaskException());
-        emrAddStepsTask.handle(taskCallBack);
+        Mockito.when(emrClient.addJobFlowSteps(any())).thenThrow(new AmazonElasticMapReduceException("error"),
+                new EmrTaskException());
+        Assertions.assertThrows(TaskException.class, () -> {
+            emrAddStepsTask.handle(taskCallBack);
+        });
     }
 
     private EmrParameters buildEmrTaskParameters() {
