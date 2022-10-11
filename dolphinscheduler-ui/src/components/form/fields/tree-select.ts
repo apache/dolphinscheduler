@@ -16,7 +16,7 @@
  */
 
 import { h, unref } from 'vue'
-import { NTreeSelect, TreeSelectOption } from 'naive-ui'
+import { NTreeSelect } from 'naive-ui'
 import { isFunction } from 'lodash'
 import type { IJsonItem } from '../types'
 

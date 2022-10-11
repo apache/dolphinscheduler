@@ -201,11 +201,9 @@ export default defineComponent({
     })
 
     const initBreadcrumb = async (dirs: string[]) => {
-      let index = 0
-      for (const dir of dirs) {
+      for (let index = 0; index < dirs.length; index ++) {
         const newDir = dirs.slice(0, index + 1).join('/')
         const id = 0
-        // should be checking whether fileName ends with "/"
         const resource = await queryResourceById(
           {
             id,
@@ -216,8 +214,7 @@ export default defineComponent({
           id
         )
         breadcrumbItemsRef.value?.push({ id: resource.fullName, fullName: resource.alias, userName: resource.userName })
-        index = index + 1
-      }
+        }
     }
 
     onMounted(() => {
