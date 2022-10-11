@@ -18,35 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
 import static org.apache.commons.lang3.time.DateUtils.addWeeks;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_MONTHS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HYPHEN;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAST_DAY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_BEGIN;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_END;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_FIRST_DAY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_LAST_DAY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.N;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.P;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RIGHT_BRACE_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.THIS_DAY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TIMESTAMP;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_BEGIN;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_END;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_FIRST_DAY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_LAST_DAY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.YEAR_WEEK;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 import static org.apache.dolphinscheduler.spi.utils.DateUtils.addDays;
 import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMinutes;
 import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMonths;
@@ -301,7 +273,7 @@ public class TimePlaceholderUtils {
      * Placeholder replacement resolver
      */
     private static class TimePlaceholderResolver implements
-        PropertyPlaceholderHelper.PlaceholderResolver {
+            PropertyPlaceholderHelper.PlaceholderResolver {
 
         private final String value;
 
@@ -353,16 +325,34 @@ public class TimePlaceholderUtils {
         try {
             if (expression.startsWith(TIMESTAMP)) {
                 String timeExpression = expression.substring(TIMESTAMP.length() + 1, expression.length() - 1);
-
                 Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
-
                 String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
-
                 Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
-
                 value = String.valueOf(timestamp.getTime() / 1000);
-            } else if (expression.startsWith(YEAR_WEEK)) {
-                value = calculateYearWeek(expression,date);
+            } else if (expression.startsWith(UNIXTIME)) {
+                String timeExpression = expression.substring(UNIXTIME.length() + 1, expression.length() - 1);
+                Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
+                String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
+                Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
+                value = String.valueOf(timestamp.getTime() / 1000);
+            } else if (expression.startsWith(MILLI_UNIXTIME)){
+                String timeExpression = expression.substring(MILLI_UNIXTIME.length() + 1, expression.length() - 1);
+                Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
+                String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
+                Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
+                value = String.valueOf(timestamp.getTime());
+            } else if (expression.startsWith(MICRO_UNIXTIME)){
+                String timeExpression = expression.substring(MICRO_UNIXTIME.length() + 1, expression.length() - 1);
+                Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
+                String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
+                Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
+                value = String.valueOf(timestamp.getTime()*1000);
+            }  else if (expression.startsWith(NANO_UNIXTIME)){
+                String timeExpression = expression.substring(NANO_UNIXTIME.length() + 1, expression.length() - 1);
+                Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
+                String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
+                Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
+                value = String.valueOf(timestamp.getTime()*1000000);
             } else {
                 Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
                 value = DateUtils.format(entry.getKey(), entry.getValue());
@@ -755,7 +745,7 @@ public class TimePlaceholderUtils {
         } else {
 
             calcExpression = String.format("60*24*(%s)%s", minuteExpression.substring(0, index),
-                minuteExpression.substring(index));
+                    minuteExpression.substring(index));
         }
 
         return calculate(calcExpression);

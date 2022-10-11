@@ -115,6 +115,22 @@ public class TimePlaceholderUtilsTest {
     }
 
     @Test
+    public void timePlaceHolderForCalculateTime() {
+        Assert.assertEquals("2022test12022:***2022-08-25,20220802,20220830,20220823,20220827", TimePlaceholderUtils
+                .replacePlaceholders("$[yyyy]test1$[yyyy:***]$[yyyy-MM-dd-1],$[month_begin(yyyyMMdd, 1)],$[month_end(yyyyMMdd, -1)],$[week_begin(yyyyMMdd, 1)],$[week_end(yyyyMMdd, -1)]",
+                        date, true));
+        Assert.assertEquals("1661443200",TimePlaceholderUtils.replacePlaceholders("$[timestamp(yyyyMMddHHmmss)]",date, true));
+        Assert.assertEquals("1661356800",TimePlaceholderUtils.replacePlaceholders("$[timestamp(yyyyMMddHHmmss-1)]",date, true));
+        Assert.assertEquals("1661356800",TimePlaceholderUtils.replacePlaceholders("$[unixtime(yyyyMMddHHmmss-1)]",date, true));
+        Assert.assertEquals("1661356800000",TimePlaceholderUtils.replacePlaceholders("$[milli_unixtime(yyyyMMddHHmmss-1)]",date, true));
+        Assert.assertEquals("1661356800000000",TimePlaceholderUtils.replacePlaceholders("$[mirco_unixtime(yyyyMMddHHmmss-1)]",date, true));
+        Assert.assertEquals("1661356800000000000",TimePlaceholderUtils.replacePlaceholders("$[nano_unixtime(yyyyMMddHHmmss-1)]",date, true));
+        Assert.assertEquals("1661184000",TimePlaceholderUtils.replacePlaceholders("$[unixtime(week_begin(yyyyMMddHHmmss, 1))]",date, true));
+        Assert.assertEquals("1661184000000",TimePlaceholderUtils.replacePlaceholders("$[milli_unixtime(week_begin(yyyyMMddHHmmss, 1))]",date, true));
+
+    }
+
+    @Test
     public void timePlaceHolderForWeekLastDay() {
         String weekLastDate = "$[week_last_day(yyyy-MM-dd,0)]";
         String weekLastDay = "$[week_last_day(yyyyMMdd,0)]";

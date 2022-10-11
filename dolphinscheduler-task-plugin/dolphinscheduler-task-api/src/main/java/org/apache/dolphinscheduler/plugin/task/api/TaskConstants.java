@@ -273,6 +273,11 @@ public class TaskConstants {
      * timestamp
      */
     public static final String TIMESTAMP = "timestamp";
+    public static final String UNIXTIME = "unixtime";
+    public static final String MILLI_UNIXTIME = "milli_unixtime";
+    public static final String MICRO_UNIXTIME = "mirco_unixtime";
+    public static final String NANO_UNIXTIME = "nano_unixtime";
+
     public static final char SUBTRACT_CHAR = '-';
     public static final char ADD_CHAR = '+';
     public static final char MULTIPLY_CHAR = '*';
