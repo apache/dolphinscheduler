@@ -298,16 +298,4 @@ public class DateUtilsTest {
         Assert.assertNull(date);
     }
 
-    @Test
-    public void testGetRemainTime() {
-        Date date = DateUtils.stringToDate("3022-09-29 20:00:00");
-        int interval = 10;
-        long remainTime = DateUtils.getRemainTime(date, interval);
-        Assert.assertEquals(remainTime, interval);
-
-        date = DateUtils.stringToDate("2000-09-29 20:00:00");
-        interval = 0;
-        remainTime = DateUtils.getRemainTime(date, interval);
-        Assert.assertTrue(remainTime < 0);
-    }
 }
