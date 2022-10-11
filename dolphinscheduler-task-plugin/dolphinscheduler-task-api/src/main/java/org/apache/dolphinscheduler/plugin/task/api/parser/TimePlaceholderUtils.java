@@ -273,7 +273,7 @@ public class TimePlaceholderUtils {
      * Placeholder replacement resolver
      */
     private static class TimePlaceholderResolver implements
-            PropertyPlaceholderHelper.PlaceholderResolver {
+        PropertyPlaceholderHelper.PlaceholderResolver {
 
         private final String value;
 
@@ -354,7 +354,7 @@ public class TimePlaceholderUtils {
                 Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
                 value = String.valueOf(timestamp.getTime()*1000000);
             } else if (expression.startsWith(YEAR_WEEK)) {
-                value = calculateYearWeek(expression, date);
+                value = calculateYearWeek(expression,date);
             } else {
                 Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
                 value = DateUtils.format(entry.getKey(), entry.getValue());
@@ -747,7 +747,7 @@ public class TimePlaceholderUtils {
         } else {
 
             calcExpression = String.format("60*24*(%s)%s", minuteExpression.substring(0, index),
-                    minuteExpression.substring(index));
+                minuteExpression.substring(index));
         }
 
         return calculate(calcExpression);
