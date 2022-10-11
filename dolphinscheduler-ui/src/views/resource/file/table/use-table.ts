@@ -87,11 +87,6 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
       ...COLUMN_WIDTH_CONFIG['name'],
       key: 'fullName'
     },
-//     {
-//       title: t('resource.file.description'),
-//       ...COLUMN_WIDTH_CONFIG['note'],
-//       key: 'description'
-//     },
     {
       title: t('resource.file.size'),
       key: 'size',
