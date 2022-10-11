@@ -195,8 +195,8 @@ const DetailModal = defineComponent({
                   path='type'
                   show-require-mark
                 >
-                  <div class={[styles.typeBox, !!id && styles.disabledBox]}>
-                    <div>{detailForm.type}</div>
+                  <div class={[styles.typeBox, !!id && styles.disabledBox, 'btn-data-source-type-drop-down']}>
+                    <div v-model={[detailForm.type, 'value']}>{detailForm.type}</div>
                     <div class={styles['text-color']} onClick={handleSourceModalOpen}>更换</div>
                   </div>
                 </NFormItem>
