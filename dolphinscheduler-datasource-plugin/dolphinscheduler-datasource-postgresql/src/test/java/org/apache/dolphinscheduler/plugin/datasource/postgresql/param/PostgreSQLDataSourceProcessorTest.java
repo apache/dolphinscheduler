@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -46,13 +47,14 @@ public class PostgreSQLDataSourceProcessorTest {
         postgreSqlDatasourceParamDTO.setPort(3308);
         postgreSqlDatasourceParamDTO.setDatabase("default");
         postgreSqlDatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDatasourceProcessor
-                .createConnectionParams(postgreSqlDatasourceParamDTO);
-        Assert.assertEquals("jdbc:postgresql://localhost:3308", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:postgresql://localhost:3308/default", connectionParams.getJdbcUrl());
-        Assert.assertEquals("root", connectionParams.getUser());
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDatasourceProcessor
+                    .createConnectionParams(postgreSqlDatasourceParamDTO);
+            Assert.assertEquals("jdbc:postgresql://localhost:3308", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:postgresql://localhost:3308/default", connectionParams.getJdbcUrl());
+            Assert.assertEquals("root", connectionParams.getUser());
+        }
     }
 
     @Test

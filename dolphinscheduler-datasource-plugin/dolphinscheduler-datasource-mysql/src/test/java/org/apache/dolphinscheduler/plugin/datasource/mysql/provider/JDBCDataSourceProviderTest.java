@@ -39,7 +39,8 @@ public class JDBCDataSourceProviderTest {
                 MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
                         Mockito.mockStatic(JDBCDataSourceProvider.class)) {
             HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
-            Mockito.when(JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any()))
+            mockedJDBCDataSourceProvider
+                    .when(() -> JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any()))
                     .thenReturn(dataSource);
             Assert.assertNotNull(JDBCDataSourceProvider.createJdbcDataSource(new MySQLConnectionParam(), DbType.MYSQL));
         }
@@ -51,7 +52,8 @@ public class JDBCDataSourceProviderTest {
                 MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
                         Mockito.mockStatic(JDBCDataSourceProvider.class)) {
             HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
-            Mockito.when(JDBCDataSourceProvider.createOneSessionJdbcDataSource(Mockito.any(), Mockito.any()))
+            mockedJDBCDataSourceProvider
+                    .when(() -> JDBCDataSourceProvider.createOneSessionJdbcDataSource(Mockito.any(), Mockito.any()))
                     .thenReturn(dataSource);
             Assert.assertNotNull(
                     JDBCDataSourceProvider.createOneSessionJdbcDataSource(new MySQLConnectionParam(), DbType.MYSQL));

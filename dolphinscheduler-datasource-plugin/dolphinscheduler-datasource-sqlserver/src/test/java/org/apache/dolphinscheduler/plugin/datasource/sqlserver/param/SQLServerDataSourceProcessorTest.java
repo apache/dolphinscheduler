@@ -28,6 +28,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -47,13 +48,15 @@ public class SQLServerDataSourceProcessorTest {
         sqlServerDatasourceParamDTO.setHost("localhost");
         sqlServerDatasourceParamDTO.setPort(1234);
         sqlServerDatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) sqlServerDatasourceProcessor
-                .createConnectionParams(sqlServerDatasourceParamDTO);
-        Assert.assertEquals("jdbc:sqlserver://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default", connectionParams.getJdbcUrl());
-        Assert.assertEquals("root", connectionParams.getUser());
+
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) sqlServerDatasourceProcessor
+                    .createConnectionParams(sqlServerDatasourceParamDTO);
+            Assert.assertEquals("jdbc:sqlserver://localhost:1234", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default", connectionParams.getJdbcUrl());
+            Assert.assertEquals("root", connectionParams.getUser());
+        }
     }
 
     @Test

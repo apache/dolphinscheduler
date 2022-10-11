@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -108,10 +109,12 @@ public class JupyterTaskTest {
     public void jupyterTaskUsePipRequirements() throws Exception {
         String jupyterTaskParameters = buildJupyterTaskUsePipRequirementsCommand();
         JupyterTask jupyterTask = prepareJupyterTaskForTest(jupyterTaskParameters);
-        Mockito.mockStatic(DateUtils.class);
-        when(DateUtils.getTimestampString()).thenReturn("123456789");
-        jupyterTask.init();
-        Assertions.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PIP_REQUIREMENTS);
+
+        try (MockedStatic<DateUtils> mockedStaticDateUtils = Mockito.mockStatic(DateUtils.class)) {
+            mockedStaticDateUtils.when(DateUtils::getTimestampString).thenReturn("123456789");
+            jupyterTask.init();
+            Assertions.assertEquals(jupyterTask.buildCommand(), EXPECTED_JUPYTER_TASK_COMMAND_USE_PIP_REQUIREMENTS);
+        }
     }
 
     private JupyterTask prepareJupyterTaskForTest(final String jupyterTaskParameters) {

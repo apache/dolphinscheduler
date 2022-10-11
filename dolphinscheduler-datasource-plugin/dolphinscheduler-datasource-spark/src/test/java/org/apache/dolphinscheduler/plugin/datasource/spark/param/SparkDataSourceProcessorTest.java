@@ -28,6 +28,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -47,14 +48,17 @@ public class SparkDataSourceProcessorTest {
         sparkDatasourceParamDTO.setPort(1234);
         sparkDatasourceParamDTO.setDatabase("default");
         sparkDatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        Mockito.mockStatic(CommonUtils.class);
-        Mockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
-                .createConnectionParams(sparkDatasourceParamDTO);
-        Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default", connectionParams.getJdbcUrl());
+
+        try (
+                MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
+                MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
+            SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
+                    .createConnectionParams(sparkDatasourceParamDTO);
+            Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test
