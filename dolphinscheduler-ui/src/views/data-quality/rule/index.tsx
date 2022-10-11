@@ -21,11 +21,9 @@ import {
   onMounted,
   ref,
   toRefs,
-  withKeys
 } from 'vue'
 import {
   NSpace,
-  NInput,
   NButton,
   NIcon,
   NDataTable,
@@ -34,6 +32,7 @@ import {
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import Card from '@/components/card'
+import Search from '@/components/search-model'
 import RuleModal from './components/rule-modal'
 
 const TaskResult = defineComponent({
@@ -116,13 +115,10 @@ const TaskResult = defineComponent({
       <NSpace vertical>
         <Card>
           <NSpace justify='end'>
-            <NInput
-              allowInput={this.trim}
-              v-model={[this.searchVal, 'value']}
-              size='small'
+            <Search
+                v-model={[this.searchVal, 'value']}
               placeholder={t('data_quality.rule.name')}
-              onKeydown={withKeys(onSearch,["enter"])}
-              clearable
+              onKeyDown={onSearch}
             />
             <NButton size='small' type='primary' onClick={onSearch}>
               <NIcon>
