@@ -33,6 +33,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.swagger.annotations.ApiModelProperty;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
  * schedule create request
  */

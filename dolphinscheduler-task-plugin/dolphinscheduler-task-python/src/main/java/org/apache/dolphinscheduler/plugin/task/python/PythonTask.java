@@ -23,13 +23,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -40,7 +38,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Objects;
 
 import com.google.common.base.Preconditions;
 
@@ -85,7 +82,6 @@ public class PythonTask extends AbstractTask {
 
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), PythonParameters.class);
 
-        // A null pointer exception may be raised here
         if (!pythonParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
         }
@@ -196,15 +192,6 @@ public class PythonTask extends AbstractTask {
             FileUtils.writeStringToFile(new File(pythonScriptFile),
                     sb.toString(),
                     StandardCharsets.UTF_8);
-
-            if (Objects.isNull(FileUtils.getFile(pythonScriptFile))) {
-                throw new TaskPluginException(String.format("path: %s Failed to obtain a file", pythonScriptFile));
-            }
-            // Check whether have the execution permission
-            if (!FileUtils.getFile(pythonScriptFile).canExecute() && OSUtils.isSudoEnable()) {
-                OSUtils.exeCmd(
-                        OSUtils.getSudoCmd(taskRequest.getTenantCode(), "chmod 755 " + pythonScriptFile));
-            }
         }
     }
 

@@ -2,8 +2,8 @@
 
 ## Overview
 
-[AWS Database Migration Service (AWS DMS)](https://aws.amazon.com/cn/dms) helps you migrate databases to AWS quickly and securely.
-The source database remains fully operational during the migration, minimizing downtime to applications that rely on the database.
+[AWS Database Migration Service (AWS DMS)](https://aws.amazon.com/cn/dms) helps you migrate databases to AWS quickly and securely. 
+The source database remains fully operational during the migration, minimizing downtime to applications that rely on the database. 
 The AWS Database Migration Service can migrate your data to and from the most widely used commercial and open-source databases.
 
 DMS task plugin can help users to create and start DMS tasks in DolphinScheduler more conveniently.
@@ -33,9 +33,11 @@ The task plugin picture is as follows
 
 ![dms](../../../../img/tasks/demo/dms_create_and_start.png)
 
+
 **Restart DMS task by interface**
 
 ![dms](../../../../img/tasks/demo/dms_restart.png)
+
 
 **Create and start DMS task by JSON data**
 
@@ -44,6 +46,7 @@ The task plugin picture is as follows
 **Restart DMS task by JSON data**
 
 ![dms](../../../../img/tasks/demo/dms_restart_json.png)
+
 
 ### First, introduce some general parameters of DolphinScheduler
 
@@ -68,10 +71,10 @@ Parameters of restarting the task by interface
 
 - **replicationTaskArn**：The ARN of the task.
 
+
 ## Environment to prepare
 
 Some AWS configuration is required, modify a field in file `common.properties`
-
 ```yaml
 # The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.access.key.id=<YOUR AWS ACCESS KEY>
@@ -80,4 +83,3 @@ resource.aws.secret.access.key=<YOUR AWS SECRET KEY>
 # The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.region=<AWS REGION>
 ```
-
