@@ -55,7 +55,7 @@
 
   - **WorkerManagerThread** is mainly responsible for the submission of the task queue, continuously receives tasks from the task queue, and submits them to the thread pool for processing;
 
-  - **TaskExecuteThread** is mainly responsible for the workflow of task execution, and the actual processing of tasks according to different task types;
+  - **TaskExecuteThread** is mainly responsible for the process of task execution, and the actual processing of tasks according to different task types;
 
   - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
 
