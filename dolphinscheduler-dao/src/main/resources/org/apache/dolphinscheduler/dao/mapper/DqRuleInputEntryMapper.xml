@@ -24,7 +24,7 @@
                a.field,
                a.type,
                a.title,
-               a.value,
+               a.`value`,
                a.options,
                a.placeholder,
                a.option_source_type,
