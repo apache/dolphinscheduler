@@ -16,4 +16,4 @@
 # under the License.
 
 requests~=2.28
-GitPython
+GitPython~=3.1
