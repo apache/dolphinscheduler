@@ -28,6 +28,9 @@ public class SparkConstants {
      */
     public static final String MAIN_CLASS = "--class";
 
+    public static final String DEFAULT_MAIN_CLASS_NAME =
+            "org.apache.dolphinscheduler.data.quality.DataQualityApplication";
+
     /**
      * --name NAME
      */
