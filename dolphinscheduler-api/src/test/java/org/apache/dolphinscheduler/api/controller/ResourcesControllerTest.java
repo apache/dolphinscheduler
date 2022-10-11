@@ -65,11 +65,15 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testQuerytResourceList() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(resourcesService.queryResourceList(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn(mockResult);
+        Mockito.when(resourcesService.queryResourceList(Mockito.any(), Mockito.any(), Mockito.anyString()))
+                .thenReturn(mockResult);
 
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("type", ResourceType.FILE.name());
         MvcResult mvcResult = mockMvc.perform(get("/resources/list")
                 .header(SESSION_ID, sessionId)
-                .param("type", ResourceType.FILE.name()))
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -95,6 +99,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "1");
         paramsMap.add("searchVal", "test");
         paramsMap.add("pageSize", "1");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(get("/resources")
                 .header(SESSION_ID, sessionId)
@@ -138,12 +144,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.HDFS_NOT_STARTUP.getCode());
         Mockito.when(resourcesService.readResource(Mockito.any(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("skipLineNum", "2");
         paramsMap.add("limit", "100");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/view", "5")
                 .header(SESSION_ID, sessionId)
@@ -194,12 +202,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         Mockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyInt(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "1");
         paramsMap.add("content", "echo test_1111");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(put("/resources/1/update-content")
                 .header(SESSION_ID, sessionId)
@@ -218,10 +228,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testDownloadResource() throws Exception {
 
         Mockito.when(resourcesService.downloadResource(Mockito.any(), Mockito.anyInt(),
-                    Mockito.anyString()))
+                Mockito.anyString()))
                 .thenReturn(null);
 
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+
         MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/download", 5)
+                .params(paramsMap)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andReturn();
@@ -246,6 +260,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("database", "database");
         paramsMap.add("description", "description");
         paramsMap.add("resourceId", "1");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
 
         MvcResult mvcResult = mockMvc.perform(post("/resources/{resourceId}/udf-func", "123")
                 .header(SESSION_ID, sessionId)
@@ -286,7 +301,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         Mockito.when(udfFuncService
                 .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt(), Mockito.anyString()))
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt(),
+                        Mockito.anyString()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -298,6 +314,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("database", "database");
         paramsMap.add("description", "description");
         paramsMap.add("resourceId", "1");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
 
         MvcResult mvcResult = mockMvc.perform(put("/resources/{resourceId}/udf-func/{id}", "123", "456")
                 .header(SESSION_ID, sessionId)
@@ -470,11 +487,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
         Mockito.when(resourcesService.delete(Mockito.any(), Mockito.anyInt(), Mockito.anyString(),
-                    Mockito.anyString()))
+                Mockito.anyString()))
                 .thenReturn(mockResult);
-
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
         MvcResult mvcResult = mockMvc.perform(delete("/resources/{id}", "123")
-                .header(SESSION_ID, sessionId))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

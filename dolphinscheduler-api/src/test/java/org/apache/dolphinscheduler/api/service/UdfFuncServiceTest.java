@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -37,6 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -82,6 +84,9 @@ public class UdfFuncServiceTest {
     @Mock
     private UDFUserMapper udfUserMapper;
 
+    @Mock
+    private StorageOperate storageOperate;
+
     @Before
     public void setUp() {
         mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
@@ -110,16 +115,22 @@ public class UdfFuncServiceTest {
         Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
         // resource not exist
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", "",UdfType.HIVE, Integer.MAX_VALUE);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE, Integer.MAX_VALUE);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
         // success
-        Mockito.when(resourceMapper.selectById(1)).thenReturn(getResource());
+        try {
+            Mockito.when(storageOperate.exists("String")).thenReturn(true);
+        } catch (IOException e) {
+            logger.error("AmazonServiceException when checking resource: String");
+        }
+
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", "",UdfType.HIVE, 1);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
@@ -151,7 +162,6 @@ public class UdfFuncServiceTest {
 
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         Mockito.when(udfFuncMapper.selectUdfById(1)).thenReturn(getUdfFunc());
-        Mockito.when(resourceMapper.selectById(1)).thenReturn(getResource());
 
         // UDF_FUNCTION_NOT_EXIST
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1,
@@ -189,6 +199,12 @@ public class UdfFuncServiceTest {
         // success
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, null, 1,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
+        try {
+            Mockito.when(storageOperate.exists("")).thenReturn(true);
+        } catch (IOException e) {
+            logger.error("AmazonServiceException when checking resource: ");
+        }
+
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");

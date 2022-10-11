@@ -128,11 +128,6 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['size'],
         render: (row) => bytesToSize(row.size)
       },
-//       {
-//         title: t('resource.udf.description'),
-//         key: 'description',
-//         ...COLUMN_WIDTH_CONFIG['note']
-//       },
       {
         title: t('resource.udf.create_time'),
         key: 'createTime',
@@ -290,7 +285,6 @@ export function useTable() {
     deleteResource(id, fullNameObj).then(() =>
       getTableData({
         id: -1,
-//         id: variables.id,
         fullName: variables.fileId,
         tenantCode: variables.tenantCode,
         pageSize: variables.pageSize,
@@ -305,7 +299,6 @@ export function useTable() {
   }
 
   const goBread = (fileName: string) => {
-//     const { id } = variables
     const id = -1
     queryResourceById(
       {
