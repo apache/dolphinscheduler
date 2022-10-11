@@ -37,7 +37,7 @@ type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
 type RelationType = 'AND' | 'OR'
 type ITaskType = TaskType
-type IDateType = 'hour' | 'day' | 'week' | 'month'
+type IDateType = 'hour' | 'day' | 'week' | 'month' | 'custom'
 
 interface IOption {
   label: string
@@ -74,8 +74,10 @@ interface IDependpendItem {
   dateOptions?: IOption[]
   projectCode?: number
   definitionCode?: number
-  cycle?: 'month' | 'week' | 'day' | 'hour'
+  cycle?: 'month' | 'week' | 'day' | 'hour' | 'custom'
   dateValue?: string
+  startDateExpression?: string
+  endDateExpression?: string
 }
 
 interface IDependTask {

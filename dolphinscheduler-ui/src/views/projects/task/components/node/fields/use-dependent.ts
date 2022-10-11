@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, watch, h } from 'vue'
+import { ref, onMounted, watch, h, reactive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NEllipsis, NIcon } from 'naive-ui'
 import { useRelationCustomParams, useDependentTimeout } from '.'
@@ -34,6 +34,7 @@ import type {
   ITaskState,
   IDateType
 } from '../types'
+import { useDependentInterval } from './use-dependent-interval'
 
 export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -66,120 +67,126 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     {
       value: 'hour',
       label: t('project.node.hour')
+    },
+    {
+      value: 'custom',
+      label: t('project.node.custom')
     }
   ]
-  const DATE_LIST = {
-    hour: [
-      {
-        value: 'currentHour',
-        label: t('project.node.current_hour')
-      },
-      {
-        value: 'last1Hour',
-        label: t('project.node.last_1_hour')
-      },
-      {
-        value: 'last2Hours',
-        label: t('project.node.last_2_hour')
-      },
-      {
-        value: 'last3Hours',
-        label: t('project.node.last_3_hour')
-      },
-      {
-        value: 'last24Hours',
-        label: t('project.node.last_24_hour')
-      }
-    ],
-    day: [
-      {
-        value: 'today',
-        label: t('project.node.today')
-      },
-      {
-        value: 'last1Days',
-        label: t('project.node.last_1_days')
-      },
-      {
-        value: 'last2Days',
-        label: t('project.node.last_2_days')
-      },
-      {
-        value: 'last3Days',
-        label: t('project.node.last_3_days')
-      },
-      {
-        value: 'last7Days',
-        label: t('project.node.last_7_days')
-      }
-    ],
-    week: [
-      {
-        value: 'thisWeek',
-        label: t('project.node.this_week')
-      },
-      {
-        value: 'lastWeek',
-        label: t('project.node.last_week')
-      },
-      {
-        value: 'lastMonday',
-        label: t('project.node.last_monday')
-      },
-      {
-        value: 'lastTuesday',
-        label: t('project.node.last_tuesday')
-      },
-      {
-        value: 'lastWednesday',
-        label: t('project.node.last_wednesday')
-      },
-      {
-        value: 'lastThursday',
-        label: t('project.node.last_thursday')
-      },
-      {
-        value: 'lastFriday',
-        label: t('project.node.last_friday')
-      },
-      {
-        value: 'lastSaturday',
-        label: t('project.node.last_saturday')
-      },
-      {
-        value: 'lastSunday',
-        label: t('project.node.last_sunday')
-      }
-    ],
-    month: [
-      {
-        value: 'thisMonth',
-        label: t('project.node.this_month')
-      },
-      {
-        value: 'thisMonthBegin',
-        label: t('project.node.this_month_begin')
-      },
-      {
-        value: 'lastMonth',
-        label: t('project.node.last_month')
-      },
-      {
-        value: 'lastMonthBegin',
-        label: t('project.node.last_month_begin')
-      },
-      {
-        value: 'lastMonthEnd',
-        label: t('project.node.last_month_end')
-      }
-    ]
-  } as { [key in IDateType]: { value: string; label: string }[] }
+  const DATE_LIST = reactive({
+      custom: [],
+      hour: [
+        {
+          value: 'currentHour',
+          label: t('project.node.current_hour')
+        },
+        {
+          value: 'last1Hour',
+          label: t('project.node.last_1_hour')
+        },
+        {
+          value: 'last2Hours',
+          label: t('project.node.last_2_hour')
+        },
+        {
+          value: 'last3Hours',
+          label: t('project.node.last_3_hour')
+        },
+        {
+          value: 'last24Hours',
+          label: t('project.node.last_24_hour')
+        }
+      ],
+      day: [
+        {
+          value: 'today',
+          label: t('project.node.today')
+        },
+        {
+          value: 'last1Days',
+          label: t('project.node.last_1_days')
+        },
+        {
+          value: 'last2Days',
+          label: t('project.node.last_2_days')
+        },
+        {
+          value: 'last3Days',
+          label: t('project.node.last_3_days')
+        },
+        {
+          value: 'last7Days',
+          label: t('project.node.last_7_days')
+        }
+      ],
+      week: [
+        {
+          value: 'thisWeek',
+          label: t('project.node.this_week')
+        },
+        {
+          value: 'lastWeek',
+          label: t('project.node.last_week')
+        },
+        {
+          value: 'lastMonday',
+          label: t('project.node.last_monday')
+        },
+        {
+          value: 'lastTuesday',
+          label: t('project.node.last_tuesday')
+        },
+        {
+          value: 'lastWednesday',
+          label: t('project.node.last_wednesday')
+        },
+        {
+          value: 'lastThursday',
+          label: t('project.node.last_thursday')
+        },
+        {
+          value: 'lastFriday',
+          label: t('project.node.last_friday')
+        },
+        {
+          value: 'lastSaturday',
+          label: t('project.node.last_saturday')
+        },
+        {
+          value: 'lastSunday',
+          label: t('project.node.last_sunday')
+        }
+      ],
+      month: [
+        {
+          value: 'thisMonth',
+          label: t('project.node.this_month')
+        },
+        {
+          value: 'thisMonthBegin',
+          label: t('project.node.this_month_begin')
+        },
+        {
+          value: 'lastMonth',
+          label: t('project.node.last_month')
+        },
+        {
+          value: 'lastMonthBegin',
+          label: t('project.node.last_month_begin')
+        },
+        {
+          value: 'lastMonthEnd',
+          label: t('project.node.last_month_end')
+        }
+      ]
+    } as { [key in IDateType]: { value: string; label: string }[] }
+  )
 
   const getProjectList = async () => {
     const result = await queryAllProjectListForDependent()
     projectList.value = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: () => h(NEllipsis, null, () => item.name)
     }))
     return projectList
   }
@@ -190,7 +197,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await queryProcessDefinitionList(code)
     const processList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: () => h(NEllipsis, null, () => item.name)
     }))
     processCache[code] = processList
 
@@ -204,7 +211,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await getTasksByDefinitionList(code, processCode)
     const taskList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: () => h(NEllipsis, null, () => item.name)
     }))
     taskList.unshift({
       value: 0,
@@ -233,6 +240,52 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     getProjectList()
   })
 
+  const customOptions = computed(
+    () => model.localParams
+      .map(({ prop }: any) => prop)
+      .filter((prop: any) => !!prop)
+      .map((prop: string) => ({
+          value: prop,
+          label: prop
+        })
+      ))
+
+  const localParamsMap = computed(
+    ()=>model.localParams
+    .reduce(
+      (acc:any,{prop,...rest}:any)=>{
+        acc[prop]=rest;return acc
+      }
+      ,{})
+  )
+
+  watch(() => localParamsMap.value,
+    (value) => {
+      model.dependTaskList.forEach((item: IDependTask) => {
+        if (!item.dependItemList?.length) return
+        item.dependItemList?.forEach(async (dependItem: IDependpendItem) => {
+          if (dependItem.cycle === 'custom' && dependItem.dateValue) {
+            dependItem.startDateExpression=value[dependItem.dateValue]?.startDate
+            dependItem.endDateExpression=value[dependItem.dateValue]?.endDate
+          }
+        })
+      })
+    }
+  )
+
+  watch(() => customOptions.value,
+    (value) => {
+      DATE_LIST.custom = value
+      model.dependTaskList.forEach((item: IDependTask) => {
+        if (!item.dependItemList?.length) return
+        item.dependItemList?.forEach(async (dependItem: IDependpendItem) => {
+          if (dependItem.cycle === 'custom') {
+            dependItem.dateOptions = DATE_LIST[dependItem.cycle]
+          }
+        })
+      })
+    }
+  )
   watch(
     () => model.dependTaskList,
     (value) => {
@@ -261,6 +314,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
 
   return [
     ...useDependentTimeout(model),
+    ...useDependentInterval({ model, field: 'localParams' }),
     ...useRelationCustomParams({
       model,
       children: (i = 0) => ({
@@ -375,6 +429,12 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             field: 'dateValue',
             span: 10,
             name: ' ',
+            props: {
+              onUpdateValue: (value: string) => {
+                model.dependTaskList[i].dependItemList[j].startDateExpression=localParamsMap.value[value]?.startDate
+                model.dependTaskList[i].dependItemList[j].endDateExpression=localParamsMap.value[value]?.endDate
+              }
+            },
             options:
               model.dependTaskList[i]?.dependItemList[j]?.dateOptions || [],
             path: `dependTaskList.${i}.dependItemList.${j}.dateValue`,
