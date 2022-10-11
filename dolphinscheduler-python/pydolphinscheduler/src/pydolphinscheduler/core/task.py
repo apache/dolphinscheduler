@@ -25,6 +25,7 @@ from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import (
     Delimiter,
     ResourceKey,
+    Symbol,
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
@@ -277,21 +278,21 @@ class Task(Base):
             if isinstance(_ext_attr, str) and _ext_attr.endswith(tuple(self.ext)):
                 res = self.get_plugin()
                 content = res.read_file(_ext_attr)
-                setattr(self, self.ext_attr.lstrip("_"), content)
+                setattr(self, self.ext_attr.lstrip(Symbol.UNDERLINE), content)
             else:
                 if self.resource_plugin is not None or (
                     self.process_definition is not None
                     and self.process_definition.resource_plugin is not None
                 ):
-                    index = _ext_attr.rfind(".")
+                    index = _ext_attr.rfind(Symbol.POINT)
                     if index != -1:
                         raise ValueError(
                             "This task does not support files with suffix {}, only supports {}".format(
                                 _ext_attr[index:],
-                                ",".join(str(suf) for suf in self.ext),
+                                Symbol.COMMA.join(str(suf) for suf in self.ext),
                             )
                         )
-                setattr(self, self.ext_attr.lstrip("_"), _ext_attr)
+                setattr(self, self.ext_attr.lstrip(Symbol.UNDERLINE), _ext_attr)
 
     def __hash__(self):
         return hash(self.code)
