@@ -28,5 +28,4 @@ to finish PyPI release.
 ## Get All Contributors
 
 You might need all contributors in current release when you want to publish the release news or announcement, you could
-use the git command `git log --pretty="%an" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> | sort | uniq` to auto generate
-the git author name.
+use command `python release.py contributor` in directory `tools/release` to auto generate contributor GitHub id.
