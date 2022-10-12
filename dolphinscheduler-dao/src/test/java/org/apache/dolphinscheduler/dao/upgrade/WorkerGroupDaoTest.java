@@ -16,9 +16,6 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertThat;
-
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 
 import java.util.Map;
@@ -48,7 +45,7 @@ public class WorkerGroupDaoTest {
 
         Map<Integer, String> workerGroupMap = workerGroupDao.queryAllOldWorkerGroup(dataSource.getConnection());
 
-        assertThat(workerGroupMap.size(), greaterThanOrEqualTo(0));
+        Assertions.assertTrue(workerGroupMap.size() >= 0);
     }
 
     @Test
