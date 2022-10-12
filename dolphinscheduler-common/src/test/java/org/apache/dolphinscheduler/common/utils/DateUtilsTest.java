@@ -297,5 +297,4 @@ public class DateUtilsTest {
         Date date = DateUtils.timeStampToDate(0L);
         Assert.assertNull(date);
     }
-
 }
