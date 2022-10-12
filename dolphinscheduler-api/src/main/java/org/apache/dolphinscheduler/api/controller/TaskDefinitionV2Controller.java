@@ -157,7 +157,7 @@ public class TaskDefinitionV2Controller extends BaseController {
      * @return PageResourceResponse from condition
      */
     @ApiOperation(value = "get", notes = "FILTER_TASK_DEFINITION_NOTES")
-    @PostMapping(consumes = {"application/json"})
+    @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
