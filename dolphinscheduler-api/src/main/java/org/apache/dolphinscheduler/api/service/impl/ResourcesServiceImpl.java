@@ -693,7 +693,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<StorageEntity> filteredResourceList = resourcesList.stream()
                 .filter(x -> x.getFileName().matches("(.*)" + trimmedSearchVal + "(.*)")).collect(Collectors.toList());
         // inefficient pagination
-        List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((pageNo - 1) * pageSize)
+        List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((long) (pageNo - 1) * pageSize)
                 .limit(pageSize).collect(Collectors.toList());
 
         pageInfo.setTotal(resourcesList.size());
@@ -1733,7 +1733,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             list = new ArrayList<>(0);
         }
         // Transform into StorageEntity for compatibility
-        List<StorageEntity> transformedResourceList = resourceList.stream()
+        List<StorageEntity> transformedResourceList = list.stream()
                 .map(resource -> new StorageEntity.Builder()
                         .fullName(resource.getFullName())
                         .pfullName(resource.getPid() == -1 ? ""

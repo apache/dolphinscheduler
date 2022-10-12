@@ -3230,7 +3230,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
             resourceFullNames = params.getResourceFilesList().
                     stream()
-                    .filter(t -> t.getResourceName() != "")
+                    .filter(t -> !"".equals(t.getResourceName()))
                     .map(ResourceInfo::getResourceName)
                     .collect(toSet());
         }
