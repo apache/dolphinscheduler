@@ -45,7 +45,7 @@ export function useTable() {
     tableData: [],
     // here is id not prefix because udf function is still stored in db
     id: ref(Number(router.currentRoute.value.params.id) || -1),
-    fileId: ref(String(router.currentRoute.value.query.prefix) || ""),
+    fileId: ref(String(router.currentRoute.value.query.prefix || "")),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),

@@ -389,6 +389,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
      */
     public boolean copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource,
                                    boolean overwrite) throws IOException {
+
         Path srcPath = new Path(srcHdfsFilePath);
         File dstPath = new File(dstFile);
 
@@ -467,7 +468,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
         // TODO: Does listStatus truncate resultList if its size goes above certain threshold (like a 1000 in S3)
         // TODO: add hdfs prefix  getFile
         List<StorageEntity> storageEntityList = new ArrayList<>();
-//        String defaultFsPrefix = getDefaultFS();
         try {
             FileStatus[] fileStatuses = fs.listStatus(new Path(path));
 
@@ -530,7 +530,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
     public StorageEntity getFileStatus(String path, String prefix, String tenantCode, ResourceType type) throws IOException {
         try {
             FileStatus fileStatus = fs.getFileStatus(new Path(path));
-//            String defaultFsPrefix = getDefaultFS();
             String alias = "";
             String fileName = "";
             String fullName = fileStatus.getPath().toString();

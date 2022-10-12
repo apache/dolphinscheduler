@@ -63,8 +63,8 @@ export function useTable() {
     row: {},
     tableData: [],
     breadList: [],
-    fileId: ref(String(router.currentRoute.value.query.prefix) || ""),
-    tenantCode: ref(String(router.currentRoute.value.query.tenantCode) || ""),
+    fileId: ref(String(router.currentRoute.value.query.prefix || "")),
+    tenantCode: ref(String(router.currentRoute.value.query.tenantCode || "")),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
@@ -253,7 +253,7 @@ export function useTable() {
             ).then((res: ResourceFile) => {
                 if (res.fileName) {
                   const breadList = res.fileName.split('/') as Array<never>
-                  breadList.shift()
+                  breadList.pop()
                   variables.breadList = breadList
                 }
             })

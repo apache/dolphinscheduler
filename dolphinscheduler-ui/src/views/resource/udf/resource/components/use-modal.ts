@@ -36,7 +36,7 @@ export function useModal(
 
   const handleCreateResource = async () => {
     const pid = router.currentRoute.value.params.id || -1
-    const currentFullName = String(router.currentRoute.value.query.prefix) || ""
+    const currentFullName = String(router.currentRoute.value.query.prefix || "")
     const currentDir = currentFullName == "" ? '/' : fileStore.getCurrentDir || '/'
     submitRequest(
       async () =>
@@ -89,16 +89,15 @@ export function useModal(
     state.saving = true
 
     try {
-      const pid = String(router.currentRoute.value.params.id) || "-1"
-//       const currentDir = pid === -1 ? '/' : fileStore.getCurrentDir || '/'
-      const currentFullName = String(router.currentRoute.value.query.prefix) || ""
+      const pid = Number(router.currentRoute.value.params.id) || "-1"
+      const currentFullName = String(router.currentRoute.value.query.prefix || "")
       const currentDir = currentFullName == "" ? '/' : fileStore.getCurrentDir || '/'
 
       const formData = new FormData()
       formData.append('file', state.uploadForm.file)
       formData.append('type', 'UDF')
       formData.append('name', state.uploadForm.name)
-      formData.append('pid', pid)
+      formData.append('pid', String(pid))
       formData.append('currentDir', currentDir)
       formData.append('description', state.uploadForm.description)
 

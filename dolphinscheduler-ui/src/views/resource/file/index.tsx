@@ -57,8 +57,8 @@ export default defineComponent({
   name: 'File',
   setup() {
     const router: Router = useRouter()
-    const fileId = ref(String(router.currentRoute.value.query.prefix) || "")
-    const tenantCode = ref(String(router.currentRoute.value.query.tenantCode) || "")
+    const fileId = ref(String(router.currentRoute.value.query.prefix || ""))
+    const tenantCode = ref(String(router.currentRoute.value.query.tenantCode || ""))
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
@@ -192,7 +192,7 @@ export default defineComponent({
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
-      const currFileId = String(router.currentRoute.value.query.prefix) || ""
+      const currFileId = String(router.currentRoute.value.query.prefix || "")
       if (currFileId === "") {
         fileStore.setCurrentDir('/')
       } else {
@@ -234,7 +234,7 @@ export default defineComponent({
           if (res.fileName) {
             const dirs = res.fileName.split('/')
             if (dirs && dirs.length > 1) {
-              dirs.shift()
+              dirs.pop()
               initBreadcrumb(dirs)
             }
           }
