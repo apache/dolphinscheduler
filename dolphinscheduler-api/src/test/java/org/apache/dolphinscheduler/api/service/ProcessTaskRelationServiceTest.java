@@ -52,16 +52,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -70,7 +70,8 @@ import com.google.common.collect.Lists;
 /**
  * process task instance relation service test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessTaskRelationServiceTest {
 
     @InjectMocks
@@ -107,7 +108,7 @@ public class ProcessTaskRelationServiceTest {
     protected User user;
     protected Exception exception;
 
-    @Before
+    @BeforeEach
     public void before() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -302,7 +303,7 @@ public class ProcessTaskRelationServiceTest {
 
         Mockito.when(processTaskRelationMapper.batchInsert(processTaskRelationList)).thenReturn(1);
         Mockito.when(processTaskRelationLogMapper.batchInsert(processTaskRelationLogList)).thenReturn(1);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -350,8 +351,8 @@ public class ProcessTaskRelationServiceTest {
         }
         Map<String, Object> relation = processTaskRelationService
                 .queryDownstreamRelation(user, projectCode, taskCode);
-        Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
-        Assert.assertEquals(2, ((List) relation.get("data")).size());
+        Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
+        Assertions.assertEquals(2, ((List) relation.get("data")).size());
     }
 
     @Test
@@ -398,8 +399,8 @@ public class ProcessTaskRelationServiceTest {
         }
         Map<String, Object> relation = processTaskRelationService
                 .queryUpstreamRelation(user, projectCode, taskCode);
-        Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
-        Assert.assertEquals(2, ((List) relation.get("data")).size());
+        Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
+        Assertions.assertEquals(2, ((List) relation.get("data")).size());
     }
 
     @Test
@@ -430,7 +431,7 @@ public class ProcessTaskRelationServiceTest {
                 .thenReturn(1);
         Map<String, Object> result1 =
                 processTaskRelationService.deleteDownstreamRelation(user, projectCode, "123", taskCode);
-        Assert.assertEquals(Status.SUCCESS, result1.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result1.get(Constants.STATUS));
     }
 
     @Test
@@ -460,7 +461,7 @@ public class ProcessTaskRelationServiceTest {
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
                 1, relationLogs, Lists.newArrayList(), Boolean.TRUE)).thenReturn(0);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -497,9 +498,10 @@ public class ProcessTaskRelationServiceTest {
                 .thenReturn(processTaskRelationList);
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
+
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
                 1, relationLogs, Lists.newArrayList(), Boolean.TRUE)).thenReturn(0);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -530,7 +532,7 @@ public class ProcessTaskRelationServiceTest {
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
                 1, relationLogs, Lists.newArrayList(), Boolean.TRUE)).thenReturn(0);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
