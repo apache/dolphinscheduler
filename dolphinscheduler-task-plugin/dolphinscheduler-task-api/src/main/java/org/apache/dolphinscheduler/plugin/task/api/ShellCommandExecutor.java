@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -27,7 +25,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
@@ -70,8 +67,10 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String buildCommandFilePath() {
         // command file
-        return String.format("%s/%s.%s", taskRequest.getExecutePath(), taskRequest.getTaskAppId(),
-                SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
+        return String.format("%s/%s.%s"
+                , taskRequest.getExecutePath()
+                , taskRequest.getTaskAppId()
+                , SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
     }
 
     /**
@@ -118,15 +117,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
             // write data to file
             FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
-
-            if (Objects.isNull(FileUtils.getFile(commandFile))) {
-                throw new TaskPluginException(String.format("path: %s Failed to obtain a file", commandFile));
-            }
-            // Check whether have the execution permission
-            if (!FileUtils.getFile(commandFile).canExecute() && OSUtils.isSudoEnable()) {
-                OSUtils.exeCmd(
-                        OSUtils.getSudoCmd(taskRequest.getTenantCode(), "chmod 755 " + commandFile));
-            }
         }
     }
 
