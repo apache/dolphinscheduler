@@ -27,7 +27,7 @@ from pydolphinscheduler.utils import file
 from tests.testing.file import delete_file
 
 file_name = "local_res.sql"
-file_content = 'echo "test res_local"'
+file_content = 'select 1'
 res_plugin_prefix = Path(__file__).parent
 file_path = res_plugin_prefix.joinpath(file_name)
 
