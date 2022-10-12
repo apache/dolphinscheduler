@@ -45,7 +45,7 @@ public class WorkerGroupDaoTest {
 
         Map<Integer, String> workerGroupMap = workerGroupDao.queryAllOldWorkerGroup(dataSource.getConnection());
 
-        Assertions.assertTrue(workerGroupMap.size() >= 0);
+        Assertions.assertTrue(workerGroupMap.size() > 0);
     }
 
     @Test

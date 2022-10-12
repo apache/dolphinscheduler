@@ -174,7 +174,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceByName(name);
 
         for (DataSource actualDataSource : actualDataSources) {
-            if (expectedDataSource.getId() == actualDataSource.getId()) {
+            if (expectedDataSource.getId().equals(actualDataSource.getId())) {
                 Assertions.assertEquals(expectedDataSource, actualDataSource);
             }
         }

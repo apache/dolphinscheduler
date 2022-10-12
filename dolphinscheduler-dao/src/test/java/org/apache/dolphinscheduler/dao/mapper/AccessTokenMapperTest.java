@@ -116,7 +116,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Integer userId = 1;
         AccessToken accessToken = createAccessToken(userId);
         int result = accessToken.hashCode();
-        Assertions.assertNotNull(result);
+        Assertions.assertNotNull(Integer.valueOf(result));
     }
 
     /**
