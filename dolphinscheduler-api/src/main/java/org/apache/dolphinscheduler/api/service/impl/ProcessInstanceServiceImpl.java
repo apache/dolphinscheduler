@@ -63,6 +63,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -320,11 +321,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         for (ProcessInstance processInstance : processInstances) {
-            // if processInstance is running, the endTime should be the current time
-            String duration = processInstance.getState() != null && processInstance.getState().isFinished() ?
-                    DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()) :
-                    DateUtils.format2Duration(processInstance.getStartTime(), new Date());
-            processInstance.setDuration(duration);
+            processInstance.setDuration(WorkflowUtils.getWorkflowInstanceDuration(processInstance));
             User executor = idToUserMap.get(processInstance.getExecutorId());
             if (null != executor) {
                 processInstance.setExecutorName(executor.getUserName());
