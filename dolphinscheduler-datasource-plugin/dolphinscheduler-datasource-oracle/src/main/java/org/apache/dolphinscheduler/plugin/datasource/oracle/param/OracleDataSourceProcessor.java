@@ -102,7 +102,13 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public ConnectionParam createConnectionParams(String connectionJson) {
-        return JSONUtils.parseObject(connectionJson, OracleConnectionParam.class);
+        OracleConnectionParam oracleConnectionParam = JSONUtils.parseObject(connectionJson, OracleConnectionParam.class);
+        Map<String, String> props = oracleConnectionParam.getProps();
+        String schema = props.get(Constants.SCHEMA);
+        if (StringUtils.isNotEmpty(schema)) {
+            oracleConnectionParam.setDatabase(schema);
+        }
+        return oracleConnectionParam;
     }
 
     @Override

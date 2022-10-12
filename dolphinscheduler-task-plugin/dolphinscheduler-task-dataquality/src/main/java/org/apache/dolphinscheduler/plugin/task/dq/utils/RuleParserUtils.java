@@ -115,15 +115,17 @@ public class RuleParserUtils {
             sourceBaseConfig.setType(dataQualityTaskExecutionContext.getSourceConnectorType());
             Map<String,Object> config = new HashMap<>();
             if (sourceDataSource != null) {
-                config.put(DATABASE,sourceDataSource.getDatabase());
-                config.put(TABLE,inputParameterValue.get(SRC_TABLE));
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()),sourceDataSource));
-                config.put(USER,sourceDataSource.getUser());
-                config.put(PASSWORD,sourceDataSource.getPassword());
+                String tableName = inputParameterValue.get(SRC_TABLE);
+                String database = sourceDataSource.getDatabase();
+                config.put(DATABASE, database);
+                config.put(TABLE, database.concat(Constants.DOTS).concat(tableName));
+                config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()), sourceDataSource));
+                config.put(USER, sourceDataSource.getUser());
+                config.put(PASSWORD, sourceDataSource.getPassword());
                 config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
-                String outputTable = sourceDataSource.getDatabase() + "_" + inputParameterValue.get(SRC_TABLE);
-                config.put(OUTPUT_TABLE,outputTable);
-                inputParameterValue.put(SRC_TABLE,outputTable);
+                String outputTable = database + "_" + tableName;
+                config.put(OUTPUT_TABLE, outputTable);
+                inputParameterValue.put(SRC_TABLE, outputTable);
             }
             sourceBaseConfig.setConfig(config);
 

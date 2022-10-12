@@ -199,6 +199,7 @@ public class Constants {
     public static final String JDBC_URL = "jdbcUrl";
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
+    public static final String SCHEMA = "schema";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
     public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
     public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
