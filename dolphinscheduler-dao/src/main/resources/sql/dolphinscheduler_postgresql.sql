@@ -702,15 +702,15 @@ CREATE TABLE t_ds_resources (
 -- Table structure for table t_ds_relation_resources_task
 --
 DROP TABLE IF EXISTS t_ds_relation_resources_task;
-CREATE TABLE t_ds_relation_resources_task
-(
+CREATE TABLE t_ds_relation_resources_task (
   id SERIAL int NOT NULL,
-  task_id int(11) DEFAULT NULL,
+  task_id int DEFAULT NULL,
   full_name varchar(255) DEFAULT NULL,
   type int DEFAULT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT t_ds_relation_resources_task_un UNIQUE (task_id, full_name)
 );
-CREATE UNIQUE INDEX t_ds_relation_resources_task_un on t_ds_relation_resources_task (task_id, full_name);
+
 --
 -- Table structure for table t_ds_schedules
 --
