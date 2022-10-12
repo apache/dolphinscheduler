@@ -266,26 +266,8 @@ public class ResourcesServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
-        // RESOURCE_NOT_EXIST
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-
-        try {
-            Mockito.when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTestFail",
-                    "/dolphinscheduler/123/resources/",
-                    "123", ResourceType.FILE)).thenThrow(new FileNotFoundException("The path does not exist."));
-        } catch (Exception e) {
-            logger.error(e.getMessage() + " Resource path: {}",
-                    "/dolphinscheduler/123/resources/ResourcesServiceTestFail", e);
-        }
-        try {
-            resourcesService.updateResource(user, 0, "/dolphinscheduler/123/resources/ResourcesServiceTestFail",
-                    "123", "ResourcesServiceTestFail", "", ResourceType.FILE, null);
-        } catch (ServiceException e) {
-            Assert.assertEquals("Internal Server Error: The path does not exist. " +
-                    "Resource path: /dolphinscheduler/123/resources/ResourcesServiceTestFail", e.getMessage());
-        }
-
         // USER_NO_OPERATION_PERM
+        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         user.setUserType(UserType.GENERAL_USER);
         // tenant who have access to resource is 123,
         Tenant tenantWNoPermission = new Tenant();
