@@ -25,7 +25,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -50,11 +51,12 @@ public class WorkerGroupDaoTest {
         assertThat(workerGroupMap.size(), greaterThanOrEqualTo(0));
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testQueryQueryAllOldWorkerGroupException() throws Exception {
-        WorkerGroupDao workerGroupDao = new WorkerGroupDao();
-
-        workerGroupDao.queryAllOldWorkerGroup(null);
+        Assertions.assertThrows(Exception.class, () -> {
+                    WorkerGroupDao workerGroupDao = new WorkerGroupDao();
+                    workerGroupDao.queryAllOldWorkerGroup(null);
+                });
 
     }
 

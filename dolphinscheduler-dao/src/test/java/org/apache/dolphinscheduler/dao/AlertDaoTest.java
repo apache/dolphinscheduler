@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -57,14 +57,14 @@ public class AlertDaoTest {
         alertDao.addAlert(alert);
 
         List<Alert> alerts = alertDao.listPendingAlerts();
-        Assert.assertNotNull(alerts);
-        Assert.assertNotEquals(0, alerts.size());
+        Assertions.assertNotNull(alerts);
+        Assertions.assertNotEquals(0, alerts.size());
     }
 
     @Test
     public void testAddAlertSendStatus() {
         int insertCount = alertDao.addAlertSendStatus(AlertStatus.EXECUTION_SUCCESS,"success",1,1);
-        Assert.assertEquals(1, insertCount);
+        Assertions.assertEquals(1, insertCount);
     }
 
     @Test
@@ -78,6 +78,6 @@ public class AlertDaoTest {
                              .stream()
                              .filter(alert -> alert.getContent().contains(host))
                              .count();
-        Assert.assertEquals(1L, count);
+        Assertions.assertEquals(1L, count);
     }
 }

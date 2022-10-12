@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ProcessDefinitionTest {
 
@@ -33,7 +33,7 @@ public class ProcessDefinitionTest {
         taskInstance.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
 
         taskInstance.getGlobalParamMap();
-        Assert.assertEquals("{selenium_global_parameters_1=selenium_global_parameters_value_1}",taskInstance.getGlobalParamMap().toString());
+        Assertions.assertEquals("{selenium_global_parameters_1=selenium_global_parameters_value_1}",taskInstance.getGlobalParamMap().toString());
 
     }
 }
