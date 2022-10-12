@@ -22,9 +22,8 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
+import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 import java.util.HashMap;
 import java.util.Map;
 
