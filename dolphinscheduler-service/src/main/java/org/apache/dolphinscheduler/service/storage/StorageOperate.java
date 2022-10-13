@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.storage;
+package org.apache.dolphinscheduler.service.storage;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
 import java.util.List;
-
 
 public interface StorageOperate {
 
@@ -127,7 +126,8 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException;
+    boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
+                   boolean overwrite) throws IOException;
 
     /**
      * download the srcPath to local
@@ -138,7 +138,8 @@ public interface StorageOperate {
      * @param overwrite
      * @throws IOException
      */
-    void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource, boolean overwrite)throws IOException;
+    void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource,
+                  boolean overwrite) throws IOException;
 
     /**
      * vim the context of filePath
