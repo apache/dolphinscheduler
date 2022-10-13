@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class ResourceProcessDefinitionUtilsTest {
         map.put("code",1L);
         map.put("resource_ids","1,2,3");
         mapList.add(map);
-        Assert.assertNotNull(ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(mapList));
+        Assertions.assertNotNull(ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(mapList));
     }
 
 }

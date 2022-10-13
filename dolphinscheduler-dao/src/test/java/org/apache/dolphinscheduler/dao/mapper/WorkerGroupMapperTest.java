@@ -20,24 +20,26 @@ package org.apache.dolphinscheduler.dao.mapper;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
+
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class WorkerGroupMapperTest extends BaseDaoTest {
 
     @Resource
     private WorkerGroupMapper workerGroupMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearTestData();
     }
 
-    @After
+    @AfterEach
     public void after() {
         clearTestData();
     }
@@ -75,7 +77,7 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
     public void testQueryAllWorkerGroups() {
         insertOneWorkerGroup();
         List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
-        Assert.assertEquals(1, workerGroups.size());
+        Assertions.assertEquals(1, workerGroups.size());
     }
 
     /**
@@ -85,10 +87,10 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
     public void testQueryWorkerGroupByName() {
         WorkerGroup workerGroup = insertOneWorkerGroup();
         List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
-        Assert.assertEquals(1, workerGroups.size());
+        Assertions.assertEquals(1, workerGroups.size());
 
         workerGroups = workerGroupMapper.queryWorkerGroupByName("server2");
-        Assert.assertEquals(0, workerGroups.size());
+        Assertions.assertEquals(0, workerGroups.size());
     }
 
     /**
@@ -99,7 +101,7 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
         WorkerGroup workerGroup = insertOneWorkerGroup();
         workerGroup.setDescription("Server Update");
         int update = workerGroupMapper.updateById(workerGroup);
-        Assert.assertEquals(1, update);
+        Assertions.assertEquals(1, update);
     }
 
     /**
@@ -109,6 +111,6 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
     public void delete() {
         WorkerGroup workerGroup = insertOneWorkerGroup();
         int delete = workerGroupMapper.deleteById(workerGroup.getId());
-        Assert.assertEquals(1, delete);
+        Assertions.assertEquals(1, delete);
     }
 }

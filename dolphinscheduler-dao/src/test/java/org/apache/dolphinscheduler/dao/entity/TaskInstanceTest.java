@@ -30,8 +30,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameter
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TaskInstanceTest {
 
@@ -44,19 +44,19 @@ public class TaskInstanceTest {
 
         //sub process
         taskInstance.setTaskType(TASK_TYPE_SUB_PROCESS);
-        Assert.assertTrue(taskInstance.isSubProcess());
+        Assertions.assertTrue(taskInstance.isSubProcess());
 
         //not sub process
         taskInstance.setTaskType("HTTP");
-        Assert.assertFalse(taskInstance.isSubProcess());
+        Assertions.assertFalse(taskInstance.isSubProcess());
 
         //sub process
         taskInstance.setTaskType(TASK_TYPE_CONDITIONS);
-        Assert.assertTrue(taskInstance.isConditionsTask());
+        Assertions.assertTrue(taskInstance.isConditionsTask());
 
         //sub process
         taskInstance.setTaskType(TASK_TYPE_DEPENDENT);
-        Assert.assertTrue(taskInstance.isDependTask());
+        Assertions.assertTrue(taskInstance.isDependTask());
     }
 
     /**

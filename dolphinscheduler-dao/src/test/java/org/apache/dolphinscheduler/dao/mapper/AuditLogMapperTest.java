@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.AuditLog;
 
 import java.util.Date;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -59,12 +59,12 @@ public class AuditLogMapperTest extends BaseDaoTest {
         int[] operationType = new int[0];
 
         IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, resourceType, operationType, "", null, null);
-        Assert.assertNotEquals(logIPage.getTotal(), 0);
+        Assertions.assertNotEquals(logIPage.getTotal(), 0);
     }
 
     @Test
     public void testQueryResourceNameByType() {
         String resourceName = logMapper.queryResourceNameByType("USER", 1);
-        Assert.assertEquals("admin", resourceName);
+        Assertions.assertEquals("admin", resourceName);
     }
 }

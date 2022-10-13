@@ -22,7 +22,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -50,8 +51,10 @@ public class ProcessDefinitionDaoTest {
         //processDefinitionDao.queryAllProcessDefinition(null);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testUpdateProcessDefinitionJsonException() {
-        processDefinitionDao.updateProcessDefinitionJson(null,null);
+        Assertions.assertThrows(Exception.class, () ->
+            processDefinitionDao.updateProcessDefinitionJson(null, null)
+        );
     }
 }

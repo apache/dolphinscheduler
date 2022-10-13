@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.assertj.core.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProcessTaskRelationMapperTest extends BaseDaoTest {
@@ -57,14 +57,14 @@ public class ProcessTaskRelationMapperTest extends BaseDaoTest {
     public void testQueryByProcessCode() {
         ProcessTaskRelation processTaskRelation = insertOne();
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(1L, 1L);
-        Assert.assertNotEquals(processTaskRelations.size(), 0);
+        Assertions.assertNotEquals(processTaskRelations.size(), 0);
     }
 
     @Test
     public void testQueryByTaskCode() {
         ProcessTaskRelation processTaskRelation = insertOne();
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByTaskCode(2L);
-        Assert.assertNotEquals(processTaskRelations.size(), 0);
+        Assertions.assertNotEquals(processTaskRelations.size(), 0);
     }
 
     @Test
@@ -73,14 +73,14 @@ public class ProcessTaskRelationMapperTest extends BaseDaoTest {
 
         Long[] codes = Arrays.array(1L, 2L);
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByTaskCodes(codes);
-        Assert.assertNotEquals(processTaskRelations.size(), 0);
+        Assertions.assertNotEquals(processTaskRelations.size(), 0);
     }
 
     @Test
     public void testDeleteByCode() {
         ProcessTaskRelation processTaskRelation = insertOne();
         int i = processTaskRelationMapper.deleteByCode(1L, 1L);
-        Assert.assertNotEquals(i, 0);
+        Assertions.assertNotEquals(i, 0);
     }
 
 }

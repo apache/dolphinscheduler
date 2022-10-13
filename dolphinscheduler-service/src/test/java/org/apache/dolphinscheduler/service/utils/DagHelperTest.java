@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -87,16 +87,16 @@ public class DagHelperTest {
         processDag.setNodes(taskNodes);
         DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
         boolean canSubmit = DagHelper.haveAllNodeAfterNode(parentNodeCode, dag);
-        Assert.assertTrue(canSubmit);
+        Assertions.assertTrue(canSubmit);
 
         boolean haveBlocking = DagHelper.haveBlockingAfterNode(parentNodeCode, dag);
-        Assert.assertTrue(haveBlocking);
+        Assertions.assertTrue(haveBlocking);
 
         boolean haveConditions = DagHelper.haveConditionsAfterNode(parentNodeCode, dag);
-        Assert.assertTrue(haveConditions);
+        Assertions.assertTrue(haveConditions);
 
         boolean dependent = DagHelper.haveSubAfterNode(parentNodeCode, dag, TaskConstants.TASK_TYPE_DEPENDENT);
-        Assert.assertFalse(dependent);
+        Assertions.assertFalse(dependent);
     }
 
     /**
@@ -121,14 +121,14 @@ public class DagHelperTest {
         TaskNode nodex = dag.getNode("4");
         nodex.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, skipNodeList, completeTaskList);
-        Assert.assertEquals(canSubmit, true);
+        Assertions.assertEquals(canSubmit, true);
 
         // 2forbidden, 3 cannot be submit
         completeTaskList.putIfAbsent("2", new TaskInstance());
         TaskNode nodey = dag.getNode("4");
         nodey.setRunFlag("");
         canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, skipNodeList, completeTaskList);
-        Assert.assertEquals(canSubmit, false);
+        Assertions.assertEquals(canSubmit, false);
 
         // 2/3 forbidden submit 5
         TaskNode node3 = dag.getNode("3");
@@ -137,7 +137,7 @@ public class DagHelperTest {
         node8.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         TaskNode node5 = dag.getNode("5");
         canSubmit = DagHelper.allDependsForbiddenOrEnd(node5, dag, skipNodeList, completeTaskList);
-        Assert.assertEquals(canSubmit, true);
+        Assertions.assertEquals(canSubmit, true);
     }
 
     /**
@@ -153,56 +153,56 @@ public class DagHelperTest {
         // complete : null
         // expect post: 1/4
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("1"));
-        Assert.assertTrue(postNodes.contains("4"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("1"));
+        Assertions.assertTrue(postNodes.contains("4"));
 
         // complete : 1
         // expect post: 2/4
         completeTaskList.put("1", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("2"));
-        Assert.assertTrue(postNodes.contains("4"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("2"));
+        Assertions.assertTrue(postNodes.contains("4"));
 
         // complete : 1/2
         // expect post: 4
         completeTaskList.put("2", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("4"));
-        Assert.assertTrue(postNodes.contains("8"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("4"));
+        Assertions.assertTrue(postNodes.contains("8"));
 
         // complete : 1/2/4
         // expect post: 3
         completeTaskList.put("4", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("3"));
-        Assert.assertTrue(postNodes.contains("8"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("3"));
+        Assertions.assertTrue(postNodes.contains("8"));
 
         // complete : 1/2/4/3
         // expect post: 8/6
         completeTaskList.put("3", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("8"));
-        Assert.assertTrue(postNodes.contains("6"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("8"));
+        Assertions.assertTrue(postNodes.contains("6"));
 
         // complete : 1/2/4/3/8
         // expect post: 6/5
         completeTaskList.put("8", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("5"));
-        Assert.assertTrue(postNodes.contains("6"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("5"));
+        Assertions.assertTrue(postNodes.contains("6"));
         // complete : 1/2/4/3/5/6/8
         // expect post: 7
         completeTaskList.put("6", new TaskInstance());
         completeTaskList.put("5", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(1, postNodes.size());
-        Assert.assertTrue(postNodes.contains("7"));
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("7"));
     }
 
     /**
@@ -222,25 +222,25 @@ public class DagHelperTest {
         TaskNode node2 = dag.getNode("2");
         node2.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("4"));
-        Assert.assertTrue(postNodes.contains("8"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("4"));
+        Assertions.assertTrue(postNodes.contains("8"));
 
         // forbid:2/4 complete:1 post:3/8
         TaskNode node4 = dag.getNode("4");
         node4.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(2, postNodes.size());
-        Assert.assertTrue(postNodes.contains("3"));
-        Assert.assertTrue(postNodes.contains("8"));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("3"));
+        Assertions.assertTrue(postNodes.contains("8"));
 
         // forbid:2/4/5 complete:1/8 post:3
         completeTaskList.put("8", new TaskInstance());
         TaskNode node5 = dag.getNode("5");
         node5.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(1, postNodes.size());
-        Assert.assertTrue(postNodes.contains("3"));
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("3"));
     }
 
     /**
@@ -278,15 +278,15 @@ public class DagHelperTest {
         // complete 1/2/3/4 expect:8
         completeTaskList.put("3", taskInstance);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(1, postNodes.size());
-        Assert.assertTrue(postNodes.contains("8"));
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("8"));
 
         // 2.complete 1/2/3/4/8 expect:5 skip:6
         completeTaskList.put("8", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertTrue(postNodes.contains("5"));
-        Assert.assertEquals(1, skipNodeList.size());
-        Assert.assertTrue(skipNodeList.containsKey("6"));
+        Assertions.assertTrue(postNodes.contains("5"));
+        Assertions.assertEquals(1, skipNodeList.size());
+        Assertions.assertTrue(skipNodeList.containsKey("6"));
 
         // 3.complete 1/2/3/4/5/8 expect post:7 skip:6
         skipNodeList.clear();
@@ -294,10 +294,10 @@ public class DagHelperTest {
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         completeTaskList.put("5", taskInstance1);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(1, postNodes.size());
-        Assert.assertTrue(postNodes.contains("7"));
-        Assert.assertEquals(1, skipNodeList.size());
-        Assert.assertTrue(skipNodeList.containsKey("6"));
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("7"));
+        Assertions.assertEquals(1, skipNodeList.size());
+        Assertions.assertTrue(skipNodeList.containsKey("6"));
 
         // dag: 1-2-3-5-7 4-3-6
         // 3-if , complete:1/2/3/4
@@ -312,11 +312,11 @@ public class DagHelperTest {
         taskInstance.setState(TaskExecutionStatus.FAILURE);
         completeTaskList.put("3", taskInstance);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(1, postNodes.size());
-        Assert.assertTrue(postNodes.contains("6"));
-        Assert.assertEquals(2, skipNodeList.size());
-        Assert.assertTrue(skipNodeList.containsKey("5"));
-        Assert.assertTrue(skipNodeList.containsKey("7"));
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertTrue(postNodes.contains("6"));
+        Assertions.assertEquals(2, skipNodeList.size());
+        Assertions.assertTrue(skipNodeList.containsKey("5"));
+        Assertions.assertTrue(skipNodeList.containsKey("7"));
 
         // dag: 1-2-3-5-7 4-3-6
         // 3-if , complete:1/2/3/4
@@ -327,7 +327,7 @@ public class DagHelperTest {
         taskInstance.setSwitchDependency(getSwitchNode());
         completeTaskList.put("1", taskInstance);
         postNodes = DagHelper.parsePostNodes("1", skipNodeList, dag, completeTaskList);
-        Assert.assertEquals(1, postNodes.size());
+        Assertions.assertEquals(1, postNodes.size());
     }
 
     /**
@@ -541,7 +541,7 @@ public class DagHelperTest {
         List<TaskNode> taskNodeList = processData.getTasks();
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
         DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
-        Assert.assertNotNull(dag);
+        Assertions.assertNotNull(dag);
     }
 
 }

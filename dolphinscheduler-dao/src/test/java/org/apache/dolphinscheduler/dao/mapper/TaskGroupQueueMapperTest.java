@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TaskGroupQueueMapperTest extends BaseDaoTest {
@@ -59,7 +59,7 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
         taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
         taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
         int i = taskGroupQueueMapper.updateById(taskGroupQueue);
-        Assert.assertEquals(i, 1);
+        Assertions.assertEquals(i, 1);
     }
 
     /**
@@ -69,7 +69,7 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
     public void testDelete() {
         TaskGroupQueue taskGroupQueue = insertOne();
         int i = taskGroupQueueMapper.deleteByTaskId(taskGroupQueue.getId());
-        Assert.assertEquals(i, 0);
+        Assertions.assertEquals(i, 0);
     }
 
     /**
@@ -79,10 +79,10 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
     public void testSelect() {
         TaskGroupQueue taskGroupQueue = insertOne();
         TaskGroupQueue result = taskGroupQueueMapper.selectById(taskGroupQueue.getId());
-        Assert.assertEquals(result.getTaskName(), "task1");
+        Assertions.assertEquals(result.getTaskName(), "task1");
 
         List<TaskGroupQueue> taskGroupQueues = taskGroupQueueMapper.queryByStatus(taskGroupQueue.getStatus().getCode());
-        Assert.assertEquals(taskGroupQueues.size(), 1);
+        Assertions.assertEquals(taskGroupQueues.size(), 1);
 
     }
 
@@ -90,13 +90,13 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
     public void testUpdateStatusByTaskId() {
         TaskGroupQueue taskGroupQueue = insertOne();
         int i = taskGroupQueueMapper.updateStatusByTaskId(taskGroupQueue.getTaskId(), 7);
-        Assert.assertEquals(i, 1);
+        Assertions.assertEquals(i, 1);
     }
 
     @Test
     public void testDeleteByTaskId() {
         TaskGroupQueue taskGroupQueue = insertOne();
         int i = taskGroupQueueMapper.deleteByTaskId(taskGroupQueue.getTaskId());
-        Assert.assertEquals(i, 1);
+        Assertions.assertEquals(i, 1);
     }
 }

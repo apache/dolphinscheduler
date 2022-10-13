@@ -20,11 +20,13 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         taskGroup.setUpdateTime(date);
         taskGroup.setUpdateTime(date);
 
-        int i = taskGroupMapper.insert(taskGroup);
+        taskGroupMapper.insert(taskGroup);
         return taskGroup;
     }
 
@@ -67,7 +69,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         taskGroup.setGroupSize(100);
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int i = taskGroupMapper.updateById(taskGroup);
-        Assert.assertEquals(i, 1);
+        Assertions.assertEquals(i, 1);
     }
 
     /**
@@ -77,7 +79,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
     public void testCheckName() {
         TaskGroup taskGroup = insertOne();
         TaskGroup result = taskGroupMapper.queryByName(taskGroup.getUserId(), taskGroup.getName());
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
     /**
@@ -87,11 +89,14 @@ public class TaskGroupMapperTest extends BaseDaoTest {
     public void testQueryTaskGroupPaging() {
         TaskGroup taskGroup = insertOne();
         Page<TaskGroup> page = new Page(1, 3);
+        List<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ids.add(2);
         IPage<TaskGroup> taskGroupIPage = taskGroupMapper.queryTaskGroupPaging(
                 page,
-                Mockito.anyList(),
+                ids,
                 taskGroup.getName(), taskGroup.getStatus());
 
-        Assert.assertEquals(taskGroupIPage.getTotal(), 1);
+        Assertions.assertEquals(taskGroupIPage.getTotal(), 1);
     }
 }
