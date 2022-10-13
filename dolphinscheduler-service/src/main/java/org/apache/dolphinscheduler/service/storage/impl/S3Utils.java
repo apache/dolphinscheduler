@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.service.storage.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.AWS_END_POINT;
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
@@ -27,8 +27,9 @@ import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -80,7 +81,6 @@ public class S3Utils implements Closeable, StorageOperate {
 
     public static final String BUCKET_NAME = PropertyUtils.getString(Constants.AWS_S3_BUCKET_NAME);
 
-
     private AmazonS3 s3Client = null;
 
     private S3Utils() {
@@ -88,17 +88,20 @@ public class S3Utils implements Closeable, StorageOperate {
 
             if (!StringUtils.isEmpty(PropertyUtils.getString(AWS_END_POINT))) {
                 s3Client = AmazonS3ClientBuilder
-                    .standard()
-                    .withPathStyleAccessEnabled(true)
-                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(PropertyUtils.getString(AWS_END_POINT), Regions.fromName(REGION).getName()))
-                    .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
-                    .build();
+                        .standard()
+                        .withPathStyleAccessEnabled(true)
+                        .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
+                                PropertyUtils.getString(AWS_END_POINT), Regions.fromName(REGION).getName()))
+                        .withCredentials(
+                                new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
+                        .build();
             } else {
                 s3Client = AmazonS3ClientBuilder
-                    .standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
-                    .withRegion(Regions.fromName(REGION))
-                    .build();
+                        .standard()
+                        .withCredentials(
+                                new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY_ID)))
+                        .withRegion(Regions.fromName(REGION))
+                        .build();
             }
             checkBucketNameExists(BUCKET_NAME);
         }
@@ -108,6 +111,7 @@ public class S3Utils implements Closeable, StorageOperate {
      * S3Utils single
      */
     private enum S3Singleton {
+
         INSTANCE;
 
         private final S3Utils instance;
@@ -176,7 +180,8 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource, boolean overwrite) throws IOException {
+    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
+                         boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
@@ -184,8 +189,9 @@ public class S3Utils implements Closeable, StorageOperate {
             Files.createDirectories(dstFile.getParentFile().toPath());
         }
         S3Object o = s3Client.getObject(BUCKET_NAME, srcFilePath);
-        try (S3ObjectInputStream s3is = o.getObjectContent();
-             FileOutputStream fos = new FileOutputStream(dstFilePath)) {
+        try (
+                S3ObjectInputStream s3is = o.getObjectContent();
+                FileOutputStream fos = new FileOutputStream(dstFilePath)) {
             byte[] readBuf = new byte[1024];
             int readLen;
             while ((readLen = s3is.read(readBuf)) > 0) {
@@ -236,7 +242,8 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
+    public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
+                          boolean overwrite) throws IOException {
         try {
             s3Client.putObject(BUCKET_NAME, dstPath, new File(srcFile));
             return true;
@@ -322,7 +329,6 @@ public class S3Utils implements Closeable, StorageOperate {
         s3Client.putObject(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(strPath));
     }
 
-
     /**
      * xxx untest
      * download S3 Directory to local
@@ -334,10 +340,12 @@ public class S3Utils implements Closeable, StorageOperate {
     private void downloadDirectory(String tenantCode, String keyPrefix, String srcPath) {
         TransferManager tm = TransferManagerBuilder.standard().withS3Client(s3Client).build();
         try {
-            MultipleFileDownload download = tm.downloadDirectory(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(srcPath));
+            MultipleFileDownload download =
+                    tm.downloadDirectory(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(srcPath));
             download.waitForCompletion();
         } catch (AmazonS3Exception | InterruptedException e) {
-            logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix);
+            logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME,
+                    tenantCode + FOLDER_SEPARATOR + keyPrefix);
             Thread.currentThread().interrupt();
         } finally {
             tm.shutdownNow();
@@ -350,16 +358,17 @@ public class S3Utils implements Closeable, StorageOperate {
         }
 
         Bucket existsBucket = s3Client.listBuckets()
-            .stream()
-            .filter(
-                bucket -> bucket.getName().equals(bucketName)
-            )
-            .findFirst()
-            .orElseThrow(() -> {
-                return new IllegalArgumentException("bucketName: " + bucketName + " is not exists, you need to create them by yourself");
-            });
+                .stream()
+                .filter(
+                        bucket -> bucket.getName().equals(bucketName))
+                .findFirst()
+                .orElseThrow(() -> {
+                    return new IllegalArgumentException(
+                            "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+                });
 
-        logger.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(), s3Client.getRegionName());
+        logger.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(),
+                s3Client.getRegionName());
     }
 
     /**

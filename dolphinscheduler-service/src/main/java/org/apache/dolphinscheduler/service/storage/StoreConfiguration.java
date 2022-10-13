@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.config;
+package org.apache.dolphinscheduler.service.storage;
 
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_OSS;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
 
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.OssOperator;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.S3Utils;
+import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+import org.apache.dolphinscheduler.service.storage.impl.OssOperator;
+import org.apache.dolphinscheduler.service.storage.impl.S3Utils;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

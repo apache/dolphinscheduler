@@ -14,35 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.service.utils;
 
-package org.apache.dolphinscheduler.common.utils;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.service.model.TaskNode;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import java.util.List;
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+@Data
+@NoArgsConstructor
+public class ProcessData {
+    @EqualsAndHashCode.Include
+    private List<TaskNode> tasks;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+    @EqualsAndHashCode.Include
+    private List<Property> globalParams;
 
-/**
- * cluster conf will include all env type, but only k8s config now
- */
-public class ClusterConfUtils {
+    private int timeout;
 
-    private static final String K8S_CONFIG = "k8s";
+    private int tenantId;
 
-    /**
-     * get k8s
-     *
-     * @param config cluster config in db
-     * @return
-     */
-    public static String getK8sConfig(String config) {
-        if (StringUtils.isEmpty(config)) {
-            return null;
-        }
-        ObjectNode conf = JSONUtils.parseObject(config);
-        if (conf == null) {
-            return null;
-        }
-        return conf.get(K8S_CONFIG).asText();
+    public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
+        this.tasks = tasks;
+        this.globalParams = globalParams;
     }
-
 }

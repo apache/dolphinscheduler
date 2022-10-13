@@ -318,7 +318,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
         List<ProcessInstance> processInstances = processInstanceMapper
-                .queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
+                .queryByWorkerGroupNameAndStatus(workerGroup.getName(), org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             List<Integer> processInstanceIds =
                     processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());

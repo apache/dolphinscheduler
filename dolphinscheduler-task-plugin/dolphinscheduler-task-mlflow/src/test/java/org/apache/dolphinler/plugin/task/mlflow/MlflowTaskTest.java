@@ -17,15 +17,13 @@
 
 package org.apache.dolphinler.plugin.task.mlflow;
 
-import static org.powermock.api.mockito.PowerMockito.when;
-
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowConstants;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowParameters;
 import org.apache.dolphinscheduler.plugin.task.mlflow.MlflowTask;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.util.Date;
 import java.util.UUID;
@@ -42,6 +40,8 @@ import org.powermock.core.classloader.annotations.SuppressStaticInitializationFo
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({

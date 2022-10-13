@@ -15,11 +15,35 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.enums;
+package org.apache.dolphinscheduler.api.utils;
+
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * data base types
+ * cluster conf will include all env type, but only k8s config now
  */
-public enum ResUploadType {
-    HDFS, S3, OSS, NONE
+public class ClusterConfUtils {
+
+    private static final String K8S_CONFIG = "k8s";
+
+    /**
+     * get k8s
+     *
+     * @param config cluster config in db
+     * @return
+     */
+    public static String getK8sConfig(String config) {
+        if (StringUtils.isEmpty(config)) {
+            return null;
+        }
+        ObjectNode conf = JSONUtils.parseObject(config);
+        if (conf == null) {
+            return null;
+        }
+        return conf.get(K8S_CONFIG).asText();
+    }
+
 }

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import io.netty.channel.Channel;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -28,6 +27,7 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;

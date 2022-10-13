@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.service.model;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.common.model.PreviousTaskNode;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -138,7 +139,6 @@ public class TaskNode {
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String dependence;
-
 
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
@@ -402,7 +402,8 @@ public class TaskNode {
      */
     public TaskTimeoutParameter getTaskTimeoutParameter() {
         if (!StringUtils.isEmpty(this.getTimeout())) {
-            String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
+            String formatStr =
+                    String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
             String taskTimeout = this.getTimeout().replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
             return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
         }
@@ -430,7 +431,8 @@ public class TaskNode {
     }
 
     public String getTaskParams() {
-        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> taskParams = JSONUtils.parseObject(this.params, new TypeReference<Map<String, Object>>() {
+        });
 
         if (taskParams == null) {
             taskParams = new HashMap<>();
@@ -443,7 +445,8 @@ public class TaskNode {
     }
 
     public Map<String, Object> taskParamsToJsonObj(String taskParams) {
-        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {});
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskParams, new TypeReference<Map<String, Object>>() {
+        });
         if (taskParamsMap == null) {
             taskParamsMap = new HashMap<>();
         }

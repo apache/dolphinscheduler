@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -81,6 +80,7 @@ import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 
@@ -429,7 +429,7 @@ public class ProcessServiceTest {
         command6.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
         command6.setProcessDefinitionVersion(1);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1,
-                Constants.RUNNING_PROCESS_STATE, 223)).thenReturn(lists);
+                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 223)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateNextProcessIdById(223, 222)).thenReturn(true);
         Mockito.when(commandMapper.deleteById(6)).thenReturn(1);
         ProcessInstance processInstance6 = processService.handleCommand(host, command6);
@@ -451,7 +451,7 @@ public class ProcessServiceTest {
         command7.setProcessDefinitionVersion(1);
         Mockito.when(commandMapper.deleteById(7)).thenReturn(1);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1,
-                Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
+                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
         ProcessInstance processInstance8 = processService.handleCommand(host, command7);
         Assert.assertTrue(processInstance8 != null);
 
@@ -474,7 +474,7 @@ public class ProcessServiceTest {
         command9.setProcessDefinitionVersion(1);
         Mockito.when(processInstanceMapper.queryDetailById(225)).thenReturn(processInstance9);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(12L, 1,
-                Constants.RUNNING_PROCESS_STATE, 0)).thenReturn(lists);
+                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 0)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateById(processInstance)).thenReturn(1);
         Mockito.when(commandMapper.deleteById(9)).thenReturn(1);
         ProcessInstance processInstance10 = processService.handleCommand(host, command9);

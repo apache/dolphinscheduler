@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.service.storage.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
@@ -25,8 +25,13 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.common.utils.HttpUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.KerberosHttpClient;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
+import org.apache.dolphinscheduler.service.utils.CommonUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.io.IOUtils;
@@ -350,15 +355,15 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * copy hdfs file to local
      *
      * @param srcHdfsFilePath source hdfs file path
-     * 
+     *
      * @param dstFile destination file
-     * 
+     *
      * @param deleteSource delete source
-     * 
+     *
      * @param overwrite overwrite
-     * 
+     *
      * @return result of copy hdfs file to local
-     * 
+     *
      * @throws IOException errors
      */
     public boolean copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource,

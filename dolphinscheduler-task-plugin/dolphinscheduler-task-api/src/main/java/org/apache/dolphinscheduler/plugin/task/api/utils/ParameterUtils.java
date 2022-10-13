@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils;
@@ -36,6 +37,7 @@ import java.util.regex.Pattern;
  * parameter parse utils
  */
 public class ParameterUtils {
+
     private static final Pattern DATE_PARSE_PATTERN = Pattern.compile("\\$\\[([^\\$\\]]+)]");
     private static final Pattern DATE_START_PATTERN = Pattern.compile("^[0-9]");
 
@@ -60,7 +62,7 @@ public class ParameterUtils {
             parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
         }
         if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
-            //Get current time, schedule execute time
+            // Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME, null);
         } else {
