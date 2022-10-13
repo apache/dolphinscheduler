@@ -25,34 +25,36 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
-
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
-import org.junit.Assert;
-import org.junit.Test;
 
-import io.netty.channel.Channel;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+import io.netty.channel.Channel;
+
+@ExtendWith(MockitoExtension.class)
 public class AlertRequestProcessorTest {
+
     @InjectMocks
     private AlertRequestProcessor alertRequestProcessor;
 
     @Mock
     private AlertSenderService alertSenderService;
 
-
     @Test
     public void testProcess() {
-        Mockito.when(alertSenderService.syncHandler(1, "title", "content", WarningType.FAILURE.getCode())).thenReturn(new AlertSendResponseCommand());
+        Mockito.when(alertSenderService.syncHandler(1, "title", "content", WarningType.FAILURE.getCode()))
+                .thenReturn(new AlertSendResponseCommand());
         Channel channel = mock(Channel.class);
-        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1, "title", "content", WarningType.FAILURE.getCode());
+        AlertSendRequestCommand alertSendRequestCommand =
+                new AlertSendRequestCommand(1, "title", "content", WarningType.FAILURE.getCode());
         Command reqCommand = alertSendRequestCommand.convert2Command();
-        Assert.assertEquals(CommandType.ALERT_SEND_REQUEST, reqCommand.getType());
+        Assertions.assertEquals(CommandType.ALERT_SEND_REQUEST, reqCommand.getType());
         alertRequestProcessor.process(channel, reqCommand);
     }
 }

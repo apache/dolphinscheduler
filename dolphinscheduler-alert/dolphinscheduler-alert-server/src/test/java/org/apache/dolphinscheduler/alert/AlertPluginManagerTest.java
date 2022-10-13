@@ -17,34 +17,35 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import junit.framework.TestCase;
+import static org.mockito.ArgumentMatchers.any;
+
 import org.apache.dolphinscheduler.dao.PluginDao;
-import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class AlertPluginManagerTest extends TestCase {
-    
-    @InjectMocks
-    private AlertPluginManager alertPluginManager;
-    
+@ExtendWith(MockitoExtension.class)
+public class AlertPluginManagerTest {
+
     @Mock
     private PluginDao pluginDao;
-    
+
+    @InjectMocks
+    private AlertPluginManager alertPluginManager;
+
     @Test
     public void testAlertPluginManager() {
-        Mockito.when(pluginDao.addOrUpdatePluginDefine(Mockito.any(PluginDefine.class))).thenReturn(0);
-        
+        Mockito.when(pluginDao.addOrUpdatePluginDefine(any())).thenReturn(0);
+
         alertPluginManager.installPlugin(null);
-        
-        Assert.assertEquals(1, alertPluginManager.size());
-        
-        Assert.assertNotNull(alertPluginManager.getAlertChannel(0));
+
+        Assertions.assertEquals(1, alertPluginManager.size());
+
+        Assertions.assertNotNull(alertPluginManager.getAlertChannel(0));
     }
 }

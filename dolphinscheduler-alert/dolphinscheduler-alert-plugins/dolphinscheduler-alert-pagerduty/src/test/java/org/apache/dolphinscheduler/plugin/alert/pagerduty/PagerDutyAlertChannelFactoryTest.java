@@ -20,9 +20,11 @@ package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PagerDutyAlertChannelFactoryTest {
 
@@ -31,13 +33,13 @@ public class PagerDutyAlertChannelFactoryTest {
         PagerDutyAlertChannelFactory pagerDutyAlertChannelFactory = new PagerDutyAlertChannelFactory();
         List<PluginParams> params = pagerDutyAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
-        Assert.assertEquals(1, params.size());
+        Assertions.assertEquals(1, params.size());
     }
 
     @Test
     public void testCreate() {
         PagerDutyAlertChannelFactory pagerDutyAlertChannelFactory = new PagerDutyAlertChannelFactory();
         AlertChannel alertChannel = pagerDutyAlertChannelFactory.create();
-        Assert.assertNotNull(alertChannel);
+        Assertions.assertNotNull(alertChannel);
     }
 }

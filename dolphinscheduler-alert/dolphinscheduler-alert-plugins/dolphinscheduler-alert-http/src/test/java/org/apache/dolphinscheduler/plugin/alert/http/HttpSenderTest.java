@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HttpSenderTest {
 
@@ -44,6 +44,6 @@ public class HttpSenderTest {
         HttpSender httpSender = spy(new HttpSender(paramsMap));
         doReturn("success").when(httpSender).getResponseString(any());
         AlertResult alertResult = httpSender.send("Fault tolerance warning");
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assertions.assertEquals("true", alertResult.getStatus());
     }
 }

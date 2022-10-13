@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.lang.reflect.Method;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.method.HandlerMethod;
 
 public class ApiExceptionHandlerTest {
@@ -35,19 +35,21 @@ public class ApiExceptionHandlerTest {
     public void exceptionHandler() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
         AccessTokenController controller = new AccessTokenController();
-        Method method = controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
+        Method method =
+                controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void exceptionHandlerRuntime() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
         ProcessDefinitionController controller = new ProcessDefinitionController();
-        Method method = controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
+        Method method =
+                controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(), result.getCode().intValue());
     }
 }

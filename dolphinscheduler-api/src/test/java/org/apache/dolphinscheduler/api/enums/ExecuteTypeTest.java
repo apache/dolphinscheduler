@@ -17,18 +17,17 @@
 
 package org.apache.dolphinscheduler.api.enums;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ExecuteTypeTest {
 
     @Test
     public void testGetEnum() {
-        assertEquals(ExecuteType.REPEAT_RUNNING, ExecuteType.getEnum(1));
-        assertEquals(ExecuteType.RECOVER_SUSPENDED_PROCESS, ExecuteType.getEnum(2));
-        assertEquals(ExecuteType.START_FAILURE_TASK_PROCESS, ExecuteType.getEnum(3));
-        assertEquals(ExecuteType.STOP, ExecuteType.getEnum(4));
-        assertEquals(ExecuteType.PAUSE, ExecuteType.getEnum(5));
+        Assertions.assertEquals(ExecuteType.REPEAT_RUNNING, ExecuteType.getEnum(1));
+        Assertions.assertEquals(ExecuteType.RECOVER_SUSPENDED_PROCESS, ExecuteType.getEnum(2));
+        Assertions.assertEquals(ExecuteType.START_FAILURE_TASK_PROCESS, ExecuteType.getEnum(3));
+        Assertions.assertEquals(ExecuteType.STOP, ExecuteType.getEnum(4));
+        Assertions.assertEquals(ExecuteType.PAUSE, ExecuteType.getEnum(5));
     }
 }

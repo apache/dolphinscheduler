@@ -36,22 +36,19 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * abstract controller test
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ApiApplicationServer.class, DaoConfiguration.class, RegistryServer.class})
 @AutoConfigureMockMvc
 @DirtiesContext
@@ -72,13 +69,13 @@ public abstract class AbstractControllerTest {
 
     protected String sessionId;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         user = usersService.queryUser(1);
         createSession(user);
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         sessionService.signOut("127.0.0.1", user);
     }
@@ -90,7 +87,7 @@ public abstract class AbstractControllerTest {
         String session = sessionService.createSession(loginUser, "127.0.0.1");
         sessionId = session;
 
-        Assert.assertFalse(StringUtils.isEmpty(session));
+        Assertions.assertFalse(StringUtils.isEmpty(session));
     }
 
     public Map<String, Object> success() {
@@ -119,6 +116,7 @@ public abstract class AbstractControllerTest {
 
     @Configuration
     public static class RegistryServer {
+
         @PostConstruct
         public void startEmbedRegistryServer() throws Exception {
             final TestingServer server = new TestingServer(true);

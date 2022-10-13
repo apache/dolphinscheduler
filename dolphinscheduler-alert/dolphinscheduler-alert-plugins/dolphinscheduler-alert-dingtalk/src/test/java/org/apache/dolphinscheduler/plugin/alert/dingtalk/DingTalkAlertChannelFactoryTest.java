@@ -23,22 +23,23 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DingTalkAlertChannelFactoryTest {
+
     @Test
     public void testGetParams() {
         DingTalkAlertChannelFactory dingTalkAlertChannelFactory = new DingTalkAlertChannelFactory();
         List<PluginParams> params = dingTalkAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
-        Assert.assertEquals(12, params.size());
+        Assertions.assertEquals(12, params.size());
     }
 
     @Test
     public void testCreate() {
         DingTalkAlertChannelFactory dingTalkAlertChannelFactory = new DingTalkAlertChannelFactory();
         AlertChannel alertChannel = dingTalkAlertChannelFactory.create();
-        Assert.assertNotNull(alertChannel);
+        Assertions.assertNotNull(alertChannel);
     }
 }

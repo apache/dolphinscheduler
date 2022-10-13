@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,7 +37,7 @@ public class LocaleChangeInterceptorTest extends AbstractControllerTest {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         // test no language
-        Assert.assertTrue(interceptor.preHandle(request, response, null));
+        Assertions.assertTrue(interceptor.preHandle(request, response, null));
     }
 
 }

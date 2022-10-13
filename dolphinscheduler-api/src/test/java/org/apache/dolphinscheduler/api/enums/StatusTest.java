@@ -16,41 +16,39 @@
  */
 package org.apache.dolphinscheduler.api.enums;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 public class StatusTest {
 
     @Test
     public void testGetCode() {
-        assertEquals(0, Status.SUCCESS.getCode());
-        assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
+        Assertions.assertEquals(0, Status.SUCCESS.getCode());
+        Assertions.assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
     }
 
     @Test
     public void testGetMsg() {
         LocaleContextHolder.setLocale(Locale.US);
-        Assert.assertEquals("success", Status.SUCCESS.getMsg());
+        Assertions.assertEquals("success", Status.SUCCESS.getMsg());
 
         LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
-        Assert.assertEquals("成功", Status.SUCCESS.getMsg());
+        Assertions.assertEquals("成功", Status.SUCCESS.getMsg());
     }
 
     @Test
     public void testGetStatusByCode() {
         // FAILURE
         Optional<Status> optional = Status.findStatusBy(1);
-        Assert.assertFalse(optional.isPresent());
+        Assertions.assertFalse(optional.isPresent());
 
         // SUCCESS
         optional = Status.findStatusBy(10018);
-        Assert.assertTrue(optional.isPresent());
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, optional.get());
+        Assertions.assertTrue(optional.isPresent());
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, optional.get());
     }
 }

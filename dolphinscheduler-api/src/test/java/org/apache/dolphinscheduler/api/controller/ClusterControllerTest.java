@@ -26,10 +26,10 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -41,19 +41,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 
 public class ClusterControllerTest extends AbstractControllerTest {
+
     public static final String clusterName = "Cluster1";
     public static final String config = "{\"k8s\":\"apiVersion: v1\"}";
     public static final String desc = "this is cluster description";
     private static final Logger logger = LoggerFactory.getLogger(ClusterControllerTest.class);
     private String clusterCode;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         testCreateCluster();
     }
 
     @Override
-    @After
+    @AfterEach
     public void after() throws Exception {
         testDeleteCluster();
     }
@@ -66,17 +67,18 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("description", desc);
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/create")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
-            .andExpect(status().isCreated())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), new TypeReference<Result<String>>() {
-        });
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<String>>() {
+                });
         logger.info(result.toString());
-        Assert.assertTrue(result != null && result.isSuccess());
-        Assert.assertNotNull(result.getData());
+        Assertions.assertTrue(result != null && result.isSuccess());
+        Assertions.assertNotNull(result.getData());
         logger.info("create cluster return result:{}", mvcResult.getResponse().getContentAsString());
 
         clusterCode = (String) result.getData();
@@ -91,15 +93,15 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("desc", "the test cluster update");
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/update")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assertions.assertTrue(result != null && result.isSuccess());
         logger.info("update cluster return result:{}", mvcResult.getResponse().getContentAsString());
 
     }
@@ -110,17 +112,18 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterCode", clusterCode);
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/query-by-code")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assertions.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
-        logger.info("query cluster by id :{}, return result:{}", clusterCode, mvcResult.getResponse().getContentAsString());
+        logger.info("query cluster by id :{}, return result:{}", clusterCode,
+                mvcResult.getResponse().getContentAsString());
 
     }
 
@@ -132,15 +135,15 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "2");
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/list-paging")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assertions.assertTrue(result != null && result.isSuccess());
         logger.info("query list-paging cluster return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -149,15 +152,15 @@ public class ClusterControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/query-cluster-list")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assertions.assertTrue(result != null && result.isSuccess());
         logger.info("query all cluster return result:{}", mvcResult.getResponse().getContentAsString());
 
     }
@@ -168,15 +171,15 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterName", clusterName);
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/verify-cluster")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assert.assertTrue(result.isStatus(Status.CLUSTER_NAME_EXISTS));
+        Assertions.assertTrue(result.isStatus(Status.CLUSTER_NAME_EXISTS));
         logger.info("verify cluster return result:{}", mvcResult.getResponse().getContentAsString());
 
     }
@@ -188,15 +191,15 @@ public class ClusterControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterCode", clusterCode);
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/delete")
-            .header(SESSION_ID, sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assert.assertTrue(result != null && result.isSuccess());
+        Assertions.assertTrue(result != null && result.isSuccess());
         logger.info("delete cluster return result:{}", mvcResult.getResponse().getContentAsString());
     }
 }

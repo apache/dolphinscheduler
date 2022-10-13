@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HttpAlertChannelTest {
 
@@ -47,7 +47,7 @@ public class HttpAlertChannelTest {
         alertData.setContent("Fault tolerance warning");
         alertInfo.setAlertData(alertData);
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assert.assertEquals("http params is null", alertResult.getMessage());
+        Assertions.assertEquals("http params is null", alertResult.getMessage());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class HttpAlertChannelTest {
         // it
         doReturn(new AlertResult("true", "success")).when(alertChannel).process(any());
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assertions.assertEquals("true", alertResult.getStatus());
     }
 
     /**

@@ -43,20 +43,22 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * scheduler service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class SchedulerServiceTest extends BaseServiceTestTool {
 
     @InjectMocks
@@ -107,7 +109,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private static final String endTime = "2020-02-01 12:13:14";
     private static final String crontab = "0 0 * * * ? *";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         user = new User();
         user.setUserName(userName);
@@ -139,29 +141,29 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.when(projectService.hasProjectAndPerm(user, project, result, null)).thenReturn(true);
         // schedule not exists
         result = schedulerService.setScheduleState(user, project.getCode(), 2, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));
 
         // SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE
         result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.OFFLINE);
-        Assert.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, result.get(Constants.STATUS));
 
         // PROCESS_DEFINE_NOT_EXIST
         schedule.setProcessDefinitionCode(2);
         result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
         schedule.setProcessDefinitionCode(1);
 
         result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
 
         processDefinition.setReleaseState(ReleaseState.ONLINE);
 
         result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
 
         // SUCCESS
         result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
     }
 
     @Test

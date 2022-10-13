@@ -17,11 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -29,19 +37,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 public class TenantControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
 
     @Test
     public void testCreateTenant() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tenantCode","hayden");
-        paramsMap.add("queueId","1");
-        paramsMap.add("description","tenant description");
+        paramsMap.add("tenantCode", "hayden");
+        paramsMap.add("queueId", "1");
+        paramsMap.add("description", "tenant description");
 
         MvcResult mvcResult = mockMvc.perform(post("/tenants/")
                 .header(SESSION_ID, sessionId)
@@ -51,7 +56,7 @@ public class TenantControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -59,9 +64,9 @@ public class TenantControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryTenantlistPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","1");
-        paramsMap.add("searchVal","tenant");
-        paramsMap.add("pageSize","30");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("searchVal", "tenant");
+        paramsMap.add("pageSize", "30");
 
         MvcResult mvcResult = mockMvc.perform(get("/tenants/")
                 .header(SESSION_ID, sessionId)
@@ -71,17 +76,17 @@ public class TenantControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testUpdateTenant() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","9");
-        paramsMap.add("tenantCode","cxc_te");
-        paramsMap.add("queueId","1");
-        paramsMap.add("description","tenant description");
+        paramsMap.add("id", "9");
+        paramsMap.add("tenantCode", "cxc_te");
+        paramsMap.add("queueId", "1");
+        paramsMap.add("description", "tenant description");
 
         MvcResult mvcResult = mockMvc.perform(put("/tenants/{id}", 9)
                 .header(SESSION_ID, sessionId)
@@ -91,7 +96,7 @@ public class TenantControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -99,7 +104,7 @@ public class TenantControllerTest extends AbstractControllerTest {
     @Test
     public void testVerifyTenantCode() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tenantCode","cxc_test");
+        paramsMap.add("tenantCode", "cxc_test");
 
         MvcResult mvcResult = mockMvc.perform(get("/tenants/verify-code")
                 .header(SESSION_ID, sessionId)
@@ -109,12 +114,12 @@ public class TenantControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
 
-    //    @Test
+    // @Test
     public void testVerifyTenantCodeExists() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("tenantCode", "hayden");
@@ -127,7 +132,7 @@ public class TenantControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -142,7 +147,7 @@ public class TenantControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
@@ -150,7 +155,7 @@ public class TenantControllerTest extends AbstractControllerTest {
     @Test
     public void testDeleteTenantById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","64");
+        paramsMap.add("id", "64");
 
         MvcResult mvcResult = mockMvc.perform(delete("/tenants/{id}", 64)
                 .header(SESSION_ID, sessionId)
@@ -159,7 +164,7 @@ public class TenantControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
