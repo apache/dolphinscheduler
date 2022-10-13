@@ -333,11 +333,19 @@ public final class DateUtils {
      * @param d2 d2
      * @return format time
      */
-    public static String format2Duration(Date d1, Date d2) {
-        if (d1 == null || d2 == null) {
+    public static String format2Duration(Date start, Date end) {
+        if (start == null) {
             return null;
         }
-        return format2Duration(differMs(d1, d2));
+
+        if (end == null) {
+            end = new Date();
+        }
+        if (start.after(end)) {
+            logger.warn("start Time {} is later than end Time {}", start, end);
+            return null;
+        }
+        return format2Duration(differMs(start, end));
     }
 
     /**

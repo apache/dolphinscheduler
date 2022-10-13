@@ -297,6 +297,11 @@ public class ProcessInstanceServiceTest {
         WorkerGroup workerGroup = getWorkGroup();
         Map<String, Object> workerExistRes = processInstanceService.queryProcessInstanceById(loginUser, projectCode, 1);
         Assert.assertEquals(Status.SUCCESS, workerExistRes.get(Constants.STATUS));
+
+        when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+            processInstance.getProcessDefinitionVersion())).thenReturn(null);;
+        workerExistRes = processInstanceService.queryProcessInstanceById(loginUser, projectCode, 1);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, workerExistRes.get(Constants.STATUS));
     }
 
     @Test
@@ -343,6 +348,11 @@ public class ProcessInstanceServiceTest {
         Map<String, DependResult> resultMap =
             processInstanceService.parseLogForDependentResult(logString);
         Assert.assertEquals(1, resultMap.size());
+
+        resultMap.clear();
+        resultMap = processInstanceService.parseLogForDependentResult("");
+        Assert.assertEquals(0, resultMap.size());
+
     }
 
     @Test
@@ -378,6 +388,7 @@ public class ProcessInstanceServiceTest {
         when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         Map<String, Object> notSubprocessRes = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, 1);
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, notSubprocessRes.get(Constants.STATUS));
+
 
         //sub process not exist
         TaskInstance subTask = getTaskInstance();
@@ -533,6 +544,11 @@ public class ProcessInstanceServiceTest {
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
         Map<String, Object> successRes = processInstanceService.viewVariables(1L,1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        when(processInstanceMapper.queryDetailById(1)).thenReturn(null);
+        Map<String, Object> processNotExist = processInstanceService.viewVariables(1L, 1);
+        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
+
     }
 
     @Test
@@ -558,6 +574,10 @@ public class ProcessInstanceServiceTest {
 
         Map<String, Object> successRes = processInstanceService.viewGantt(0L, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        when(processInstanceMapper.queryDetailById(1)).thenReturn(null);
+        Map<String, Object> processNotExist = processInstanceService.viewVariables(1L, 1);
+        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
     }
 
     /**
