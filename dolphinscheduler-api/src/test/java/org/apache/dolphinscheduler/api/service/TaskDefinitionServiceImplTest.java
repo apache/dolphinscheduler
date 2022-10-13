@@ -58,17 +58,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TaskDefinitionServiceImplTest {
 
     @InjectMocks
@@ -114,7 +113,7 @@ public class TaskDefinitionServiceImplTest {
     protected User user;
     protected Exception exception;
 
-    @Before
+    @BeforeEach
     public void before() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -148,7 +147,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> relation = taskDefinitionService
                 .createTaskDefinition(user, PROJECT_CODE, createTaskDefinitionJson);
-        Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
     @Test
@@ -161,6 +160,7 @@ public class TaskDefinitionServiceImplTest {
                         + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
                         + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
                         + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}";
+
         Project project = getProject();
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
 
@@ -176,7 +176,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         result = taskDefinitionService.updateTaskDefinition(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class TaskDefinitionServiceImplTest {
         Map<String, Object> relation = taskDefinitionService
                 .queryTaskDefinitionByName(user, PROJECT_CODE, PROCESS_DEFINITION_CODE, taskName);
 
-        Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
     @Test
@@ -231,6 +231,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
+
         putMsg(result, Status.SUCCESS, PROJECT_CODE);
         Mockito.when(
                 projectService.checkProjectAndAuth(user, project, PROJECT_CODE, WORKFLOW_SWITCH_TO_THIS_VERSION))
@@ -246,7 +247,7 @@ public class TaskDefinitionServiceImplTest {
         Map<String, Object> relation = taskDefinitionService
                 .switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION);
 
-        Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
@@ -269,7 +270,7 @@ public class TaskDefinitionServiceImplTest {
                         + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
                         + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
-        Assert.assertFalse(taskDefinitionLogs.isEmpty());
+        Assertions.assertFalse(taskDefinitionLogs.isEmpty());
         String taskJson =
                 "[{\"name\":\"shell1\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
                         + "\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},"
@@ -279,23 +280,23 @@ public class TaskDefinitionServiceImplTest {
                         + ":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}},\"flag\":\"NORMAL\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\","
                         + "\"failRetryTimes\":\"0\",\"failRetryInterval\":\"1\",\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"\",\"timeout\":null,\"delayTime\":\"0\"}]";
         taskDefinitionLogs = JSONUtils.toList(taskJson, TaskDefinitionLog.class);
-        Assert.assertFalse(taskDefinitionLogs.isEmpty());
+        Assertions.assertFalse(taskDefinitionLogs.isEmpty());
         String taskParams =
                 "{\"resourceList\":[],\"localParams\":[{\"prop\":\"datetime\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
                         + "\"value\":\"${system.datetime}\"}],\"rawScript\":\"echo ${datetime}\",\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
                         + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":{}}";
         Map parameters = JSONUtils.parseObject(taskParams, Map.class);
-        Assert.assertNotNull(parameters);
+        Assertions.assertNotNull(parameters);
         String params =
                 "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";
         Map parameters1 = JSONUtils.parseObject(params, Map.class);
-        Assert.assertNotNull(parameters1);
+        Assertions.assertNotNull(parameters1);
     }
 
     @Test
     public void genTaskCodeList() {
         Map<String, Object> genTaskCodeList = taskDefinitionService.genTaskCodeList(10);
-        Assert.assertEquals(Status.SUCCESS, genTaskCodeList.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, genTaskCodeList.get(Constants.STATUS));
     }
 
     @Test
@@ -309,7 +310,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, null)).thenReturn(result);
         Map<String, Object> map =
                 taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.OFFLINE);
-        Assert.assertEquals(Status.TASK_DEFINE_NOT_EXIST, map.get(Constants.STATUS));
+        Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST, map.get(Constants.STATUS));
 
         // process definition offline
         putMsg(result, Status.SUCCESS);
@@ -327,17 +328,17 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(taskDefinitionLog);
         Map<String, Object> offlineTaskResult =
                 taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.OFFLINE);
-        Assert.assertEquals(Status.SUCCESS, offlineTaskResult.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, offlineTaskResult.get(Constants.STATUS));
 
         // process definition online, resource exist
         Map<String, Object> onlineTaskResult =
                 taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SUCCESS, onlineTaskResult.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, onlineTaskResult.get(Constants.STATUS));
 
         // release error code
         Map<String, Object> failResult =
                 taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.getEnum(2));
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failResult.get(Constants.STATUS));
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failResult.get(Constants.STATUS));
     }
 
     @Test
