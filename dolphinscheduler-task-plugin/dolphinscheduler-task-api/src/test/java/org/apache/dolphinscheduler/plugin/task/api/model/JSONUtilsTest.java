@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.plugin.task.api.model;
+
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,18 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class JSONUtilsTest {
 
@@ -47,7 +48,8 @@ public class JSONUtilsTest {
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue("sssssss");
-        String str = "[{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
+        String str =
+                "[{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
         JsonNode jsonNode = JSONUtils.toJsonNode(property);
 
         ArrayNode arrayNode = JSONUtils.createArrayNode();
@@ -154,7 +156,8 @@ public class JSONUtilsTest {
         Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
         Assert.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
         Assert.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
-        Assert.assertEquals("{\"1\":\"2\",\"2\":3}", JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
+        Assert.assertEquals("{\"1\":\"2\",\"2\":3}",
+                JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
     }
 
     @Test
@@ -245,26 +248,11 @@ public class JSONUtilsTest {
     }
 
     @Test
-    public void jsonDataDeserializerTest() {
-        String a = "{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-                + "\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,"
-                + "\"id\":\"tasks-86823\",\"maxRetryTimes\":1,\"name\":\"shell test\","
-                + "\"params\":\"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo "
-                + "'yyc'\\\"}\",\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\","
-                + "\"taskInstancePriority\":\"HIGHEST\",\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
-                + "\"timeout\":\"{}\",\"type\":\"SHELL\",\"workerGroup\":\"default\"}";
-
-        TaskNode taskNode = JSONUtils.parseObject(a, TaskNode.class);
-
-        Assert.assertTrue(true);
-    }
-
-    @Test
     public void dateToString() {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         TimeZone.setDefault(timeZone);
         JSONUtils.setTimeZone(timeZone);
-      
+
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
@@ -279,12 +267,11 @@ public class JSONUtilsTest {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         TimeZone.setDefault(timeZone);
         JSONUtils.setTimeZone(timeZone);
-      
+
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
         Assert.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
 
     }
-
 
 }

@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.service.utils;
+
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

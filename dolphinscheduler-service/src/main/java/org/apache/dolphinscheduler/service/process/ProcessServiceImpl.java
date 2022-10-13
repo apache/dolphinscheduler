@@ -44,9 +44,7 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -113,7 +111,6 @@ import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -134,7 +131,9 @@ import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.log.LogClient;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -333,7 +332,8 @@ public class ProcessServiceImpl implements ProcessService {
             List<ProcessInstance> runningProcessInstances =
                     this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
                             processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
+                            processInstance.getProcessDefinitionVersion(),
+                            org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
@@ -344,7 +344,8 @@ public class ProcessServiceImpl implements ProcessService {
             List<ProcessInstance> runningProcessInstances =
                     this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
                             processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
+                            processInstance.getProcessDefinitionVersion(),
+                            org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
                 processInstance.setStateWithDesc(WorkflowExecutionStatus.STOP, "stop by serial_discard strategy");
@@ -358,7 +359,8 @@ public class ProcessServiceImpl implements ProcessService {
             List<ProcessInstance> runningProcessInstances =
                     this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
                             processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion(), Constants.RUNNING_PROCESS_STATE,
+                            processInstance.getProcessDefinitionVersion(),
+                            org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             for (ProcessInstance info : runningProcessInstances) {
                 info.setCommandType(CommandType.STOP);

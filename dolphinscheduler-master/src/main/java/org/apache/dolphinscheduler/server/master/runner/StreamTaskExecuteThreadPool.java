@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;

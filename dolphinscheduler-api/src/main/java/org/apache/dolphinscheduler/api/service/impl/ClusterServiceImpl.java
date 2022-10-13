@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.api.dto.ClusterDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.k8s.K8sManager;
 import org.apache.dolphinscheduler.api.service.ClusterService;
+import org.apache.dolphinscheduler.api.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
@@ -384,4 +384,3 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     }
 
 }
-

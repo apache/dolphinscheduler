@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.plugin.task.dms;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,6 +29,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,13 +60,11 @@ import com.amazonaws.services.databasemigrationservice.model.StopReplicationTask
 import com.amazonaws.services.databasemigrationservice.model.Tag;
 import com.amazonaws.services.databasemigrationservice.model.TestConnectionRequest;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Data
 public class DmsHook {
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private AWSDatabaseMigrationService client;
     private String replicationTaskIdentifier;
     private String sourceEndpointArn;
@@ -93,27 +95,27 @@ public class DmsHook {
 
         // create a DMS client
         return AWSDatabaseMigrationServiceClientBuilder.standard()
-            .withCredentials(awsCredentialsProvider)
-            .withRegion(awsRegion)
-            .build();
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(awsRegion)
+                .build();
     }
 
     public Boolean createReplicationTask() throws Exception {
         logger.info("createReplicationTask ......");
         CreateReplicationTaskRequest request = new CreateReplicationTaskRequest()
-            .withReplicationTaskIdentifier(replicationTaskIdentifier)
-            .withSourceEndpointArn(sourceEndpointArn)
-            .withTargetEndpointArn(targetEndpointArn)
-            .withReplicationInstanceArn(replicationInstanceArn)
-            .withMigrationType(migrationType)
-            .withTableMappings(tableMappings)
-            .withReplicationTaskSettings(replicationTaskSettings)
-            .withCdcStartTime(cdcStartTime)
-            .withCdcStartPosition(cdcStartPosition)
-            .withCdcStopPosition(cdcStopPosition)
-            .withTags(tags)
-            .withTaskData(taskData)
-            .withResourceIdentifier(resourceIdentifier);
+                .withReplicationTaskIdentifier(replicationTaskIdentifier)
+                .withSourceEndpointArn(sourceEndpointArn)
+                .withTargetEndpointArn(targetEndpointArn)
+                .withReplicationInstanceArn(replicationInstanceArn)
+                .withMigrationType(migrationType)
+                .withTableMappings(tableMappings)
+                .withReplicationTaskSettings(replicationTaskSettings)
+                .withCdcStartTime(cdcStartTime)
+                .withCdcStartPosition(cdcStartPosition)
+                .withCdcStopPosition(cdcStopPosition)
+                .withTags(tags)
+                .withTaskData(taskData)
+                .withResourceIdentifier(resourceIdentifier);
 
         request.setTableMappings(replaceFileParameters(request.getTableMappings()));
         request.setReplicationTaskSettings(replaceFileParameters(request.getReplicationTaskSettings()));
@@ -121,19 +123,19 @@ public class DmsHook {
         CreateReplicationTaskResult result = client.createReplicationTask(request);
         replicationTaskIdentifier = result.getReplicationTask().getReplicationTaskIdentifier();
         replicationTaskArn = result.getReplicationTask().getReplicationTaskArn();
-        logger.info("replicationTaskIdentifier: {}, replicationTaskArn: {}", replicationTaskIdentifier, replicationTaskArn);
+        logger.info("replicationTaskIdentifier: {}, replicationTaskArn: {}", replicationTaskIdentifier,
+                replicationTaskArn);
         return awaitReplicationTaskStatus(STATUS.READY);
     }
-
 
     public Boolean startReplicationTask() {
         logger.info("startReplicationTask ......");
         StartReplicationTaskRequest request = new StartReplicationTaskRequest()
-            .withReplicationTaskArn(replicationTaskArn)
-            .withStartReplicationTaskType(startReplicationTaskType)
-            .withCdcStartTime(cdcStartTime)
-            .withCdcStartPosition(cdcStartPosition)
-            .withCdcStopPosition(cdcStopPosition);
+                .withReplicationTaskArn(replicationTaskArn)
+                .withStartReplicationTaskType(startReplicationTaskType)
+                .withCdcStartTime(cdcStartTime)
+                .withCdcStartPosition(cdcStartPosition)
+                .withCdcStopPosition(cdcStopPosition);
         StartReplicationTaskResult result = client.startReplicationTask(request);
         replicationTaskArn = result.getReplicationTask().getReplicationTaskArn();
         return awaitReplicationTaskStatus(STATUS.RUNNING);
@@ -152,7 +154,7 @@ public class DmsHook {
             return;
         }
         StopReplicationTaskRequest request = new StopReplicationTaskRequest()
-            .withReplicationTaskArn(replicationTaskArn);
+                .withReplicationTaskArn(replicationTaskArn);
         client.stopReplicationTask(request);
         awaitReplicationTaskStatus(STATUS.STOPPED);
     }
@@ -160,7 +162,7 @@ public class DmsHook {
     public Boolean deleteReplicationTask() {
         logger.info("deleteReplicationTask ......");
         DeleteReplicationTaskRequest request = new DeleteReplicationTaskRequest()
-            .withReplicationTaskArn(replicationTaskArn);
+                .withReplicationTaskArn(replicationTaskArn);
         client.deleteReplicationTask(request);
         Boolean isDeleteSuccessfully;
         try {
@@ -172,14 +174,14 @@ public class DmsHook {
     }
 
     public Boolean testConnectionEndpoint() {
-        return (testConnection(replicationInstanceArn, sourceEndpointArn) && testConnection(replicationInstanceArn, targetEndpointArn));
+        return (testConnection(replicationInstanceArn, sourceEndpointArn)
+                && testConnection(replicationInstanceArn, targetEndpointArn));
     }
 
     public Boolean testConnection(String replicationInstanceArn, String endpointArn) {
         logger.info("Test connect replication instance: {} and endpoint: {}", replicationInstanceArn, endpointArn);
-        TestConnectionRequest request = new TestConnectionRequest().
-            withReplicationInstanceArn(replicationInstanceArn)
-            .withEndpointArn(endpointArn);
+        TestConnectionRequest request = new TestConnectionRequest().withReplicationInstanceArn(replicationInstanceArn)
+                .withEndpointArn(endpointArn);
         try {
             client.testConnection(request);
         } catch (InvalidResourceStateException e) {
@@ -190,10 +192,12 @@ public class DmsHook {
     }
 
     public Boolean awaitConnectSuccess(String replicationInstanceArn, String endpointArn) {
-        Filter instanceFilters = new Filter().withName(AWS_KEY.REPLICATION_INSTANCE_ARN).withValues(replicationInstanceArn);
+        Filter instanceFilters =
+                new Filter().withName(AWS_KEY.REPLICATION_INSTANCE_ARN).withValues(replicationInstanceArn);
         Filter endpointFilters = new Filter().withName(AWS_KEY.ENDPOINT_ARN).withValues(endpointArn);
-        DescribeConnectionsRequest request = new DescribeConnectionsRequest().withFilters(endpointFilters, instanceFilters)
-            .withMarker("");
+        DescribeConnectionsRequest request =
+                new DescribeConnectionsRequest().withFilters(endpointFilters, instanceFilters)
+                        .withMarker("");
         while (true) {
             ThreadUtils.sleep(CONSTANTS.CHECK_INTERVAL);
             DescribeConnectionsResult response = client.describeConnections(request);
@@ -210,8 +214,10 @@ public class DmsHook {
     }
 
     public ReplicationTask describeReplicationTasks() {
-        Filter replicationTaskFilter = new Filter().withName(AWS_KEY.REPLICATION_TASK_ARN).withValues(replicationTaskArn);
-        DescribeReplicationTasksRequest request = new DescribeReplicationTasksRequest().withFilters(replicationTaskFilter).withMaxRecords(20).withMarker("");
+        Filter replicationTaskFilter =
+                new Filter().withName(AWS_KEY.REPLICATION_TASK_ARN).withValues(replicationTaskArn);
+        DescribeReplicationTasksRequest request = new DescribeReplicationTasksRequest()
+                .withFilters(replicationTaskFilter).withMaxRecords(20).withMarker("");
         DescribeReplicationTasksResult result = client.describeReplicationTasks(request);
         ReplicationTask replicationTask = result.getReplicationTasks().get(0);
 
@@ -291,10 +297,12 @@ public class DmsHook {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ApplicationIds {
+
         private String replicationTaskArn;
     }
 
     public static class STATUS {
+
         public static final String DELETE = "delete";
         public static final String READY = "ready";
         public static final String RUNNING = "running";
@@ -305,17 +313,20 @@ public class DmsHook {
     }
 
     public static class AWS_KEY {
+
         public static final String REPLICATION_TASK_ARN = "replication-task-arn";
         public static final String REPLICATION_INSTANCE_ARN = "replication-instance-arn";
         public static final String ENDPOINT_ARN = "endpoint-arn";
     }
 
     public static class START_TYPE {
+
         public static final String START_REPLICATION = "start-replication";
         public static final String RELOAD_TARGET = "reload-target";
     }
 
     public static class CONSTANTS {
+
         public static final int CHECK_INTERVAL = 1000;
     }
 }

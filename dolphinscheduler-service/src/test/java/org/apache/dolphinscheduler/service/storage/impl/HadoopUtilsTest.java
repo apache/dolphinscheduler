@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.service.storage.impl;
 
+import org.apache.dolphinscheduler.common.utils.HttpUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.junit.Assert;
