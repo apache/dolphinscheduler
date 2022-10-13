@@ -26,13 +26,13 @@ import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RateLimitInterceptorTest {
 
     @Test
@@ -40,8 +40,8 @@ public class RateLimitInterceptorTest {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         RateLimitInterceptor rateLimitInterceptor = new RateLimitInterceptor(new TrafficConfiguration());
-        Assert.assertTrue(rateLimitInterceptor.preHandle(request, response, null));
-        Assert.assertTrue(rateLimitInterceptor.preHandle(request, response, null));
+        Assertions.assertTrue(rateLimitInterceptor.preHandle(request, response, null));
+        Assertions.assertTrue(rateLimitInterceptor.preHandle(request, response, null));
     }
 
     @Test
@@ -64,8 +64,8 @@ public class RateLimitInterceptorTest {
         for (int i = 0; i < 2; i++) {
             rateLimitInterceptor.preHandle(tenant1Request, response, null);
         }
-        Assert.assertFalse(rateLimitInterceptor.preHandle(tenant1Request, response, null));
-        Assert.assertTrue(rateLimitInterceptor.preHandle(tenant2Request, response, null));
+        Assertions.assertFalse(rateLimitInterceptor.preHandle(tenant1Request, response, null));
+        Assertions.assertTrue(rateLimitInterceptor.preHandle(tenant2Request, response, null));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class RateLimitInterceptorTest {
         for (int i = 0; i < 2; i++) {
             rateLimitInterceptor.preHandle(request, response, null);
         }
-        Assert.assertFalse(rateLimitInterceptor.preHandle(request, response, null));
+        Assertions.assertFalse(rateLimitInterceptor.preHandle(request, response, null));
     }
 
 }

@@ -28,19 +28,19 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * work flow lineage controller test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WorkFlowLineageControllerTest {
 
     @InjectMocks
@@ -51,7 +51,7 @@ public class WorkFlowLineageControllerTest {
 
     protected User user;
 
-    @Before
+    @BeforeEach
     public void before() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -78,11 +78,11 @@ public class WorkFlowLineageControllerTest {
         result.put(Constants.DATA_LIST, 1);
         Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal)).thenReturn(result);
         Result response = workFlowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
-    public  void testQueryWorkFlowLineageByCode() {
+    public void testQueryWorkFlowLineageByCode() {
         long projectCode = 1L;
         long code = 1L;
         Map<String, Object> result = new HashMap<>();
@@ -90,6 +90,6 @@ public class WorkFlowLineageControllerTest {
         result.put(Constants.DATA_LIST, 1);
         Mockito.when(workFlowLineageService.queryWorkFlowLineageByCode(projectCode, code)).thenReturn(result);
         Result response = workFlowLineageController.queryWorkFlowLineageByCode(user, projectCode, code);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 }

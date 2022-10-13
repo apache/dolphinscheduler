@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -46,12 +47,13 @@ public class PrestoDataSourceProcessorTest {
         prestoDatasourceParamDTO.setUserName("root");
         prestoDatasourceParamDTO.setPassword("123456");
         prestoDatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
-                .createConnectionParams(prestoDatasourceParamDTO);
-        Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
+                    .createConnectionParams(prestoDatasourceParamDTO);
+            Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test

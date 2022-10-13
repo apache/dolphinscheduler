@@ -27,6 +27,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -45,12 +46,13 @@ public class AthenaDataSourceProcessorTest {
         athenaDataSourceParamDTO.setPassword("123456");
         athenaDataSourceParamDTO.setAwsRegion("cn-north-1");
         athenaDataSourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        AthenaConnectionParam connectionParams = (AthenaConnectionParam) this.athenaDataSourceProcessor
-                .createConnectionParams(athenaDataSourceParamDTO);
-        Assert.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;", connectionParams.getJdbcUrl());
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            AthenaConnectionParam connectionParams = (AthenaConnectionParam) this.athenaDataSourceProcessor
+                    .createConnectionParams(athenaDataSourceParamDTO);
+            Assert.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test
