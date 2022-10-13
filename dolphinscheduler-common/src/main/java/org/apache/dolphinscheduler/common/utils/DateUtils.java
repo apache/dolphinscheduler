@@ -353,6 +353,10 @@ public final class DateUtils {
         if (end == null) {
             end = new Date();
         }
+        if (start.after(end)) {
+            logger.warn("start Time {} is later than end Time {}", start, end);
+            return null;
+        }
         return format2Duration(differMs(start, end));
     }
 
