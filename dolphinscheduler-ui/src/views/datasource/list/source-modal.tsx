@@ -76,7 +76,7 @@ const SourceModal = defineComponent({
             <div class={styles.content}>
               <NSpace>
                 {datasourceTypeList.map((item) => (
-                  <div class={styles.itemBox} onClick={() => handleTypeSelect(item.value)}>
+                  <div class={[styles.itemBox, `${item.label}-box`]} onClick={() => handleTypeSelect(item.value)}>
                     {item.label}
                   </div>
                 ))}
