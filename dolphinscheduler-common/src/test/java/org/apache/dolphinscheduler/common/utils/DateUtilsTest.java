@@ -176,6 +176,9 @@ public class DateUtilsTest {
         String duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1d 1h 10m 10s", duration);
 
+        duration = DateUtils.format2Duration(end, start);
+        Assert.assertNull(duration);
+
         // hours minutes seconds
         start = DateUtils.stringToDate("2020-01-20 11:00:00");
         end = DateUtils.stringToDate("2020-01-20 12:10:10");
