@@ -39,8 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.google.common.collect.Lists;
-
 /**
  * permission service test
  */
@@ -94,8 +92,6 @@ public class ResourcePermissionCheckServiceTest {
         user.setId(1);
         // ADMIN
         user.setUserType(UserType.ADMIN_USER);
-        Object[] obj = new Object[]{1, 2};
-        List<Project> projectList = Lists.newArrayList(this.getEntity());
         Set result = resourcePermissionCheckServices.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
                 user.getId(),
                 logger);

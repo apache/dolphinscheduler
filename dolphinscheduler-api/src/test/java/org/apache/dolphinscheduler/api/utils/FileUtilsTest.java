@@ -22,6 +22,7 @@ import org.apache.http.entity.ContentType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Assertions;
@@ -87,7 +88,7 @@ public class FileUtilsTest {
 
         // Define test resource
         File file = new File(destFilename);
-        org.apache.commons.io.FileUtils.writeStringToFile(file, "test data");
+        org.apache.commons.io.FileUtils.writeStringToFile(file, "test data", Charset.defaultCharset());
 
         // Invoke file2Resource and test not null
         Resource resource = FileUtils.file2Resource(file.toString());
@@ -102,7 +103,8 @@ public class FileUtilsTest {
     @Test
     public void testFile2String() throws IOException {
         String content = "123";
-        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/task.json"), content);
+        org.apache.commons.io.FileUtils.writeStringToFile(new File("/tmp/task.json"), content,
+                Charset.defaultCharset());
 
         File file = new File("/tmp/task.json");
         FileInputStream fileInputStream = new FileInputStream("/tmp/task.json");
