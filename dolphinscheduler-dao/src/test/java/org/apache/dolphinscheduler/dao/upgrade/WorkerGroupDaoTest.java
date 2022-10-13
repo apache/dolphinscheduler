@@ -40,15 +40,6 @@ public class WorkerGroupDaoTest {
     protected DataSource dataSource;
 
     @Test
-    public void testQueryQueryAllOldWorkerGroup() throws Exception {
-        WorkerGroupDao workerGroupDao = new WorkerGroupDao();
-
-        Map<Integer, String> workerGroupMap = workerGroupDao.queryAllOldWorkerGroup(dataSource.getConnection());
-
-        Assertions.assertTrue(workerGroupMap.size() > 0);
-    }
-
-    @Test
     public void testQueryQueryAllOldWorkerGroupException() throws Exception {
         Assertions.assertThrows(Exception.class, () -> {
                     WorkerGroupDao workerGroupDao = new WorkerGroupDao();
