@@ -65,6 +65,7 @@ const SourceModal = defineComponent({
     } = this
     return (
       <Modal
+        class='dialog-source-modal'
         show={show}
         title={t('datasource.choose_datasource_type')}
         cancelShow={false}
