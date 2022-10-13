@@ -118,3 +118,5 @@ class Symbol(str):
 
     SLASH = "/"
     POINT = "."
+    COMMA = ","
+    UNDERLINE = "_"
