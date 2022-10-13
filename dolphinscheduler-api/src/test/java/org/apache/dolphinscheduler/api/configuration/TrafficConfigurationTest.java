@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 
 import org.apache.commons.collections.MapUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TrafficConfigurationTest extends AbstractControllerTest {
@@ -32,26 +32,26 @@ public class TrafficConfigurationTest extends AbstractControllerTest {
 
     @Test
     public void isTrafficGlobalControlSwitch() {
-        Assert.assertFalse(trafficConfiguration.isGlobalSwitch());
+        Assertions.assertFalse(trafficConfiguration.isGlobalSwitch());
     }
 
     @Test
     public void getMaxGlobalQpsLimit() {
-        Assert.assertEquals(300, (int) trafficConfiguration.getMaxGlobalQpsRate());
+        Assertions.assertEquals(300, (int) trafficConfiguration.getMaxGlobalQpsRate());
     }
 
     @Test
     public void isTrafficTenantControlSwitch() {
-        Assert.assertFalse(trafficConfiguration.isTenantSwitch());
+        Assertions.assertFalse(trafficConfiguration.isTenantSwitch());
     }
 
     @Test
     public void getDefaultTenantQpsLimit() {
-        Assert.assertEquals(10, (int) trafficConfiguration.getDefaultTenantQpsRate());
+        Assertions.assertEquals(10, (int) trafficConfiguration.getDefaultTenantQpsRate());
     }
 
     @Test
     public void getCustomizeTenantQpsRate() {
-        Assert.assertTrue(MapUtils.isEmpty(trafficConfiguration.getCustomizeTenantQpsRate()));
+        Assertions.assertTrue(MapUtils.isEmpty(trafficConfiguration.getCustomizeTenantQpsRate()));
     }
 }
