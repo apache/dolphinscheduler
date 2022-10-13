@@ -152,7 +152,7 @@ public class WorkflowV2Controller extends BaseController {
      * @return PageResourceResponse from condition
      */
     @ApiOperation(value = "get", notes = "FILTER_WORKFLOWS_NOTES")
-    @GetMapping(consumes = {"application/json"})
+    @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

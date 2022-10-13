@@ -113,9 +113,7 @@ public class ProcessTaskRelation {
                                long postTaskCode,
                                int postTaskVersion,
                                ConditionType conditionType,
-                               String conditionParams,
-                               Date createTime,
-                               Date updateTime) {
+                               String conditionParams) {
         this.name = name;
         this.processDefinitionVersion = processDefinitionVersion;
         this.projectCode = projectCode;
@@ -126,8 +124,26 @@ public class ProcessTaskRelation {
         this.postTaskVersion = postTaskVersion;
         this.conditionType = conditionType;
         this.conditionParams = conditionParams;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
+
+        Date now = new Date();
+        this.createTime = now;
+        this.updateTime = now;
+    }
+
+    public ProcessTaskRelation(ProcessTaskRelationLog processTaskRelationLog) {
+        this.name = processTaskRelationLog.getName();
+        this.processDefinitionVersion = processTaskRelationLog.getProcessDefinitionVersion();
+        this.projectCode = processTaskRelationLog.getProjectCode();
+        this.processDefinitionCode = processTaskRelationLog.getProcessDefinitionCode();
+        this.preTaskCode = processTaskRelationLog.getPreTaskCode();
+        this.preTaskVersion = processTaskRelationLog.getPreTaskVersion();
+        this.postTaskCode = processTaskRelationLog.getPostTaskCode();
+        this.postTaskVersion = processTaskRelationLog.getPostTaskVersion();
+        this.conditionType = processTaskRelationLog.getConditionType();
+        this.conditionParams = processTaskRelationLog.getConditionParams();
+
+        this.createTime = processTaskRelationLog.getCreateTime();
+        this.updateTime = new Date();
     }
 
 }
