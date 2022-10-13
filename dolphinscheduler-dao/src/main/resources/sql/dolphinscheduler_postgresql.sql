@@ -703,7 +703,7 @@ CREATE TABLE t_ds_resources (
 --
 DROP TABLE IF EXISTS t_ds_relation_resources_task;
 CREATE TABLE t_ds_relation_resources_task (
-  id SERIAL int NOT NULL,
+  id SERIAL NOT NULL,
   task_id int DEFAULT NULL,
   full_name varchar(255) DEFAULT NULL,
   type int DEFAULT NULL,
