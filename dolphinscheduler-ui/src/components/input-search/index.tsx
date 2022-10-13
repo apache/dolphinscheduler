@@ -15,52 +15,31 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, withKeys} from 'vue'
-import {NInput} from 'naive-ui'
-
-
-const placeholder = 'Please enter keyword'
-
-const clearable = true
+import { defineComponent, withKeys, PropType } from 'vue'
+import { NInput, InputProps } from 'naive-ui'
 
 const props = {
-  placeholder: {
-    type: String as PropType<string>,
-    required: false
-  },
-  clearable: {
-    type: Boolean as PropType<boolean>,
-    required: false
-  },
-  searchVal: {
-    type: Object as PropType<any>,
-    required: true
+  inputProps: {
+    type: Object as PropType<InputProps>,
+    default: {}
   }
 }
 
 const Search = defineComponent({
   name: 'Search',
-  props,
-  emits: ['keyDown'],
+  emits: ['search'],
+  props: props,
   setup(props, ctx) {
-
-
-    const onKeyDown = () => {
-      ctx.emit('keyDown')
+    const onKeyDown = (ev: KeyboardEvent) => {
+      ctx.emit('search', (ev.target as HTMLInputElement)?.value || '')
     }
-    return {
-      onKeyDown
-    }
-  },
-  render() {
-    const {  $slots } = this
-    return (
-        <NInput
-            size='small'
-            placeholder={this.placeholder?this.placeholder:placeholder}
-            onKeydown={withKeys(this.onKeyDown,["enter"])}
-            clearable={this.clearable ? this.clearable : clearable}
-        />
+    return () => (
+      <NInput
+        size='small'
+        clearable
+        {...props.inputProps}
+        onKeydown={withKeys(onKeyDown, ['enter'])}
+      />
     )
   }
 })
