@@ -17,13 +17,14 @@
 
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { FormRules } from 'naive-ui'
+import type { FormRules, UploadFileInfo } from 'naive-ui'
 
-const defaultValue = () => ({
-  files: [],
-  pid: -1,
-  currentDir: '/'
-})
+const defaultValue = () =>
+  ({
+    files: [],
+    pid: -1,
+    currentDir: '/'
+  } as { files: UploadFileInfo[]; pid: number; currentDir: string })
 
 export function useForm() {
   const { t } = useI18n()

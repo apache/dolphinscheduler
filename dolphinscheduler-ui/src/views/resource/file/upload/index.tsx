@@ -50,7 +50,6 @@ export default defineComponent({
     }
 
     const handleFile = () => {
-      console.log(state.uploadForm.files)
       handleUploadFile(ctx.emit, hideModal, resetForm)
     }
 

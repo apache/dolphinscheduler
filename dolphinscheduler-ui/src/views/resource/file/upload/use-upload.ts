@@ -41,7 +41,10 @@ export function useUpload(state: any) {
       const pid = router.currentRoute.value.params.id || -1
       const currentDir = fileStore.getCurrentDir || '/'
       const formData = new FormData()
-      formData.append('files', state.uploadForm.files)
+      formData.append(
+        'files',
+        state.uploadForm.files.map((file: UploadFileInfo) => file.file)
+      )
       formData.append('type', 'FILE')
       formData.append('pid', String(pid))
       formData.append('currentDir', currentDir)
