@@ -89,7 +89,7 @@ public class WorkerGroupServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         WorkerGroup wg2 = getWorkerGroup(2);
         Mockito.when(workerGroupMapper.selectById(2)).thenReturn(wg2);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg2.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(getProcessInstanceList());
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg2.getName(), org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES)).thenReturn(getProcessInstanceList());
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(user, 1);
         Assert.assertEquals(Status.DELETE_WORKER_GROUP_NOT_EXIST.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
         result = workerGroupService.deleteWorkerGroupById(user, 2);
@@ -97,7 +97,7 @@ public class WorkerGroupServiceTest {
         // correct
         WorkerGroup wg3 = getWorkerGroup(3);
         Mockito.when(workerGroupMapper.selectById(3)).thenReturn(wg3);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg3.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(new ArrayList<>());
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg3.getName(), org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES)).thenReturn(new ArrayList<>());
         result = workerGroupService.deleteWorkerGroupById(user, 3);
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.get(Constants.MSG));
     }
