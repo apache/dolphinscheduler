@@ -341,7 +341,7 @@ const DetailModal = defineComponent({
                       autosize={{
                         minRows: 2
                       }}
-                      placeholder='HDFS Path'
+                      placeholder='hdfs://{IP}:{Port}/{Path}'
                   />
                 </NFormItem>
 

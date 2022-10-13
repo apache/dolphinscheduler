@@ -38,6 +38,9 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -52,6 +55,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Optional;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -336,6 +342,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;
             }
+            if (connectionParam.toString().contains("hdfsPath")) {
+                String[] tmp = connectionParam.toString().split("hdfsPath='");
+                String hdfsPath = tmp[1].split("', principal")[0];
+                if (!checkHDFSPath(hdfsPath)){
+                    logger.error("Invalid hdfsPath");
+                    return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), "Invalid hdfsPath");
+                }
+            }
             putMsg(result, Status.SUCCESS);
             return result;
         } catch (Exception e) {
@@ -346,6 +360,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), message);
         }
     }
+
 
     /**
      * test connection
@@ -636,4 +651,20 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
     }
 
+    private Boolean checkHDFSPath(String hdfsPath) throws URISyntaxException, IOException, InterruptedException {
+        Configuration conf = new Configuration();
+        System.setProperty("hadoop.home.dir", "/");
+        String[] tmp = hdfsPath.split(":");
+        String hdfsURI = tmp[0] + ":" + tmp[1] + ":" + tmp[2].split("/")[0];
+        FileSystem fs = FileSystem.get(new URI(hdfsURI), conf, "root");
+        logger.warn(hdfsURI);
+        logger.warn(hdfsPath);
+        if (fs.exists(new Path(hdfsPath))) {
+            logger.warn("hdfsPath Exist");
+            return true;
+        } else {
+            logger.warn("hdfsPath Not Exist");
+            return false;
+        }
+    }
 }
