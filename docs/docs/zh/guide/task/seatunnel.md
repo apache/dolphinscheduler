@@ -12,7 +12,7 @@
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务`参数一栏。
 - 引擎：支持 FLINK 和 SPARK
   - FLINK
     - 运行模型：支持 `run` 和 `run-application` 两种模式

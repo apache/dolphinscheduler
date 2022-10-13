@@ -11,7 +11,7 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务`参数一栏。
 - 除上述默认参数，此任务没有其他参数
 
 ## 任务样例

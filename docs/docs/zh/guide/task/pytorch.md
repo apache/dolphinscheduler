@@ -21,7 +21,7 @@
 
 ### Pytorch参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务`参数一栏。
 
 #### 运行参数
 

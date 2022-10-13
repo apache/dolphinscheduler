@@ -11,7 +11,7 @@ MapReduce(MR) 任务类型，用于执行 MapReduce 程序。对于 MapReduce �
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务`参数一栏。
 
 ### JAVA/SCALA 程序
 

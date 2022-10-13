@@ -12,7 +12,7 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 
 ## Task Parameter
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 - Engine: Supports FLINK and SPARK
   - FLINK
     - Run model: supports `run` and `run-application` modes

@@ -11,7 +11,7 @@ The sub-process node is to execute an external workflow definition as a task nod
 
 ## Task Parameter
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 | **Parameter** |                                                                              **Description**                                                                              |
 |---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

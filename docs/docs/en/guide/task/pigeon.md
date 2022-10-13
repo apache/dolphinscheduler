@@ -11,7 +11,7 @@ Pigeon is a task used to trigger remote tasks, acquire logs or status by calling
 
 ## Task Parameters
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |  **Parameter**   |            **Description**            |
 |------------------|---------------------------------------|

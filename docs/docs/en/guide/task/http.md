@@ -11,7 +11,7 @@ This node is used to perform http type tasks such as the common POST and GET req
 
 ## Task Parameters
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |    **Parameter**     |                                                                        **Description**                                                                        |
 |----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|---|--------------------|---|---|-------------------------|-----------------------------------------------------------------------------------------------|
