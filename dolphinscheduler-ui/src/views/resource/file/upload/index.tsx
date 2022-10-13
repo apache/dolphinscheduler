@@ -14,9 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineComponent, toRefs, PropType, getCurrentInstance } from 'vue'
-import { NButton, NForm, NFormItem, NInput, NUpload } from 'naive-ui'
-
+import { defineComponent, toRefs, PropType } from 'vue'
+import {
+  NForm,
+  NFormItem,
+  NUpload,
+  NUploadDragger,
+  NSpace,
+  NIcon,
+  NText
+} from 'naive-ui'
+import { UploadOutlined, LoadingOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
@@ -35,37 +43,22 @@ export default defineComponent({
   emits: ['updateList', 'update:show'],
   setup(props, ctx) {
     const { state, resetForm } = useForm()
-    const { handleUploadFile } = useUpload(state)
+    const { onSelectFile, handleUploadFile } = useUpload(state)
 
     const hideModal = () => {
-      resetForm()
       ctx.emit('update:show')
     }
 
-    const customRequest = ({ file }: any) => {
-      state.uploadForm.name = file.name
-      state.uploadForm.file = file.file
-      state.uploadFormRef.validate()
-    }
-
     const handleFile = () => {
+      console.log(state.uploadForm.files)
       handleUploadFile(ctx.emit, hideModal, resetForm)
     }
 
-    const removeFile = () => {
-      state.uploadForm.name = ''
-      state.uploadForm.file = ''
-    }
-
-    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-
     return {
       hideModal,
-      customRequest,
       handleFile,
-      removeFile,
-      ...toRefs(state),
-      trim
+      onSelectFile,
+      ...toRefs(state)
     }
   },
   render() {
@@ -80,37 +73,17 @@ export default defineComponent({
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}
       >
-        <NForm rules={this.rules} ref='uploadFormRef'>
-          <NFormItem
-            label={t('resource.file.file_name')}
-            path='name'
-            ref='uploadFormNameRef'
-          >
-            <NInput
-              allowInput={this.trim}
-              v-model={[this.uploadForm.name, 'value']}
-              placeholder={t('resource.file.enter_name_tips')}
-              class='input-file-name'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.description')} path='description'>
-            <NInput
-              allowInput={this.trim}
-              type='textarea'
-              v-model={[this.uploadForm.description, 'value']}
-              placeholder={t('resource.file.enter_description_tips')}
-              class='input-description'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.upload_files')} path='file'>
-            <NUpload
-              v-model={[this.uploadForm.file, 'value']}
-              customRequest={this.customRequest}
-              class='btn-upload'
-              max={1}
-              onRemove={this.removeFile}
-            >
-              <NButton>{t('resource.file.upload_files')}</NButton>
+        <NForm rules={this.rules} ref='uploadFormRef' model={this.uploadForm}>
+          <NFormItem path='files'>
+            <NUpload class='btn-upload' on-change={this.onSelectFile} multiple>
+              <NUploadDragger>
+                <NSpace vertical>
+                  <NIcon size='48' depth='3'>
+                    {this.saving ? <LoadingOutlined /> : <UploadOutlined />}
+                  </NIcon>
+                  <NText>{t('resource.file.upload_tips')}</NText>
+                </NSpace>
+              </NUploadDragger>
             </NUpload>
           </NFormItem>
         </NForm>

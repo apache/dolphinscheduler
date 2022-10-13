@@ -18,9 +18,10 @@
 import { useI18n } from 'vue-i18n'
 import { IEmit } from '../types'
 import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
 import { useFileStore } from '@/store/file/file'
-import { createResource } from '@/service/modules/resources'
+import { resourceBatchUpload } from '@/service/modules/resources'
+import type { Router } from 'vue-router'
+import type { UploadFileInfo } from 'naive-ui'
 
 export function useUpload(state: any) {
   const { t } = useI18n()
@@ -40,26 +41,31 @@ export function useUpload(state: any) {
       const pid = router.currentRoute.value.params.id || -1
       const currentDir = fileStore.getCurrentDir || '/'
       const formData = new FormData()
-      formData.append('file', state.uploadForm.file)
+      formData.append('files', state.uploadForm.files)
       formData.append('type', 'FILE')
-      formData.append('name', state.uploadForm.name)
       formData.append('pid', String(pid))
       formData.append('currentDir', currentDir)
-      formData.append('description', state.uploadForm.description)
-
-      await createResource(formData as any)
+      await resourceBatchUpload(formData as any)
       window.$message.success(t('resource.file.success'))
-      state.saving = false
       emit('updateList')
 
       hideModal()
       resetForm()
-    } catch (err) {
+    } finally {
       state.saving = false
     }
   }
 
+  const onSelectFile = (options: {
+    file: UploadFileInfo
+    fileList: Array<UploadFileInfo>
+    event?: Event
+  }) => {
+    state.uploadForm.files = options.fileList
+  }
+
   return {
-    handleUploadFile
+    handleUploadFile,
+    onSelectFile
   }
 }
