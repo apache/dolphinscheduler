@@ -31,7 +31,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,15 +40,14 @@ public class EtcdRegistryTest {
 
     private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
 
-    @RegisterExtension
-    public static final EtcdClusterExtension server = EtcdClusterExtension.builder()
-            .withNodes(1)
-            .withImage("ibmcom/etcd:3.2.24")
-            .build();
     public static EtcdRegistry registry;
 
     @BeforeAll
     public static void before() throws Exception {
+        EtcdClusterExtension server = EtcdClusterExtension.builder()
+                .withNodes(1)
+                .withImage("ibmcom/etcd:3.2.24")
+                .build();
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
         server.restart();
         properties.setEndpoints(String.valueOf(server.clientEndpoints().get(0)));
