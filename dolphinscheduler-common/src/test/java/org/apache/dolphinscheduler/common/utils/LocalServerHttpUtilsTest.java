@@ -17,22 +17,18 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.apache.dolphinscheduler.common.Constants;
-
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 public class LocalServerHttpUtilsTest extends TestCase {
 
@@ -50,11 +46,11 @@ public class LocalServerHttpUtilsTest extends TestCase {
         // success
         String result = null;
         result = HttpUtils.get("http://localhost:" + server.getServerPort() + "/test.json");
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
         ObjectNode jsonObject = JSONUtils.parseObject(result);
-        Assert.assertEquals("Github", jsonObject.path("name").asText());
+        Assertions.assertEquals("Github", jsonObject.path("name").asText());
         result = HttpUtils.get("http://123.333.111.33/ccc");
-        Assert.assertNull(result);
+        Assertions.assertNull(result);
     }
 
     public void testGetResponseContentString() {
@@ -68,19 +64,19 @@ public class LocalServerHttpUtilsTest extends TestCase {
 
         String responseContent = null;
         responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
-        Assert.assertNotNull(responseContent);
+        Assertions.assertNotNull(responseContent);
 
         responseContent = HttpUtils.getResponseContentString(null, httpclient);
-        Assert.assertNull(responseContent);
+        Assertions.assertNull(responseContent);
 
         responseContent = HttpUtils.getResponseContentString(httpget, null);
-        Assert.assertNull(responseContent);
+        Assertions.assertNull(responseContent);
     }
 
     public void testGetHttpClient() {
         CloseableHttpClient httpClient1 = HttpUtils.getInstance();
         CloseableHttpClient httpClient2 = HttpUtils.getInstance();
-        Assert.assertEquals(httpClient1, httpClient2);
+        Assertions.assertEquals(httpClient1, httpClient2);
     }
 
     public void testKerberosHttpsGet() {
@@ -89,19 +85,19 @@ public class LocalServerHttpUtilsTest extends TestCase {
         logger.info(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
         String url = "https://www.apache.org/";
         logger.info(KerberosHttpClient.get(url));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     public void testHttpsGet() {
         String url = "https://www.apache.org/";
         logger.info(HttpUtils.get(url));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     public void testHttpGet() {
         String url = "http://www.apache.org/";
         logger.info(HttpUtils.get(url));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
 }
