@@ -12,6 +12,9 @@ it will call `Dinky API` to trigger dinky task. Click [here](http://www.dlink.to
 
 ## Task Parameter
 
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 | **Parameter** |                                                                                       **Description**                                                                                        |

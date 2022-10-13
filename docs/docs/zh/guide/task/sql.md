@@ -15,12 +15,15 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务`参数一栏。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 - 数据源：选择对应的数据源
 - sql类型：支持查询和非查询两种。
-  - 查询：支持 `DML select` 类型的命令，是有结果集返回的，可以指定邮件通知为表格、附件或表格附件三种模板；
-  - 非查询：支持 `DDL`全部命令 和 `DML update、delete、insert` 三种类型的命令；
-    - 默认采用`;\n`作为SQL分隔符,拆分成多段SQL语句执行。Hive支持一次执行多段SQL语句,故不会拆分。
+- 查询：支持 `DML select` 类型的命令，是有结果集返回的，可以指定邮件通知为表格、附件或表格附件三种模板；
+- 非查询：支持 `DDL`全部命令 和 `DML update、delete、insert` 三种类型的命令；
+- 默认采用`;\n`作为SQL分隔符,拆分成多段SQL语句执行。Hive支持一次执行多段SQL语句,故不会拆分。
 - sql参数：输入参数格式为key1=value1;key2=value2…
 - sql语句：SQL语句
 - UDF函数：对于HIVE类型的数据源，可以引用资源中心中创建的UDF函数，其他类型的数据源暂不支持UDF函数。
