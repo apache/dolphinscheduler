@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.service.utils;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 
 import java.util.ArrayList;
 import java.util.List;
