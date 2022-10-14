@@ -176,6 +176,9 @@ public class DateUtilsTest {
         String duration = DateUtils.format2Duration(start, end);
         Assert.assertEquals("1d 1h 10m 10s", duration);
 
+        duration = DateUtils.format2Duration(end, start);
+        Assert.assertNull(duration);
+
         // hours minutes seconds
         start = DateUtils.stringToDate("2020-01-20 11:00:00");
         end = DateUtils.stringToDate("2020-01-20 12:10:10");
@@ -259,5 +262,42 @@ public class DateUtilsTest {
         String asiaShNowStr = DateUtils.dateToString(utcNow, asiaSh);
         String utcNowStr = DateUtils.dateToString(asiaShNow, utc);
         Assert.assertEquals(asiaShNowStr, utcNowStr);
+    }
+
+    @Test
+    public void testDateToTimeStamp() throws ParseException {
+        // Beijing Date
+        String timeString = "2022-09-29 21:00:00";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+        Date date = sdf.parse(timeString);
+        long timeStamp = DateUtils.dateToTimeStamp(date);
+        Assert.assertEquals(1664456400000L, timeStamp);
+
+        // Tokyo Date
+        String tokyoTime = "2022-09-29 22:00:00";
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+        date = sdf.parse(tokyoTime);
+        timeStamp = DateUtils.dateToTimeStamp(date);
+        Assert.assertEquals(1664456400000L, timeStamp);
+
+        date = null;
+        Assert.assertEquals(0L, DateUtils.dateToTimeStamp(date));
+    }
+
+    @Test
+    public void testTimeStampToDate() {
+        long timeStamp = 1664456400000L;
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+        String sd = sdf.format(new Date(timeStamp));
+        Assert.assertEquals("2022-09-29 21:00:00", sd);
+
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+        sd = sdf.format(new Date(timeStamp));
+        Assert.assertEquals("2022-09-29 22:00:00", sd);
+
+        Date date = DateUtils.timeStampToDate(0L);
+        Assert.assertNull(date);
     }
 }

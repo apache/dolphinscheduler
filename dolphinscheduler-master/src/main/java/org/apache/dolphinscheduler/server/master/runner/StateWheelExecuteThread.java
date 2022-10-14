@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -35,6 +34,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,13 +120,13 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
 
     public void addProcess4TimeoutCheck(ProcessInstance processInstance) {
         processInstanceTimeoutCheckList.add(processInstance.getId());
-        logger.info("Success add workflow instance into timeout check list");
+        logger.info("Success add workflow instance {} into timeout check list", processInstance.getId());
     }
 
     public void removeProcess4TimeoutCheck(int processInstanceId) {
         boolean removeFlag = processInstanceTimeoutCheckList.remove(processInstanceId);
         if (removeFlag) {
-            logger.info("Success remove workflow instance from timeout check list");
+            logger.info("Success remove workflow instance {} from timeout check list", processInstanceId);
         }
     }
 
@@ -154,7 +154,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                         (long) processInstance.getTimeout()
                                 * Constants.SEC_2_MINUTES_TIME_UNIT);
                 if (timeRemain < 0) {
-                    logger.info("Workflow instance timeout, adding timeout event");
+                    logger.info("Workflow instance {} timeout, adding timeout event", processInstance.getId());
                     addProcessTimeoutEvent(processInstance);
                     processInstanceTimeoutCheckList.remove(processInstance.getId());
                     logger.info("Workflow instance timeout, added timeout event");

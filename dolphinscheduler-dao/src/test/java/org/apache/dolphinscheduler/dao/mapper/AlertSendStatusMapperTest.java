@@ -17,15 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
-
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
 
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -48,6 +46,6 @@ public class AlertSendStatusMapperTest extends BaseDaoTest {
         alertSendStatus.setCreateTime(DateUtils.getCurrentDate());
 
         alertSendStatusMapper.insert(alertSendStatus);
-        assertThat(alertSendStatus.getId(), greaterThan(0));
+        Assertions.assertThat(alertSendStatus.getId() > 0);
     }
 }

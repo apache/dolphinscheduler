@@ -38,8 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * DataQualityTaskTest
@@ -96,7 +96,7 @@ public class DataQualityTaskTest {
                 + "as unique_code,'table_count.total'AS statistics_name,"
                 + "table_count.total AS statistics_value,'2021-08-12 10:15:48' as data_time,'2021-08-12 10:15:48' as create_time,"
                 + "'2021-08-12 10:15:48' as update_time from table_count\"}}]}";
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     private DataQualityTaskExecutionContext getSingleTableContext() {
@@ -540,7 +540,7 @@ public class DataQualityTaskTest {
                         + "'2021-08-30 00:00:00' as data_time,'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' "
                         + "as update_time from test_person\"}}]}";
 
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     @Test
@@ -819,7 +819,7 @@ public class DataQualityTaskTest {
                 + "where c1>20 ) tmp2\"}}]}";
 
         RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     @Test
@@ -1171,6 +1171,6 @@ public class DataQualityTaskTest {
                 + "\"config\":{\"path\":\"hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test\",\"input_table\":\"miss_items\"}}]}";
 
         RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 }

@@ -16,11 +16,12 @@
  */
 
 package org.apache.dolphinscheduler.plugin.task.api;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AbstractTaskTest {
 
@@ -33,8 +34,8 @@ public class AbstractTaskTest {
         if (matcher.find()) {
             str = matcher.group();
         }
-        Assert.assertNotNull(str);
-        Assert.assertEquals(jobId, str.substring(6));
+        Assertions.assertNotNull(str);
+        Assertions.assertEquals(jobId, str.substring(6));
     }
 
 }

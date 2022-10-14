@@ -59,6 +59,9 @@ class Sql(Task):
         "display_rows",
     }
 
+    ext: set = {".sql"}
+    ext_attr: str = "_sql"
+
     def __init__(
         self,
         name: str,
@@ -71,8 +74,8 @@ class Sql(Task):
         *args,
         **kwargs
     ):
+        self._sql = sql
         super().__init__(name, TaskType.SQL, *args, **kwargs)
-        self.sql = sql
         self.param_sql_type = sql_type
         self.datasource_name = datasource_name
         self.pre_statements = pre_statements or []
@@ -101,7 +104,7 @@ class Sql(Task):
             "|(.* |)update |(.* |)truncate |(.* |)alter |(.* |)create ).*"
         )
         pattern_select = re.compile(pattern_select_str, re.IGNORECASE)
-        if pattern_select.match(self.sql) is None:
+        if pattern_select.match(self._sql) is None:
             return SqlType.NOT_SELECT
         else:
             return SqlType.SELECT

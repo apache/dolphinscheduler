@@ -38,22 +38,23 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * logger service test
  */
-@RunWith(MockitoJUnitRunner.class)
-@PrepareForTest({LoggerServiceImpl.class})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class LoggerServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerServiceTest.class);
@@ -83,23 +84,23 @@ public class LoggerServiceTest {
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Result result = loggerService.queryLog(2, 1, 1);
         // TASK_INSTANCE_NOT_FOUND
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
 
         try {
             // HOST NOT FOUND OR ILLEGAL
             result = loggerService.queryLog(1, 1, 1);
         } catch (RuntimeException e) {
-            Assert.assertTrue(true);
+            Assertions.assertTrue(true);
             logger.error("testQueryDataSourceList error {}", e.getMessage());
         }
-        Assert.assertEquals(Status.TASK_INSTANCE_HOST_IS_NULL.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TASK_INSTANCE_HOST_IS_NULL.getCode(), result.getCode().intValue());
 
         // SUCCESS
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         result = loggerService.queryLog(1, 1, 1);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -112,7 +113,7 @@ public class LoggerServiceTest {
         try {
             loggerService.getLogBytes(2);
         } catch (RuntimeException e) {
-            Assert.assertTrue(true);
+            Assertions.assertTrue(true);
             logger.error("testGetLogBytes error: {}", "task instance is null");
         }
 
@@ -120,7 +121,7 @@ public class LoggerServiceTest {
         try {
             loggerService.getLogBytes(1);
         } catch (RuntimeException e) {
-            Assert.assertTrue(true);
+            Assertions.assertTrue(true);
             logger.error("testGetLogBytes error: {}", "task instance host is null");
         }
 
@@ -160,7 +161,7 @@ public class LoggerServiceTest {
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         result = loggerService.queryLog(loginUser, projectCode, 1, 1, 1);
-        Assert.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
     }
 
     @Test

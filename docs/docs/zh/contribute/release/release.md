@@ -248,13 +248,21 @@ svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/dev/dolphin
 cd ~/ds_svn/dev/dolphinscheduler
 ```
 
-### 添加gpg公钥
+### 将 gpg KEYS 文件拷贝至发布目录（可选）
 
-仅第一次部署的账号需要添加，只要`KEYS`中包含已经部署过的账户的公钥即可。
+只有你第一次使用该 KEY 发版时才需要，如果之前已经发过版且 KEY 没有变化则不需要。你需要切换到一个新的目录，因为这步骤需要 checkout 并修改 release
+库中的 KEYS 文件
 
 ```shell
+mkdir -p ~/ds_svn/release/
+cd ~/ds_svn/release/
+svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/release/dolphinscheduler
 gpg -a --export <YOUR-GPG-KEY-ID> >> KEYS
+svn add *
+svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 ```
+
+> 注意：这个步骤需要一定的时间去 checkout 特别是在你第一次 checkout 的时候，因为这个库比较大，且这个操作需要 checkout 出全部文件
 
 ### 将待发布的内容添加至SVN目录
 
@@ -314,7 +322,7 @@ cd ../
 首先导入发布人公钥。从svn仓库导入KEYS到本地环境。（发布版本的人不需要再导入，帮助做验证的人需要导入，用户名填发版人的即可）
 
 ```shell
-curl https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS >> KEYS
+curl https://dist.apache.org/repos/dist/release/dolphinscheduler/KEYS >> KEYS
 gpg --import KEYS
 gpg --edit-key "${A_USERNAME}"
   > trust
@@ -345,7 +353,7 @@ gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
 cd ../
 ```
 
-> 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令 
+> 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令
 > `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz` 和
 > `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz` 将创建它们
 
@@ -381,8 +389,11 @@ cd ../
 ### 更新版本说明
 
 在 GitHub 中通过 [创建新的 release note](https://github.com/apache/dolphinscheduler/releases/new) 创建一个 release note。 这要在
-投票邮件开始之前完成，因为我们需要在邮件中使用 release note。你可以通过命令 `git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md`
-自动生成 changelog（部分可以不太准确，需要人为过滤一遍），然后将他们分类并粘贴到 GitHub 的 release note 中
+投票邮件开始之前完成，因为我们需要在邮件中使用 release note。你可以在 `tools/release` 目录中运行 `python release.py changelog` 自动创建
+changelog.
+
+> 备注： 如果你更加倾向于手动创建 changelog，你可以通过命令 `git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md`
+> 生成 changelog（部分可以不太准确，需要人为过滤一遍），然后将他们分类并粘贴到 GitHub 的 release note 中
 
 ### 投票阶段
 
@@ -418,7 +429,7 @@ Git tag for the release: https://github.com/apache/dolphinscheduler/tree/<VERSIO
 
 Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
-Keys to verify the Release Candidate: https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS
+Keys to verify the Release Candidate: https://downloads.apache.org/dolphinscheduler/KEYS
 
 Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/contribute/release/release.html
 
@@ -468,19 +479,6 @@ Thanks everyone for taking time to check this release and help us.
 svn mv https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
 ```
 
-### 将 gpg KEYS svn的dev目录移动到release目录
-
-只有你第一次使用该 KEY 发版时才需要，如果之前已经发过版且 KEY 没有变化则不需要
-
-```shell
-mkdir -p ~/ds_svn/release/
-cd ~/ds_svn/release/
-svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/release/dolphinscheduler
-gpg -a --export <YOUR-GPG-KEY-ID> >> KEYS
-svn add *
-svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
-```
-
 ### 更新文档
 
 官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改pull requests 被 merge 后就会生效）:
@@ -488,11 +486,10 @@ svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 - **apache/dolphinscheduler-website** 仓库：
   - `download/en-us/download.md` 和 `download/zh-cn/download.md`: 增加 `<VERSION>` 版本发布包的下载
   - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `<VERSION>` 的新键值对
-- **apache/dolphinscheduler** 仓库：
+- **apache/dolphinscheduler** 仓库 (dev 分支)：
   - `docs/configs/site.js`:
     - `docsLatest`: 更新为 `<VERSION>`
     - `docs0`: 两处 `en-us/zh-cn` 的 `text` 更新为 `latest(<VERSION>)`
-    - `docsxyz`: 两处 `en-us/zh-cn` 的 `children` 增加 `key` 为 `docsxyz`, `text` 为 `<VERSION>` 的下拉菜单
   - `docs/configs/index.md.jsx`: 增加 `'<VERSION>': docsxyzConfig,`
   - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的发版版本 `<VERSION>` 的链接
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler 在 GitHub issue 中有版本选择的部分，当有新版本发版后，需要更新这部分的内容。目前与版本关联的是

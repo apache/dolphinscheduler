@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
+import lombok.Data;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 /**
  * page query dto
@@ -29,8 +29,8 @@ import lombok.Data;
 public class PageQueryDto {
 
     @ApiModelProperty(example = "10", required = true)
-    private Integer pageSize;
+    private Integer pageSize = 10;
 
     @ApiModelProperty(example = "1", required = true)
-    private Integer pageNo;
+    private Integer pageNo = 1;
 }

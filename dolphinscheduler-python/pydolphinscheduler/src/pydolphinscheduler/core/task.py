@@ -16,7 +16,8 @@
 # under the License.
 
 """DolphinScheduler Task and TaskRelation object."""
-
+import copy
+import types
 from logging import getLogger
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
@@ -24,6 +25,7 @@ from pydolphinscheduler import configuration
 from pydolphinscheduler.constants import (
     Delimiter,
     ResourceKey,
+    Symbol,
     TaskFlag,
     TaskPriority,
     TaskTimeoutFlag,
@@ -100,10 +102,21 @@ class Task(Base):
         "timeout",
     }
 
+    # task default attribute will into `task_params` property
+    _task_default_attr = {
+        "local_params",
+        "resource_list",
+        "dependence",
+        "wait_start_timeout",
+        "condition_result",
+    }
+    # task attribute ignore from _task_default_attr and will not into `task_params` property
+    _task_ignore_attr: set = set()
+    # task custom attribute define in sub class and will append to `task_params` property
     _task_custom_attr: set = set()
 
     ext: set = None
-    ext_attr: str = None
+    ext_attr: Union[str, types.FunctionType] = None
 
     DEFAULT_CONDITION_RESULT = {"successNode": [""], "failedNode": [""]}
 
@@ -220,20 +233,24 @@ class Task(Base):
         """Set attribute condition_result."""
         self._condition_result = condition_result
 
+    def _get_attr(self) -> Set[str]:
+        """Get final task task_params attribute.
+
+        Base on `_task_default_attr`, append attribute from `_task_custom_attr` and subtract attribute from
+        `_task_ignore_attr`.
+        """
+        attr = copy.deepcopy(self._task_default_attr)
+        attr -= self._task_ignore_attr
+        attr |= self._task_custom_attr
+        return attr
+
     @property
     def task_params(self) -> Optional[Dict]:
         """Get task parameter object.
 
         Will get result to combine _task_custom_attr and custom_attr.
         """
-        custom_attr = {
-            "local_params",
-            "resource_list",
-            "dependence",
-            "wait_start_timeout",
-            "condition_result",
-        }
-        custom_attr |= self._task_custom_attr
+        custom_attr = self._get_attr()
         return self.get_define_custom(custom_attr=custom_attr)
 
     def get_plugin(self):
@@ -256,23 +273,26 @@ class Task(Base):
         """Get the file content according to the resource plugin."""
         if self.ext_attr is None and self.ext is None:
             return
-
         _ext_attr = getattr(self, self.ext_attr)
-
         if _ext_attr is not None:
-            if _ext_attr.endswith(tuple(self.ext)):
+            if isinstance(_ext_attr, str) and _ext_attr.endswith(tuple(self.ext)):
                 res = self.get_plugin()
                 content = res.read_file(_ext_attr)
-                setattr(self, self.ext_attr.lstrip("_"), content)
+                setattr(self, self.ext_attr.lstrip(Symbol.UNDERLINE), content)
             else:
-                index = _ext_attr.rfind(".")
-                if index != -1:
-                    raise ValueError(
-                        "This task does not support files with suffix {}, only supports {}".format(
-                            _ext_attr[index:], ",".join(str(suf) for suf in self.ext)
+                if self.resource_plugin is not None or (
+                    self.process_definition is not None
+                    and self.process_definition.resource_plugin is not None
+                ):
+                    index = _ext_attr.rfind(Symbol.POINT)
+                    if index != -1:
+                        raise ValueError(
+                            "This task does not support files with suffix {}, only supports {}".format(
+                                _ext_attr[index:],
+                                Symbol.COMMA.join(str(suf) for suf in self.ext),
+                            )
                         )
-                    )
-                setattr(self, self.ext_attr.lstrip("_"), _ext_attr)
+                setattr(self, self.ext_attr.lstrip(Symbol.UNDERLINE), _ext_attr)
 
     def __hash__(self):
         return hash(self.code)

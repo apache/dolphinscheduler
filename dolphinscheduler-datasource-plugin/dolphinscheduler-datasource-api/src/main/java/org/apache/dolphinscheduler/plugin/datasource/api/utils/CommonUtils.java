@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 import static org.apache.dolphinscheduler.spi.utils.Constants.RESOURCE_STORAGE_TYPE;
 
-import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.hadoop.conf.Configuration;

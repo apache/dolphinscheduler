@@ -17,9 +17,9 @@
 
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
-import type { TaskType } from '@/views/projects/task/constants/task-type'
+import type { TaskType } from '@/store/project/types'
 import type { Coordinate } from './types'
-import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import { useCustomCellBuilder } from './dag-hooks'
 import utils from '@/utils'
 import type { Edge } from '@antv/x6'
