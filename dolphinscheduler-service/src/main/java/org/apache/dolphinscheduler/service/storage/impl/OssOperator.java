@@ -27,9 +27,8 @@ import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
 import org.apache.dolphinscheduler.common.model.OssConnection;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.storage.StorageEntity;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -287,17 +286,20 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode, ResourceType type) {
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type) {
         return null;
     }
 
     @Override
-    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws Exception {
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws Exception {
         return null;
     }
 
     @Override
-    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws Exception {
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
+                                       ResourceType type) throws Exception {
         return null;
     }
 

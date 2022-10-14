@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
@@ -30,8 +29,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.storage.StorageEntity;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -44,12 +41,12 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +58,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -236,11 +234,6 @@ public class ResourcesServiceTest {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-
-        result = resourcesService.createDirectory(user, "directoryTest", "directory test", ResourceType.FILE, 1, "/");
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.PARENT_RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
-        // RESOURCE_EXIST
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         Mockito.when(resourcesMapper.existResource("/directoryTest", 0)).thenReturn(true);
         result = resourcesService.createDirectory(user, "directoryTest", "directory test", ResourceType.FILE, -1, "/");
@@ -448,7 +441,7 @@ public class ResourcesServiceTest {
                     .thenReturn(getStorageEntityResource());
             result = resourcesService.delete(loginUser, 2, "/dolphinscheduler/123/resources/ResNotExist", "123");
             logger.info(result.toString());
-            Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
+            Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
             // SUCCESS
             loginUser.setTenantId(1);
@@ -617,28 +610,27 @@ public class ResourcesServiceTest {
     }
 
     // TODO: revise this testcase after modifying PythonGateway.java
-    @Ignore("revise this testcase after modifying PythonGateway.java")
-    @Test
-    public void testQueryResourcesFileInfo() {
-        User user = getUser();
-        String userName = "test-user";
-        Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(user);
-        Resource file = new Resource();
-        file.setFullName("/dir/file1.py");
-        file.setId(1);
-        Mockito.when(resourcesMapper.queryResource(file.getFullName(), ResourceType.FILE.ordinal()))
-                .thenReturn(Collections.singletonList(file));
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(
-                AuthorizationType.RESOURCE_FILE_ID, null, user.getId(), ApiFuncIdentificationConstant.FILE_VIEW,
-                serviceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(
-                AuthorizationType.RESOURCE_FILE_ID, new Object[]{file.getId()}, user.getId(), serviceLogger))
-                .thenReturn(true);
-        Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
-        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Resource result = resourcesService.queryResourcesFileInfo(userName, file.getFullName());
-        Assertions.assertEquals(file.getFullName(), result.getFullName());
-    }
+//    @Test
+//    public void testQueryResourcesFileInfo() {
+//        User user = getUser();
+//        String userName = "test-user";
+//        Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(user);
+//        Resource file = new Resource();
+//        file.setFullName("/dir/file1.py");
+//        file.setId(1);
+//        Mockito.when(resourcesMapper.queryResource(file.getFullName(), ResourceType.FILE.ordinal()))
+//                .thenReturn(Collections.singletonList(file));
+//        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(
+//                AuthorizationType.RESOURCE_FILE_ID, null, user.getId(), ApiFuncIdentificationConstant.FILE_VIEW,
+//                serviceLogger)).thenReturn(true);
+//        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(
+//                AuthorizationType.RESOURCE_FILE_ID, new Object[]{file.getId()}, user.getId(), serviceLogger))
+//                .thenReturn(true);
+//        Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
+//        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+//        Resource result = resourcesService.queryResourcesFileInfo(userName, file.getFullName());
+//        Assertions.assertEquals(file.getFullName(), result.getFullName());
+//    }
 
     @Test
     public void testUpdateResourceContent() {

@@ -17,8 +17,7 @@
 package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.common.storage.StorageEntity;
-import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +67,7 @@ public class ResourceTreeVisitorTest {
 
         ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(resourceList);
         Assertions.assertTrue(resourceTreeVisitor.rootNode(resource1, "/default"));
-        Assertions.assertFalse(resourceTreeVisitor.rootNode(resource2,"/default"));
+        Assertions.assertFalse(resourceTreeVisitor.rootNode(resource2, "/default"));
     }
 
 }

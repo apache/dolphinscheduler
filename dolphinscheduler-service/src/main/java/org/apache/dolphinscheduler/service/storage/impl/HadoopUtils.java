@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
 
-import com.google.common.base.Joiner;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
@@ -30,9 +29,8 @@ import org.apache.dolphinscheduler.common.utils.HttpUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.KerberosHttpClient;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.storage.StorageEntity;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.utils.CommonUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -57,7 +55,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -314,8 +319,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
         // Then we split the result substring
         // with "/" and join all elements except the first two elements because they are
         // tenantCode and "resource" directory.
-        String resourceUploadPath = RESOURCE_UPLOAD_PATH.endsWith("/") ?
-                StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
+        String resourceUploadPath =
+                RESOURCE_UPLOAD_PATH.endsWith("/") ? StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
         // +1 because we want to skip the "/" after resource upload path as well.
         String pathContainingTenantNResource = fullName.substring(
                 fullName.indexOf(resourceUploadPath)
@@ -323,7 +328,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
         String[] fileNameArr = pathContainingTenantNResource.split("/");
         return Joiner.on("/").join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
     }
-
 
     @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
@@ -348,11 +352,11 @@ public class HadoopUtils implements Closeable, StorageOperate {
      */
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
-//        if(!exists(dstPath))
-//        {
-//            fs.mkdirs(new Path(dstPath));
-//            logger.info("created the destination path: {}", dstPath);
-//        }
+        // if(!exists(dstPath))
+        // {
+        // fs.mkdirs(new Path(dstPath));
+        // logger.info("created the destination path: {}", dstPath);
+        // }
         return FileUtil.copy(fs, new Path(srcPath), fs, new Path(dstPath), deleteSource, overwrite, fs.getConf());
     }
 
@@ -475,43 +479,43 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @throws IOException errors
      */
     @Override
-    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws IOException {
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws IOException {
         // TODO: Does listStatus truncate resultList if its size goes above certain threshold (like a 1000 in S3)
-        // TODO: add hdfs prefix  getFile
+        // TODO: add hdfs prefix getFile
         List<StorageEntity> storageEntityList = new ArrayList<>();
         try {
             FileStatus[] fileStatuses = fs.listStatus(new Path(path));
 
             // transform FileStatusArray into the StorageEntity List
-            for (FileStatus fileStatus: fileStatuses) {
+            for (FileStatus fileStatus : fileStatuses) {
                 if (fileStatus.isDirectory()) {
                     // the path is a directory
                     String fullName = fileStatus.getPath().toString();
                     fullName = addFolderSeparatorIfNotExisted(fullName);
 
-                    String suffix = StringUtils.difference( path, fullName);
-                    String fileName = StringUtils.difference( defaultPath, fullName);
+                    String suffix = StringUtils.difference(path, fullName);
+                    String fileName = StringUtils.difference(defaultPath, fullName);
 
                     storageEntityList.add(new StorageEntity.Builder()
-                                    .alias(suffix)
-                                    .fileName(fileName)
-                                    .fullName(fullName)
-                                    .isDirectory(true)
-                                    .description("")
-                                    .userName(tenantCode)
-                                    .type(type)
-                                    .size(fileStatus.getLen())
-                                    .updateTime(new Date(fileStatus.getModificationTime()))
-                                    .pfullName(path)
-                                    .build()
-                    );
+                            .alias(suffix)
+                            .fileName(fileName)
+                            .fullName(fullName)
+                            .isDirectory(true)
+                            .description("")
+                            .userName(tenantCode)
+                            .type(type)
+                            .size(fileStatus.getLen())
+                            .updateTime(new Date(fileStatus.getModificationTime()))
+                            .pfullName(path)
+                            .build());
                 } else {
                     // the path is a file
                     String fullName = fileStatus.getPath().toString();
                     String[] aliasArr = fullName.split("/");
                     String alias = aliasArr[aliasArr.length - 1];
 
-                    String fileName = StringUtils.difference( defaultPath, fullName);
+                    String fileName = StringUtils.difference(defaultPath, fullName);
 
                     storageEntityList.add(new StorageEntity.Builder()
                             .alias(alias)
@@ -524,11 +528,10 @@ public class HadoopUtils implements Closeable, StorageOperate {
                             .size(fileStatus.getLen())
                             .updateTime(new Date(fileStatus.getModificationTime()))
                             .pfullName(path)
-                            .build()
-                    );
+                            .build());
                 }
             }
-        } catch (FileNotFoundException e ) {
+        } catch (FileNotFoundException e) {
             throw new FileNotFoundException("The path does not exist.");
         } catch (IOException e) {
             throw new IOException("Get file list exception.", e);
@@ -538,7 +541,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
     }
 
     @Override
-    public StorageEntity getFileStatus(String path, String prefix, String tenantCode, ResourceType type) throws IOException {
+    public StorageEntity getFileStatus(String path, String prefix, String tenantCode,
+                                       ResourceType type) throws IOException {
         try {
             FileStatus fileStatus = fs.getFileStatus(new Path(path));
             String alias = "";
@@ -547,11 +551,11 @@ public class HadoopUtils implements Closeable, StorageOperate {
             if (fileStatus.isDirectory()) {
                 fullName = addFolderSeparatorIfNotExisted(fullName);
                 alias = findDirAlias(fullName);
-                fileName = StringUtils.difference(  prefix, fullName);
+                fileName = StringUtils.difference(prefix, fullName);
             } else {
                 String[] aliasArr = fileStatus.getPath().toString().split("/");
                 alias = aliasArr[aliasArr.length - 1];
-                fileName = StringUtils.difference(  prefix, fileStatus.getPath().toString());
+                fileName = StringUtils.difference(prefix, fileStatus.getPath().toString());
             }
 
             return new StorageEntity.Builder()
@@ -566,7 +570,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
                     .createTime(new Date(fileStatus.getModificationTime()))
                     .updateTime(new Date(fileStatus.getModificationTime()))
                     .build();
-        } catch (FileNotFoundException e ) {
+        } catch (FileNotFoundException e) {
             throw new FileNotFoundException("The path does not exist.");
         } catch (IOException e) {
             throw new IOException("Get file exception.", e);
@@ -895,7 +899,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
     }
 
     @Override
-    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode, ResourceType type) {
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type) {
         List<StorageEntity> storageEntityList = new ArrayList<>();
 
         LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
@@ -918,7 +923,7 @@ public class HadoopUtils implements Closeable, StorageOperate {
                 }
 
                 storageEntityList.addAll(tempList);
-            } catch (FileNotFoundException e ) {
+            } catch (FileNotFoundException e) {
                 logger.error(e.getMessage() + "Resource path:" + pathToExplore, e);
                 // return the resources fetched before error occurs.
                 return storageEntityList;
@@ -927,7 +932,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
                 // return the resources fetched before error occurs.
                 return storageEntityList;
             }
-
 
         } while (foldersToFetch.size() != 0);
 

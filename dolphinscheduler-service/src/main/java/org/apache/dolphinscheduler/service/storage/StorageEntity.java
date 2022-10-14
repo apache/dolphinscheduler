@@ -18,7 +18,7 @@
  *
  */
 
-package org.apache.dolphinscheduler.common.storage;
+package org.apache.dolphinscheduler.service.storage;
 
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -27,6 +27,7 @@ import java.util.Date;
 // Could be put into org.apache.dolphinscheduler.common.model module?
 // MayBe spi
 public class StorageEntity {
+
     // builder. createStartTime(), createUpdateTime()
     private int id;
     private String fullName;
@@ -44,6 +45,7 @@ public class StorageEntity {
     private String pfullName;
 
     public static class Builder {
+
         private int id;
         private String alias;
         private String fileName;
@@ -123,8 +125,7 @@ public class StorageEntity {
             return this;
         }
 
-
-        public StorageEntity build(){
+        public StorageEntity build() {
             return new StorageEntity(this);
         }
     }

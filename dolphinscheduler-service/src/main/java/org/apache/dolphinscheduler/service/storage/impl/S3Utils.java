@@ -25,23 +25,11 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
 import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
 
-import com.amazonaws.services.s3.model.ListObjectsV2Request;
-import com.amazonaws.services.s3.model.ListObjectsV2Result;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.google.common.base.Joiner;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.dolphinscheduler.common.storage.StorageEntity;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -57,7 +45,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,9 +63,20 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.google.common.base.Joiner;
 
 /**
  * By default, directory path does end with '/'
@@ -189,8 +192,8 @@ public class S3Utils implements Closeable, StorageOperate {
         // Then we split the result substring
         // with "/" and join all elements except the first two elements because they are
         // tenantCode and "resource" directory.
-        String resourceUploadPath = RESOURCE_UPLOAD_PATH.endsWith("/") ?
-                StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
+        String resourceUploadPath =
+                RESOURCE_UPLOAD_PATH.endsWith("/") ? StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
         // +1 because we want to skip the "/" after resource upload path as well.
         String pathContainingTenantNResource = fullName.substring(
                 fullName.indexOf(resourceUploadPath)
@@ -234,7 +237,7 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean exists(String fullName) throws IOException{
+    public boolean exists(String fullName) throws IOException {
         return s3Client.doesObjectExist(BUCKET_NAME, fullName);
     }
 
@@ -258,7 +261,7 @@ public class S3Utils implements Closeable, StorageOperate {
                 .withKeys(childrenPathList.stream().toArray(String[]::new));
         try {
             s3Client.deleteObjects(deleteObjectsRequest);
-        }  catch (AmazonServiceException e) {
+        } catch (AmazonServiceException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -431,7 +434,8 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public List<StorageEntity> listFilesStatusRecursively (String path, String defaultPath, String tenantCode, ResourceType type) {
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type) {
         List<StorageEntity> storageEntityList = new ArrayList<>();
 
         LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
@@ -444,7 +448,7 @@ public class S3Utils implements Closeable, StorageOperate {
                 pathToExplore = foldersToFetch.pop().getFullName();
             }
 
-            try{
+            try {
                 List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
 
                 for (StorageEntity temp : tempList) {
@@ -467,10 +471,11 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws AmazonServiceException {
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws AmazonServiceException {
         List<StorageEntity> storageEntityList = new ArrayList<>();
 
-        //TODO: optimize pagination
+        // TODO: optimize pagination
         ListObjectsV2Request request = new ListObjectsV2Request();
         request.setBucketName(BUCKET_NAME);
         request.setPrefix(path);
@@ -486,7 +491,7 @@ public class S3Utils implements Closeable, StorageOperate {
 
             List<S3ObjectSummary> summaries = v2Result.getObjectSummaries();
 
-            for (S3ObjectSummary summary: summaries) {
+            for (S3ObjectSummary summary : summaries) {
                 if (!summary.getKey().endsWith("/")) {
                     // the path is a file
                     String[] aliasArr = summary.getKey().split("/");
@@ -509,7 +514,7 @@ public class S3Utils implements Closeable, StorageOperate {
                 }
             }
 
-            for (String commonPrefix: v2Result.getCommonPrefixes()) {
+            for (String commonPrefix : v2Result.getCommonPrefixes()) {
                 // the paths in commonPrefix are directories
                 String suffix = StringUtils.difference(path, commonPrefix);
                 String fileName = StringUtils.difference(defaultPath, commonPrefix);
@@ -537,7 +542,8 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws AmazonServiceException, FileNotFoundException{
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
+                                       ResourceType type) throws AmazonServiceException, FileNotFoundException {
         // Notice: we do not use getObject here because intermediate directories
         // may not exist in S3, which can cause getObject to throw exception.
         // Since we still want to access it on frontend, this is a workaround using listObjects.
