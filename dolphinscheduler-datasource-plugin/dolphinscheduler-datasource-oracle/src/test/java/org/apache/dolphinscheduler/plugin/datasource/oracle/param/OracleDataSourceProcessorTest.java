@@ -25,14 +25,14 @@ import org.apache.dolphinscheduler.spi.utils.Constants;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class OracleDataSourceProcessorTest {
 
     private OracleDataSourceProcessor oracleDatasourceProcessor = new OracleDataSourceProcessor();
@@ -54,9 +54,9 @@ public class OracleDataSourceProcessorTest {
             mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
                     .createConnectionParams(oracleDatasourceParamDTO);
-            Assert.assertNotNull(connectionParams);
-            Assert.assertEquals("jdbc:oracle:thin:@localhost:3308", connectionParams.getAddress());
-            Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default", connectionParams.getJdbcUrl());
+            Assertions.assertNotNull(connectionParams);
+            Assertions.assertEquals("jdbc:oracle:thin:@localhost:3308", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:oracle:thin:@localhost:3308:default", connectionParams.getJdbcUrl());
         }
     }
 
@@ -67,13 +67,13 @@ public class OracleDataSourceProcessorTest {
                         + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:oracle:thin:@localhost:3308:default\",\"connectType\":\"ORACLE_SID\"}";
         OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
                 .createConnectionParams(connectionJson);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("root", connectionParams.getUser());
+        Assertions.assertNotNull(connectionParams);
+        Assertions.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_ORACLE_JDBC_DRIVER, oracleDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(Constants.COM_ORACLE_JDBC_DRIVER, oracleDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -81,17 +81,17 @@ public class OracleDataSourceProcessorTest {
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308:default");
         oracleConnectionParam.setOther("other=other");
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default?other=other",
+        Assertions.assertEquals("jdbc:oracle:thin:@localhost:3308:default?other=other",
                 oracleDatasourceProcessor.getJdbcUrl(oracleConnectionParam));
     }
 
     @Test
     public void getDbType() {
-        Assert.assertEquals(DbType.ORACLE, oracleDatasourceProcessor.getDbType());
+        Assertions.assertEquals(DbType.ORACLE, oracleDatasourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.ORACLE_VALIDATION_QUERY, oracleDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(Constants.ORACLE_VALIDATION_QUERY, oracleDatasourceProcessor.getValidationQuery());
     }
 }

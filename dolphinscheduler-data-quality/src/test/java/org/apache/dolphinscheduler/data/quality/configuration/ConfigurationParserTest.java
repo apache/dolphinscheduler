@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.data.quality.configuration;
 import org.apache.dolphinscheduler.data.quality.config.DataQualityConfiguration;
 import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * ConfigurationParserTest
@@ -30,7 +30,7 @@ public class ConfigurationParserTest {
 
     @Test
     public void testConfigurationValidate() {
-        Assert.assertEquals(1,verifyConfigurationValidate());
+        Assertions.assertEquals(1, verifyConfigurationValidate());
     }
 
     private int verifyConfigurationValidate() {
@@ -50,7 +50,8 @@ public class ConfigurationParserTest {
                     + " threshold, 3 as operator, 0 as failure_strategy, '2021-06-29 10:18:59' as create_time,'2021-06-29 10:18:59' as update_time "
                     + "from miss_count FULL JOIN total_count\"} }]}";
 
-            DataQualityConfiguration dataQualityConfiguration = JsonUtils.fromJson(parameterStr,DataQualityConfiguration.class);
+            DataQualityConfiguration dataQualityConfiguration =
+                    JsonUtils.fromJson(parameterStr, DataQualityConfiguration.class);
             dataQualityConfiguration.validate();
         } catch (Exception e) {
             flag = 0;
