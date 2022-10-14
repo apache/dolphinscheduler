@@ -773,6 +773,43 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
+     * Change the resource ids from String to Set
+     *
+     * @param ResourceIds resource id array that need authorize
+     * @return Integer Set of resource ids
+     */
+    private Set<Integer> getNeedAuthorizeResIds(String ResourceIds){
+        Set<Integer> needAuthorizeResIds = new HashSet<>();
+        if (StringUtils.isNotBlank(ResourceIds)) {
+            String[] resourceFullIdArr = ResourceIds.split(",");
+            // need authorize resource id set
+            for (String resourceFullId : resourceFullIdArr) {
+                String[] resourceIdArr = resourceFullId.split("-");
+                for (int i = 0; i <= resourceIdArr.length - 1; i++) {
+                    int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
+                    needAuthorizeResIds.add(resourceIdValue);
+                }
+            }
+        }
+        return needAuthorizeResIds;
+    }
+
+    private void insertNeedAuthorizeResources(Resource resource, int userId, int resourceIdValue, int permLevel){
+        Date now = new Date();
+        ResourcesUser resourcesUser = new ResourcesUser();
+        resourcesUser.setUserId(userId);
+        resourcesUser.setResourcesId(resourceIdValue);
+        if (resource.isDirectory()) {
+            resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
+        } else {
+            resourcesUser.setPerm(permLevel);
+        }
+        resourcesUser.setCreateTime(now);
+        resourcesUser.setUpdateTime(now);
+        resourceUserMapper.insert(resourcesUser);
+    }
+
+    /**
      * grant resource with permission level
      *
      * @param loginUser login user
@@ -796,31 +833,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        Set<Integer> needAuthorizeReadPermResIds = new HashSet<>();
-        if (StringUtils.isNotBlank(readPermResourceIds)) {
-            String[] resourceFullIdArr = readPermResourceIds.split(",");
-            // need authorize resource id set
-            for (String resourceFullId : resourceFullIdArr) {
-                String[] resourceIdArr = resourceFullId.split("-");
-                for (int i = 0; i <= resourceIdArr.length - 1; i++) {
-                    int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
-                    needAuthorizeReadPermResIds.add(resourceIdValue);
-                }
-            }
-        }
+        Set<Integer> needAuthorizeReadPermResIds = getNeedAuthorizeResIds(readPermResourceIds);
 
-        Set<Integer> needAuthorizeAllPermResIds = new HashSet<>();
-        if (StringUtils.isNotBlank(allPermResourceIds)) {
-            String[] resourceFullIdArr = allPermResourceIds.split(",");
-            // need authorize resource id set
-            for (String resourceFullId : resourceFullIdArr) {
-                String[] resourceIdArr = resourceFullId.split("-");
-                for (int i = 0; i <= resourceIdArr.length - 1; i++) {
-                    int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
-                    needAuthorizeAllPermResIds.add(resourceIdValue);
-                }
-            }
-        }
+        Set<Integer> needAuthorizeAllPermResIds = getNeedAuthorizeResIds(allPermResourceIds);
 
         //If a resource appears in the set of read-only and the set of all permissions, its place in the set with higher permissions is retained
         needAuthorizeReadPermResIds.removeAll(needAuthorizeAllPermResIds);
@@ -859,7 +874,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         resourceUserMapper.deleteResourceUser(userId, 0);
-
         if (check(result, StringUtils.isEmpty(readPermResourceIds + allPermResourceIds), Status.SUCCESS)) {
             return result;
         }
@@ -870,21 +884,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-
-            Date now = new Date();
-            ResourcesUser resourcesUser = new ResourcesUser();
-            resourcesUser.setUserId(userId);
-            resourcesUser.setResourcesId(resourceIdValue);
-            if (resource.isDirectory()) {
-                resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
-            } else {
-                resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
-            }
-
-            resourcesUser.setCreateTime(now);
-            resourcesUser.setUpdateTime(now);
-            resourceUserMapper.insert(resourcesUser);
-
+            insertNeedAuthorizeResources(resource, userId, resourceIdValue, Constants.AUTHORIZE_READABLE_PERM);
         }
 
         for (int resourceIdValue : needAuthorizeAllPermResIds) {
@@ -893,25 +893,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-
-            Date now = new Date();
-            ResourcesUser resourcesUser = new ResourcesUser();
-            resourcesUser.setUserId(userId);
-            resourcesUser.setResourcesId(resourceIdValue);
-            if (resource.isDirectory()) {
-                resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
-            } else {
-                resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            }
-
-            resourcesUser.setCreateTime(now);
-            resourcesUser.setUpdateTime(now);
-            resourceUserMapper.insert(resourcesUser);
-
+            insertNeedAuthorizeResources(resource, userId, resourceIdValue, Constants.AUTHORIZE_WRITABLE_PERM);
         }
-
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
