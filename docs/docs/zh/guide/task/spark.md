@@ -16,7 +16,10 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 - 程序类型：支持 Java、Scala、Python 和 SQL 四种语言。
 - Spark 版本：支持 Spark1 和 Spark2。
 - 主函数的 Class：Spark 程序的入口 Main class 的全路径。
