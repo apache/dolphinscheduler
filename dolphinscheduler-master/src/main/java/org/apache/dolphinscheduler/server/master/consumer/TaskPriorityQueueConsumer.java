@@ -128,12 +128,14 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
                 if (CollectionUtils.isNotEmpty(failedDispatchTasks)) {
+                    logger.info("{} tasks dispatch failed, will retry to dispatch", failedDispatchTasks.size());
                     TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
                     // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
                     if (fetchTaskNum == failedDispatchTasks.size()) {
+                        logger.info("All tasks dispatch failed, will sleep a while to avoid the master cpu higher");
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
@@ -209,6 +211,8 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
             if (isTaskNeedToCheck(taskPriority)) {
                 if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
                     // when task finish, ignore this task, there is no need to dispatch anymore
+                    logger.info("Task {} is already finished, no need to dispatch, task instance id: {}",
+                            taskInstance.getName(), taskInstance.getId());
                     return true;
                 }
             }

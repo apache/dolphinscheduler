@@ -17,20 +17,10 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
-import static org.mockito.ArgumentMatchers.any;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -38,52 +28,41 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.*;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.*;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * process service test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
     @InjectMocks
     private ProcessServiceImpl processService;
     @Mock
@@ -171,19 +150,19 @@ public class ProcessServiceTest {
         Mockito.when(processDefineMapper.queryByDefineId(100)).thenReturn(processDefinition);
         Mockito.when(processDefineMapper.queryByCode(10L)).thenReturn(processDefinition);
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
+        Assertions.assertEquals(CommandType.START_PROCESS, command.getCommandType());
 
         // father history: start,start failure; child null == command type: start
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
+        Assertions.assertEquals(CommandType.START_PROCESS, command.getCommandType());
 
         // father history: scheduler,start failure; child null == command type: scheduler
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("SCHEDULER,START_FAILURE_TASK_PROCESS");
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assert.assertEquals(CommandType.SCHEDULER, command.getCommandType());
+        Assertions.assertEquals(CommandType.SCHEDULER, command.getCommandType());
 
         // father history: complement,start failure; child null == command type: complement
 
@@ -196,20 +175,20 @@ public class ProcessServiceTest {
         complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE, endString);
         parentInstance.setCommandParam(JSONUtils.toJsonString(complementMap));
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assert.assertEquals(CommandType.COMPLEMENT_DATA, command.getCommandType());
+        Assertions.assertEquals(CommandType.COMPLEMENT_DATA, command.getCommandType());
 
         JsonNode complementDate = JSONUtils.parseObject(command.getCommandParam());
         Date start = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE).asText());
         Date end = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE).asText());
-        Assert.assertEquals(startString, DateUtils.dateToString(start));
-        Assert.assertEquals(endString, DateUtils.dateToString(end));
+        Assertions.assertEquals(startString, DateUtils.dateToString(start));
+        Assertions.assertEquals(endString, DateUtils.dateToString(end));
 
         // father history: start,failure,start failure; child not null == command type: start failure
         childInstance = new ProcessInstance();
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assert.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command.getCommandType());
+        Assertions.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command.getCommandType());
     }
 
     @Test
@@ -222,16 +201,16 @@ public class ProcessServiceTest {
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\"}");
         commands.add(command);
         Mockito.when(commandMapper.selectList(null)).thenReturn(commands);
-        Assert.assertFalse(processService.verifyIsNeedCreateCommand(command));
+        Assertions.assertFalse(processService.verifyIsNeedCreateCommand(command));
 
         Command command1 = new Command();
         command1.setCommandType(CommandType.REPEAT_RUNNING);
         command1.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"222\"}");
-        Assert.assertTrue(processService.verifyIsNeedCreateCommand(command1));
+        Assertions.assertTrue(processService.verifyIsNeedCreateCommand(command1));
 
         Command command2 = new Command();
         command2.setCommandType(CommandType.PAUSE);
-        Assert.assertTrue(processService.verifyIsNeedCreateCommand(command2));
+        Assertions.assertTrue(processService.verifyIsNeedCreateCommand(command2));
     }
 
     @Test
@@ -276,10 +255,10 @@ public class ProcessServiceTest {
                 + CMD_PARAM_SUB_PROCESS_DEFINE_CODE
                 + "\":\"222\"}");
         try {
-            Assert.assertNull(processService.handleCommand(host, command));
+            Assertions.assertNull(processService.handleCommand(host, command));
         } catch (IllegalArgumentException illegalArgumentException) {
             // assert throw illegalArgumentException here since the definition is null
-            Assert.assertTrue(true);
+            Assertions.assertTrue(true);
         }
 
         int definitionVersion = 1;
@@ -317,7 +296,7 @@ public class ProcessServiceTest {
         Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        Assert.assertNotNull(processService.handleCommand(host, command1));
+        Assertions.assertNotNull(processService.handleCommand(host, command1));
 
         Command command2 = new Command();
         command2.setId(2);
@@ -327,7 +306,7 @@ public class ProcessServiceTest {
         command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
         command2.setProcessInstanceId(processInstanceId);
         Mockito.when(commandMapper.deleteById(2)).thenReturn(1);
-        Assert.assertNotNull(processService.handleCommand(host, command2));
+        Assertions.assertNotNull(processService.handleCommand(host, command2));
 
         Command command3 = new Command();
         command3.setId(3);
@@ -337,7 +316,7 @@ public class ProcessServiceTest {
         command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
         command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         Mockito.when(commandMapper.deleteById(3)).thenReturn(1);
-        Assert.assertNotNull(processService.handleCommand(host, command3));
+        Assertions.assertNotNull(processService.handleCommand(host, command3));
 
         Command command4 = new Command();
         command4.setId(4);
@@ -347,7 +326,7 @@ public class ProcessServiceTest {
         command4.setCommandType(CommandType.REPEAT_RUNNING);
         command4.setProcessInstanceId(processInstanceId);
         Mockito.when(commandMapper.deleteById(4)).thenReturn(1);
-        Assert.assertNotNull(processService.handleCommand(host, command4));
+        Assertions.assertNotNull(processService.handleCommand(host, command4));
 
         Command command5 = new Command();
         command5.setId(5);
@@ -367,7 +346,7 @@ public class ProcessServiceTest {
                 CommandType.START_PROCESS,
                 processInstance.getScheduleTime(), null)).thenReturn("\"testStartParam1\"");
         ProcessInstance processInstance1 = processService.handleCommand(host, command5);
-        Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
+        Assertions.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
 
         ProcessDefinition processDefinition1 = new ProcessDefinition();
         processDefinition1.setId(123);
@@ -391,7 +370,7 @@ public class ProcessServiceTest {
         Mockito.when(processInstanceMapper.queryDetailById(223)).thenReturn(processInstance2);
         Mockito.when(processDefineMapper.queryByCode(11L)).thenReturn(processDefinition1);
         Mockito.when(commandMapper.deleteById(1)).thenReturn(1);
-        Assert.assertNotNull(processService.handleCommand(host, command1));
+        Assertions.assertNotNull(processService.handleCommand(host, command1));
 
         Command command6 = new Command();
         command6.setId(6);
@@ -400,11 +379,11 @@ public class ProcessServiceTest {
         command6.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
         command6.setProcessDefinitionVersion(1);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1,
-                Constants.RUNNING_PROCESS_STATE, 223)).thenReturn(lists);
+                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 223)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateNextProcessIdById(223, 222)).thenReturn(true);
         Mockito.when(commandMapper.deleteById(6)).thenReturn(1);
         ProcessInstance processInstance6 = processService.handleCommand(host, command6);
-        Assert.assertTrue(processInstance6 != null);
+        Assertions.assertNotNull(processInstance6);
 
         processDefinition1.setExecutionType(ProcessExecutionTypeEnum.SERIAL_DISCARD);
         Mockito.when(processDefineMapper.queryByCode(11L)).thenReturn(processDefinition1);
@@ -422,9 +401,9 @@ public class ProcessServiceTest {
         command7.setProcessDefinitionVersion(1);
         Mockito.when(commandMapper.deleteById(7)).thenReturn(1);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1,
-                Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
+                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
         ProcessInstance processInstance8 = processService.handleCommand(host, command7);
-        Assert.assertTrue(processInstance8 != null);
+        Assertions.assertNotNull(processInstance8);
 
         ProcessDefinition processDefinition2 = new ProcessDefinition();
         processDefinition2.setId(123);
@@ -445,14 +424,14 @@ public class ProcessServiceTest {
         command9.setProcessDefinitionVersion(1);
         Mockito.when(processInstanceMapper.queryDetailById(225)).thenReturn(processInstance9);
         Mockito.when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(12L, 1,
-                Constants.RUNNING_PROCESS_STATE, 0)).thenReturn(lists);
+                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 0)).thenReturn(lists);
         Mockito.when(processInstanceMapper.updateById(processInstance)).thenReturn(1);
         Mockito.when(commandMapper.deleteById(9)).thenReturn(1);
         ProcessInstance processInstance10 = processService.handleCommand(host, command9);
-        Assert.assertTrue(processInstance10 != null);
+        Assertions.assertNotNull(processInstance10);
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void testDeleteNotExistCommand() throws CronParseException, CodeGenerateUtils.CodeGenerateException {
         String host = "127.0.0.1";
         int definitionVersion = 1;
@@ -490,8 +469,10 @@ public class ProcessServiceTest {
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
 
-        // will throw exception when command id is 0 and delete fail
-        processService.handleCommand(host, command1);
+        Assertions.assertThrows(ServiceException.class, () -> {
+            // will throw exception when command id is 0 and delete fail
+            processService.handleCommand(host, command1);
+        });
     }
 
     @Test
@@ -499,7 +480,7 @@ public class ProcessServiceTest {
         User user = new User();
         user.setId(123);
         Mockito.when(userMapper.selectById(123)).thenReturn(user);
-        Assert.assertEquals(user, processService.getUserById(123));
+        Assertions.assertEquals(user, processService.getUserById(123));
     }
 
     @Test
@@ -508,7 +489,7 @@ public class ProcessServiceTest {
         taskInstance.setId(333);
         taskInstance.setProcessInstanceId(222);
         Mockito.when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(null);
-        Assert.assertEquals("", processService.formatTaskAppId(taskInstance));
+        Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(111);
@@ -518,7 +499,7 @@ public class ProcessServiceTest {
         processInstance.setProcessDefinitionCode(1L);
         Mockito.when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId()))
                 .thenReturn(processInstance);
-        Assert.assertEquals("", processService.formatTaskAppId(taskInstance));
+        Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
     }
 
     @Test
@@ -552,7 +533,7 @@ public class ProcessServiceTest {
         List<Long> ids = new ArrayList<>();
         processService.recurseFindSubProcess(parentProcessDefineCode, ids);
 
-        Assert.assertEquals(0, ids.size());
+        Assertions.assertEquals(0, ids.size());
     }
 
     @Test
@@ -567,25 +548,25 @@ public class ProcessServiceTest {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
-        Assert.assertEquals(0, processService.switchVersion(processDefinition, processDefinitionLog));
+        Assertions.assertEquals(0, processService.switchVersion(processDefinition, processDefinitionLog));
     }
 
     @Test
     public void getDqRule() {
         Mockito.when(dqRuleMapper.selectById(1)).thenReturn(new DqRule());
-        Assert.assertNotNull(processService.getDqRule(1));
+        Assertions.assertNotNull(processService.getDqRule(1));
     }
 
     @Test
     public void getRuleInputEntry() {
         Mockito.when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
-        Assert.assertNotNull(processService.getRuleInputEntry(1));
+        Assertions.assertNotNull(processService.getRuleInputEntry(1));
     }
 
     @Test
     public void getDqExecuteSql() {
         Mockito.when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
-        Assert.assertNotNull(processService.getDqExecuteSql(1));
+        Assertions.assertNotNull(processService.getDqExecuteSql(1));
     }
 
     private List<DqRuleInputEntry> getRuleInputEntryList() {
@@ -702,7 +683,7 @@ public class ProcessServiceTest {
                 .thenReturn(Collections.singletonList(taskDefinition));
         Mockito.when(taskDefinitionMapper.queryByCode(Mockito.anyLong())).thenReturn(taskDefinition);
         int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs, Boolean.TRUE);
-        Assert.assertEquals(0, result);
+        Assertions.assertEquals(0, result);
     }
 
     @Test
@@ -756,7 +737,7 @@ public class ProcessServiceTest {
 
         DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG =
                 processService.genDagGraph(processDefinition);
-        Assert.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
+        Assertions.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
     }
 
     @Test
@@ -768,7 +749,7 @@ public class ProcessServiceTest {
         int mockResult = 1;
         Mockito.when(commandMapper.insert(command)).thenReturn(mockResult);
         int exeMethodResult = processService.createCommand(command);
-        Assert.assertEquals(mockResult, exeMethodResult);
+        Assertions.assertEquals(mockResult, exeMethodResult);
         Mockito.verify(commandMapper, Mockito.times(1)).insert(command);
     }
 
@@ -792,12 +773,12 @@ public class ProcessServiceTest {
         // test if input is null
         ResourceInfo resourceInfoNull = null;
         ResourceInfo updatedResourceInfo1 = processService.updateResourceInfo(0, resourceInfoNull);
-        Assert.assertNull(updatedResourceInfo1);
+        Assertions.assertNull(updatedResourceInfo1);
 
         // test if resource id less than 1
         ResourceInfo resourceInfoVoid = new ResourceInfo();
         ResourceInfo updatedResourceInfo2 = processService.updateResourceInfo(0, resourceInfoVoid);
-        Assert.assertNull(updatedResourceInfo2.getResourceName());
+        Assertions.assertNull(updatedResourceInfo2.getResourceName());
 
         // test normal situation
         ResourceInfo resourceInfoNormal = new ResourceInfo();
@@ -808,9 +789,9 @@ public class ProcessServiceTest {
 
         ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
 
-        Assert.assertEquals(1, updatedResourceInfo3.getId().intValue());
-        Assert.assertEquals("test.txt", updatedResourceInfo3.getRes());
-        Assert.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
+        Assertions.assertEquals(1, updatedResourceInfo3.getId().intValue());
+        Assertions.assertEquals("test.txt", updatedResourceInfo3.getRes());
+        Assertions.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
 
     }
 
@@ -819,7 +800,7 @@ public class ProcessServiceTest {
         Mockito.when(taskGroupQueueMapper.insert(Mockito.any(TaskGroupQueue.class))).thenReturn(1);
         TaskGroupQueue taskGroupQueue =
                 processService.insertIntoTaskGroupQueue(1, "task name", 1, 1, 1, TaskGroupQueueStatus.WAIT_QUEUE);
-        Assert.assertNotNull(taskGroupQueue);
+        Assertions.assertNotNull(taskGroupQueue);
     }
 
     @Test
@@ -842,7 +823,7 @@ public class ProcessServiceTest {
     public void testFindTaskInstanceByIdList() {
         List<Integer> emptyList = new ArrayList<>();
         Mockito.when(taskInstanceMapper.selectBatchIds(emptyList)).thenReturn(new ArrayList<>());
-        Assert.assertEquals(0, processService.findTaskInstanceByIdList(emptyList).size());
+        Assertions.assertEquals(0, processService.findTaskInstanceByIdList(emptyList).size());
 
         List<Integer> idList = Collections.singletonList(1);
         TaskInstance instance = new TaskInstance();
@@ -851,8 +832,8 @@ public class ProcessServiceTest {
         Mockito.when(taskInstanceMapper.selectBatchIds(idList)).thenReturn(Collections.singletonList(instance));
         List<TaskInstance> taskInstanceByIdList = processService.findTaskInstanceByIdList(idList);
 
-        Assert.assertEquals(1, taskInstanceByIdList.size());
-        Assert.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
+        Assertions.assertEquals(1, taskInstanceByIdList.size());
+        Assertions.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
     }
 
     @Test
@@ -863,7 +844,7 @@ public class ProcessServiceTest {
         int thisMasterSlot = 2;
         List<Command> commandList =
                 processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
-        Assert.assertEquals(0, commandList.size());
+        Assertions.assertEquals(0, commandList.size());
     }
 
     @Test
@@ -875,13 +856,13 @@ public class ProcessServiceTest {
         // find test lastManualProcessInterval
         ProcessInstance lastManualProcessInterval =
                 processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
-        Assert.assertEquals(null, lastManualProcessInterval);
+        Assertions.assertNull(lastManualProcessInterval);
 
         // find online lastManualProcessInterval
         testFlag = 0;
         lastManualProcessInterval =
                 processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
-        Assert.assertEquals(null, lastManualProcessInterval);
+        Assertions.assertNull(lastManualProcessInterval);
     }
 
     @Test
@@ -891,13 +872,13 @@ public class ProcessServiceTest {
         // unbound testDataSourceId
         Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
         Integer result = processService.queryTestDataSourceId(onlineDataSourceId);
-        Assert.assertNull(result);
+        Assertions.assertNull(result);
 
         // bound testDataSourceId
         Integer testDataSourceId = 2;
         Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(testDataSourceId);
         result = processService.queryTestDataSourceId(onlineDataSourceId);
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
     private TaskGroupQueue getTaskGroupQueue() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();

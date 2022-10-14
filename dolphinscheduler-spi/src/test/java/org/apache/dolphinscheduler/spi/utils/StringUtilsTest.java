@@ -17,75 +17,72 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class StringUtilsTest {
 
     @Test
     public void testIsEmpty() {
-        assertTrue(StringUtils.isEmpty(""));
+        Assertions.assertTrue(StringUtils.isEmpty(""));
     }
 
     @Test
     public void testIsEmpty2() {
-        assertFalse(StringUtils.isEmpty("123"));
+        Assertions.assertFalse(StringUtils.isEmpty("123"));
     }
 
     @Test
     public void testIsNotEmpty() {
-        assertTrue(StringUtils.isNotEmpty("cs"));
+        Assertions.assertTrue(StringUtils.isNotEmpty("cs"));
     }
 
     @Test
     public void testIsNotEmpty2() {
-        assertFalse(StringUtils.isNotEmpty(""));
+        Assertions.assertFalse(StringUtils.isNotEmpty(""));
     }
 
     @Test
     public void testIsBlank() {
-        assertTrue(StringUtils.isBlank(""));
+        Assertions.assertTrue(StringUtils.isBlank(""));
     }
 
     @Test
     public void testIsBlank2() {
-        assertFalse(StringUtils.isBlank("123"));
+        Assertions.assertFalse(StringUtils.isBlank("123"));
     }
 
     @Test
     public void testIsNotBlank() {
-        assertTrue(StringUtils.isNotBlank("cs"));
+        Assertions.assertTrue(StringUtils.isNotBlank("cs"));
     }
 
     @Test
     public void testIsNotBlank2() {
-        assertFalse(StringUtils.isNotBlank(""));
+        Assertions.assertFalse(StringUtils.isNotBlank(""));
     }
 
     @Test
     public void testTrim() {
-        assertEquals("result", StringUtils.trim(" result "));
+        Assertions.assertEquals("result", StringUtils.trim(" result "));
     }
 
     @Test
     public void testTrim2() {
-        assertEquals("", StringUtils.trim(""));
+        Assertions.assertEquals("", StringUtils.trim(""));
     }
 
     @Test
     public void testEqualsIgnoreCase() {
-        assertTrue(StringUtils.equalsIgnoreCase("Str1", "str1"));
+        Assertions.assertTrue(StringUtils.equalsIgnoreCase("Str1", "str1"));
     }
 
     @Test
     public void testEqualsIgnoreCase2() {
-        assertFalse(StringUtils.equalsIgnoreCase("str1", null));
+        Assertions.assertFalse(StringUtils.equalsIgnoreCase("str1", null));
     }
 
     @Test
@@ -99,16 +96,16 @@ public class StringUtilsTest {
         final String result = StringUtils.join(collection, "_");
 
         // Verify the results
-        assertEquals("1_2", result);
+        Assertions.assertEquals("1_2", result);
     }
 
     @Test
     public void testEscapeJava() {
-        assertEquals("str", StringUtils.escapeJava("str"));
+        Assertions.assertEquals("str", StringUtils.escapeJava("str"));
     }
 
     @Test
     public void testReplaceDoubleBrackets() {
-        assertEquals("{ {a} }", StringUtils.replaceDoubleBrackets("{{a}}"));
+        Assertions.assertEquals("{ {a} }", StringUtils.replaceDoubleBrackets("{{a}}"));
     }
 }

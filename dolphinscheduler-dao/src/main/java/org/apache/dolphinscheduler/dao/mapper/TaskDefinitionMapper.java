@@ -122,7 +122,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
                                               @Param("searchWorkflowName") String searchWorkflowName,
                                               @Param("searchTaskName") String searchTaskName,
                                               @Param("taskType") String taskType,
-                                              @Param("taskExecuteType")TaskExecuteType taskExecuteType);
+                                              @Param("taskExecuteType") TaskExecuteType taskExecuteType);
 
     /**
      * query task definition by code list
@@ -131,4 +131,14 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition list
      */
     List<TaskDefinition> queryByCodeList(@Param("codes") Collection<Long> codes);
+
+    /**
+     * Filter task definition
+     *
+     * @param page page
+     * @param taskDefinition process definition object
+     * @return task definition IPage
+     */
+    IPage<TaskDefinition> filterTaskDefinition(IPage<TaskDefinition> page,
+                                               @Param("task") TaskDefinition taskDefinition);
 }

@@ -17,63 +17,62 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
-
 import org.apache.dolphinscheduler.common.Constants;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(DateUtils.class)
+@ExtendWith(MockitoExtension.class)
 public class FileUtilsTest {
 
     @Test
     public void testGetDownloadFilename() {
-        PowerMockito.mockStatic(DateUtils.class);
-        PowerMockito.when(DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
-        Assert.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
-                FileUtils.getDownloadFilename("test"));
+        try (MockedStatic<DateUtils> mockedDateUtils = Mockito.mockStatic(DateUtils.class)) {
+            mockedDateUtils.when(() -> DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
+            Assertions.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
+                    FileUtils.getDownloadFilename("test"));
+        }
     }
 
     @Test
     public void testGetUploadFilename() {
-        Assert.assertEquals("/tmp/dolphinscheduler/aaa/resources/bbb",
-                FileUtils.getUploadFilename("aaa","bbb"));
+        Assertions.assertEquals("/tmp/dolphinscheduler/aaa/resources/bbb",
+                FileUtils.getUploadFilename("aaa", "bbb"));
     }
 
     @Test
     public void testGetProcessExecDir() {
         String dir = FileUtils.getProcessExecDir(1L, 2L, 1, 3, 4);
-        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2_1/3/4", dir);
+        Assertions.assertEquals("/tmp/dolphinscheduler/exec/process/1/2_1/3/4", dir);
     }
 
     @Test
     public void testCreateWorkDirIfAbsent() {
         try {
             FileUtils.createWorkDirIfAbsent("/tmp/createWorkDirAndUserIfAbsent");
-            Assert.assertTrue(true);
+            Assertions.assertTrue(true);
         } catch (Exception e) {
-            Assert.assertTrue(false);
+            Assertions.fail();
         }
     }
 
     @Test
     public void testSetValue() {
         try {
-            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
-            Assert.assertTrue(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
-            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
-            Assert.assertFalse(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
+            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
+            Assertions.assertTrue(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
+            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
+            Assertions.assertFalse(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
         } catch (Exception e) {
-            Assert.assertTrue(false);
+            Assertions.fail();
         }
     }
 
@@ -85,7 +84,7 @@ public class FileUtilsTest {
         FileUtils.writeContent2File(content, filePath);
 
         String fileContent = FileUtils.readFile2Str(new FileInputStream(filePath));
-        Assert.assertEquals(content, fileContent);
+        Assertions.assertEquals(content, fileContent);
     }
 
     @Test
@@ -93,29 +92,29 @@ public class FileUtilsTest {
         // test case which do not directory traversal
         String path;
         path = "abc.txt";
-        Assert.assertFalse(FileUtils.directoryTraversal(path));
+        Assertions.assertFalse(FileUtils.directoryTraversal(path));
 
         path = "abc...txt";
-        Assert.assertFalse(FileUtils.directoryTraversal(path));
+        Assertions.assertFalse(FileUtils.directoryTraversal(path));
 
         path = "..abc.txt";
-        Assert.assertFalse(FileUtils.directoryTraversal(path));
+        Assertions.assertFalse(FileUtils.directoryTraversal(path));
 
         // test case which will directory traversal
         path = "../abc.txt";
-        Assert.assertTrue(FileUtils.directoryTraversal(path));
+        Assertions.assertTrue(FileUtils.directoryTraversal(path));
 
         path = "../../abc.txt";
-        Assert.assertTrue(FileUtils.directoryTraversal(path));
+        Assertions.assertTrue(FileUtils.directoryTraversal(path));
 
         path = "abc../def.txt";
-        Assert.assertTrue(FileUtils.directoryTraversal(path));
+        Assertions.assertTrue(FileUtils.directoryTraversal(path));
 
         path = "abc./def.txt";
-        Assert.assertTrue(FileUtils.directoryTraversal(path));
+        Assertions.assertTrue(FileUtils.directoryTraversal(path));
 
         path = "abc/def...txt";
-        Assert.assertTrue(FileUtils.directoryTraversal(path));
+        Assertions.assertTrue(FileUtils.directoryTraversal(path));
     }
 
 }

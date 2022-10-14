@@ -58,7 +58,7 @@ How to use
 Resource plugin can be used in task subclasses and workflows. You can use the resource plugin by adding the `resource_plugin` parameter when they are initialized.
 For example, local resource plugin, add `resource_plugin = Local("/tmp")`.
 
-The resource plugin we currently support are `local`, `github`.
+The resource plugin we currently support are `local`, `github`, `gitlab`, `OSS`, `S3`.
 
 Here is an example.
 

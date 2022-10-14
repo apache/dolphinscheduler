@@ -242,6 +242,7 @@ CREATE TABLE `t_ds_process_definition_log` (
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
@@ -403,8 +404,10 @@ alter table t_ds_process_instance add process_definition_version int(11) DEFAULT
 alter table t_ds_process_instance add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
 alter table t_ds_process_instance add var_pool longtext COMMENT 'var_pool' AFTER tenant_id;
 alter table t_ds_process_instance add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER var_pool;
+alter table t_ds_process_instance add next_process_instance_id int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId' AFTER dry_run;
 alter table t_ds_process_instance drop KEY `process_instance_index`;
 alter table t_ds_process_instance add KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE;
+alter table t_ds_process_instance add KEY `process_instance_code_state_index` (`process_definition_code`,`state`) USING BTREE;
 alter table t_ds_process_instance drop process_instance_json;
 alter table t_ds_process_instance drop locations;
 alter table t_ds_process_instance drop connects;
@@ -438,4 +441,5 @@ alter table t_ds_process_definition add `warning_group_id` int(11) DEFAULT NULL 
 alter table t_ds_process_definition add UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE;
 alter table t_ds_process_definition modify `description` text COMMENT 'description' after `version`;
 alter table t_ds_process_definition modify `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online' after `project_code`;
-alter table t_ds_process_definition modify `create_time` datetime DEFAULT NULL COMMENT 'create time' after `tenant_id`;
+alter table t_ds_process_definition add `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority' after `tenant_id`;
+alter table t_ds_process_definition modify `create_time` datetime DEFAULT NULL COMMENT 'create time' after `execution_type`;

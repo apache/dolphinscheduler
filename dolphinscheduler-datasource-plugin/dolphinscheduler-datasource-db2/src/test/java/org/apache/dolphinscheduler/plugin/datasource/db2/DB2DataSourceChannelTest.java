@@ -20,13 +20,13 @@ package org.apache.dolphinscheduler.plugin.datasource.db2;
 import org.apache.dolphinscheduler.plugin.datasource.db2.param.Db2ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DB2DataSourceChannelTest {
 
     @Test
@@ -34,6 +34,6 @@ public class DB2DataSourceChannelTest {
         DB2DataSourceChannel sourceChannel = Mockito.mock(DB2DataSourceChannel.class);
         DB2DataSourceClient dataSourceClient = Mockito.mock(DB2DataSourceClient.class);
         Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
+        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
     }
 }

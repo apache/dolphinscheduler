@@ -135,4 +135,24 @@
             </foreach>
         </if>
     </select>
+    <select id="filterTaskDefinition"
+            parameterType="org.apache.dolphinscheduler.dao.entity.TaskDefinition"
+            resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition"
+    >
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_task_definition
+        <where>
+            <if test=" task.projectCode != 0">
+                and project_code = #{task.projectCode}
+            </if>
+            <if test=" task.name != null and task.name != ''">
+                and name like concat('%', #{task.name}, '%')
+            </if>
+            <if test=" task.taskType != null and task.taskType != ''">
+                and task_type = #{task.taskType}
+            </if>
+        </where>
+        order by update_time desc, id asc
+    </select>
 </mapper>

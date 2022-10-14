@@ -55,7 +55,7 @@ public class ChunJunParameters extends AbstractParameters {
     private String others;
 
     /**
-     * deploy mode local standlone yarn-session yarn-per-job
+     * deploy mode: [local, standalone, yarn-session, yarn-per-job]
      */
     private String deployMode;
 
