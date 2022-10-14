@@ -17,27 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2.param;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
-import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@RunWith(MockitoJUnitRunner.class)
 public class Db2DataSourceProcessorTest {
 
     private Db2DataSourceProcessor db2DatasourceProcessor = new Db2DataSourceProcessor();
@@ -53,14 +47,15 @@ public class Db2DataSourceProcessorTest {
         db2DatasourceParamDTO.setPort(5142);
         db2DatasourceParamDTO.setDatabase("default");
         db2DatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
 
-        Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
-                .createConnectionParams(db2DatasourceParamDTO);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
+            Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
+                    .createConnectionParams(db2DatasourceParamDTO);
+            Assert.assertNotNull(connectionParams);
+            Assert.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
+            Assert.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test

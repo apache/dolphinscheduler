@@ -18,7 +18,44 @@
 import type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
 import type { IOption } from '@/components/form/types'
 
-type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
+type TaskExecuteType = 'STREAM' | 'BATCH'
+
+type TaskType =
+  | 'SHELL'
+  | 'SUB_PROCESS'
+  | 'PROCEDURE'
+  | 'SQL'
+  | 'SPARK'
+  | 'FLINK'
+  | 'MR'
+  | 'PYTHON'
+  | 'DEPENDENT'
+  | 'HTTP'
+  | 'DATAX'
+  | 'PIGEON'
+  | 'SQOOP'
+  | 'CONDITIONS'
+  | 'DATA_QUALITY'
+  | 'SWITCH'
+  | 'SEATUNNEL'
+  | 'EMR'
+  | 'ZEPPELIN'
+  | 'K8S'
+  | 'JUPYTER'
+  | 'MLFLOW'
+  | 'OPENMLDB'
+  | 'DVC'
+  | 'JAVA'
+  | 'DINKY'
+  | 'SAGEMAKER'
+  | 'CHUNJUN'
+  | 'FLINK_STREAM'
+  | 'PYTORCH'
+  | 'HIVECLI'
+  | 'DMS'
+  | 'DATASYNC'
+
+type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type DependentResultType = {
   [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
 }
@@ -45,6 +82,20 @@ interface TaskNodeState {
   name: string
   dependentResult: DependentResultType
 }
+
+interface ITaskType {
+  alias: string
+  helperLinkDisable?: boolean
+  taskDefinitionDisable?: boolean
+  taskExecuteType?: TaskExecuteType
+}
+interface ITaskTypeItem extends ITaskType {
+  type: TaskType
+}
+interface TaskTypeState {
+  types: ITaskTypeItem[]
+}
+
 export {
   TaskNodeState,
   EditWorkflowDefinition,
@@ -53,5 +104,10 @@ export {
   ProgramType,
   DependentResultType,
   BDependentResultType,
-  IMainJar
+  IMainJar,
+  TaskType,
+  ITaskType,
+  ITaskTypeItem,
+  TaskTypeState,
+  TaskExecuteType
 }

@@ -32,11 +32,13 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import springfox.documentation.annotations.ApiIgnore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,6 +64,8 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("projects")
 public class ProjectController extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     @Autowired
     private ProjectService projectService;
@@ -163,6 +167,7 @@ public class ProjectController extends BaseController {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
+            logger.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
@@ -278,5 +283,20 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         return projectService.queryAllProjectList(loginUser);
+    }
+
+    /**
+     * query all project list for dependent
+     *
+     * @param loginUser login user
+     * @return all project list
+     */
+    @ApiOperation(value = "queryAllProjectListForDependent", notes = "QUERY_ALL_PROJECT_LIST_FOR_DEPENDENT_NOTES")
+    @GetMapping(value = "/list-dependent")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryAllProjectListForDependent(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        return projectService.queryAllProjectListForDependent();
     }
 }

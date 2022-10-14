@@ -37,8 +37,19 @@ DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
 ./mvnw spotless:apply
 ```
 
-您可将`/style/pre-commit`目录下的`pre-commit hook`文件拷贝到您的`.git/hooks/`
-目录下，这样您每次使用`git commit`命令时，`Spotless`将会自动为您修复代码风格和格式问题。
+我们也提供了一个`pre-commit`配置文件，方便您配置。要使用它，您需要先安装python，然后通过运行以下命令安装`pre-commit`：
+
+```shell
+python -m pip install pre-commit
+```
+
+之后，您可以运行以下命令安装`pre-commit`钩子：
+
+```shell
+pre-commit install
+```
+
+现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
 
 ## Docker镜像构建
 
@@ -129,7 +140,7 @@ pnpm install
 pnpm run dev
 ```
 
-截止目前，前后端已成功运行起来，浏览器访问[http://localhost:3000](http://localhost:3000)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
+截止目前，前后端已成功运行起来，浏览器访问[http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
 
 ## DolphinScheduler 普通开发模式
 
@@ -215,4 +226,4 @@ pnpm install
 pnpm run dev
 ```
 
-截止目前，前后端已成功运行起来，浏览器访问[http://localhost:3000](http://localhost:3000)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
+截止目前，前后端已成功运行起来，浏览器访问[http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录

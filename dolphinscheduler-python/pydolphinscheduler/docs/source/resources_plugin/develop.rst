@@ -20,7 +20,7 @@ How to develop
 
 When you want to create a new resource plugin, you need to add a new class in the module `resources_plugin`.
 
-The resource plug-in class needs to inherit the abstract class `ResourcePlugin` and implement its abstract method `read_file` function.
+The resource plugin class needs to inherit the abstract class `ResourcePlugin` and implement its abstract method `read_file` function.
 
 The parameter of the `__init__` function of `ResourcePlugin` is the prefix of STR type. You can override this function when necessary.
 
@@ -37,7 +37,7 @@ Example
 
 - Method `read_file`: Get content from the given URI, The function parameter is the suffix of the file path.
 
-The file prefix has been initialized in init of the resource plug-in.
+The file prefix has been initialized in init of the resource plugin.
 
 The prefix plus suffix is the absolute path of the file in this resource.
 

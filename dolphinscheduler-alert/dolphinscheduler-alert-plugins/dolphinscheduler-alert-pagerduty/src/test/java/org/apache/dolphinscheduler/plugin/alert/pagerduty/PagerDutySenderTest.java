@@ -18,16 +18,19 @@
 package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PagerDutySenderTest {
+
     private static final Map<String, String> pagerDutyConfig = new HashMap<>();
 
-    @Before
+    @BeforeEach
     public void initDingTalkConfig() {
         pagerDutyConfig.put(PagerDutyParamsConstants.NAME_PAGER_DUTY_INTEGRATION_KEY_NAME, "test");
     }
@@ -36,6 +39,6 @@ public class PagerDutySenderTest {
     public void testSend() {
         PagerDutySender pagerDutySender = new PagerDutySender(pagerDutyConfig);
         AlertResult alertResult = pagerDutySender.sendPagerDutyAlter("pagerduty test title", "pagerduty test content");
-        Assert.assertEquals("false", alertResult.getStatus());
+        Assertions.assertEquals("false", alertResult.getStatus());
     }
 }

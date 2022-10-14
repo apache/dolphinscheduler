@@ -51,14 +51,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -66,7 +67,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * task instance service test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class TaskInstanceServiceTest {
 
@@ -117,7 +119,7 @@ public class TaskInstanceServiceTest {
                         TaskExecuteType.BATCH,
                         1,
                         20));
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
 
         // data parameter check
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
@@ -137,7 +139,7 @@ public class TaskInstanceServiceTest {
                 TaskExecuteType.BATCH,
                 1,
                 20);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) dataParameterRes.getCode());
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) dataParameterRes.getCode());
 
         // project
         Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
@@ -162,7 +164,7 @@ public class TaskInstanceServiceTest {
         Result successRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS,
                 "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
         // executor name empty
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
@@ -172,7 +174,7 @@ public class TaskInstanceServiceTest {
         Result executorEmptyRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
                 "", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx",
                 TaskExecuteType.BATCH, 1, 20);
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorEmptyRes.getCode());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorEmptyRes.getCode());
 
         // executor null
         when(usersService.queryUser(loginUser.getId())).thenReturn(null);
@@ -181,7 +183,7 @@ public class TaskInstanceServiceTest {
         Result executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS,
                 "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorNullRes.getCode());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorNullRes.getCode());
 
         // start/end date null
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
@@ -190,7 +192,7 @@ public class TaskInstanceServiceTest {
                         .thenReturn(pageReturn);
         Result executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
                 "", null, null, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorNullDateRes.getCode());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorNullDateRes.getCode());
 
         // start date error format
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
@@ -201,10 +203,12 @@ public class TaskInstanceServiceTest {
         Result executorErrorStartDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
                 "",
                 "", "error date", null, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) executorErrorStartDateRes.getCode());
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(),
+                (int) executorErrorStartDateRes.getCode());
         Result executorErrorEndDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
                 "", null, "error date", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int) executorErrorEndDateRes.getCode());
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(),
+                (int) executorErrorEndDateRes.getCode());
     }
 
     /**
@@ -282,7 +286,7 @@ public class TaskInstanceServiceTest {
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAuth(user, project, FORCED_SUCCESS);
         Map<String, Object> authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertNotSame(Status.SUCCESS, authFailRes.get(Constants.STATUS));
+        Assertions.assertNotSame(Status.SUCCESS, authFailRes.get(Constants.STATUS));
 
         // test task not found
         Mockito.doNothing().when(projectService).checkProjectAuth(user, project, FORCED_SUCCESS);
@@ -291,27 +295,27 @@ public class TaskInstanceServiceTest {
         taskDefinition.setProjectCode(projectCode);
         when(taskDefinitionMapper.queryByCode(task.getTaskCode())).thenReturn(taskDefinition);
         Map<String, Object> taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
+        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
 
         // test task instance state error
         task.setState(TaskExecutionStatus.SUCCESS);
         when(taskInstanceMapper.selectById(1)).thenReturn(task);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Map<String, Object> taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
+        Assertions.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
 
         // test error
         task.setState(TaskExecutionStatus.FAILURE);
         when(taskInstanceMapper.updateById(task)).thenReturn(0);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Map<String, Object> errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR, errorRes.get(Constants.STATUS));
+        Assertions.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR, errorRes.get(Constants.STATUS));
 
         // test success
         task.setState(TaskExecutionStatus.FAILURE);
         when(taskInstanceMapper.updateById(task)).thenReturn(1);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Map<String, Object> successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 }

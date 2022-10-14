@@ -6,15 +6,15 @@ This section briefs about the hardware requirements for DolphinScheduler. Dolphi
 
 The Linux operating systems specified below can run on physical servers and mainstream virtualization environments such as VMware, KVM, and XEN.
 
-| Operating System | Version         |
-| :----------------------- | :----------: |
-| Red Hat Enterprise Linux | 7.0 and above   |
-| CentOS                   | 7.0 and above   |
-| Oracle Enterprise Linux  | 7.0 and above   |
+| Operating System         |     Version     |
+|:-------------------------|:---------------:|
+| Red Hat Enterprise Linux |  7.0 and above  |
+| CentOS                   |  7.0 and above  |
+| Oracle Enterprise Linux  |  7.0 and above  |
 | Ubuntu LTS               | 16.04 and above |
 
 > **Note:**
->The above Linux operating systems can run on physical servers and mainstream virtualization environments such as VMware, KVM, and XEN.
+> The above Linux operating systems can run on physical servers and mainstream virtualization environments such as VMware, KVM, and XEN.
 
 ## Server Configuration
 
@@ -23,8 +23,8 @@ DolphinScheduler supports 64-bit hardware platforms with Intel x86-64 architectu
 ### Production Environment
 
 | **CPU** | **MEM** | **HD** | **NIC** | **Num** |
-| --- | --- | --- | --- | --- |
-| 4 core+ | 8 GB+ | SAS | GbE | 1+ |
+|---------|---------|--------|---------|---------|
+| 4 core+ | 8 GB+   | SAS    | GbE     | 1+      |
 
 > **Note:**
 > - The above recommended configuration is the minimum configuration for deploying DolphinScheduler. Higher configuration is strongly recommended for production environments.
@@ -34,11 +34,11 @@ DolphinScheduler supports 64-bit hardware platforms with Intel x86-64 architectu
 
 DolphinScheduler provides the following network port configurations for normal operation:
 
-| Server | Port | Desc |
-|  --- | --- | --- |
-| MasterServer |  5678  | not the communication port, require the native ports do not conflict |
-| WorkerServer | 1234  | not the communication port, require the native ports do not conflict |
-| ApiApplicationServer |  12345 | backend communication port |
+|        Server        | Port  |                                 Desc                                 |
+|----------------------|-------|----------------------------------------------------------------------|
+| MasterServer         | 5678  | not the communication port, require the native ports do not conflict |
+| WorkerServer         | 1234  | not the communication port, require the native ports do not conflict |
+| ApiApplicationServer | 12345 | backend communication port                                           |
 
 > **Note:**
 > - MasterServer and WorkerServer do not need to enable communication between the networks. As long as the local ports do not conflict.

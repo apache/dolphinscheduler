@@ -445,6 +445,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aws-java-sdk-core-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.300  Apache 2.0
     aws-java-sdk-kms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.300  Apache 2.0
     aws-java-sdk-sagemaker-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sagemaker/1.12.300  Apache 2.0
+    aws-java-sdk-dms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dms/1.12.300  Apache 2.0
+    datasync-2.17.282 https://mvnrepository.com/artifact/software.amazon.awssdk/datasync/2.17.282  Apache 2.0
     commons-text 1.8: https://mvnrepository.com/artifact/org.apache.commons/commons-text/1.8, Apache 2.0
     httpasyncclient 4.1.5: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient/4.1.4, Apache 2.0
     httpcore-nio 4.4.15: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio/4.4.15, Apache 2.0
@@ -471,6 +473,36 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     proto-google-common-protos 2.0.1: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-common-protos/2.0.1 Apache 2.0
     kotlin 1.6.21: https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib, Apache 2.0
     JetBrains annotations: https://mvnrepository.com/artifact/org.jetbrains/annotations, Apache 2.0
+    aliyun-java-sdk-core 4.5.10: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-java-sdk-kms 2.11.0: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-java-sdk-ram 3.1.0: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-sdk-oss 3.15.1: https://github.com/aliyun/aliyun-oss-java-sdk/blob/master/README.md#license, Apache 2.0
+    ini4j 0.5.4: https://mvnrepository.com/artifact/org.ini4j/ini4j/0.5.4, Apache 2.0
+    opentracing-api 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    opentracing-noop 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    opentracing-util 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    jettison 1.1: https://github.com/jettison-json/jettison/blob/master/LICENSE, Apache 2.0
+    stax-api 1.0.1: https://mvnrepository.com/artifact/stax/stax-api/1.0.1, Apache 2.0
+    hbase-noop-htrace 4.1.1: https://mvnrepository.com/artifact/org.apache.hbase.thirdparty/hbase-noop-htrace/4.1.1, Apache 2.0
+    annotations 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/annotations/2.17.282, Apache 2.0
+    apache-client 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/apache-client/2.17.282, Apache 2.0
+    auth 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/auth/2.17.282, Apache 2.0
+    aws-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/aws-core/2.17.282, Apache 2.0
+    aws-json-protocol 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/aws-json-protocol/2.17.282, Apache 2.0
+    eventstream 1.0.1: https://mvnrepository.com/artifact/software.amazon.eventstream/eventstream/1.0.1, Apache 2.0
+    http-client-spi 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/http-client-spi/2.17.282, Apache 2.0
+    json-utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/json-utils/2.17.282, Apache 2.0
+    metrics-spi 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/metrics-spi/2.17.282, Apache 2.0
+    netty-codec-http 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http/4.1.53.Final, Apache 2.0
+    netty-codec-http2 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http2/4.1.53.Final, Apache 2.0
+    netty-nio-client 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/netty-nio-client/2.17.282, Apache 2.0
+    netty-transport-classes-epoll 4.1.79.Final: https://mvnrepository.com/artifact/io.netty/netty-transport-classes-epoll/4.1.79.Final, Apache 2.0
+    profiles 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/profiles/2.17.282, Apache 2.0
+    protocol-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/protocol-core/2.17.282, Apache 2.0
+    regions 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/regions/2.17.282, Apache 2.0
+    sdk-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core/2.17.282, Apache 2.0
+    third-party-jackson-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/third-party-jackson-core/2.17.282, Apache 2.0
+    utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/utils/2.17.282, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -549,12 +581,13 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     slf4j-api 1.7.36: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.36, MIT
     animal-sniffer-annotations 1.19 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.19, MIT
     checker-qual 3.12.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.12.0, MIT + GPLv2
-    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket  MIT
+    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket,  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
     classgraph 4.8.83: https://mvnrepository.com/artifact/io.github.classgraph/classgraph, MIT
-    bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on MIT
-    bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on MIT
+    bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on, MIT
+    bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on, MIT
+    reactive-streams 1.0.4: https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams/1.0.4, MIT
 
 ========================================================================
 MPL 1.1 licenses
@@ -589,47 +622,47 @@ MIT licenses
 ========================================
     @antv/layout 0.1.31: https://github.com/antvis/layout MIT
     @types/js-cookie 3.0.2: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
-    @antv/x6 1.32.7: https://github.com/antvis/x6 MIT
-    @vueuse/core 8.8.0: https://github.com/vueuse/vueuse MIT
+    @antv/x6 1.34.1: https://github.com/antvis/x6 MIT
+    @vueuse/core 9.2.0: https://github.com/vueuse/vueuse MIT
     axios 0.27.2: https://github.com/axios/axios MIT
-    date-fns 2.28.0: https://github.com/date-fns/date-fns MIT
+    date-fns 2.29.3: https://github.com/date-fns/date-fns MIT
     lodash 4.17.21: https://github.com/lodash/lodash MIT
-    monaco-editor 0.33.0: https://github.com/microsoft/monaco-editor MIT
-    naive-ui 2.30.8: https://github.com/TuSimple/naive-ui MIT
+    monaco-editor 0.34.0: https://github.com/microsoft/monaco-editor MIT
+    naive-ui 2.30.7: https://github.com/TuSimple/naive-ui MIT
     nprogress 0.2.0: https://github.com/rstacruz/nprogress MIT
-    pinia 2.0.14: https://github.com/vuejs/pinia MIT
-    pinia-plugin-persistedstate 1.6.1: https://github.com/prazdevs/pinia-plugin-persistedstate MIT
+    pinia 2.0.22: https://github.com/vuejs/pinia MIT
+    pinia-plugin-persistedstate 2.2.0: https://github.com/prazdevs/pinia-plugin-persistedstate MIT
     vfonts 0.0.3: https://www.npmjs.com/package/vfonts MIT
-    vue 3.2.37: https://github.com/vuejs/core MIT
-    vue-i18n 9.1.10: https://github.com/kazupon/vue-i18n MIT
-    vue-router 4.1.1: https://github.com/vuejs/router MIT
-    @types/node 18.0.3: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
+    vue 3.2.39: https://github.com/vuejs/core MIT
+    vue-i18n 9.2.2: https://github.com/kazupon/vue-i18n MIT
+    vue-router 4.1.5: https://github.com/vuejs/router MIT
+    @types/node 18.7.18: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @types/nprogress 0.2.0: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @types/qs 6.9.7: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @vicons/antd 0.12.0: https://www.npmjs.com/package/@vicons/antd MIT
-    @vitejs/plugin-vue 2.3.3: https://github.com/vitejs/vite MIT
-    @vitejs/plugin-vue-jsx 1.3.10: https://github.com/vitejs/vite MIT
+    @vitejs/plugin-vue 3.1.0: https://github.com/vitejs/vite MIT
+    @vitejs/plugin-vue-jsx 2.0.1: https://github.com/vitejs/vite MIT
     dart-sass 1.25.0: https://github.com/sass/dart-sass MIT
-    eslint 8.19.0: https://github.com/eslint/eslint MIT
+    eslint 8.23.1: https://github.com/eslint/eslint MIT
     eslint-config-prettier 8.5.0: https://github.com/prettier/eslint-config-prettier MIT
     eslint-plugin-prettier 4.2.1: https://github.com/prettier/eslint-plugin-prettier MIT
-    eslint-plugin-vue 9.2.0: https://github.com/vuejs/eslint-plugin-vue MIT
+    eslint-plugin-vue 9.5.1: https://github.com/vuejs/eslint-plugin-vue MIT
     prettier 2.7.1: https://github.com/prettier/prettier MIT
-    sass 1.53.0: https://github.com/sass/dart-sass MIT
+    sass 1.54.9: https://github.com/sass/dart-sass MIT
     sass-loader 13.0.2: https://github.com/webpack-contrib/sass-loader MIT
     typescript-plugin-css-modules 3.4.0: https://github.com/mrmckeb/typescript-plugin-css-modules MIT
-    vite 2.9.13: https://github.com/vitejs/vite MIT
+    vite 3.1.2: https://github.com/vitejs/vite MIT
     vite-plugin-compression 0.5.1: https://github.com/vbenjs/vite-plugin-compression MIT
-    vue-tsc 0.38.2: https://github.com/johnsoncodehk/volar MIT
-    date-fns-tz 1.3.5: https://github.com/marnusw/date-fns-tz MIT
+    vue-tsc 0.40.13: https://github.com/johnsoncodehk/volar MIT
+    date-fns-tz 1.3.7: https://github.com/marnusw/date-fns-tz MIT
     screenfull 6.0.2: https://github.com/sindresorhus/screenfull MIT
-    @types/lodash 4.14.182: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
+    @types/lodash 4.14.185: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
 
 ========================================
 Apache 2.0 licenses
 ========================================
     echarts	5.3.3: https://github.com/apache/echarts Apache-2.0
-    typescript 4.7.4: https://github.com/Microsoft/TypeScript Apache-2.0
+    typescript 4.8.3: https://github.com/Microsoft/TypeScript Apache-2.0
     open-sans: Apache-2.0
     roboto: Apache-2.0
 
@@ -640,8 +673,8 @@ BSD licenses
 The following components are provided under a BSD license. See project link for details.
 The text of each license is also included at licenses/ui-licenses/LICENSE-[project].txt.
     qs 6.11.0: https://github.com/ljharb/qs BSD 3-Clause
-    @typescript-eslint/eslint-plugin 5.30.5: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
-    @typescript-eslint/parser 5.30.5: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
+    @typescript-eslint/eslint-plugin 5.37.0: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
+    @typescript-eslint/parser 5.37.0: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
 
 ========================================
 SIL licenses
@@ -651,3 +684,8 @@ SIL licenses
     ibm-plex: SIL
     inter: https://github.com/rsms/inter SIL
     lato: SIL
+
+========================================
+JDOM licenses
+========================================
+    jdom2 2.0.6.1: https://github.com/hunterhacker/jdom/blob/master/LICENSE.txt JDOM

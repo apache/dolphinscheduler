@@ -25,11 +25,10 @@ import org.apache.dolphinscheduler.rpc.remote.NettyClient;
 import org.apache.dolphinscheduler.rpc.remote.NettyServer;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 
 public class RpcTest {
+
     private NettyServer nettyServer;
 
     private IUserService userService;
@@ -42,17 +41,6 @@ public class RpcTest {
         IRpcClient rpcClient = new RpcClient();
         host = new Host("127.0.0.1", 12346);
         userService = rpcClient.create(IUserService.class, host);
-    }
-
-    @Test
-    public void sendTest() {
-        Integer result = userService.hi(3);
-        Assert.assertSame(4, result);
-        result = userService.hi(4);
-        Assert.assertSame(5, result);
-        userService.say("sync");
-        userService.callBackIsFalse("async no call back");
-        userService.hi(999999);
     }
 
     @After

@@ -22,21 +22,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-
-import org.apache.dolphinscheduler.common.Constants;
 
 import java.net.InetAddress;
 
-import org.junit.After;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
+import org.mockito.MockedStatic;
 
 public class NetUtilsTest {
-    @After
-    public void reset() {
-        Whitebox.setInternalState(Constants.class, "KUBERNETES_MODE", false);
-    }
 
     @Test
     public void testGetAddr() {
@@ -46,32 +40,42 @@ public class NetUtilsTest {
     }
 
     @Test
-    public void testGetHost() {
+    public void testGetHostInKubernetesMode() {
+        try (MockedStatic<KubernetesUtils> mockedKubernetesUtils = mockStatic(KubernetesUtils.class)) {
+            mockedKubernetesUtils.when(() -> KubernetesUtils.isKubernetesMode()).thenReturn(true);
+
+            InetAddress address = mock(InetAddress.class);
+            when(address.getCanonicalHostName())
+                    .thenReturn("dolphinscheduler-worker-0.dolphinscheduler-worker-headless.default.svc.cluster.local");
+            when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
+            assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless", NetUtils.getHost(address));
+
+            address = mock(InetAddress.class);
+            when(address.getCanonicalHostName())
+                    .thenReturn("busybox-1.default-subdomain.my-namespace.svc.cluster-domain.example");
+            when(address.getHostName()).thenReturn("busybox-1");
+            assertEquals("busybox-1.default-subdomain", NetUtils.getHost(address));
+
+            address = mock(InetAddress.class);
+            when(address.getCanonicalHostName()).thenReturn("dolphinscheduler.cluster-domain.example");
+            when(address.getHostName()).thenReturn("dolphinscheduler");
+            assertEquals("dolphinscheduler.cluster-domain.example", NetUtils.getHost(address));
+
+            address = mock(InetAddress.class);
+            when(address.getCanonicalHostName()).thenReturn("dolphinscheduler-worker-0");
+            when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
+            assertEquals("dolphinscheduler-worker-0", NetUtils.getHost(address));
+        }
+    }
+
+    @Test
+    public void testGetHostInNonKubernetesMode() {
         InetAddress address = mock(InetAddress.class);
-        when(address.getCanonicalHostName()).thenReturn("dolphinscheduler-worker-0.dolphinscheduler-worker-headless.default.svc.cluster.local");
+        when(address.getCanonicalHostName())
+                .thenReturn("dolphinscheduler-worker-0.dolphinscheduler-worker-headless.default.svc.cluster.local");
         when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
         when(address.getHostAddress()).thenReturn("172.17.0.15");
         assertEquals("172.17.0.15", NetUtils.getHost(address));
-        Whitebox.setInternalState(Constants.class, "KUBERNETES_MODE", true);
-        assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless", NetUtils.getHost(address));
-
-        address = mock(InetAddress.class);
-        when(address.getCanonicalHostName()).thenReturn("busybox-1.default-subdomain.my-namespace.svc.cluster-domain.example");
-        when(address.getHostName()).thenReturn("busybox-1");
-        Whitebox.setInternalState(Constants.class, "KUBERNETES_MODE", true);
-        assertEquals("busybox-1.default-subdomain", NetUtils.getHost(address));
-
-        address = mock(InetAddress.class);
-        when(address.getCanonicalHostName()).thenReturn("dolphinscheduler.cluster-domain.example");
-        when(address.getHostName()).thenReturn("dolphinscheduler");
-        Whitebox.setInternalState(Constants.class, "KUBERNETES_MODE", true);
-        assertEquals("dolphinscheduler.cluster-domain.example", NetUtils.getHost(address));
-
-        address = mock(InetAddress.class);
-        when(address.getCanonicalHostName()).thenReturn("dolphinscheduler-worker-0");
-        when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
-        Whitebox.setInternalState(Constants.class, "KUBERNETES_MODE", true);
-        assertEquals("dolphinscheduler-worker-0", NetUtils.getHost(address));
     }
 
     @Test
@@ -99,6 +103,18 @@ public class NetUtilsTest {
         address = mock(InetAddress.class);
         when(address.getHostAddress()).thenReturn("1.2.3.4");
         assertTrue(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("1.2.3.4:80");
+        assertFalse(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("256.0.0.1");
+        assertFalse(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("127.0.0.0.1");
+        assertFalse(NetUtils.isValidV4Address(address));
+        address = mock(InetAddress.class);
+        when(address.getHostAddress()).thenReturn("-1.2.3.4");
+        assertFalse(NetUtils.isValidV4Address(address));
     }
 
 }

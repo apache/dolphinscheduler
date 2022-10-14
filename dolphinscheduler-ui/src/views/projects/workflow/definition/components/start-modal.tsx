@@ -323,7 +323,7 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          <NFormItem
+          {this.startForm.warningType !== 'NONE' && (<NFormItem
             label={t('project.workflow.alarm_group')}
             path='warningGroupId'
           >
@@ -333,7 +333,7 @@ export default defineComponent({
               v-model:value={this.startForm.warningGroupId}
               clearable
             />
-          </NFormItem>
+          </NFormItem>)}
           <NFormItem
             label={t('project.workflow.complement_data')}
             path='complement_data'
@@ -497,6 +497,13 @@ export default defineComponent({
               checkedValue={1}
               uncheckedValue={0}
               v-model:value={this.startForm.dryRun}
+            />
+          </NFormItem>
+          <NFormItem label={t('project.workflow.whether_test')} path='testFlag'>
+            <NSwitch
+              checkedValue={1}
+              uncheckedValue={0}
+              v-model:value={this.startForm.testFlag}
             />
           </NFormItem>
         </NForm>

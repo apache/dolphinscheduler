@@ -79,6 +79,17 @@ public class DataSource {
      */
     private Date updateTime;
 
+    /**
+     * test flag
+     */
+    protected int testFlag;
+
+    /**
+     * bind test data source id
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    protected Integer bindTestId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

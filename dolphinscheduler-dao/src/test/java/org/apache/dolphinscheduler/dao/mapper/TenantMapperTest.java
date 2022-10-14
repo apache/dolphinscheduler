@@ -20,13 +20,12 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -44,8 +43,8 @@ public class TenantMapperTest extends BaseDaoTest {
      * insert
      * @return Tenant
      */
-    private Tenant insertOne(){
-        //insertOne
+    private Tenant insertOne() {
+        // insertOne
         Tenant tenant = new Tenant();
         tenant.setCreateTime(new Date());
         tenant.setUpdateTime(new Date());
@@ -58,23 +57,23 @@ public class TenantMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOne
+    public void testUpdate() {
+        // insertOne
         Tenant tenant = insertOne();
         tenant.setUpdateTime(new Date());
-        //update
+        // update
         int update = tenantMapper.updateById(tenant);
-        Assert.assertEquals(1, update);
+        Assertions.assertEquals(1, update);
     }
 
     /**
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Tenant tenant = insertOne();
         int delete = tenantMapper.deleteById(tenant.getId());
-        Assert.assertEquals(1, delete);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -83,9 +82,9 @@ public class TenantMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Tenant tenant = insertOne();
-        //query
+        // query
         List<Tenant> tenants = tenantMapper.selectList(null);
-        Assert.assertNotEquals(tenants.size(), 0);
+        Assertions.assertNotEquals(tenants.size(), 0);
     }
 
     /**
@@ -99,14 +98,13 @@ public class TenantMapperTest extends BaseDaoTest {
         queue.setQueue("ut queue");
         queueMapper.insert(queue);
 
-
         Tenant tenant = insertOne();
         tenant.setQueueId(queue.getId());
         tenantMapper.updateById(tenant);
 
         Tenant tenant1 = tenantMapper.queryById(tenant.getId());
 
-        Assert.assertNotEquals(tenant1, null);
+        Assertions.assertNotEquals(tenant1, null);
     }
 
     /**
@@ -117,7 +115,7 @@ public class TenantMapperTest extends BaseDaoTest {
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenantMapper.updateById(tenant);
-        Assert.assertNotNull(tenantMapper.queryByTenantCode("ut code"));
+        Assertions.assertNotNull(tenantMapper.queryByTenantCode("ut code"));
     }
 
     /**
@@ -137,16 +135,17 @@ public class TenantMapperTest extends BaseDaoTest {
         tenantMapper.updateById(tenant);
         Page<Tenant> page = new Page(1, 3);
 
-        //tenant.getTenantCode() used instead of tenant.getTenantName()
-        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
+        // tenant.getTenantCode() used instead of tenant.getTenantName()
+        IPage<Tenant> tenantIPage =
+                tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
 
-        Assert.assertNotEquals(tenantIPage.getTotal(), 0);
+        Assertions.assertNotEquals(tenantIPage.getTotal(), 0);
     }
 
     public void testExistTenant() {
         String tenantCode = "test_code";
-        Assert.assertNull(tenantMapper.existTenant(tenantCode));
+        Assertions.assertNull(tenantMapper.existTenant(tenantCode));
         insertOne();
-        Assert.assertTrue(tenantMapper.existTenant(tenantCode));
+        Assertions.assertTrue(tenantMapper.existTenant(tenantCode));
     }
 }

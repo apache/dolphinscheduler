@@ -44,19 +44,13 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import springfox.documentation.annotations.ApiIgnore;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -660,9 +654,8 @@ public class ProcessDefinitionController extends BaseController {
     public Result deleteProcessDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @PathVariable("code") long code) {
-        Map<String, Object> result =
-                processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, code);
-        return returnDataList(result);
+        processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
+        return new Result(Status.SUCCESS);
     }
 
     /**
@@ -684,31 +677,9 @@ public class ProcessDefinitionController extends BaseController {
     public Result batchDeleteProcessDefinitionByCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
-        Map<String, Object> result = new HashMap<>();
-        Set<String> deleteFailedCodeSet = new HashSet<>();
-        if (!StringUtils.isEmpty(codes)) {
-            String[] processDefinitionCodeArray = codes.split(",");
-            for (String strProcessDefinitionCode : processDefinitionCodeArray) {
-                long code = Long.parseLong(strProcessDefinitionCode);
-                try {
-                    Map<String, Object> deleteResult =
-                            processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, code);
-                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedCodeSet.add((String) deleteResult.get(Constants.MSG));
-                        logger.error((String) deleteResult.get(Constants.MSG));
-                    }
-                } catch (Exception e) {
-                    deleteFailedCodeSet.add(MessageFormat.format(Status.DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(),
-                            strProcessDefinitionCode));
-                }
-            }
-        }
 
-        if (!deleteFailedCodeSet.isEmpty()) {
-            putMsg(result, BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join("\n", deleteFailedCodeSet));
-        } else {
-            putMsg(result, Status.SUCCESS);
-        }
+        Map<String, Object> result =
+                processDefinitionService.batchDeleteProcessDefinitionByCodes(loginUser, projectCode, codes);
         return returnDataList(result);
     }
 

@@ -6,9 +6,10 @@ Make the following configuration (take zookeeper as an example)
 
 * Registry plug-in configuration, take Zookeeper as an example (registry.properties)
   dolphinscheduler-service/src/main/resources/registry.properties
+
   ```registry.properties
-   registry.plugin.name=zookeeper
-   registry.servers=127.0.0.1:2181
+  registry.plugin.name=zookeeper
+  registry.servers=127.0.0.1:2181
   ```
 
 For specific configuration information, please refer to the parameter information provided by the specific plug-in, for example zk: `org/apache/dolphinscheduler/plugin/registry/zookeeper/ZookeeperConfiguration.java`

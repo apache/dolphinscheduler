@@ -69,21 +69,24 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.assertj.core.util.Lists;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * executor service 2 test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ExecutorServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
@@ -143,7 +146,7 @@ public class ExecutorServiceTest {
 
     private final Project project = new Project();
 
-    @Before
+    @BeforeEach
     public void init() {
         // user
         int userId = 1;
@@ -196,7 +199,7 @@ public class ExecutorServiceTest {
     public void testForceStartTaskInstance() {
 
         Map<String, Object> result = executorService.forceStartTaskInstance(loginUser, taskQueueId);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     /**
@@ -212,11 +215,12 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.START_PROCESS,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(1)).createCommand(any(Command.class));
 
     }
@@ -234,11 +238,12 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.START_PROCESS,
                 null, "n1,n2",
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(1)).createCommand(any(Command.class));
 
     }
@@ -284,7 +289,7 @@ public class ExecutorServiceTest {
         command.setExecutorId(1);
 
         int count = executorService.createComplementDependentCommand(schedules, command);
-        Assert.assertEquals(1, count);
+        Assertions.assertEquals(1, count);
     }
 
     /**
@@ -300,11 +305,12 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2022-01-07 12:12:12\",\"complementEndDate\":\"2022-01-06 12:12:12\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(processService, times(0)).createCommand(any(Command.class));
     }
 
@@ -321,11 +327,12 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(1)).createCommand(any(Command.class));
     }
 
@@ -342,11 +349,12 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(31)).createCommand(any(Command.class));
 
     }
@@ -364,11 +372,12 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(15)).createCommand(any(Command.class));
 
     }
@@ -382,11 +391,12 @@ public class ExecutorServiceTest {
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
                 null, null,
-                null, null, 0,
+                null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
-        Assert.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
+        Assertions.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
 
     }
 
@@ -396,7 +406,25 @@ public class ExecutorServiceTest {
         Mockito.doNothing().when(projectService).checkProjectAuth(loginUser, project, RERUN);
         Map<String, Object> result =
                 executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testOfTestRun() {
+        Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
+                .thenReturn(checkProjectAndAuth());
+        Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.COMPLEMENT_DATA,
+                null, null,
+                null, null, 0,
+                RunMode.RUN_MODE_PARALLEL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_YES,
+                ComplementDependentMode.OFF_MODE);
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -414,7 +442,7 @@ public class ExecutorServiceTest {
                 .thenReturn(processDefinitionList);
 
         Map<String, Object> result = executorService.startCheckByProcessDefinedCode(1L);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     private List<Server> getMasterServersList() {
@@ -481,9 +509,9 @@ public class ExecutorServiceTest {
             result.add(listDate.get(startDateIndex) + "," + listDate.get(endDateIndex));
         }
 
-        Assert.assertEquals("0,1", result.get(0));
-        Assert.assertEquals("2,3", result.get(1));
-        Assert.assertEquals("4,4", result.get(2));
+        Assertions.assertEquals("0,1", result.get(0));
+        Assertions.assertEquals("2,3", result.get(1));
+        Assertions.assertEquals("4,4", result.get(2));
     }
 
 }

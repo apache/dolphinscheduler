@@ -137,4 +137,10 @@ public interface ProjectService {
      * @return project list
      */
     Result queryProjectCreatedAndAuthorizedByUser(User loginUser);
+
+    /**
+     * the project list in dependent node's permissions should not be restricted
+     * @return project list
+     */
+    Result queryAllProjectListForDependent();
 }

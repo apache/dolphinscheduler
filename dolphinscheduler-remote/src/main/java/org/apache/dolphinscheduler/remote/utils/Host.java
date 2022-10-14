@@ -17,16 +17,17 @@
 
 package org.apache.dolphinscheduler.remote.utils;
 
-import lombok.NonNull;
-import static org.apache.dolphinscheduler.common.Constants.COLON;
-
 import java.io.Serializable;
 import java.util.Objects;
+
+import lombok.NonNull;
 
 /**
  * server address
  */
 public class Host implements Serializable {
+
+    private static final String COLON = ":";
 
     public static final Host EMPTY = new Host();
 

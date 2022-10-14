@@ -4,9 +4,9 @@
 
 和上一个版本比较，如果有依赖及版本发生了变化，当前版本的 `release-docs` 需要被更新到最新
 
- - `dolphinscheduler-dist/release-docs/LICENSE`
- - `dolphinscheduler-dist/release-docs/NOTICE`
- - `dolphinscheduler-dist/release-docs/licenses`
+- `dolphinscheduler-dist/release-docs/LICENSE`
+- `dolphinscheduler-dist/release-docs/NOTICE`
+- `dolphinscheduler-dist/release-docs/licenses`
 
 ## 更新版本
 
@@ -27,6 +27,7 @@
 - 修改文档（docs模块）中的版本号:
   - 将 `docs` 文件夹下文件的占位符 `<version>` (除了 pom.xml 相关的) 修改成 `x.y.z`
   - 新增历史版本
-     - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的历史版本为 `x.y.z`
+    - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的历史版本为 `x.y.z`
   - 修改文档 sidebar
-    - `docs/configs/docsdev.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`
+    - `docs/configs/docsdev.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`，**不要**修改文件名称，website 仓库的 shell 脚本会对他进行修改
+

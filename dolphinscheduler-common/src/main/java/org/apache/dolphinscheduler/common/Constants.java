@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Duration;
@@ -56,6 +52,8 @@ public final class Constants {
     public static final String RESOURCE_TYPE_UDF = "udfs";
 
     public static final String STORAGE_S3 = "S3";
+
+    public static final String STORAGE_OSS = "OSS";
 
     public static final String STORAGE_HDFS = "HDFS";
 
@@ -150,6 +148,10 @@ public final class Constants {
 
     public static final String AWS_S3_BUCKET_NAME = "resource.aws.s3.bucket.name";
     public static final String AWS_END_POINT = "resource.aws.s3.endpoint";
+
+    public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
+    public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
+
     /**
      * comma ,
      */
@@ -637,23 +639,6 @@ public final class Constants {
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            WorkflowExecutionStatus.SUBMITTED_SUCCESS.getCode(),
-            TaskExecutionStatus.DISPATCH.getCode(),
-            WorkflowExecutionStatus.RUNNING_EXECUTION.getCode(),
-            WorkflowExecutionStatus.DELAY_EXECUTION.getCode(),
-            WorkflowExecutionStatus.READY_PAUSE.getCode(),
-            WorkflowExecutionStatus.READY_STOP.getCode(),
-            TaskExecutionStatus.NEED_FAULT_TOLERANCE.getCode(),
-    };
-
-    public static final int[] RUNNING_PROCESS_STATE = new int[]{
-            TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
-            TaskExecutionStatus.SUBMITTED_SUCCESS.getCode(),
-            TaskExecutionStatus.DISPATCH.getCode(),
-            WorkflowExecutionStatus.SERIAL_WAIT.getCode()
-    };
-
     /**
      * status
      */
@@ -791,9 +776,6 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
-            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
-
     /**
      * dry run flag
      */
@@ -851,6 +833,13 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+
+    /**
+     * test flag
+     */
+    public static final int TEST_FLAG_NO = 0;
+    public static final int TEST_FLAG_YES = 1;
+
     /**
      * Task Types
      */
@@ -861,4 +850,6 @@ public final class Constants {
     public static final String TYPE_DATA_QUALITY = "DataQuality";
     public static final String TYPE_OTHER = "Other";
     public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
+
+    public static final String DATASOUCE = "datasource";
 }

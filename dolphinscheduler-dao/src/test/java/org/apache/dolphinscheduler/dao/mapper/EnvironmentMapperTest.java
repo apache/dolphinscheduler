@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.dao.entity.Environment;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -43,7 +43,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
      * @return Environment
      */
     private Environment insertOne() {
-        //insertOne
+        // insertOne
         Environment environment = new Environment();
         environment.setName("testEnv");
         environment.setCode(1L);
@@ -56,12 +56,12 @@ public class EnvironmentMapperTest extends BaseDaoTest {
         return environment;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearTestData();
     }
 
-    @After
+    @AfterEach
     public void after() {
         clearTestData();
     }
@@ -77,12 +77,12 @@ public class EnvironmentMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Environment environment = insertOne();
         environment.setDescription("new description info");
-        //update
+        // update
         int update = environmentMapper.updateById(environment);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
@@ -92,7 +92,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testDelete() {
         Environment environment = insertOne();
         int delete = environmentMapper.deleteById(environment.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -101,9 +101,9 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         insertOne();
-        //query
+        // query
         List<Environment> environments = environmentMapper.selectList(null);
-        Assert.assertEquals(environments.size(), 1);
+        Assertions.assertEquals(environments.size(), 1);
     }
 
     /**
@@ -113,7 +113,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testQueryByEnvironmentName() {
         Environment entity = insertOne();
         Environment environment = environmentMapper.queryByEnvironmentName(entity.getName());
-        Assert.assertEquals(entity.toString(),environment.toString());
+        Assertions.assertEquals(entity.toString(), environment.toString());
     }
 
     /**
@@ -123,7 +123,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testQueryByEnvironmentCode() {
         Environment entity = insertOne();
         Environment environment = environmentMapper.queryByEnvironmentCode(entity.getCode());
-        Assert.assertEquals(entity.toString(),environment.toString());
+        Assertions.assertEquals(entity.toString(), environment.toString());
     }
 
     /**
@@ -133,8 +133,8 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testQueryAllEnvironmentList() {
         Environment entity = insertOne();
         List<Environment> environments = environmentMapper.queryAllEnvironmentList();
-        Assert.assertEquals(environments.size(), 1);
-        Assert.assertEquals(entity.toString(),environments.get(0).toString());
+        Assertions.assertEquals(environments.size(), 1);
+        Assertions.assertEquals(entity.toString(), environments.get(0).toString());
     }
 
     /**
@@ -144,13 +144,13 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testQueryEnvironmentListPaging() {
         Environment entity = insertOne();
         Page<Environment> page = new Page<>(1, 10);
-        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page,"");
+        IPage<Environment> environmentIPage = environmentMapper.queryEnvironmentListPaging(page, "");
         List<Environment> environmentList = environmentIPage.getRecords();
-        Assert.assertEquals(environmentList.size(), 1);
+        Assertions.assertEquals(environmentList.size(), 1);
 
-        environmentIPage = environmentMapper.queryEnvironmentListPaging(page,"abc");
+        environmentIPage = environmentMapper.queryEnvironmentListPaging(page, "abc");
         environmentList = environmentIPage.getRecords();
-        Assert.assertEquals(environmentList.size(), 0);
+        Assertions.assertEquals(environmentList.size(), 0);
     }
 
     /**
@@ -160,7 +160,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     public void testDeleteByCode() {
         Environment entity = insertOne();
         int delete = environmentMapper.deleteByCode(entity.getCode());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     private String getDesc() {
@@ -173,8 +173,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
     private String getConfig() {
         return "export HADOOP_HOME=/opt/hadoop-2.6.5\n"
                 + "export HADOOP_CONF_DIR=/etc/hadoop/conf\n"
-                + "export SPARK_HOME1=/opt/soft/spark1\n"
-                + "export SPARK_HOME2=/opt/soft/spark2\n"
+                + "export SPARK_HOME=/opt/soft/spark\n"
                 + "export PYTHON_HOME=/opt/soft/python\n"
                 + "export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n"
                 + "export HIVE_HOME=/opt/soft/hive\n"
@@ -182,7 +181,7 @@ public class EnvironmentMapperTest extends BaseDaoTest {
                 + "export DATAX_HOME=/opt/soft/datax\n"
                 + "export YARN_CONF_DIR=\"/etc/hadoop/conf\"\n"
                 + "\n"
-                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
+                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
                 + "\n"
                 + "export HADOOP_CLASSPATH=`hadoop classpath`\n"
                 + "\n"

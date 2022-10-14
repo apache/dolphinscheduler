@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.*;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -26,14 +26,10 @@ import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
 import springfox.documentation.annotations.ApiIgnore;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +41,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.api.enums.Status.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 /**
  * process instance controller

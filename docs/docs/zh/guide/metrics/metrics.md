@@ -5,11 +5,11 @@ Apache DolphinScheduler通过向外透出指标来提高系统的监控告警能
 
 ## 快速上手
 
-- 我们提供Apache DolphinScheduler `standalone` 模式下采集并透出指标的能力，提供用户轻松快速的体验。 
+- 我们提供Apache DolphinScheduler `standalone` 模式下采集并透出指标的能力，提供用户轻松快速的体验。
 - 当您在`standalone`模式下触发任务后，您可通过链接 `http://localhost:12345/dolphinscheduler/actuator/metrics` 访问生成的metrics列表。
 - 当您在`standalone`模式下触发任务后，您可通过链接 `http://localhost:12345/dolphinscheduler/actuator/prometheus` 访问`prometheus格式`指标。
 - 为了给您提供一个一站式的`Prometheus` + `Grafana`体验, 我们已经为您准备好了开箱即用的 `Grafana` 配置。您可在`dolphinscheduler-meter/resources/grafana`找到`Grafana`面板配置。
-您可直接将这些配置导入您的`Grafana`实例中。
+  您可直接将这些配置导入您的`Grafana`实例中。
 - 如果您想通过`docker`方式体验，可使用如下命令启动我们为您准备好的开箱即用的`Prometheus`和`Grafana`:
 
 ```shell
@@ -17,12 +17,12 @@ cd dolphinscheduler-meter/src/main/resources/grafana-demo
 docker compose up
 ```
 
-然后，您即可通过http://localhost/3001`链接访问`Grafana`面板。    
+然后，您即可通过http://localhost/3001`链接访问`Grafana`面板。
 
 ![image.png](../../../../img/metrics/metrics-master.png)
 ![image.png](../../../../img/metrics/metrics-worker.png)
 ![image.png](../../../../img/metrics/metrics-datasource.png)
-      
+
 - 如果您想在`集群`模式下体验指标，请参照下面的[配置](#配置)一栏：
 
 ## 配置
@@ -43,13 +43,13 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 ## 命名规则 & 命名映射
 
 - Apache DolphinScheduler指标命名遵循[Micrometer](https://github.com/micrometer-metrics/micrometer-docs/blob/main/src/docs/concepts/naming.adoc)
-官方推荐的命名方式。
+  官方推荐的命名方式。
 - `Micrometer` 会根据您配置的外部指标系统自动将指标名称转化成适合您指标系统的格式。目前，我们只支持`Prometheus Exporter`，但是多样化的指标格式将会持续贡献给用户。
 
 ### Prometheus
 
 - 指标名中的点会被映射为下划线
-- 以数字开头的指标名会被加上`m_`前缀 
+- 以数字开头的指标名会被加上`m_`前缀
 - COUNTER: 如果没有以`_total`结尾，会自动加上此后缀
 - LONG_TASK_TIMER: 如果没有以`_timer_seconds`结尾，会自动加上此后缀
 - GAUGE: 如果没有以`_baseUnit`结尾，会自动加上此后缀
@@ -57,7 +57,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 ## Dolphin Scheduler指标清单
 
 - Dolphin Scheduler按照组成部分进行指标分类，如：`master server`, `worker server`, `api server` and `alert server`。
-- 尽管任务 / 工作流相关指标是由 `master server` 和 `worker server` 透出的，我们将这两块指标单独罗列出来，以方便您对任务 / 工作流的监控。  
+- 尽管任务 / 工作流相关指标是由 `master server` 和 `worker server` 透出的，我们将这两块指标单独罗列出来，以方便您对任务 / 工作流的监控。
 
 ### 任务相关指标
 
@@ -67,18 +67,17 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
   - success：成功完成的任务数量
   - fail：失败的任务数量
   - stop：暂停的任务数量
-  - retry：重试的任务数量 
+  - retry：重试的任务数量
   - submit：已提交的任务数量
   - failover：容错的任务数量
 - ds.task.dispatch.count: (counter) 分发到worker上的任务数量
 - ds.task.dispatch.failure.count: (counter) 分发失败的任务数量，重试也包含在内
 - ds.task.dispatch.error.count: (counter) 分发任务的错误数量
 - ds.task.execution.count.by.type: (counter) 任务执行数量，按标签`task_type`聚类
-- ds.task.running: (gauge) 正在运行的任务数量 
-- ds.task.prepared: (gauge) 准备好且待提交的任务数量 
-- ds.task.execution.count: (counter) 已执行的任务数量  
+- ds.task.running: (gauge) 正在运行的任务数量
+- ds.task.prepared: (gauge) 准备好且待提交的任务数量
+- ds.task.execution.count: (counter) 已执行的任务数量
 - ds.task.execution.duration: (histogram) 任务执行时长
-
 
 ### 工作流相关指标
 
@@ -89,14 +88,14 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
   - timeout：运行超时的工作流实例数量
   - finish：已完成的工作流实例数量，包含成功和失败
   - success：运行成功的工作流实例数量
-  - fail：运行失败的工作流实例数量 
-  - stop：停止的工作流实例数量 
+  - fail：运行失败的工作流实例数量
+  - stop：停止的工作流实例数量
   - failover：容错的工作流实例数量
 
 ### Master Server指标
 
 - ds.master.overload.count: (counter) master过载次数
-- ds.master.consume.command.count: (counter) master消耗指令数量 
+- ds.master.consume.command.count: (counter) master消耗指令数量
 - ds.master.scheduler.failover.check.count: (counter) scheduler (master) 容错检查次数
 - ds.master.scheduler.failover.check.time: (histogram) scheduler (master) 容错检查耗时
 - ds.master.quartz.job.executed: 已执行quartz任务数量
@@ -125,7 +124,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 - hikaricp.connections: 连接综述
 - hikaricp.connections.creation: 连接创建时间 (包含最长时间，创建数量和时间总和)
-- hikaricp.connections.acquire: 连接获取时间 (包含最长时间，创建数量和时间总和) 
+- hikaricp.connections.acquire: 连接获取时间 (包含最长时间，创建数量和时间总和)
 - hikaricp.connections.usage: 连接使用时长 (包含最长时间，创建数量和时间总和)
 - hikaricp.connections.max: 最大连接数量
 - hikaricp.connections.min: 最小连接数量
@@ -176,3 +175,4 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 - system.load.average.1m: 系统的平均负荷（1分钟）
 - logback.events: 日志时间数量，以标签`level`聚类
 - http.server.requests: http请求总数
+

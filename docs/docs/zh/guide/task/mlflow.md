@@ -19,7 +19,6 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 - MLflow Models
   - MLFLOW: 直接使用 `mlflow models serve` 部署模型。
   - Docker: 打包 DOCKER 镜像后部署模型。
-  - Docker Compose: 使用Docker Compose 部署模型，将会取代上面的Docker部署。
 
 ## 创建任务
 
@@ -90,21 +89,26 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 
 ![mlflow-models-docker](../../../../img/tasks/demo/mlflow-models-docker.png)
 
-#### DOCKER COMPOSE
-
-![mlflow-models-docker-compose](../../../../img/tasks/demo/mlflow-models-docker-compose.png)
-
-| **任务参数** |                **描述**                |
-|----------|--------------------------------------|
-| 最大CPU限制  | 如 `1.0` 或者 `0.5`，与 docker compose 一致 |
-| 最大内存限制   | 如 `1G` 或者 `500M`，与 docker compose 一致 |
-
 ## 环境准备
 
 ### conda 环境配置
 
-你需要进入admin账户配置一个conda环境变量（请提前[安装anaconda](https://docs.continuum.io/anaconda/install/)
-或者[安装miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) )。
+请提前[安装anaconda](https://docs.continuum.io/anaconda/install/) 或者[安装miniconda](https://docs.conda.io/en/latest/miniconda.html#installing)
+
+**方法A：**
+
+配置文件：/dolphinscheduler/conf/env/dolphinscheduler_env.sh。
+
+在文件最后添加内容
+
+```
+# 配置你的conda环境路径
+export PATH=/opt/anaconda3/bin:$PATH
+```
+
+**方法B：**
+
+你需要进入admin账户配置一个conda环境变量。
 
 ![mlflow-conda-env](../../../../img/tasks/demo/mlflow-conda-env.png)
 
@@ -129,4 +133,15 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 可以通过访问 MLflow service (`http://localhost:5000`) 页面查看实验与模型。
 
 ![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)
+
+### 内置算法仓库配置
+
+如果遇到github无法访问的情况，可以修改`commom.properties`配置文件的以下字段，将github地址替换能访问的地址。
+
+```yaml
+# mlflow task plugin preset repository
+ml.mlflow.preset_repository=https://github.com/apache/dolphinscheduler-mlflow
+# mlflow task plugin preset repository version
+ml.mlflow.preset_repository_version="main"
+```
 

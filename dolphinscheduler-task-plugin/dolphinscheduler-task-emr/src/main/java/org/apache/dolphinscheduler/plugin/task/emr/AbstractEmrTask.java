@@ -22,13 +22,12 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.util.TimeZone;
 
@@ -52,7 +51,6 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
     AmazonElasticMapReduce emrClient;
     String clusterId;
 
-
     /**
      * config ObjectMapper features and propertyNamingStrategy
      * use UpperCamelCaseStrategy support capital letters parse
@@ -60,12 +58,12 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
      * @see PropertyNamingStrategy.UpperCamelCaseStrategy
      */
     static final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-        .setTimeZone(TimeZone.getDefault())
-        .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .setTimeZone(TimeZone.getDefault())
+            .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
 
     /**
      * constructor
@@ -98,7 +96,7 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
      *
      * @return AmazonElasticMapReduce
      */
-    private AmazonElasticMapReduce createEmrClient() {
+    protected AmazonElasticMapReduce createEmrClient() {
 
         final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
         final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
@@ -107,8 +105,8 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
         final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
         // create an EMR client
         return AmazonElasticMapReduceClientBuilder.standard()
-            .withCredentials(awsCredentialsProvider)
-            .withRegion(awsRegion)
-            .build();
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(awsRegion)
+                .build();
     }
 }
