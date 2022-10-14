@@ -70,3 +70,6 @@ class Project(BaseSide):
         """Delete Project."""
         JavaGate().delete_project(user, self.code)
         self.delete_all()
+
+    def __str__(self):
+        return f"Project(name={self.name}, description={self.description}, code={self.code})"

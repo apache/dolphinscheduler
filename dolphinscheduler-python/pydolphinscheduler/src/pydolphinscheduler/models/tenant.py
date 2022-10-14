@@ -78,3 +78,7 @@ class Tenant(BaseSide):
         """Delete Tenant."""
         JavaGate().delete_tenant(self.user_name, self.tenant_id)
         self.delete_all()
+
+    def __str__(self):
+        return f"Tenant(name={self.name}, description={self.description}, tenant_id={self.tenant_id}, " \
+               f"code={self.code}, queue={self.queue})"

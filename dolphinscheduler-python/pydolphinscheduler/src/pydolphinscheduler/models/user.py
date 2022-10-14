@@ -128,3 +128,8 @@ class User(BaseSide):
         """Delete User."""
         JavaGate().delete_user(self.name, self.user_id)
         self.delete_all()
+
+    def __str__(self):
+        """Return string."""
+        return f"User(user_id={self.user_id} name={self.name}, email={self.email}, phone={self.phone}, " \
+               f"tenant={self.tenant}, queue={self.queue}, status={self.status})"
