@@ -377,6 +377,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-context-support 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.13, Apache 2.0
     spring-core 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-core/5.3.22, Apache 2.0
     spring-expression 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-expression/5.3.13, Apache 2.0
+    springdoc-openapi-ui 1.6.9: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui/1.6.9, Apache 2.0
     springfox-core 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-core/3.0.0, Apache 2.0
     springfox-schema 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-schema/3.0.0, Apache 2.0
     springfox-spi 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-spi/3.0.0, Apache 2.0

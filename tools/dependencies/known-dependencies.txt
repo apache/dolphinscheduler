@@ -318,6 +318,7 @@ spring-security-rsa-1.0.10.RELEASE.jar
 spring-tx-5.3.22.jar
 spring-web-5.3.22.jar
 spring-webmvc-5.3.22.jar
+springdoc-openapi-ui-1.6.9.jar
 springfox-bean-validators-3.0.0.jar
 springfox-boot-starter-3.0.0.jar
 springfox-core-3.0.0.jar
