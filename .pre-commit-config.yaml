@@ -60,6 +60,6 @@ repos:
       # Spotless Hooks
       - id: spotless
         name: spotless lint
-        entry: ./mvnw spotless:apply
+        entry: ./mvnw spotless:check
         language: script
         pass_filenames: false
