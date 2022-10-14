@@ -16,14 +16,12 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import org.apache.dolphinscheduler.common.Constants;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.spi.FilterReply;
+import org.apache.dolphinscheduler.common.Constants;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class MasterLogFilterTest {
 
@@ -50,7 +48,7 @@ public class MasterLogFilterTest {
 
         });
 
-        Assert.assertEquals(FilterReply.ACCEPT, filterReply);
+        Assertions.assertEquals(FilterReply.ACCEPT, filterReply);
 
     }
 }
