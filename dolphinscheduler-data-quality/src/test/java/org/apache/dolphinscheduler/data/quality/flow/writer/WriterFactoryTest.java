@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.data.quality.flow.batch.writer.WriterFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * WriterFactoryTest
@@ -44,11 +44,11 @@ public class WriterFactoryTest {
 
         int flag = 0;
 
-        List<BatchWriter> writers = WriterFactory.getInstance().getWriters(null,writerConfigs);
+        List<BatchWriter> writers = WriterFactory.getInstance().getWriters(null, writerConfigs);
         if (writers != null && writers.size() >= 1) {
             flag = 1;
         }
 
-        Assert.assertEquals(1,flag);
+        Assertions.assertEquals(1, flag);
     }
 }

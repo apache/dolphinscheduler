@@ -27,28 +27,27 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.etcd.jetcd.test.EtcdClusterExtension;
 
 public class EtcdRegistryTest {
+
     private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
 
-    @RegisterExtension
-    public static final EtcdClusterExtension server = EtcdClusterExtension.builder()
-            .withNodes(1)
-            .withImage("ibmcom/etcd:3.2.24")
-            .build();
     public static EtcdRegistry registry;
 
-    @BeforeClass
+    @BeforeAll
     public static void before() throws Exception {
+        EtcdClusterExtension server = EtcdClusterExtension.builder()
+                .withNodes(1)
+                .withImage("ibmcom/etcd:3.2.24")
+                .build();
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
         server.restart();
         properties.setEndpoints(String.valueOf(server.clientEndpoints().get(0)));
@@ -60,12 +59,12 @@ public class EtcdRegistryTest {
     public void persistTest() {
         registry.put("/nodes/m1", "", false);
         registry.put("/nodes/m2", "", false);
-        Assert.assertEquals(Arrays.asList("m1", "m2"), registry.children("/nodes"));
-        Assert.assertTrue(registry.exists("/nodes/m1"));
+        Assertions.assertEquals(Arrays.asList("m1", "m2"), registry.children("/nodes"));
+        Assertions.assertTrue(registry.exists("/nodes/m1"));
         registry.delete("/nodes/m2");
-        Assert.assertFalse(registry.exists("/nodes/m2"));
+        Assertions.assertFalse(registry.exists("/nodes/m2"));
         registry.delete("/nodes");
-        Assert.assertFalse(registry.exists("/nodes/m1"));
+        Assertions.assertFalse(registry.exists("/nodes/m1"));
     }
 
     @Test
@@ -76,7 +75,8 @@ public class EtcdRegistryTest {
         new Thread(() -> {
             registry.acquireLock("/lock");
             preCountDownLatch.countDown();
-            logger.info(Thread.currentThread().getName() + " :I got the lock, but I don't want to work. I want to rest for a while");
+            logger.info(Thread.currentThread().getName()
+                    + " :I got the lock, but I don't want to work. I want to rest for a while");
             try {
                 Thread.sleep(1000);
                 logger.info(Thread.currentThread().getName() + " :I'm going to start working");
@@ -91,7 +91,7 @@ public class EtcdRegistryTest {
             }
         }).start();
         try {
-            preCountDownLatch.await(5,TimeUnit.SECONDS);
+            preCountDownLatch.await(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +113,7 @@ public class EtcdRegistryTest {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        Assert.assertEquals(testData, Arrays.asList("thread1", "thread2"));
+        Assertions.assertEquals(testData, Arrays.asList("thread1", "thread2"));
     }
 
     @Test
@@ -124,18 +124,19 @@ public class EtcdRegistryTest {
         registry.put("/sub/m2", "tt", false);
         registry.delete("/sub/m2");
         registry.delete("/sub");
-        Assert.assertTrue(status);
+        Assertions.assertTrue(status);
 
     }
 
     static class TestListener implements SubscribeListener {
+
         @Override
         public void notify(Event event) {
             logger.info("I'm test listener");
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void after() throws IOException {
         registry.close();
     }

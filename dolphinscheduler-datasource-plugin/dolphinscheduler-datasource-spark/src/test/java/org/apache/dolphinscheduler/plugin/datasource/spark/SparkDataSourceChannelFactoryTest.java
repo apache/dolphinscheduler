@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.datasource.spark;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SparkDataSourceChannelFactoryTest {
 
@@ -28,6 +28,6 @@ public class SparkDataSourceChannelFactoryTest {
     public void testCreate() {
         SparkDataSourceChannelFactory sourceChannelFactory = new SparkDataSourceChannelFactory();
         DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
-        Assert.assertNotNull(dataSourceChannel);
+        Assertions.assertNotNull(dataSourceChannel);
     }
 }

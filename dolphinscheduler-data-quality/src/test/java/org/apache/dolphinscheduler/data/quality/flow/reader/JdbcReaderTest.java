@@ -32,16 +32,16 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * JdbcConnectorTest
  */
 public class JdbcReaderTest extends FlowTestBase {
 
-    @Before
+    @BeforeEach
     public void before() {
         super.init();
         createConnectorTable();
@@ -50,17 +50,17 @@ public class JdbcReaderTest extends FlowTestBase {
     @Test
     public void testJdbcConnectorExecute() {
         JdbcReader jdbcReader = new JdbcReader(buildReaderConfig());
-        Assert.assertNotNull(jdbcReader.read(sparkRuntimeEnvironment));
+        Assertions.assertNotNull(jdbcReader.read(sparkRuntimeEnvironment));
     }
 
     private Config buildReaderConfig() {
-        Map<String,Object> config = new HashMap<>();
-        config.put(DATABASE,"test");
-        config.put(TABLE,"test.test1");
-        config.put(URL,url);
-        config.put(USER,"test");
-        config.put(PASSWORD,"123456");
-        config.put(DRIVER,driver);
+        Map<String, Object> config = new HashMap<>();
+        config.put(DATABASE, "test");
+        config.put(TABLE, "test.test1");
+        config.put(URL, url);
+        config.put(USER, "test");
+        config.put(PASSWORD, "123456");
+        config.put(DRIVER, driver);
         return new Config(config);
     }
 

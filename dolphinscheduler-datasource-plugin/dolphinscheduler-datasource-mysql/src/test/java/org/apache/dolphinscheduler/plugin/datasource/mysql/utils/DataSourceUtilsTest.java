@@ -33,14 +33,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DataSourceUtilsTest {
 
     @Test
@@ -54,7 +54,7 @@ public class DataSourceUtilsTest {
         other.put("characterEncoding", "utf8");
         mysqlDatasourceParamDTO.setOther(other);
         DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class DataSourceUtilsTest {
                     .thenReturn("123456");
             mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
             ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
-            Assert.assertNotNull(connectionParam);
+            Assertions.assertNotNull(connectionParam);
         }
     }
 
@@ -87,7 +87,7 @@ public class DataSourceUtilsTest {
         mysqlDatasourceParamDTO.setPassword("123456");
         ConnectionParam connectionParam =
                 DataSourceUtils.buildConnectionParams(DbType.MYSQL, JSONUtils.toJsonString(mysqlDatasourceParamDTO));
-        Assert.assertNotNull(connectionParam);
+        Assertions.assertNotNull(connectionParam);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class DataSourceUtilsTest {
             connectionParam.setPassword("123456");
             connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
 
-            Assert.assertNotNull(connection);
+            Assertions.assertNotNull(connection);
         }
     }
 
@@ -117,7 +117,7 @@ public class DataSourceUtilsTest {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3308");
         String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.MYSQL, mysqlConnectionParam);
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
                 jdbcUrl);
     }
@@ -131,18 +131,20 @@ public class DataSourceUtilsTest {
         connectionParam.setUser("root");
         connectionParam.setPassword("123456");
 
-        Assert.assertNotNull(
+        Assertions.assertNotNull(
                 DataSourceUtils.buildDatasourceParamDTO(DbType.MYSQL, JSONUtils.toJsonString(connectionParam)));
 
     }
 
     @Test
     public void testGetDatasourceProcessor() {
-        Assert.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.MYSQL));
+        Assertions.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.MYSQL));
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testGetDatasourceProcessorError() {
-        DataSourceUtils.getDatasourceProcessor(null);
+        Assertions.assertThrows(Exception.class, () -> {
+            DataSourceUtils.getDatasourceProcessor(null);
+        });
     }
 }
