@@ -33,15 +33,15 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * JdbcWriterTest
  */
 public class JdbcWriterTest extends FlowTestBase {
 
-    @Before
+    @BeforeEach
     public void before() {
         super.init();
         createWriterTable();
@@ -51,24 +51,24 @@ public class JdbcWriterTest extends FlowTestBase {
     public void testJdbcWriterExecute() {
         JdbcReader jdbcConnector = new JdbcReader(buildJdbcReaderConfig());
         JdbcWriter jdbcWriter = new JdbcWriter(buildJdbcConfig());
-        jdbcWriter.write(jdbcConnector.read(sparkRuntimeEnvironment),sparkRuntimeEnvironment);
+        jdbcWriter.write(jdbcConnector.read(sparkRuntimeEnvironment), sparkRuntimeEnvironment);
     }
 
     private Config buildJdbcConfig() {
-        Map<String,Object> config = new HashMap<>();
-        config.put(DATABASE,"test");
-        config.put(TABLE,"test.test2");
-        config.put(URL,url);
-        config.put(USER,"test");
-        config.put(PASSWORD,"123456");
-        config.put(DRIVER,driver);
-        config.put("save_mode","append");
+        Map<String, Object> config = new HashMap<>();
+        config.put(DATABASE, "test");
+        config.put(TABLE, "test.test2");
+        config.put(URL, url);
+        config.put(USER, "test");
+        config.put(PASSWORD, "123456");
+        config.put(DRIVER, driver);
+        config.put("save_mode", "append");
         return new Config(config);
     }
 
     private Config buildJdbcReaderConfig() {
         Config config = buildJdbcConfig();
-        config.put("sql","SELECT '1' as company,'1' as date,'2' as c1,'2' as c2,'2' as c3, 2 as c4");
+        config.put("sql", "SELECT '1' as company,'1' as date,'2' as c1,'2' as c2,'2' as c3, 2 as c4");
         return config;
     }
 
