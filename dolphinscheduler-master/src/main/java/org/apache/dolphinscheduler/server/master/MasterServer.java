@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphMasterSerinscheduler.server.master;
+package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;

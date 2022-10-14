@@ -33,7 +33,7 @@ public class ResourcesTask {
     private String fullName;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     private int taskId;
 
