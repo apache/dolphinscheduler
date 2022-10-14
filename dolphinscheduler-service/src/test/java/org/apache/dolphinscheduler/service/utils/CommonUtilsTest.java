@@ -19,21 +19,20 @@ package org.apache.dolphinscheduler.service.utils;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * configuration test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommonUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
@@ -42,37 +41,37 @@ public class CommonUtilsTest {
     public void getSystemEnvPath() {
         String envPath;
         envPath = CommonUtils.getSystemEnvPath();
-        Assert.assertEquals("/etc/profile", envPath);
+        Assertions.assertEquals("/etc/profile", envPath);
     }
 
     @Test
     public void isDevelopMode() {
         logger.info("develop mode: {}", CommonUtils.isDevelopMode());
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsDataBasePath() {
         logger.info(HadoopUtils.getHdfsDataBasePath());
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getDownloadFilename() {
         logger.info(FileUtils.getDownloadFilename("a.txt"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getUploadFilename() {
         logger.info(FileUtils.getUploadFilename("1234", "a.txt"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsDir() {
         logger.info(HadoopUtils.getHdfsResDir("1234"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
@@ -84,7 +83,7 @@ public class CommonUtilsTest {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
 }

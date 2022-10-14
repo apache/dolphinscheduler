@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class StringTest {
                 }
             }
             double during = (System.currentTimeMillis() - start) / 1000.0;
-            Assert.assertEquals("1_0000000000_0000000001", origin);
+            Assertions.assertEquals("1_0000000000_0000000001", origin);
         }
     }
 }

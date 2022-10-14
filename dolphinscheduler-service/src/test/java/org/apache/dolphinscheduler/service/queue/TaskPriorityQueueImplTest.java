@@ -18,14 +18,13 @@
 package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class TaskPriorityQueueImplTest {
 
@@ -34,88 +33,88 @@ public class TaskPriorityQueueImplTest {
         TaskPriority priorityOne = new TaskPriority(1, 0, 0, 0, 1, "default");
         TaskPriority priorityTwo = new TaskPriority(2, 0, 0, 0, 1, "default");
         TaskPriority priorityThree = new TaskPriority(3, 0, 0, 0, 1, "default");
-        List<TaskPriority> taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        List<TaskPriority> taskPriorities = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
             Arrays.asList(priorityOne, priorityTwo, priorityThree),
-            taskPrioritys
+                taskPriorities
         );
 
         priorityOne = new TaskPriority(0, 1, 0, 0, 1, "default");
         priorityTwo = new TaskPriority(0, 2, 0, 0, 1, "default");
         priorityThree = new TaskPriority(0, 3, 0, 0, 1, "default");
-        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        taskPriorities = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
             Arrays.asList(priorityOne, priorityTwo, priorityThree),
-            taskPrioritys
+                taskPriorities
         );
 
         priorityOne = new TaskPriority(0, 0, 1, 0, 1, "default");
         priorityTwo = new TaskPriority(0, 0, 2, 0, 1, "default");
         priorityThree = new TaskPriority(0, 0, 3, 0, 1, "default");
-        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        taskPriorities = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
             Arrays.asList(priorityOne, priorityTwo, priorityThree),
-            taskPrioritys
+                taskPriorities
         );
 
         priorityOne = new TaskPriority(0, 0, 0, 1, 1, "default");
         priorityTwo = new TaskPriority(0, 0, 0, 2, 1, "default");
         priorityThree = new TaskPriority(0, 0, 0, 3, 1, "default");
-        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        taskPriorities = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
             Arrays.asList(priorityOne, priorityTwo, priorityThree),
-            taskPrioritys
+                taskPriorities
         );
 
         priorityOne = new TaskPriority(0, 0, 0, 0, 1, "default_1");
         priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_2");
         priorityThree = new TaskPriority(0, 0, 0, 0, 1, "default_3");
-        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        taskPriorities = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
             Arrays.asList(priorityOne, priorityTwo, priorityThree),
-            taskPrioritys
+                taskPriorities
         );
 
         priorityOne = new TaskPriority(0, 0, 0, 0, 2, "default_1");
         priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_2");
         priorityThree = new TaskPriority(0, 0, 0, 0, 3, "default_3");
-        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        taskPriorities = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
                 Arrays.asList(priorityThree, priorityOne, priorityTwo),
-                taskPrioritys
+                taskPriorities
         );
 
         priorityOne = new TaskPriority(0, 0, 0, 0, 1, "default_1");
         priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_2");
         priorityThree = new TaskPriority(0, 0, 0, 0, 3, "default_3");
-        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        taskPriorities = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
                 Arrays.asList(priorityThree, priorityOne, priorityTwo),
-                taskPrioritys
+                taskPriorities
         );
 
         priorityTwo = new TaskPriority(0, 0, 0, 0, 1,"default_1");
         priorityOne = new TaskPriority(0, 0, 0, 0, 1, "default_1");
         priorityThree = new TaskPriority(0, 0, 0, 0, 3, "default_1");
-        taskPrioritys = Arrays.asList(priorityTwo, priorityOne, priorityThree);
-        Collections.sort(taskPrioritys);
-        Assert.assertEquals(
+        taskPriorities = Arrays.asList(priorityTwo, priorityOne, priorityThree);
+        Collections.sort(taskPriorities);
+        Assertions.assertEquals(
                 Arrays.asList(priorityThree, priorityTwo, priorityOne),
-                taskPrioritys
+                taskPriorities
         );
     }
 
     @Test
     public void put() throws Exception {
         TaskPriorityQueue queue = getPriorityQueue();
-        Assert.assertEquals(2, queue.size());
+        Assertions.assertEquals(2, queue.size());
     }
 
     @Test
@@ -123,7 +122,7 @@ public class TaskPriorityQueueImplTest {
         TaskPriorityQueue queue = getPriorityQueue();
         int peekBeforeLength = queue.size();
         queue.take();
-        Assert.assertTrue(queue.size() < peekBeforeLength);
+        Assertions.assertTrue(queue.size() < peekBeforeLength);
     }
 
     @Test
@@ -132,13 +131,13 @@ public class TaskPriorityQueueImplTest {
         int peekBeforeLength = queue.size();
         queue.poll(1000, TimeUnit.MILLISECONDS);
         queue.poll(1000, TimeUnit.MILLISECONDS);
-        Assert.assertTrue(queue.size() == 0);
+        Assertions.assertEquals(0, queue.size());
         queue.poll(1000, TimeUnit.MILLISECONDS);
     }
 
     @Test
     public void size() throws Exception {
-        Assert.assertTrue(getPriorityQueue().size() == 2);
+        Assertions.assertEquals(2, getPriorityQueue().size());
     }
 
     /**

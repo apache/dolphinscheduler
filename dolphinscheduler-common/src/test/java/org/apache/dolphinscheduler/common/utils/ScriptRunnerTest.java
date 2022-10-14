@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import java.io.StringReader;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.io.StringReader;
 
 public class ScriptRunnerTest {
     @Test
@@ -32,6 +32,6 @@ public class ScriptRunnerTest {
         } catch (Exception e) {
             exception = e;
         }
-        Assert.assertNotNull(exception);
+        Assertions.assertNotNull(exception);
     }
 }

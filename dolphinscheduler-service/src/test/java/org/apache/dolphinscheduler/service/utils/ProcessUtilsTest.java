@@ -17,34 +17,33 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import static org.mockito.ArgumentMatchers.anyString;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.mockito.ArgumentMatchers.anyString;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ProcessUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
@@ -56,7 +55,7 @@ public class ProcessUtilsTest {
         try (MockedStatic<OSUtils> mockedStaticOSUtils = Mockito.mockStatic(OSUtils.class)) {
             mockedStaticOSUtils.when(() -> OSUtils.exeCmd(anyString())).thenReturn(null);
             String pidList = ProcessUtils.getPidsStr(processId);
-            Assert.assertEquals("", pidList);
+            Assertions.assertEquals("", pidList);
         }
     }
 
@@ -72,11 +71,11 @@ public class ProcessUtilsTest {
                     .thenReturn("/etc/krb5.keytab");
             mockedStaticPropertyUtils.when(() -> PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME))
                     .thenReturn("test@DS.COM");
-            Assert.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
+            Assertions.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
             mockedStaticPropertyUtils
                     .when(() -> PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
                     .thenReturn(false);
-            Assert.assertEquals("", ProcessUtils.getKerberosInitCommand());
+            Assertions.assertEquals("", ProcessUtils.getKerberosInitCommand());
         }
     }
 
@@ -100,7 +99,7 @@ public class ProcessUtilsTest {
                 ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
             }
 
-            Assert.assertNotNull(appIds);
+            Assertions.assertNotNull(appIds);
         }
     }
 }
