@@ -63,8 +63,12 @@ Please refer to the commit message section.
 
 ### Pull Request Code Style
 
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors,)
+[//]: # (see [Development Environment Setup]&#40;../development-environment-setup.md#code-style&#41; `Code Style` section for details.)
+
 DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors,
-see [Code Style](../development-environment-setup.md#code-style) for details.
+see [Development Environment Setup](../development-environment-setup.md) `Code Style` section for details.
 
 ### Question
 

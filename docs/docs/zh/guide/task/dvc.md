@@ -17,7 +17,10 @@ DVC 组件用于在DS上使用DVC的数据版本管理功能，帮助用户简�
 
 ## 任务样例
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 | **任务参数** |            **描述**             |
 |----------|-------------------------------|

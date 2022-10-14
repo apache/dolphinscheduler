@@ -12,16 +12,19 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 
 ## Task Parameter
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
-- Engine: Supports FLINK and SPARK
-  - FLINK
-    - Run model: supports `run` and `run-application` modes
-    - Option parameters: used to add the parameters of the Flink engine, such as `-m yarn-cluster -ynm seatunnel`
-  - SPARK
-    - Deployment mode: specify the deployment mode, `cluster` `client` `local`
-    - Master: Specify the `Master` model, `yarn` `local` `spark` `mesos`, where `spark` and `mesos` need to specify the `Master` service address, for example: 127.0.0.1:7077
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
-      > Click [here](https://seatunnel.apache.org/docs/2.1.2/command/usage) for more information on the usage of `Apache SeaTunnel command`
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+- Engine: Supports FLINK and SPARK
+- FLINK
+- Run model: supports `run` and `run-application` modes
+- Option parameters: used to add the parameters of the Flink engine, such as `-m yarn-cluster -ynm seatunnel`
+- SPARK
+- Deployment mode: specify the deployment mode, `cluster` `client` `local`
+- Master: Specify the `Master` model, `yarn` `local` `spark` `mesos`, where `spark` and `mesos` need to specify the `Master` service address, for example: 127.0.0.1:7077
+
+          > Click [here](https://seatunnel.apache.org/docs/2.1.2/command/usage) for more information on the usage of `Apache SeaTunnel command`
 
 - Custom Configuration: Supports custom configuration or select configuration file from Resource Center
 

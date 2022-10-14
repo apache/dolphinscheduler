@@ -27,7 +27,10 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 
 ## 任务样例
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 以下是一些MLflow 组件的常用参数
 
@@ -100,6 +103,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 配置文件：/dolphinscheduler/conf/env/dolphinscheduler_env.sh。
 
 在文件最后添加内容
+
 ```
 # 配置你的conda环境路径
 export PATH=/opt/anaconda3/bin:$PATH
@@ -114,7 +118,6 @@ export PATH=/opt/anaconda3/bin:$PATH
 后续注意配置任务时，环境选择上面创建的conda环境，否则程序会找不到conda环境。
 
 ![mlflow-set-conda-env](../../../../img/tasks/demo/mlflow-set-conda-env.png)
-
 
 ### MLflow service 启动
 
@@ -133,7 +136,6 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 可以通过访问 MLflow service (`http://localhost:5000`) 页面查看实验与模型。
 
 ![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)
-
 
 ### 内置算法仓库配置
 
