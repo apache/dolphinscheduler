@@ -33,22 +33,22 @@ log = logging.getLogger(__file__)
 class Python(Task):
     """Task Python object, declare behavior for Python task to dolphinscheduler.
 
-    Python task support two types of parameters for :param:``code``, and here is an example:
+    Python task support two types of parameters for :param:``definition``, and here is an example:
 
-    Using str type of :param:``code``
+    Using str type of :param:``definition``
 
     .. code-block:: python
 
-        python_task = Python(name="str_type", code="print('Hello Python task.')")
+        python_task = Python(name="str_type", definition="print('Hello Python task.')")
 
-    Or using Python callable type of :param:``code``
+    Or using Python callable type of :param:``definition``
 
     .. code-block:: python
 
         def foo():
             print("Hello Python task.")
 
-        python_task = Python(name="str_type", code=foo)
+        python_task = Python(name="str_type", definition=foo)
 
     :param name: The name for Python task. It define the task name.
     :param definition: String format of Python script you want to execute or Python callable you
