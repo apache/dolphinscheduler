@@ -16,11 +16,9 @@ DMS任务组件帮助用户在DolphinScheduler中创建和启动DMS任务。
 - 通过界面创建
 - 通过Json数据创建
 
-
 DolphinScheduler 在 启动DMS 任务后，会跟中DMS任务状态，直至DMS任务完成后才将任务设为成功状态。除了以下情况：
 
 不跟踪无结束时间的CDC任务，即 当迁移类型为 `full-load-and-cdc` 或者 `cdc` 时，且没有配置 `cdcStopPosition` 参数时，DolphinScheduler 在成功启动任务后，则会将任务状态设为 成功。
-
 
 ## 创建任务
 
@@ -47,11 +45,12 @@ DolphinScheduler 在 启动DMS 任务后，会跟中DMS任务状态，直至DMS�
 
 ![dms](../../../../img/tasks/demo/dms_restart_json.png)
 
-
-
 ### 首先介绍一些DS通用参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 ### DMS组件独有的参数
 
@@ -61,7 +60,7 @@ DolphinScheduler 在 启动DMS 任务后，会跟中DMS任务状态，直至DMS�
 
 创建并启动迁移任务时参数
 
-- **migrationType**：迁移类型, 可选值为：[ `full-load`, `full-load-and-cdc`, `cdc` ]
+- **migrationType**：迁移类型, 可选值为：[ `full-load`, `full-load-and-cdc`, `cdc`]
 - **replicationTaskIdentifier**：迁移任务标识符, 任务名称
 - **replicationInstanceArn**：迁移实例的ARN
 - **sourceEndpointArn**：源端点的ARN
@@ -75,6 +74,7 @@ DolphinScheduler 在 启动DMS 任务后，会跟中DMS任务状态，直至DMS�
 ## 环境配置
 
 需要进行AWS的一些配置，修改`common.properties`中的以下配置信息
+
 ```yaml
 # The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.access.key.id=<YOUR AWS ACCESS KEY>
@@ -83,3 +83,4 @@ resource.aws.secret.access.key=<YOUR AWS SECRET KEY>
 # The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.region=<AWS REGION>
 ```
+
