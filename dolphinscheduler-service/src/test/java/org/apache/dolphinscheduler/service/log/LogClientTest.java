@@ -28,17 +28,16 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LogClientTest {
 
     @Test
@@ -56,7 +55,7 @@ public class LogClientTest {
                     .thenReturn("application_xx_11");
             LogClient logClient = new LogClient();
             String log = logClient.viewLog(localMachine, port, path);
-            Assert.assertNotNull(log);
+            Assertions.assertNotNull(log);
         }
     }
 
@@ -71,14 +70,14 @@ public class LogClientTest {
                     .thenReturn(localMachine + "1");
             LogClient logClient = new LogClient();
             String log = logClient.viewLog(localMachine, port, path);
-            Assert.assertNotNull(log);
+            Assertions.assertNotNull(log);
         }
 
         Command command = new Command();
         command.setBody(JSONUtils.toJsonString(new ViewLogResponseCommand("")).getBytes(StandardCharsets.UTF_8));
         LogClient logClient = new LogClient();
         String log = logClient.viewLog(localMachine, port, path);
-        Assert.assertNotNull(log);
+        Assertions.assertNotNull(log);
     }
 
     @Test
@@ -110,7 +109,7 @@ public class LogClientTest {
 
             LogClient logClient = new LogClient();
             String msg = logClient.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
-            Assert.assertNotNull(msg);
+            Assertions.assertNotNull(msg);
         }
     }
 
@@ -131,7 +130,7 @@ public class LogClientTest {
 
             LogClient logClient = new LogClient();
             byte[] logBytes = logClient.getLogBytes("localhost", 1234, "/tmp/log");
-            Assert.assertNotNull(logBytes);
+            Assertions.assertNotNull(logBytes);
         }
     }
 
@@ -152,7 +151,7 @@ public class LogClientTest {
 
             LogClient logClient = new LogClient();
             Boolean status = logClient.removeTaskLog("localhost", 1234, "/log/path");
-            Assert.assertTrue(status);
+            Assertions.assertTrue(status);
         }
     }
 }

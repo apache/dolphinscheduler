@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.common.exception;
 
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ExceptionTest {
 
@@ -28,16 +28,16 @@ public class ExceptionTest {
         final String message = "Test";
         RuntimeException time = new RuntimeException(message);
 
-        Assert.assertNull(new BaseException().getMessage());
-        Assert.assertNotNull(new BaseException(message).getMessage());
-        Assert.assertNotNull(new BaseException(message, time).getMessage());
-        Assert.assertNotNull(new BaseException(time).getCause());
-        Assert.assertNotNull(new BaseException(message, time, false, false).getMessage());
+        Assertions.assertNull(new BaseException().getMessage());
+        Assertions.assertNotNull(new BaseException(message).getMessage());
+        Assertions.assertNotNull(new BaseException(message, time).getMessage());
+        Assertions.assertNotNull(new BaseException(time).getCause());
+        Assertions.assertNotNull(new BaseException(message, time, false, false).getMessage());
 
-        Assert.assertNull(new StorageOperateNoConfiguredException().getMessage());
-        Assert.assertNotNull(new StorageOperateNoConfiguredException(message).getMessage());
-        Assert.assertNotNull(new StorageOperateNoConfiguredException(message, time).getMessage());
-        Assert.assertNotNull(new StorageOperateNoConfiguredException(time).getCause());
-        Assert.assertNotNull(new StorageOperateNoConfiguredException(message, time, false, false).getMessage());
+        Assertions.assertNull(new StorageOperateNoConfiguredException().getMessage());
+        Assertions.assertNotNull(new StorageOperateNoConfiguredException(message).getMessage());
+        Assertions.assertNotNull(new StorageOperateNoConfiguredException(message, time).getMessage());
+        Assertions.assertNotNull(new StorageOperateNoConfiguredException(time).getCause());
+        Assertions.assertNotNull(new StorageOperateNoConfiguredException(message, time, false, false).getMessage());
     }
 }
