@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.spi.utils.DateUtils.addDays;
 import static org.apache.dolphinscheduler.spi.utils.DateUtils.format;
 
 import org.apache.dolphinscheduler.spi.enums.CommandType;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -47,9 +48,10 @@ public class BusinessTimeUtils {
      * @return business time
      */
     public static Map<String, String> getBusinessTime(CommandType commandType, Date runTime) {
-        Date businessDate = runTime;
+        Date businessDate;
         switch (commandType) {
             case COMPLEMENT_DATA:
+                businessDate = DateUtils.addDays(runTime, -1);
                 break;
             case START_PROCESS:
             case START_CURRENT_TASK_PROCESS:
