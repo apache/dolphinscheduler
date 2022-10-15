@@ -10,12 +10,17 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProxyProcessDefinitionController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyProcessDefinitionController.class);
+
+    @Value("${server.port}")
+    private String ServerPort;
+
     public ProxyResult createProcessDefinition (String token,
                                                 long projectCode,
                                                 String name,
@@ -28,7 +33,6 @@ public class ProxyProcessDefinitionController {
                                                 String taskDefinitionJson,
                                                 ProcessExecutionTypeEnum executionType){
         ProxyResult proxyResult = new ProxyResult();
-        String ServerPort = "3000";
         String url = "http://localhost:" + ServerPort + "/dolphinscheduler/projects/" + projectCode + "/process-definition";
         String responseBody;
         Map<String, Object> requestBodyMap = new HashMap<>();

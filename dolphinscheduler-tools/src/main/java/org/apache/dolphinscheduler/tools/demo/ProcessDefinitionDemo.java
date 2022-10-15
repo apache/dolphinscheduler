@@ -46,7 +46,7 @@ public class ProcessDefinitionDemo {
     @Autowired
     private ProxyProcessDefinitionController proxyProcessDefinitionController;
 
-    public void createProcessDefinitionDemo(){
+    public void createProcessDefinitionDemo() throws Exception {
         //get user
         User loginUser = userMapper.selectById("1");
         Date now = new Date();
@@ -69,12 +69,12 @@ public class ProcessDefinitionDemo {
                     .updateTime(now)
                     .build();
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.info("create project error");
+            logger.error("create project error", e);
         }
         if (projectMapper.insert(project) > 0) {
             logger.info("create project success");
         } else {
-            logger.info("create project error");
+            throw new Exception("create project error");
         }
         Long projectCode = project.getCode();
 
