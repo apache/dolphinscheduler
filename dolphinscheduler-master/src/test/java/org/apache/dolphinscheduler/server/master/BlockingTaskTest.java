@@ -46,8 +46,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -231,7 +231,7 @@ public class BlockingTaskTest {
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
         blockingTaskProcessor.init(taskInstance, processInstance);
         boolean res = blockingTaskProcessor.action(TaskAction.SUBMIT);
-        Assert.assertEquals(true, res);
+        Assertions.assertTrue(res);
     }
 
     @Test
@@ -243,7 +243,7 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.PAUSE);
         TaskExecutionStatus status = taskInstance.getState();
-        Assert.assertEquals(TaskExecutionStatus.PAUSE, status);
+        Assertions.assertEquals(TaskExecutionStatus.PAUSE, status);
     }
 
     @Test
@@ -255,7 +255,7 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.RUN);
         WorkflowExecutionStatus status = processInstance.getState();
-        Assert.assertEquals(WorkflowExecutionStatus.READY_BLOCK, status);
+        Assertions.assertEquals(WorkflowExecutionStatus.READY_BLOCK, status);
     }
 
     @Test
@@ -267,6 +267,6 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.RUN);
         WorkflowExecutionStatus status = processInstance.getState();
-        Assert.assertEquals(WorkflowExecutionStatus.RUNNING_EXECUTION, status);
+        Assertions.assertEquals(WorkflowExecutionStatus.RUNNING_EXECUTION, status);
     }
 }
