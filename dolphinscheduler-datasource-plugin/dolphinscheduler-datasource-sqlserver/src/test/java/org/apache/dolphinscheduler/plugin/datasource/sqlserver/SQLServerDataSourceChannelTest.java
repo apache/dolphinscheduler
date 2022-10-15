@@ -20,25 +20,21 @@ package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 import org.apache.dolphinscheduler.plugin.datasource.sqlserver.param.SQLServerConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({SQLServerDataSourceClient.class, SQLServerDataSourceChannel.class})
+@ExtendWith(MockitoExtension.class)
 public class SQLServerDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        SQLServerDataSourceChannel sourceChannel = PowerMockito.mock(SQLServerDataSourceChannel.class);
-        SQLServerDataSourceClient dataSourceClient = PowerMockito.mock(SQLServerDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new SQLServerConnectionParam(), DbType.SQLSERVER));
+        SQLServerDataSourceChannel sourceChannel = Mockito.mock(SQLServerDataSourceChannel.class);
+        SQLServerDataSourceClient dataSourceClient = Mockito.mock(SQLServerDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assertions
+                .assertNotNull(sourceChannel.createDataSourceClient(new SQLServerConnectionParam(), DbType.SQLSERVER));
     }
 }

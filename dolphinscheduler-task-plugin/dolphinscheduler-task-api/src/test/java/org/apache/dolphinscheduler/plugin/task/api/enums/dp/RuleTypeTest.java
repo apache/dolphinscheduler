@@ -17,33 +17,32 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums.dp;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class RuleTypeTest {
 
     @Test
     public void testGetCode() {
-        assertEquals(0, RuleType.SINGLE_TABLE.getCode());
-        assertEquals(1, RuleType.SINGLE_TABLE_CUSTOM_SQL.getCode());
-        assertEquals(2, RuleType.MULTI_TABLE_ACCURACY.getCode());
-        assertEquals(3, RuleType.MULTI_TABLE_COMPARISON.getCode());
+        Assertions.assertEquals(0, RuleType.SINGLE_TABLE.getCode());
+        Assertions.assertEquals(1, RuleType.SINGLE_TABLE_CUSTOM_SQL.getCode());
+        Assertions.assertEquals(2, RuleType.MULTI_TABLE_ACCURACY.getCode());
+        Assertions.assertEquals(3, RuleType.MULTI_TABLE_COMPARISON.getCode());
     }
- 
+
     @Test
     public void testGetDescription() {
-        assertEquals("single_table", RuleType.SINGLE_TABLE.getDescription());
-        assertEquals("single_table_custom_sql", RuleType.SINGLE_TABLE_CUSTOM_SQL.getDescription());
-        assertEquals("multi_table_accuracy", RuleType.MULTI_TABLE_ACCURACY.getDescription());
-        assertEquals("multi_table_comparison", RuleType.MULTI_TABLE_COMPARISON.getDescription());
+        Assertions.assertEquals("single_table", RuleType.SINGLE_TABLE.getDescription());
+        Assertions.assertEquals("single_table_custom_sql", RuleType.SINGLE_TABLE_CUSTOM_SQL.getDescription());
+        Assertions.assertEquals("multi_table_accuracy", RuleType.MULTI_TABLE_ACCURACY.getDescription());
+        Assertions.assertEquals("multi_table_comparison", RuleType.MULTI_TABLE_COMPARISON.getDescription());
     }
 
     @Test
     public void testOf() {
-        assertEquals(RuleType.SINGLE_TABLE, RuleType.of(0));
-        assertEquals(RuleType.SINGLE_TABLE_CUSTOM_SQL, RuleType.of(1));
-        assertEquals(RuleType.MULTI_TABLE_ACCURACY, RuleType.of(2));
-        assertEquals(RuleType.MULTI_TABLE_COMPARISON, RuleType.of(3));
+        Assertions.assertEquals(RuleType.SINGLE_TABLE, RuleType.of(0));
+        Assertions.assertEquals(RuleType.SINGLE_TABLE_CUSTOM_SQL, RuleType.of(1));
+        Assertions.assertEquals(RuleType.MULTI_TABLE_ACCURACY, RuleType.of(2));
+        Assertions.assertEquals(RuleType.MULTI_TABLE_COMPARISON, RuleType.of(3));
     }
 }

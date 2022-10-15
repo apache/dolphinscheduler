@@ -22,22 +22,23 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class EmailAlertChannelFactoryTest {
+
     @Test
     public void testGetParams() {
         EmailAlertChannelFactory emailAlertChannelFactory = new EmailAlertChannelFactory();
         List<PluginParams> params = emailAlertChannelFactory.params();
-        Assert.assertEquals(12, params.size());
+        Assertions.assertEquals(12, params.size());
     }
 
     @Test
     public void testCreate() {
         EmailAlertChannelFactory emailAlertChannelFactory = new EmailAlertChannelFactory();
         AlertChannel alertChannel = emailAlertChannelFactory.create();
-        Assert.assertNotNull(alertChannel);
+        Assertions.assertNotNull(alertChannel);
     }
 
 }

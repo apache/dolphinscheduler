@@ -150,7 +150,7 @@ public class ScheduleV2Controller extends BaseController {
      * @return result Result
      */
     @ApiOperation(value = "get", notes = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
-    @GetMapping(consumes = {"application/json"})
+    @PostMapping(value = "/filter", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
