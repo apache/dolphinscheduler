@@ -134,11 +134,6 @@
             <artifactId>spring-context</artifactId>
         </dependency>
 
-       <!-- <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-        </dependency>-->
-
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
