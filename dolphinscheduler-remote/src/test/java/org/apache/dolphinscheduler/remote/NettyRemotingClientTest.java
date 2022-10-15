@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.remote;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
@@ -25,17 +28,12 @@ import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 
 /**
  *  netty remote client test
@@ -65,7 +63,7 @@ public class NettyRemotingClientTest {
         Command commandPing = Ping.create();
         try {
             Command response = client.sendSync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
-            Assert.assertEquals(commandPing.getOpaque(), response.getOpaque());
+            Assertions.assertEquals(commandPing.getOpaque(), response.getOpaque());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -103,7 +101,7 @@ public class NettyRemotingClientTest {
                 }
             });
             latch.await();
-            Assert.assertEquals(commandPing.getOpaque(), opaque.get());
+            Assertions.assertEquals(commandPing.getOpaque(), opaque.get());
         } catch (Exception e) {
             e.printStackTrace();
         }

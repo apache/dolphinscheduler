@@ -21,11 +21,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class TaskProcessorFactoryTest {
 
     @Test
@@ -36,7 +36,7 @@ public class TaskProcessorFactoryTest {
 
         ITaskProcessor iTaskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
 
-        Assert.assertNotNull(iTaskProcessor);
+        Assertions.assertNotNull(iTaskProcessor);
     }
 
 }

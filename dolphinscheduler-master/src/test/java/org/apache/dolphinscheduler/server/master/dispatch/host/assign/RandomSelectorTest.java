@@ -19,31 +19,33 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * random selector
  */
 public class RandomSelectorTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSelectWithIllegalArgumentException() {
         RandomSelector selector = new RandomSelector();
-        selector.select(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            selector.select(null);
+        });
     }
 
     @Test
     public void testSelect1() {
         RandomSelector selector = new RandomSelector();
         HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1:11", 100, "default"), new HostWorker("192.168.1.2:22", 80, "default")));
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
     @Test
     public void testSelect() {
         RandomSelector selector = new RandomSelector();
         HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1", 11, 100, "default"), new HostWorker("192.168.1.2:", 22, 20, "default")));
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 }

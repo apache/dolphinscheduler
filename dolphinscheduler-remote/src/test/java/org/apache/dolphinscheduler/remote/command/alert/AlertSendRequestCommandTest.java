@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.remote.command.alert;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AlertSendRequestCommandTest {
 
@@ -33,7 +32,7 @@ public class AlertSendRequestCommandTest {
         String content = "test-content";
         AlertSendRequestCommand requestCommand = new AlertSendRequestCommand(groupId,title,content,WarningType.FAILURE.getCode());
         Command command = requestCommand.convert2Command();
-        Assert.assertEquals(CommandType.ALERT_SEND_REQUEST,command.getType());
+        Assertions.assertEquals(CommandType.ALERT_SEND_REQUEST, command.getType());
         AlertSendRequestCommand verifyCommand = new AlertSendRequestCommand();
         verifyCommand.setGroupId(groupId);
         verifyCommand.setContent(content);

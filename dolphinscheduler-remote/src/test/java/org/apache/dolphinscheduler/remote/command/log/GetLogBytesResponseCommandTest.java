@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.remote.command.log;
 
 import org.apache.dolphinscheduler.remote.command.Command;
-
-import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class GetLogBytesResponseCommandTest {
 
@@ -31,6 +29,6 @@ public class GetLogBytesResponseCommandTest {
     public void testConvert2Command() {
         GetLogBytesResponseCommand getLogBytesResponseCommand = new GetLogBytesResponseCommand(data);
         Command command = getLogBytesResponseCommand.convert2Command(122);
-        Assert.assertNotNull(command);
+        Assertions.assertNotNull(command);
     }
 }

@@ -39,8 +39,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -124,7 +124,7 @@ public class SubProcessTaskTest {
         subTaskProcessor.init(taskInstance, processInstance);
         subTaskProcessor.action(TaskAction.RUN);
         TaskExecutionStatus status = taskInstance.getState();
-        Assert.assertEquals(TaskExecutionStatus.SUCCESS, status);
+        Assertions.assertEquals(TaskExecutionStatus.SUCCESS, status);
     }
 
     private String getProperty() {

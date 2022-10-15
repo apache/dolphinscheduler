@@ -34,19 +34,19 @@ import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * netty executor manager test
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
+@ExtendWith(SpringExtension.class)
+@Disabled
 public class NettyExecutorManagerTest {
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
@@ -71,11 +71,11 @@ public class NettyExecutorManagerTest {
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(serverConfig.getListenPort())));
         Boolean execute = nettyExecutorManager.execute(executionContext);
-        Assert.assertTrue(execute);
+        Assertions.assertTrue(execute);
         nettyRemotingServer.close();
     }
 
-    @Test(expected = ExecuteException.class)
+    @Test
     public void testExecuteWithException() throws ExecuteException {
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
@@ -89,7 +89,9 @@ public class NettyExecutorManagerTest {
                 .create();
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(4444)));
-        nettyExecutorManager.execute(executionContext);
+        Assertions.assertThrows(ExecuteException.class, () -> {
+            nettyExecutorManager.execute(executionContext);
+        });
 
     }
     private Command toCommand(TaskExecutionContext taskExecutionContext) {

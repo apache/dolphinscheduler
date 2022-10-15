@@ -23,20 +23,20 @@ import org.apache.dolphinscheduler.server.master.dispatch.ExecutionContextTestUt
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.assertj.core.util.Strings;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * round robin host manager test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RoundRobinHostManagerTest {
 
     @Mock
@@ -50,7 +50,7 @@ public class RoundRobinHostManagerTest {
         Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(null);
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host emptyHost = roundRobinHostManager.select(context);
-        Assert.assertTrue(Strings.isNullOrEmpty(emptyHost.getAddress()));
+        Assertions.assertTrue(Strings.isNullOrEmpty(emptyHost.getAddress()));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class RoundRobinHostManagerTest {
         Mockito.when(serverNodeManager.getWorkerNodeInfo("192.168.1.1:22")).thenReturn(new WorkerHeartBeat());
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
-        Assert.assertTrue(!Strings.isNullOrEmpty(host.getAddress()));
-        Assert.assertTrue(host.getAddress().equalsIgnoreCase("192.168.1.1:22"));
+        Assertions.assertFalse(Strings.isNullOrEmpty(host.getAddress()));
+        Assertions.assertTrue(host.getAddress().equalsIgnoreCase("192.168.1.1:22"));
     }
 }
