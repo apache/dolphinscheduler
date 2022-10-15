@@ -21,6 +21,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
 import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -29,8 +34,6 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import springfox.documentation.annotations.ApiIgnore;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -48,15 +51,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-
 /**
  * login controller
  */
-@Api(tags = "LOGIN_TAG")
+@Tag(name = "LOGIN_TAG")
 @RestController
 @RequestMapping("")
 public class LoginController extends BaseController {
@@ -76,10 +74,10 @@ public class LoginController extends BaseController {
      * @param response response
      * @return login result
      */
-    @ApiOperation(value = "login", notes = "LOGIN_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataTypeClass = String.class)
+    @Operation(summary = "login", description = "LOGIN_NOTES")
+    @Parameters({
+            @Parameter(name = "userName", description = "USER_NAME", required = true, schema =@Schema( implementation = String.class)),
+            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema =@Schema( implementation = String.class))
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)
@@ -124,11 +122,11 @@ public class LoginController extends BaseController {
      * @param request request
      * @return sign out result
      */
-    @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")
+    @Operation(summary = "signOut", description = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
     @ApiException(SIGN_OUT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "request"})
-    public Result signOut(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result signOut(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);
         sessionService.signOut(ip, loginUser);

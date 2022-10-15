@@ -21,14 +21,15 @@ import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
@@ -40,13 +41,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-
 /**
  * monitor controller
  */
-@Api(tags = "MONITOR_TAG")
+@Tag(name = "MONITOR_TAG")
 @RestController
 @RequestMapping("/monitor")
 public class MonitorController extends BaseController {
@@ -60,12 +58,12 @@ public class MonitorController extends BaseController {
      * @param loginUser login user
      * @return master list
      */
-    @ApiOperation(value = "listMaster", notes = "MASTER_LIST_NOTES")
+    @Operation(summary = "listMaster", description = "MASTER_LIST_NOTES")
     @GetMapping(value = "/masters")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result listMaster(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result listMaster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryMaster(loginUser);
         return returnDataList(result);
     }
@@ -76,12 +74,12 @@ public class MonitorController extends BaseController {
      * @param loginUser login user
      * @return worker information list
      */
-    @ApiOperation(value = "listWorker", notes = "WORKER_LIST_NOTES")
+    @Operation(summary = "listWorker", description = "WORKER_LIST_NOTES")
     @GetMapping(value = "/workers")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_WORKERS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result listWorker(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result listWorker(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryWorker(loginUser);
         return returnDataList(result);
     }
@@ -92,12 +90,12 @@ public class MonitorController extends BaseController {
      * @param loginUser login user
      * @return data base state
      */
-    @ApiOperation(value = "queryDatabaseState", notes = "QUERY_DATABASE_STATE_NOTES")
+    @Operation(summary = "queryDatabaseState", description = "QUERY_DATABASE_STATE_NOTES")
     @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATABASE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryDatabaseState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result queryDatabaseState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
         return returnDataList(result);
     }

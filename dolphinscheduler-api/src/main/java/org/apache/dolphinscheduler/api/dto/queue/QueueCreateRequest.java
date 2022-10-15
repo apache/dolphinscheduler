@@ -17,20 +17,20 @@
 
 package org.apache.dolphinscheduler.api.dto.queue;
 
+import io.swagger.v3.oas.annotations.media.Schema;;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 /**
  * queue create request
  */
-@ApiModel("QUEUE-CREATE")
+@Schema(name ="QUEUE-CREATE")
 @Data
 public class QueueCreateRequest {
 
-    @ApiModelProperty(example = "queue11", required = true)
+    @Schema(example = "queue11", required = true)
     private String queue;
 
-    @ApiModelProperty(example = "test_queue11", required = true)
+    @Schema(example = "test_queue11", required = true)
     private String queueName;
 }
