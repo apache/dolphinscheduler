@@ -21,7 +21,6 @@ import com.google.common.base.Strings;
 import lombok.NonNull;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -34,6 +33,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,10 +158,17 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             ProcessInstance processInstance = entry.getKey();
             TaskInstance taskInstance = entry.getValue();
             String address = NetUtils.getAddr(masterConfig.getListenPort());
-            if (processInstance.getHost().equalsIgnoreCase(address)) {
-                this.notifyMyself(processInstance, taskInstance);
-            } else {
-                this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
+            try {
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstance.getId());
+                if (processInstance.getHost().equalsIgnoreCase(address)) {
+                    logger.info("Process host is local master, will notify it");
+                    this.notifyMyself(processInstance, taskInstance);
+                } else {
+                    logger.info("Process host is remote master, will notify it");
+                    this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
+                }
+            } finally {
+                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
@@ -190,8 +197,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                                TaskInstance taskInstance) {
         String processInstanceHost = processInstance.getHost();
         if (Strings.isNullOrEmpty(processInstanceHost)) {
-            logger.error("process {} host is empty, cannot notify task {} now", processInstance.getId(),
-                    taskInstance.getId());
+            logger.error("Process {} host is empty, cannot notify task {} now, taskId: {}", processInstance.getName(),
+                    taskInstance.getName(), taskInstance.getId());
             return;
         }
         WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(

@@ -20,25 +20,20 @@ package org.apache.dolphinscheduler.plugin.datasource.db2;
 import org.apache.dolphinscheduler.plugin.datasource.db2.param.Db2ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({DB2DataSourceClient.class, DB2DataSourceChannel.class})
+@ExtendWith(MockitoExtension.class)
 public class DB2DataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        DB2DataSourceChannel sourceChannel = PowerMockito.mock(DB2DataSourceChannel.class);
-        DB2DataSourceClient dataSourceClient = PowerMockito.mock(DB2DataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
+        DB2DataSourceChannel sourceChannel = Mockito.mock(DB2DataSourceChannel.class);
+        DB2DataSourceClient dataSourceClient = Mockito.mock(DB2DataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
     }
 }

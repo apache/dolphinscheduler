@@ -31,7 +31,7 @@ Refer to the [Submit Guide-Issue Notice](./issue.md), [Submit Guide-Pull Request
 
 If you want to implement a Feature or fix a Bug. Please refer to the following:
 
-* All Bugs and the new Features are recommended and managed using the Issues Page.
+* All bugs and the features are recommended and managed using the GitHub issues(https://github.com/apache/dolphinscheduler/issues).
 * If you want to develop a Feature, first reply to the Issue associated with that feature, indicating that you are currently working on it. And set yourself a "deadline" when to Submit the Feature, and add it in the reply comment.
 * It's a good idea to find a mentor (or an instructor) in the core contributors who gives immediate feedback on design and functional implementation.
 * You should create a new branch to start your work, to get the name of the branch refer to the [Submit Guide-Pull Request Notice](./pull-request.md). For example, if you want to complete the feature and submit Issue 111, your branch name should be feature-111. The feature name can be determined after discussion with the instructor.

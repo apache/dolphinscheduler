@@ -22,8 +22,8 @@ import org.apache.commons.collections.CollectionUtils;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SchemaUtilsTest {
 
@@ -33,31 +33,31 @@ public class SchemaUtilsTest {
         try {
             SchemaUtils.isAGreatVersion(null, null);
         } catch (RuntimeException e) {
-            Assert.assertEquals("schemaVersion or version is empty", e.getMessage());
+            Assertions.assertEquals("schemaVersion or version is empty", e.getMessage());
         }
 
         // param is ""
         try {
             SchemaUtils.isAGreatVersion("", "");
         } catch (RuntimeException e) {
-            Assert.assertEquals("schemaVersion or version is empty", e.getMessage());
+            Assertions.assertEquals("schemaVersion or version is empty", e.getMessage());
         }
-        Assert.assertFalse(SchemaUtils.isAGreatVersion("1", "1"));
-        Assert.assertTrue(SchemaUtils.isAGreatVersion("2", "1"));
-        Assert.assertTrue(SchemaUtils.isAGreatVersion("1.1", "1"));
-        Assert.assertTrue(SchemaUtils.isAGreatVersion("1.1", "1.0.1"));
-        Assert.assertFalse(SchemaUtils.isAGreatVersion("1.1", "1.2"));
-        Assert.assertTrue(SchemaUtils.isAGreatVersion("1.1.1", "1.1"));
-        Assert.assertTrue(SchemaUtils.isAGreatVersion("10.1.1", "1.01.100"));
+        Assertions.assertFalse(SchemaUtils.isAGreatVersion("1", "1"));
+        Assertions.assertTrue(SchemaUtils.isAGreatVersion("2", "1"));
+        Assertions.assertTrue(SchemaUtils.isAGreatVersion("1.1", "1"));
+        Assertions.assertTrue(SchemaUtils.isAGreatVersion("1.1", "1.0.1"));
+        Assertions.assertFalse(SchemaUtils.isAGreatVersion("1.1", "1.2"));
+        Assertions.assertTrue(SchemaUtils.isAGreatVersion("1.1.1", "1.1"));
+        Assertions.assertTrue(SchemaUtils.isAGreatVersion("10.1.1", "1.01.100"));
         try {
             SchemaUtils.isAGreatVersion("10.1.1", ".1");
-            Assert.fail("Should fail");
+            Assertions.fail("Should fail");
         } catch (Exception ignored) {
             // This is expected
         }
         try {
             SchemaUtils.isAGreatVersion("a.1.1", "b.1");
-            Assert.fail("Should fail");
+            Assertions.fail("Should fail");
         } catch (Exception ignored) {
             // This is expected
         }
@@ -69,8 +69,8 @@ public class SchemaUtilsTest {
         try {
             list = SchemaUtils.getAllSchemaList();
         } catch (IOException ex) {
-            Assert.fail(ex.getMessage());
+            Assertions.fail(ex.getMessage());
         }
-        Assert.assertFalse("Can not find any schema files", CollectionUtils.isEmpty(list));
+        Assertions.assertFalse(CollectionUtils.isEmpty(list),"Can not find any schema files");
     }
 }

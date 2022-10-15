@@ -24,19 +24,22 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class K8sManagerTest {
 
     @InjectMocks
@@ -45,11 +48,11 @@ public class K8sManagerTest {
     @Mock
     private ClusterMapper clusterMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
@@ -58,9 +61,9 @@ public class K8sManagerTest {
         Mockito.when(clusterMapper.selectList(Mockito.any())).thenReturn(getClusterList());
 
         KubernetesClient result = k8sManager.getK8sClient(1L);
-        Assert.assertNull(result);
+        Assertions.assertNull(result);
         result = k8sManager.getK8sClient(null);
-        Assert.assertNull(result);
+        Assertions.assertNull(result);
     }
 
     private Cluster getCluster() {

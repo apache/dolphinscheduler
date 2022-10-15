@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -33,23 +32,20 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.task.SubTaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.context.ApplicationContext;
 
-@RunWith(MockitoJUnitRunner.class)
 public class SubProcessTaskTest {
 
     /**
@@ -62,23 +58,22 @@ public class SubProcessTaskTest {
     private ProcessInstance processInstance;
 
     private MockedStatic<ServerLifeCycleManager> mockedStaticServerLifeCycleManager;
+    private MockedStatic<SpringApplicationContext> mockedStaticSpringApplicationContext;
 
-    @Before
+    @BeforeEach
     public void before() {
-        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
-        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
-        springApplicationContext.setApplicationContext(applicationContext);
-
         MasterConfig config = new MasterConfig();
-        Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
         config.setTaskCommitRetryTimes(3);
         config.setTaskCommitInterval(Duration.ofSeconds(1));
 
-        mockedStaticServerLifeCycleManager = Mockito.mockStatic(ServerLifeCycleManager.class);
-        Mockito.when(ServerLifeCycleManager.isStopped()).thenReturn(false);
+        mockedStaticSpringApplicationContext = Mockito.mockStatic(SpringApplicationContext.class);
+        Mockito.when(SpringApplicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processService = Mockito.mock(ProcessService.class);
-        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        mockedStaticServerLifeCycleManager = Mockito.mockStatic(ServerLifeCycleManager.class);
+        Mockito.when(ServerLifeCycleManager.isStopped()).thenReturn(false);
 
         processInstance = getProcessInstance();
         Mockito.when(processService
@@ -91,9 +86,10 @@ public class SubProcessTaskTest {
         taskDefinition.setTimeout(0);
     }
 
-    @After
+    @AfterEach
     public void after() {
         mockedStaticServerLifeCycleManager.close();
+        mockedStaticSpringApplicationContext.close();
     }
 
     private TaskInstance testBasicInit(WorkflowExecutionStatus expectResult) {
@@ -164,12 +160,6 @@ public class SubProcessTaskTest {
         processInstance.setWarningGroupId(0);
         processInstance.setName("S");
         return processInstance;
-    }
-
-    private TaskInstance getTaskInstance() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1000);
-        return taskInstance;
     }
 
     private ProcessInstance getSubProcessInstance(WorkflowExecutionStatus executionStatus) {

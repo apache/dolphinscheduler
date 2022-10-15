@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -40,10 +39,12 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Test HttpTask
  */
+@ExtendWith(MockitoExtension.class)
 public class HttpTaskTest {
 
     private static final String CONTENT_TYPE = "Content-Type";
@@ -63,7 +65,7 @@ public class HttpTaskTest {
 
     private final List<MockWebServer> mockWebServers = new ArrayList<>();
 
-    @After
+    @AfterEach
     public void after() {
         mockWebServers.forEach(IOUtils::closeQuietly);
         mockWebServers.clear();
@@ -81,18 +83,18 @@ public class HttpTaskTest {
         headHttpTask.handle(null);
         putHttpTask.handle(null);
         deleteHttpTask.handle(null);
-        Assert.assertEquals(EXIT_CODE_SUCCESS, getHttpTask.getExitStatusCode());
-        Assert.assertEquals(EXIT_CODE_SUCCESS, postHttpTask.getExitStatusCode());
-        Assert.assertEquals(EXIT_CODE_SUCCESS, headHttpTask.getExitStatusCode());
-        Assert.assertEquals(EXIT_CODE_SUCCESS, putHttpTask.getExitStatusCode());
-        Assert.assertEquals(EXIT_CODE_SUCCESS, deleteHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, getHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, postHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, headHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, putHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, deleteHttpTask.getExitStatusCode());
     }
 
     @Test
     public void testHandleCheckCodeDefaultError() throws Exception {
         HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_BAD_REQUEST);
         getHttpTask.handle(null);
-        Assert.assertEquals(EXIT_CODE_FAILURE, getHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_FAILURE, getHttpTask.getExitStatusCode());
     }
 
     @Test
@@ -104,8 +106,8 @@ public class HttpTaskTest {
                 condition, HttpStatus.SC_OK, "");
         httpTask.handle(null);
         httpErrorTask.handle(null);
-        Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
-        Assert.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
     }
 
     @Test
@@ -116,8 +118,8 @@ public class HttpTaskTest {
                 "success", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
         httpTask.handle(null);
         httpErrorTask.handle(null);
-        Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
-        Assert.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
     }
 
     @Test
@@ -128,8 +130,8 @@ public class HttpTaskTest {
                 "failed", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
         httpTask.handle(null);
         httpErrorTask.handle(null);
-        Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
-        Assert.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_FAILURE, httpErrorTask.getExitStatusCode());
     }
 
     @Test
@@ -149,7 +151,7 @@ public class HttpTaskTest {
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
                 HttpStatus.SC_OK, "");
         httpTask.handle(null);
-        Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
     @Test
@@ -169,7 +171,7 @@ public class HttpTaskTest {
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
                 HttpStatus.SC_OK, "");
         httpTask.handle(null);
-        Assert.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
     private String withMockWebServer(String path, int actualResponseCode,
@@ -203,7 +205,7 @@ public class HttpTaskTest {
 
     private HttpTask generateHttpTaskFromParamData(String paramData, Map<String, String> prepareParamsMap) {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
         if (prepareParamsMap != null) {
             Map<String, Property> propertyParamsMap = new HashMap<>();
             prepareParamsMap.forEach((k, v) -> {
@@ -212,7 +214,7 @@ public class HttpTaskTest {
                 property.setValue(v);
                 propertyParamsMap.put(k, property);
             });
-            when(taskExecutionContext.getPrepareParamsMap()).thenReturn(propertyParamsMap);
+            Mockito.when(taskExecutionContext.getPrepareParamsMap()).thenReturn(propertyParamsMap);
         }
         HttpTask httpTask = new HttpTask(taskExecutionContext);
         httpTask.init();

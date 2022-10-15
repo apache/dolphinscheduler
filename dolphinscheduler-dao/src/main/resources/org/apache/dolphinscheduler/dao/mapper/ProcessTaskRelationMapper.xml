@@ -200,4 +200,27 @@
             and post_task_code = #{postTaskCode}
         </if>
     </select>
+
+    <select id="filterProcessTaskRelation"
+            parameterType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_process_task_relation
+        <where>
+            <if test=" relation.projectCode != 0">
+                and project_code = #{relation.projectCode}
+            </if>
+            <if test=" relation.processDefinitionCode != 0">
+                and process_definition_code = #{relation.processDefinitionCode}
+            </if>
+            <if test=" relation.preTaskCode != 0">
+                and pre_task_code = #{relation.preTaskCode}
+            </if>
+            <if test=" relation.postTaskCode != 0">
+                and post_task_code = #{relation.postTaskCode}
+            </if>
+        </where>
+        order by update_time desc, id asc
+    </select>
 </mapper>

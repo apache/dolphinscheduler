@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -208,7 +208,7 @@ public class UserMapperTest extends BaseDaoTest {
         user.setUserName("user1_update");
         user.setUserType(UserType.ADMIN_USER);
         int update = userMapper.updateById(user);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
@@ -220,7 +220,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne();
         //delete
         int delete = userMapper.deleteById(user.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -232,7 +232,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne();
         //query
         List<User> userList = userMapper.selectList(null);
-        Assert.assertNotEquals(userList.size(), 0);
+        Assertions.assertNotEquals(userList.size(), 0);
     }
 
     /**
@@ -244,7 +244,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne();
         //queryAllGeneralUser
         List<User> userList = userMapper.queryAllGeneralUser();
-        Assert.assertNotEquals(userList.size(), 0);
+        Assertions.assertNotEquals(userList.size(), 0);
     }
 
 
@@ -262,7 +262,7 @@ public class UserMapperTest extends BaseDaoTest {
         //queryUserPaging
         Page<User> page = new Page(1, 3);
         IPage<User> userIPage = userMapper.queryUserPaging(page, user.getUserName());
-        Assert.assertNotEquals(userIPage.getTotal(), 0);
+        Assertions.assertNotEquals(userIPage.getTotal(), 0);
     }
 
     /**
@@ -276,7 +276,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne(queue, tenant);
         //queryDetailsById
         User queryUser = userMapper.queryDetailsById(user.getId());
-        Assert.assertEquals(user.getUserName(), queryUser.getUserName());
+        Assertions.assertEquals(user.getUserName(), queryUser.getUserName());
     }
 
     /**
@@ -290,7 +290,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne(tenant);
         //queryTenantCodeByUserId
         User queryUser = userMapper.queryTenantCodeByUserId(user.getId());
-        Assert.assertEquals(queryUser, user);
+        Assertions.assertEquals(queryUser, user);
     }
 
     /**
@@ -304,7 +304,7 @@ public class UserMapperTest extends BaseDaoTest {
         AccessToken accessToken = insertOneAccessToken(user);
         //queryUserByToken
         User userToken = userMapper.queryUserByToken(accessToken.getToken(), new Date());
-        Assert.assertEquals(userToken, user);
+        Assertions.assertEquals(userToken, user);
 
     }
 
@@ -315,14 +315,14 @@ public class UserMapperTest extends BaseDaoTest {
         List<Integer> userIds = new ArrayList<>();
         userIds.add(user.getId());
         List<User> users = userMapper.selectByIds(userIds);
-        Assert.assertFalse(users.isEmpty());
+        Assertions.assertFalse(users.isEmpty());
     }
 
     @Test
     public void testExistUser() {
         String queueName = "queue";
-        Assert.assertNull(userMapper.existUser(queueName));
+        Assertions.assertNull(userMapper.existUser(queueName));
         insertOne();
-        Assert.assertTrue(userMapper.existUser(queueName));
+        Assertions.assertTrue(userMapper.existUser(queueName));
     }
 }
