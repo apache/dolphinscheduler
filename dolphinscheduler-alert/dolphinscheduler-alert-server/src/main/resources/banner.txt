@@ -8,5 +8,5 @@ ${AnsiColor.BLUE}${AnsiStyle.BOLD}
               |_|
 ================================================================================
 ${AnsiColor.BLUE}${AnsiStyle.BOLD}
-::  Dolphinscheduler alert server ::  ${application.formatted-version}
+::  DolphinScheduler alert server ::  ${application.formatted-version}
 ${AnsiStyle.NORMAL}

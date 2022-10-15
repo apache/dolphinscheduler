@@ -97,7 +97,7 @@
             <property name="alias" value="u"/>
         </include>
         from t_ds_user u ,t_ds_access_token t
-        where u.id = t.user_id and token=#{token} and t.expire_time > NOW()
+        where u.id = t.user_id and token=#{token} and t.expire_time > #{now}
     </select>
     <select id="queryUserListByQueue" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
@@ -118,10 +118,12 @@
     <select id="selectByIds" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select *
         from t_ds_user
-        where id in
-        <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
-            #{id}
-        </foreach>
+        <if test="ids != null and ids.size() != 0">
+            where id in
+            <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
     </select>
     <select id="queryAuthedUserListByProjectId" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
@@ -130,5 +132,11 @@
         </include>
         from t_ds_user u, t_ds_relation_project_user rel
         where u.id = rel.user_id and rel.project_id = #{projectId}
+    </select>
+    <select id="queryEnabledUsers" resultType="org.apache.dolphinscheduler.dao.entity.User">
+        select
+        <include refid="baseSql"/>
+        from t_ds_user
+        where state = 1
     </select>
 </mapper>

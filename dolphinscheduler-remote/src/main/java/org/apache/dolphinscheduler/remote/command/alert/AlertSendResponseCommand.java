@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.command.alert;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
@@ -24,40 +27,18 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import java.io.Serializable;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlertSendResponseCommand implements Serializable {
 
     /**
      * true:All alert are successful,
      * false:As long as one alert fails
      */
-    private boolean resStatus;
+    private boolean success;
 
     private List<AlertSendResponseResult> resResults;
-
-    public boolean getResStatus() {
-        return resStatus;
-    }
-
-    public void setResStatus(boolean resStatus) {
-        this.resStatus = resStatus;
-    }
-
-    public List<AlertSendResponseResult> getResResults() {
-        return resResults;
-    }
-
-    public void setResResults(List<AlertSendResponseResult> resResults) {
-        this.resResults = resResults;
-    }
-
-    public AlertSendResponseCommand() {
-
-    }
-
-    public AlertSendResponseCommand(boolean resStatus, List<AlertSendResponseResult> resResults) {
-        this.resStatus = resStatus;
-        this.resResults = resResults;
-    }
 
     /**
      * package response command

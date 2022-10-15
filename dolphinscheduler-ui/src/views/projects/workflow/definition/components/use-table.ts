@@ -25,7 +25,6 @@ import {
 } from '@/service/modules/process-definition'
 import { DeleteOutlined, ExclamationCircleOutlined } from '@vicons/antd'
 import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
-import styles from '../index.module.scss'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 
@@ -86,7 +85,6 @@ export function useTable(
       variables.columns.push({
         title: t('project.workflow.operation'),
         key: 'operation',
-        className: styles.operation,
         render: (_row: any) => {
           return h(NSpace, null, {
             default: () => [
@@ -109,7 +107,7 @@ export function useTable(
                             {
                               circle: true,
                               type: 'info',
-                              size: 'tiny',
+                              size: 'small',
                               disabled: _row.version === variables.row.version
                             },
                             {
@@ -141,7 +139,7 @@ export function useTable(
                             {
                               circle: true,
                               type: 'error',
-                              size: 'tiny',
+                              size: 'small',
                               disabled: _row.version === variables.row.version
                             },
                             {

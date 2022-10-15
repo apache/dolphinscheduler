@@ -98,7 +98,7 @@ const master = defineComponent({
                     </NSpace>
                   </NSpace>
                 </NCard>
-                <NGrid x-gap='12' cols='3'>
+                <NGrid x-gap='12' cols='4'>
                   <NGi>
                     <Card title={t('monitor.master.cpu_usage')}>
                       <div class={styles.card}>
@@ -120,6 +120,19 @@ const master = defineComponent({
                             data={(
                               JSON.parse(item.resInfo).memoryUsage * 100
                             ).toFixed(2)}
+                          />
+                        )}
+                      </div>
+                    </Card>
+                  </NGi>
+                  <NGi>
+                    <Card title={t('monitor.master.disk_available')}>
+                      <div class={[styles.card, styles['load-average']]}>
+                        {item && (
+                          <NNumberAnimation
+                            precision={2}
+                            from={0}
+                            to={JSON.parse(item.resInfo).diskAvailable}
                           />
                         )}
                       </div>

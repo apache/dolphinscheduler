@@ -19,18 +19,24 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * k8s namespace
- */
+@Data
 @TableName("t_ds_k8s_namespace")
 public class K8sNamespace {
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
+    /**
+     * cluster code
+     */
+    private Long code;
 
     /**
      * namespace name
@@ -92,137 +98,16 @@ public class K8sNamespace {
     private Integer podReplicas = 0;
 
     /**
-     * online job
+     * cluster code
      */
-    @TableField("online_job_num")
-    private Integer onlineJobNum = 0;
+    @TableField("cluster_code")
+    private Long clusterCode;
 
     /**
      * k8s name
      */
-    @TableField("k8s")
-    private String k8s;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public Double getLimitsCpu() {
-        return limitsCpu;
-    }
-
-    public void setLimitsCpu(Double limitsCpu) {
-        this.limitsCpu = limitsCpu;
-    }
-
-    public Integer getLimitsMemory() {
-        return limitsMemory;
-    }
-
-    public void setLimitsMemory(Integer limitsMemory) {
-        this.limitsMemory = limitsMemory;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getPodRequestMemory() {
-        return podRequestMemory;
-    }
-
-    public void setPodRequestMemory(Integer podRequestMemory) {
-        this.podRequestMemory = podRequestMemory;
-    }
-
-    public Integer getPodReplicas() {
-        return podReplicas;
-    }
-
-    public void setPodReplicas(Integer podReplicas) {
-        this.podReplicas = podReplicas;
-    }
-
-    public Integer getOnlineJobNum() {
-        return onlineJobNum;
-    }
-
-    public void setOnlineJobNum(Integer onlineJobNum) {
-        this.onlineJobNum = onlineJobNum;
-    }
-
-    public String getK8s() {
-        return k8s;
-    }
-
-    public void setK8s(String k8s) {
-        this.k8s = k8s;
-    }
-
-    public Double getPodRequestCpu() {
-        return podRequestCpu;
-    }
-
-    public void setPodRequestCpu(Double podRequestCpu) {
-        this.podRequestCpu = podRequestCpu;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    @Override
-    public String toString() {
-        return "K8sNamespace{" +
-            "id=" + id +
-            ", namespace=" + namespace +
-            ", limitsCpu=" + limitsCpu +
-            ", limitsMemory=" + limitsMemory +
-            ", userId=" + userId +
-            ", podRequestCpu=" + podRequestCpu +
-            ", podRequestMemory=" + podRequestMemory +
-            ", podReplicas=" + podReplicas +
-            ", k8s=" + k8s +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
-    }
+    @TableField(exist = false)
+    private String clusterName;
 
     @Override
     public boolean equals(Object o) {
@@ -239,13 +124,13 @@ public class K8sNamespace {
             return true;
         }
 
-        return namespace.equals(k8sNamespace.namespace) && k8s.equals(k8sNamespace.k8s);
+        return namespace.equals(k8sNamespace.namespace) && clusterName.equals(k8sNamespace.clusterName);
     }
 
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + (k8s+namespace).hashCode();
+        result = 31 * result + (clusterName + namespace).hashCode();
         return result;
     }
 }

@@ -42,7 +42,7 @@ export function useRules(
   const targetTableColumnOptions = ref([] as { label: string; value: number }[])
   const writerDatasourceOptions = ref([] as { label: string; value: number }[])
 
-  const fixValueSpan = computed(() => model.comparison_type === 1 ? 24 : 0)
+  const fixValueSpan = computed(() => (model.comparison_type === 1 ? 24 : 0))
 
   let preItemLen = 0
 
@@ -96,7 +96,7 @@ export function useRules(
         child.span = Math.floor(22 / item.props.rules.length)
         return child
       })
-      model[item.field] = []
+      model[item.field] = model[item.field] || []
       delete item.props.rules
     }
     if (responseItem.emit) {
@@ -107,6 +107,17 @@ export function useRules(
           }
         }
       })
+    }
+    if (responseItem.props.placeholder) {
+      item.props.placeholder = t(
+        'project.node.' +
+          responseItem.props.placeholder
+            .split(' ')
+            .join('_')
+            .split(',')
+            .join('')
+            .toLowerCase()
+      )
     }
     if (item.field === 'src_datasource_id') {
       item.options = srcDatasourceOptions
@@ -119,9 +130,11 @@ export function useRules(
     }
     if (item.field === 'src_table') {
       item.options = srcTableOptions
+      item.props.filterable = true
     }
     if (item.field === 'target_table') {
       item.options = targetTableOptions
+      item.props.filterable = true
     }
     if (item.field === 'src_field') {
       item.options = srcTableColumnOptions

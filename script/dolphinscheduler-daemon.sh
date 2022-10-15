@@ -28,6 +28,8 @@ startStop=$1
 shift
 command=$1
 shift
+CLASS=$1
+shift
 
 echo "Begin $startStop $command......"
 
@@ -49,8 +51,6 @@ function overwrite_server_env() {
     echo "Start server ${server} using env config path ${server_env_file}, because file ${BIN_ENV_FILE} not exists."
   fi
 }
-
-source "${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
 
 export HOSTNAME=`hostname`
 
@@ -111,7 +111,7 @@ case $startStop in
 
   (status)
     # more details about the status can be added later
-    serverCount=`ps -ef | grep "$DOLPHINSCHEDULER_HOME" | grep "$CLASS" | grep -v "grep" | wc -l`
+    serverCount=`ps -ef | grep "java" | grep "$DOLPHINSCHEDULER_HOME" | grep "$CLASS" | grep -v "grep" | wc -l`
     state="STOP"
     #  font color - red
     state="[ \033[1;31m $state \033[0m ]"

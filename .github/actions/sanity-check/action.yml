@@ -34,20 +34,5 @@ runs:
     - name: Check License Header
       uses: apache/skywalking-eyes@30367d8286e324d5efc58de4c70c37ea3648306d
 
-    - uses: ./.github/actions/reviewdog-setup
-      with:
-        reviewdog_version: v0.10.2
-
     - shell: bash
-      run: ./mvnw -B -q checkstyle:checkstyle-aggregate
-
-    - shell: bash
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ inputs.token }}
-      run: |
-        if [[ -n "${{ inputs.token }}" ]]; then
-          reviewdog -f=checkstyle \
-            -reporter="github-pr-check" \
-            -filter-mode="added" \
-            -fail-on-error="true" < target/checkstyle-result.xml
-        fi
+      run: ./mvnw spotless:check

@@ -18,18 +18,16 @@
 package org.apache.dolphinscheduler.server.utils;
 
 import static org.powermock.api.mockito.PowerMockito.when;
-
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
-import org.apache.commons.lang.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,12 +64,14 @@ public class ProcessUtilsTest {
     @Test
     public void testGetKerberosInitCommand() {
         PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)).thenReturn(true);
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+                .thenReturn(true);
         PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/etc/krb5.conf");
         PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/etc/krb5.keytab");
         PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("test@DS.COM");
         Assert.assertNotEquals("", ProcessUtils.getKerberosInitCommand());
-        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)).thenReturn(false);
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+                .thenReturn(false);
         Assert.assertEquals("", ProcessUtils.getKerberosInitCommand());
     }
 
@@ -82,7 +82,7 @@ public class ProcessUtilsTest {
         appIds.add("application_1598885606600_3677");
         String tenantCode = "dev";
         String executePath = "/ds-exec/1/1/1";
-        ExecutionStatus running = ExecutionStatus.RUNNING_EXECUTION;
+        TaskExecutionStatus running = TaskExecutionStatus.RUNNING_EXECUTION;
 
         PowerMockito.mockStatic(HadoopUtils.class);
         HadoopUtils hadoop = HadoopUtils.getInstance();

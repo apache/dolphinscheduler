@@ -17,22 +17,30 @@
 ---
 version: 2
 mergeable:
-  - when: pull_request.*, pull_request_review.*
+  # we can not use `pull_request.*` which including event `pull_request.labeled`, according to https://github.com/mergeability/mergeable/issues/643,
+  # otherwise mergeable will keep add or remove label endless, we just need this CI act like the default behavior as
+  # GitHub action workflow `pull_requests` https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request like,
+  # which only trigger runs when a pull_request event's activity type is opened, synchronize, or reopened
+  - when: pull_request.opened, pull_request.reopened, pull_request.synchronize
     name: synchronize change for sql files
     validate:
       # Sql files must change synchronize
       - do: dependent
-        files: ['sql/dolphinscheduler_h2.sql', 'sql/dolphinscheduler_mysql.sql', 'sql/dolphinscheduler_postgre.sql']
+        files:
+          - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_h2.sql'
+          - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_mysql.sql'
+          - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_postgresql.sql'
         message: 'Sql files not change synchronize'
-    # Add labels 'sql not sync' if Sql files not change synchronize
+    # Add labels 'sql not sync' and comment to reviewers if Sql files not change synchronize
     fail:
-      - do: checks
-        status: 'failure'
+      - do: comment
+        payload:
+          body: >
+            :warning: This PR do not change database DDL synchronize.
+        leave_old_comment: false
       - do: labels
         add: 'sql not sync'
     # Remove labels 'sql not sync' if pass
     pass:
-      - do: checks
-        status: 'success'
       - do: labels
         delete: 'sql not sync'

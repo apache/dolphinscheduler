@@ -56,16 +56,23 @@
         <include refid="baseSql">
             <property name="alias" value="udf"/>
         </include>
-        from t_ds_udfs udf
-        where 1=1
+        ,u.user_name
+        from t_ds_udfs udf,t_ds_user u
+        where 1=1 and udf.user_id=u.id
         <if test="searchVal!= null and searchVal != ''">
             and udf.func_name like concat('%', #{searchVal}, '%')
         </if>
-        <if test="userId != 0">
-            and udf.id in (
-            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
-            union select id as udf_id from t_ds_udfs where user_id=#{userId})
+        <if test="ids != null and ids.size() > 0">
+            and udf.id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
         </if>
+<!--        <if test="userId != 0">-->
+<!--            and udf.id in (-->
+<!--            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}-->
+<!--            union select id as udf_id from t_ds_udfs where user_id=#{userId})-->
+<!--        </if>-->
         order by udf.create_time desc
     </select>
     <select id="getUdfFuncByType" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
@@ -75,11 +82,17 @@
         </include>
         from t_ds_udfs udf
         where udf.type=#{type}
-        <if test="userId != 0">
-            and udf.id in (
-            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
-            union select id as udf_id from t_ds_udfs where user_id=#{userId})
+        <if test="ids != null and ids.size() > 0">
+            and udf.id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
         </if>
+<!--        <if test="userId != 0">-->
+<!--            and udf.id in (-->
+<!--            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}-->
+<!--            union select id as udf_id from t_ds_udfs where user_id=#{userId})-->
+<!--        </if>-->
     </select>
     <select id="queryUdfFuncExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select
@@ -156,5 +169,19 @@
             </where>
         </foreach>
     </update>
+
+    <select id="listAuthorizedUdfByUserId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
+        where 1=1
+        <if test="userId != 0">
+            and udf.id in (
+            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+            union select id as udf_id from t_ds_udfs where user_id=#{userId})
+        </if>
+    </select>
 </mapper>
 

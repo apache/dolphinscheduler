@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.hive.param.HiveConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

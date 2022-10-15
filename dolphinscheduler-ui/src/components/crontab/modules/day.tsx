@@ -18,7 +18,14 @@
 import { defineComponent, onMounted, PropType, ref, watch } from 'vue'
 import { NInputNumber, NRadio, NRadioGroup, NSelect } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import { isStr, isWeek, week, specificWeek, lastWeeks } from '../common'
+import {
+  isStr,
+  isWeek,
+  week,
+  specificWeek,
+  lastWeeks,
+  specificList
+} from '../common'
 import styles from '../index.module.scss'
 
 const props = {
@@ -39,11 +46,6 @@ export default defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
 
-    const options = Array.from({ length: 60 }, (x, i) => ({
-      label: i.toString(),
-      value: i
-    }))
-
     const weekOptions = week.map((v) => ({
       label: t(v.label),
       value: v.value
@@ -62,7 +64,7 @@ export default defineComponent({
     const intervalDayStartRef = ref(1)
     const intervalDayPerformRef = ref(1)
     const WkspecificDayRef = ref<Array<number>>([])
-    const WkspecificWeekRef = ref<Array<number>>([])
+    const WkspecificWeekRef = ref<Array<string>>([])
     const monthLastDaysRef = ref('L')
     const monthLastWorkingDaysRef = ref('LW')
     const monthLastWeeksRef = ref('?')
@@ -108,9 +110,7 @@ export default defineComponent({
         }
 
         const hanleWeekTwo = () => {
-          WkspecificWeekRef.value = $weekVal
-            .split(',')
-            .map((item) => parseInt(item))
+          WkspecificWeekRef.value = $weekVal.split(',')
           radioRef.value = 'WkspecificWeek'
         }
 
@@ -244,7 +244,7 @@ export default defineComponent({
     }
 
     // Specific day of the week (multiple choice)
-    const onWkspecificWeek = (arr: Array<number>) => {
+    const onWkspecificWeek = (arr: Array<string>) => {
       WkspecificWeekRef.value = arr
       if (radioRef.value === 'WkspecificWeek') {
         dayRef.value = '?'
@@ -432,7 +432,6 @@ export default defineComponent({
     onMounted(() => analyticalValue())
 
     return {
-      options,
       weekOptions,
       lastWeekOptions,
       radioRef,
@@ -553,7 +552,7 @@ export default defineComponent({
               <NSelect
                 style={{ width: '300px' }}
                 multiple
-                options={this.options}
+                options={specificList.day}
                 placeholder={t('crontab.specific_day_tip')}
                 v-model:value={this.WkspecificDayRef}
                 onUpdateValue={this.onWkspecificDay}

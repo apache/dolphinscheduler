@@ -25,7 +25,10 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import springfox.documentation.annotations.ApiIgnore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +48,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * logger controller
@@ -69,18 +71,18 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "queryLog", notes = "QUERY_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/detail")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<String> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "taskInstanceId") int taskInstanceId,
-                                   @RequestParam(value = "skipLineNum") int skipNum,
-                                   @RequestParam(value = "limit") int limit) {
+    public Result<ResponseTaskLog> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                            @RequestParam(value = "skipLineNum") int skipNum,
+                                            @RequestParam(value = "limit") int limit) {
         return loggerService.queryLog(taskInstanceId, skipNum, limit);
     }
 
@@ -93,7 +95,7 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "downloadTaskLog", notes = "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/download-log")
     @ResponseBody
@@ -103,9 +105,10 @@ public class LoggerController extends BaseController {
                                           @RequestParam(value = "taskInstanceId") int taskInstanceId) {
         byte[] logBytes = loggerService.getLogBytes(taskInstanceId);
         return ResponseEntity
-            .ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
-            .body(logBytes);
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+                .body(logBytes);
     }
 
     /**
@@ -120,10 +123,10 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "queryLogInSpecifiedProject", notes = "QUERY_TASK_INSTANCE_LOG_IN_SPECIFIED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/{projectCode}/detail")
     @ResponseStatus(HttpStatus.OK)
@@ -147,8 +150,8 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "downloadTaskLogInSpecifiedProject", notes = "DOWNLOAD_TASK_INSTANCE_LOG_IN_SPECIFIED_PROJECT_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
-        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = long.class),
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @GetMapping(value = "/{projectCode}/download-log")
     @ResponseBody
@@ -160,7 +163,8 @@ public class LoggerController extends BaseController {
         byte[] logBytes = loggerService.getLogBytes(loginUser, projectCode, taskInstanceId);
         return ResponseEntity
                 .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
                 .body(logBytes);
     }
 }

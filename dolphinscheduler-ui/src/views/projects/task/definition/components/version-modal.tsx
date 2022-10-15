@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
-import Modal from '@/components/modal'
-import { NDataTable, NPagination } from 'naive-ui'
+import { defineComponent, toRefs, watch } from 'vue'
+import { NDataTable, NPagination, NSpace } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useVersion } from './use-version'
-import styles from './version.module.scss'
+import Modal from '@/components/modal'
+import type { PropType } from 'vue'
 
 const props = {
   show: {
@@ -86,19 +86,21 @@ const VersionModal = defineComponent({
         cancelShow={false}
         onConfirm={onConfirm}
       >
-        <NDataTable
-          loading={loadingRef}
-          columns={this.columns}
-          data={this.tableData}
-        />
-        <div class={styles.pagination}>
-          <NPagination
-            v-model:page={this.page}
-            v-model:page-size={this.pageSize}
-            page-count={this.totalPage}
-            onUpdatePage={requestData}
+        <NSpace vertical>
+          <NDataTable
+            loading={loadingRef}
+            columns={this.columns}
+            data={this.tableData}
           />
-        </div>
+          <NSpace justify='center'>
+            <NPagination
+              v-model:page={this.page}
+              v-model:page-size={this.pageSize}
+              page-count={this.totalPage}
+              onUpdatePage={requestData}
+            />
+          </NSpace>
+        </NSpace>
       </Modal>
     )
   }

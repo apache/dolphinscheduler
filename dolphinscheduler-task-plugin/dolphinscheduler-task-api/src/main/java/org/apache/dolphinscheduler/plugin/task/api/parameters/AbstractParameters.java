@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -91,9 +92,9 @@ public abstract class AbstractParameters implements IParameters {
     public Map<String, Property> getInputLocalParametersMap() {
         Map<String, Property> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
-
             for (Property property : localParams) {
-                if (property.getDirect().equals(Direct.IN)) {
+                // The direct of some tasks is empty, default IN
+                if (property.getDirect() == null || Objects.equals(Direct.IN, property.getDirect())) {
                     localParametersMaps.put(property.getProp(), property);
                 }
             }

@@ -51,24 +51,6 @@ public class OSUtils {
     }
 
     /**
-     * whether is macOS
-     *
-     * @return true if mac
-     */
-    public static boolean isMacOS() {
-        return getOSName().startsWith("Mac");
-    }
-
-    /**
-     * whether is windows
-     *
-     * @return true if windows
-     */
-    public static boolean isWindows() {
-        return getOSName().startsWith("Windows");
-    }
-
-    /**
      * Execute the corresponding command of Linux or Windows
      *
      * @param command command

@@ -1,19 +1,7 @@
 # About DolphinScheduler
 
-Apache DolphinScheduler is a distributed, easy to extend visual DAG workflow task scheduling open-source system. Solves the intricate dependencies of data R&D ETL and the inability to monitor the health status of tasks. DolphinScheduler assembles tasks in the DAG streaming way, which can monitor the execution status of tasks in time, and supports operations like retry, recovery failure from specified nodes, pause, resume and kill tasks, etc.
+Apache DolphinScheduler provides a distributed and easy to expand visual workflow task scheduling open-source platform. It is suitable for enterprise-level scenarios. It provides a solution to visualize operation tasks, workflows, and the entire data processing procedures.
 
-## Simple to Use
+Apache DolphinScheduler aims to solve complex big data task dependencies and to trigger relationships in data OPS orchestration for various big data applications. Solves the intricate dependencies of data R&D ETL and the inability to monitor the health status of tasks. DolphinScheduler assembles tasks in the Directed Acyclic Graph (DAG) streaming mode, which can monitor the execution status of tasks in time, and supports operations like retry, recovery failure from specified nodes, pause, resume, and kill tasks, etc.
 
-- DolphinScheduler has DAG monitoring user interfaces, users can customize DAG by dragging and dropping. All process definitions are visualized, supports rich third-party systems APIs and one-click deployment.
-
-## High Reliability
-
-- Decentralized multi-masters and multi-workers, support HA, select queues to avoid overload.
-
-## Rich Scenarios
-
-- Support features like multi-tenants, suspend and resume operations to cope with big data scenarios. Support many task types like Spark, Flink, Hive, MR, shell, python, sub_process.
-
-## High Scalability
-
-- Supports customized task types, distributed scheduling, and the overall scheduling capability increases linearly with the scale of the cluster.
+![Apache DolphinScheduler](../../../img/introduction_ui.png)

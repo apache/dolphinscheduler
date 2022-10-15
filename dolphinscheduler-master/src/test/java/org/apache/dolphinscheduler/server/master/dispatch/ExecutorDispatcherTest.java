@@ -18,11 +18,12 @@
 package org.apache.dolphinscheduler.server.master.dispatch;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 
 import org.junit.Ignore;
@@ -60,15 +61,16 @@ public class ExecutorDispatcherTest {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(port);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(org.apache.dolphinscheduler.remote.command.CommandType.TASK_EXECUTE_REQUEST, Mockito.mock(TaskExecuteProcessor.class));
+        nettyRemotingServer.registerProcessor(CommandType.TASK_DISPATCH_REQUEST, Mockito.mock(
+                TaskDispatchProcessor.class));
         nettyRemotingServer.start();
         //
         workerConfig.setListenPort(port);
-        workerRegistryClient.registry();
+        workerRegistryClient.start();
 
         ExecutionContext executionContext = ExecutionContextTestUtils.getExecutionContext(port);
         executorDispatcher.dispatch(executionContext);
 
-        workerRegistryClient.unRegistry();
+        workerRegistryClient.close();
     }
 }

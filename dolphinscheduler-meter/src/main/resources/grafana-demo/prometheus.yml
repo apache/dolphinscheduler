@@ -28,4 +28,9 @@ scrape_configs:
           - 'host.docker.internal:5679' # Change the address to the address of DolphinScheduler master server
           - 'host.docker.internal:1235' # Change the address to the address of DolphinScheduler worker server
           - 'host.docker.internal:50053' # Change the address to the address of DolphinScheduler alert server
-          - 'host.docker.internal:8080' # Change the address to the DolphinScheduler standalone server
+  - job_name: 'DolphinScheduler-Standalone'
+    metrics_path: '/dolphinscheduler/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - 'host.docker.internal:12345' # Change the address to the DolphinScheduler standalone server

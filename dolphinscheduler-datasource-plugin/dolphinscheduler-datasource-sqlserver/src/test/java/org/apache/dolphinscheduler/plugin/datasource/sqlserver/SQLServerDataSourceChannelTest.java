@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQLServerConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.sqlserver.param.SQLServerConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;

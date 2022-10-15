@@ -22,6 +22,8 @@ import {
   createK8sNamespace,
   updateK8sNamespace
 } from '@/service/modules/k8s-namespace'
+import { queryAllClusterList } from '@/service/modules/cluster'
+import { useAsyncState } from '@vueuse/core'
 
 export function useModal(
   props: any,
@@ -34,10 +36,11 @@ export function useModal(
     model: {
       id: ref<number>(-1),
       namespace: ref(''),
-      k8s: ref(''),
+      clusterCode: ref(''),
       userId: ref(''),
       limitsCpu: ref(''),
-      limitsMemory: ref('')
+      limitsMemory: ref(''),
+      clusterOptions: []
     },
     saving: false,
     rules: {
@@ -50,11 +53,11 @@ export function useModal(
           }
         }
       },
-      k8s: {
+      clusterCode: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (variables.model.k8s === '') {
+          if (variables.model.clusterCode === '') {
             return new Error(t('security.k8s_namespace.k8s_cluster_tips'))
           }
         }
@@ -78,11 +81,35 @@ export function useModal(
     }
   }
 
+  const getListData = () => {
+    const { state } = useAsyncState(
+      queryAllClusterList().then((res: any) => {
+        variables.model.clusterOptions = res
+          .filter((item: any) => {
+            if (item.config) {
+              const k8s = JSON.parse(item.config).k8s
+              return !!k8s
+            }
+            return false
+          })
+          .map((item: any) => {
+            return {
+              label: item.name,
+              value: item.code
+            }
+          })
+      }),
+      {}
+    )
+
+    return state
+  }
+
   const submitK8SNamespaceModal = () => {
     verifyNamespaceK8s(variables.model).then(() => {
       createK8sNamespace(variables.model).then(() => {
         variables.model.namespace = ''
-        variables.model.k8s = ''
+        variables.model.clusterCode = ''
         variables.model.limitsCpu = ''
         variables.model.limitsMemory = ''
         variables.model.userId = ''
@@ -101,6 +128,7 @@ export function useModal(
 
   return {
     variables,
-    handleValidate
+    handleValidate,
+    getListData
   }
 }

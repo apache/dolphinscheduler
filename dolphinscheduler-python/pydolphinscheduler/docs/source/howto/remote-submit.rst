@@ -28,7 +28,7 @@ Export Configuration File
 
 .. code-block:: bash
 
-    $ pydolphinscheduler config --init
+   pydolphinscheduler config --init
 
 your could find more detail in :ref:`configuration exporting <config:export configuration file>`
 
@@ -37,7 +37,7 @@ Run API Server in Other Host
 
 .. code-block:: bash
 
-    $ pydolphinscheduler config --set java_gateway.address <your-api-server-ip-or-hostname>
+   pydolphinscheduler config --set java_gateway.address <your-api-server-ip-or-hostname>
 
 your could find more detail in :ref:`configuration setting <config:change configuration>`
 
@@ -46,6 +46,6 @@ Run API Server in Other Port
 
 .. code-block:: bash
 
-    $ pydolphinscheduler config --set java_gateway.port <your-python-gateway-service-port>
+   pydolphinscheduler config --set java_gateway.port <your-python-gateway-service-port>
 
 your could find more detail in :ref:`configuration setting <config:change configuration>`

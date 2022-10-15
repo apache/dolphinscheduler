@@ -1,6 +1,6 @@
 # MySQL 数据源
 
-![mysql](/img/new_ui/dev/datasource/mysql.png)
+![mysql](../../../../img/new_ui/dev/datasource/mysql.png)
 
 - 数据源：选择 MYSQL
 - 数据源名称：输入数据源的名称
@@ -14,4 +14,4 @@
 
 ## 是否原生支持
 
-否，使用前需请参考[简介](introduction.md)中的 "样例" 章节激活数据源。
+否，使用前需请参考 [数据源配置](../howto/datasource-setting.md) 中的 "数据源中心" 章节激活数据源。

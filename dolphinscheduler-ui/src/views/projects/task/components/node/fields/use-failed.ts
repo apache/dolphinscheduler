@@ -26,6 +26,9 @@ export function useFailed(): IJsonItem[] {
       field: 'failRetryTimes',
       name: t('project.node.number_of_failed_retries'),
       span: 12,
+      props: {
+        min: 0
+      },
       slots: {
         suffix: () => t('project.node.times')
       }
@@ -35,6 +38,9 @@ export function useFailed(): IJsonItem[] {
       field: 'failRetryInterval',
       name: t('project.node.failed_retry_interval'),
       span: 12,
+      props: {
+        min: 0
+      },
       slots: {
         suffix: () => t('project.node.minute')
       }

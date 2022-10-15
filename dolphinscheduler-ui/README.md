@@ -1,7 +1,7 @@
 # Dolphin Scheduler UI
 
-> Brand new UI management system (Beta).
-> 
+> Brand new UI management system (V3.0.0-Release).
+>
 > Compared with the old `UI`, it will be more standardized, and it will also have a more complete type checking mechanism. At the same time, its speed has made a qualitative leap.
 >
 > We also provide dark mode and light mode to meet the preferences of different developers. It will make your eyes shine.
@@ -12,7 +12,7 @@
 
 ### Start Using
 
-For the best experience, we recommend using `node 16.x.x` and `pnpm 6.x.x`.
+For the best experience, we recommend using `node 16.x.x` and `pnpm 7.x.x`.
 You can learn how to install the corresponding version from their official website.
 
 - [node](https://nodejs.org/en/)
@@ -63,3 +63,4 @@ vue-tsc --noEmit
 ```
 
 ---
+

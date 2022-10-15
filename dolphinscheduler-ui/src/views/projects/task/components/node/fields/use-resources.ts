@@ -15,14 +15,18 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
 
-export function useResources(): IJsonItem {
+export function useResources(
+  span: number | Ref<number> = 24,
+  required = false,
+  limit: number | Ref<number> = -1
+): IJsonItem {
   const { t } = useI18n()
 
   const resourcesOptions = ref([] as IResource[])
@@ -52,6 +56,7 @@ export function useResources(): IJsonItem {
     type: 'tree-select',
     field: 'resourceList',
     name: t('project.node.resources'),
+    span: span,
     options: resourcesOptions,
     props: {
       multiple: true,
@@ -63,6 +68,21 @@ export function useResources(): IJsonItem {
       keyField: 'id',
       labelField: 'name',
       loading: resourcesLoading
+    },
+    validate: {
+      trigger: ['input', 'blur'],
+      required: required,
+      validator(validate: any, value: IResource[]) {
+        if (required) {
+          if (!value) {
+            return new Error(t('project.node.resources_tips'))
+          }
+
+          if (limit > 0 && value.length > limit) {
+            return new Error(t('project.node.resources_limit_tips') + limit)
+          }
+        }
+      }
     }
   }
 }

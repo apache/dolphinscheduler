@@ -20,14 +20,14 @@ package org.apache.dolphinscheduler.server.master.consumer;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
@@ -83,7 +83,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -98,7 +98,7 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
 
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         TimeUnit.SECONDS.sleep(10);
@@ -112,7 +112,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SQL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -125,7 +125,7 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
@@ -153,7 +153,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("DATAX");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -166,7 +166,7 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
@@ -192,7 +192,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SQOOP");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -205,7 +205,7 @@ public class TaskPriorityQueueConsumerTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "default");
         taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
@@ -231,7 +231,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -248,7 +248,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -258,7 +258,7 @@ public class TaskPriorityQueueConsumerTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
@@ -266,7 +266,7 @@ public class TaskPriorityQueueConsumerTest {
 
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "NoWorkGroup");
         taskPriorityQueue.put(taskPriority);
 
         TimeUnit.SECONDS.sleep(10);
@@ -281,7 +281,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -291,7 +291,7 @@ public class TaskPriorityQueueConsumerTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
@@ -317,7 +317,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
         taskInstance.setProcessInstanceId(1);
-        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -327,7 +327,7 @@ public class TaskPriorityQueueConsumerTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
@@ -335,7 +335,7 @@ public class TaskPriorityQueueConsumerTest {
 
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "NoWorkGroup");
         taskPriorityQueue.put(taskPriority);
 
         taskPriorityQueueConsumer.run();
@@ -347,7 +347,7 @@ public class TaskPriorityQueueConsumerTest {
 
     @After
     public void close() {
-        Stopper.stop();
+        ServerLifeCycleManager.toStopped();
     }
 
 }
