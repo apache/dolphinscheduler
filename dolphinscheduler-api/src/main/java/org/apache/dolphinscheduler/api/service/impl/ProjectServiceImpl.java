@@ -502,11 +502,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Map<String, Object> result = new HashMap<>();
 
         Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-//        if (projectIds.isEmpty()) {
-//            result.put(Constants.DATA_LIST, Collections.emptyList());
-//            putMsg(result, Status.SUCCESS);
-//            return result;
-//        }
         List<Project> projectList = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), new ArrayList<>(projectIds));
 
         List<Project> unauthorizedProjectsList = new ArrayList<>();
