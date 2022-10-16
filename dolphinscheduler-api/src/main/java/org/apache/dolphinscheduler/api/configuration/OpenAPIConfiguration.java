@@ -36,7 +36,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class OpenAPIConfiguration implements WebMvcConfigurer {
 
     @Bean
-    public OpenAPI apiV1Info() {
+    public OpenAPI apiV1Info1() {
         return new OpenAPI()
                 .info(new Info()
                         .title("Dolphin Scheduler Api Docs")
@@ -45,11 +45,18 @@ public class OpenAPIConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public GroupedOpenApi publicApi() {
+    public GroupedOpenApi publicApi1() {
         return GroupedOpenApi.builder()
                 .group("v1")
                 .pathsToMatch("/**")
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi publicApi2() {
+        return GroupedOpenApi.builder()
+                .group("v2")
+                .pathsToMatch("/**")
+                .build();
+    }
 }
