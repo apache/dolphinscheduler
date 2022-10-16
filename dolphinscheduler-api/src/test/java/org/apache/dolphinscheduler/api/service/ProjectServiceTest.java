@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -217,7 +218,9 @@ public class ProjectServiceTest {
         User tempUser = new User();
         tempUser.setId(Integer.MAX_VALUE);
         tempUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
+            new Object[]{project.getId()},
+            tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
         boolean checkResult = projectService.hasProjectAndWritePerm(tempUser, project, result);
         logger.info(result.toString());
         Assert.assertFalse(checkResult);
@@ -226,8 +229,12 @@ public class ProjectServiceTest {
         result = new HashMap<>();
         project.setUserId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{project.getId()}, 0, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
+            new Object[]{project.getId()},
+            loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
+            new Object[]{project.getId()},
+            0, baseServiceLogger)).thenReturn(true);
         checkResult = projectService.hasProjectAndWritePerm(loginUser, project, result);
         logger.info(result.toString());
         Assert.assertTrue(checkResult);
