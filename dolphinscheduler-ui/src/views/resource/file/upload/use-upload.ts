@@ -34,13 +34,11 @@ export function useUpload(state: any) {
     if (state.saving) return
     state.saving = true
     try {
-      const pid = -1
       const currentDir = fileStore.getCurrentDir || '/'
       const formData = new FormData()
       formData.append('file', state.uploadForm.file)
       formData.append('type', 'FILE')
       formData.append('name', state.uploadForm.name)
-      formData.append('pid', String(pid))
       formData.append('currentDir', currentDir)
       formData.append('description', state.uploadForm.description)
 

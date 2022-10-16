@@ -41,7 +41,7 @@ export function useEdit(state: any) {
     })
   }
 
-  const handleUpdateContent = (id: string, fullName: string, tenantCode: string) => {
+  const handleUpdateContent = (fullName: string, tenantCode: string) => {
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
         await updateResourceContent(

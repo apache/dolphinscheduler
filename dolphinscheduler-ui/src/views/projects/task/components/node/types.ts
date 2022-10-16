@@ -90,6 +90,10 @@ interface ISwitchResult {
   nextNode?: number
 }
 
+/*
+ * resourceName: resource full name
+ * res: resource file name
+ */
 interface ISourceItem {
   id?: number,
   resourceName: string,

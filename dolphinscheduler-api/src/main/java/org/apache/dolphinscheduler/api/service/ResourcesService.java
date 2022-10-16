@@ -57,9 +57,8 @@ public interface ResourcesService {
      * @param loginUser login user
      * @param name alias
      * @param desc description
-     * @param file file
      * @param type type
-     * @param pid parent id
+     * @param file file
      * @param currentDir current directory
      * @return create result code
      */
@@ -68,7 +67,6 @@ public interface ResourcesService {
                                   String desc,
                                   ResourceType type,
                                   MultipartFile file,
-                                  int pid,
                                   String currentDir);
 
     /**
@@ -172,7 +170,7 @@ public interface ResourcesService {
      * @return create result code
      */
     Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                        String desc, String content, int pid, String currentDirectory);
+                                        String desc, String content, String currentDirectory);
 
     /**
      * create or update resource.

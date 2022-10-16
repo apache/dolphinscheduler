@@ -51,7 +51,7 @@ export default defineComponent({
     const requestData = () => {
       getTableData({
         id: -1,
-        fullName: variables.fileId,
+        fullName: variables.fullName,
         tenantCode: variables.tenantCode,
         pageSize: variables.pageSize,
         pageNo: variables.page,

@@ -62,8 +62,8 @@ export function useTable() {
     tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
-    breadList: [],
-    fileId: ref(String(router.currentRoute.value.query.prefix || "")),
+    breadList: [] as String[],
+    fullName: ref(String(router.currentRoute.value.query.prefix || "")),
     tenantCode: ref(String(router.currentRoute.value.query.tenantCode || "")),
     page: ref(1),
     pageSize: ref(10),
@@ -240,19 +240,19 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
-        if (variables.fileId != ""){
+        if (variables.fullName !== ""){
             const id = -1
             queryCurrentResourceById(
               {
                 id,
                 type: 'UDF',
-                fullName: variables.fileId,
+                fullName: variables.fullName,
                 tenantCode: variables.tenantCode,
               },
               id
             ).then((res: ResourceFile) => {
                 if (res.fileName) {
-                  const breadList = res.fileName.split('/') as Array<never>
+                  const breadList = res.fileName.split('/')
                   breadList.pop()
                   variables.breadList = breadList
                 }
@@ -285,7 +285,7 @@ export function useTable() {
     deleteResource(id, fullNameObj).then(() =>
       getTableData({
         id: -1,
-        fullName: variables.fileId,
+        fullName: variables.fullName,
         tenantCode: variables.tenantCode,
         pageSize: variables.pageSize,
         pageNo: variables.page,

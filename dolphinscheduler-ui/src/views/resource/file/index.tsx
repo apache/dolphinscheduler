@@ -57,7 +57,7 @@ export default defineComponent({
   name: 'File',
   setup() {
     const router: Router = useRouter()
-    const fileId = ref(String(router.currentRoute.value.query.prefix || ""))
+    const fullName = ref(String(router.currentRoute.value.query.prefix || ""))
     const tenantCode = ref(String(router.currentRoute.value.query.tenantCode || ""))
     const resourceListRef = ref()
     const folderShowRef = ref(false)
@@ -84,7 +84,7 @@ export default defineComponent({
       paginationReactive.page = page
       resourceListRef.value = getResourceListState(
         -1,
-        fileId.value,
+        fullName.value,
         tenantCode.value,
         searchRef.value,
         paginationReactive.page,
@@ -97,7 +97,7 @@ export default defineComponent({
       paginationReactive.pageSize = pageSize
       resourceListRef.value = getResourceListState(
         -1,
-        fileId.value,
+        fullName.value,
         tenantCode.value,
         searchRef.value,
         paginationReactive.page,
@@ -118,7 +118,7 @@ export default defineComponent({
     const handleConditions = () => {
       resourceListRef.value = getResourceListState(
         -1,
-        fileId.value,
+        fullName.value,
         tenantCode.value,
         searchRef.value
       )
@@ -129,12 +129,12 @@ export default defineComponent({
     }
 
     const handleCreateFile = () => {
-      const name = fileId.value
+      const name = fullName.value
         ? 'resource-subfile-create'
         : 'resource-file-create'
       router.push({
         name,
-        params: { id: fileId.value }
+        params: { id: fullName.value }
       })
     }
 
@@ -160,7 +160,7 @@ export default defineComponent({
     const updateList = () => {
       resourceListRef.value = getResourceListState(
         -1,
-        fileId.value,
+        fullName.value,
         tenantCode.value,
         searchRef.value
       )
@@ -168,7 +168,7 @@ export default defineComponent({
     const fileStore = useFileStore()
 
     onMounted(() => {
-      resourceListRef.value = getResourceListState(-1, fileId.value, tenantCode.value,searchRef.value)
+      resourceListRef.value = getResourceListState(-1, fullName.value, tenantCode.value,searchRef.value)
     })
 
     const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([
@@ -192,11 +192,11 @@ export default defineComponent({
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
-      const currFileId = String(router.currentRoute.value.query.prefix || "")
-      if (currFileId === "") {
+      const currfullName = String(router.currentRoute.value.query.prefix || "")
+      if (currfullName === "") {
         fileStore.setCurrentDir('/')
       } else {
-        fileStore.setCurrentDir(currFileId)
+        fileStore.setCurrentDir(currfullName)
       }
     })
 
@@ -219,14 +219,14 @@ export default defineComponent({
 
     onMounted(() => {
       breadcrumbItemsRef.value = []
-      if (fileId.value != "") {
+      if (fullName.value != "") {
         breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root', userName: '' })
         const id = 0
         queryCurrentResourceById(
           {
             id,
             type: 'FILE',
-            fullName: fileId.value,
+            fullName: fullName.value,
             tenantCode: tenantCode.value,
           },
           id
@@ -243,7 +243,7 @@ export default defineComponent({
     })
 
     return {
-      fileId,
+      fullName,
       searchRef,
       folderShowRef,
       uploadShowRef,

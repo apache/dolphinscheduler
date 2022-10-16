@@ -141,7 +141,6 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataTypeClass = String.class),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataTypeClass = int.class, example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataTypeClass = String.class)
     })
     @PostMapping()
@@ -152,10 +151,9 @@ public class ResourcesController extends BaseController {
                                          @RequestParam(value = "name") String alias,
                                          @RequestParam(value = "description", required = false) String description,
                                          @RequestParam("file") MultipartFile file,
-                                         @RequestParam(value = "pid") int pid,
                                          @RequestParam(value = "currentDir") String currentDir) {
         // todo verify the file name
-        return resourceService.createResource(loginUser, alias, description, type, file, pid, currentDir);
+        return resourceService.createResource(loginUser, alias, description, type, file, currentDir);
     }
 
     /**
@@ -163,7 +161,7 @@ public class ResourcesController extends BaseController {
      *
      * @param loginUser login user
      * @param alias alias
-     * @param resourceId resource id
+     * @param resourceId DEPRECATED
      * @param type resource type
      * @param description description
      * @param file resource file
@@ -261,7 +259,7 @@ public class ResourcesController extends BaseController {
      * delete resource
      *
      * @param loginUser login user
-     * @param resourceId resource id
+     * @param resourceId DEPRECATED
      * @return delete result code
      */
     @ApiOperation(value = "deleteResource", notes = "DELETE_RESOURCE_BY_ID_NOTES")
@@ -359,7 +357,7 @@ public class ResourcesController extends BaseController {
      * view resource file online
      *
      * @param loginUser login user
-     * @param resourceId resource id
+     * @param resourceId DEPRECATED
      * @param skipLineNum skip line number
      * @param limit limit
      * @return resource content
@@ -396,7 +394,6 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "suffix", value = "SUFFIX", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataTypeClass = String.class),
             @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataTypeClass = int.class, example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataTypeClass = String.class)
     })
     @PostMapping(value = "/online-create")
@@ -408,13 +405,12 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "suffix") String fileSuffix,
                                        @RequestParam(value = "description", required = false) String description,
                                        @RequestParam(value = "content") String content,
-                                       @RequestParam(value = "pid") int pid,
                                        @RequestParam(value = "currentDir") String currentDir) {
         if (StringUtils.isEmpty(content)) {
             logger.error("resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
-        return resourceService.onlineCreateResource(loginUser, type, fileName, fileSuffix, description, content, pid,
+        return resourceService.onlineCreateResource(loginUser, type, fileName, fileSuffix, description, content,
                 currentDir);
     }
 
@@ -422,7 +418,7 @@ public class ResourcesController extends BaseController {
      * edit resource file online
      *
      * @param loginUser login user
-     * @param resourceId resource id
+     * @param resourceId DEPRECATED
      * @param content content
      * @return update result code
      */
@@ -452,7 +448,7 @@ public class ResourcesController extends BaseController {
      * download resource file
      *
      * @param loginUser login user
-     * @param resourceId resource id
+     * @param resourceId DEPRECATED
      * @return resource content
      */
     @ApiOperation(value = "downloadResource", notes = "DOWNLOAD_RESOURCE_NOTES")
@@ -487,7 +483,7 @@ public class ResourcesController extends BaseController {
      * @param database database
      * @param description description
      * @param className class name
-     * @param resourceId resource id
+     * @param resourceId DEPRECATED
      * @return create result code
      */
     @ApiOperation(value = "createUdfFunc", notes = "CREATE_UDF_FUNCTION_NOTES")
@@ -548,7 +544,7 @@ public class ResourcesController extends BaseController {
      * @param argTypes argument types
      * @param database data base
      * @param description description
-     * @param resourceId resource id
+     * @param resourceId DEPRECATED
      * @param className class name
      * @param udfFuncId udf function id
      * @return update result code

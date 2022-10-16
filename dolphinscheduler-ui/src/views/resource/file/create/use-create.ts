@@ -27,13 +27,12 @@ export function useCreate(state: any) {
   const fileStore = useFileStore()
 
   const handleCreateFile = () => {
-    const pid = -1
     const currentDir = fileStore.getCurrentDir || '/'
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
         await onlineCreateResource({
           ...state.fileForm,
-          ...{ pid, currentDir }
+          ...{ currentDir }
         })
 
         window.$message.success(t('resource.file.success'))
