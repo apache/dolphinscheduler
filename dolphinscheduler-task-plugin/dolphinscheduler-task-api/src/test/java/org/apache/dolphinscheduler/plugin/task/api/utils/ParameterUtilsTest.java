@@ -28,14 +28,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ParameterUtilsTest {
 
     public static final Logger logger = LoggerFactory.getLogger(ParameterUtilsTest.class);
@@ -46,29 +46,29 @@ public class ParameterUtilsTest {
     @Test
     public void testConvertParameterPlaceholders() throws ParseException {
         // parameterString,parameterMap is null
-        Assert.assertNull(ParameterUtils.convertParameterPlaceholders(null, null));
+        Assertions.assertNull(ParameterUtils.convertParameterPlaceholders(null, null));
 
         // parameterString is null,parameterMap is not null
         Map<String, String> parameterMap = new HashMap<String, String>();
         parameterMap.put("testParameter", "testParameter");
-        Assert.assertNull(ParameterUtils.convertParameterPlaceholders(null, parameterMap));
+        Assertions.assertNull(ParameterUtils.convertParameterPlaceholders(null, parameterMap));
 
         // parameterString、parameterMap is not null
         String parameterString = "test_parameter";
-        Assert.assertEquals(parameterString,
+        Assertions.assertEquals(parameterString,
                 ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap));
 
         // replace variable ${} form
         parameterMap.put("testParameter2", "${testParameter}");
-        Assert.assertEquals(parameterString, PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
+        Assertions.assertEquals(parameterString, PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
 
         // replace time $[...] form, eg. $[yyyyMMdd]
         Date cronTime = new Date();
-        Assert.assertEquals(parameterString, replacePlaceholders(parameterString, cronTime, true));
+        Assertions.assertEquals(parameterString, replacePlaceholders(parameterString, cronTime, true));
 
         // replace time $[...] form, eg. $[yyyyMMdd]
         Date cronTimeStr = DateUtils.stringToDate("2019-02-02 00:00:00");
-        Assert.assertEquals(parameterString, replacePlaceholders(parameterString, cronTimeStr, true));
+        Assertions.assertEquals(parameterString, replacePlaceholders(parameterString, cronTimeStr, true));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ParameterUtilsTest {
         parameterMap.put("user", "Kris");
         parameterMap.put(Constants.PARAMETER_DATETIME, "20201201123000");
         parameterString = ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap);
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "Kris is userName, '$[1]' '20221201' '20181201' '20210301' '20200801' '20201215' '20201117'  '20201204'  '$[0]' '20201128' '143000' '113000' '123300' '122800'  '$[3]'",
                 parameterString);
     }
@@ -90,10 +90,10 @@ public class ParameterUtilsTest {
      */
     @Test
     public void testHandleEscapes() throws Exception {
-        Assert.assertNull(ParameterUtils.handleEscapes(null));
-        Assert.assertEquals("", ParameterUtils.handleEscapes(""));
-        Assert.assertEquals("test Parameter", ParameterUtils.handleEscapes("test Parameter"));
-        Assert.assertEquals("////%test////%Parameter", ParameterUtils.handleEscapes("%test%Parameter"));
+        Assertions.assertNull(ParameterUtils.handleEscapes(null));
+        Assertions.assertEquals("", ParameterUtils.handleEscapes(""));
+        Assertions.assertEquals("test Parameter", ParameterUtils.handleEscapes("test Parameter"));
+        Assertions.assertEquals("////%test////%Parameter", ParameterUtils.handleEscapes("%test%Parameter"));
     }
 
 }

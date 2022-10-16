@@ -84,9 +84,9 @@ Try not to use Thread.sleep in your test code, it makes the test unstable and ma
 
 2: Ignore some test classes
 
-The @Ignore annotation should be linked to the relevant issue address so that subsequent developers can track the history of why the test was ignored.
+The @Disabled annotation should be linked to the relevant issue address so that subsequent developers can track the history of why the test was ignored.
 
-For example @Ignore("see #1").
+For example @Disabled("see #1").
 
 3: try-catch Unit test exception
 
