@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
+import com.alibaba.druid.sql.dialect.presto.parser.PrestoStatementParser;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.alibaba.druid.sql.dialect.clickhouse.parser.ClickhouseStatementParser;
@@ -39,7 +40,7 @@ public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_CLICKHOUSE = "clickhousereader";
 
-    public static final String DATAX_READER_PLUGIN_HIVE = "rdbmsreader";
+    public static final String DATAX_READER_PLUGIN_RDBMS = "rdbmsreader";
 
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
@@ -51,7 +52,7 @@ public class DataxUtils {
 
     public static final String DATAX_WRITER_PLUGIN_CLICKHOUSE = "clickhousewriter";
 
-    public static final String DATAX_WRITER_PLUGIN_HIVE = "rdbmswriter";
+    public static final String DATAX_WRITER_PLUGIN_RDBMS = "rdbmswriter";
 
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
@@ -66,7 +67,9 @@ public class DataxUtils {
             case CLICKHOUSE:
                 return DATAX_READER_PLUGIN_CLICKHOUSE;
             case HIVE:
-                return DATAX_READER_PLUGIN_HIVE;
+                return DATAX_READER_PLUGIN_RDBMS;
+            case PRESTO:
+                return DATAX_READER_PLUGIN_RDBMS;
             default:
                 return null;
         }
@@ -85,7 +88,9 @@ public class DataxUtils {
             case CLICKHOUSE:
                 return DATAX_WRITER_PLUGIN_CLICKHOUSE;
             case HIVE:
-                return DATAX_WRITER_PLUGIN_HIVE;
+                return DATAX_WRITER_PLUGIN_RDBMS;
+            case PRESTO:
+                return DATAX_WRITER_PLUGIN_RDBMS;
             default:
                 return null;
         }
@@ -105,6 +110,8 @@ public class DataxUtils {
                 return new ClickhouseStatementParser(sql);
             case HIVE:
                 return new HiveStatementParser(sql);
+            case PRESTO:
+                return new PrestoStatementParser(sql);
             default:
                 return null;
         }
