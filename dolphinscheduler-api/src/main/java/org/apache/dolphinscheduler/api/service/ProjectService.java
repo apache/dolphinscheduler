@@ -81,8 +81,9 @@ public interface ProjectService {
      */
     boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission);
 
-    boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result);
+    boolean hasProjectAndWritePerm(User loginUser, Project project, Result result);
 
+    boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result);
 
     /**
      * admin can view all projects

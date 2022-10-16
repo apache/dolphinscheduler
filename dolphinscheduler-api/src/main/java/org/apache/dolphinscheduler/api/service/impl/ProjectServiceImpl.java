@@ -244,10 +244,36 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (project == null) {
             logger.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()},AuthorizationType.PROJECTS,perm)) {
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()},AuthorizationType.PROJECTS,permission)) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         } else {
             checkResult = true;
+        }
+        return checkResult;
+    }
+
+    @Override
+    public boolean hasProjectAndWritePerm(User loginUser, Project project, Result result) {
+        boolean checkResult = false;
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUND, "");
+        } else {
+            // case 1: user is admin
+            if (loginUser.getUserType() == UserType.ADMIN_USER) {
+                return true;
+            }
+            // case 2: user is project owner
+            if (project.getUserId() == loginUser.getId()) {
+                return true;
+            }
+            // case 3: check user permission level
+            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+            if(projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION || projectUser == null) {
+                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+                checkResult = false;
+            } else {
+                checkResult = true;
+            }
         }
         return checkResult;
     }
@@ -269,8 +295,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             // case 3: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
             if(projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION || projectUser == null) {
-                logger.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.", permission, loginUser.getUserName(), project.getCode());
-                putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
                 checkResult = true;
