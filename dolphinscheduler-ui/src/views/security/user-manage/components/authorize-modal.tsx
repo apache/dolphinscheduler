@@ -57,7 +57,7 @@ export const AuthorizeModal = defineComponent({
   emits: ['cancel'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize } = useAuthorize()
+    const { state, onInit, onSave, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize } = useAuthorize()
     const onCancel = () => {
       ctx.emit('cancel')
     }
@@ -67,7 +67,7 @@ export const AuthorizeModal = defineComponent({
     }
 
     // 新增部分
-    const { columnsRef } = useColumns(onOperationClick)
+    const { columnsRef } = useColumns()
     const handleCheck = (rowKeys: Array<number>) => {
       projectIds = rowKeys.join()
     }
