@@ -207,7 +207,7 @@ public class LogClient implements AutoCloseable {
 
     public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath,
                                             @NonNull String taskAppInfoPath) throws RemotingException, InterruptedException {
-        logger.info("Begin to get appIds from worker: {}:{} taskAppInfoPath: {}", host, port, taskAppInfoPath);
+        logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", host, port, taskLogFilePath, taskAppInfoPath);
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
         if (NetUtils.getHost().equals(host)) {
