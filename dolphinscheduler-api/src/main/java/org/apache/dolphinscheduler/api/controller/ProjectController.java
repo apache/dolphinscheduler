@@ -289,8 +289,7 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectWithAuthorizedLevel(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryProjectWithAuthorizedLevel(loginUser, userId);
-        return returnDataList(result);
+        return projectService.queryProjectWithAuthorizedLevel(loginUser, userId);
     }
 
     /**

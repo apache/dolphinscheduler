@@ -152,7 +152,7 @@ public interface ProjectService {
      * @param loginUser login user
      * @return project list
      */
-    Map<String, Object> queryProjectWithAuthorizedLevel(User loginUser, Integer userId);
+    Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId);
 
     /**
      * query authorized user

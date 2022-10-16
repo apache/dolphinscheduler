@@ -523,8 +523,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return project list
      */
     @Override
-    public Map<String, Object> queryProjectWithAuthorizedLevel(User loginUser, Integer userId){
-        Map<String, Object> result = new HashMap<>();
+    public Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId){
+        Result result = new Result();
 
         Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
         List<Project> projectList = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), new ArrayList<>(projectIds));
@@ -550,7 +550,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         joined.addAll(authedProjectList);
         joined.addAll(unauthorizedProjectsList);
 
-        result.put(Constants.DATA_LIST, joined);
+        result.setData(joined);
         putMsg(result, Status.SUCCESS);
         return result;
     }
