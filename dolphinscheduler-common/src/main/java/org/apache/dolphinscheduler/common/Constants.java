@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.common;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Duration;
@@ -652,23 +648,6 @@ public final class Constants {
      */
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            WorkflowExecutionStatus.SUBMITTED_SUCCESS.getCode(),
-            TaskExecutionStatus.DISPATCH.getCode(),
-            WorkflowExecutionStatus.RUNNING_EXECUTION.getCode(),
-            WorkflowExecutionStatus.DELAY_EXECUTION.getCode(),
-            WorkflowExecutionStatus.READY_PAUSE.getCode(),
-            WorkflowExecutionStatus.READY_STOP.getCode(),
-            TaskExecutionStatus.NEED_FAULT_TOLERANCE.getCode(),
-    };
-
-    public static final int[] RUNNING_PROCESS_STATE = new int[]{
-            TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
-            TaskExecutionStatus.SUBMITTED_SUCCESS.getCode(),
-            TaskExecutionStatus.DISPATCH.getCode(),
-            WorkflowExecutionStatus.SERIAL_WAIT.getCode()
-    };
-
     /**
      * status
      */
@@ -805,9 +784,6 @@ public final class Constants {
      * pstree, get pud and sub pid
      */
     public static final String PSTREE = "pstree";
-
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
-            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
     /**
      * dry run flag

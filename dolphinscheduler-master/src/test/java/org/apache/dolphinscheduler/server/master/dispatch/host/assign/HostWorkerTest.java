@@ -17,27 +17,27 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HostWorkerTest {
 
     @Test
     public void testHostWorker1() {
         HostWorker hostWorker = new HostWorker("192.158.2.2", 11, 20, "default");
-        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
-        Assert.assertEquals(11, hostWorker.getPort());
-        Assert.assertEquals(20, hostWorker.getHostWeight());
-        Assert.assertEquals("default", hostWorker.getWorkerGroup());
+        Assertions.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assertions.assertEquals(11, hostWorker.getPort());
+        Assertions.assertEquals(20, hostWorker.getHostWeight());
+        Assertions.assertEquals("default", hostWorker.getWorkerGroup());
     }
 
     @Test
     public void testHostWorker2() {
         HostWorker hostWorker = HostWorker.of("192.158.2.2:22", 80, "default");
-        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
-        Assert.assertEquals(22, hostWorker.getPort());
-        Assert.assertEquals(80, hostWorker.getHostWeight());
-        Assert.assertEquals("default", hostWorker.getWorkerGroup());
+        Assertions.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assertions.assertEquals(22, hostWorker.getPort());
+        Assertions.assertEquals(80, hostWorker.getHostWeight());
+        Assertions.assertEquals("default", hostWorker.getWorkerGroup());
     }
 
 }

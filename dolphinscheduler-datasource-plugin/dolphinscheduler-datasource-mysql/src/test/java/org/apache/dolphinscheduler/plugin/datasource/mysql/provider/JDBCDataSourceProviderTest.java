@@ -21,34 +21,44 @@ import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSource
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {HikariDataSource.class, JDBCDataSourceProvider.class})
+@ExtendWith(MockitoExtension.class)
 public class JDBCDataSourceProviderTest {
 
     @Test
     public void testCreateJdbcDataSource() {
-        PowerMockito.mockStatic(JDBCDataSourceProvider.class);
-        HikariDataSource dataSource = PowerMockito.mock(HikariDataSource.class);
-        PowerMockito.when(JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any())).thenReturn(dataSource);
-        Assert.assertNotNull(JDBCDataSourceProvider.createJdbcDataSource(new MySQLConnectionParam(), DbType.MYSQL));
+        try (
+                MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
+                        Mockito.mockStatic(JDBCDataSourceProvider.class)) {
+            HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
+            mockedJDBCDataSourceProvider
+                    .when(() -> JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any()))
+                    .thenReturn(dataSource);
+            Assertions.assertNotNull(
+                    JDBCDataSourceProvider.createJdbcDataSource(new MySQLConnectionParam(), DbType.MYSQL));
+        }
     }
 
     @Test
     public void testCreateOneSessionJdbcDataSource() {
-        PowerMockito.mockStatic(JDBCDataSourceProvider.class);
-        HikariDataSource dataSource = PowerMockito.mock(HikariDataSource.class);
-        PowerMockito.when(JDBCDataSourceProvider.createOneSessionJdbcDataSource(Mockito.any(), Mockito.any())).thenReturn(dataSource);
-        Assert.assertNotNull(JDBCDataSourceProvider.createOneSessionJdbcDataSource(new MySQLConnectionParam(), DbType.MYSQL));
+        try (
+                MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
+                        Mockito.mockStatic(JDBCDataSourceProvider.class)) {
+            HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
+            mockedJDBCDataSourceProvider
+                    .when(() -> JDBCDataSourceProvider.createOneSessionJdbcDataSource(Mockito.any(), Mockito.any()))
+                    .thenReturn(dataSource);
+            Assertions.assertNotNull(
+                    JDBCDataSourceProvider.createOneSessionJdbcDataSource(new MySQLConnectionParam(), DbType.MYSQL));
+        }
     }
 
 }

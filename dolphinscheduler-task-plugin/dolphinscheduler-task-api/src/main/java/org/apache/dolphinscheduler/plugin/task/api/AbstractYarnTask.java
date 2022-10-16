@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import static org.apache.dolphinscheduler.spi.utils.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.spi.utils.Constants.DEFAULT_COLLECT_WAY;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.util.List;
 import java.util.regex.Pattern;

@@ -38,7 +38,6 @@
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-registry</module>
         <module>dolphinscheduler-task-plugin</module>
-        <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
         <module>dolphinscheduler-aop</module>
@@ -54,7 +53,6 @@
         <module>dolphinscheduler-meter</module>
         <module>dolphinscheduler-master</module>
         <module>dolphinscheduler-worker</module>
-        <module>dolphinscheduler-log-server</module>
         <module>dolphinscheduler-tools</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-scheduler-plugin</module>
@@ -66,7 +64,7 @@
         <spring.boot.version>2.6.1</spring.boot.version>
         <java.version>1.8</java.version>
         <junit.version>5.9.0</junit.version>
-        <mockito.version>3.9.0</mockito.version>
+        <mockito.version>3.12.4</mockito.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
@@ -84,7 +82,6 @@
         <auto-service.version>1.0.1</auto-service.version>
         <jacoco.skip>false</jacoco.skip>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <powermock.version>2.0.9</powermock.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <owasp-dependency-check-maven.version>7.1.2</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
@@ -102,22 +99,12 @@
         <dependencies>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-master</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-worker</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-log-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -352,6 +339,12 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>${mockito.version}</version>
             <scope>test</scope>
@@ -380,24 +373,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-core</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -683,6 +658,11 @@
                         <replaceRegex>
                             <name>Remove wildcard imports</name>
                             <searchRegex>import\s+[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
+                        <replaceRegex>
+                            <name>Block powermock</name>
+                            <searchRegex>import\s+org\.powermock\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
                     </java>

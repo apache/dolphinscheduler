@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.chunjun;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ChunJunConstantsTest {
 
@@ -29,7 +29,7 @@ public class ChunJunConstantsTest {
 
     private String hadoopConfDir;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         flinkConfDir = "${FLINK_HOME}/conf";
         flinkLibDir = "${FLINK_HOME}/lib";
@@ -38,9 +38,9 @@ public class ChunJunConstantsTest {
 
     @Test
     public void testEqualsString() {
-        Assert.assertEquals(ChunJunConstants.FLINK_CONF_DIR, flinkConfDir);
-        Assert.assertEquals(ChunJunConstants.FLINK_LIB_DIR, flinkLibDir);
-        Assert.assertEquals(ChunJunConstants.HADOOP_CONF_DIR, hadoopConfDir);
+        Assertions.assertEquals(ChunJunConstants.FLINK_CONF_DIR, flinkConfDir);
+        Assertions.assertEquals(ChunJunConstants.FLINK_LIB_DIR, flinkLibDir);
+        Assertions.assertEquals(ChunJunConstants.HADOOP_CONF_DIR, hadoopConfDir);
     }
 
 }

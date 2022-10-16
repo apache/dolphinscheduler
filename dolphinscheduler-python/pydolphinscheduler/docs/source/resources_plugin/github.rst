@@ -22,7 +22,7 @@ GitHub
 
 When using a github resource plugin, you only need to add the `resource_plugin` parameter in the task subclass or workflow definition,
 such as `resource_plugin=GitHub(prefix="https://github.com/xxx", access_token="ghpxx")`.
-The token parameter is optional. You need to add it when your warehouse is a private repository.
+The token parameter is optional. You need to add it when your repository is a private repository.
 
 You can view this `document <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token>`_
 when creating a token.

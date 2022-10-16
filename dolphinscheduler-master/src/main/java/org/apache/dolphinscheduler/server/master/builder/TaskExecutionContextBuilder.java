@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UN
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -62,8 +63,8 @@ public class TaskExecutionContextBuilder {
     public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(TaskInstance taskInstance) {
         taskExecutionContext.setTaskInstanceId(taskInstance.getId());
         taskExecutionContext.setTaskName(taskInstance.getName());
-        taskExecutionContext.setFirstSubmitTime(taskInstance.getFirstSubmitTime());
-        taskExecutionContext.setStartTime(taskInstance.getStartTime());
+        taskExecutionContext.setFirstSubmitTime(DateUtils.dateToTimeStamp(taskInstance.getFirstSubmitTime()));
+        taskExecutionContext.setStartTime(DateUtils.dateToTimeStamp(taskInstance.getStartTime()));
         taskExecutionContext.setTaskType(taskInstance.getTaskType());
         taskExecutionContext.setLogPath(taskInstance.getLogPath());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
@@ -103,7 +104,7 @@ public class TaskExecutionContextBuilder {
      */
     public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(ProcessInstance processInstance) {
         taskExecutionContext.setProcessInstanceId(processInstance.getId());
-        taskExecutionContext.setScheduleTime(processInstance.getScheduleTime());
+        taskExecutionContext.setScheduleTime(DateUtils.dateToTimeStamp(processInstance.getScheduleTime()));
         taskExecutionContext.setGlobalParams(processInstance.getGlobalParams());
         taskExecutionContext.setExecutorId(processInstance.getExecutorId());
         taskExecutionContext.setCmdTypeIfComplement(processInstance.getCmdTypeIfComplement().getCode());

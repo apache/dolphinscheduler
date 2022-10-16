@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_COLLECT_WAY;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -38,8 +37,9 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.factory.NettyRemotingClientFactory;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.List;
 

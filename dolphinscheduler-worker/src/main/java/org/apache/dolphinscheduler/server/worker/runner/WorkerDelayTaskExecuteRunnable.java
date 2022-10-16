@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import lombok.NonNull;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import javax.annotation.Nullable;
@@ -47,7 +47,8 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext();
         return unit.convert(
                 DateUtils.getRemainTime(
-                        taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
+                        DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                    taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
     }
 
     @Override

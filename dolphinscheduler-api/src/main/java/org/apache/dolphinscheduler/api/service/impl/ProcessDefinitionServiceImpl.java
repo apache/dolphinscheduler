@@ -69,7 +69,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
@@ -109,6 +108,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
@@ -950,6 +950,45 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
+    @Override
+    @Transactional
+    public Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser, long projectCode, String codes) {
+        Map<String, Object> result = new HashMap<>();
+        if (StringUtils.isEmpty(codes)) {
+            logger.error("Parameter processDefinitionCodes is empty, projectCode is {}.", projectCode);
+            putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
+            return result;
+        }
+
+        Set<Long> definitionCodes = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
+                .collect(Collectors.toSet());
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
+        Set<Long> queryCodes =
+                processDefinitionList.stream().map(ProcessDefinition::getCode).collect(Collectors.toSet());
+        // definitionCodes - queryCodes
+        Set<Long> diffCode =
+                definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
+
+        if (!diffCode.isEmpty()) {
+            logger.error("Process definition does not exist, processCodes:{}.",
+                    diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA)));
+            throw new ServiceException(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR,
+                    diffCode.stream().map(code -> code + "[process definition not exist]")
+                            .collect(Collectors.joining(Constants.COMMA))
+            );
+        }
+
+        for (ProcessDefinition process : processDefinitionList) {
+            try {
+                this.deleteProcessDefinitionByCode(loginUser, process.getCode());
+            } catch (Exception e) {
+                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
+            }
+        }
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
     /**
      * Process definition want to delete whether used in other task, should throw exception when have be used.
      *
@@ -965,7 +1004,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // check process instances is already running
         List<ProcessInstance> processInstances = processInstanceService
-                .queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
+                .queryByProcessDefineCodeAndStatus(processDefinition.getCode(), org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processInstances.size());
         }
@@ -2166,6 +2205,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 // copy timing configuration
                 Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
                 if (scheduleObj != null) {
+                    scheduleObj.setId(null);
                     scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     scheduleObj.setCreateTime(date);

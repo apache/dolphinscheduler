@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.google.common.base.Strings;
-import lombok.NonNull;
-import org.apache.dolphinscheduler.common.Constants;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+
+import static org.apache.dolphinscheduler.common.Constants.DRY_RUN_FLAG_YES;
+import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_COLLECT_WAY;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -39,14 +38,15 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.service.utils.CommonUtils;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -54,15 +54,23 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Date;
 import java.util.List;
-import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_COLLECT_WAY;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+
+import javax.annotation.Nullable;
+
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.google.common.base.Strings;
 
 
 
 public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, WorkerTaskExecuteRunnable.class));
+    protected final Logger logger = LoggerFactory
+            .getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, WorkerTaskExecuteRunnable.class));
 
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
@@ -75,13 +83,13 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected @Nullable AbstractTask task;
 
     protected WorkerTaskExecuteRunnable(
-            @NonNull TaskExecutionContext taskExecutionContext,
-            @NonNull WorkerConfig workerConfig,
-            @NonNull String masterAddress,
-            @NonNull WorkerMessageSender workerMessageSender,
-            @NonNull AlertClientService alertClientService,
-            @NonNull TaskPluginManager taskPluginManager,
-            @Nullable StorageOperate storageOperate) {
+                                        @NonNull TaskExecutionContext taskExecutionContext,
+                                        @NonNull WorkerConfig workerConfig,
+                                        @NonNull String masterAddress,
+                                        @NonNull WorkerMessageSender workerMessageSender,
+                                        @NonNull AlertClientService alertClientService,
+                                        @NonNull TaskPluginManager taskPluginManager,
+                                        @Nullable StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.masterAddress = masterAddress;
@@ -89,7 +97,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
-        String taskLogName = LoggerUtils.buildTaskId(taskExecutionContext.getFirstSubmitTime(),
+        String taskLogName = LoggerUtils.buildTaskId(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                 taskExecutionContext.getProcessDefineCode(),
                 taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
@@ -117,7 +125,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         cancelTask();
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
-        taskExecutionContext.setEndTime(new Date());
+        taskExecutionContext.setEndTime(System.currentTimeMillis());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
         logger.info(
                 "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
@@ -156,9 +164,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             initializeTask();
 
-            if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
+            if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
-                taskExecutionContext.setEndTime(new Date());
+                taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress,
                         CommandType.TASK_EXECUTE_RESULT);
@@ -186,7 +194,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected void initializeTask() {
         logger.info("Begin to initialize task");
 
-        Date taskStartTime = new Date();
+        long taskStartTime = System.currentTimeMillis();
         taskExecutionContext.setStartTime(taskStartTime);
         logger.info("Set task startTime: {}", taskStartTime);
 
@@ -252,7 +260,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected void sendTaskResult() {
         taskExecutionContext.setCurrentExecutionStatus(task.getExitStatus());
-        taskExecutionContext.setEndTime(new Date());
+        taskExecutionContext.setEndTime(System.currentTimeMillis());
         taskExecutionContext.setProcessId(task.getProcessId());
         taskExecutionContext.setAppIds(task.getAppIds());
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));

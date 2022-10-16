@@ -353,6 +353,10 @@ public final class DateUtils {
         if (end == null) {
             end = new Date();
         }
+        if (start.after(end)) {
+            logger.warn("start Time {} is later than end Time {}", start, end);
+            return null;
+        }
         return format2Duration(differMs(start, end));
     }
 
@@ -644,6 +648,25 @@ public final class DateUtils {
             return (d % (C6 / C2)) / (C5 / C2);
         }
 
+    }
+
+    /**
+     * transform timeStamp to local date
+     *
+     * @param timeStamp time stamp (milliseconds)
+     * @return local date
+     */
+    public static @Nullable Date timeStampToDate(long timeStamp) {
+        return timeStamp <= 0L ? null : new Date(timeStamp);
+    }
+
+    /**
+     * transform date to timeStamp
+     * @param date date
+     * @return time stamp (milliseconds)
+     */
+    public static long dateToTimeStamp(Date date) {
+        return date == null ? 0L : date.getTime();
     }
 
 }

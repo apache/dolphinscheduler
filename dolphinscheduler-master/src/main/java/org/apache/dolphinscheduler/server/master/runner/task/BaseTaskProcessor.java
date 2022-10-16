@@ -36,9 +36,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
@@ -77,7 +75,9 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
@@ -304,6 +304,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
+            logger.info("Task state changes to {}", TaskExecutionStatus.FAILURE);
             taskInstance.setState(TaskExecutionStatus.FAILURE);
             processService.saveTaskInstance(taskInstance);
             return null;
@@ -419,7 +420,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         int ruleId = dataQualityParameters.getRuleId();
         DqRule dqRule = processService.getDqRule(ruleId);
         if (dqRule == null) {
-            logger.error("can not get DqRule by id {}", ruleId);
+            logger.error("Can not get dataQuality rule by id {}", ruleId);
             return;
         }
 
@@ -429,7 +430,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         List<DqRuleInputEntry> ruleInputEntryList = processService.getRuleInputEntry(ruleId);
         if (CollectionUtils.isEmpty(ruleInputEntryList)) {
-            logger.error("{} rule input entry list is empty ", ruleId);
+            logger.error("Rule input entry list is empty, ruleId: {}", ruleId);
             return;
         }
         List<DqRuleExecuteSql> executeSqlList = processService.getDqExecuteSql(ruleId);
@@ -604,9 +605,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
         if (tenant == null) {
-            logger.error("tenant not exists,process instance id : {},task instance id : {}",
-                    taskInstance.getProcessInstance().getId(),
-                    taskInstance.getId());
+            logger.error("Tenant does not exists");
             return true;
         }
         return false;

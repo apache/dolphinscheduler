@@ -61,7 +61,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
 
         Date fireTime = context.getFireTime();
 
-        logger.info("scheduled fire time :{}, fire time :{}, process id :{}", scheduledFireTime, fireTime, scheduleId);
+        logger.info("scheduled fire time :{}, fire time :{}, scheduleId :{}", scheduledFireTime, fireTime, scheduleId);
 
         // query schedule
         Schedule schedule = processService.querySchedule(scheduleId);
@@ -75,7 +75,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
         // release state : online/offline
         ReleaseState releaseState = processDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {
-            logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processId:{}", projectId, processDefinition.getId());
+            logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processDefinitionId:{}", projectId, processDefinition.getId());
             return;
         }
 

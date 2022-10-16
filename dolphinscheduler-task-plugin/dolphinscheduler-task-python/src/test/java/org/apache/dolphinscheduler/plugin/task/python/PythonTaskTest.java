@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.python;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PythonTaskTest {
 
     @Test
     public void buildPythonExecuteCommand() throws Exception {
         PythonTask pythonTask = createPythonTask();
-        Assert.assertEquals("${PYTHON_HOME} test.py", pythonTask.buildPythonExecuteCommand("test.py"));
+        Assertions.assertEquals("${PYTHON_HOME} test.py", pythonTask.buildPythonExecuteCommand("test.py"));
     }
 
     private PythonTask createPythonTask() {

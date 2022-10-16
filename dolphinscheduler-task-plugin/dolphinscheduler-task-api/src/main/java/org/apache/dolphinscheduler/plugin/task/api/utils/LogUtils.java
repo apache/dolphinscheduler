@@ -49,12 +49,9 @@ public class LogUtils {
             case "aop":
                 log.info("Start finding appId in {}, fetch way: {} ", appInfoPath);
                 return getAppIdsFromAppInfoFile(appInfoPath, log);
-            case "log":
+            default:
                 log.info("Start finding appId in {}, fetch way: {} ", logPath);
                 return getAppIdsFromLogFile(logPath, log);
-            default:
-                log.info("Match No Way!!");
-                return null;
         }
     }
 
