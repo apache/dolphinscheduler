@@ -15,30 +15,14 @@
  * limitations under the License.
  */
 
-import { h, ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  DataTableCreateRowKey,
-  NSpace,
-  NRadioGroup,
-  NRadioButton,
-  NTooltip,
-  NButton,
-  NIcon,
-  NTag,
-  NDropdown,
-  NPopconfirm,
-  NRadio,
-  NText
-} from 'naive-ui'
-import { EditOutlined, DeleteOutlined, UserOutlined } from '@vicons/antd'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import type { TableColumns, InternalRowData } from '../types'
-import { absolute } from '@antv/x6/lib/registry/port-layout/absolute'
+import type { TableColumns } from '../types'
 
 // const { t } = useI18n()
 const PERM_LIST = [
@@ -57,17 +41,13 @@ const PERM_LIST = [
 ]
   
 
-export function useColumns(onCallback: Function) {
+export function useColumns() {
   const { t } = useI18n()
 
   const columnsRef = ref({
     columns: [] as TableColumns,
     tableWidth: DefaultTableWidth
   })
-
-  const handleClick = (row: any) => {
-    console.log('Clicked')
-  }
 
   const createColumns = () => {
     const columns: any = [

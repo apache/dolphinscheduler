@@ -16,8 +16,6 @@
  */
 import { reactive } from 'vue'
 import {
-  queryAuthorizedProject,
-  queryUnauthorizedProject,
   queryProjectWithAuthorizedLevelListPaging
 } from '@/service/modules/projects'
 import {
@@ -38,7 +36,6 @@ import {
 import {
   grantProject,
   grantProjectWithReadPerm,
-  grantResource,
   grantDataSource,
   grantUDFFunc,
   grantNamespaceFunc,
@@ -47,9 +44,6 @@ import {
 } from '@/service/modules/users'
 import utils from '@/utils'
 import type { TAuthType, IResourceOption, IOption, IRecord } from '../types'
-import type {ProjectList} from '../../../../service/modules/projects/types'
-import { parseTime } from '@/common/common'
-import { format } from 'date-fns'
 
 export function useAuthorize() {
   const state = reactive({
@@ -82,19 +76,7 @@ export function useAuthorize() {
     userId: 0
   })
 
-  const onOperationClick = (
-    data: { rowData: IRecord; key?: TAuthType },
-    type: 'authorize' | 'edit' | 'delete'
-  ) => {
-    // state.currentRecord = data.rowData
-    // if (type === 'edit') {
-    //   state.detailModalShow = true
-    // }
-    // if (type === 'authorize' && data.key) {
-    //   state.authorizeModalShow = true
-    //   state.authorizeType = data.key
-    // }
-  }
+  const onOperationClick = ( ) => { }
 
   const getProjects = async (userId: number) => {
     if (state.loading) return
@@ -141,32 +123,22 @@ export function useAuthorize() {
       userId,
       projectIds: projectIds
     })
-    // if (!res) throw Error()
-    console.log('res', res)
     await getProjects(userId)
   }
 
   const grantProjectRequest = async (userId: number, projectIds: string) => {
-    // if (state.loading) return
-    // state.loading = true
     const res = await grantProject({
       userId,
       projectIds: projectIds
     })
-    // if (!res) throw Error()
-    console.log('res', res)
     await getProjects(userId)
   }
 
   const grantProjectWithReadPermRequest = async (userId: number, projectIds: string) => {
-    // if (state.loading) return
-    // state.loading = true
     const res = await grantProjectWithReadPerm({
       userId,
       projectIds: projectIds
     })
-    // if (!res) throw Error()
-    console.log('res', res)
     await getProjects(userId)
   }
 

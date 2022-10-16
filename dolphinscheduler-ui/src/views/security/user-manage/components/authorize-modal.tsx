@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch, reactive } from 'vue'
+import { defineComponent, PropType, toRefs, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   NInput,
@@ -58,7 +58,6 @@ export const AuthorizeModal = defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
     const { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize } = useAuthorize()
-    console.log('state', state.pagination)
     const onCancel = () => {
       ctx.emit('cancel')
     }
@@ -69,11 +68,8 @@ export const AuthorizeModal = defineComponent({
 
     // 新增部分
     const { columnsRef } = useColumns(onOperationClick)
-    // const checkedRowKeysRef = ref<any[]>([])
     const handleCheck = (rowKeys: Array<number>) => {
-      console.log('rowKeys', rowKeys)
       projectIds = rowKeys.join()
-      // checkedRowKeysRef.value = rowKeys
     }
     watch(
       () => props.show,
