@@ -427,11 +427,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * Whether task definition can be deleted or not
      */
-    private void taskCanDeleteValid(User user, TaskDefinition taskDefinition) {
+    private void taskCanDeleteValid(User user, TaskDefinition taskDefinition, User loginUser) {
         // check user access for project
         Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(user, project, TASK_DEFINITION_DELETE);
         //check if user have write perm for project
+        Map<String, Object> result = new HashMap<>();
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             throw new ServiceException(Status.TASK_DEFINE_STATE_ONLINE, taskDefinition.getCode());
@@ -472,7 +473,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
         }
 
-        this.taskCanDeleteValid(loginUser, taskDefinition);
+        this.taskCanDeleteValid(loginUser, taskDefinition, loginUser);
         int delete = taskDefinitionMapper.deleteByCode(taskCode);
         if (delete <= 0) {
             throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_MSG_ERROR, taskDefinition.getCode());
