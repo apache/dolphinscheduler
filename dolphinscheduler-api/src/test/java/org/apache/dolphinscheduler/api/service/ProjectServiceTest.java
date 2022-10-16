@@ -247,10 +247,10 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{1}, loginUser.getId(),
                 PROJECT_DELETE, baseServiceLogger)).thenReturn(true);
-        // PROJECT_NOT_FOUNT
+        // PROJECT_NOT_FOUND
         Result result = projectService.deleteProject(loginUser, 11L);
         logger.info(result.toString());
-        Assertions.assertTrue(Status.PROJECT_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertTrue(Status.PROJECT_NOT_FOUND.getCode() == result.getCode());
         loginUser.setId(2);
         // USER_NO_OPERATION_PROJECT_PERM
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
@@ -258,7 +258,7 @@ public class ProjectServiceTest {
                 baseServiceLogger)).thenReturn(true);
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-        Assertions.assertTrue(Status.USER_NO_OPERATION_PROJECT_PERM.getCode() == result.getCode());
+        Assertions.assertTrue(Status.USER_NO_WRITE_PROJECT_PERM.getCode() == result.getCode());
 
         // DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
         Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());

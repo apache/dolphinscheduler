@@ -256,6 +256,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public boolean hasProjectAndWritePerm(User loginUser, Project project, Result result) {
         boolean checkResult = false;
         if (project == null) {
+            logger.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else {
             // case 1: user is admin
@@ -268,7 +269,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
             // case 3: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if(projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION || projectUser == null) {
+            if(projectUser == null || projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
@@ -282,6 +283,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result) {
         boolean checkResult = false;
         if (project == null) {
+            logger.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else {
             // case 1: user is admin
@@ -294,7 +296,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
             // case 3: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if(projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION || projectUser == null) {
+            if(projectUser == null || projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
