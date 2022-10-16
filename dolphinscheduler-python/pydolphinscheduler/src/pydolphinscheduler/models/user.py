@@ -58,7 +58,7 @@ class User(BaseSide):
 
     def create_tenant_if_not_exists(self) -> None:
         """Create tenant object."""
-        tenant = Tenant(name=self.tenant, queue=self.queue)
+        tenant = Tenant(code=self.tenant, queue=self.queue)
         tenant.create_if_not_exists(self.queue)
 
     def create_if_not_exists(self, **kwargs):
@@ -131,5 +131,7 @@ class User(BaseSide):
 
     def __str__(self):
         """Return string."""
-        return f"User(user_id={self.user_id} name={self.name}, email={self.email}, phone={self.phone}, " \
-               f"tenant={self.tenant}, queue={self.queue}, status={self.status})"
+        return (
+            f"User(user_id={self.user_id} name={self.name}, email={self.email}, phone={self.phone}, "
+            f"tenant={self.tenant}, queue={self.queue}, status={self.status})"
+        )

@@ -27,7 +27,7 @@ from pydolphinscheduler.configuration import (
     set_single_config,
 )
 from pydolphinscheduler.core.yaml_process_define import create_process_definition
-from pydolphinscheduler.models import User, Tenant, Project
+from pydolphinscheduler.models import Project, Tenant, User
 
 version_option_val = ["major", "minor", "micro"]
 
@@ -96,33 +96,36 @@ def config(getter, setter, init) -> None:
 
 @cli.command()
 @click.option(
-    "--setter",
+    "--set",
     "-s",
-    multiple=True,
+    "setter",
+    multiple=False,
     type=click.Tuple([str, str, str, str, str, str, int]),
     help="Set user to pydolphinscheduler."
-    "Use multiple ``--set <NAME> <PASSWORD> <EMAIL> <PHONE> <TENANT> <QUEUE> <STATUS>`` options to set multiple users",
+    "Use ``--set <NAME> <PASSWORD> <EMAIL> <PHONE> <TENANT> <QUEUE> <STATUS>`` options to set user",
 )
 @click.option(
-    "--getter",
+    "--get",
     "-g",
+    "getter",
     multiple=True,
     type=int,
     help="Get user from pydolphinscheduler."
     "Use multiple ``--get <USER_ID>`` options to get multiple users",
 )
 @click.option(
-    "--updater",
+    "--update",
     "-u",
-    multiple=True,
+    "updater",
+    multiple=False,
     type=click.Tuple([str, str, str, str, str, str, int]),
     help="Update user to pydolphinscheduler."
-    "Use multiple ``--update <NAME> <PASSWORD> <EMAIL> <PHONE> <TENANT> <QUEUE> <STATUS>`` options to update "
-         "multiple users",
+    "Use ``--update <NAME> <PASSWORD> <EMAIL> <PHONE> <TENANT> <QUEUE> <STATUS>`` options to update user",
 )
 @click.option(
-    "--deleter",
+    "--delete",
     "-d",
+    "deleter",
     multiple=True,
     type=int,
     help="Delete user from pydolphinscheduler."
@@ -137,14 +140,18 @@ def user(getter, setter, updater, deleter) -> None:
             click.echo(user_)
     elif setter:
         click.echo("Set user start.")
-        user_ = User(setter[0], setter[1], setter[2], setter[3], setter[4], setter[5], setter[6])
+        user_ = User(
+            setter[0], setter[1], setter[2], setter[3], setter[4], setter[5], setter[6]
+        )
         user_.create_if_not_exists()
         click.echo(user_)
         click.echo("Set user done.")
     elif updater:
         click.echo("Update user start.")
         user_ = User(updater[0])
-        user_.update(updater[1], updater[2], updater[3], updater[4], updater[5], updater[6])
+        user_.update(
+            updater[1], updater[2], updater[3], updater[4], updater[5], updater[6]
+        )
         click.echo(user_)
         click.echo("Update user done.")
     elif deleter:
@@ -157,36 +164,40 @@ def user(getter, setter, updater, deleter) -> None:
 
 @cli.command()
 @click.option(
-    "--setter",
+    "--set",
     "-s",
-    multiple=True,
+    "setter",
+    multiple=False,
     type=click.Tuple([str, str, str, str, str]),
     help="Set tenant to pydolphinscheduler."
-    "Use multiple ``--set <NAME> <QUEUE> <DESCRIPTION> <TENANT_CODE> <USER_NAME>`` options to set multiple tenants",
+    "Use ``--set <NAME> <QUEUE> <DESCRIPTION> <TENANT_CODE> <USER_NAME>`` options to set tenant",
 )
 @click.option(
-    "--getter",
+    "--get",
     "-g",
+    "getter",
     multiple=True,
     type=str,
     help="Get tenant from pydolphinscheduler."
     "Use multiple ``--get <TENANT_CODE>`` options to get multiple tenants",
 )
 @click.option(
-    "--updater",
+    "--update",
     "-u",
-    multiple=True,
+    "updater",
+    multiple=False,
     type=click.Tuple([str, str, int, str]),
     help="Update tenant to pydolphinscheduler."
-    "Use multiple ``--update <USER_NAME> <TENANT_CODE> <QUEUE_ID> <DESCRIPTION>`` options to update "
+    "Use ``--update <USER_NAME> <TENANT_CODE> <QUEUE_ID> <DESCRIPTION>`` options to update tenant",
 )
 @click.option(
-    "--deleter",
+    "--delete",
     "-d",
+    "deleter",
     multiple=True,
-    type=str,
+    type=click.Tuple([str, str]),
     help="Delete tenant from pydolphinscheduler."
-    "Use multiple ``--delete <TENANT_CODE>`` options to delete multiple tenants",
+    "Use multiple ``--delete <USER_NAME> <TENANT_CODE>`` options to delete multiple tenants",
 )
 def tenant(getter, setter, updater, deleter) -> None:
     """Manage the tenant of pydolphinscheduler."""
@@ -197,68 +208,76 @@ def tenant(getter, setter, updater, deleter) -> None:
             click.echo(tenant_)
     elif setter:
         click.echo("Set tenant start.")
-        tenant_ = Tenant(setter[0], setter[1], setter[2], setter[3], setter[4])
-        tenant_.create_if_not_exists(setter[0])
+        tenant_ = Tenant(
+            setter[0], setter[1], setter[2], code=setter[3], user_name=setter[4]
+        )
+        tenant_.create_if_not_exists(setter[3])
         click.echo(tenant_)
         click.echo("Set tenant done.")
     elif updater:
         click.echo("Update tenant start.")
-        tenant_ = Tenant(updater[0])
+        tenant_ = Tenant.get_tenant(updater[1])
         tenant_.update(updater[0], updater[1], updater[2], updater[3])
         click.echo(tenant_)
         click.echo("Update tenant done.")
     elif deleter:
         click.echo(f"Delete tenant {deleter} from pydolphinscheduler.")
-        for tenant_code in deleter:
+        for user_name, tenant_code in deleter:
             tenant_ = Tenant.get_tenant(tenant_code)
-            tenant_.delete()
+            echo(tenant_)
+            tenant_.delete(user=user_name)
             click.echo(f"Delete tenant {tenant_code} done.")
 
 
 @cli.command()
 @click.option(
-    "--setter",
+    "--set",
     "-s",
+    "setter",
+    multiple=False,
+    type=click.Tuple([str, str, str]),
+    help="Set project to pydolphinscheduler."
+    "Use ``--set <NAME> <DESCRIPTION> <USER_NAME>`` options to set project",
+)
+@click.option(
+    "--get",
+    "-g",
+    "getter",
     multiple=True,
     type=click.Tuple([str, str]),
-    help="Set project to pydolphinscheduler."
-    "Use multiple ``--set <NAME> <DESCRIPTION>`` options to set multiple projects",
-)
-@click.option(
-    "--getter",
-    "-g",
-    multiple=True,
-    type=str,
     help="Get project from pydolphinscheduler."
-    "Use multiple ``--get <PROJECT_NAME>`` options to get multiple projects",
+    "Use multiple ``--get <USER_NAME> <PROJECT_NAME>`` options to get multiple projects",
 )
 @click.option(
-    "--updater",
+    "--update",
     "-u",
-    multiple=True,
-    type=click.Tuple([str, str, str, str]),
+    "updater",
+    multiple=False,
+    type=click.Tuple([str, int, str, str]),
     help="Update project to pydolphinscheduler."
-    "Use multiple ``--update <USER> <PROJECT_CODE> <PROJECT_NAME> <DESCRIPTION>`` options to update multiple projects",
+    "Use ``--update <USER_NAME> <PROJECT_CODE> <PROJECT_NAME> <DESCRIPTION>`` options to update project",
 )
 @click.option(
-    "--deleter",
+    "--delete",
     "-d",
+    "deleter",
     multiple=True,
-    type=int,
+    type=click.Tuple([str, str]),
     help="Delete project from pydolphinscheduler."
-    "Use multiple ``--delete <PROJECT_CODE>`` options to delete multiple projects",
+    "Use multiple ``--delete <USER_NAME> <PROJECT_NAME>`` options to delete multiple projects",
 )
 def project(getter, setter, updater, deleter) -> None:
     """Manage the project of pydolphinscheduler."""
     if getter:
         click.echo(f"Get project {getter} from pydolphinscheduler.")
-        for project_name in getter:
-            project_ = Project.get_project_by_name(project_name)
+        for user_name, project_name in getter:
+            project_ = Project.get_project_by_name(user_name, project_name)
             click.echo(project_)
     elif setter:
         click.echo("Set project start.")
         project_ = Project(setter[0], setter[1])
-        project_.create_if_not_exists()
+        click.echo(setter)
+        project_.create_if_not_exists(user=setter[2])
         click.echo(project_)
         click.echo("Set project done.")
     elif updater:
@@ -269,9 +288,10 @@ def project(getter, setter, updater, deleter) -> None:
         click.echo("Update project done.")
     elif deleter:
         click.echo(f"Delete project {deleter} from pydolphinscheduler.")
-        for project_name in deleter:
-            project_ = Project.get_project_by_name(project_name)
-            project_.delete()
+        for user_name, project_name in deleter:
+            project_ = Project.get_project_by_name(user_name, project_name)
+            click.echo(project_)
+            project_.delete(user=user_name)
             click.echo(f"Delete project {project_name} done.")
 
 

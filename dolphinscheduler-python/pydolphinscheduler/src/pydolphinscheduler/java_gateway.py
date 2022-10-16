@@ -156,11 +156,11 @@ class JavaGate:
         return self.java_gateway.entry_point.deleteProject(user, code)
 
     def create_tenant(
-        self, tenant_name: str, queue_name: str, description: Optional[str] = None
+        self, tenant_code: str, description: Optional[str], queue_name: str = None
     ):
         """Create tenant through java gateway."""
         return self.java_gateway.entry_point.createTenant(
-            tenant_name, description, queue_name
+            tenant_code, description, queue_name
         )
 
     def query_tenant(self, tenant_code: str):

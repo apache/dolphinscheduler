@@ -39,6 +39,8 @@ class Project(BaseSide):
     def create_if_not_exists(self, user=configuration.USER_NAME) -> None:
         """Create Project if not exists."""
         JavaGate().create_or_grant_project(user, self.name, self.description)
+        project = self.get_project_by_name(user, self.name)
+        self.code = project.code
         # TODO recover result checker
         # gateway_result_checker(result, None)
 

@@ -55,7 +55,7 @@ def get_user(
 
 
 def test_create_user():
-    """Test weather client could connect java gate way or not."""
+    """Test weather client could connect java gateway or not."""
     user = User(
         name="test-name",
         password="test-password",

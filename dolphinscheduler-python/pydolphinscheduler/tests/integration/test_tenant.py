@@ -45,7 +45,7 @@ def get_tenant(
 ):
     """Get a test tenant."""
     tenant = Tenant(name, queue, description, code=tenant_code, user_name=user_name)
-    tenant.create_if_not_exists(name)
+    tenant.create_if_not_exists(queue)
     return tenant
 
 
@@ -79,7 +79,7 @@ def test_update_tenant():
 def test_delete_tenant():
     """Test delete tenant from java gateway."""
     tenant = get_tenant(user_name="admin")
-    tenant.delete()
+    tenant.delete(user="admin")
     with pytest.raises(AttributeError) as excinfo:
         _ = tenant.tenant_id
 

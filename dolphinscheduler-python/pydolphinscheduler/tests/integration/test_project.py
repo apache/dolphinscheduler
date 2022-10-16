@@ -39,15 +39,14 @@ def get_user(
 def get_project(name="test-name-1", description="test-description", code=1):
     """Get a test project."""
     project = Project(name, description, code=code)
-    user = get_user()
-    project.create_if_not_exists(user=user.name)
+    project.create_if_not_exists(user="admin")
     return project
 
 
 def test_create_and_get_project():
     """Test create and get project from java gateway."""
     project = get_project()
-    project_ = Project.get_project_by_name(user="test-name", name=project.name)
+    project_ = Project.get_project_by_name(user="admin", name=project.name)
     assert project_.name == project.name
     assert project_.description == project.description
 
@@ -55,22 +54,22 @@ def test_create_and_get_project():
 def test_update_project():
     """Test update project from java gateway."""
     project = get_project()
-    project = project.get_project_by_name(user="test-name", name=project.name)
+    project = project.get_project_by_name(user="admin", name=project.name)
     project.update(
-        user="test-name",
+        user="admin",
         project_code=project.code,
         project_name="test-name-updated",
         description="test-description-updated",
     )
-    project_ = Project.get_project_by_name(user="test-name", name="test-name-updated")
+    project_ = Project.get_project_by_name(user="admin", name="test-name-updated")
     assert project_.description == "test-description-updated"
 
 
 def test_delete_project():
     """Test delete project from java gateway."""
     project = get_project()
-    project.get_project_by_name(user="test-name", name=project.name)
-    project.delete(user="test-name")
+    project.get_project_by_name(user="admin", name=project.name)
+    project.delete(user="admin")
 
     with pytest.raises(AttributeError) as excinfo:
         _ = project.name
