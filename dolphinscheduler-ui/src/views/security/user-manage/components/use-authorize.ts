@@ -93,15 +93,6 @@ export function useAuthorize() {
     })
     state.loading = false
     if (!projectsList) throw Error()
-    // state.projectWithAuthorizedLevel = projectsList.map((record: ProjectList) => {
-    //   record.createTime = record.createTime
-    //     ? format(parseTime(record.createTime), 'yyyy-MM-dd HH:mm:ss')
-    //     : ''
-    //   record.updateTime = record.updateTime
-    //     ? format(parseTime(record.updateTime), 'yyyy-MM-dd HH:mm:ss')
-    //     : ''
-    //   return record
-    // })
     state.pagination.totalPage = projectsList.totalPage
     state.projectWithAuthorizedLevel = projectsList.totalList
     return state.projectWithAuthorizedLevel
@@ -119,7 +110,7 @@ export function useAuthorize() {
   }
 
   const revokeProjectByIdRequest = async (userId: number, projectIds: string) => {
-    const res = await revokeProjectById({
+    await revokeProjectById({
       userId,
       projectIds: projectIds
     })
@@ -127,7 +118,7 @@ export function useAuthorize() {
   }
 
   const grantProjectRequest = async (userId: number, projectIds: string) => {
-    const res = await grantProject({
+    await grantProject({
       userId,
       projectIds: projectIds
     })
@@ -135,7 +126,7 @@ export function useAuthorize() {
   }
 
   const grantProjectWithReadPermRequest = async (userId: number, projectIds: string) => {
-    const res = await grantProjectWithReadPerm({
+    await grantProjectWithReadPerm({
       userId,
       projectIds: projectIds
     })
@@ -288,10 +279,7 @@ export function useAuthorize() {
     if (state.saving) return false
     state.saving = true
     if (type === 'authorize_project') {
-      // await grantProject({
-      //   userId,
-      //   projectIds: state.authorizedProjects.join(',')
-      // })
+
     }
     if (type === 'authorize_datasource') {
       await grantDataSource({
