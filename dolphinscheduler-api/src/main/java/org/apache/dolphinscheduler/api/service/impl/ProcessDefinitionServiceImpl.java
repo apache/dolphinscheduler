@@ -1996,6 +1996,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 // copy timing configuration
                 Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
                 if (scheduleObj != null) {
+                    scheduleObj.setId(null);
+                    scheduleObj.setUserId(loginUser.getId());
                     scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     scheduleObj.setCreateTime(date);
