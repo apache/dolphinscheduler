@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProcessInstanceMapMapperTest extends BaseDaoTest {
@@ -56,7 +56,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         //update
         processInstanceMap.setParentProcessInstanceId(1);
         int update = processInstanceMapMapper.updateById(processInstanceMap);
-        Assert.assertEquals(1, update);
+        Assertions.assertEquals(1, update);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
     public void testDelete() {
         ProcessInstanceMap processInstanceMap = insertOne();
         int delete = processInstanceMapMapper.deleteById(processInstanceMap.getId());
-        Assert.assertEquals(1, delete);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -77,7 +77,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         ProcessInstanceMap processInstanceMap = insertOne();
         //query
         List<ProcessInstanceMap> dataSources = processInstanceMapMapper.selectList(null);
-        Assert.assertNotEquals(dataSources.size(), 0);
+        Assertions.assertNotEquals(dataSources.size(), 0);
     }
 
     /**
@@ -104,7 +104,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         int delete = processInstanceMapMapper.deleteByParentProcessId(
                 processInstanceMap.getParentProcessInstanceId()
         );
-        Assert.assertEquals(1, delete);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -121,7 +121,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
 
         List<Integer> subIds = processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
 
-        Assert.assertNotEquals(subIds.size(), 0);
+        Assertions.assertNotEquals(subIds.size(), 0);
 
 
     }

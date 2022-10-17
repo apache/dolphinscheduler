@@ -20,14 +20,13 @@ package org.apache.dolphinscheduler.remote.command.future;
 import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class ResponseFutureTest {
 
@@ -51,7 +50,7 @@ public class ResponseFutureTest {
         ResponseFuture future = new ResponseFuture(1, 2000, invokeCallback, null);
         try {
             latch.await(5000, TimeUnit.MILLISECONDS);
-            Assert.assertNull(ResponseFuture.getFuture(1));
+            Assertions.assertNull(ResponseFuture.getFuture(1));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
