@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.remote.command.log;
 
 import org.apache.dolphinscheduler.remote.command.Command;
-
-import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class RemoveTaskLogRequestCommandTest {
 
@@ -30,6 +28,6 @@ public class RemoveTaskLogRequestCommandTest {
         RemoveTaskLogResponseCommand removeTaskLogResponseCommand = new RemoveTaskLogResponseCommand();
         removeTaskLogResponseCommand.setStatus(true);
         Command command = removeTaskLogResponseCommand.convert2Command(122);
-        Assert.assertNotNull(command);
+        Assertions.assertNotNull(command);
     }
 }
