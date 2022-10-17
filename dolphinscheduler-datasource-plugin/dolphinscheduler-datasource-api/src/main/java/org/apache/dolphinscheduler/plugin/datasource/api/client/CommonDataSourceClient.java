@@ -50,7 +50,16 @@ public class CommonDataSourceClient implements DataSourceClient {
         preInit();
         checkEnv(baseConnectionParam);
         initClient(baseConnectionParam, dbType);
-        checkClient();
+        if (dbType != DbType.ELASTICSEARCH) {
+            checkClient();
+        }
+        else {
+            checkElasticSearchClient();
+        }
+    }
+
+    private void checkElasticSearchClient() {
+
     }
 
     protected void preInit() {

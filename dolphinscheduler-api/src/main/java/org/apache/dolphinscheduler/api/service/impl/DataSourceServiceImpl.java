@@ -344,7 +344,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             if (connectionParam.toString().contains("hdfsPath")) {
                 String[] tmp = connectionParam.toString().split("hdfsPath='");
-                String hdfsPath = tmp[1].split("', principal")[0];
+                String hdfsPath = tmp[1].split("',")[0];
                 if (!checkHDFSPath(hdfsPath)){
                     logger.error("Invalid hdfsPath");
                     return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), "Invalid hdfsPath");
