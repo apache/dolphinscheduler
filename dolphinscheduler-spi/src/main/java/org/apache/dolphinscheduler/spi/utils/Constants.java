@@ -208,10 +208,7 @@ public class Constants {
      * fetch applicationId way
      */
     public static final String APPID_COLLECT = "appId.collect";
-    public static final String APPID_FILE_PATH = "appId.file.path";
-    public static final String AOP_DEBUG = "aop.debug";
     public static final String DEFAULT_COLLECT_WAY = "log";
-    public static final String DEFAULT_APPID_FILE_PATH = "appInfo.log";
 
     /**
      * DOUBLE_SLASH //

@@ -23,8 +23,6 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXE
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
 import static org.apache.dolphinscheduler.common.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
-import static org.apache.dolphinscheduler.common.Constants.APPID_FILE_PATH;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_APPID_FILE_PATH;
 
 import org.apache.commons.io.IOUtils;
 
@@ -48,7 +46,7 @@ public class FileUtils {
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
-    public static final String APPINFO_PATH = PropertyUtils.getString(APPID_FILE_PATH, DEFAULT_APPID_FILE_PATH);
+    public static final String APPINFO_PATH = "appInfo.log";
 
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
@@ -61,7 +59,8 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        String fileName = String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName =
+                String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
 
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
@@ -98,7 +97,8 @@ public class FileUtils {
      * @param taskInstanceId task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
+    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion,
+                                           int processInstanceId, int taskInstanceId) {
         String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
                 projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
         File file = new File(fileName);

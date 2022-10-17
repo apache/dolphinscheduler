@@ -145,12 +145,6 @@ alert.rpc.port=50052
 
 # way to collect applicationId: log(original regex match), aop
 appId.collect: log
-
-# appIds info log path
-appId.file.path = appInfo.log
-
-# whether to print aop debug info
-aop.debug = false
 ```
 
 > **注意**：

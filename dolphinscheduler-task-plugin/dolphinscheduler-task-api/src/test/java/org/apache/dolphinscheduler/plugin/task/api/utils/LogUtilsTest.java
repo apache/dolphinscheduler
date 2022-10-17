@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 
 public class LogUtilsTest {
 
-    private static final String APP_ID_FILE = LogUtilsTest.class.getResource("/appId.log")
+    private static final String APP_ID_FILE = LogUtilsTest.class.getResource("/appId.txt")
             .getFile();
     private static final String APP_INFO_FILE = LogUtilsTest.class.getResource("/appInfo.log")
             .getFile();

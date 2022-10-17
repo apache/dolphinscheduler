@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.aop;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
-
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContext;
@@ -48,9 +44,8 @@ public class YarnClientAspect {
     private boolean debug;
 
     public YarnClientAspect() {
-        appInfoFilePath = String.format("%s/%s", System.getProperty("user.dir"),
-                PropertyUtils.getString(APPID_FILE_PATH, DEFAULT_APPID_FILE_PATH));
-        debug = Boolean.parseBoolean(PropertyUtils.getString(AOP_DEBUG, "false"));
+        appInfoFilePath = String.format("%s/%s", System.getProperty("user.dir"), "appInfo.log");
+        debug = true;
     }
 
     /**

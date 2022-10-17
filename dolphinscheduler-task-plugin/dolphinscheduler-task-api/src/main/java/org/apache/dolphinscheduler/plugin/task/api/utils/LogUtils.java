@@ -72,7 +72,6 @@ public class LogUtils {
         }
     }
 
-
     public List<String> getAppIdsFromLogFile(@NonNull String logPath, Logger logger) {
         File logFile = new File(logPath);
         if (!logFile.exists() || !logFile.isFile()) {
@@ -94,7 +93,7 @@ public class LogUtils {
             });
             return new ArrayList<>(appIds);
         } catch (IOException e) {
-            logger.error("Get appId from log file erro, logPath: {}", logPath, e);
+            logger.error("Get appId from log file error, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
     }
