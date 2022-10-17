@@ -27,6 +27,6 @@ if [[ "$DOCKER" == "true" ]]; then
   JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
 fi
 
-java $JAVA_OPTS \
+$JAVA_HOME/bin/java $JAVA_OPTS \
   -cp "$DOLPHINSCHEDULER_HOME/conf":"$DOLPHINSCHEDULER_HOME/libs/*" \
   org.apache.dolphinscheduler.server.master.MasterServer

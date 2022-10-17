@@ -16,7 +16,7 @@
 #
 
 # JAVA_HOME, will use it to start DolphinScheduler server
-export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
+export JAVA_HOME=${JAVA_HOME:-/opt/java/openjdk}
 
 # Never put sensitive config such as database password here in your production environment,
 # this file will be sourced everytime a new task is executed.
