@@ -40,7 +40,6 @@ const props = {
   row: {
     type: Object as PropType<ResourceFileTableData>,
     default: {
-      id: -1,
       name: '',
       description: '',
       user_name: '',
@@ -63,16 +62,16 @@ export default defineComponent({
       return !(flag && size < 1000000)
     }
 
-    const handleEditFile = (item: { id: number, fullName: string, user_name: string }) => {
-      router.push({ name: 'resource-file-edit', params: { id: item.id }, query: {prefix: item.fullName, tenantCode: item.user_name} })
+    const handleEditFile = (item: {fullName: string, user_name: string }) => {
+      router.push({ name: 'resource-file-edit', query: {prefix: item.fullName, tenantCode: item.user_name} })
     }
 
     const handleDeleteFile = (fullNameObj: {fullName: string, tenantCode: string}) => {
       deleteResource(fullNameObj).then(() => emit('updateList'))
     }
 
-    const handleRenameFile: IRenameFile = (id: number, name: string, description: string, fullName: string, user_name: string) => {
-      emit('renameResource', id, name, description, fullName, user_name)
+    const handleRenameFile: IRenameFile = (name: string, description: string, fullName: string, user_name: string) => {
+      emit('renameResource', name, description, fullName, user_name)
     }
 
     return {
@@ -98,7 +97,7 @@ export default defineComponent({
                 disabled={this.rtDisb(this.row.name, this.row.size)}
                 tag='div'
                 onClick={() => {
-                  this.handleEditFile({id:this.row.id, fullName:this.row.fullName, user_name:this.row.user_name})
+                  this.handleEditFile({fullName:this.row.fullName, user_name:this.row.user_name})
                 }}
                 style={{ marginRight: '-5px' }}
                 circle
@@ -120,7 +119,6 @@ export default defineComponent({
                 type='info'
                 onClick={() => {
                   this.handleRenameFile(
-                    this.row.id,
                     this.row.name,
                     this.row.description,
                     this.row.fullName,

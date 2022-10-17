@@ -47,7 +47,7 @@ const goSubFolder = (router: Router, item: any) => {
   fileStore.setFileInfo(`${item.alias}|${item.size}`)
   if (item.directory) {
     fileStore.setCurrentDir(`${item.fullName}`)
-    router.push({ name: 'resource-sub-manage', params: { id: -1 },
+    router.push({ name: 'resource-sub-manage',
         query: {prefix: item.fullName, tenantCode: item.userName} })
   }
 }
@@ -304,7 +304,7 @@ export function useTable() {
       }
     ).then((res: any) => {
       fileStore.setCurrentDir(res.fullName)
-      router.push({ name: 'resource-sub-manage', params: { id: -1 }, query: {prefix: res.fullName, tenantCode: res.userName} })
+      router.push({ name: 'resource-sub-manage', query: {prefix: res.fullName, tenantCode: res.userName} })
     })
   }
 

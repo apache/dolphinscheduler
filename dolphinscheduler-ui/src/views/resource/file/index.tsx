@@ -66,7 +66,6 @@ export default defineComponent({
     const searchRef = ref()
 
     const renameInfo = reactive({
-      id: -1,
       name: '',
       description: '',
       fullName: '',
@@ -115,7 +114,6 @@ export default defineComponent({
 
     const handleConditions = () => {
       resourceListRef.value = getResourceListState(
-        -1,
         fullName.value,
         tenantCode.value,
         searchRef.value
@@ -140,9 +138,8 @@ export default defineComponent({
       handleShowModal(uploadShowRef)
     }
 
-    const handleRenameFile: IRenameFile = (id: number, name: string, description: string, fullName: string, user_name: string) => {
+    const handleRenameFile: IRenameFile = (name: string, description: string, fullName: string, user_name: string) => {
       renameInfo.fullName = fullName
-      renameInfo.id = id
       renameInfo.name = name
       renameInfo.description = description
       renameInfo.user_name = user_name
@@ -215,7 +212,6 @@ export default defineComponent({
       breadcrumbItemsRef.value = []
       if (fullName.value != "") {
         breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root', userName: '' })
-        const id = 0
         queryCurrentResourceByFullName(
           {
             type: 'FILE',
@@ -362,7 +358,6 @@ export default defineComponent({
         />
         <ResourceRenameModal
           v-model:show={this.renameShowRef}
-          id={this.renameInfo.id}
           name={this.renameInfo.name}
           fullName={this.renameInfo.fullName}
           description={this.renameInfo.description}

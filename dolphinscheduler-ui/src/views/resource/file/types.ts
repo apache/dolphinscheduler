@@ -31,7 +31,7 @@ export interface IEmit {
 }
 
 export interface IRenameFile {
-  (id: number, name: string, description: string, fullName: string, user_name: string): void
+  (name: string, description: string, fullName: string, user_name: string): void
 }
 export interface IRtDisb {
   (name: string, size: number): boolean

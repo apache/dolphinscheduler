@@ -32,10 +32,6 @@ const props = {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  id: {
-    type: Number as PropType<number>,
-    default: -1
-  },
   name: {
     type: String as PropType<string>,
     default: ''
@@ -75,7 +71,6 @@ export default defineComponent({
       () => props.show,
       () => {
         state.renameForm.fullName = props.fullName
-        state.renameForm.id = props.id
         state.renameForm.name = props.name
         state.renameForm.description = props.description
         state.renameForm.user_name = props.userName
