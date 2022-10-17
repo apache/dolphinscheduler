@@ -16,7 +16,7 @@
 #
 
 # JAVA_HOME, will use it to start DolphinScheduler server
-export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
+export JAVA_HOME=${JAVA_HOME:-/opt/java/openjdk}
 
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-postgresql}
