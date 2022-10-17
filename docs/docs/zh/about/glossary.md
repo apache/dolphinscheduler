@@ -2,7 +2,7 @@
 
 在对 Apache DolphinScheduler 了解之前，我们先来认识一下调度系统常用的名词
 
-### 1.名词解释
+### 名词解释
 
 **DAG：** 全称 Directed Acyclic Graph，简称 DAG。工作流中的 Task 任务以有向无环图的形式组装起来，从入度为零的节点进行拓扑遍历，直到无后继节点为止。举例如下图：
 
@@ -32,7 +32,7 @@
 
 **补数**：补历史数据，支持**区间并行和串行**两种补数方式
 
-### 2.模块介绍
+### 模块介绍
 
 - dolphinscheduler-alert 告警模块，提供 AlertServer 服务。
 
