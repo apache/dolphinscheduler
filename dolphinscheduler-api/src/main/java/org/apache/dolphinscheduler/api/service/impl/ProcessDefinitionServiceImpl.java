@@ -36,7 +36,6 @@ import static org.apache.dolphinscheduler.common.Constants.COPY_SUFFIX;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.Constants.IMPORT_SUFFIX;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMPLEX_TASK_TYPES;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
@@ -2057,9 +2056,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         List<String> failedProcessList = new ArrayList<>();
         doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, true);
-        if (result.get(Constants.STATUS) == Status.NOT_SUPPORT_COPY_TASK_TYPE) {
-            return result;
-        }
         checkBatchOperateResult(projectCode, targetProjectCode, result, failedProcessList, true);
         return result;
     }
@@ -2151,11 +2147,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-                    if (COMPLEX_TASK_TYPES.contains(taskDefinitionLog.getTaskType())) {
-                        logger.error("Task types {} do not support copy.", taskDefinitionLog.getTaskType());
-                        putMsg(result, Status.NOT_SUPPORT_COPY_TASK_TYPE, taskDefinitionLog.getTaskType());
-                        return;
-                    }
                     try {
                         long taskCode = CodeGenerateUtils.getInstance().genCode();
                         taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
