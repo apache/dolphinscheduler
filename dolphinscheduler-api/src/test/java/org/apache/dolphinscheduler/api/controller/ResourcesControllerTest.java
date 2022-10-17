@@ -153,7 +153,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("fullName", "dolphinscheduler/resourcePath");
         paramsMap.add("tenantCode", "123");
 
-        MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/view", "5")
+        MvcResult mvcResult = mockMvc.perform(get("/resources/view")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -211,7 +211,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("fullName", "dolphinscheduler/resourcePath");
         paramsMap.add("tenantCode", "123");
 
-        MvcResult mvcResult = mockMvc.perform(put("/resources/1/update-content")
+        MvcResult mvcResult = mockMvc.perform(put("/resources/update-content")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -233,7 +233,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("fullName", "dolphinscheduler/resourcePath");
 
-        MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/download", 5)
+        MvcResult mvcResult = mockMvc.perform(get("/resources/download")
                 .params(paramsMap)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -261,7 +261,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("resourceId", "1");
         paramsMap.add("fullName", "dolphinscheduler/resourcePath");
 
-        MvcResult mvcResult = mockMvc.perform(post("/resources/{resourceId}/udf-func", "123")
+        MvcResult mvcResult = mockMvc.perform(post("/resources/udf-func")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -315,7 +315,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("resourceId", "1");
         paramsMap.add("fullName", "dolphinscheduler/resourcePath");
 
-        MvcResult mvcResult = mockMvc.perform(put("/resources/{resourceId}/udf-func/{id}", "123", "456")
+        MvcResult mvcResult = mockMvc.perform(put("/resources/udf-func/{id}", "456")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -491,7 +491,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("fullName", "dolphinscheduler/resourcePath");
         paramsMap.add("tenantCode", "123");
-        MvcResult mvcResult = mockMvc.perform(delete("/resources/{id}", "123")
+        MvcResult mvcResult = mockMvc.perform(delete("/resources")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
