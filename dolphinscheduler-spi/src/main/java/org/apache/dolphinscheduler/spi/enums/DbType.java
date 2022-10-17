@@ -69,4 +69,8 @@ public enum DbType {
     public boolean isHive() {
         return this == DbType.HIVE;
     }
+
+    public boolean isMysql() {
+        return this == DbType.MYSQL;
+    }
 }

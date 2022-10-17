@@ -143,4 +143,12 @@ public interface DataSourceService {
      * @return
      */
     Map<String, Object> getTableColumns(Integer datasourceId,String tableName);
+
+    /**
+     * get table columns with sql type
+     * @param datasourceId
+     * @param tableName
+     * @return
+     */
+    Map<String, Object> getTableColumnsWithType(Integer datasourceId, String tableName);
 }

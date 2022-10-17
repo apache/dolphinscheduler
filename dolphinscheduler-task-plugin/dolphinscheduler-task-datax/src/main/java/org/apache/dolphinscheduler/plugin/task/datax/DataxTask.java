@@ -51,11 +51,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -209,7 +205,8 @@ public class DataxTask extends AbstractTaskExecutor {
             json = dataXParameters.getJson().replaceAll("\\r\\n", "\n");
         } else {
             ObjectNode job = JSONUtils.createObjectNode();
-            job.putArray("content").addAll(buildDataxJobContentJson());
+            job.putArray("content").addAll(buildDataxJobContentJsonFromConfiguration());
+
             job.set("setting", buildDataxJobSettingJson());
 
             ObjectNode root = JSONUtils.createObjectNode();
@@ -234,22 +231,107 @@ public class DataxTask extends AbstractTaskExecutor {
      * @return collection of datax job config JSONObject
      * @throws SQLException if error throws SQLException
      */
-    private List<ObjectNode> buildDataxJobContentJson() {
+//    private List<ObjectNode> buildDataxJobContentJsonFromSQL() {
+//
+//        BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+//                dataxTaskExecutionContext.getSourcetype(),
+//                dataxTaskExecutionContext.getSourceConnectionParams());
+//
+//        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+//                dataxTaskExecutionContext.getTargetType(),
+//                dataxTaskExecutionContext.getTargetConnectionParams());
+//
+//        List<ObjectNode> readerConnArr = new ArrayList<>();
+//        ObjectNode readerConn = JSONUtils.createObjectNode();
+//
+//        ArrayNode sqlArr = readerConn.putArray("querySql");
+//        for (String sql : new String[]{dataXParameters.getSql()}) {
+//            sqlArr.add(sql);
+//        }
+//
+//        ArrayNode urlArr = readerConn.putArray("jdbcUrl");
+//        urlArr.add(DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
+//
+//        readerConnArr.add(readerConn);
+//
+//        ObjectNode readerParam = JSONUtils.createObjectNode();
+//        readerParam.put("username", dataSourceCfg.getUser());
+//        readerParam.put("password", decodePassword(dataSourceCfg.getPassword()));
+//        readerParam.putArray("connection").addAll(readerConnArr);
+//
+//        ObjectNode reader = JSONUtils.createObjectNode();
+//        reader.put("name", DataxUtils.getReaderPluginName(dataxTaskExecutionContext.getSourcetype()));
+//        reader.set("parameter", readerParam);
+//
+//        List<ObjectNode> writerConnArr = new ArrayList<>();
+//        ObjectNode writerConn = JSONUtils.createObjectNode();
+//        ArrayNode tableArr = writerConn.putArray("table");
+//        tableArr.add(dataXParameters.getTargetTable());
+//
+//        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
+//        writerConnArr.add(writerConn);
+//
+//        ObjectNode writerParam = JSONUtils.createObjectNode();
+//        writerParam.put("username", dataTargetCfg.getUser());
+//        writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
+//
+//        String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
+//                dataxTaskExecutionContext.getTargetType(),
+//                dataSourceCfg, dataXParameters.getSql());
+//
+//        ArrayNode columnArr = writerParam.putArray("column");
+//        for (String column : columns) {
+//            columnArr.add(column);
+//        }
+//        writerParam.putArray("connection").addAll(writerConnArr);
+//
+//        if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
+//            ArrayNode preSqlArr = writerParam.putArray("preSql");
+//            for (String preSql : dataXParameters.getPreStatements()) {
+//                preSqlArr.add(preSql);
+//            }
+//
+//        }
+//
+//        if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
+//            ArrayNode postSqlArr = writerParam.putArray("postSql");
+//            for (String postSql : dataXParameters.getPostStatements()) {
+//                postSqlArr.add(postSql);
+//            }
+//        }
+//
+//        ObjectNode writer = JSONUtils.createObjectNode();
+//        writer.put("name", DataxUtils.getWriterPluginName(dataxTaskExecutionContext.getTargetType()));
+//        writer.set("parameter", writerParam);
+//
+//        List<ObjectNode> contentList = new ArrayList<>();
+//        ObjectNode content = JSONUtils.createObjectNode();
+//        content.set("reader", reader);
+//        content.set("writer", writer);
+//        contentList.add(content);
+//
+//        return contentList;
+//    }
 
+    private List<ObjectNode> buildDataxJobContentJsonFromConfiguration() {
+        List<ObjectNode> contentList = new ArrayList<>();
+        ObjectNode content = JSONUtils.createObjectNode();
+        content.set("reader", buildDataxReaderJson());
+        content.set("writer", buildDataxWriterJson());
+        contentList.add(content);
+        return contentList;
+    }
+
+    public ObjectNode buildDataxReaderJson(){
         BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                 dataxTaskExecutionContext.getSourcetype(),
                 dataxTaskExecutionContext.getSourceConnectionParams());
-
-        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                dataxTaskExecutionContext.getTargetType(),
-                dataxTaskExecutionContext.getTargetConnectionParams());
-
         List<ObjectNode> readerConnArr = new ArrayList<>();
         ObjectNode readerConn = JSONUtils.createObjectNode();
 
-        ArrayNode sqlArr = readerConn.putArray("querySql");
-        for (String sql : new String[]{dataXParameters.getSql()}) {
-            sqlArr.add(sql);
+        ArrayNode tableArr = readerConn.putArray("table");
+        for (String table : new String[]{dataXParameters.getSourceTable()}) {
+            tableArr.add(table);
         }
 
         ArrayNode urlArr = readerConn.putArray("jdbcUrl");
@@ -260,12 +342,37 @@ public class DataxTask extends AbstractTaskExecutor {
         ObjectNode readerParam = JSONUtils.createObjectNode();
         readerParam.put("username", dataSourceCfg.getUser());
         readerParam.put("password", decodePassword(dataSourceCfg.getPassword()));
+
+        if (dataXParameters.getCustomSQL() == Flag.YES.ordinal()) {
+            ArrayNode sqlArr = readerConn.putArray("querySql");
+            for (String sql : new String[]{dataXParameters.getSql()}) {
+                sqlArr.add(sql);
+            }
+        } else {
+            ArrayNode columnArr = readerParam.putArray("column");
+            for (String column : dataXParameters.getDsColumns()) {
+                columnArr.add(column);
+            }
+            if (StringUtils.isNotEmpty(dataXParameters.getWhere())) {
+                readerParam.put("where", dataXParameters.getWhere());
+            }
+        }
+        if (StringUtils.isNotEmpty(dataXParameters.getSplitPk())) {
+            readerParam.put("splitPk", dataXParameters.getSplitPk());
+        }
+
         readerParam.putArray("connection").addAll(readerConnArr);
 
         ObjectNode reader = JSONUtils.createObjectNode();
         reader.put("name", DataxUtils.getReaderPluginName(dataxTaskExecutionContext.getSourcetype()));
         reader.set("parameter", readerParam);
+        return reader;
+    }
 
+    public ObjectNode buildDataxWriterJson(){
+        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                dataxTaskExecutionContext.getTargetType(),
+                dataxTaskExecutionContext.getTargetConnectionParams());
         List<ObjectNode> writerConnArr = new ArrayList<>();
         ObjectNode writerConn = JSONUtils.createObjectNode();
         ArrayNode tableArr = writerConn.putArray("table");
@@ -278,13 +385,29 @@ public class DataxTask extends AbstractTaskExecutor {
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
 
-        String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
-                dataxTaskExecutionContext.getTargetType(),
-                dataSourceCfg, dataXParameters.getSql());
+        // only write to mysql has 3 write modes
+        if (dataxTaskExecutionContext.getTargetType().isMysql()) {
+            writerParam.put("writeMode", WriteMode.valueOf(dataXParameters.getWriteMode()).getDescp());
+        }
 
-        ArrayNode columnArr = writerParam.putArray("column");
-        for (String column : columns) {
-            columnArr.add(column);
+        if (dataXParameters.getCustomSQL() == Flag.YES.ordinal()){
+            BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                    dataxTaskExecutionContext.getSourcetype(),
+                    dataxTaskExecutionContext.getSourceConnectionParams());
+
+            String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
+                    dataxTaskExecutionContext.getTargetType(),
+                    dataSourceCfg, dataXParameters.getSql());
+
+            ArrayNode columnArr = writerParam.putArray("column");
+            for (String column : columns) {
+                columnArr.add(column);
+            }
+        }else {
+            ArrayNode columnArr = writerParam.putArray("column");
+            for (String column : dataXParameters.getDtColumns()) {
+                columnArr.add(column);
+            }
         }
         writerParam.putArray("connection").addAll(writerConnArr);
 
@@ -303,17 +426,14 @@ public class DataxTask extends AbstractTaskExecutor {
             }
         }
 
+        if (dataXParameters.getBatchSize() > 0){
+            writerParam.put("batchSize", dataXParameters.getBatchSize());
+
+        }
         ObjectNode writer = JSONUtils.createObjectNode();
         writer.put("name", DataxUtils.getWriterPluginName(dataxTaskExecutionContext.getTargetType()));
         writer.set("parameter", writerParam);
-
-        List<ObjectNode> contentList = new ArrayList<>();
-        ObjectNode content = JSONUtils.createObjectNode();
-        content.set("reader", reader);
-        content.set("writer", writer);
-        contentList.add(content);
-
-        return contentList;
+        return writer;
     }
 
     /**
@@ -325,8 +445,6 @@ public class DataxTask extends AbstractTaskExecutor {
 
         ObjectNode speed = JSONUtils.createObjectNode();
 
-        speed.put("channel", DATAX_CHANNEL_COUNT);
-
         if (dataXParameters.getJobSpeedByte() > 0) {
             speed.put("byte", dataXParameters.getJobSpeedByte());
         }
@@ -334,6 +452,8 @@ public class DataxTask extends AbstractTaskExecutor {
         if (dataXParameters.getJobSpeedRecord() > 0) {
             speed.put("record", dataXParameters.getJobSpeedRecord());
         }
+
+        speed.put("channel", dataXParameters.getChannel() == 0 ? DATAX_CHANNEL_COUNT : dataXParameters.getChannel());
 
         ObjectNode errorLimit = JSONUtils.createObjectNode();
         errorLimit.put("record", 0);
@@ -349,7 +469,6 @@ public class DataxTask extends AbstractTaskExecutor {
     private ObjectNode buildDataxCoreJson() {
 
         ObjectNode speed = JSONUtils.createObjectNode();
-        speed.put("channel", DATAX_CHANNEL_COUNT);
 
         if (dataXParameters.getJobSpeedByte() > 0) {
             speed.put("byte", dataXParameters.getJobSpeedByte());

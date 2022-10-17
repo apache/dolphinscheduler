@@ -363,4 +363,18 @@ public class DataSourceController extends BaseController {
         Map<String, Object> result = dataSourceService.getTableColumns(datasourceId,tableName);
         return returnDataList(result);
     }
+
+    @ApiOperation(value = "tableColumnsWithType", notes = "GET_DATASOURCE_TABLE_COLUMNS_WITH_TYPE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "tableName", value = "TABLE_NAME", required = true, dataType = "String", example = "test")
+    })
+    @GetMapping(value = "/tableColumnsWithType")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
+    public Result getTableColumnsWithType(@RequestParam("datasourceId") Integer datasourceId,
+                                  @RequestParam("tableName") String tableName) {
+        Map<String, Object> result = dataSourceService.getTableColumnsWithType(datasourceId,tableName);
+        return returnDataList(result);
+    }
 }

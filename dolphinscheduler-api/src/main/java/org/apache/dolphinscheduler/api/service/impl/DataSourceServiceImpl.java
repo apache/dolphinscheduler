@@ -38,10 +38,7 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -82,6 +79,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     private static final String[] TABLE_TYPES = new String[]{TABLE, VIEW};
     private static final String TABLE_NAME = "TABLE_NAME";
     private static final String COLUMN_NAME = "COLUMN_NAME";
+    private static final String DATA_TYPE = "DATA_TYPE";
 
     /**
      * create data source
@@ -568,6 +566,57 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         List<ParamsOptions> options = getParamsOptions(columnList);
 
         result.put(Constants.DATA_LIST, options);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getTableColumnsWithType(Integer datasourceId, String tableName) {
+        Map<String, Object> result = new HashMap<>();
+
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+        BaseConnectionParam connectionParam =
+                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                        dataSource.getType(),
+                        dataSource.getConnectionParams());
+
+        if (null == connectionParam) {
+            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+            return result;
+        }
+
+        Connection connection =
+                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+        Map<String, String> columnList = new HashMap<>();
+        ResultSet rs = null;
+
+        try {
+
+            String database = connectionParam.getDatabase();
+            if (null == connection) {
+                return result;
+            }
+
+            DatabaseMetaData metaData = connection.getMetaData();
+
+            if (dataSource.getType() == DbType.ORACLE) {
+                database = null;
+            }
+            rs = metaData.getColumns(database, null, tableName, "%");
+            if (rs == null) {
+                return result;
+            }
+            while (rs.next()) {
+                columnList.put(rs.getString(COLUMN_NAME), JDBCType.valueOf(rs.getInt(DATA_TYPE)).getName());
+            }
+        } catch (Exception e) {
+            logger.error(e.toString(), e);
+        } finally {
+            closeResult(rs);
+            releaseConnection(connection);
+        }
+
+        result.put(Constants.DATA_LIST, columnList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
