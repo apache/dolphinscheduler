@@ -223,7 +223,6 @@ public class ResourcesController extends BaseController {
     @ApiOperation(value = "queryResourceListPaging", notes = "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "10"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULLNAME", required = true, dataTypeClass = String.class, example = "bucket_name/tenant_name/type/ds"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
@@ -237,7 +236,6 @@ public class ResourcesController extends BaseController {
                                                   @RequestParam(value = "fullName") String fullName,
                                                   @RequestParam(value = "tenantCode") String tenantCode,
                                                   @RequestParam(value = "type") ResourceType type,
-                                                  @RequestParam(value = "id") int id,
                                                   @RequestParam("pageNo") Integer pageNo,
                                                   @RequestParam(value = "searchVal", required = false) String searchVal,
                                                   @RequestParam("pageSize") Integer pageSize) {
@@ -247,7 +245,7 @@ public class ResourcesController extends BaseController {
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = resourceService.queryResourceListPaging(loginUser, id, fullName, tenantCode, type, searchVal, pageNo,
+        result = resourceService.queryResourceListPaging(loginUser, fullName, tenantCode, type, searchVal, pageNo,
                 pageSize);
         return result;
     }

@@ -83,7 +83,6 @@ export default defineComponent({
     const handleUpdatePage = (page: number) => {
       paginationReactive.page = page
       resourceListRef.value = getResourceListState(
-        -1,
         fullName.value,
         tenantCode.value,
         searchRef.value,
@@ -96,7 +95,6 @@ export default defineComponent({
       paginationReactive.page = 1
       paginationReactive.pageSize = pageSize
       resourceListRef.value = getResourceListState(
-        -1,
         fullName.value,
         tenantCode.value,
         searchRef.value,
@@ -159,7 +157,6 @@ export default defineComponent({
 
     const updateList = () => {
       resourceListRef.value = getResourceListState(
-        -1,
         fullName.value,
         tenantCode.value,
         searchRef.value
@@ -168,7 +165,7 @@ export default defineComponent({
     const fileStore = useFileStore()
 
     onMounted(() => {
-      resourceListRef.value = getResourceListState(-1, fullName.value, tenantCode.value,searchRef.value)
+      resourceListRef.value = getResourceListState(fullName.value, tenantCode.value,searchRef.value)
     })
 
     const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([

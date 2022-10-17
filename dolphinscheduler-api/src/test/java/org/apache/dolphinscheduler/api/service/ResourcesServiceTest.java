@@ -365,7 +365,7 @@ public class ResourcesServiceTest {
         } catch (Exception e) {
             logger.error("QueryResourceListPaging Error");
         }
-        Result result = resourcesService.queryResourceListPaging(loginUser, -1, "", "",
+        Result result = resourcesService.queryResourceListPaging(loginUser, "", "",
                 ResourceType.FILE, "Test", 1, 10);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());

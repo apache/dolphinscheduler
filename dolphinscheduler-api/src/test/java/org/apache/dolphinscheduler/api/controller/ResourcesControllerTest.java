@@ -89,7 +89,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
         Mockito.when(resourcesService.queryResourceListPaging(
-                Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
+                Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
                 Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 

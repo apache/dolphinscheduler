@@ -16,7 +16,6 @@
  */
 
 export interface ResourceFileTableData {
-  id: number
   name: string
   fullName: string
   user_name: string
@@ -39,7 +38,7 @@ export interface IRtDisb {
 }
 
 export interface IResourceListState {
-  (id?: number, searchVal?: string, fullName?: string, tenantCode?: string, pageNo?: number, pageSize?: number): any
+  (searchVal?: string, fullName?: string, tenantCode?: string, pageNo?: number, pageSize?: number): any
 }
 
 export interface BasicTableProps {

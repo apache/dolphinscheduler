@@ -27,7 +27,6 @@ export function useFileState(
   setPagination: ISetPagination = {} as ISetPagination
 ) {
   const getResourceListState: IResourceListState = (
-    id = -1,
     fullName = '',
     tenantCode = '',
     searchVal = '',
@@ -39,7 +38,6 @@ export function useFileState(
         fullName,
         tenantCode,
         type: 'FILE',
-        id,
         searchVal,
         pageNo,
         pageSize

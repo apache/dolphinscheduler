@@ -668,7 +668,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * query resources list paging
      *
      * @param loginUser login user
-     * @param directoryId folder id
      * @param fullName resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
@@ -679,7 +678,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list page
      */
     @Override
-    public Result queryResourceListPaging(User loginUser, int directoryId, String fullName, String resTenantCode,
+    public Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
                                           ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);

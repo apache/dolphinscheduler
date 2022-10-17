@@ -96,7 +96,7 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result queryResourceListPaging(User loginUser, int directoryId, String fullName, String resTenantCode,
+    Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
                                    ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
