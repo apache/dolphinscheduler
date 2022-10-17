@@ -48,7 +48,7 @@ public class OpenAPIConfiguration implements WebMvcConfigurer {
     public GroupedOpenApi publicApi1() {
         return GroupedOpenApi.builder()
                 .group("v1")
-               .pathsToExclude("v2/**")
+               .pathsToExclude("/v2/**")
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class OpenAPIConfiguration implements WebMvcConfigurer {
     public GroupedOpenApi publicApi2() {
         return GroupedOpenApi.builder()
                 .group("v2")
-                .pathsToMatch("v2/**")
+                .pathsToMatch("/v2/**")
                 .build();
     }
 }
