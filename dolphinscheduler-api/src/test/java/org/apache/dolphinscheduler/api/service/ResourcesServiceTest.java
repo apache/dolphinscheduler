@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -443,8 +444,9 @@ public class ResourcesServiceTest {
         loginUser.setId(0);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
-        Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
+        Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource(1));
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        Mockito.when(resourceUserMapper.queryResourceRelation(Mockito.anyInt(),Mockito.anyInt())).thenReturn(getResourceUser());
 
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null,
                 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
@@ -1098,6 +1100,15 @@ public class ResourcesServiceTest {
         user.setTenantId(1);
         user.setTenantCode("tenantCode");
         return user;
+    }
+
+    private ResourcesUser getResourceUser() {
+        ResourcesUser resourcesUser = new ResourcesUser();
+        resourcesUser.setResourcesId(1);
+        resourcesUser.setUserId(0);
+        resourcesUser.setId(1);
+        resourcesUser.setPerm(7);
+        return resourcesUser;
     }
 
     private List<String> getContent() {
