@@ -157,7 +157,7 @@ public class CuringGlobalParams implements CuringParamsService {
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
         Map<String, String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
 
-        if (globalParamsMap != null) {
+        if (MapUtils.isNotEmpty(globalParamsMap)) {
             params.putAll(globalParamsMap);
         }
 
