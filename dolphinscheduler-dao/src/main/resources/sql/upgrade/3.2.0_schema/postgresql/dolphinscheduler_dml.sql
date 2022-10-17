@@ -15,15 +15,4 @@
  * limitations under the License.
 */
 
-delimiter d//
-
-return 'Success!';
-exception when others then
-		---Raise EXCEPTION '(%)',SQLERRM;
-        return SQLERRM;
-END;
-$BODY$;
-
-select dolphin_insert_dq_initial_data();
-
-d//
+UPDATE qrtz_job_details SET job_class_name = 'org.apache.dolphinscheduler.scheduler.quartz.ProcessScheduleTask' WHERE job_class_name = 'org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob';
