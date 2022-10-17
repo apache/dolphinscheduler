@@ -84,11 +84,7 @@ interface ViewResourceReq {
   skipLineNum: number
 }
 
-interface ResourceIdReq {
-  resourceId: number
-}
-
-interface UdfFuncReq extends UdfTypeReq, DescriptionReq, ResourceIdReq, FullNameReq {
+interface UdfFuncReq extends UdfTypeReq, DescriptionReq, FullNameReq {
   className: string
   funcName: string
   argTypes?: string
@@ -140,7 +136,6 @@ export {
   ProgramTypeReq,
   ListReq,
   ViewResourceReq,
-  ResourceIdReq,
   UdfFuncReq,
   ResourceListRes,
   ResourceViewRes,

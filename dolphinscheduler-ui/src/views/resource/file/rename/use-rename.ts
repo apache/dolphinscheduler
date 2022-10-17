@@ -35,8 +35,7 @@ export function useRename(state: any) {
         {
           ...state.renameForm,
           tenantCode: state.renameForm.user_name,
-        },
-        state.renameForm.id
+        }
       )
       window.$message.success(t('resource.file.success'))
       state.saving = false

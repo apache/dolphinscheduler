@@ -39,8 +39,7 @@ export function useModal(
         await createUdfFunc(
           {
             ...state.functionForm
-          },
-          state.functionForm.resourceId
+          }
         )
     )
   }
@@ -52,7 +51,6 @@ export function useModal(
           ...state.functionForm,
           id
         },
-        state.functionForm.resourceId,
         id
       )
     })

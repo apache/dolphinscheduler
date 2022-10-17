@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -40,7 +41,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param argTypes argument types
      * @param database database
      * @param desc description
-     * @param resourceId resource id
      * @param className class name
      * @return create result code
      */
@@ -92,8 +91,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                             String argTypes,
                                             String database,
                                             String desc,
-                                            UdfType type,
-                                            int resourceId) {
+                                            UdfType type) {
         Result<Object> result = new Result<>();
 
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
@@ -130,7 +128,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
 
         if (!existResource) {
-            logger.error("resourceId {} is not exist", fullName);
+            logger.error("resource full name {} is not exist", fullName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -190,7 +188,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
-            logger.error("Resource does not exist, resourceId:{}.", id);
+            logger.error("Resource does not exist, udf func id:{}.", id);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -208,7 +206,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param argTypes argument types
      * @param database data base
      * @param desc description
-     * @param resourceId resource id
      * @param fullName resource full name
      * @param className class name
      * @return update result code
@@ -222,7 +219,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                         String database,
                                         String desc,
                                         UdfType type,
-                                        int resourceId,
                                         String fullName) {
         Result<Object> result = new Result<>();
 
@@ -277,7 +273,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
 
         if (!doesResExist) {
-            logger.error("resourceId {} is not exist", resourceId);
+            logger.error("resource full name {} is not exist", fullName);
             result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
             result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
             return result;
@@ -291,7 +287,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             udf.setDatabase(database);
         }
         udf.setDescription(desc);
-        udf.setResourceId(resourceId);
+        // set resourceId to -1 because we do not store resource to db anymore, instead we use fullName
+        udf.setResourceId(-1);
         udf.setResourceName(fullName);
         udf.setType(type);
 

@@ -28,14 +28,14 @@ export function useEdit(state: any) {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const getResourceView = (fullName: string, tenantCode: string, id: number) => {
+  const getResourceView = (fullName: string, tenantCode: string) => {
     const params = {
       skipLineNum: 0,
       limit: 3000,
       fullName: fullName,
       tenantCode: tenantCode
     }
-    return useAsyncState(viewResource(params, id), {
+    return useAsyncState(viewResource(params), {
       alias: '',
       content: ''
     })
@@ -50,7 +50,6 @@ export function useEdit(state: any) {
             tenantCode: tenantCode,
             fullName: fullName,
           },
-          0
         )
 
         window.$message.success(t('resource.file.success'))

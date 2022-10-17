@@ -49,8 +49,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import springfox.documentation.annotations.ApiIgnore;
@@ -161,7 +161,6 @@ public class ResourcesController extends BaseController {
      *
      * @param loginUser login user
      * @param alias alias
-     * @param resourceId DEPRECATED
      * @param type resource type
      * @param description description
      * @param file resource file
@@ -169,25 +168,23 @@ public class ResourcesController extends BaseController {
      */
     @ApiOperation(value = "updateResource", notes = "UPDATE_RESOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULLNAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataTypeClass = String.class),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataTypeClass = MultipartFile.class)
     })
-    @PutMapping(value = "/{id}")
+    @PutMapping()
     @ApiException(UPDATE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> updateResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable(value = "id") int resourceId,
                                          @RequestParam(value = "fullName") String fullName,
                                          @RequestParam(value = "tenantCode", required = false) String tenantCode,
                                          @RequestParam(value = "type") ResourceType type,
                                          @RequestParam(value = "name") String alias,
                                          @RequestParam(value = "description", required = false) String description,
                                          @RequestParam(value = "file", required = false) MultipartFile file) {
-        return resourceService.updateResource(loginUser, resourceId, fullName, tenantCode, alias, description, type, file);
+        return resourceService.updateResource(loginUser, fullName, tenantCode, alias, description, type, file);
     }
 
     /**
@@ -208,8 +205,7 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "type") ResourceType type,
-                                            @RequestParam(value = "fullName") String fullName
-    ) {
+                                            @RequestParam(value = "fullName") String fullName) {
         Map<String, Object> result = resourceService.queryResourceList(loginUser, type, fullName);
         return returnDataList(result);
     }
@@ -251,7 +247,8 @@ public class ResourcesController extends BaseController {
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = resourceService.queryResourceListPaging(loginUser, id, fullName,tenantCode, type, searchVal, pageNo, pageSize);
+        result = resourceService.queryResourceListPaging(loginUser, id, fullName, tenantCode, type, searchVal, pageNo,
+                pageSize);
         return result;
     }
 
@@ -259,24 +256,20 @@ public class ResourcesController extends BaseController {
      * delete resource
      *
      * @param loginUser login user
-     * @param resourceId DEPRECATED
      * @return delete result code
      */
     @ApiOperation(value = "deleteResource", notes = "DELETE_RESOURCE_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_ID", required = true, dataTypeClass = String.class, example = "test/")
     })
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> deleteResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable(value = "id") int resourceId,
                                          @RequestParam(value = "fullName") String fullName,
-                                         @RequestParam(value = "tenantCode", required = false) String tenantCode
-    ) throws Exception {
-        return resourceService.delete(loginUser, resourceId, fullName, tenantCode);
+                                         @RequestParam(value = "tenantCode", required = false) String tenantCode) throws Exception {
+        return resourceService.delete(loginUser, fullName, tenantCode);
     }
 
     /**
@@ -330,27 +323,24 @@ public class ResourcesController extends BaseController {
      * @param fileName resource file name, it is not full name
      * @param tenantCode tenantcode of the owner of the resource
      * @param type resource type
-     * @param id resource id
      * @return true if the resource name not exists, otherwise return false
      */
-    @ApiOperation(value = "queryResource", notes = "QUERY_BY_RESOURCE_NAME")
+    @ApiOperation(value = "queryResourceByFileName", notes = "QUERY_BY_RESOURCE_FILE_NAME")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "fileName", value = "RESOURCE_FILE_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataTypeClass = int.class, example = "10")
     })
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/query-file-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @PathVariable(value = "id", required = false) Integer id,
-                                        @RequestParam(value = "fileName", required = false) String fileName,
-                                        @RequestParam(value = "tenantCode", required = false) String tenantCode,
-                                        @RequestParam(value = "type") ResourceType type) {
+    public Result<Object> queryResourceByFileName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @RequestParam(value = "fileName", required = false) String fileName,
+                                                  @RequestParam(value = "tenantCode", required = false) String tenantCode,
+                                                  @RequestParam(value = "type") ResourceType type) {
 
-        return resourceService.queryResource(loginUser, fileName, id, type, tenantCode);
+        return resourceService.queryResourceByFileName(loginUser, fileName, type, tenantCode);
     }
 
     /**
@@ -364,22 +354,20 @@ public class ResourcesController extends BaseController {
      */
     @ApiOperation(value = "viewResource", notes = "VIEW_RESOURCE_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataTypeClass = String.class, example = "tenant/1.png"),
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataTypeClass = int.class, example = "100")
     })
-    @GetMapping(value = "/{id}/view")
+    @GetMapping(value = "/view")
     @ApiException(VIEW_RESOURCE_FILE_ON_LINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                               @PathVariable(value = "id") String resourceId,
                                @RequestParam(value = "skipLineNum") int skipLineNum,
                                @RequestParam(value = "limit") int limit,
                                @RequestParam(value = "fullName") String fullName,
                                @RequestParam(value = "tenantCode") String tenantCode) {
-        return resourceService.readResource(loginUser, resourceId, fullName, tenantCode, skipLineNum, limit);
+        return resourceService.readResource(loginUser, fullName, tenantCode, skipLineNum, limit);
     }
 
     /**
@@ -418,22 +406,19 @@ public class ResourcesController extends BaseController {
      * edit resource file online
      *
      * @param loginUser login user
-     * @param resourceId DEPRECATED
      * @param content content
      * @return update result code
      */
     @ApiOperation(value = "updateResourceContent", notes = "UPDATE_RESOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "fullName", value = "FULL_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataTypeClass = String.class)
     })
-    @PutMapping(value = "/{id}/update-content")
+    @PutMapping(value = "/update-content")
     @ApiException(EDIT_RESOURCE_FILE_ON_LINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateResourceContent(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @PathVariable(value = "id") int resourceId,
                                         @RequestParam(value = "fullName") String fullName,
                                         @RequestParam(value = "tenantCode") String tenantCode,
                                         @RequestParam(value = "content") String content) {
@@ -441,29 +426,26 @@ public class ResourcesController extends BaseController {
             logger.error("The resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
-        return resourceService.updateResourceContent(loginUser, resourceId, fullName, tenantCode, content);
+        return resourceService.updateResourceContent(loginUser, fullName, tenantCode, content);
     }
 
     /**
      * download resource file
      *
      * @param loginUser login user
-     * @param resourceId DEPRECATED
      * @return resource content
      */
     @ApiOperation(value = "downloadResource", notes = "DOWNLOAD_RESOURCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
-        @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULLNAME", required = true, dataType = "String", example = "test/")
+            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULLNAME", required = true, dataType = "String", example = "test/")
     })
-    @GetMapping(value = "/{id}/download")
+    @GetMapping(value = "/download")
     @ResponseBody
     @ApiException(DOWNLOAD_RESOURCE_FILE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ResponseEntity downloadResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @PathVariable(value = "id") int resourceId,
                                            @RequestParam(value = "fullName") String fullName) throws Exception {
-        Resource file = resourceService.downloadResource(loginUser, resourceId, fullName);
+        Resource file = resourceService.downloadResource(loginUser, fullName);
         if (file == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(RESOURCE_NOT_EXIST.getMsg());
         }
@@ -497,7 +479,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
 
     })
-    @PostMapping(value = "/{resourceId}/udf-func")
+    @PostMapping(value = "/udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -508,17 +490,17 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "fullName") String fullName,
                                 @RequestParam(value = "argTypes", required = false) String argTypes,
                                 @RequestParam(value = "database", required = false) String database,
-                                @RequestParam(value = "description", required = false) String description,
-                                @PathVariable(value = "resourceId") int resourceId) {
+                                @RequestParam(value = "description", required = false) String description) {
         // todo verify the sourceName
-        return udfFuncService.createUdfFunction(loginUser, funcName, className, fullName, argTypes, database, description, type, resourceId);
+        return udfFuncService.createUdfFunction(loginUser, funcName, className, fullName,
+                argTypes, database, description, type);
     }
 
     /**
      * view udf function
      *
      * @param loginUser login user
-     * @param id resource id
+     * @param id udf function id
      * @return udf function detail
      */
     @ApiOperation(value = "viewUIUdfFunction", notes = "VIEW_UDF_FUNCTION_NOTES")
@@ -544,7 +526,6 @@ public class ResourcesController extends BaseController {
      * @param argTypes argument types
      * @param database data base
      * @param description description
-     * @param resourceId DEPRECATED
      * @param className class name
      * @param udfFuncId udf function id
      * @return update result code
@@ -557,11 +538,9 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "className", value = "CLASS_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES", dataTypeClass = String.class),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "UDF_DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
-
+            @ApiImplicitParam(name = "description", value = "UDF_DESC", dataTypeClass = String.class)
     })
-    @PutMapping(value = "/{resourceId}/udf-func/{id}")
+    @PutMapping(value = "/udf-func/{id}")
     @ApiException(UPDATE_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateUdfFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
@@ -572,9 +551,9 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "argTypes", required = false) String argTypes,
                                 @RequestParam(value = "database", required = false) String database,
                                 @RequestParam(value = "description", required = false) String description,
-                                @RequestParam(value = "fullName") String fullName,
-                                @PathVariable(value = "resourceId") int resourceId) {
-        return udfFuncService.updateUdfFunc(loginUser, udfFuncId, funcName, className, argTypes, database, description, type, resourceId, fullName);
+                                @RequestParam(value = "fullName") String fullName) {
+        return udfFuncService.updateUdfFunc(loginUser, udfFuncId, funcName, className,
+                argTypes, database, description, type, fullName);
     }
 
     /**
@@ -754,28 +733,26 @@ public class ResourcesController extends BaseController {
     }
 
     /**
-     * query resource by resource id
+     * query a resource by resource full name
      *
      * @param loginUser login user
-     * @param id resource id
+     * @param fullName resource full name
      * @return resource
      */
-    @ApiOperation(value = "queryResourceById", notes = "QUERY_BY_RESOURCE_NAME")
+    @ApiOperation(value = "queryResourceByFullName", notes = "QUERY_BY_RESOURCE_FULL_NAME")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "10"),
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataTypeClass = String.class),
     })
-    @GetMapping(value = "/{id}/query")
+    @GetMapping(value = "/query-full-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryResourceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @PathVariable(value = "id", required = true) Integer id,
-                                    @RequestParam(value = "type") ResourceType type,
-                                    @RequestParam(value = "fullName") String fullName,
-                                    @RequestParam(value = "tenantCode") String tenantCode) throws IOException {
+    public Result queryResourceByFullName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam(value = "type") ResourceType type,
+                                          @RequestParam(value = "fullName") String fullName,
+                                          @RequestParam(value = "tenantCode") String tenantCode) throws IOException {
 
-        return resourceService.queryResourceById(loginUser, id, fullName, tenantCode, type);
+        return resourceService.queryResourceByFullName(loginUser, fullName, tenantCode, type);
     }
 }

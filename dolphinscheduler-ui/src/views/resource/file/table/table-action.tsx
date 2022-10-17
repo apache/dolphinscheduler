@@ -67,8 +67,8 @@ export default defineComponent({
       router.push({ name: 'resource-file-edit', params: { id: item.id }, query: {prefix: item.fullName, tenantCode: item.user_name} })
     }
 
-    const handleDeleteFile = (id: number, fullNameObj: {fullName: string, tenantCode: string}) => {
-      deleteResource(id, fullNameObj).then(() => emit('updateList'))
+    const handleDeleteFile = (fullNameObj: {fullName: string, tenantCode: string}) => {
+      deleteResource(fullNameObj).then(() => emit('updateList'))
     }
 
     const handleRenameFile: IRenameFile = (id: number, name: string, description: string, fullName: string, user_name: string) => {
@@ -151,7 +151,7 @@ export default defineComponent({
                 tag='div'
                 circle
                 style={{ marginRight: '-5px' }}
-                onClick={() => downloadResource(this.row.id, {fullName: this.row.fullName})}
+                onClick={() => downloadResource({fullName: this.row.fullName})}
                 class='btn-download'
               >
                 <NIcon>
@@ -170,7 +170,7 @@ export default defineComponent({
                   positive-text={t('resource.file.confirm')}
                   negative-text={t('resource.file.cancel')}
                   onPositiveClick={() => {
-                    this.handleDeleteFile(this.row.id, {fullName: this.row.fullName, tenantCode: this.row.user_name})
+                    this.handleDeleteFile({fullName: this.row.fullName, tenantCode: this.row.user_name})
                   }}
                 >
                   {{

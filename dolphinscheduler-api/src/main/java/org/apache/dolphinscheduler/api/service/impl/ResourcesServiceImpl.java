@@ -296,7 +296,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         if (currDirNFileName.length() > Constants.RESOURCE_FULL_NAME_MAX_LENGTH) {
             logger.error(
-                    "Resource file's name is longer than max full name length, fullName:{}, fullNameSize:{}, maxFullNameSize:{}",
+                    "Resource file's name is longer than max full name length, fullName:{}, " +
+                            "fullNameSize:{}, maxFullNameSize:{}",
                     RegexUtils.escapeNRT(name), currDirNFileName.length(), Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
             putMsg(result, Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
             return result;
@@ -365,7 +366,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * update resource
      *
      * @param loginUser  login user
-     * @param resourceId resource id
      * @param resourceFullName resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
@@ -378,7 +378,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     @Transactional
     public Result<Object> updateResource(User loginUser,
-                                         int resourceId,
                                          String resourceFullName,
                                          String resTenantCode,
                                          String name,
@@ -441,7 +440,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         if (file == null && name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
-            logger.info("Resource does not need to be updated due to no change, resourceId:{}.", resourceId);
+            logger.info("Resource does not need to be updated due to no change, resource full name:{}.",
+                    resourceFullName);
             putMsg(result, Status.SUCCESS);
             return result;
         }
@@ -575,8 +575,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (file != null) {
             // fail upload
             if (!upload(loginUser, fullName, file, type)) {
-                logger.error("Storage operation error, resourceId:{}, resourceName:{}, originFileName:{}.",
-                        resourceId, name, RegexUtils.escapeNRT(file.getOriginalFilename()));
+                logger.error("Storage operation error, resourceName:{}, originFileName:{}.",
+                        name, RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.HDFS_OPERATION_ERROR);
                 throw new ServiceException(
                         String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
@@ -964,7 +964,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * delete resource
      *
      * @param loginUser  login user
-     * @param resourceId resource id
      * @param fullName resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
@@ -973,7 +972,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<Object> delete(User loginUser, int resourceId, String fullName,
+    public Result<Object> delete(User loginUser, String fullName,
                                  String resTenantCode) throws IOException {
         Result<Object> result = new Result<>();
 
@@ -1015,7 +1014,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
+            logger.error("Resource does not exist, resource full name:{}.", fullName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -1214,17 +1213,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * verify resource by full name or pid and type
      *
      * @param fileName resource file name
-     * @param id       resource id
      * @param type     resource type
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
      * @return true if the resource full name or pid not exists, otherwise return false
      */
     @Override
-    public Result<Object> queryResource(User loginUser, String fileName, Integer id, ResourceType type,
-                                        String resTenantCode) {
+    public Result<Object> queryResourceByFileName(User loginUser, String fileName, ResourceType type,
+                                                  String resTenantCode) {
         Result<Object> result = new Result<>();
-        if (StringUtils.isBlank(fileName) && id == null) {
+        if (StringUtils.isBlank(fileName)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
@@ -1272,15 +1270,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     /**
      * get resource by id
-     * @param id        resource id
      * @param fullName resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
      * @return resource
      */
     @Override
-    public Result<Object> queryResourceById(User loginUser, Integer id, String fullName, String resTenantCode,
-                                            ResourceType type) throws IOException {
+    public Result<Object> queryResourceByFullName(User loginUser, String fullName, String resTenantCode,
+                                                  ResourceType type) throws IOException {
         Result<Object> result = new Result<>();
 
         User user = userMapper.selectById(loginUser.getId());
@@ -1327,7 +1324,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * view resource file online
      *
-     * @param resourceId  resource id
      * @param fullName  resource fullName
      * @param resTenantCode  owner's tenant code of the resource
      * @param skipLineNum skip line number
@@ -1335,7 +1331,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource content
      */
     @Override
-    public Result<Object> readResource(User loginUser, String resourceId, String fullName, String resTenantCode,
+    public Result<Object> readResource(User loginUser, String fullName, String resTenantCode,
                                        int skipLineNum, int limit) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1504,7 +1500,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // TODO: need update to third party service
         if (checkResourceExists(fileFullName)) {
             Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
-            Result<Object> result = this.updateResourceContent(loginUser, resource.getId(), fileFullName,
+            Result<Object> result = this.updateResourceContent(loginUser, fileFullName,
                     resource.getUserName(), content);
             if (result.getCode() == Status.SUCCESS.getCode()) {
                 resource.setDescription(desc);
@@ -1636,7 +1632,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * updateProcessInstance resource
      *
-     * @param resourceId resource id
      * @param fullName resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
@@ -1645,7 +1640,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     @Override
     @Transactional
-    public Result<Object> updateResourceContent(User loginUser, int resourceId, String fullName, String resTenantCode,
+    public Result<Object> updateResourceContent(User loginUser, String fullName, String resTenantCode,
                                                 String content) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1678,13 +1673,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             resource = storageOperate.getFileStatus(fullName, "", resTenantCode, ResourceType.FILE);
         } catch (Exception e) {
-            logger.error("error occurred when fetching resource information ,  resource id {}", resourceId);
+            logger.error("error occurred when fetching resource information ,  resource full name {}", fullName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
 
         if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
+            logger.error("Resource does not exist, resource full name:{}.", fullName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -1695,7 +1690,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (StringUtils.isNotEmpty(resourceViewSuffixes)) {
             List<String> strList = Arrays.asList(resourceViewSuffixes.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.warn("Resource suffix does not support view, resourceId:{}, suffix:{}.", resourceId, nameSuffix);
+                logger.warn("Resource suffix does not support view, resource full name:{}, suffix:{}.",
+                        fullName, nameSuffix);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
@@ -1706,7 +1702,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         } else
-            logger.info("Update resource content complete, resourceId:{}.", resourceId);
+            logger.info("Update resource content complete, resource full name:{}.", fullName);
         return result;
     }
 
@@ -1759,13 +1755,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     /**
      * download file
-     *
-     * @param resourceId resource id
      * @return resource content
      * @throws IOException exception
      */
     @Override
-    public org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId,
+    public org.springframework.core.io.Resource downloadResource(User loginUser,
                                                                  String fullName) throws IOException {
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
@@ -1863,13 +1857,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     @Override
-    public Resource queryResourcesFileInfo(String userName, String fullName) {
+    public Resource queryResourcesFileInfo(String userName, String fileName) {
         // TODO: It is used in PythonGateway, should be revised
         User user = userMapper.queryByUserNameAccurately(userName);
-        Result<Object> resourceResponse = this.queryResource(user, fullName, null, ResourceType.FILE, "");
+        Result<Object> resourceResponse = this.queryResourceByFileName(user, fileName, ResourceType.FILE, "");
         if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
             String msg =
-                    String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fullName);
+                    String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fileName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
@@ -2111,7 +2105,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      *                      can be different from the login user in the case of logging in as admin users.
      * @return isValid
      */
-    private boolean isUserTenantValid(boolean isAdmin, String userTenantCode, String resTenantCode) throws ServiceException {
+    private boolean isUserTenantValid(boolean isAdmin, String userTenantCode,
+                                      String resTenantCode) throws ServiceException {
         if (!isAdmin) {
             resTenantCode = resTenantCode == null ? "" : resTenantCode;
             if (!"".equals(resTenantCode) && !resTenantCode.equals(userTenantCode)) {

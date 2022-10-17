@@ -60,7 +60,7 @@ export default defineComponent({
     }
 
     const handleRename = () => {
-      handleRenameResource(props.row.id, props.row.fullName)
+      handleRenameResource(props.row.fullName)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim

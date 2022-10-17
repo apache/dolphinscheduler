@@ -42,8 +42,8 @@ import { useFileState } from './use-file'
 import { BreadcrumbItem, IRenameFile } from './types'
 import { useFileStore } from '@/store/file/file'
 import {
-  queryCurrentResourceById,
-  queryResourceById
+  queryCurrentResourceByFullName,
+  queryCurrentResourceByFileName
 } from '@/service/modules/resources'
 import Card from '@/components/card'
 import ResourceFolderModal from './folder'
@@ -203,15 +203,12 @@ export default defineComponent({
     const initBreadcrumb = async (dirs: string[]) => {
       for (let index = 0; index < dirs.length; index ++) {
         const newDir = dirs.slice(0, index + 1).join('/')
-        const id = 0
-        const resource = await queryResourceById(
+        const resource = await queryCurrentResourceByFileName(
           {
-            id,
             type: 'FILE',
             fileName: newDir+"/",
             tenantCode: tenantCode.value
-          },
-          id
+          }
         )
         breadcrumbItemsRef.value?.push({ id: resource.fullName, fullName: resource.alias, userName: resource.userName })
         }
@@ -222,14 +219,12 @@ export default defineComponent({
       if (fullName.value != "") {
         breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root', userName: '' })
         const id = 0
-        queryCurrentResourceById(
+        queryCurrentResourceByFullName(
           {
-            id,
             type: 'FILE',
             fullName: fullName.value,
             tenantCode: tenantCode.value,
-          },
-          id
+          }
         ).then((res: ResourceFile) => {
           if (res.fileName) {
             const dirs = res.fileName.split('/')

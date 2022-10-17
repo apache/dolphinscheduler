@@ -30,8 +30,8 @@ import {
   queryResourceListPaging,
   downloadResource,
   deleteResource,
-  queryResourceById,
-  queryCurrentResourceById
+  queryCurrentResourceByFileName,
+  queryCurrentResourceByFullName
 } from '@/service/modules/resources'
 import ButtonLink from '@/components/button-link'
 import {
@@ -183,7 +183,7 @@ export function useTable() {
                         size: 'tiny',
                         class: 'btn-download',
                         disabled: row?.directory ? true : false,
-                        onClick: () => downloadResource(row.id, {fullName: row.fullName})
+                        onClick: () => downloadResource({fullName: row.fullName})
                       },
                       {
                         icon: () => h(DownloadOutlined)
@@ -196,7 +196,7 @@ export function useTable() {
                 NPopconfirm,
                 {
                   onPositiveClick: () => {
-                    handleDelete(row.id, {fullName: row.fullName, tenantCode: row.userName})
+                    handleDelete({fullName: row.fullName, tenantCode: row.userName})
                   }
                 },
                 {
@@ -241,15 +241,12 @@ export function useTable() {
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
         if (variables.fullName !== ""){
-            const id = -1
-            queryCurrentResourceById(
+            queryCurrentResourceByFullName(
               {
-                id,
                 type: 'UDF',
                 fullName: variables.fullName,
                 tenantCode: variables.tenantCode,
-              },
-              id
+              }
             ).then((res: ResourceFile) => {
                 if (res.fileName) {
                   const breadList = res.fileName.split('/')
@@ -276,13 +273,13 @@ export function useTable() {
     variables.row = row
   }
 
-  const handleDelete = (id: number, fullNameObj: {fullName: string, tenantCode: string}) => {
+  const handleDelete = (fullNameObj: {fullName: string, tenantCode: string}) => {
     /* after deleting data from the current page, you need to jump forward when the page is empty. */
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
 
-    deleteResource(id, fullNameObj).then(() =>
+    deleteResource(fullNameObj).then(() =>
       getTableData({
         id: -1,
         fullName: variables.fullName,
@@ -299,15 +296,12 @@ export function useTable() {
   }
 
   const goBread = (fileName: string) => {
-    const id = -1
-    queryResourceById(
+    queryCurrentResourceByFileName(
       {
-        id,
         type: 'UDF',
         fileName: fileName + "/",
         tenantCode: variables.tenantCode
-      },
-      id
+      }
     ).then((res: any) => {
       fileStore.setCurrentDir(res.fullName)
       router.push({ name: 'resource-sub-manage', params: { id: -1 }, query: {prefix: res.fullName, tenantCode: res.userName} })

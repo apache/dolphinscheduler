@@ -47,15 +47,13 @@ export function useModal(
     )
   }
 
-  const handleRenameResource = async (id: number, fullName: string) => {
+  const handleRenameResource = async (fullName: string) => {
     submitRequest(async () => {
       await updateResource(
         {
           fullName: fullName,
           ...state.folderForm,
-          ...{ id }
-        },
-        id
+        }
       )
     })
   }

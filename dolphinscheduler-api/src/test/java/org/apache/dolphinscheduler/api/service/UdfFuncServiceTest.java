@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -45,7 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,7 +113,7 @@ public class UdfFuncServiceTest {
         // hdfs not start
         Result result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE, Integer.MAX_VALUE);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE);
         logger.info(result.toString());
         Assertions.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
         // resource not exist
@@ -121,7 +121,7 @@ public class UdfFuncServiceTest {
 
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE, Integer.MAX_VALUE);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE);
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
         // success
@@ -133,7 +133,7 @@ public class UdfFuncServiceTest {
 
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE, 1);
+                "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
@@ -173,7 +173,7 @@ public class UdfFuncServiceTest {
                 serviceLogger)).thenReturn(true);
         Result<Object> result = udfFuncService.updateUdfFunc(getLoginUser(), 12, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");
         logger.info(result.toString());
         Assertions.assertTrue(Status.UDF_FUNCTION_NOT_EXIST.getCode() == result.getCode());
 
@@ -182,7 +182,7 @@ public class UdfFuncServiceTest {
                 serviceLogger)).thenReturn(true);
         result = udfFuncService.updateUdfFunc(getLoginUser(), 1, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");
         logger.info(result.toString());
         Assertions.assertTrue(Status.HDFS_NOT_STARTUP.getCode() == result.getCode());
 
@@ -195,7 +195,7 @@ public class UdfFuncServiceTest {
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 12, "");
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");
         logger.info(result.toString());
         Assertions.assertTrue(Status.RESOURCE_NOT_EXIST.getCode() == result.getCode());
 
@@ -210,7 +210,7 @@ public class UdfFuncServiceTest {
 
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
-                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1, "");
+                "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");
         logger.info(result.toString());
         Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
 

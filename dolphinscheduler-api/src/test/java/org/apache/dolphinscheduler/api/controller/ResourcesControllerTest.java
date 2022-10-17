@@ -143,7 +143,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testViewResource() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.HDFS_NOT_STARTUP.getCode());
-        Mockito.when(resourcesService.readResource(Mockito.any(), Mockito.anyString(),
+        Mockito.when(resourcesService.readResource(Mockito.any(),
                 Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 
@@ -201,8 +201,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testUpdateResourceContent() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        Mockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyInt(),
-                Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -227,8 +227,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     @Test
     public void testDownloadResource() throws Exception {
 
-        Mockito.when(resourcesService.downloadResource(Mockito.any(), Mockito.anyInt(),
-                Mockito.anyString()))
+        Mockito.when(resourcesService.downloadResource(Mockito.any(), Mockito.anyString()))
                 .thenReturn(null);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -249,7 +248,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         Mockito.when(udfFuncService
                 .createUdfFunction(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -301,7 +300,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         Mockito.when(udfFuncService
                 .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
                         Mockito.anyString()))
                 .thenReturn(mockResult);
 
@@ -486,7 +485,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testDeleteResource() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        Mockito.when(resourcesService.delete(Mockito.any(), Mockito.anyInt(), Mockito.anyString(),
+        Mockito.when(resourcesService.delete(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString()))
                 .thenReturn(mockResult);
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
