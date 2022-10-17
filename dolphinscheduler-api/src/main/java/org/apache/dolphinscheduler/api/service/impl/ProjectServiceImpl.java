@@ -264,7 +264,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 return true;
             }
             // case 2: user is project owner
-            if (project.getUserId() == loginUser.getId()) {
+            if (project.getUserId().equals(loginUser.getId())) {
                 return true;
             }
             // case 3: check user permission level
@@ -291,7 +291,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 return true;
             }
             // case 2: user is project owner
-            if (project.getUserId() == loginUser.getId()) {
+            if (project.getUserId().equals(loginUser.getId())) {
                 return true;
             }
             // case 3: check user permission level

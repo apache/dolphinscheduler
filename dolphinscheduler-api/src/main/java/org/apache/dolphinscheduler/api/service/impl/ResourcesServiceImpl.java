@@ -357,13 +357,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return true;
             }
             // case 2: user is resource owner
-            if (resource.getUserId() == loginUser.getId()) {
+            if(Integer.valueOf(resource.getUserId()).equals(loginUser.getId())) {
                 return true;
             }
             // case 3: check user permission level
             ResourcesUser resourcesUser = resourceUserMapper.queryResourceRelation(resource.getId(), loginUser.getId());
 
-            if(resourcesUser.getPerm()!=Constants.AUTHORIZE_WRITABLE_PERM || resourcesUser == null) {
+            if(resourcesUser == null || resourcesUser.getPerm()!=Constants.AUTHORIZE_WRITABLE_PERM) {
                 putMsg(result, Status.USER_NO_WRITE_RESOURCE_PERM, loginUser.getUserName(), resource.getFileName());
                 checkResult = false;
             }
