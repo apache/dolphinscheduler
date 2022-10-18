@@ -46,9 +46,10 @@ class User(BaseSide):
         tenant: Optional[str] = configuration.WORKFLOW_TENANT,
         queue: Optional[str] = configuration.WORKFLOW_QUEUE,
         status: Optional[int] = configuration.USER_STATE,
+        user_id: Optional[int] = 0,
     ):
         super().__init__(name)
-        self.user_id: Optional[int] = None
+        self.user_id = user_id
         self.password = password
         self.email = email
         self.phone = phone

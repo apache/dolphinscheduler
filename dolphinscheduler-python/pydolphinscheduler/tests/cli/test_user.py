@@ -16,12 +16,20 @@
 # under the License.
 
 """Test command line interface subcommand `user`."""
+from unittest.mock import patch
 
 import pytest
 
 from pydolphinscheduler.cli.commands import cli
-from tests.integration.test_user import get_user
+from pydolphinscheduler.models import User
 from tests.testing.cli import CliTestWrapper
+
+
+def show_user(a=None, b=None, c=None, d=None, e=None, f=None, g=None):  # noqa: D103
+    return (
+        "User(user_id=1 name=test-name, email=test-email@abc.com, phone=17366637777, tenant=test-tenant, "
+        "queue=test-queue, status=1)"
+    )
 
 
 @pytest.mark.parametrize(
@@ -40,12 +48,15 @@ from tests.testing.cli import CliTestWrapper
                 1,
             ],
             "Set user start.\n"
-            "User(user_id=2 name=test-name, email=test-email@abc.com, phone=17366637777, "
-            "tenant=test-tenant, queue=test-queue, status=1)\nSet user done.",
+            "User(user_id=1 name=test-name, email=test-email@abc.com, phone=17366637777, tenant=test-tenant, "
+            "queue=test-queue, status=1)\n"
+            "Set user done.",
         ),
     ],
 )
-def test_user_setter(option, output):
+@patch.object(User, "create_if_not_exists", show_user)
+@patch.object(User, "__str__", show_user)
+def test_user_set(option, output):
     """Test subcommand `user` option `--setter`."""
     cli_test = CliTestWrapper(cli, option)
     cli_test.assert_success(output=output)
@@ -55,16 +66,28 @@ def test_user_setter(option, output):
     "option, output",
     [
         (
-            ["user", "--get", 2],
-            "Get user (2,) from pydolphinscheduler.\n"
-            "User(user_id=2 name=test-name, email=test-email@abc.com, phone=17366637777, "
-            "tenant=None, queue=None, status=1)",
+            ["user", "--get", 1],
+            "Get user (1,) from pydolphinscheduler.\n"
+            "User(user_id=1 name=test-name, email=test-email@abc.com, phone=17366637777, "
+            "tenant=test-tenant, queue=test-queue, status=1)",
         )
     ],
 )
-def test_user_getter(option, output):
+@patch(
+    "pydolphinscheduler.models.user.User.get_user",
+    return_value=User(
+        name="test-name",
+        password="test-password",
+        email="test-email@abc.com",
+        phone="17366637777",
+        tenant="test-tenant",
+        queue="test-queue",
+        status=1,
+        user_id=1,
+    ),
+)
+def test_user_getter(mock_get_user, option, output):
     """Test subcommand `user` option `--getter`."""
-    get_user()
     cli_test = CliTestWrapper(cli, option)
     cli_test.assert_success(output=output)
 
@@ -85,15 +108,16 @@ def test_user_getter(option, output):
                 1,
             ],
             "Update user start.\n"
-            "User(user_id=2 name=test-name, email=test-email@abc.com, phone=17366637766, "
-            "tenant=tenant_pydolphin, queue=test-queue, status=1)\n"
+            "User(user_id=1 name=test-name, email=test-email@abc.com, phone=17366637777, tenant=test-tenant, "
+            "queue=test-queue, status=1)\n"
             "Update user done.",
         )
     ],
 )
+@patch.object(User, "update", show_user)
+@patch.object(User, "__str__", show_user)
 def test_user_updater(option, output):
     """Test subcommand `user` option `--updater`."""
-    get_user()
     cli_test = CliTestWrapper(cli, option)
     cli_test.assert_success(output=output)
 
@@ -102,13 +126,15 @@ def test_user_updater(option, output):
     "option, output",
     [
         (
-            ["user", "--delete", 2],
-            "Delete user (2,) from pydolphinscheduler.\n" "Delete user 2 done.",
+            ["user", "--delete", 1],
+            "Delete user (1,) from pydolphinscheduler.\n" "Delete user 1 done.",
         )
     ],
 )
+@patch.object(User, "delete", show_user)
+@patch.object(User, "get_user", User)
 def test_user_deleter(option, output):
     """Test subcommand `user` option `--deleter`."""
-    get_user()
     cli_test = CliTestWrapper(cli, option)
+    print(cli_test.result.exception)
     cli_test.assert_success(output=output)
