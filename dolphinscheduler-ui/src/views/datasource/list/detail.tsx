@@ -108,6 +108,7 @@ const DetailModal = defineComponent({
       () => props.show,
       async () => {
         state.detailForm.type = props.selectType
+        state.detailForm.label = props.selectType === 'HIVE' ? 'HIVE/IMPALA' :  props.selectType
         props.show &&
           state.detailForm.type &&
           (await changeType(
@@ -123,6 +124,7 @@ const DetailModal = defineComponent({
       () => props.selectType,
       async () => {
         state.detailForm.type = props.selectType
+        state.detailForm.label = props.selectType === 'HIVE' ? 'HIVE/IMPALA' :  props.selectType
         state.detailForm.type &&
         (await changeType(
           state.detailForm.type,
@@ -196,7 +198,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <div class={[styles.typeBox, !!id && styles.disabledBox]}>
-                    <div v-model={[detailForm.type, 'value']}>{detailForm.type}</div>
+                    <div v-model={[detailForm.type, 'value']}>{detailForm.label}</div>
                     <div class={[styles['text-color'], 'btn-data-source-type-drop-down']} onClick={handleSourceModalOpen}>更换</div>
                   </div>
                 </NFormItem>

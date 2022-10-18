@@ -63,6 +63,7 @@ const SourceModal = defineComponent({
       t,
       handleTypeSelect
     } = this
+
     return (
       <Modal
         class='dialog-source-modal'
