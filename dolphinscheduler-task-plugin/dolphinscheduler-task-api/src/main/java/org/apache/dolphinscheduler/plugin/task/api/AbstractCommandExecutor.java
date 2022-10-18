@@ -127,6 +127,7 @@ public abstract class AbstractCommandExecutor {
                 command.add("sudo");
                 command.add("-u");
                 command.add(taskRequest.getTenantCode());
+                command.add("-E");
             }
         }
         command.add(commandInterpreter());
