@@ -338,13 +338,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
         try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
-            if (connection == null) {
+            if (connection == null && type != DbType.ELASTICSEARCH) {
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;
             }
             if (connectionParam.toString().contains("hdfsPath")) {
                 String[] tmp = connectionParam.toString().split("hdfsPath='");
-                String hdfsPath = tmp[1].split("', principal")[0];
+                String hdfsPath = tmp[1].split("',")[0];
                 if (!checkHDFSPath(hdfsPath)){
                     logger.error("Invalid hdfsPath");
                     return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), "Invalid hdfsPath");

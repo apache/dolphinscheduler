@@ -69,7 +69,6 @@ public class DataSourceClientProvider {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         logger.info("Get connection from datasource {}", datasourceUniqueId);
-
         DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
             DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());

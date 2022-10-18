@@ -41,7 +41,9 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
         checkHost(baseDataSourceParamDTO.getHost());
-        checkDatasourcePatter(baseDataSourceParamDTO.getDatabase());
+        if (baseDataSourceParamDTO.getType() != DbType.ELASTICSEARCH) {
+            checkDatasourcePatter(baseDataSourceParamDTO.getDatabase());
+        }
         checkOther(baseDataSourceParamDTO.getOther());
     }
 

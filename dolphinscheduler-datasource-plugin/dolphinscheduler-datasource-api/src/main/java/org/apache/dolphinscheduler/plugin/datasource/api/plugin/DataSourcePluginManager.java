@@ -43,10 +43,8 @@ public class DataSourcePluginManager {
 
     public void installPlugin() {
         final Set<String> names = new HashSet<>();
-
         ServiceLoader.load(DataSourceChannelFactory.class).forEach(factory -> {
             final String name = factory.getName();
-
             logger.info("Registering datasource plugin: {}", name);
 
             if (!names.add(name)) {
