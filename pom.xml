@@ -693,7 +693,10 @@
                             <include>**/*.md</include>
                         </includes>
                         <excludes>
+                            <!--Avoid conflicts with formatting tools in some special modules-->
                             <exclude>**/.github/**/*.md</exclude>
+                            <exclude>**/dolphinscheduler-ui/**/*.md</exclude>
+                            <exclude>**/dolphinscheduler-python/**/*.md</exclude>
                         </excludes>
                         <flexmark />
                     </markdown>
