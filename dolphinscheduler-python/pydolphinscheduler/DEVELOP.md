@@ -249,7 +249,8 @@ When you add a new package in pydolphinscheduler, you should also add the packag
 When you change public class, method or interface, you should change the [UPDATING.md](./UPDATING.md) to notice
 users who may use it in other way.
 
-<!-- content -->
+## Reference
+
 [py4j]: https://www.py4j.org/index.html
 [pycharm]: https://www.jetbrains.com/pycharm
 [idea]: https://www.jetbrains.com/idea/
@@ -260,4 +261,5 @@ users who may use it in other way.
 [black-editor]: https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea
 [coverage]: https://coverage.readthedocs.io/en/stable/
 [isort]: https://pycqa.github.io/isort/index.html
-[sphinx]: https://www.sphinx-doc.org/en/mas-->
+[sphinx]: https://www.sphinx-doc.org/en/master
+
