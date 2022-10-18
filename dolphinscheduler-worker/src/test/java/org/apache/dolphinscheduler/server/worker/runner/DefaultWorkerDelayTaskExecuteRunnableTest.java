@@ -18,18 +18,16 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
-
-import java.util.Date;
 
 public class DefaultWorkerDelayTaskExecuteRunnableTest {
 
@@ -53,7 +51,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .dryRun(Constants.DRY_RUN_FLAG_YES)
                 .taskInstanceId(0)
                 .processDefineId(0)
-                .firstSubmitTime(new Date())
+                .firstSubmitTime(System.currentTimeMillis())
                 .taskLogName("TestLogName")
                 .build();
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
@@ -77,7 +75,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .testFlag(Constants.TEST_FLAG_YES)
                 .taskInstanceId(0)
                 .processDefineId(0)
-                .firstSubmitTime(new Date())
+                .firstSubmitTime(System.currentTimeMillis())
                 .taskLogName("TestLogName")
                 .taskType("SQL")
                 .taskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"POSTGRESQL\",\"datasource\":null,\"sql\":\"select * from t_ds_user\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}")

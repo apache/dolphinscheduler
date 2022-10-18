@@ -16,7 +16,7 @@
 #
 
 # JAVA_HOME, will use it to start DolphinScheduler server
-export JAVA_HOME=${JAVA_HOME:-/usr/local/openjdk-8}
+export JAVA_HOME=${JAVA_HOME:-/opt/java/openjdk}
 
 # Database related configuration, set database type, username and password
 export DATABASE=${DATABASE:-mysql}

@@ -29,13 +29,14 @@ import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_TASK_DEFINITIO
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import springfox.documentation.annotations.ApiIgnore;
@@ -294,8 +295,8 @@ public class TaskDefinitionController extends BaseController {
     public Result deleteTaskDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @PathVariable(value = "code") long code) {
-        Map<String, Object> result = taskDefinitionService.deleteTaskDefinitionByCode(loginUser, projectCode, code);
-        return returnDataList(result);
+        taskDefinitionService.deleteTaskDefinitionByCode(loginUser, code);
+        return new Result(Status.SUCCESS);
     }
 
     /**

@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class CheckUtilsTest {
 
@@ -35,9 +32,9 @@ public class CheckUtilsTest {
      */
     @Test
     public void testCheckUserName() {
-        assertTrue(CheckUtils.checkUserName("test01"));
-        assertFalse(CheckUtils.checkUserName(null));
-        assertFalse(CheckUtils.checkUserName("test01@abc"));
+        Assertions.assertTrue(CheckUtils.checkUserName("test01"));
+        Assertions.assertFalse(CheckUtils.checkUserName(null));
+        Assertions.assertFalse(CheckUtils.checkUserName("test01@abc"));
     }
 
     /**
@@ -45,10 +42,10 @@ public class CheckUtilsTest {
      */
     @Test
     public void testCheckEmail() {
-        assertTrue(CheckUtils.checkEmail("test01@gmail.com"));
-        assertFalse(CheckUtils.checkEmail("test01@gmail"));
-        assertFalse(CheckUtils.checkEmail("test01@gmail."));
-        assertTrue(CheckUtils.checkEmail("test01@gmail.edu.cn"));
+        Assertions.assertTrue(CheckUtils.checkEmail("test01@gmail.com"));
+        Assertions.assertFalse(CheckUtils.checkEmail("test01@gmail"));
+        Assertions.assertFalse(CheckUtils.checkEmail("test01@gmail."));
+        Assertions.assertTrue(CheckUtils.checkEmail("test01@gmail.edu.cn"));
     }
 
     /**
@@ -58,16 +55,16 @@ public class CheckUtilsTest {
     public void testCheckDesc() {
         Map<String, Object> objectMap = CheckUtils.checkDesc("I am desc");
         Status status = (Status) objectMap.get(Constants.STATUS);
-        assertEquals(status.getCode(), Status.SUCCESS.getCode());
+        Assertions.assertEquals(status.getCode(), Status.SUCCESS.getCode());
     }
 
     @Test
     public void testCheckOtherParams() {
-        assertFalse(CheckUtils.checkOtherParams(null));
-        assertFalse(CheckUtils.checkOtherParams(""));
-        assertTrue(CheckUtils.checkOtherParams("xxx"));
-        assertFalse(CheckUtils.checkOtherParams("{}"));
-        assertFalse(CheckUtils.checkOtherParams("{\"key1\":111}"));
+        Assertions.assertFalse(CheckUtils.checkOtherParams(null));
+        Assertions.assertFalse(CheckUtils.checkOtherParams(""));
+        Assertions.assertTrue(CheckUtils.checkOtherParams("xxx"));
+        Assertions.assertFalse(CheckUtils.checkOtherParams("{}"));
+        Assertions.assertFalse(CheckUtils.checkOtherParams("{\"key1\":111}"));
     }
 
     /**
@@ -75,13 +72,13 @@ public class CheckUtilsTest {
      */
     @Test
     public void testCheckPassword() {
-        assertFalse(CheckUtils.checkPassword(null));
-        assertFalse(CheckUtils.checkPassword("a"));
-        assertFalse(CheckUtils.checkPassword("1234567890abcderfasdf2"));
-        assertTrue(CheckUtils.checkPassword("123456"));
-        assertFalse(CheckUtils.checkPasswordLength("1"));
-        assertTrue(CheckUtils.checkPasswordLength("dolphinscheduler123"));
-        assertFalse(CheckUtils.checkPasswordLength("dolphinscheduler123456"));
+        Assertions.assertFalse(CheckUtils.checkPassword(null));
+        Assertions.assertFalse(CheckUtils.checkPassword("a"));
+        Assertions.assertFalse(CheckUtils.checkPassword("1234567890abcderfasdf2"));
+        Assertions.assertTrue(CheckUtils.checkPassword("123456"));
+        Assertions.assertFalse(CheckUtils.checkPasswordLength("1"));
+        Assertions.assertTrue(CheckUtils.checkPasswordLength("dolphinscheduler123"));
+        Assertions.assertFalse(CheckUtils.checkPasswordLength("dolphinscheduler123456"));
     }
 
     /**
@@ -90,9 +87,9 @@ public class CheckUtilsTest {
     @Test
     public void testCheckPhone() {
         // phone can be null
-        assertTrue(CheckUtils.checkPhone(null));
-        assertFalse(CheckUtils.checkPhone("14567134578654"));
-        assertTrue(CheckUtils.checkPhone("17362537263"));
+        Assertions.assertTrue(CheckUtils.checkPhone(null));
+        Assertions.assertFalse(CheckUtils.checkPhone("14567134578654"));
+        Assertions.assertTrue(CheckUtils.checkPhone("17362537263"));
     }
 
 }

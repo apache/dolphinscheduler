@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.remote.command.TaskSavePointResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
             logger.error("task savepoint request command is null");
             return;
         }
-        logger.info("task savepoint command : {}", taskSavePointRequestCommand);
+        logger.info("Receive task savepoint command : {}", taskSavePointRequestCommand);
 
         int taskInstanceId = taskSavePointRequestCommand.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
@@ -76,9 +77,14 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
             return;
         }
 
-        doSavePoint(taskInstanceId);
+        try {
+            LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
+            doSavePoint(taskInstanceId);
 
-        sendTaskSavePointResponseCommand(channel, taskExecutionContext);
+            sendTaskSavePointResponseCommand(channel, taskExecutionContext);
+        } finally {
+            LoggerUtils.removeTaskInstanceIdMDC();
+        }
     }
 
     private void sendTaskSavePointResponseCommand(Channel channel, TaskExecutionContext taskExecutionContext) {
@@ -89,7 +95,8 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()) {
                     logger.error("Submit kill response to master error, kill command: {}", taskSavePointResponseCommand);
-                }
+                } else
+                    logger.info("Submit kill response to master success, kill command: {}", taskSavePointResponseCommand);
             }
         });
     }

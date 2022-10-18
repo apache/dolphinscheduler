@@ -27,19 +27,17 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPoo
 import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.Date;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import io.netty.channel.Channel;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TaskResponseServiceTest {
 
     @Mock(name = "processService")
@@ -69,7 +67,7 @@ public class TaskResponseServiceTest {
     @Mock
     private TaskExecuteThreadPool taskExecuteThreadPool;
 
-    @Before
+    @BeforeEach
     public void before() {
         taskEventService.start();
 
@@ -82,7 +80,7 @@ public class TaskResponseServiceTest {
         taskExecuteRunningMessage.setExecutePath("path");
         taskExecuteRunningMessage.setLogPath("logPath");
         taskExecuteRunningMessage.setHost("127.*.*.*");
-        taskExecuteRunningMessage.setStartTime(new Date());
+        taskExecuteRunningMessage.setStartTime(System.currentTimeMillis());
 
         ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
                 channel,
@@ -94,7 +92,7 @@ public class TaskResponseServiceTest {
         taskExecuteResultMessage.setProcessInstanceId(1);
         taskExecuteResultMessage.setTaskInstanceId(22);
         taskExecuteResultMessage.setStatus(TaskExecutionStatus.SUCCESS.getCode());
-        taskExecuteResultMessage.setEndTime(new Date());
+        taskExecuteResultMessage.setEndTime(System.currentTimeMillis());
         taskExecuteResultMessage.setVarPool("varPol");
         taskExecuteResultMessage.setAppIds("ids");
         taskExecuteResultMessage.setProcessId(1);
@@ -113,7 +111,7 @@ public class TaskResponseServiceTest {
         taskEventService.addEvent(resultEvent);
     }
 
-    @After
+    @AfterEach
     public void after() {
         if (taskEventService != null) {
             taskEventService.stop();
