@@ -135,7 +135,7 @@ public class DataxTask extends AbstractTask {
         logger.info("datax task params {}", taskExecutionContext.getTaskParams());
         dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
 
-        if (!dataXParameters.checkParameters()) {
+        if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
         }
 
@@ -145,7 +145,7 @@ public class DataxTask extends AbstractTask {
     /**
      * run DataX process
      *
-     * @throws Exception if error throws Exception
+     * @throws TaskException if error throws Exception
      */
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
@@ -153,7 +153,7 @@ public class DataxTask extends AbstractTask {
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-            // run datax procesDataSourceService.s
+            // run datax processDataSourceService
             String jsonFilePath = buildDataxJsonFile(paramsMap);
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
@@ -233,7 +233,6 @@ public class DataxTask extends AbstractTask {
      * build datax job config
      *
      * @return collection of datax job config JSONObject
-     * @throws SQLException if error throws SQLException
      */
     private List<ObjectNode> buildDataxJobContentJson() {
 
@@ -393,18 +392,17 @@ public class DataxTask extends AbstractTask {
         }
 
         // datax python command
-        StringBuilder sbr = new StringBuilder();
-        sbr.append(getPythonCommand());
-        sbr.append(" ");
-        sbr.append(DATAX_PATH);
-        sbr.append(" ");
-        sbr.append(loadJvmEnv(dataXParameters));
-        sbr.append(addCustomParameters(paramsMap));
-        sbr.append(" ");
-        sbr.append(jobConfigFilePath);
+        String sbr = getPythonCommand() +
+                " " +
+                DATAX_PATH +
+                " " +
+                loadJvmEnv(dataXParameters) +
+                addCustomParameters(paramsMap) +
+                " " +
+                jobConfigFilePath;
 
         // replace placeholder
-        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
+        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr, ParamUtils.convert(paramsMap));
 
         logger.debug("raw script : {}", dataxCommand);
 
@@ -424,10 +422,14 @@ public class DataxTask extends AbstractTask {
     }
 
     private StringBuilder addCustomParameters(Map<String, Property> paramsMap) {
-        StringBuilder customParameters = new StringBuilder("-p\"");
+        if (paramsMap == null || paramsMap.size() == 0) {
+            return new StringBuilder();
+        }
+        StringBuilder customParameters = new StringBuilder("-p \"");
         for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
             customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
         }
+        customParameters.replace(4, 5, "");
         customParameters.append("\"");
         return customParameters;
     }
@@ -530,12 +532,12 @@ public class DataxTask extends AbstractTask {
                     }
                 } else {
                     throw new RuntimeException(
-                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                            String.format("grammatical analysis sql column [ %s ] failed", item));
                 }
 
                 if (columnName == null) {
                     throw new RuntimeException(
-                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                            String.format("grammatical analysis sql column [ %s ] failed", item));
                 }
 
                 columnNames[i] = columnName;
