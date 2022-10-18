@@ -463,9 +463,8 @@ public class DataSourceServiceTest {
 
     }
 
-
     @Test
-    public void test1() throws IOException, URISyntaxException, InterruptedException {
+    public void hdfsPathCheckTest() throws IOException, URISyntaxException, InterruptedException {
         Configuration conf = new Configuration();
         System.setProperty("hadoop.home.dir", "/");
         FileSystem fs = FileSystem.get(new URI("hdfs://192.150.1.181:8020"), conf, "root");

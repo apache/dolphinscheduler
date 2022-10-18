@@ -17,22 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
+import com.google.common.base.Stopwatch;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.google.common.base.Stopwatch;
-import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 public class CommonDataSourceClient implements DataSourceClient {
 
@@ -50,16 +48,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         preInit();
         checkEnv(baseConnectionParam);
         initClient(baseConnectionParam, dbType);
-        if (dbType != DbType.ELASTICSEARCH) {
-            checkClient();
-        }
-        else {
-            checkElasticSearchClient();
-        }
-    }
-
-    private void checkElasticSearchClient() {
-
+        checkClient();
     }
 
     protected void preInit() {

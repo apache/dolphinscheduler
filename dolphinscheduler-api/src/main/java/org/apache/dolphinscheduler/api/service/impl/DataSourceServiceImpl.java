@@ -338,7 +338,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
         try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
-            if (connection == null) {
+            if (connection == null && type != DbType.ELASTICSEARCH) {
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;
             }

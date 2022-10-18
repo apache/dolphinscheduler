@@ -30,6 +30,7 @@
         <module>dolphinscheduler-datasource-sqlserver</module>
         <module>dolphinscheduler-datasource-clickhouse</module>
         <module>dolphinscheduler-datasource-db2</module>
+        <module>dolphinscheduler-datasource-elasticsearch</module>
         <module>dolphinscheduler-datasource-hive</module>
         <module>dolphinscheduler-datasource-mysql</module>
         <module>dolphinscheduler-datasource-oracle</module>
