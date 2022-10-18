@@ -50,8 +50,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) createConnectionParams(connectionJson);
 
-        Db2DataSourceParamDTO
-                db2DatasourceParamDTO = new Db2DataSourceParamDTO();
+        Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
         db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());

@@ -33,13 +33,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
 public class RegistryLockManager implements AutoCloseable {
 
@@ -112,6 +112,7 @@ public class RegistryLockManager implements AutoCloseable {
      */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     static class LockTermRefreshTask implements Runnable {
+
         private final Map<String, MysqlRegistryLock> lockHoldMap;
         private final MysqlOperator mysqlOperator;
 
@@ -134,4 +135,3 @@ public class RegistryLockManager implements AutoCloseable {
         }
     }
 }
-

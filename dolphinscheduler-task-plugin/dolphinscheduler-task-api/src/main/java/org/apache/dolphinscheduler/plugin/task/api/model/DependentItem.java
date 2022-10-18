@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
+import lombok.Data;
 
 /**
  * dependent item

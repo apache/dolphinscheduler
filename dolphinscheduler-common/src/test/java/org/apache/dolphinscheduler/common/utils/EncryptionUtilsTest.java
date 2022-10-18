@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
  */
 public class EncryptionUtilsTest {
 
-
     @Test
     public void testGetMd5() {
         Assertions.assertEquals(EncryptionUtils.getMd5(null), EncryptionUtils.getMd5(""));

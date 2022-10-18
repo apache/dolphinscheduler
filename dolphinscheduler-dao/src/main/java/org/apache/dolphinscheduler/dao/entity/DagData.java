@@ -39,7 +39,8 @@ public class DagData {
      */
     private List<TaskDefinition> taskDefinitionList;
 
-    public DagData(ProcessDefinition processDefinition, List<ProcessTaskRelation> processTaskRelationList, List<TaskDefinition> taskDefinitionList) {
+    public DagData(ProcessDefinition processDefinition, List<ProcessTaskRelation> processTaskRelationList,
+                   List<TaskDefinition> taskDefinitionList) {
         this.processDefinition = processDefinition;
         this.processTaskRelationList = processTaskRelationList;
         this.taskDefinitionList = taskDefinitionList;

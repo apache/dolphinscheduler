@@ -19,17 +19,18 @@ package org.apache.dolphinscheduler.server.master.service;
 
 import org.apache.dolphinscheduler.common.enums.NodeType;
 
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import lombok.NonNull;
 
 /**
  * failover service
  */
 @Component
 public class FailoverService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FailoverService.class);
 
     private final MasterFailoverService masterFailoverService;

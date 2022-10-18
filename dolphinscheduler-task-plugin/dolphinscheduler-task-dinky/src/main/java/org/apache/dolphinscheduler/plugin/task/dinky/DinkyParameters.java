@@ -72,9 +72,9 @@ public class DinkyParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "DinkyParameters{" +
-            "address='" + address + '\'' +
-            ", taskId='" + taskId + '\'' +
-            ", online='" + online + '\'' +
-            '}';
+                "address='" + address + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", online='" + online + '\'' +
+                '}';
     }
 }
