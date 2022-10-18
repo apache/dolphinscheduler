@@ -470,7 +470,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Connection connection =
                 DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
         ResultSet tables = null;
-
         try {
 
             if (null == connection) {
@@ -587,36 +586,70 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         Connection connection =
                 DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+        Map<String, Object> data = new HashMap<>();
         Map<String, String> columnList = new HashMap<>();
         ResultSet rs = null;
+        Statement statement = null;
 
         try {
+            if (dataSource.getType().isHive()) {
+                // hive need to distinguish the partition columns
+                statement = connection.createStatement();
+                // can't pass the table name as a binding parameter
+                rs = statement.executeQuery("describe " + tableName);
+                Map<String, String> columns = new HashMap<>();
+                Map<String, String> partitionColumns = new HashMap<>();
+                Map<String, String> insertMap = columns;
+                String columnName;
+                while (rs.next()) {
+                    columnName = rs.getString("col_name");
+                    if (StringUtils.isEmpty(columnName) || columnName.startsWith("#")) {
+                        insertMap = partitionColumns;
+                        continue;
+                    }
+                    insertMap.put(columnName, rs.getString("data_type"));
+                }
+                for (String partitionColumn : partitionColumns.keySet()) {
+                    columns.remove(partitionColumn);
+                }
+                if (partitionColumns.isEmpty()) {
+                    data.put("partitionTable", false);
+                    data.put("columns", columns);
+                } else {
+                    data.put("partitionTable", true);
+                    data.put("partitionColumns", partitionColumns);
+                    data.put("columns", columns);
+                }
+            }else {
+                String database = connectionParam.getDatabase();
+                if (null == connection) {
+                    return result;
+                }
 
-            String database = connectionParam.getDatabase();
-            if (null == connection) {
-                return result;
-            }
+                DatabaseMetaData metaData = connection.getMetaData();
 
-            DatabaseMetaData metaData = connection.getMetaData();
-
-            if (dataSource.getType() == DbType.ORACLE) {
-                database = null;
-            }
-            rs = metaData.getColumns(database, null, tableName, "%");
-            if (rs == null) {
-                return result;
-            }
-            while (rs.next()) {
-                columnList.put(rs.getString(COLUMN_NAME), JDBCType.valueOf(rs.getInt(DATA_TYPE)).getName());
+                if (dataSource.getType() == DbType.ORACLE) {
+                    database = null;
+                }
+                rs = metaData.getColumns(database, null, tableName, "%");
+                if (rs == null) {
+                    return result;
+                }
+                while (rs.next()) {
+                    columnList.put(rs.getString(COLUMN_NAME), JDBCType.valueOf(rs.getInt(DATA_TYPE)).getName());
+                }
+                data.put("partitionTable", false);
+                data.put("columns", columnList);
             }
         } catch (Exception e) {
             logger.error(e.toString(), e);
         } finally {
             closeResult(rs);
+            closeStatement(statement);
             releaseConnection(connection);
         }
 
-        result.put(Constants.DATA_LIST, columnList);
+        result.put(Constants.DATA_LIST, data);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -681,6 +714,16 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 rs.close();
             } catch (Exception e) {
                 logger.error("ResultSet close error", e);
+            }
+        }
+    }
+
+    private static void closeStatement(Statement statement) {
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (Exception e) {
+                logger.error("Statement close error", e);
             }
         }
     }
