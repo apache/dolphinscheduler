@@ -122,9 +122,10 @@ public abstract class AbstractCommandExecutor {
 
         // if sudo.enable=true,setting up user to run commands
         if (OSUtils.isSudoEnable()) {
-            command.add("sudo");
-            command.add("-u");
-            command.add(taskRequest.getTenantCode());
+                command.add("sudo");
+                command.add("-u");
+                command.add(taskRequest.getTenantCode());
+                command.add("-E");
         }
         command.add(commandInterpreter());
         command.addAll(Collections.emptyList());
@@ -398,7 +399,7 @@ public abstract class AbstractCommandExecutor {
 
         return lineList;
     }
-    
+
     /**
      * find var pool
      *
