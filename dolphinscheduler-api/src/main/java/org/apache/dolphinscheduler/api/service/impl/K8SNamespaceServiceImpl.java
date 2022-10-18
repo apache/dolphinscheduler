@@ -445,7 +445,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         if (isAdmin(loginUser)) {
             k8sNamespaces = k8sNamespaceMapper.selectList(null);
         } else {
-             k8sNamespaces = k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());
+             k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(loginUser.getId());
         }
         setClusterName(k8sNamespaces);
         return k8sNamespaces;
