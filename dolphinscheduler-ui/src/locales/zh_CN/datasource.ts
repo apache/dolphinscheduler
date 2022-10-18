@@ -49,6 +49,7 @@ export default {
   oracle_service_name: '服务名',
   oracle_sid: 'SID',
   jdbc_connect_parameters: 'jdbc连接参数',
+  hdfs_parameters: 'HDFS Path',
   principal_tips: '请输入Principal',
   krb5_conf_tips: '请输入kerberos认证参数 java.security.krb5.conf',
   keytab_username_tips: '请输入kerberos认证参数 login.user.keytab.username',

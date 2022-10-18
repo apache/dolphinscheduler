@@ -326,9 +326,30 @@ const DetailModal = defineComponent({
                     )}`}
                   />
                 </NFormItem>
+
+
+                <NFormItem
+                    label={t('datasource.hdfs_parameters')}
+                    path='other'
+                >
+                  <NInput
+                      allowInput={this.trim}
+                      v-model={[detailForm.hdfsPath, 'value']}
+                      disabled={detailForm.type != "HIVE"}
+
+                      type='textarea'
+                      autosize={{
+                        minRows: 2
+                      }}
+                      placeholder='hdfs://{IP}:{Port}/{Path}'
+                  />
+                </NFormItem>
+
               </NForm>
             </NSpin>
           ),
+
+
           'btn-middle': () => (
             <NButton
               class='btn-test-connection'
