@@ -86,7 +86,7 @@ public class DagHelperTest {
         processDag.setEdges(taskNodeRelations);
         processDag.setNodes(taskNodes);
         DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
-        boolean canSubmit = DagHelper.haveAllNodeAfterNode(parentNodeCode, dag);
+        boolean canSubmit = DagHelper.haveAnyNodeAfterNode(parentNodeCode, dag);
         Assertions.assertTrue(canSubmit);
 
         boolean haveBlocking = DagHelper.haveBlockingAfterNode(parentNodeCode, dag);
