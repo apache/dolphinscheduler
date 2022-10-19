@@ -28,11 +28,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FavTaskDto implements Cloneable {
 
-    //task type name
-    private String taskName;
-    private boolean isCollection;
-    //task category the task type belongs to
+    // task type name
     private String taskType;
+    private boolean isCollection;
+    // task category the task type belongs to
+    private String taskCategory;
 
     @Override
     public Object clone() throws CloneNotSupportedException {

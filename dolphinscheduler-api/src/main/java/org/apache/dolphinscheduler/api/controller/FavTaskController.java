@@ -79,12 +79,12 @@ public class FavTaskController extends BaseController {
      * @return
      */
     @ApiOperation(value = "deleteTaskType", notes = "DELETE_TASK_TYPE")
-    @DeleteMapping(value = "/{taskName}")
+    @DeleteMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteFavTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @PathVariable("taskName") String taskType) {
+                                @PathVariable("taskType") String taskType) {
         boolean b = favTaskService.deleteFavTask(loginUser, taskType);
         return success(b);
     }
@@ -96,12 +96,12 @@ public class FavTaskController extends BaseController {
      * @return
      */
     @ApiOperation(value = "addTaskType", notes = "ADD_TASK_TYPE")
-    @PostMapping(value = "/{taskName}")
+    @PostMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ADD_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result addFavTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @PathVariable("taskName") String taskType) {
+                             @PathVariable("taskType") String taskType) {
         int i = favTaskService.addFavTask(loginUser, taskType);
         return success(i > 0);
     }
