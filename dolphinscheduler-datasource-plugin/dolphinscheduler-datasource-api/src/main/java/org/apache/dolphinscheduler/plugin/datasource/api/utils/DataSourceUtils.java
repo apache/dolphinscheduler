@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.clickhouse.ClickHouseDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.db2.Db2DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.elasticsearch.ElasticSearchDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.mysql.MySQLDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.oracle.OracleDataSourceProcessor;
@@ -29,13 +31,16 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.presto.Prest
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.redshift.RedshiftDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.spark.SparkDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.sqlserver.SQLServerDataSourceProcessor;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import java.sql.Connection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.MessageFormat;
 
 public class DataSourceUtils {
 
@@ -54,6 +59,7 @@ public class DataSourceUtils {
     private static final DataSourceProcessor db2PROCESSOR = new Db2DataSourceProcessor();
     private static final DataSourceProcessor prestoPROCESSOR = new PrestoDataSourceProcessor();
     private static final DataSourceProcessor redshiftProcessor = new RedshiftDataSourceProcessor();
+    private static final DataSourceProcessor elasticSearchProcessor = new ElasticSearchDataSourceProcessor();
 
     /**
      * check datasource param
@@ -124,6 +130,8 @@ public class DataSourceUtils {
                 return prestoPROCESSOR;
             case REDSHIFT:
                 return redshiftProcessor;
+            case ELASTICSEARCH:
+                return elasticSearchProcessor;
             default:
                 throw new IllegalArgumentException("datasource type illegal:" + dbType);
         }

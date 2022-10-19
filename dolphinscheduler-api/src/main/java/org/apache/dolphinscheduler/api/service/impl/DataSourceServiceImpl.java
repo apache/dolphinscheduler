@@ -75,7 +75,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param datasourceParam datasource parameters
      * @return create result code
      */
@@ -124,7 +124,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param id data source id
+     * @param id        data source id
      * @return update result code
      */
     @Override
@@ -217,8 +217,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
     @Override
@@ -269,7 +269,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * query data resource list
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
     @Override
@@ -312,7 +312,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * check connection
      *
-     * @param type data source type
+     * @param type            data source type
      * @param connectionParam connectionParam
      * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
@@ -321,7 +321,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
         try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
-            if (connection == null) {
+            if (connection == null && type != DbType.ELASTICSEARCH) {
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;
             }
@@ -356,7 +356,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * delete datasource
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param datasourceId data source id
      * @return delete result code
      */
@@ -390,7 +390,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
     @Override
@@ -428,7 +428,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @Override
@@ -461,6 +461,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Connection connection =
                 DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
         ResultSet tables = null;
+
         try {
 
             if (null == connection) {
@@ -478,7 +479,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
             tables = metaData.getTables(
                     connectionParam.getDatabase(),
-                    getDbSchemaPattern(dataSource.getType(),schema,connectionParam),
+                    getDbSchemaPattern(dataSource.getType(), schema, connectionParam),
                     "%", TABLE_TYPES);
             if (null == tables) {
                 putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
@@ -508,7 +509,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public Map<String, Object> getTableColumns(Integer datasourceId,String tableName) {
+    public Map<String, Object> getTableColumns(Integer datasourceId, String tableName) {
         Map<String, Object> result = new HashMap<>();
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
@@ -601,9 +602,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                     }
                     insertList.add(new ColumnInfo(index++, columnName, rs.getString("data_type")));
                 }
-                for (ColumnInfo partitionColumn: partitionColumns){
-                    for (int i = columns.size() - 1; i >= 0 ; i--) {
-                        if (columns.get(i).getColumnName().equals(partitionColumn.getColumnName())){
+                for (ColumnInfo partitionColumn : partitionColumns) {
+                    for (int i = columns.size() - 1; i >= 0; i--) {
+                        if (columns.get(i).getColumnName().equals(partitionColumn.getColumnName())) {
                             columns.remove(i);
                             break;
                         }
@@ -617,7 +618,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                     data.put("partitionColumns", partitionColumns);
                     data.put("columns", columns);
                 }
-            }else {
+            } else {
                 String database = connectionParam.getDatabase();
                 if (null == connection) {
                     return result;
@@ -669,7 +670,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return options;
     }
 
-    private String getDbSchemaPattern(DbType dbType,String schema,BaseConnectionParam connectionParam) {
+    private String getDbSchemaPattern(DbType dbType, String schema, BaseConnectionParam connectionParam) {
         if (dbType == null) {
             return null;
         }

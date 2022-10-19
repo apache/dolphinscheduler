@@ -42,6 +42,9 @@ import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +52,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -457,4 +463,16 @@ public class DataSourceServiceTest {
 
     }
 
+    @Test
+    public void hdfsPathCheckTest() throws IOException, URISyntaxException, InterruptedException {
+        Configuration conf = new Configuration();
+        System.setProperty("hadoop.home.dir", "/");
+        FileSystem fs = FileSystem.get(new URI("hdfs://192.150.1.181:8020"), conf, "root");
+        if (fs.exists(new Path("hdfs://192.150.1.181:8020/user/hive/warehouse"))) {
+            System.out.println("t");
+        } else {
+            System.out.println("f");
+        }
+
+    }
 }

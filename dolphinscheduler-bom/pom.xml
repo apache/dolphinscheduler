@@ -336,14 +336,14 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector.version}</version>
-                <scope>test</scope>
+<!--                <scope>test</scope>-->
             </dependency>
 
             <dependency>
                 <groupId>com.oracle.database.jdbc</groupId>
                 <artifactId>ojdbc8</artifactId>
                 <version>${oracle-jdbc.version}</version>
-                <scope>test</scope>
+<!--                <scope>test</scope>-->
             </dependency>
 
             <dependency>
