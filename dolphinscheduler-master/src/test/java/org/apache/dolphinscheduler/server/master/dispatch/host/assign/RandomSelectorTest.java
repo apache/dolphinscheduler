@@ -38,14 +38,16 @@ public class RandomSelectorTest {
     @Test
     public void testSelect1() {
         RandomSelector selector = new RandomSelector();
-        HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1:11", 100, "default"), new HostWorker("192.168.1.2:22", 80, "default")));
+        HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1:11", 100, "default"),
+                new HostWorker("192.168.1.2:22", 80, "default")));
         Assertions.assertNotNull(result);
     }
 
     @Test
     public void testSelect() {
         RandomSelector selector = new RandomSelector();
-        HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1", 11, 100, "default"), new HostWorker("192.168.1.2:", 22, 20, "default")));
+        HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1", 11, 100, "default"),
+                new HostWorker("192.168.1.2:", 22, 20, "default")));
         Assertions.assertNotNull(result);
     }
 }

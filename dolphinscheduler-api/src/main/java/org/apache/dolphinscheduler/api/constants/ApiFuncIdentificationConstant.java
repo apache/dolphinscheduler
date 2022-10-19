@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.constants;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class ApiFuncIdentificationConstant {
     public static final String ACCESS_TOKEN_DELETE = "security:token:delete";
     public static final String ALERT_GROUP_VIEW = "security:alert-group:view";
     public static final String ALERT_GROUP_CREATE = "security:alert-group:create";
-    public static final String ALERT_GROUP_UPDATE  = "security:alert-group:update";
+    public static final String ALERT_GROUP_UPDATE = "security:alert-group:update";
     public static final String ALERT_GROUP_DELETE = "security:alert-group:delete";
     public static final String TENANT_MANAGER = "security:tenant:view";
     public static final String TENANT_CREATE = "security:tenant:create";
@@ -156,28 +157,28 @@ public class ApiFuncIdentificationConstant {
 
     public static final String MONITOR_STATISTICS_VIEW = "monitor:statistics:view";
 
-    public final static Map<ExecuteType,String> map = new HashMap<ExecuteType,String>();
+    public final static Map<ExecuteType, String> map = new HashMap<ExecuteType, String>();
 
-    static{
-        for(ExecuteType type : ExecuteType.values()){
-            switch (type){
+    static {
+        for (ExecuteType type : ExecuteType.values()) {
+            switch (type) {
                 case REPEAT_RUNNING:
-                    map.put(type,RERUN);
+                    map.put(type, RERUN);
                     break;
                 case RECOVER_SUSPENDED_PROCESS:
-                    map.put(type,RECOVERY_SUSPEND);
+                    map.put(type, RECOVERY_SUSPEND);
                     break;
                 case START_FAILURE_TASK_PROCESS:
-                    map.put(type,FAILED_TO_RETRY);
+                    map.put(type, FAILED_TO_RETRY);
                     break;
                 case STOP:
-                    map.put(type,STOP);
+                    map.put(type, STOP);
                     break;
                 case PAUSE:
-                    map.put(type,PAUSE);
+                    map.put(type, PAUSE);
                     break;
                 case NONE:
-                    map.put(type,null);
+                    map.put(type, null);
                     break;
                 default:
             }

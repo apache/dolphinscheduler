@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * timeout flag
  */
 public enum TimeoutFlag {
+
     /**
      * 0 close
      * 1 open

@@ -18,8 +18,6 @@ package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 
-import java.util.Map;
-
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Assertions;
@@ -36,15 +34,16 @@ import org.springframework.test.context.ActiveProfiles;
 @ExtendWith(MockitoExtension.class)
 @SpringBootApplication(scanBasePackageClasses = DaoConfiguration.class)
 public class WorkerGroupDaoTest {
+
     @Autowired
     protected DataSource dataSource;
 
     @Test
     public void testQueryQueryAllOldWorkerGroupException() throws Exception {
         Assertions.assertThrows(Exception.class, () -> {
-                    WorkerGroupDao workerGroupDao = new WorkerGroupDao();
-                    workerGroupDao.queryAllOldWorkerGroup(null);
-                });
+            WorkerGroupDao workerGroupDao = new WorkerGroupDao();
+            workerGroupDao.queryAllOldWorkerGroup(null);
+        });
 
     }
 

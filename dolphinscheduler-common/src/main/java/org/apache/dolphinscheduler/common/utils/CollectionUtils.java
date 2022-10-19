@@ -75,7 +75,8 @@ public class CollectionUtils {
      * @param <T> T
      * @return removes certain attributes of each object in the list
      */
-    public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList, Set<String> exclusionSet) {
+    public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList,
+                                                                                  Set<String> exclusionSet) {
         List<Map<String, Object>> instanceList = new ArrayList<>();
         if (originList == null) {
             return instanceList;
