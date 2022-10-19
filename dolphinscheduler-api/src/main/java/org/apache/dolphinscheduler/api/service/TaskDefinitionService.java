@@ -17,9 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
+import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
+import org.apache.dolphinscheduler.api.dto.task.TaskUpdateRequest;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -39,6 +44,16 @@ public interface TaskDefinitionService {
     Map<String, Object> createTaskDefinition(User loginUser,
                                              long projectCode,
                                              String taskDefinitionJson);
+
+    /**
+     * Create resource task definition
+     *
+     * @param loginUser login user
+     * @param taskCreateRequest task definition json
+     * @Return new TaskDefinition have created
+     */
+    TaskDefinition createTaskDefinitionV2(User loginUser,
+                                          TaskCreateRequest taskCreateRequest);
 
     /**
      * create single task definition that binds the workflow
@@ -70,15 +85,16 @@ public interface TaskDefinitionService {
                                                   String taskName);
 
     /**
-     * delete task definition
+     * Delete resource task definition by code
+     *
+     * Only task release state offline and no downstream tasks can be deleted, will also remove the exists
+     * task relation [upstreamTaskCode, taskCode]
      *
      * @param loginUser login user
-     * @param projectCode project code
      * @param taskCode task code
      */
-    Map<String, Object> deleteTaskDefinitionByCode(User loginUser,
-                                                   long projectCode,
-                                                   long taskCode);
+    void deleteTaskDefinitionByCode(User loginUser,
+                                    long taskCode);
 
     /**
      * update task definition
@@ -92,6 +108,38 @@ public interface TaskDefinitionService {
                                              long projectCode,
                                              long taskCode,
                                              String taskDefinitionJsonObj);
+
+    /**
+     * Update resource task definition by code
+     *
+     * @param loginUser login user
+     * @param taskCode task code
+     * @param taskUpdateRequest task definition json object
+     * @return new TaskDefinition have updated
+     */
+    TaskDefinition updateTaskDefinitionV2(User loginUser,
+                                          long taskCode,
+                                          TaskUpdateRequest taskUpdateRequest);
+
+    /**
+     * Get resource task definition by code
+     *
+     * @param loginUser login user
+     * @param taskCode task code
+     * @return TaskDefinition
+     */
+    TaskDefinition getTaskDefinition(User loginUser,
+                                     long taskCode);
+
+    /**
+     * Get resource task definition according to query parameter
+     *
+     * @param loginUser         login user
+     * @param taskFilterRequest taskFilterRequest
+     * @return PageResourceResponse from condition
+     */
+    PageInfo<TaskDefinition> filterTaskDefinition(User loginUser,
+                                                  TaskFilterRequest taskFilterRequest);
 
     /**
      * update task definition and upstream
@@ -204,7 +252,7 @@ public interface TaskDefinitionService {
      * @return update result code
      */
     Map<String, Object> releaseTaskDefinition(User loginUser,
-                                             long projectCode,
-                                             long code,
-                                             ReleaseState releaseState);
+                                              long projectCode,
+                                              long code,
+                                              ReleaseState releaseState);
 }

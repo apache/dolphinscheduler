@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * encryption utils
@@ -27,7 +27,7 @@ public class EncryptionUtilsTest {
 
     @Test
     public void testGetMd5() {
-        Assert.assertEquals(EncryptionUtils.getMd5(null), EncryptionUtils.getMd5(""));
+        Assertions.assertEquals(EncryptionUtils.getMd5(null), EncryptionUtils.getMd5(""));
     }
 
 }

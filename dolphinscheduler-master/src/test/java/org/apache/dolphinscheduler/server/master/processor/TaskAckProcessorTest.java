@@ -24,22 +24,20 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventServic
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.Date;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import io.netty.channel.Channel;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * task ack processor test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({SpringApplicationContext.class, TaskEvent.class})
+@ExtendWith(MockitoExtension.class)
 public class TaskAckProcessorTest {
 
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
@@ -49,20 +47,24 @@ public class TaskAckProcessorTest {
     private TaskEvent taskResponseEvent;
     private Channel channel;
 
-    @Before
+    private MockedStatic<SpringApplicationContext> mockedStaticSpringApplicationContext;
+
+    @BeforeEach
     public void before() {
-        PowerMockito.mockStatic(SpringApplicationContext.class);
+        mockedStaticSpringApplicationContext = Mockito.mockStatic(SpringApplicationContext.class);
 
-        taskEventService = PowerMockito.mock(TaskEventService.class);
-        PowerMockito.when(SpringApplicationContext.getBean(TaskEventService.class)).thenReturn(taskEventService);
+        taskEventService = Mockito.mock(TaskEventService.class);
+        mockedStaticSpringApplicationContext.when(() -> SpringApplicationContext.getBean(TaskEventService.class))
+                .thenReturn(taskEventService);
 
-        processService = PowerMockito.mock(ProcessService.class);
-        PowerMockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        processService = Mockito.mock(ProcessService.class);
+        mockedStaticSpringApplicationContext.when(() -> SpringApplicationContext.getBean(ProcessService.class))
+                .thenReturn(processService);
 
         taskExecuteRunningProcessor = new TaskExecuteRunningProcessor();
 
-        channel = PowerMockito.mock(Channel.class);
-        taskResponseEvent = PowerMockito.mock(TaskEvent.class);
+        channel = Mockito.mock(Channel.class);
+        taskResponseEvent = Mockito.mock(TaskEvent.class);
 
         taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
                 " 127.0.0.1:1234",
@@ -71,25 +73,17 @@ public class TaskAckProcessorTest {
         taskExecuteRunningMessage.setExecutePath("/dolphinscheduler/worker");
         taskExecuteRunningMessage.setHost("localhost");
         taskExecuteRunningMessage.setLogPath("/temp/worker.log");
-        taskExecuteRunningMessage.setStartTime(new Date());
+        taskExecuteRunningMessage.setStartTime(System.currentTimeMillis());
         taskExecuteRunningMessage.setTaskInstanceId(1);
         taskExecuteRunningMessage.setProcessInstanceId(1);
     }
 
+    @AfterEach
+    public void after() {
+        mockedStaticSpringApplicationContext.close();
+    }
+
     @Test
     public void testProcess() {
-        // Command command = taskExecuteAckCommand.convert2Command();
-        // Assert.assertEquals(CommandType.TASK_EXECUTE_ACK,command.getType());
-        // InetSocketAddress socketAddress = new InetSocketAddress("localhost",12345);
-        // PowerMockito.when(channel.remoteAddress()).thenReturn(socketAddress);
-        // PowerMockito.mockStatic(TaskResponseEvent.class);
-        //
-        // PowerMockito.when(TaskResponseEvent.newAck(Mockito.any(), Mockito.any(), Mockito.anyString(),
-        // Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), channel))
-        // .thenReturn(taskResponseEvent);
-        // TaskInstance taskInstance = PowerMockito.mock(TaskInstance.class);
-        // PowerMockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
-        //
-        // taskAckProcessor.process(channel,command);
     }
 }

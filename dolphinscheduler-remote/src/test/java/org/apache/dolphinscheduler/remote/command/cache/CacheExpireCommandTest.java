@@ -21,9 +21,8 @@ import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class CacheExpireCommandTest {
 
@@ -31,6 +30,6 @@ public class CacheExpireCommandTest {
     public void testConvert2Command() {
         CacheExpireCommand cacheExpireCommand = new CacheExpireCommand(CacheType.TENANT, "1");
         Command command = cacheExpireCommand.convert2Command();
-        Assert.assertEquals(CommandType.CACHE_EXPIRE, command.getType());
+        Assertions.assertEquals(CommandType.CACHE_EXPIRE, command.getType());
     }
 }

@@ -20,25 +20,21 @@ package org.apache.dolphinscheduler.plugin.datasource.postgresql;
 import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQLConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({PostgreSQLDataSourceClient.class, PostgreSQLDataSourceChannel.class})
+@ExtendWith(MockitoExtension.class)
 public class PostgreSQLDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        PostgreSQLDataSourceChannel sourceChannel = PowerMockito.mock(PostgreSQLDataSourceChannel.class);
-        PostgreSQLDataSourceClient dataSourceClient = PowerMockito.mock(PostgreSQLDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new PostgreSQLConnectionParam(), DbType.POSTGRESQL));
+        PostgreSQLDataSourceChannel sourceChannel = Mockito.mock(PostgreSQLDataSourceChannel.class);
+        PostgreSQLDataSourceClient dataSourceClient = Mockito.mock(PostgreSQLDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assertions.assertNotNull(
+                sourceChannel.createDataSourceClient(new PostgreSQLConnectionParam(), DbType.POSTGRESQL));
     }
 }

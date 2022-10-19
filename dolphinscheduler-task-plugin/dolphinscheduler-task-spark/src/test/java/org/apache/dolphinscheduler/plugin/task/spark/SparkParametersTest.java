@@ -22,15 +22,15 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SparkParametersTest {
 
     @Test
     public void getResourceFilesList() {
         SparkParameters sparkParameters = new SparkParameters();
-        Assert.assertTrue(sparkParameters.getResourceFilesList().isEmpty());
+        Assertions.assertTrue(sparkParameters.getResourceFilesList().isEmpty());
 
         ResourceInfo mainResource = new ResourceInfo();
         mainResource.setRes("testSparkMain-1.0.0-SNAPSHOT.jar\"");
@@ -43,8 +43,8 @@ public class SparkParametersTest {
 
         sparkParameters.setResourceList(resourceInfos);
         List<ResourceInfo> resourceFilesList = sparkParameters.getResourceFilesList();
-        Assert.assertNotNull(resourceFilesList);
-        Assert.assertEquals(2, resourceFilesList.size());
+        Assertions.assertNotNull(resourceFilesList);
+        Assertions.assertEquals(2, resourceFilesList.size());
 
         ResourceInfo resourceInfo2 = new ResourceInfo();
         resourceInfo2.setRes("testSparkParameters2.jar");
@@ -52,8 +52,8 @@ public class SparkParametersTest {
 
         sparkParameters.setResourceList(resourceInfos);
         resourceFilesList = sparkParameters.getResourceFilesList();
-        Assert.assertNotNull(resourceFilesList);
-        Assert.assertEquals(3, resourceFilesList.size());
+        Assertions.assertNotNull(resourceFilesList);
+        Assertions.assertEquals(3, resourceFilesList.size());
 
     }
 }

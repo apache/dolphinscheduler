@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.util.StringUtils;
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
@@ -61,7 +61,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
 
         Date fireTime = context.getFireTime();
 
-        logger.info("scheduled fire time :{}, fire time :{}, process id :{}", scheduledFireTime, fireTime, scheduleId);
+        logger.info("scheduled fire time :{}, fire time :{}, scheduleId :{}", scheduledFireTime, fireTime, scheduleId);
 
         // query schedule
         Schedule schedule = processService.querySchedule(scheduleId);
@@ -75,7 +75,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
         // release state : online/offline
         ReleaseState releaseState = processDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {
-            logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processId:{}", projectId, processDefinition.getId());
+            logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processDefinitionId:{}", projectId, processDefinition.getId());
             return;
         }
 

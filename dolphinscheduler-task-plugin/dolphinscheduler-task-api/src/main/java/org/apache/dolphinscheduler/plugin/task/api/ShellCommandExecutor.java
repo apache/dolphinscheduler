@@ -38,9 +38,9 @@ import com.google.common.base.Strings;
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
-     * For Unix-like, using sh
+     * For Unix-like, using bash
      */
-    private static final String SH = "sh";
+    private static final String SH = "bash";
 
     /**
      * For Windows, using cmd.exe

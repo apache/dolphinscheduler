@@ -23,25 +23,24 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * PluginParamsTransfer Tester.
  */
 public class PluginParamsTransferTest {
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
     }
 
@@ -178,7 +177,7 @@ public class PluginParamsTransferTest {
                 + ",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\""
                 + ":\"attachment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"tableattachment\""
                 + ",\"value\":\"tableattachment\",\"disabled\":false}]}]";
-        Assert.assertEquals(paramsJsonAssert, paramsJson);
+        Assertions.assertEquals(paramsJsonAssert, paramsJson);
     }
 
     @Test
@@ -213,10 +212,10 @@ public class PluginParamsTransferTest {
                 + "{\"label\":\"attachment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"tableattachment\",\"value\":\"tableattachment\",\"disabled\":false}]}]";
         List<PluginParams> pluginParams = PluginParamsTransfer.transferJsonToParamsList(paramsJsonAssert);
         String[] results = new String[]{"v1", "v2", "v3", "v4", "v5", "true", "v6", "v7", "false", "false", "*", "table", "v1"};
-        Assert.assertEquals(12, pluginParams.size());
+        Assertions.assertEquals(12, pluginParams.size());
         for (int i = 0; i < pluginParams.size(); i++) {
             PluginParams param = pluginParams.get(i);
-            Assert.assertEquals(param.getValue().toString(), results[i]);
+            Assertions.assertEquals(param.getValue().toString(), results[i]);
         }
     }
 }

@@ -55,6 +55,11 @@ public class TaskConstants {
     public static final String COMMA = ",";
 
     /**
+     * hyphen
+     */
+    public static final String HYPHEN = "-";
+
+    /**
      * slash /
      */
     public static final String SLASH = "/";
@@ -231,6 +236,40 @@ public class TaskConstants {
      */
     public static final String WEEK_END = "week_end";
     /**
+     * this_day
+     */
+    public static final String THIS_DAY = "this_day";
+    /**
+     * last_day
+     */
+    public static final String LAST_DAY = "last_day";
+
+    /**
+     * month_first_day
+     */
+    public static final String MONTH_FIRST_DAY = "month_first_day";
+
+    /**
+     * month_last_day
+     */
+    public static final String MONTH_LAST_DAY = "month_last_day";
+
+    /**
+     * week_first_day
+     */
+    public static final String WEEK_FIRST_DAY = "week_first_day";
+
+    /**
+     * week_last_day
+     */
+    public static final String WEEK_LAST_DAY = "week_last_day";
+
+    /**
+     * year_week
+     *
+     */
+    public static final String YEAR_WEEK = "year_week";
+    /**
      * timestamp
      */
     public static final String TIMESTAMP = "timestamp";
@@ -399,9 +438,6 @@ public class TaskConstants {
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
     public static final String TASK_TYPE_STREAM = "STREAM";
-
-    public static final List<String> COMPLEX_TASK_TYPES = Arrays
-            .asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
 
     /**
      * aws config

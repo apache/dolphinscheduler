@@ -18,11 +18,10 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandleException;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
-
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
