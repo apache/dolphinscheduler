@@ -173,7 +173,7 @@ public abstract class AbstractCycle {
         FieldExpression dayOfWeekFieldExpression = dayOfWeekField.getExpression();
         return (dayOfWeekFieldExpression instanceof Every || dayOfWeekFieldExpression instanceof Always);
     }
-    
+
     /**
      * whether the year field has a value of every or always
      *

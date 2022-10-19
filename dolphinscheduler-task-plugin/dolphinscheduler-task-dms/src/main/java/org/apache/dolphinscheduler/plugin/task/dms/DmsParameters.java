@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import java.util.Date;
 import java.util.List;
 
-import com.amazonaws.services.databasemigrationservice.model.Tag;
-
 import lombok.Data;
+
+import com.amazonaws.services.databasemigrationservice.model.Tag;
 
 @Data
 public class DmsParameters extends AbstractParameters {
@@ -57,7 +57,7 @@ public class DmsParameters extends AbstractParameters {
             flag = replicationTaskArn != null;
         } else {
             flag = sourceEndpointArn != null && targetEndpointArn != null && replicationInstanceArn != null
-                && migrationType != null && replicationTaskIdentifier != null && tableMappings != null;
+                    && migrationType != null && replicationTaskIdentifier != null && tableMappings != null;
         }
         return flag;
     }

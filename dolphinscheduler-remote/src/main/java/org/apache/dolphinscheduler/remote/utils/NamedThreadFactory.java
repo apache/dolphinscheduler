@@ -36,11 +36,11 @@ public class NamedThreadFactory implements ThreadFactory {
      */
     private final int count;
 
-    public NamedThreadFactory(String name){
+    public NamedThreadFactory(String name) {
         this(name, 0);
     }
 
-    public NamedThreadFactory(String name, int count){
+    public NamedThreadFactory(String name, int count) {
         this.name = name;
         this.count = count;
     }

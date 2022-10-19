@@ -130,7 +130,8 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state, String timeZone) throws IOException;
+                                   int tenantId, String phone, String queue, int state,
+                                   String timeZone) throws IOException;
 
     /**
      * delete user
@@ -151,7 +152,6 @@ public interface UsersService {
      * @return grant result code
      */
     Map<String, Object> grantProject(User loginUser, int userId, String projectIds);
-
 
     /**
      * grant project by code
@@ -182,7 +182,6 @@ public interface UsersService {
      */
     Map<String, Object> grantResources(User loginUser, int userId, String resourceIds);
 
-
     /**
      * grant udf function
      *
@@ -193,7 +192,6 @@ public interface UsersService {
      */
     Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds);
 
-
     /**
      * grant namespace
      *
@@ -203,7 +201,6 @@ public interface UsersService {
      * @return grant result code
      */
     Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds);
-
 
     /**
      * grant datasource
@@ -231,7 +228,6 @@ public interface UsersService {
      */
     Map<String, Object> queryAllGeneralUsers(User loginUser);
 
-
     /**
      * query user list
      *
@@ -248,7 +244,6 @@ public interface UsersService {
      */
     Result<Object> verifyUserName(String userName);
 
-
     /**
      * unauthorized user
      *
@@ -257,7 +252,6 @@ public interface UsersService {
      * @return unauthorize result code
      */
     Map<String, Object> unauthorizedUser(User loginUser, Integer alertGroupId);
-
 
     /**
      * authorized user

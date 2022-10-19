@@ -60,7 +60,8 @@ public class ParameterUtilsTest {
 
         // replace variable ${} form
         parameterMap.put("testParameter2", "${testParameter}");
-        Assertions.assertEquals(parameterString, PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
+        Assertions.assertEquals(parameterString,
+                PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
 
         // replace time $[...] form, eg. $[yyyyMMdd]
         Date cronTime = new Date();

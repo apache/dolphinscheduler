@@ -38,7 +38,8 @@ public interface WorkerGroupService {
      * @param otherParamsJson  otherParamsJson
      * @return create or update result code
      */
-    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String otherParamsJson);
+    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description,
+                                        String otherParamsJson);
 
     /**
      * query worker group paging

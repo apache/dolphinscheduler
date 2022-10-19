@@ -18,21 +18,19 @@
 package org.apache.dolphinscheduler.server.master.cache.impl;
 
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
+import lombok.NonNull;
+
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
-
-import lombok.NonNull;
 
 /**
  * cache of process instance id and WorkflowExecuteThread
@@ -40,7 +38,8 @@ import lombok.NonNull;
 @Component
 public class StreamTaskInstanceExecCacheManagerImpl implements StreamTaskInstanceExecCacheManager {
 
-    private final ConcurrentHashMap<Integer, StreamTaskExecuteRunnable> streamTaskInstanceExecMaps = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, StreamTaskExecuteRunnable> streamTaskInstanceExecMaps =
+            new ConcurrentHashMap<>();
 
     @PostConstruct
     public void registerMetrics() {
