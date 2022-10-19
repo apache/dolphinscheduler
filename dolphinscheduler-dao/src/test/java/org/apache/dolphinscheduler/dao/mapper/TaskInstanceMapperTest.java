@@ -381,7 +381,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
-        Assert.assertEquals(taskInstanceIPage.getTotal(), 0);
+        Assertions.assertEquals(taskInstanceIPage.getTotal(), 0);
 
     }
 
