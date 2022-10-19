@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import com.google.common.base.Preconditions;
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -28,10 +26,14 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Preconditions;
+import io.netty.channel.Channel;
 
 /**
  * handle state event received from master/api

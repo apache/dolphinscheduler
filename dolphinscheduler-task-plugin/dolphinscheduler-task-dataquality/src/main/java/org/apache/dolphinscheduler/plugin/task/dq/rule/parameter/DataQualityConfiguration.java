@@ -44,7 +44,8 @@ public class DataQualityConfiguration {
     @JsonProperty("writers")
     private List<BaseConfig> writerConfigs;
 
-    public DataQualityConfiguration() {}
+    public DataQualityConfiguration() {
+    }
 
     public DataQualityConfiguration(String name,
                                     List<BaseConfig> readerConfigs,

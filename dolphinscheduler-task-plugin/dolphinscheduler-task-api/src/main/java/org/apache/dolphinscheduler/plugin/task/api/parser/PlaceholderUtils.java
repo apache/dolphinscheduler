@@ -52,15 +52,16 @@ public class PlaceholderUtils {
     public static String replacePlaceholders(String value,
                                              Map<String, String> paramsMap,
                                              boolean ignoreUnresolvablePlaceholders) {
-        //replacement tool， parameter key will be replaced by value,if can't match , will throw an exception
+        // replacement tool， parameter key will be replaced by value,if can't match , will throw an exception
         PropertyPlaceholderHelper strictHelper = getPropertyPlaceholderHelper(false);
 
-        //Non-strict replacement tool implementation, when the position to be replaced does not get the corresponding value, the current position is ignored, and the next position is replaced.
+        // Non-strict replacement tool implementation, when the position to be replaced does not get the corresponding
+        // value, the current position is ignored, and the next position is replaced.
         PropertyPlaceholderHelper nonStrictHelper = getPropertyPlaceholderHelper(true);
 
         PropertyPlaceholderHelper helper = (ignoreUnresolvablePlaceholders ? nonStrictHelper : strictHelper);
 
-        //the PlaceholderResolver to use for replacement
+        // the PlaceholderResolver to use for replacement
         return helper.replacePlaceholders(value, new PropertyPlaceholderResolver(value, paramsMap));
     }
 
@@ -72,7 +73,8 @@ public class PlaceholderUtils {
      */
     public static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
 
-        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null, ignoreUnresolvablePlaceholders);
+        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null,
+                ignoreUnresolvablePlaceholders);
     }
 
     /**

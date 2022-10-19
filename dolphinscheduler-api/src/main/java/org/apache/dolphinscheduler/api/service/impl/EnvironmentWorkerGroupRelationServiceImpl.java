@@ -36,8 +36,9 @@ import org.springframework.stereotype.Service;
  * task definition service impl
  */
 @Service
-public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl implements
-        EnvironmentWorkerGroupRelationService {
+public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl
+        implements
+            EnvironmentWorkerGroupRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentWorkerGroupRelationServiceImpl.class);
 
@@ -52,7 +53,8 @@ public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl i
     @Override
     public Map<String, Object> queryEnvironmentWorkerGroupRelation(Long environmentCode) {
         Map<String, Object> result = new HashMap<>();
-        List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.queryByEnvironmentCode(environmentCode);
+        List<EnvironmentWorkerGroupRelation> relations =
+                environmentWorkerGroupRelationMapper.queryByEnvironmentCode(environmentCode);
         result.put(Constants.DATA_LIST, relations);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -69,8 +71,8 @@ public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl i
 
         List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
 
-        result.put(Constants.DATA_LIST,relations);
-        putMsg(result,Status.SUCCESS);
+        result.put(Constants.DATA_LIST, relations);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 }

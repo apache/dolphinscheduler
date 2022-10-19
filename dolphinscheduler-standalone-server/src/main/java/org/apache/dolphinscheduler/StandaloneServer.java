@@ -21,6 +21,8 @@ import org.apache.curator.test.TestingServer;
 
 import java.io.IOException;
 
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -29,8 +31,6 @@ import org.springframework.boot.context.event.ApplicationFailedEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
-
-import lombok.NonNull;
 
 @SpringBootApplication
 public class StandaloneServer implements ApplicationListener<ApplicationEvent> {
