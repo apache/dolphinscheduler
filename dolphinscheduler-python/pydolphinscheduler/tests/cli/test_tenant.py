@@ -16,12 +16,20 @@
 # under the License.
 
 """Test command line interface subcommand `tenant`."""
+from unittest.mock import patch
 
 import pytest
 
 from pydolphinscheduler.cli.commands import cli
-from tests.integration.test_tenant import get_tenant
+from pydolphinscheduler.models import Tenant
 from tests.testing.cli import CliTestWrapper
+
+
+def show_tenant(a=None, b=None, c=None, d=None, e=None, f=None, g=None):  # noqa: D103
+    return (
+        "Tenant(name=test-tenant, description=test-desc, tenant_id=1, code=test-tenant-code, "
+        "queue=test-queue, user_name=admin)"
+    )
 
 
 @pytest.mark.parametrize(
@@ -44,14 +52,12 @@ from tests.testing.cli import CliTestWrapper
         ),
     ],
 )
+@patch.object(Tenant, "create_if_not_exists", show_tenant)
+@patch.object(Tenant, "__str__", show_tenant)
 def test_tenant_setter(option, output):
     """Test subcommand `tenant` option `--setter`."""
     cli_test = CliTestWrapper(cli, option)
-    cli_test.assert_success()
-    assert (
-        "Tenant(name=test-tenant, description=test-desc, tenant_id="
-        in cli_test.result.output
-    )
+    cli_test.assert_success(output=output)
 
 
 @pytest.mark.parametrize(
@@ -60,14 +66,15 @@ def test_tenant_setter(option, output):
         (
             ["tenant", "--get", "test-name-1"],
             "Get tenant ('test-name-1',) from pydolphinscheduler.\n"
-            "Tenant(name=tenant_pydolphin, description=None, tenant_id=None, "
-            "code=None, queue=queuePythonGateway, user_name=None)",
+            "Tenant(name=test-tenant, description=test-desc, tenant_id=1, code=test-tenant-code, "
+            "queue=test-queue, user_name=admin)",
         )
     ],
 )
+@patch.object(Tenant, "get_tenant", show_tenant)
+@patch.object(Tenant, "__str__", show_tenant)
 def test_tenant_getter(option, output):
     """Test subcommand `tenant` option `--getter`."""
-    get_tenant()
     cli_test = CliTestWrapper(cli, option)
     cli_test.assert_success(output=output)
 
@@ -78,15 +85,27 @@ def test_tenant_getter(option, output):
         (
             ["tenant", "--update", "admin", "test-tenant-code", 1, "test-desc-1"],
             "Update tenant start.\n"
-            "Tenant(name=tenant_pydolphin, description=test-desc-1, tenant_id=1, "
-            "code=test-tenant-code, queue=1, user_name=None)\n"
+            "Tenant(name=test-tenant, description=test-desc, tenant_id=1, code=test-tenant-code, "
+            "queue=test-queue, user_name=admin)\n"
             "Update tenant done.",
         ),
     ],
 )
-def test_tenant_updater(option, output):
+@patch(
+    "pydolphinscheduler.models.tenant.Tenant.get_tenant",
+    return_value=Tenant(
+        name="test-name",
+        description="test-desc-1",
+        tenant_id=1,
+        code="test-tenant-code",
+        queue="test-queue",
+        user_name="admin",
+    ),
+)
+@patch.object(Tenant, "update", show_tenant)
+@patch.object(Tenant, "__str__", show_tenant)
+def test_tenant_updater(mock_get_tenant, option, output):
     """Test subcommand `tenant` option `--updater`."""
-    get_tenant(user_name="admin")
     cli_test = CliTestWrapper(cli, option)
     cli_test.assert_success(output=output)
 
@@ -94,12 +113,29 @@ def test_tenant_updater(option, output):
 @pytest.mark.parametrize(
     "option, output",
     [
-        (["tenant", "--delete", "admin", "abc"], None),
+        (
+            ["tenant", "--delete", "admin", "abc"],
+            "Delete tenant (('admin', 'abc'),) from pydolphinscheduler.\n"
+            "Tenant(name=test-tenant, description=test-desc, tenant_id=1, code=test-tenant-code, "
+            "queue=test-queue, user_name=admin)\n"
+            "Delete tenant abc done.",
+        ),
     ],
 )
-def test_tenant_deleter(option, output):
+@patch(
+    "pydolphinscheduler.models.tenant.Tenant.get_tenant",
+    return_value=Tenant(
+        name="test-name",
+        description="test-desc-1",
+        tenant_id=1,
+        code="test-tenant-code",
+        queue="test-queue",
+        user_name="admin",
+    ),
+)
+@patch.object(Tenant, "delete", show_tenant)
+@patch.object(Tenant, "__str__", show_tenant)
+def test_tenant_deleter(mock_get_tenant, option, output):
     """Test subcommand `tenant` option `--deleter`."""
-    get_tenant(tenant_code="abc", user_name="admin")
     cli_test = CliTestWrapper(cli, option)
-    cli_test.assert_success()
-    assert "Delete tenant abc done." in cli_test.result.output
+    cli_test.assert_success(output=output)

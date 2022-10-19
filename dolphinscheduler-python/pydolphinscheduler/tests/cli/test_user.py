@@ -136,5 +136,4 @@ def test_user_updater(option, output):
 def test_user_deleter(option, output):
     """Test subcommand `user` option `--deleter`."""
     cli_test = CliTestWrapper(cli, option)
-    print(cli_test.result.exception)
     cli_test.assert_success(output=output)

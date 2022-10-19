@@ -16,42 +16,56 @@
 # under the License.
 
 """Test command line interface subcommand `project`."""
+from unittest.mock import patch
 
 import pytest
 
 from pydolphinscheduler.cli.commands import cli
-from tests.integration.test_project import get_project
+from pydolphinscheduler.models import Project
 from tests.testing.cli import CliTestWrapper
 
 
+def show_project(a=None, b=None, c=None, d=None, e=None, f=None, g=None):  # noqa: D103
+    return "Project(name=test-name-1, description=test-description, code=1)"
+
+
 @pytest.mark.parametrize(
     "option, output",
     [
-        (["project", "--set", "test-project", "test-desc", "admin"], None),
+        (
+            ["project", "--set", "test-project", "test-desc", "admin"],
+            "Set project start.\n"
+            "Project(name=test-name-1, description=test-description, code=1)\n"
+            "Set project done.",
+        ),
     ],
 )
+@patch.object(Project, "create_if_not_exists", show_project)
+@patch.object(Project, "__str__", show_project)
 def test_project_setter(option, output):
     """Test subcommand `project` option `--setter`."""
     cli_test = CliTestWrapper(cli, option)
-    cli_test.assert_success()
-    assert "Set project done." in cli_test.result.output
+    cli_test.assert_success(output=output)
 
 
 @pytest.mark.parametrize(
     "option, output",
     [
-        (["project", "--get", "admin", "test-name-1"], None),
+        (
+            ["project", "--get", "admin", "test-name-1"],
+            "Get project (('admin', 'test-name-1'),) from pydolphinscheduler.\n"
+            "Project(name=test-name-1, description=test-description, code=1)",
+        ),
     ],
 )
-def test_project_getter(option, output):
+@patch(
+    "pydolphinscheduler.models.project.Project.get_project_by_name",
+    return_value=Project(name="test-name-1", description="test-description", code=1),
+)
+def test_project_getter(mock_get_project_by_name, option, output):
     """Test subcommand `project` option `--getter`."""
-    get_project()
     cli_test = CliTestWrapper(cli, option)
-    cli_test.assert_success()
-    assert (
-        "Project(name=test-name-1, description=test-description, code="
-        in cli_test.result.output
-    )
+    cli_test.assert_success(output=output)
 
 
 @pytest.mark.parametrize(
@@ -66,31 +80,38 @@ def test_project_getter(option, output):
                 "test-name-updated",
                 "test-description-updated",
             ],
-            None,
+            "Update project start.\n"
+            "Project(name=test-name-1, description=test-description, code=1)\n"
+            "Update project done.",
         ),
     ],
 )
+@patch.object(Project, "update", show_project)
+@patch.object(Project, "__str__", show_project)
 def test_project_updater(option, output):
     """Test subcommand `project` option `--updater`."""
-    project = get_project()
-    option[3] = project.code
     cli_test = CliTestWrapper(cli, option)
-    cli_test.assert_success()
-    assert "Update project done." in cli_test.result.output
+    cli_test.assert_success(output=output)
 
 
 @pytest.mark.parametrize(
     "option, output",
     [
-        (["project", "--delete", "admin", "test-name-1"], None),
+        (
+            ["project", "--delete", "admin", "test-name-1"],
+            "Delete project (('admin', 'test-name-1'),) from pydolphinscheduler.\n"
+            "Project(name=test-name-1, description=test-description, code=1)\n"
+            "Delete project test-name-1 done.",
+        ),
     ],
 )
-def test_project_deleter(option, output):
+@patch(
+    "pydolphinscheduler.models.project.Project.get_project_by_name",
+    return_value=Project(name="test-name-1", description="test-description", code=1),
+)
+@patch.object(Project, "delete", show_project)
+@patch.object(Project, "__str__", show_project)
+def test_project_deleter(mock_get_project_by_name, option, output):
     """Test subcommand `project` option `--deleter`."""
-    get_project()
     cli_test = CliTestWrapper(cli, option)
-    cli_test.assert_success()
-    assert (
-        "Project(name=test-name-1, description=test-description, code="
-        in cli_test.result.output
-    )
+    cli_test.assert_success(output=output)

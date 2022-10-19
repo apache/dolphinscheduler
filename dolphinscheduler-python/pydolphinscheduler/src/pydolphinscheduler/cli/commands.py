@@ -225,7 +225,7 @@ def tenant(getter, setter, updater, deleter) -> None:
         for user_name, tenant_code in deleter:
             tenant_ = Tenant.get_tenant(tenant_code)
             echo(tenant_)
-            tenant_.delete(user=user_name)
+            tenant_.delete(user_name)
             click.echo(f"Delete tenant {tenant_code} done.")
 
 
@@ -276,8 +276,7 @@ def project(getter, setter, updater, deleter) -> None:
     elif setter:
         click.echo("Set project start.")
         project_ = Project(setter[0], setter[1])
-        click.echo(setter)
-        project_.create_if_not_exists(user=setter[2])
+        project_.create_if_not_exists(setter[2])
         click.echo(project_)
         click.echo("Set project done.")
     elif updater:
@@ -291,7 +290,7 @@ def project(getter, setter, updater, deleter) -> None:
         for user_name, project_name in deleter:
             project_ = Project.get_project_by_name(user_name, project_name)
             click.echo(project_)
-            project_.delete(user=user_name)
+            project_.delete(user_name)
             click.echo(f"Delete project {project_name} done.")
 
 
