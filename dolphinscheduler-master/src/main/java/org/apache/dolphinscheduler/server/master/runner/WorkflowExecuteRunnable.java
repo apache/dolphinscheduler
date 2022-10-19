@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
@@ -421,15 +420,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * continue to submit subsequent tasks after failure
      *
      * if there are subsequent tasks:
-     *      1. the execution type is parallel;
-     *      2. the execution type is serial and failed task type is condition;
-     *      3. the execution type is serial and next task type is condition;
+     *      1. nodes are parallel;
+     *      2. nodes are serial and failed task type is condition;
+     *      3. nodes are serial and next task type is condition;
      */
     private void failureContinueSubmitPostNodes(TaskInstance taskInstance) throws StateEventHandleException {
         if (!DagHelper.haveAnyNodeAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
-            return;
-        }
-        if (ProcessExecutionTypeEnum.PARALLEL.equals(processDefinition.getExecutionType())) {
             submitPostNode(Long.toString(taskInstance.getTaskCode()));
         } else {
             if (taskInstance.isConditionsTask()
