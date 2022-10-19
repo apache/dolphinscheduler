@@ -15,23 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.datax;
+package org.apache.dolphinscheduler.plugin.task.datax.entity;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.datax.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.ColumnInfo;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * DataX parameter
  */
+@Data
 public class DataxParameters extends AbstractParameters {
 
     /**
@@ -77,9 +82,14 @@ public class DataxParameters extends AbstractParameters {
     private String splitPk;
 
     /**
-     * columns from source table
+     * column infos of source table
      */
-    private List<String> dsColumns;
+    private List<ColumnInfo> dsColumns;
+
+    /**
+     * partition values of source table
+     */
+    private List<String> dsPartitions;
 
     // Note: for writer part
 
@@ -93,7 +103,16 @@ public class DataxParameters extends AbstractParameters {
      */
     private int dataTarget;
 
-    private List<String> dtColumns;
+    /**
+     * column infos of target table
+     */
+    private List<ColumnInfo> dtColumns;
+
+    /**
+     * partition values of target table
+     */
+    private List<String> dtPartitions;
+
     /**
      * sql
      */
@@ -150,193 +169,6 @@ public class DataxParameters extends AbstractParameters {
      * Xmx memory
      */
     private int xmx;
-
-    public int getCustomConfig() {
-        return customConfig;
-    }
-
-    public void setCustomConfig(int customConfig) {
-        this.customConfig = customConfig;
-    }
-
-    public int getCustomSQL() {
-        return customSQL;
-    }
-
-    public void getCustomSQL(int customSQL) {
-        this.customSQL = customSQL;
-    }
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
-
-    public String getDsType() {
-        return dsType;
-    }
-
-    public void setDsType(String dsType) {
-        this.dsType = dsType;
-    }
-
-    public int getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(int dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public String getDtType() {
-        return dtType;
-    }
-
-    public void setDtType(String dtType) {
-        this.dtType = dtType;
-    }
-
-    public int getDataTarget() {
-        return dataTarget;
-    }
-
-    public void setDataTarget(int dataTarget) {
-        this.dataTarget = dataTarget;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public String getTargetTable() {
-        return targetTable;
-    }
-
-    public void setTargetTable(String targetTable) {
-        this.targetTable = targetTable;
-    }
-
-    public List<String> getPreStatements() {
-        return preStatements;
-    }
-
-    public void setPreStatements(List<String> preStatements) {
-        this.preStatements = preStatements;
-    }
-
-    public List<String> getPostStatements() {
-        return postStatements;
-    }
-
-    public void setPostStatements(List<String> postStatements) {
-        this.postStatements = postStatements;
-    }
-
-    public int getJobSpeedByte() {
-        return jobSpeedByte;
-    }
-
-    public void setJobSpeedByte(int jobSpeedByte) {
-        this.jobSpeedByte = jobSpeedByte;
-    }
-
-    public int getJobSpeedRecord() {
-        return jobSpeedRecord;
-    }
-
-    public void setJobSpeedRecord(int jobSpeedRecord) {
-        this.jobSpeedRecord = jobSpeedRecord;
-    }
-
-    public int getXms() {
-        return xms;
-    }
-
-    public void setXms(int xms) {
-        this.xms = xms;
-    }
-
-    public int getXmx() {
-        return xmx;
-    }
-
-    public void setXmx(int xmx) {
-        this.xmx = xmx;
-    }
-
-    public void setCustomSQL(int customSQL) {
-        this.customSQL = customSQL;
-    }
-
-    public String getSourceTable() {
-        return sourceTable;
-    }
-
-    public void setSourceTable(String sourceTable) {
-        this.sourceTable = sourceTable;
-    }
-
-    public String getWhere() {
-        return where;
-    }
-
-    public void setWhere(String where) {
-        this.where = where;
-    }
-
-    public String getSplitPk() {
-        return splitPk;
-    }
-
-    public void setSplitPk(String splitPk) {
-        this.splitPk = splitPk;
-    }
-
-    public List<String> getDsColumns() {
-        return dsColumns;
-    }
-
-    public void setDsColumns(List<String> dsColumns) {
-        this.dsColumns = dsColumns;
-    }
-
-    public List<String> getDtColumns() {
-        return dtColumns;
-    }
-
-    public void setDtColumns(List<String> dtColumns) {
-        this.dtColumns = dtColumns;
-    }
-
-    public int getWriteMode() {
-        return writeMode;
-    }
-
-    public void setWriteMode(int writeMode) {
-        this.writeMode = writeMode;
-    }
-
-    public int getBatchSize() {
-        return batchSize;
-    }
-
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-    }
-
-    public int getChannel() {
-        return channel;
-    }
-
-    public void setChannel(int channel) {
-        this.channel = channel;
-    }
 
     @Override
     public boolean checkParameters() {

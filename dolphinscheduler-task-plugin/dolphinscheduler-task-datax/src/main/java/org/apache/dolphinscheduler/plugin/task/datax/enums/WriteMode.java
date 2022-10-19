@@ -1,13 +1,15 @@
-package org.apache.dolphinscheduler.plugin.task.datax;
+package org.apache.dolphinscheduler.plugin.task.datax.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-
-import java.sql.JDBCType;
 
 public enum WriteMode {
     INSERT(0,"insert"),
     REPLACE(1, "replace"),
-    UPDATE(2, "update");
+    UPDATE(2, "update"),
+    APPEND(3, "append"),
+    NON_CONFLICT(4, "nonConflict"),
+    TRUNCATE(5, "truncate");
+
 
     WriteMode(int code, String descp) {
         this.code = code;

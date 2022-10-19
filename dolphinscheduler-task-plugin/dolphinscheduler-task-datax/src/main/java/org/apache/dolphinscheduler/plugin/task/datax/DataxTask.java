@@ -21,6 +21,8 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import com.fasterxml.jackson.databind.util.RawValue;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -33,6 +35,10 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.ColumnInfo;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.DataxParameters;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.HiveMetadata;
+import org.apache.dolphinscheduler.plugin.task.datax.enums.WriteMode;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
@@ -225,94 +231,6 @@ public class DataxTask extends AbstractTaskExecutor {
         return fileName;
     }
 
-    /**
-     * build datax job config
-     *
-     * @return collection of datax job config JSONObject
-     * @throws SQLException if error throws SQLException
-     */
-//    private List<ObjectNode> buildDataxJobContentJsonFromSQL() {
-//
-//        BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-//                dataxTaskExecutionContext.getSourcetype(),
-//                dataxTaskExecutionContext.getSourceConnectionParams());
-//
-//        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-//                dataxTaskExecutionContext.getTargetType(),
-//                dataxTaskExecutionContext.getTargetConnectionParams());
-//
-//        List<ObjectNode> readerConnArr = new ArrayList<>();
-//        ObjectNode readerConn = JSONUtils.createObjectNode();
-//
-//        ArrayNode sqlArr = readerConn.putArray("querySql");
-//        for (String sql : new String[]{dataXParameters.getSql()}) {
-//            sqlArr.add(sql);
-//        }
-//
-//        ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-//        urlArr.add(DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
-//
-//        readerConnArr.add(readerConn);
-//
-//        ObjectNode readerParam = JSONUtils.createObjectNode();
-//        readerParam.put("username", dataSourceCfg.getUser());
-//        readerParam.put("password", decodePassword(dataSourceCfg.getPassword()));
-//        readerParam.putArray("connection").addAll(readerConnArr);
-//
-//        ObjectNode reader = JSONUtils.createObjectNode();
-//        reader.put("name", DataxUtils.getReaderPluginName(dataxTaskExecutionContext.getSourcetype()));
-//        reader.set("parameter", readerParam);
-//
-//        List<ObjectNode> writerConnArr = new ArrayList<>();
-//        ObjectNode writerConn = JSONUtils.createObjectNode();
-//        ArrayNode tableArr = writerConn.putArray("table");
-//        tableArr.add(dataXParameters.getTargetTable());
-//
-//        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
-//        writerConnArr.add(writerConn);
-//
-//        ObjectNode writerParam = JSONUtils.createObjectNode();
-//        writerParam.put("username", dataTargetCfg.getUser());
-//        writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
-//
-//        String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
-//                dataxTaskExecutionContext.getTargetType(),
-//                dataSourceCfg, dataXParameters.getSql());
-//
-//        ArrayNode columnArr = writerParam.putArray("column");
-//        for (String column : columns) {
-//            columnArr.add(column);
-//        }
-//        writerParam.putArray("connection").addAll(writerConnArr);
-//
-//        if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
-//            ArrayNode preSqlArr = writerParam.putArray("preSql");
-//            for (String preSql : dataXParameters.getPreStatements()) {
-//                preSqlArr.add(preSql);
-//            }
-//
-//        }
-//
-//        if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
-//            ArrayNode postSqlArr = writerParam.putArray("postSql");
-//            for (String postSql : dataXParameters.getPostStatements()) {
-//                postSqlArr.add(postSql);
-//            }
-//        }
-//
-//        ObjectNode writer = JSONUtils.createObjectNode();
-//        writer.put("name", DataxUtils.getWriterPluginName(dataxTaskExecutionContext.getTargetType()));
-//        writer.set("parameter", writerParam);
-//
-//        List<ObjectNode> contentList = new ArrayList<>();
-//        ObjectNode content = JSONUtils.createObjectNode();
-//        content.set("reader", reader);
-//        content.set("writer", writer);
-//        contentList.add(content);
-//
-//        return contentList;
-//    }
-
     private List<ObjectNode> buildDataxJobContentJsonFromConfiguration() {
         List<ObjectNode> contentList = new ArrayList<>();
         ObjectNode content = JSONUtils.createObjectNode();
@@ -322,46 +240,67 @@ public class DataxTask extends AbstractTaskExecutor {
         return contentList;
     }
 
-    public ObjectNode buildDataxReaderJson(){
+    public ObjectNode buildDataxReaderJson() {
         BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                 dataxTaskExecutionContext.getSourcetype(),
                 dataxTaskExecutionContext.getSourceConnectionParams());
         List<ObjectNode> readerConnArr = new ArrayList<>();
-        ObjectNode readerConn = JSONUtils.createObjectNode();
-
-        ArrayNode tableArr = readerConn.putArray("table");
-        for (String table : new String[]{dataXParameters.getSourceTable()}) {
-            tableArr.add(table);
-        }
-
-        ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-        urlArr.add(DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
-
-        readerConnArr.add(readerConn);
 
         ObjectNode readerParam = JSONUtils.createObjectNode();
-        readerParam.put("username", dataSourceCfg.getUser());
-        readerParam.put("password", decodePassword(dataSourceCfg.getPassword()));
 
-        if (dataXParameters.getCustomSQL() == Flag.YES.ordinal()) {
-            ArrayNode sqlArr = readerConn.putArray("querySql");
-            for (String sql : new String[]{dataXParameters.getSql()}) {
-                sqlArr.add(sql);
-            }
-        } else {
+        if (dataxTaskExecutionContext.getSourcetype().isHive()) {
+            HiveMetadata hiveMetadata = tryGetHiveTableMetadataFromDDL(dataSourceCfg, dataXParameters.getSourceTable());
             ArrayNode columnArr = readerParam.putArray("column");
-            for (String column : dataXParameters.getDsColumns()) {
-                columnArr.add(column);
+            if (CollectionUtils.isEmpty(dataXParameters.getDsColumns())) {
+                columnArr.add("*");
+            } else {
+                for (ColumnInfo columnInfo : dataXParameters.getDsColumns()) {
+                    if (columnInfo.isEnable()) {
+                        columnArr.add(getHiveSourceColumnNodeFromColumnInfo(columnInfo));
+                    }
+                }
             }
-            if (StringUtils.isNotEmpty(dataXParameters.getWhere())) {
-                readerParam.put("where", dataXParameters.getWhere());
+            readerParam.put("path", getHdfsFilePath(hiveMetadata.getPath(),true));
+            readerParam.put("defaultFS", hiveMetadata.getDefaultFS());
+            readerParam.put("fileType", hiveMetadata.getFileType());
+            readerParam.put("fieldDelimiter", hiveMetadata.getFieldDelimiter());
+        } else {
+            ObjectNode readerConn = JSONUtils.createObjectNode();
+            ArrayNode tableArr = readerConn.putArray("table");
+            for (String table : new String[]{dataXParameters.getSourceTable()}) {
+                tableArr.add(table);
             }
-        }
-        if (StringUtils.isNotEmpty(dataXParameters.getSplitPk())) {
-            readerParam.put("splitPk", dataXParameters.getSplitPk());
-        }
 
-        readerParam.putArray("connection").addAll(readerConnArr);
+            ArrayNode urlArr = readerConn.putArray("jdbcUrl");
+            urlArr.add(DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
+
+            readerConnArr.add(readerConn);
+
+            readerParam.put("username", dataSourceCfg.getUser());
+            readerParam.put("password", decodePassword(dataSourceCfg.getPassword()));
+
+            if (dataXParameters.getCustomSQL() == Flag.YES.ordinal()) {
+                ArrayNode sqlArr = readerConn.putArray("querySql");
+                for (String sql : new String[]{dataXParameters.getSql()}) {
+                    sqlArr.add(sql);
+                }
+            } else {
+                ArrayNode columnArr = readerParam.putArray("column");
+                for (ColumnInfo columnInfo : dataXParameters.getDsColumns()) {
+                    if (columnInfo.isEnable()) {
+                        columnArr.add(columnInfo.getColumnName());
+                    }
+                }
+                if (StringUtils.isNotEmpty(dataXParameters.getWhere())) {
+                    readerParam.put("where", dataXParameters.getWhere());
+                }
+            }
+            if (StringUtils.isNotEmpty(dataXParameters.getSplitPk())) {
+                readerParam.put("splitPk", dataXParameters.getSplitPk());
+            }
+
+            readerParam.putArray("connection").addAll(readerConnArr);
+        }
 
         ObjectNode reader = JSONUtils.createObjectNode();
         reader.put("name", DataxUtils.getReaderPluginName(dataxTaskExecutionContext.getSourcetype()));
@@ -369,67 +308,84 @@ public class DataxTask extends AbstractTaskExecutor {
         return reader;
     }
 
-    public ObjectNode buildDataxWriterJson(){
+    public ObjectNode buildDataxWriterJson() {
         BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                 dataxTaskExecutionContext.getTargetType(),
                 dataxTaskExecutionContext.getTargetConnectionParams());
-        List<ObjectNode> writerConnArr = new ArrayList<>();
-        ObjectNode writerConn = JSONUtils.createObjectNode();
-        ArrayNode tableArr = writerConn.putArray("table");
-        tableArr.add(dataXParameters.getTargetTable());
-
-        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
-        writerConnArr.add(writerConn);
-
         ObjectNode writerParam = JSONUtils.createObjectNode();
-        writerParam.put("username", dataTargetCfg.getUser());
-        writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
-
-        // only write to mysql has 3 write modes
-        if (dataxTaskExecutionContext.getTargetType().isMysql()) {
+        if (dataxTaskExecutionContext.getTargetType().isHive()) {
+            HiveMetadata hiveMetadata = tryGetHiveTableMetadataFromDDL(dataTargetCfg, dataXParameters.getTargetTable());
+            ArrayNode columnArr = writerParam.putArray("column");
+            for (ColumnInfo columnInfo : dataXParameters.getDtColumns()) {
+                if (columnInfo.isEnable()) {
+                    columnArr.add(getHiveTargetColumnNodeFromColumnInfo(columnInfo));
+                }
+            }
+            writerParam.put("fileName", dataXParameters.getTargetTable());
+            writerParam.put("defaultFS", hiveMetadata.getDefaultFS());
+            writerParam.put("path", getHdfsFilePath(hiveMetadata.getPath(), false));
+            writerParam.put("fileType", hiveMetadata.getFileType());
+            writerParam.put("fieldDelimiter", hiveMetadata.getFieldDelimiter());
             writerParam.put("writeMode", WriteMode.valueOf(dataXParameters.getWriteMode()).getDescp());
-        }
+        } else {
+            List<ObjectNode> writerConnArr = new ArrayList<>();
+            ObjectNode writerConn = JSONUtils.createObjectNode();
+            ArrayNode tableArr = writerConn.putArray("table");
+            tableArr.add(dataXParameters.getTargetTable());
 
-        if (dataXParameters.getCustomSQL() == Flag.YES.ordinal()){
-            BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                    dataxTaskExecutionContext.getSourcetype(),
-                    dataxTaskExecutionContext.getSourceConnectionParams());
+            writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
+            writerConnArr.add(writerConn);
 
-            String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
-                    dataxTaskExecutionContext.getTargetType(),
-                    dataSourceCfg, dataXParameters.getSql());
+            writerParam.put("username", dataTargetCfg.getUser());
+            writerParam.put("password", decodePassword(dataTargetCfg.getPassword()));
 
-            ArrayNode columnArr = writerParam.putArray("column");
-            for (String column : columns) {
-                columnArr.add(column);
-            }
-        }else {
-            ArrayNode columnArr = writerParam.putArray("column");
-            for (String column : dataXParameters.getDtColumns()) {
-                columnArr.add(column);
-            }
-        }
-        writerParam.putArray("connection").addAll(writerConnArr);
-
-        if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
-            ArrayNode preSqlArr = writerParam.putArray("preSql");
-            for (String preSql : dataXParameters.getPreStatements()) {
-                preSqlArr.add(preSql);
+            // only write to mysql has 3 write modes
+            if (dataxTaskExecutionContext.getTargetType().isMysql()) {
+                writerParam.put("writeMode", WriteMode.valueOf(dataXParameters.getWriteMode()).getDescp());
             }
 
-        }
+            if (dataXParameters.getCustomSQL() == Flag.YES.ordinal()) {
+                BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                        dataxTaskExecutionContext.getSourcetype(),
+                        dataxTaskExecutionContext.getSourceConnectionParams());
 
-        if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
-            ArrayNode postSqlArr = writerParam.putArray("postSql");
-            for (String postSql : dataXParameters.getPostStatements()) {
-                postSqlArr.add(postSql);
+                String[] columns = parsingSqlColumnNames(dataxTaskExecutionContext.getSourcetype(),
+                        dataxTaskExecutionContext.getTargetType(),
+                        dataSourceCfg, dataXParameters.getSql());
+
+                ArrayNode columnArr = writerParam.putArray("column");
+                for (String column : columns) {
+                    columnArr.add(column);
+                }
+            } else {
+                ArrayNode columnArr = writerParam.putArray("column");
+                for (ColumnInfo columnInfo : dataXParameters.getDtColumns()) {
+                    columnArr.add(columnInfo.getColumnName());
+                }
+            }
+            writerParam.putArray("connection").addAll(writerConnArr);
+
+            if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
+                ArrayNode preSqlArr = writerParam.putArray("preSql");
+                for (String preSql : dataXParameters.getPreStatements()) {
+                    preSqlArr.add(preSql);
+                }
+
+            }
+
+            if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
+                ArrayNode postSqlArr = writerParam.putArray("postSql");
+                for (String postSql : dataXParameters.getPostStatements()) {
+                    postSqlArr.add(postSql);
+                }
+            }
+
+            if (dataXParameters.getBatchSize() > 0) {
+                writerParam.put("batchSize", dataXParameters.getBatchSize());
             }
         }
 
-        if (dataXParameters.getBatchSize() > 0){
-            writerParam.put("batchSize", dataXParameters.getBatchSize());
 
-        }
         ObjectNode writer = JSONUtils.createObjectNode();
         writer.put("name", DataxUtils.getWriterPluginName(dataxTaskExecutionContext.getTargetType()));
         writer.set("parameter", writerParam);
@@ -445,13 +401,14 @@ public class DataxTask extends AbstractTaskExecutor {
 
         ObjectNode speed = JSONUtils.createObjectNode();
 
-        if (dataXParameters.getJobSpeedByte() > 0) {
-            speed.put("byte", dataXParameters.getJobSpeedByte());
-        }
-
-        if (dataXParameters.getJobSpeedRecord() > 0) {
-            speed.put("record", dataXParameters.getJobSpeedRecord());
-        }
+        // job speed for per channel
+//        if (dataXParameters.getJobSpeedByte() > 0) {
+//            speed.put("byte", dataXParameters.getJobSpeedByte());
+//        }
+//
+//        if (dataXParameters.getJobSpeedRecord() > 0) {
+//            speed.put("record", dataXParameters.getJobSpeedRecord());
+//        }
 
         speed.put("channel", dataXParameters.getChannel() == 0 ? DATAX_CHANNEL_COUNT : dataXParameters.getChannel());
 
@@ -697,4 +654,86 @@ public class DataxTask extends AbstractTaskExecutor {
         }
     }
 
+    public HiveMetadata tryGetHiveTableMetadataFromDDL(BaseConnectionParam baseDataSource, String table) {
+        String[] columnNames;
+        String sql = String.format("SHOW CREATE TABLE %s", table);
+
+        try (
+                Connection connection = DataSourceClientProvider.getInstance().getConnection(DbType.HIVE, baseDataSource);
+                PreparedStatement stmt = connection.prepareStatement(sql);
+                ResultSet resultSet = stmt.executeQuery()) {
+            StringBuilder ddlBuilder = new StringBuilder();
+            while (resultSet.next()){
+                ddlBuilder.append(resultSet.getString(1)).append('\n');
+            }
+            String ddl = ddlBuilder.toString();
+            Pattern fieldDelimiterPattern = Pattern.compile("'field.delim'='(.*?)'");
+            Matcher fieldDelimiterMatcher = fieldDelimiterPattern.matcher(ddl);
+            Pattern inputFormatPattern = Pattern.compile("INPUTFORMAT\\s*\\n\\s*'(.*?)'");
+            Matcher inputFormatMatcher = inputFormatPattern.matcher(ddl);
+            Pattern locationPattern = Pattern.compile("LOCATION\\s*\\n\\s*'(.*?)'");
+            Matcher locationMatcher = locationPattern.matcher(ddl);
+            HiveMetadata hiveMetadata = new HiveMetadata();
+            if (fieldDelimiterMatcher.find()){
+                String fd = fieldDelimiterMatcher.group(1);
+                fd = fd.replace("\\t","\t");
+                hiveMetadata.setFieldDelimiter(fd);
+            }
+            if (inputFormatMatcher.find()){
+                String input = inputFormatMatcher.group(1);
+                if (input.contains("TextInputFormat")){
+                    hiveMetadata.setFileType("text");
+                }else if (input.contains("OrcInputFormat")){
+                    hiveMetadata.setFileType("orc");
+                }else {
+                    throw new RuntimeException("parse hive metadata failed: only support orcfile and textfile");
+                }
+            }
+            if (locationMatcher.find()) {
+                String location = locationMatcher.group(1);
+                hiveMetadata.setLocation(location);
+            }
+            if(!hiveMetadata.checkParameters()){
+                throw new RuntimeException("parse hive metadata from ddl failed");
+            }
+            return hiveMetadata;
+        } catch (SQLException | ExecutionException e) {
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private ObjectNode getHiveTargetColumnNodeFromColumnInfo(ColumnInfo columnInfo){
+        ObjectNode columnNode = JSONUtils.createObjectNode();
+        columnNode.put("name", columnInfo.getColumnName());
+        columnNode.put("type",columnInfo.getDataType());
+        return columnNode;
+    }
+
+    private ObjectNode getHiveSourceColumnNodeFromColumnInfo(ColumnInfo columnInfo){
+        ObjectNode columnNode = JSONUtils.createObjectNode();
+        if(columnInfo.getIndex() >= 0){
+            columnNode.put("index", columnInfo.getIndex());
+            // TODO: hardcode dataType as string
+            columnNode.put("type","string");
+        }else {
+            columnNode.put("value", columnInfo.getColumnName());
+            columnNode.put("type","string");
+        }
+        return columnNode;
+    }
+
+    private String getHdfsFilePath(String basePath, boolean isReader){
+        if(isReader){
+            if (CollectionUtils.isNotEmpty(dataXParameters.getDsPartitions())){
+                return String.format("%s/%s/*",basePath, StringUtils.join(dataXParameters.getDsPartitions(),"/"));
+            }
+            return basePath + "/*";
+        }else {
+            if (CollectionUtils.isNotEmpty(dataXParameters.getDtPartitions())){
+                return String.format("%s/%s",basePath, StringUtils.join(dataXParameters.getDtPartitions(),"/"));
+            }
+            return basePath;
+        }
+    }
 }

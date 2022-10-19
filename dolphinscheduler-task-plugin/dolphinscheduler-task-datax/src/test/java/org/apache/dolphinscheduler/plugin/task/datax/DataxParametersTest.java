@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
+import org.apache.dolphinscheduler.plugin.task.datax.entity.DataxParameters;
 import org.junit.Assert;
 import org.junit.Test;
 
