@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-
 public class DvcTaskChannel implements TaskChannel {
 
     @Override
@@ -48,4 +47,3 @@ public class DvcTaskChannel implements TaskChannel {
     }
 
 }
-

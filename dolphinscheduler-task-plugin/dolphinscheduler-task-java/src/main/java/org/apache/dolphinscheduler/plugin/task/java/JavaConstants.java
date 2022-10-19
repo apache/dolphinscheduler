@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import java.io.File;
-
 public class JavaConstants {
 
     private JavaConstants() {

@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.alert.api;
 
 public final class AlertConstants {
+
     /**
      * the field name of alert show type
      **/

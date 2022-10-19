@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * alert sending(execution) status
  */
 public enum AlertStatus {
+
     /**
      * 0 waiting executed; 1 execute successfully，2 execute failed
      */

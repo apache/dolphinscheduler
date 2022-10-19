@@ -38,7 +38,7 @@ public class SessionMapperTest extends BaseDaoTest {
      * @return Session
      */
     private Session insertOne() {
-        //insertOne
+        // insertOne
         Session session = new Session();
         session.setId(UUID.randomUUID().toString());
         session.setLastLoginTime(new Date());
@@ -51,11 +51,11 @@ public class SessionMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOne
+    public void testUpdate() {
+        // insertOne
         Session session = insertOne();
         session.setLastLoginTime(new Date());
-        //update
+        // update
         int update = sessionMapper.updateById(session);
         Assertions.assertEquals(update, 1);
     }
@@ -64,7 +64,7 @@ public class SessionMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Session session = insertOne();
         int delete = sessionMapper.deleteById(session.getId());
         Assertions.assertEquals(delete, 1);
@@ -76,7 +76,7 @@ public class SessionMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Session session = insertOne();
-        //query
+        // query
         List<Session> sessions = sessionMapper.selectList(null);
         Assertions.assertNotEquals(sessions.size(), 0);
     }

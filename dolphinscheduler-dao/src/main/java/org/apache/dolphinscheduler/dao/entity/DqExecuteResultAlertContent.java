@@ -35,7 +35,7 @@ public class DqExecuteResultAlertContent implements Serializable {
      * process define name
      */
     @JsonProperty("processDefinitionName")
-    private String  processDefinitionName;
+    private String processDefinitionName;
     /**
      * process_instance_id
      */
@@ -141,8 +141,9 @@ public class DqExecuteResultAlertContent implements Serializable {
     }
 
     public static class Builder {
+
         private long processDefinitionId;
-        private String  processDefinitionName;
+        private String processDefinitionName;
         private long processInstanceId;
         private String processInstanceName;
         private long taskInstanceId;

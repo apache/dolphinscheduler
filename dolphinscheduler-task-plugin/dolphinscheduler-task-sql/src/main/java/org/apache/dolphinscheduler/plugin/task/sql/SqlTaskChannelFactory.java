@@ -27,6 +27,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class SqlTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public String getName() {
         return "SQL";

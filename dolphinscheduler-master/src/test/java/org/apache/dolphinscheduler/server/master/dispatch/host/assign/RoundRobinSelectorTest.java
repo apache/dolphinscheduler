@@ -40,13 +40,13 @@ public class RoundRobinSelectorTest {
     public void testSelect1() {
         RoundRobinSelector selector = new RoundRobinSelector();
         List<HostWorker> hostOneList = Arrays.asList(
-            new HostWorker("192.168.1.1", 80, 20, "kris"),
-            new HostWorker("192.168.1.2", 80, 10, "kris"));
+                new HostWorker("192.168.1.1", 80, 20, "kris"),
+                new HostWorker("192.168.1.2", 80, 10, "kris"));
 
         List<HostWorker> hostTwoList = Arrays.asList(
-            new HostWorker("192.168.1.1", 80, 20, "kris"),
-            new HostWorker("192.168.1.2", 80, 10, "kris"),
-            new HostWorker("192.168.1.3", 80, 10, "kris"));
+                new HostWorker("192.168.1.1", 80, 20, "kris"),
+                new HostWorker("192.168.1.2", 80, 10, "kris"),
+                new HostWorker("192.168.1.3", 80, 10, "kris"));
 
         HostWorker result;
         result = selector.select(hostOneList);
@@ -98,7 +98,8 @@ public class RoundRobinSelectorTest {
         RoundRobinSelector selector = new RoundRobinSelector();
         HostWorker result;
         result = selector.select(
-            Arrays.asList(new HostWorker("192.168.1.1", 11, 20, "kris"), new HostWorker("192.168.1.2", 22, 80, "kris")));
+                Arrays.asList(new HostWorker("192.168.1.1", 11, 20, "kris"),
+                        new HostWorker("192.168.1.2", 22, 80, "kris")));
         Assertions.assertEquals("192.168.1.2", result.getIp());
     }
 

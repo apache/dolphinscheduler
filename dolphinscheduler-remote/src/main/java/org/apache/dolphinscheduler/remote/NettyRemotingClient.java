@@ -17,17 +17,6 @@
 
 package org.apache.dolphinscheduler.remote;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -46,8 +35,6 @@ import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,6 +46,21 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
 public class NettyRemotingClient implements AutoCloseable {
 
@@ -87,9 +89,11 @@ public class NettyRemotingClient implements AutoCloseable {
     public NettyRemotingClient(final NettyClientConfig clientConfig) {
         this.clientConfig = clientConfig;
         if (Epoll.isAvailable()) {
-            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
+            this.workerGroup =
+                    new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
         } else {
-            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
+            this.workerGroup =
+                    new NioEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
         }
         this.callbackExecutor = new ThreadPoolExecutor(
                 Constants.CPUS,
@@ -101,7 +105,8 @@ public class NettyRemotingClient implements AutoCloseable {
                 new CallerThreadExecutePolicy());
         this.clientHandler = new NettyClientHandler(this, callbackExecutor);
 
-        this.responseFutureExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ResponseFutureExecutor"));
+        this.responseFutureExecutor =
+                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ResponseFutureExecutor"));
 
         this.start();
     }
@@ -117,14 +122,18 @@ public class NettyRemotingClient implements AutoCloseable {
                 .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
                 .handler(new ChannelInitializer<SocketChannel>() {
+
                     @Override
                     public void initChannel(SocketChannel ch) {
                         ch.pipeline()
-                                .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
+                                .addLast("client-idle-handler",
+                                        new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0,
+                                                TimeUnit.MILLISECONDS))
                                 .addLast(new NettyDecoder(), clientHandler, encoder);
                     }
                 });
-        this.responseFutureExecutor.scheduleAtFixedRate(ResponseFuture::scanFutureTable, 5000, 1000, TimeUnit.MILLISECONDS);
+        this.responseFutureExecutor.scheduleAtFixedRate(ResponseFuture::scanFutureTable, 5000, 1000,
+                TimeUnit.MILLISECONDS);
         isStarted.compareAndSet(false, true);
     }
 
@@ -148,14 +157,14 @@ public class NettyRemotingClient implements AutoCloseable {
          */
         final long opaque = command.getOpaque();
         /*
-         *  control concurrency number
+         * control concurrency number
          */
         boolean acquired = this.asyncSemaphore.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
         if (acquired) {
             final ReleaseSemaphore releaseSemaphore = new ReleaseSemaphore(this.asyncSemaphore);
 
             /*
-             *  response future
+             * response future
              */
             final ResponseFuture responseFuture = new ResponseFuture(opaque,
                     timeoutMillis,
@@ -184,7 +193,8 @@ public class NettyRemotingClient implements AutoCloseable {
                 throw new RemotingException(String.format("send command to host: %s failed", host), ex);
             }
         } else {
-            String message = String.format("try to acquire async semaphore timeout: %d, waiting thread num: %d, total permits: %d",
+            String message = String.format(
+                    "try to acquire async semaphore timeout: %d, waiting thread num: %d, total permits: %d",
                     timeoutMillis, asyncSemaphore.getQueueLength(), asyncSemaphore.availablePermits());
             throw new RemotingTooMuchRequestException(message);
         }
@@ -198,7 +208,8 @@ public class NettyRemotingClient implements AutoCloseable {
      * @param timeoutMillis timeoutMillis
      * @return command
      */
-    public Command sendSync(final Host host, final Command command, final long timeoutMillis) throws InterruptedException, RemotingException {
+    public Command sendSync(final Host host, final Command command,
+                            final long timeoutMillis) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(host);
         if (channel == null) {
             throw new RemotingException(String.format("connect to : %s fail", host));
@@ -254,7 +265,8 @@ public class NettyRemotingClient implements AutoCloseable {
             throw remotingException;
         } catch (Exception e) {
             logger.error("Send command {} to address {} encounter error.", command, host.getAddress());
-            throw new RemotingException(String.format("Send command : %s , to :%s encounter error", command, host.getAddress()), e);
+            throw new RemotingException(
+                    String.format("Send command : %s , to :%s encounter error", command, host.getAddress()), e);
         }
     }
 
@@ -275,7 +287,8 @@ public class NettyRemotingClient implements AutoCloseable {
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+                                  final ExecutorService executor) {
         this.clientHandler.registerProcessor(commandType, processor, executor);
     }
 
