@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import static org.apache.dolphinscheduler.api.enums.Status.ADD_TASK_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -27,6 +29,13 @@ import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,14 +45,9 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.annotation.Resource;
-import java.util.List;
-
-import static org.apache.dolphinscheduler.api.enums.Status.ADD_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * fav controller

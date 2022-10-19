@@ -19,5 +19,5 @@ package org.apache.dolphinscheduler.common.enums;
 
 public enum AlertEvent {
 
-    SERVER_DOWN,TIME_OUT
+    SERVER_DOWN, TIME_OUT
 }

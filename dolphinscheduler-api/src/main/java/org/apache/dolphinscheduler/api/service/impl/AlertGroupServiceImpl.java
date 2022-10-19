@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -48,8 +53,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
-
 /**
  * alert group service impl
  */
@@ -74,7 +77,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             alertGroups = alertGroupMapper.queryAllGroupList();
         } else {
-            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
+            Set<Integer> ids = resourcePermissionCheckService
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
             if (ids.isEmpty()) {
                 result.put(Constants.DATA_LIST, Collections.emptyList());
                 putMsg(result, Status.SUCCESS);
@@ -99,12 +103,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        //only admin can operate
-        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.ALERT_GROUP,ALERT_GROUP_VIEW)) {
+        // only admin can operate
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_VIEW)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        //check if exist
+        // check if exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
@@ -134,7 +138,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             alertGroupPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
         } else {
-            Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
+            Set<Integer> ids = resourcePermissionCheckService
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
             if (ids.isEmpty()) {
                 result.setData(pageInfo);
                 putMsg(result, Status.SUCCESS);
@@ -161,14 +166,15 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      */
     @Override
     @Transactional
-    public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
+    public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc,
+                                                String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
+        // only admin can operate
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
@@ -189,7 +195,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             if (insert > 0) {
                 result.put(Constants.DATA_LIST, alertGroup);
                 putMsg(result, Status.SUCCESS);
-                permissionPostHandle(AuthorizationType.ALERT_GROUP, loginUser.getId(), Collections.singletonList(alertGroup.getId()), logger);
+                permissionPostHandle(AuthorizationType.ALERT_GROUP, loginUser.getId(),
+                        Collections.singletonList(alertGroup.getId()), logger);
                 logger.info("Create alert group complete, groupName:{}", alertGroup.getGroupName());
             } else {
                 logger.error("Create alert group error, groupName:{}", alertGroup.getGroupName());
@@ -214,14 +221,15 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
+    public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc,
+                                                String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if (!canOperatorPermissions(loginUser, new Object[]{id},AuthorizationType.ALERT_GROUP,ALERT_GROUP_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if(checkDescriptionLength(desc)){
+        if (checkDescriptionLength(desc)) {
             logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
@@ -268,8 +276,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        //only admin can operate
-        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.ALERT_GROUP,ALERT_GROUP_DELETE)) {
+        // only admin can operate
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -281,7 +289,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
 
-        //check exist
+        // check exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
             logger.error("Alert group does not exist, id:{}.", id);

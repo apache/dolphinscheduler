@@ -16,24 +16,25 @@
  */
 package org.apache.dolphinscheduler.dao.utils;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /**
  * resource process definition utils test
  */
 public class ResourceProcessDefinitionUtilsTest {
+
     @Test
-    public void getResourceProcessDefinitionMapTest(){
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>();
-        map.put("code",1L);
-        map.put("resource_ids","1,2,3");
+    public void getResourceProcessDefinitionMapTest() {
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", 1L);
+        map.put("resource_ids", "1,2,3");
         mapList.add(map);
         Assertions.assertNotNull(ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(mapList));
     }

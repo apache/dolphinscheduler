@@ -38,26 +38,19 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINI
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import springfox.documentation.annotations.ApiIgnore;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -685,7 +678,8 @@ public class ProcessDefinitionController extends BaseController {
                                                       @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
 
-        Map<String, Object> result = processDefinitionService.batchDeleteProcessDefinitionByCodes(loginUser, projectCode, codes);
+        Map<String, Object> result =
+                processDefinitionService.batchDeleteProcessDefinitionByCodes(loginUser, projectCode, codes);
         return returnDataList(result);
     }
 

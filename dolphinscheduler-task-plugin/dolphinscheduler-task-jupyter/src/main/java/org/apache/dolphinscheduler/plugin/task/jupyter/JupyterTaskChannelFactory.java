@@ -27,6 +27,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class JupyterTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public String getName() {
         return "JUPYTER";

@@ -32,7 +32,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 public interface AccessTokenMapper extends BaseMapper<AccessToken> {
 
-
     /**
      * access token page
      *
@@ -43,8 +42,7 @@ public interface AccessTokenMapper extends BaseMapper<AccessToken> {
      */
     IPage<AccessToken> selectAccessTokenPage(Page page,
                                              @Param("userName") String userName,
-                                             @Param("userId") int userId
-    );
+                                             @Param("userId") int userId);
 
     /**
      * Query access token for specified user
@@ -68,5 +66,6 @@ public interface AccessTokenMapper extends BaseMapper<AccessToken> {
      * @param accessTokensIds
      * @return access token for specified user
      */
-    List<AccessToken> listAuthorizedAccessToken(@Param("userId") int userId, @Param("accessTokensIds")List<Integer> accessTokensIds);
+    List<AccessToken> listAuthorizedAccessToken(@Param("userId") int userId,
+                                                @Param("accessTokensIds") List<Integer> accessTokensIds);
 }

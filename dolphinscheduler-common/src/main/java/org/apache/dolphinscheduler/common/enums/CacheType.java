@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.enums;
 
 public enum CacheType {
+
     TENANT("tenant"),
     USER("user"),
     QUEUE("queue"),

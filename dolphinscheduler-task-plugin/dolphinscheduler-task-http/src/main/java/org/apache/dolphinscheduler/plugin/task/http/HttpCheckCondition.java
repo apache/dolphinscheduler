@@ -27,6 +27,6 @@ public enum HttpCheckCondition {
      * 2 body_contains
      * 3 body_not_contains
      */
-    STATUS_CODE_DEFAULT,STATUS_CODE_CUSTOM, BODY_CONTAINS, BODY_NOT_CONTAINS
+    STATUS_CODE_DEFAULT, STATUS_CODE_CUSTOM, BODY_CONTAINS, BODY_NOT_CONTAINS
 
 }

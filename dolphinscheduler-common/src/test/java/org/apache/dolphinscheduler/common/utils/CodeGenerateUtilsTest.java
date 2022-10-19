@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.HashSet;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-
 public class CodeGenerateUtilsTest {
+
     @Test
     public void testNoGenerateDuplicateCode() throws CodeGenerateUtils.CodeGenerateException {
         HashSet<Long> existsCode = new HashSet<>();

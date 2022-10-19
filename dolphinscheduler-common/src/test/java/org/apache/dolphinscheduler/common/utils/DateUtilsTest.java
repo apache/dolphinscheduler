@@ -18,18 +18,20 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import javax.management.timer.Timer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
+
+import javax.management.timer.Timer;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DateUtilsTest {
 
@@ -226,7 +228,8 @@ public class DateUtilsTest {
         Assertions.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(defaultTimeZoneDate));
 
         Date targetTimeZoneDate = DateUtils.transformTimezoneDate(date, TimeZone.getDefault().getID(), "Asia/Shanghai");
-        Assertions.assertEquals(DateUtils.dateToString(date, TimeZone.getDefault().getID()), DateUtils.dateToString(targetTimeZoneDate, "Asia/Shanghai"));
+        Assertions.assertEquals(DateUtils.dateToString(date, TimeZone.getDefault().getID()),
+                DateUtils.dateToString(targetTimeZoneDate, "Asia/Shanghai"));
     }
 
     @Test
@@ -286,7 +289,7 @@ public class DateUtilsTest {
     @Test
     public void testTimeStampToDate() {
         long timeStamp = 1664456400000L;
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         String sd = sdf.format(new Date(timeStamp));
         Assertions.assertEquals("2022-09-29 21:00:00", sd);

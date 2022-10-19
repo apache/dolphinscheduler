@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * task savepoint response command

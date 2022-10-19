@@ -50,7 +50,8 @@ public interface K8sNamespaceService {
      * @param limitsMemory limits memory, can null means not limit
      * @return
      */
-    Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode, Double limitsCpu, Integer limitsMemory);
+    Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode, Double limitsCpu,
+                                           Integer limitsMemory);
 
     /**
      * update K8s Namespace tag and resource limit
@@ -61,7 +62,8 @@ public interface K8sNamespaceService {
      * @param limitsMemory max memory
      * @return
      */
-    Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu, Integer limitsMemory);
+    Map<String, Object> updateK8sNamespace(User loginUser, int id, String userName, Double limitsCpu,
+                                           Integer limitsMemory);
 
     /**
      * verify namespace and k8s

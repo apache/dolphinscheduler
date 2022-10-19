@@ -25,8 +25,8 @@ public class WechatAppChatMessage {
 
     private String chatid;
     private String msgtype;
-    private Map<String,String> text;
-    private Map<String,String> markdown;
+    private Map<String, String> text;
+    private Map<String, String> markdown;
     private Integer safe;
 
     public String getChatid() {

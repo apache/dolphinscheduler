@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.clickhouse.param;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
 public class ClickHouseConnectionParam extends BaseConnectionParam {
+
     @Override
     public String toString() {
         return "ClickHouseConnectionParam{"

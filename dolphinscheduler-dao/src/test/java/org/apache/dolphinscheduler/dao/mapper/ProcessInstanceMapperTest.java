@@ -25,11 +25,10 @@ import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Date;
 import java.util.List;
-
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -306,7 +305,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.updateById(processInstance);
 
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null, processInstance.getTestFlag());
+                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null,
+                        processInstance.getTestFlag());
         Assertions.assertNotEquals(processInstance1, null);
         processInstanceMapper.deleteById(processInstance.getId());
     }
@@ -325,7 +325,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 WorkflowExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
 
         ProcessInstance processInstance1 = processInstanceMapper
-                .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null, processInstance.getTestFlag(), stateArray);
+                .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null,
+                        processInstance.getTestFlag(), stateArray);
 
         Assertions.assertNotEquals(processInstance1, null);
         processInstanceMapper.deleteById(processInstance.getId());
@@ -342,12 +343,14 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         Date start = new Date(2019 - 1900, 1 - 1, 01, 0, 0, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 01, 5, 0, 0);
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end, processInstance.getTestFlag());
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end,
+                        processInstance.getTestFlag());
         Assertions.assertEquals(processInstance1.getId(), processInstance.getId());
 
         start = new Date(2019 - 1900, 1 - 1, 01, 1, 0, 0);
         processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end, processInstance.getTestFlag());
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end,
+                        processInstance.getTestFlag());
         Assertions.assertNull(processInstance1);
 
         processInstanceMapper.deleteById(processInstance.getId());

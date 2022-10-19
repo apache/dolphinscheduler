@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

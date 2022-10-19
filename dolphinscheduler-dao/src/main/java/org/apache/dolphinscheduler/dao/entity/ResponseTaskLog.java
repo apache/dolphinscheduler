@@ -26,6 +26,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ResponseTaskLog {
+
     private int lineNum;
     private String message;
 }

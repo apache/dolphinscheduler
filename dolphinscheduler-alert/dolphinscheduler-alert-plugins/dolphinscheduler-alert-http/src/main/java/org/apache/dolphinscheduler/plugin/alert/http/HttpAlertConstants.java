@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.http;
 
 public final class HttpAlertConstants {
+
     public static final String URL = "$t('url')";
 
     public static final String NAME_URL = "url";

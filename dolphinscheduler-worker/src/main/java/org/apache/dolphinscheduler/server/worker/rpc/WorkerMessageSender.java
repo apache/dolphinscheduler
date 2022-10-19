@@ -29,13 +29,13 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import lombok.NonNull;
 
 @Component
 public class WorkerMessageSender {
@@ -54,7 +54,7 @@ public class WorkerMessageSender {
     public void init() {
         Map<String, MessageSender> messageSenders = applicationContext.getBeansOfType(MessageSender.class);
         messageSenders.values().forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
-                                                                              messageSender));
+                messageSender));
     }
 
     // todo: use message rather than context

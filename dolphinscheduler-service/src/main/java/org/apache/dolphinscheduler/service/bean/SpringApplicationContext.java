@@ -38,7 +38,7 @@ public class SpringApplicationContext implements ApplicationContextAware, AutoCl
      */
     @Override
     public void close() {
-        ((AbstractApplicationContext)applicationContext).close();
+        ((AbstractApplicationContext) applicationContext).close();
     }
 
     public static <T> T getBean(Class<T> requiredType) {

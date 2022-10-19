@@ -34,8 +34,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = "engine")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = SeatunnelFlinkParameters.class, name = "FLINK"),
-    @JsonSubTypes.Type(value = SeatunnelSparkParameters.class, name = "SPARK")
+        @JsonSubTypes.Type(value = SeatunnelFlinkParameters.class, name = "FLINK"),
+        @JsonSubTypes.Type(value = SeatunnelSparkParameters.class, name = "SPARK")
 })
 public class SeatunnelParameters extends AbstractParameters {
 
@@ -86,7 +86,8 @@ public class SeatunnelParameters extends AbstractParameters {
     public boolean checkParameters() {
         return Objects.nonNull(engine)
                 && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
-                || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList) && resourceList.size() == 1));
+                        || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList)
+                                && resourceList.size() == 1));
     }
 
     @Override

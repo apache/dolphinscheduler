@@ -28,6 +28,6 @@ import java.util.Map;
  */
 public interface IRuleParser {
 
-    DataQualityConfiguration parse(Map<String,String> inputParameterValue,
+    DataQualityConfiguration parse(Map<String, String> inputParameterValue,
                                    DataQualityTaskExecutionContext context) throws DataQualityException;
 }

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.registry.api;
 
-import lombok.Data;
-
 import java.time.Duration;
+
+import lombok.Data;
 
 @Data
 public class ConnectStrategyProperties {

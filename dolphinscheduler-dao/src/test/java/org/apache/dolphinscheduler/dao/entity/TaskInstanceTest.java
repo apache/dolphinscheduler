@@ -42,19 +42,19 @@ public class TaskInstanceTest {
     public void testTaskInstanceIsSubProcess() {
         TaskInstance taskInstance = new TaskInstance();
 
-        //sub process
+        // sub process
         taskInstance.setTaskType(TASK_TYPE_SUB_PROCESS);
         Assertions.assertTrue(taskInstance.isSubProcess());
 
-        //not sub process
+        // not sub process
         taskInstance.setTaskType("HTTP");
         Assertions.assertFalse(taskInstance.isSubProcess());
 
-        //sub process
+        // sub process
         taskInstance.setTaskType(TASK_TYPE_CONDITIONS);
         Assertions.assertTrue(taskInstance.isConditionsTask());
 
-        //sub process
+        // sub process
         taskInstance.setTaskType(TASK_TYPE_DEPENDENT);
         Assertions.assertTrue(taskInstance.isDependTask());
     }

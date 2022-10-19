@@ -45,7 +45,8 @@ public class NetUtilsTest {
             when(address.getCanonicalHostName())
                     .thenReturn("dolphinscheduler-worker-0.dolphinscheduler-worker-headless.default.svc.cluster.local");
             when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
-            Assertions.assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless", NetUtils.getHost(address));
+            Assertions.assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless",
+                    NetUtils.getHost(address));
 
             address = mock(InetAddress.class);
             when(address.getCanonicalHostName())

@@ -205,7 +205,8 @@ public class TenantServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+        Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1,
+                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
                 .thenReturn(getInstanceList());
         Mockito.when(processDefinitionMapper.queryDefinitionListByTenant(2)).thenReturn(getDefinitionsList());
         Mockito.when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());

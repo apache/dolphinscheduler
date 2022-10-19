@@ -19,15 +19,16 @@ package org.apache.dolphinscheduler.service.utils;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * configuration test

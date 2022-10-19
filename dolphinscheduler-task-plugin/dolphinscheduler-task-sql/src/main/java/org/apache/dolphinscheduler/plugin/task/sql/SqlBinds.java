@@ -25,6 +25,7 @@ import java.util.Map;
  * Used to contains both prepared sql string and its to-be-bind parameters
  */
 public class SqlBinds {
+
     private final String sql;
     private final Map<Integer, Property> paramsMap;
 

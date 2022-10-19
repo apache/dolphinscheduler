@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -39,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.auto.service.AutoService;
 
 /**
@@ -183,13 +183,15 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     protected void convertExeEnvironmentOnlineToTest() {
-        //SQL taskType
+        // SQL taskType
         if (TaskConstants.TASK_TYPE_SQL.equals(taskInstance.getTaskType())) {
-            //replace test data source
-            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
-            Map<String, Object> taskInstanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
+            // replace test data source
+            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(
+                    taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            Map<String, Object> taskInstanceParams =
+                    JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
             Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(Constants.DATASOUCE);
             Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
             taskDefinitionParams.put(Constants.DATASOUCE, testDataSourceId);

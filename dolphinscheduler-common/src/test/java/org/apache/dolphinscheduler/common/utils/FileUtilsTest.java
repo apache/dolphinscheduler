@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+
 import org.apache.dolphinscheduler.common.Constants;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
 @ExtendWith(MockitoExtension.class)
 public class FileUtilsTest {

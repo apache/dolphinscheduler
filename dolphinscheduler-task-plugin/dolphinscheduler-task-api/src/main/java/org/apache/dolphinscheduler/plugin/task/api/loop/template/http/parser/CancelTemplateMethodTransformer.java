@@ -25,8 +25,9 @@ import java.util.Map;
 
 import lombok.NonNull;
 
-public class CancelTemplateMethodTransformer implements
-    TemplateMethodTransformer<LoopTaskYamlDefinition.LoopTaskCancelYamlDefinition, HttpLoopTaskCancelTaskMethodDefinition> {
+public class CancelTemplateMethodTransformer
+        implements
+            TemplateMethodTransformer<LoopTaskYamlDefinition.LoopTaskCancelYamlDefinition, HttpLoopTaskCancelTaskMethodDefinition> {
 
     @Override
     public @NonNull HttpLoopTaskCancelTaskMethodDefinition transform(@NonNull LoopTaskYamlDefinition.LoopTaskCancelYamlDefinition loopTaskAPIYamlDefinition) {
@@ -37,10 +38,10 @@ public class CancelTemplateMethodTransformer implements
         Map<String, Object> requestParams = loopTaskAPIYamlDefinition.getRequestParams();
         Map<String, Object> requestBody = loopTaskAPIYamlDefinition.getRequestBody();
         return new HttpLoopTaskCancelTaskMethodDefinition(url,
-                                                          method,
-                                                          dataType,
-                                                          httpHeaders,
-                                                          requestParams,
-                                                          requestBody);
+                method,
+                dataType,
+                httpHeaders,
+                requestParams,
+                requestBody);
     }
 }

@@ -28,13 +28,13 @@ import java.util.Set;
  */
 public class Config {
 
-    private Map<String,Object> configuration = new HashMap<>();
+    private Map<String, Object> configuration = new HashMap<>();
 
     public Config() {
 
     }
 
-    public Config(Map<String,Object> configuration) {
+    public Config(Map<String, Object> configuration) {
         if (configuration != null) {
             this.configuration = configuration;
         }
@@ -45,7 +45,7 @@ public class Config {
     }
 
     public List<String> getStringList(String key) {
-        return (List<String>)configuration.get(key);
+        return (List<String>) configuration.get(key);
     }
 
     public Integer getInt(String key) {
@@ -81,7 +81,7 @@ public class Config {
     }
 
     public void put(String key, Object value) {
-        this.configuration.put(key,value);
+        this.configuration.put(key, value);
     }
 
     public void merge(Map<String, Object> configuration) {

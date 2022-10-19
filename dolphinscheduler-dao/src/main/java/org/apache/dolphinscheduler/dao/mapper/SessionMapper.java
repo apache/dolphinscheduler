@@ -17,10 +17,12 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.Session;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * session mapper interface
@@ -40,6 +42,6 @@ public interface SessionMapper extends BaseMapper<Session> {
      * @param ip ip
      * @return session
      */
-    Session queryByUserIdAndIp(@Param("userId") int userId,@Param("ip") String ip);
+    Session queryByUserIdAndIp(@Param("userId") int userId, @Param("ip") String ip);
 
 }

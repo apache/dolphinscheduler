@@ -44,8 +44,8 @@ public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand>
 
     public TaskRejectCommand buildMessage(TaskExecutionContext taskExecutionContext, String masterAddress) {
         TaskRejectCommand taskRejectMessage = new TaskRejectCommand(workerConfig.getWorkerAddress(),
-                                                                    masterAddress,
-                                                                    System.currentTimeMillis());
+                masterAddress,
+                System.currentTimeMillis());
         taskRejectMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskRejectMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskRejectMessage.setHost(taskExecutionContext.getHost());

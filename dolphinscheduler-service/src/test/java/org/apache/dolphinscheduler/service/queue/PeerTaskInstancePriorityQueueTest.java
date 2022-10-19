@@ -20,10 +20,11 @@ package org.apache.dolphinscheduler.service.queue;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PeerTaskInstancePriorityQueueTest {
 
@@ -47,7 +48,6 @@ public class PeerTaskInstancePriorityQueueTest {
         Assertions.assertTrue(queue.size() < peekBeforeLength);
     }
 
-
     @Test
     public void poll() throws Exception {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
@@ -64,7 +64,7 @@ public class PeerTaskInstancePriorityQueueTest {
     }
 
     @Test
-    public void peekTaskGroupPriority() throws Exception{
+    public void peekTaskGroupPriority() throws Exception {
         PeerTaskInstancePriorityQueue queue = new PeerTaskInstancePriorityQueue();
         TaskInstance taskInstanceHigPriority = createTaskInstance("high", Priority.HIGH, 2);
         TaskInstance taskInstanceMediumPriority = createTaskInstance("medium", Priority.HIGH, 1);

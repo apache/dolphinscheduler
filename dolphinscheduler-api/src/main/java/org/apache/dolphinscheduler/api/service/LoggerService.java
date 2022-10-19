@@ -38,7 +38,6 @@ public interface LoggerService {
      */
     Result<ResponseTaskLog> queryLog(int taskInstId, int skipLineNum, int limit);
 
-
     /**
      * get log size
      *

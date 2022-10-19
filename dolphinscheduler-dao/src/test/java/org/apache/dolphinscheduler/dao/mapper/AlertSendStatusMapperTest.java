@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * AlertSendStatus mapper test
  */
 public class AlertSendStatusMapperTest extends BaseDaoTest {
+
     @Autowired
     private AlertSendStatusMapper alertSendStatusMapper;
 

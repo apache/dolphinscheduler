@@ -27,6 +27,7 @@ import lombok.Data;
 
 @Data
 public class JavaParameters extends AbstractParameters {
+
     /**
      * origin java script
      */

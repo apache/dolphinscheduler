@@ -38,5 +38,5 @@ public interface DqRuleService {
                                String endTime,
                                Integer pageNo, Integer pageSize);
 
-    Map<String,Object> getDatasourceOptionsById(int datasourceId);
+    Map<String, Object> getDatasourceOptionsById(int datasourceId);
 }

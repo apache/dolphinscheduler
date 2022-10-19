@@ -20,20 +20,23 @@ package org.apache.dolphinscheduler.remote.command.future;
 import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 public class ResponseFutureTest {
 
     @Test
     public void testScanFutureTable() {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("executor-service"));
+        ScheduledExecutorService executorService =
+                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("executor-service"));
         executorService.scheduleAtFixedRate(new Runnable() {
+
             @Override
             public void run() {
                 ResponseFuture.scanFutureTable();
@@ -42,6 +45,7 @@ public class ResponseFutureTest {
 
         CountDownLatch latch = new CountDownLatch(1);
         InvokeCallback invokeCallback = new InvokeCallback() {
+
             @Override
             public void operationComplete(ResponseFuture responseFuture) {
                 latch.countDown();

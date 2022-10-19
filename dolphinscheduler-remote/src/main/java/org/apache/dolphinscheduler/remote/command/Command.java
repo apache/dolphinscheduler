@@ -33,11 +33,11 @@ public class Command implements Serializable {
     public static final byte MAGIC = (byte) 0xbabe;
     public static final byte VERSION = 0;
 
-    public Command(){
+    public Command() {
         this.opaque = REQUEST_ID.getAndIncrement();
     }
 
-    public Command(long opaque){
+    public Command(long opaque) {
         this.opaque = opaque;
     }
 

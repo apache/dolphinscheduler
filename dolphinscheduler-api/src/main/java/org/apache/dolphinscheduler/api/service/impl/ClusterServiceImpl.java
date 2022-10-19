@@ -258,7 +258,8 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
                 .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
 
         if (relatedNamespaceNumber > 0) {
-            logger.warn("Delete cluster failed because {} namespace(s) is(are) using it, clusterCode:{}.", relatedNamespaceNumber, code);
+            logger.warn("Delete cluster failed because {} namespace(s) is(are) using it, clusterCode:{}.",
+                    relatedNamespaceNumber, code);
             putMsg(result, Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS);
             return result;
         }
@@ -273,7 +274,6 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         }
         return result;
     }
-
 
     /**
      * update cluster

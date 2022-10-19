@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -34,21 +33,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -62,7 +61,7 @@ public class JSONUtils {
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
 
     static {
-        logger.info("init timezone: {}",TimeZone.getDefault());
+        logger.info("init timezone: {}", TimeZone.getDefault());
     }
 
     private static final SimpleModule LOCAL_DATE_TIME_MODULE = new SimpleModule()
@@ -190,7 +189,8 @@ public class JSONUtils {
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        return parseObject(json, new TypeReference<Map<String, String>>() {});
+        return parseObject(json, new TypeReference<Map<String, String>>() {
+        });
     }
 
     /**
@@ -204,7 +204,8 @@ public class JSONUtils {
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        return parseObject(json, new TypeReference<Map<K, V>>() {});
+        return parseObject(json, new TypeReference<Map<K, V>>() {
+        });
     }
 
     /**
@@ -250,7 +251,7 @@ public class JSONUtils {
      * @param <T> object type
      * @return byte array
      */
-    public static <T> byte[] toJsonByteArray(T obj)  {
+    public static <T> byte[] toJsonByteArray(T obj) {
         if (obj == null) {
             return null;
         }

@@ -24,9 +24,10 @@ import java.util.Map;
  */
 public class TransformerConfig extends BaseConfig {
 
-    public TransformerConfig() {}
+    public TransformerConfig() {
+    }
 
-    public TransformerConfig(String type, Map<String,Object> config) {
+    public TransformerConfig(String type, Map<String, Object> config) {
         super(type, config);
     }
 }

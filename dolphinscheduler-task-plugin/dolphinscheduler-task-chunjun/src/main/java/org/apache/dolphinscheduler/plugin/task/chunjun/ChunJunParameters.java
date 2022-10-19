@@ -113,8 +113,8 @@ public class ChunJunParameters extends AbstractParameters {
     public boolean checkParameters() {
         if (customConfig == Flag.NO.ordinal()) {
             return dataSource != 0 && dataTarget != 0
-                && StringUtils.isNotEmpty(sql)
-                && StringUtils.isNotEmpty(targetTable);
+                    && StringUtils.isNotEmpty(sql)
+                    && StringUtils.isNotEmpty(targetTable);
         } else {
             return StringUtils.isNotEmpty(json);
         }

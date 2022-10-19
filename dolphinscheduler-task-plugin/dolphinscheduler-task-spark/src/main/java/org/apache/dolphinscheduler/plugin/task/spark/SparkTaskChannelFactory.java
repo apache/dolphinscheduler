@@ -27,6 +27,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class SparkTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public String getName() {
         return "SPARK";

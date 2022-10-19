@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 public class SagemakerConstants {
+
     public static final int CHECK_PIPELINE_EXECUTION_STATUS_INTERVAL = 5000;
     public static final int PIPELINE_MAX_RESULTS = 100;
 

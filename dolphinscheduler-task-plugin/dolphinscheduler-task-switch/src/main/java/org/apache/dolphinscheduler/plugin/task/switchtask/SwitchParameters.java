@@ -79,15 +79,16 @@ public class SwitchParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        //default next node should not be null
+        // default next node should not be null
         boolean defaultNode = switchResult != null && switchResult.getNextNode() != null;
         if (!defaultNode) {
             return false;
         }
-        //validate conditions must have next node
+        // validate conditions must have next node
         List<SwitchCondition> conditions = this.switchResult.getDependTaskList();
         if (conditions != null && conditions.size() != 0) {
-            if (conditions.stream().anyMatch(e -> (StringUtils.isNotEmpty(e.getCondition()) && e.getNextNode() == null))) {
+            if (conditions.stream()
+                    .anyMatch(e -> (StringUtils.isNotEmpty(e.getCondition()) && e.getNextNode() == null))) {
                 return false;
             }
         }

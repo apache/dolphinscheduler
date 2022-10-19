@@ -36,7 +36,7 @@ public interface AlertPluginInstanceService {
      * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> create(User loginUser,int pluginDefineId,String instanceName,String pluginInstanceParams);
+    Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams);
 
     /**
      * update
@@ -46,7 +46,8 @@ public interface AlertPluginInstanceService {
      * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> update(User loginUser, int alertPluginInstanceId,String instanceName,String pluginInstanceParams);
+    Map<String, Object> update(User loginUser, int alertPluginInstanceId, String instanceName,
+                               String pluginInstanceParams);
 
     /**
      * delete alert plugin instance

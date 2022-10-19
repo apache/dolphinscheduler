@@ -24,9 +24,10 @@ import java.util.Map;
  */
 public class WriterConfig extends BaseConfig {
 
-    public WriterConfig() {}
+    public WriterConfig() {
+    }
 
-    public WriterConfig(String type, Map<String,Object> config) {
+    public WriterConfig(String type, Map<String, Object> config) {
         super(type, config);
     }
 }

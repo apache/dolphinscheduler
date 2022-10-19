@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import java.util.Map;
 
 public final class HttpAlertChannel implements AlertChannel {
+
     @Override
     public AlertResult process(AlertInfo alertInfo) {
         AlertData alertData = alertInfo.getAlertData();

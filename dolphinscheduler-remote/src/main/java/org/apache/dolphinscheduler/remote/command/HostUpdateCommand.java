@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * process host update

@@ -16,12 +16,14 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.LoggingEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.LoggingEvent;
 
 public class TaskLogDiscriminatorTest {
 

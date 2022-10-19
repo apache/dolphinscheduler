@@ -22,5 +22,5 @@ package org.apache.dolphinscheduler.plugin.task.api.enums;
  */
 public enum DependentRelation {
 
-    AND,OR;
+    AND, OR;
 }

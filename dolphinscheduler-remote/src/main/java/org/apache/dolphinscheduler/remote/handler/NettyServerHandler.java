@@ -38,7 +38,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 
-
 /**
  * netty server request handler
  */
@@ -55,7 +54,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * server processors queue
      */
-    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors =
+            new ConcurrentHashMap<>();
 
     public NettyServerHandler(NettyRemotingServer nettyRemotingServer) {
         this.nettyRemotingServer = nettyRemotingServer;
@@ -100,7 +100,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+                                  final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if (executorRef == null) {
             executorRef = nettyRemotingServer.getDefaultExecutor();

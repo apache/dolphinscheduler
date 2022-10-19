@@ -25,14 +25,15 @@ public class DinkyTaskConstants {
     private DinkyTaskConstants() {
         throw new IllegalStateException("Utility class");
     }
-    
+
     private static final String API_ROUTE = "/openapi/";
     public static final String SUBMIT_TASK = API_ROUTE + "submitTask";
     public static final String ONLINE_TASK = API_ROUTE + "onLineTask";
     public static final String SAVEPOINT_TASK = API_ROUTE + "savepointTask";
     public static final String GET_JOB_INFO = API_ROUTE + "getJobInstance";
     public static final int API_ERROR = 1;
-    public static final String API_VERSION_ERROR_TIPS = "Please check that the dinky version is greater than or equal to 0.6.5";
+    public static final String API_VERSION_ERROR_TIPS =
+            "Please check that the dinky version is greater than or equal to 0.6.5";
     public static final String API_RESULT_DATAS = "datas";
 
     public static final String SAVEPOINT_CANCEL = "cancel";

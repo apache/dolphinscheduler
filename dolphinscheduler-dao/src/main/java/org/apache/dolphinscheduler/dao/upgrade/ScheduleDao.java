@@ -68,7 +68,8 @@ public class ScheduleDao {
      * @param scheduleMap scheduleMap
      * @param processIdCodeMap processIdCodeMap
      */
-    public void updateScheduleCode(Connection conn, Map<Integer, Long> scheduleMap, Map<Integer, Long> processIdCodeMap) {
+    public void updateScheduleCode(Connection conn, Map<Integer, Long> scheduleMap,
+                                   Map<Integer, Long> processIdCodeMap) {
         String sql = "UPDATE t_ds_schedules SET process_definition_code=?,timezone_id=?,environment_code=-1 where id=?";
         try {
             Clock clock = Clock.systemDefaultZone();

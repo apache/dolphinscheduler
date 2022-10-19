@@ -28,6 +28,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 public class RpcTest {
+
     private NettyServer nettyServer;
 
     private IUserService userService;

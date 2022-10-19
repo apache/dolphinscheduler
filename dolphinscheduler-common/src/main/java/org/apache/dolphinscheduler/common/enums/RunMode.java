@@ -22,7 +22,8 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 /**
  * complement data run mode
  */
-public enum  RunMode {
+public enum RunMode {
+
     /**
      * 0 serial run
      * 1 parallel run

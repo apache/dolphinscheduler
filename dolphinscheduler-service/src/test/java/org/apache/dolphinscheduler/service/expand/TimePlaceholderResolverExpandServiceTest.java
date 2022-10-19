@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.commons.lang3.StringUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +46,8 @@ public class TimePlaceholderResolverExpandServiceTest {
 
         boolean implCheckResult = timePlaceholderResolverExpandServiceImpl.timeFunctionNeedExpand(placeHolderName);
         Assertions.assertFalse(implCheckResult);
-        String implResultString = timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
+        String implResultString =
+                timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
         Assertions.assertTrue(StringUtils.isEmpty(implResultString));
     }
 }

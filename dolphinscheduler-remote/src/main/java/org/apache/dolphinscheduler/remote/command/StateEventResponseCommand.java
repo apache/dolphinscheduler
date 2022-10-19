@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * db task final result response command

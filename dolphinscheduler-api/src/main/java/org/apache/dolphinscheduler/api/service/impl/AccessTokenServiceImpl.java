@@ -125,7 +125,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Result result = new Result();
 
         // 1. check permission
-        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
+        if (!(canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE)
+                || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -190,7 +191,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_DELETE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -226,7 +227,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperatorPermissions(loginUser, null,AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

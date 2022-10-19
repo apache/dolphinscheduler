@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.loop;
 
 import lombok.NonNull;
 
-public interface LoopTaskDefinition<SubmitTaskMethodT extends LoopTaskSubmitTaskMethodDefinition,
-    QueryTaskMethodT extends LoopTaskQueryStatusMethodDefinition, CancelTaskMethodT extends LoopTaskCancelMethodDefinition> {
+public interface LoopTaskDefinition<SubmitTaskMethodT extends LoopTaskSubmitTaskMethodDefinition, QueryTaskMethodT extends LoopTaskQueryStatusMethodDefinition, CancelTaskMethodT extends LoopTaskCancelMethodDefinition> {
+
     /**
      * The task name of this loop task, e.g: K8sPodTask
      */

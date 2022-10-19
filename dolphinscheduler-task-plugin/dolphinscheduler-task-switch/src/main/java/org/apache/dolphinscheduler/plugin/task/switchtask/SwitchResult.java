@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.switchtask;
 import java.util.List;
 
 public class SwitchResult {
+
     private List<SwitchCondition> dependTaskList;
 
     private Long nextNode;

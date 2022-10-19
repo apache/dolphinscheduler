@@ -29,8 +29,8 @@ public interface StateEventHandler {
      * @throws StateEventHandleException this exception means it can be recovered.
      * @throws StateEventHandleError     this exception means it cannot be recovered, so the event need to drop.
      */
-    boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleException, StateEventHandleError;
+    boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                             StateEvent stateEvent) throws StateEventHandleException, StateEventHandleError;
 
     StateEventType getEventType();
 }

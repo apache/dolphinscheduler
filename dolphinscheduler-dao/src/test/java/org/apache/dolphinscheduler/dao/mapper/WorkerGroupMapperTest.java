@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import java.util.Date;
-import java.util.List;
-import javax.annotation.Resource;
-
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -49,7 +50,7 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
      */
     public void clearTestData() {
         workerGroupMapper.queryAllWorkerGroup()
-            .forEach(workerGroup -> workerGroupMapper.deleteById(workerGroup.getId()));
+                .forEach(workerGroup -> workerGroupMapper.deleteById(workerGroup.getId()));
     }
 
     /**

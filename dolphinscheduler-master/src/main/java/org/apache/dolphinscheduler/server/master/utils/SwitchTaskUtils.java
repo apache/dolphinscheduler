@@ -22,6 +22,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 public class SwitchTaskUtils {
+
     private static ScriptEngineManager manager;
     private static ScriptEngine engine;
 

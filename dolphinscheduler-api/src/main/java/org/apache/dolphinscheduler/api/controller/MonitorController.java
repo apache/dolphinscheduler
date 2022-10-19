@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * monitor controller

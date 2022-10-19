@@ -17,7 +17,7 @@ there are no subsequent nodes. Examples are as follows:
 manual start or scheduled scheduling. Each time the process definition runs, a process instance is generated
 
 **Task instance**: The task instance is the instantiation of the task node in the process definition, which identifies
-the specific task 
+the specific task
 
 **Task type**: Currently supports SHELL, SQL, SUB_PROCESS (sub-process), PROCEDURE, MR, SPARK, PYTHON, DEPENDENT (
 depends), and plans to support dynamic plug-in expansion, note: **SUB_PROCESS**  need relation with another workflow definition which also a separate process

@@ -43,6 +43,7 @@ import org.openjdk.jmh.annotations.Warmup;
 @State(Scope.Benchmark)
 @BenchmarkMode({Mode.Throughput, Mode.AverageTime, Mode.SampleTime})
 public class RpcTest extends AbstractBaseBenchmark {
+
     private NettyServer nettyServer;
 
     private IUserService userService;

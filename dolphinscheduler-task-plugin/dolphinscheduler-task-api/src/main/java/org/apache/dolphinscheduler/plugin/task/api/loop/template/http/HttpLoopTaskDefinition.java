@@ -24,8 +24,9 @@ import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.method.Htt
 
 import lombok.NonNull;
 
-public class HttpLoopTaskDefinition implements
-    LoopTaskDefinition<HttpLoopTaskSubmitTaskMethodDefinition, HttpLoopTaskQueryStatusMethodDefinition, HttpLoopTaskCancelTaskMethodDefinition> {
+public class HttpLoopTaskDefinition
+        implements
+            LoopTaskDefinition<HttpLoopTaskSubmitTaskMethodDefinition, HttpLoopTaskQueryStatusMethodDefinition, HttpLoopTaskCancelTaskMethodDefinition> {
 
     private final String taskName;
     private final HttpLoopTaskSubmitTaskMethodDefinition submitTaskMethod;

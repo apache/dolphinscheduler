@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 public class K8sTaskChannel implements TaskChannel {
+
     @Override
     public void cancelApplication(boolean status) {
 

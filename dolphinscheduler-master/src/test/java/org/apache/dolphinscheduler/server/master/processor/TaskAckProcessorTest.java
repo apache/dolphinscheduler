@@ -30,9 +30,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.netty.channel.Channel;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * task ack processor test

@@ -28,6 +28,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * have_alert
  */
 public enum Flag {
+
     /**
      * 0 no
      * 1 yes

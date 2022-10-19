@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.sift.SiftingAppender;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.TaskLogDiscriminator;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,9 +33,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Date;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.sift.SiftingAppender;
 
 @ExtendWith(MockitoExtension.class)
 public class LogUtilsTest {

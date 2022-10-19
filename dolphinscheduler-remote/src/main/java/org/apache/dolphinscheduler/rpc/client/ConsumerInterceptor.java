@@ -31,12 +31,12 @@ import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
 
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ConsumerInterceptor
@@ -70,7 +70,7 @@ public class ConsumerInterceptor {
         while (retries-- > 0) {
             RpcResponse rsp;
             rsp = nettyClient.sendMsg(host, protocol, async);
-            //success
+            // success
             if (null != rsp && rsp.getStatus() == 0) {
                 return rsp.getResult();
             }

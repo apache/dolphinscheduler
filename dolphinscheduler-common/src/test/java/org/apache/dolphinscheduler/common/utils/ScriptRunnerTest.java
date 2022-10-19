@@ -16,15 +16,16 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import java.io.StringReader;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.StringReader;
-
 public class ScriptRunnerTest {
+
     @Test
     public void testRunScript() {
-        //connection is null
+        // connection is null
         Exception exception = null;
         ScriptRunner s = new ScriptRunner(null, true, true);
         try {

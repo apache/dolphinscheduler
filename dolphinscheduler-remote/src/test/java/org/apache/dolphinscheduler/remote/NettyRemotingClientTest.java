@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.remote;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
@@ -28,12 +25,17 @@ import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 
 /**
  *  netty remote client test
@@ -49,12 +51,12 @@ public class NettyRemotingClientTest {
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
         server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+
             @Override
             public void process(Channel channel, Command command) {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
             }
         });
-
 
         server.start();
         //
@@ -75,11 +77,12 @@ public class NettyRemotingClientTest {
      *  test sned async
      */
     @Test
-    public void testSendAsync(){
+    public void testSendAsync() {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
         server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+
             @Override
             public void process(Channel channel, Command command) {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
@@ -93,13 +96,15 @@ public class NettyRemotingClientTest {
         Command commandPing = Ping.create();
         try {
             final AtomicLong opaque = new AtomicLong(0);
-            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000, new InvokeCallback() {
-                @Override
-                public void operationComplete(ResponseFuture responseFuture) {
-                    opaque.set(responseFuture.getOpaque());
-                    latch.countDown();
-                }
-            });
+            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000,
+                    new InvokeCallback() {
+
+                        @Override
+                        public void operationComplete(ResponseFuture responseFuture) {
+                            opaque.set(responseFuture.getOpaque());
+                            latch.countDown();
+                        }
+                    });
             latch.await();
             Assertions.assertEquals(commandPing.getOpaque(), opaque.get());
         } catch (Exception e) {

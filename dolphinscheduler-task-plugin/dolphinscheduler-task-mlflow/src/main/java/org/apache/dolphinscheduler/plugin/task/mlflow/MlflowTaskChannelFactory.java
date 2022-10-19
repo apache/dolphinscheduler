@@ -32,6 +32,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class MlflowTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public TaskChannel create() {
         return new MlflowTaskChannel();
@@ -46,9 +47,12 @@ public class MlflowTaskChannelFactory implements TaskChannelFactory {
     public List<PluginParams> getParams() {
         List<PluginParams> paramsList = new ArrayList<>();
 
-        InputParam nodeName = InputParam.newBuilder("name", "$t('Node name')").addValidate(Validate.newBuilder().setRequired(true).build()).build();
+        InputParam nodeName = InputParam.newBuilder("name", "$t('Node name')")
+                .addValidate(Validate.newBuilder().setRequired(true).build()).build();
 
-        RadioParam runFlag = RadioParam.newBuilder("runFlag", "RUN_FLAG").addParamsOptions(new ParamsOptions("NORMAL", "NORMAL", false)).addParamsOptions(new ParamsOptions("FORBIDDEN", "FORBIDDEN", false)).build();
+        RadioParam runFlag = RadioParam.newBuilder("runFlag", "RUN_FLAG")
+                .addParamsOptions(new ParamsOptions("NORMAL", "NORMAL", false))
+                .addParamsOptions(new ParamsOptions("FORBIDDEN", "FORBIDDEN", false)).build();
 
         paramsList.add(nodeName);
         paramsList.add(runFlag);

@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.FavTask;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Set;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * fav mapper interface

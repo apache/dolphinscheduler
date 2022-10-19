@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import java.util.Map;
 
 public final class WeChatAlertChannel implements AlertChannel {
+
     @Override
     public AlertResult process(AlertInfo info) {
         AlertData alertData = info.getAlertData();

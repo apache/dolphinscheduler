@@ -47,11 +47,11 @@ public class MasterRegistryDataListener implements SubscribeListener {
         if (Strings.isNullOrEmpty(path)) {
             return;
         }
-        //monitor master
+        // monitor master
         if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_MASTERS + Constants.SINGLE_SLASH)) {
             handleMasterEvent(event);
         } else if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH)) {
-            //monitor worker
+            // monitor worker
             handleWorkerEvent(event);
         }
     }

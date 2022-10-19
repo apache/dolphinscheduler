@@ -21,12 +21,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import lombok.experimental.UtilityClass;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ThreadUtils {

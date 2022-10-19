@@ -64,7 +64,8 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         SQLServerDataSourceParamDTO sqlServerParam = (SQLServerDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_SQLSERVER, sqlServerParam.getHost(), sqlServerParam.getPort());
+        String address =
+                String.format("%s%s:%s", Constants.JDBC_SQLSERVER, sqlServerParam.getHost(), sqlServerParam.getPort());
         String jdbcUrl = address + ";databaseName=" + sqlServerParam.getDatabase();
 
         SQLServerConnectionParam sqlServerConnectionParam = new SQLServerConnectionParam();

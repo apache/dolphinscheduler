@@ -71,6 +71,6 @@ public class SchemaUtilsTest {
         } catch (IOException ex) {
             Assertions.fail(ex.getMessage());
         }
-        Assertions.assertFalse(CollectionUtils.isEmpty(list),"Can not find any schema files");
+        Assertions.assertFalse(CollectionUtils.isEmpty(list), "Can not find any schema files");
     }
 }

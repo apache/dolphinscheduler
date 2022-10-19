@@ -153,7 +153,8 @@ public class DependentExecute {
     private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance, int testFlag) {
         DependResult result;
         TaskInstance taskInstance = null;
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId(), testFlag);
+        List<TaskInstance> taskInstanceList =
+                processService.findValidTaskListByProcessId(processInstance.getId(), testFlag);
 
         for (TaskInstance task : taskInstanceList) {
             if (task.getTaskCode() == taskCode) {
@@ -191,7 +192,8 @@ public class DependentExecute {
         ProcessInstance lastSchedulerProcess =
                 processService.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
-        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+        ProcessInstance lastManualProcess =
+                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;

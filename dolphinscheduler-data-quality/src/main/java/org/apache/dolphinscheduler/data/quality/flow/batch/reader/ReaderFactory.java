@@ -33,6 +33,7 @@ import java.util.List;
 public class ReaderFactory {
 
     private static class Singleton {
+
         static ReaderFactory instance = new ReaderFactory();
     }
 
@@ -40,7 +41,8 @@ public class ReaderFactory {
         return Singleton.instance;
     }
 
-    public List<BatchReader> getReaders(SparkRuntimeEnvironment sparkRuntimeEnvironment, List<ReaderConfig> readerConfigs) throws DataQualityException {
+    public List<BatchReader> getReaders(SparkRuntimeEnvironment sparkRuntimeEnvironment,
+                                        List<ReaderConfig> readerConfigs) throws DataQualityException {
 
         List<BatchReader> readerList = new ArrayList<>();
 

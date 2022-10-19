@@ -28,7 +28,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
 
-
     /**
      * delete datasource by userId
      * @param userId userId

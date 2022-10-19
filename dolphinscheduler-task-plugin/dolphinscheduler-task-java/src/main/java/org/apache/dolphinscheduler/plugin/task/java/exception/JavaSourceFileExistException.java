@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.java.exception;
 
 public class JavaSourceFileExistException extends RuntimeException {
+
     public JavaSourceFileExistException() {
     }
 
@@ -33,7 +34,8 @@ public class JavaSourceFileExistException extends RuntimeException {
         super(cause);
     }
 
-    public JavaSourceFileExistException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public JavaSourceFileExistException(String message, Throwable cause, boolean enableSuppression,
+                                        boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

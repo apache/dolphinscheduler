@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
 public final class PagerDutyParamsConstants {
+
     public static final String NAME_PAGER_DUTY_INTEGRATION_KEY_NAME = "IntegrationKey";
     public static final String PAGER_DUTY_INTEGRATION_KEY = "integrationKey";
     public static final String PAGER_DUTY_EVENT_ACTION_TRIGGER = "trigger";

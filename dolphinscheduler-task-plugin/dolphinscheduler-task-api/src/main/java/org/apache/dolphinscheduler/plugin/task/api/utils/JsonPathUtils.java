@@ -20,13 +20,13 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 import java.util.Optional;
 import java.util.Set;
 
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.internal.DefaultsImpl;
-
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.minidev.json.JSONArray;
+
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.internal.DefaultsImpl;
 
 @UtilityClass
 public class JsonPathUtils {

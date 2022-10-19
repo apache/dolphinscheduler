@@ -30,6 +30,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(AlertChannelFactory.class)
 public final class SlackAlertChannelFactory implements AlertChannelFactory {
+
     @Override
     public String name() {
         return "Slack";
@@ -39,19 +40,20 @@ public final class SlackAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
         List<PluginParams> paramsList = new LinkedList<>();
 
-        InputParam webHookParam = InputParam.newBuilder(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME, SlackParamsConstants.SLACK_WEB_HOOK_URL)
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .setPlaceholder("Input WebHook Url")
-                                            .build();
+        InputParam webHookParam = InputParam
+                .newBuilder(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME, SlackParamsConstants.SLACK_WEB_HOOK_URL)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .setPlaceholder("Input WebHook Url")
+                .build();
 
         InputParam botName = InputParam.newBuilder(SlackParamsConstants.SLACK_BOT_NAME, SlackParamsConstants.SLACK_BOT)
-                                       .addValidate(Validate.newBuilder()
-                                                            .setRequired(true)
-                                                            .build())
-                                       .setPlaceholder("Input the bot username")
-                                       .build();
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .setPlaceholder("Input the bot username")
+                .build();
 
         paramsList.add(webHookParam);
         paramsList.add(botName);

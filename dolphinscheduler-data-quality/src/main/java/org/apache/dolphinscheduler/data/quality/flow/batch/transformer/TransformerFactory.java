@@ -33,6 +33,7 @@ import java.util.List;
 public class TransformerFactory {
 
     private static class Singleton {
+
         static TransformerFactory instance = new TransformerFactory();
     }
 
@@ -40,11 +41,12 @@ public class TransformerFactory {
         return Singleton.instance;
     }
 
-    public List<BatchTransformer> getTransformer(SparkRuntimeEnvironment sparkRuntimeEnvironment, List<TransformerConfig> transformerConfigs) throws DataQualityException {
+    public List<BatchTransformer> getTransformer(SparkRuntimeEnvironment sparkRuntimeEnvironment,
+                                                 List<TransformerConfig> transformerConfigs) throws DataQualityException {
 
         List<BatchTransformer> transformers = new ArrayList<>();
 
-        for (TransformerConfig transformerConfig:transformerConfigs) {
+        for (TransformerConfig transformerConfig : transformerConfigs) {
             BatchTransformer transformer = getTransformer(transformerConfig);
             if (transformer != null) {
                 transformer.validateConfig();

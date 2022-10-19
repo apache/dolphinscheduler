@@ -75,7 +75,7 @@ public class GroupParam extends PluginParams {
             this.emit = emit;
             return this;
         }
-        
+
         public Builder setProps(GroupParamsProps props) {
             this.props = props;
             return this;
@@ -86,10 +86,10 @@ public class GroupParam extends PluginParams {
                 this.setProps(new GroupParamsProps());
             }
 
-            ((GroupParamsProps)this.props).setRules(rules);
+            ((GroupParamsProps) this.props).setRules(rules);
             return this;
         }
-        
+
         @Override
         public GroupParam build() {
             return new GroupParam(this);

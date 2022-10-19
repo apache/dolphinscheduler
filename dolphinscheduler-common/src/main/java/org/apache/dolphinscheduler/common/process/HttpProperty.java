@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.HttpParametersType;
 import java.util.Objects;
 
 public class HttpProperty {
+
     /**
      * key
      */
@@ -115,9 +116,9 @@ public class HttpProperty {
     @Override
     public String toString() {
         return "HttpProperty{"
-              + "prop='" + prop + '\''
-              + ", httpParametersType=" + httpParametersType
-              + ", value='" + value + '\''
-              + '}';
+                + "prop='" + prop + '\''
+                + ", httpParametersType=" + httpParametersType
+                + ", value='" + value + '\''
+                + '}';
     }
 }

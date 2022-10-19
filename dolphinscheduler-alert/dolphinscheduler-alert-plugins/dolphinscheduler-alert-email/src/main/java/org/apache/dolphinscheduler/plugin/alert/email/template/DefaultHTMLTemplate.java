@@ -33,14 +33,13 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONTokener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONTokener;
 
 public class DefaultHTMLTemplate implements AlertTemplate {
 
@@ -55,7 +54,8 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             case TEXT:
                 return getTextTypeMessage(content);
             default:
-                throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate", showType));
+                throw new IllegalArgumentException(
+                        String.format("not support showType: %s in DefaultHTMLTemplate", showType));
         }
     }
 

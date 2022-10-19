@@ -26,16 +26,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * quality task result check type
  */
 public enum CheckType {
+
     /**
      * 0-comparison_minus_statistics
      * 1-statistics_minus_comparison
      * 2-statistics_comparison_percentage
      * 3-statistics_comparison_difference_comparison_percentage
      */
-    COMPARISON_MINUS_STATISTICS(0,"comparison_minus_statistics"),
-    STATISTICS_MINUS_COMPARISON(1,"statistics_minus_comparison"),
-    STATISTICS_COMPARISON_PERCENTAGE(2,"statistics_comparison_percentage"),
-    STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE(3,"statistics_comparison_difference_comparison_percentage");
+    COMPARISON_MINUS_STATISTICS(0, "comparison_minus_statistics"),
+    STATISTICS_MINUS_COMPARISON(1, "statistics_minus_comparison"),
+    STATISTICS_COMPARISON_PERCENTAGE(2, "statistics_comparison_percentage"),
+    STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE(3, "statistics_comparison_difference_comparison_percentage");
 
     CheckType(int code, String description) {
         this.code = code;
@@ -58,7 +59,7 @@ public enum CheckType {
 
     static {
         for (CheckType type : CheckType.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

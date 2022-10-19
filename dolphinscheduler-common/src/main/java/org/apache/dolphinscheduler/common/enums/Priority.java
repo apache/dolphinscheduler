@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  *  define process and task priority
  */
 public enum Priority {
+
     /**
      * 0 highest priority
      * 1 higher priority

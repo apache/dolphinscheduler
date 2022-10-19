@@ -20,5 +20,6 @@
 package org.apache.dolphinscheduler.registry.api;
 
 public interface SubscribeListener {
+
     void notify(Event event);
 }

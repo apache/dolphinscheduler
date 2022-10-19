@@ -43,7 +43,6 @@ public interface TaskPriorityQueue<T> {
      */
     T take() throws TaskPriorityQueueException, InterruptedException;
 
-
     /**
      * poll taskInfo with timeout
      * @param timeout

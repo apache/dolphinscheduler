@@ -41,7 +41,8 @@ public class PigeonConfig {
     }
 
     private PigeonConfig() {
-        ResourceBundle bundle = ResourceBundle.getBundle(PigeonConfig.class.getPackage().getName().replace(".", "/") + "/config");
+        ResourceBundle bundle =
+                ResourceBundle.getBundle(PigeonConfig.class.getPackage().getName().replace(".", "/") + "/config");
         this.jobTriggerUrl = bundle.getString("job.trigger.url");
         this.jobStatusUrl = bundle.getString("job.status.url");
         this.jobTriggerPostBody = bundle.getString("job.trigger.post.body");

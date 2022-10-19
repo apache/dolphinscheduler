@@ -54,7 +54,6 @@ public class PytorchParameters extends AbstractParameters {
         return true;
     }
 
-
     public String getRequirementPath() {
         return getPossiblePath(requirements);
     }
@@ -68,7 +67,6 @@ public class PytorchParameters extends AbstractParameters {
         }
         return command;
     }
-
 
     public String getScriptPath() {
         return getPossiblePath(script);

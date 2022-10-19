@@ -96,4 +96,3 @@ public interface ClusterService {
     Map<String, Object> verifyCluster(String clusterName);
 
 }
-

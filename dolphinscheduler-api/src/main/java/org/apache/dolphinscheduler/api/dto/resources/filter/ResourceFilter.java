@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  * resource filter
  */
 public class ResourceFilter implements IFilter {
+
     /**
      * resource suffix
      */
@@ -40,7 +41,7 @@ public class ResourceFilter implements IFilter {
     /**
      * parent list
      */
-    //Set<Resource> parentList =  new HashSet<>();
+    // Set<Resource> parentList = new HashSet<>();
 
     /**
      * constructor
@@ -56,7 +57,7 @@ public class ResourceFilter implements IFilter {
      * file filter
      * @return file filtered by suffix
      */
-    public Set<Resource> fileFilter(){
+    public Set<Resource> fileFilter() {
         return resourceList.stream().filter(t -> {
             String alias = t.getAlias();
             return alias.endsWith(suffix);
@@ -67,12 +68,12 @@ public class ResourceFilter implements IFilter {
      * list all parent dir
      * @return parent resource dir set
      */
-    Set<Resource> listAllParent(){
-        Set<Resource> parentList =  new HashSet<>();
+    Set<Resource> listAllParent() {
+        Set<Resource> parentList = new HashSet<>();
         Set<Resource> filterFileList = fileFilter();
-        for(Resource file:filterFileList){
+        for (Resource file : filterFileList) {
             parentList.add(file);
-            setAllParent(file,parentList);
+            setAllParent(file, parentList);
         }
         return parentList;
 
@@ -83,11 +84,11 @@ public class ResourceFilter implements IFilter {
      * @param resource  resource
      * @return parent resource dir set
      */
-    private void setAllParent(Resource resource,Set<Resource> parentList){
+    private void setAllParent(Resource resource, Set<Resource> parentList) {
         for (Resource resourceTemp : resourceList) {
             if (resourceTemp.getId() == resource.getPid()) {
                 parentList.add(resourceTemp);
-                setAllParent(resourceTemp,parentList);
+                setAllParent(resourceTemp, parentList);
             }
         }
     }

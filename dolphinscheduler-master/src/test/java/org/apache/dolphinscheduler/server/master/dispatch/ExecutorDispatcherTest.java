@@ -54,7 +54,7 @@ public class ExecutorDispatcherTest {
     public void testDispatchWithException() throws ExecuteException {
         ExecutionContext executionContext = ExecutionContextTestUtils.getExecutionContext(10000);
         Assertions.assertThrows(ExecuteException.class, () -> {
-                executorDispatcher.dispatch(executionContext);
+            executorDispatcher.dispatch(executionContext);
         });
     }
 

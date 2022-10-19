@@ -67,7 +67,8 @@ public class K8sManager {
      * @param clusterCode
      * @return new client if need updated
      */
-    public synchronized KubernetesClient getAndUpdateK8sClient(Long clusterCode, boolean update) throws RemotingException {
+    public synchronized KubernetesClient getAndUpdateK8sClient(Long clusterCode,
+                                                               boolean update) throws RemotingException {
         if (null == clusterCode) {
             return null;
         }
@@ -83,7 +84,6 @@ public class K8sManager {
         }
         return clientMap.get(clusterCode);
     }
-
 
     private void deleteK8sClientInner(Long clusterCode) {
         if (clusterCode == null) {

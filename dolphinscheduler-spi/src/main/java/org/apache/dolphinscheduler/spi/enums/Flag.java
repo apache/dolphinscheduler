@@ -26,6 +26,7 @@ package org.apache.dolphinscheduler.spi.enums;
  * have_alert
  */
 public enum Flag {
+
     /**
      * 0 no
      * 1 yes

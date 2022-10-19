@@ -43,7 +43,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
      * @return ErrorCommand
      */
     private ErrorCommand insertOne() {
-        //insertOne
+        // insertOne
         ErrorCommand errorCommand = new ErrorCommand();
         errorCommand.setId(10101);
         errorCommand.setCommandType(CommandType.START_PROCESS);
@@ -52,10 +52,6 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         errorCommandMapper.insert(errorCommand);
         return errorCommand;
     }
-
-
-
-
 
     /**
      * test query
@@ -79,8 +75,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
                 null,
                 null,
-                new Long[0]
-        );
+                new Long[0]);
 
         Long[] projectCodeArray = new Long[2];
         projectCodeArray[0] = processDefinition.getProjectCode();
@@ -88,8 +83,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         List<CommandCount> commandCounts2 = errorCommandMapper.countCommandState(
                 null,
                 null,
-                projectCodeArray
-        );
+                projectCodeArray);
 
         Assertions.assertNotEquals(commandCounts.size(), 0);
         Assertions.assertNotEquals(commandCounts2.size(), 0);

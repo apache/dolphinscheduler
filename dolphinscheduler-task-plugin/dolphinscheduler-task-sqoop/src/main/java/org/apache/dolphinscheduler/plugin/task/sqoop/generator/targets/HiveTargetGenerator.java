@@ -54,16 +54,16 @@ public class HiveTargetGenerator implements ITargetGenerator {
 
         try {
             TargetHiveParameter targetHiveParameter =
-                JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHiveParameter.class);
+                    JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHiveParameter.class);
             if (null != targetHiveParameter) {
                 hiveTargetSb.append(SPACE).append(HIVE_IMPORT);
 
                 if (StringUtils.isNotEmpty(targetHiveParameter.getHiveDatabase())
-                    && StringUtils.isNotEmpty(targetHiveParameter.getHiveTable())) {
+                        && StringUtils.isNotEmpty(targetHiveParameter.getHiveTable())) {
                     hiveTargetSb.append(SPACE).append(HIVE_DATABASE)
-                        .append(SPACE).append(targetHiveParameter.getHiveDatabase())
-                        .append(SPACE).append(HIVE_TABLE)
-                        .append(SPACE).append(targetHiveParameter.getHiveTable());
+                            .append(SPACE).append(targetHiveParameter.getHiveDatabase())
+                            .append(SPACE).append(HIVE_TABLE)
+                            .append(SPACE).append(targetHiveParameter.getHiveTable());
                 }
 
                 if (targetHiveParameter.isCreateHiveTable()) {
@@ -76,20 +76,20 @@ public class HiveTargetGenerator implements ITargetGenerator {
 
                 if (targetHiveParameter.isHiveOverWrite()) {
                     hiveTargetSb.append(SPACE).append(HIVE_OVERWRITE)
-                        .append(SPACE).append(DELETE_TARGET_DIR);
+                            .append(SPACE).append(DELETE_TARGET_DIR);
                 }
 
                 if (StringUtils.isNotEmpty(targetHiveParameter.getReplaceDelimiter())) {
                     hiveTargetSb.append(SPACE).append(HIVE_DELIMS_REPLACEMENT)
-                        .append(SPACE).append(targetHiveParameter.getReplaceDelimiter());
+                            .append(SPACE).append(targetHiveParameter.getReplaceDelimiter());
                 }
 
                 if (StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionKey())
-                    && StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionValue())) {
+                        && StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionValue())) {
                     hiveTargetSb.append(SPACE).append(HIVE_PARTITION_KEY)
-                        .append(SPACE).append(targetHiveParameter.getHivePartitionKey())
-                        .append(SPACE).append(HIVE_PARTITION_VALUE)
-                        .append(SPACE).append(targetHiveParameter.getHivePartitionValue());
+                            .append(SPACE).append(targetHiveParameter.getHivePartitionKey())
+                            .append(SPACE).append(HIVE_PARTITION_VALUE)
+                            .append(SPACE).append(targetHiveParameter.getHivePartitionValue());
                 }
 
                 if (StringUtils.isNotEmpty(targetHiveParameter.getHiveTargetDir())) {

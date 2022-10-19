@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * task execute type
  */
 public enum TaskExecuteType {
+
     /**
      * 0 batch
      * 1 stream

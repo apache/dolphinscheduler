@@ -20,25 +20,25 @@ package org.apache.dolphinscheduler.server.worker.metrics;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import lombok.experimental.UtilityClass;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
-import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class WorkerServerMetrics {
 
     private final Counter workerOverloadCounter =
-        Counter.builder("ds.worker.overload.count")
-            .description("overloaded workers count")
-            .register(Metrics.globalRegistry);
+            Counter.builder("ds.worker.overload.count")
+                    .description("overloaded workers count")
+                    .register(Metrics.globalRegistry);
 
     private final Counter workerFullSubmitQueueCounter =
-        Counter.builder("ds.worker.full.submit.queue.count")
-            .description("full worker submit queues count")
-            .register(Metrics.globalRegistry);
+            Counter.builder("ds.worker.full.submit.queue.count")
+                    .description("full worker submit queues count")
+                    .register(Metrics.globalRegistry);
 
     private final Counter workerResourceDownloadSuccessCounter =
             Counter.builder("ds.worker.resource.download.count")
@@ -61,11 +61,11 @@ public class WorkerServerMetrics {
 
     private final DistributionSummary workerResourceDownloadSizeDistribution =
             DistributionSummary.builder("ds.worker.resource.download.size")
-            .baseUnit("bytes")
-            .publishPercentiles(0.5, 0.75, 0.95, 0.99)
-            .publishPercentileHistogram()
-            .description("size of downloaded resource files on worker")
-            .register(Metrics.globalRegistry);
+                    .baseUnit("bytes")
+                    .publishPercentiles(0.5, 0.75, 0.95, 0.99)
+                    .publishPercentileHistogram()
+                    .description("size of downloaded resource files on worker")
+                    .register(Metrics.globalRegistry);
 
     public void incWorkerOverloadCount() {
         workerOverloadCounter.increment();
@@ -93,8 +93,8 @@ public class WorkerServerMetrics {
 
     public void registerWorkerRunningTaskGauge(final Supplier<Number> supplier) {
         Gauge.builder("ds.task.running", supplier)
-            .description("number of running tasks on workers")
-            .register(Metrics.globalRegistry);
+                .description("number of running tasks on workers")
+                .register(Metrics.globalRegistry);
     }
 
 }

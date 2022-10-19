@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -39,6 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -67,7 +67,7 @@ public class AlertDao {
      * logger of AlertDao
      */
     private static final Logger logger = LoggerFactory.getLogger(AlertDao.class);
-  
+
     private static final int QUERY_ALERT_THRESHOLD = 100;
 
     @Value("${alert.alarm-suppression.crash:60}")

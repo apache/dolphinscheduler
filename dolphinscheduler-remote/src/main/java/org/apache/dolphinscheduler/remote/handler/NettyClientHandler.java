@@ -117,7 +117,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+                                  final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if (executorRef == null) {
             executorRef = defaultExecutor;
@@ -159,7 +160,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             try {
                 pair.getRight().submit(run);
             } catch (RejectedExecutionException e) {
-                logger.warn("thread pool is full, discard command {} from {}", command, ChannelUtils.getRemoteAddress(channel));
+                logger.warn("thread pool is full, discard command {} from {}", command,
+                        ChannelUtils.getRemoteAddress(channel));
             }
         } else {
             logger.warn("receive response {}, but not matched any request ", command);

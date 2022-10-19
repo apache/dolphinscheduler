@@ -57,7 +57,7 @@ public class HiveReader implements BatchReader {
     @Override
     public void prepare(SparkRuntimeEnvironment prepareEnv) {
         if (Strings.isNullOrEmpty(config.getString(SQL))) {
-            config.put(SQL,"select * from " + config.getString(DATABASE) + "." + config.getString(TABLE));
+            config.put(SQL, "select * from " + config.getString(DATABASE) + "." + config.getString(TABLE));
         }
     }
 

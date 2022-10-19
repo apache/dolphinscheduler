@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 public class ProcessDefinitionDao {
 
-
     public static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDao.class);
 
     /**
@@ -99,7 +98,8 @@ public class ProcessDefinitionDao {
 
     public List<ProcessDefinition> queryProcessDefinition(Connection conn) {
         List<ProcessDefinition> processDefinitions = new ArrayList<>();
-        String sql = "SELECT id,code,project_code,user_id,locations,name,description,release_state,flag,create_time FROM t_ds_process_definition";
+        String sql =
+                "SELECT id,code,project_code,user_id,locations,name,description,release_state,flag,create_time FROM t_ds_process_definition";
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         try {
@@ -140,7 +140,8 @@ public class ProcessDefinitionDao {
      * @param processDefinitions processDefinitions
      * @param projectIdCodeMap projectIdCodeMap
      */
-    public void updateProcessDefinitionCode(Connection conn, List<ProcessDefinition> processDefinitions, Map<Integer, Long> projectIdCodeMap) {
+    public void updateProcessDefinitionCode(Connection conn, List<ProcessDefinition> processDefinitions,
+                                            Map<Integer, Long> projectIdCodeMap) {
         String sql = "UPDATE t_ds_process_definition SET code=?, project_code=?, version=? where id=?";
         try {
             for (ProcessDefinition processDefinition : processDefinitions) {

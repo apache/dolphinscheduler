@@ -33,7 +33,7 @@ public class SwitchParam extends PluginParams {
     private SwitchParam(Builder builder) {
         super(builder);
     }
-    
+
     private SwitchParamProps props;
 
     public static Builder newBuilder(String name, String title) {

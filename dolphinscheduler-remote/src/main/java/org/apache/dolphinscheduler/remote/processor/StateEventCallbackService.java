@@ -141,8 +141,7 @@ public class StateEventCallbackService {
             Thread.currentThread().interrupt();
         } catch (RemotingException e) {
             logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
-        }
-        finally {
+        } finally {
             this.nettyRemotingClient.closeChannel(host);
         }
         return null;

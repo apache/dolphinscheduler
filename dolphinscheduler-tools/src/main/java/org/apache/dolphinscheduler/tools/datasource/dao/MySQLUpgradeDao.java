@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MySQLUpgradeDao extends UpgradeDao {
+
     public static final Logger logger = LoggerFactory.getLogger(MySQLUpgradeDao.class);
 
     private MySQLUpgradeDao(DataSource dataSource) {
@@ -62,8 +63,8 @@ public class MySQLUpgradeDao extends UpgradeDao {
             rs = conn.getMetaData().getTables(conn.getCatalog(), conn.getSchema(), tableName, null);
             return rs.next();
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
             ConnectionUtils.releaseResource(rs, conn);
         }
@@ -77,16 +78,16 @@ public class MySQLUpgradeDao extends UpgradeDao {
      * @return  if column name exist return true，else return false
      */
     @Override
-    public boolean isExistsColumn(String tableName,String columnName) {
+    public boolean isExistsColumn(String tableName, String columnName) {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(),tableName,columnName);
+            ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(), tableName, columnName);
             return rs.next();
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
             ConnectionUtils.releaseResource(conn);
         }

@@ -48,7 +48,6 @@ public class PropertyPlaceholderHelper {
         wellKnownSimplePrefixes.put(")", "(");
     }
 
-
     private final String placeholderPrefix;
 
     private final String placeholderSuffix;
@@ -88,8 +87,7 @@ public class PropertyPlaceholderHelper {
         String simplePrefixForSuffix = wellKnownSimplePrefixes.get(this.placeholderSuffix);
         if (simplePrefixForSuffix != null && this.placeholderPrefix.endsWith(simplePrefixForSuffix)) {
             this.simplePrefix = simplePrefixForSuffix;
-        }
-        else {
+        } else {
             this.simplePrefix = this.placeholderPrefix;
         }
         this.valueSeparator = valueSeparator;
@@ -106,6 +104,7 @@ public class PropertyPlaceholderHelper {
     public String replacePlaceholders(String value, final Properties properties) {
         notNull(properties, "'properties' must not be null");
         return replacePlaceholders(value, new PlaceholderResolver() {
+
             @Override
             public String resolvePlaceholder(String placeholderName) {
                 return properties.getProperty(placeholderName);
@@ -126,7 +125,8 @@ public class PropertyPlaceholderHelper {
     }
 
     protected String parseStringValue(
-            String value, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
+                                      String value, PlaceholderResolver placeholderResolver,
+                                      Set<String> visitedPlaceholders) {
 
         StringBuilder result = new StringBuilder(value);
 
@@ -164,18 +164,15 @@ public class PropertyPlaceholderHelper {
                         logger.trace("Resolved placeholder '" + placeholder + "'");
                     }
                     startIndex = result.indexOf(this.placeholderPrefix, startIndex + propVal.length());
-                }
-                else if (this.ignoreUnresolvablePlaceholders) {
+                } else if (this.ignoreUnresolvablePlaceholders) {
                     // Proceed with unprocessed value.
                     startIndex = result.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());
-                }
-                else {
+                } else {
                     throw new IllegalArgumentException("Could not resolve placeholder '"
                             + placeholder + "'" + " in value \"" + value + "\"");
                 }
                 visitedPlaceholders.remove(originalPlaceholder);
-            }
-            else {
+            } else {
                 startIndex = -1;
             }
         }
@@ -191,16 +188,13 @@ public class PropertyPlaceholderHelper {
                 if (withinNestedPlaceholder > 0) {
                     withinNestedPlaceholder--;
                     index = index + this.placeholderSuffix.length();
-                }
-                else {
+                } else {
                     return index;
                 }
-            }
-            else if (substringMatch(buf, index, this.simplePrefix)) {
+            } else if (substringMatch(buf, index, this.simplePrefix)) {
                 withinNestedPlaceholder++;
                 index = index + this.simplePrefix.length();
-            }
-            else {
+            } else {
                 index++;
             }
         }
@@ -252,4 +246,3 @@ public class PropertyPlaceholderHelper {
     }
 
 }
-

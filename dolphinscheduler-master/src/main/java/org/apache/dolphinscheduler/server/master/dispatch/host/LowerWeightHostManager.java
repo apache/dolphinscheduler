@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -26,10 +25,9 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
 import org.apache.dolphinscheduler.server.master.registry.WorkerInfoChangeListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +37,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * lower weight host manager
@@ -90,8 +93,8 @@ public class LowerWeightHostManager extends CommonHostManager {
         throw new UnsupportedOperationException("not support");
     }
 
-
     private class WorkerWeightListener implements WorkerInfoChangeListener {
+
         @Override
         public void notify(Map<String, Set<String>> workerGroups, Map<String, WorkerHeartBeat> workerNodeInfo) {
             syncWorkerResources(workerGroups, workerNodeInfo);

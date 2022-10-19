@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 public enum ScriptType {
+
     SHELL(0, "SHELL"),
     ;
 

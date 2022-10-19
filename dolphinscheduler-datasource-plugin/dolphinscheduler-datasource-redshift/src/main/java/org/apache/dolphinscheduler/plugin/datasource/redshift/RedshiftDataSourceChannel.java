@@ -23,8 +23,9 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class RedshiftDataSourceChannel implements DataSourceChannel {
+
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new RedshiftDataSourceClient(baseConnectionParam,dbType);
+        return new RedshiftDataSourceClient(baseConnectionParam, dbType);
     }
 }

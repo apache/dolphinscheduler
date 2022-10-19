@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteThreadPool;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -34,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
 /**
@@ -53,13 +51,18 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_START == command.getType(), String.format("invalid command type : %s", command.getType()));
-        TaskExecuteStartCommand taskExecuteStartCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteStartCommand.class);
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_START == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
+        TaskExecuteStartCommand taskExecuteStartCommand =
+                JSONUtils.parseObject(command.getBody(), TaskExecuteStartCommand.class);
         logger.info("taskExecuteStartCommand: {}", taskExecuteStartCommand);
 
-        TaskDefinition taskDefinition = processService.findTaskDefinition(taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
+        TaskDefinition taskDefinition = processService.findTaskDefinition(
+                taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
         if (taskDefinition == null) {
-            logger.error("Task definition can not be found, taskDefinitionCode:{}, taskDefinitionVersion:{}", taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
+            logger.error("Task definition can not be found, taskDefinitionCode:{}, taskDefinitionVersion:{}",
+                    taskExecuteStartCommand.getTaskDefinitionCode(),
+                    taskExecuteStartCommand.getTaskDefinitionVersion());
             return;
         }
         streamTaskExecuteThreadPool.execute(new StreamTaskExecuteRunnable(taskDefinition, taskExecuteStartCommand));

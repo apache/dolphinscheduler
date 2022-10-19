@@ -25,6 +25,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ShowType {
+
     /**
      * 0 TABLE;
      * 1 TEXT;

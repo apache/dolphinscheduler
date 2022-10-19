@@ -33,7 +33,7 @@ public enum ExecuteType {
     NONE, REPEAT_RUNNING, RECOVER_SUSPENDED_PROCESS, START_FAILURE_TASK_PROCESS, STOP, PAUSE;
 
     public static ExecuteType getEnum(int value) {
-        for (ExecuteType e: ExecuteType.values()) {
+        for (ExecuteType e : ExecuteType.values()) {
             if (e.ordinal() == value) {
                 return e;
             }

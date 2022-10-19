@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.java.exception;
 
 public class PublicClassNotFoundException extends RuntimeException {
+
     public PublicClassNotFoundException() {
     }
 
@@ -33,7 +34,8 @@ public class PublicClassNotFoundException extends RuntimeException {
         super(cause);
     }
 
-    public PublicClassNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public PublicClassNotFoundException(String message, Throwable cause, boolean enableSuppression,
+                                        boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

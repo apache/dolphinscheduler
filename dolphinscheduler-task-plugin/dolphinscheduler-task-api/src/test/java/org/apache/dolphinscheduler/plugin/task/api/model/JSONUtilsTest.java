@@ -156,7 +156,8 @@ public class JSONUtilsTest {
         Assertions.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
         Assertions.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
         Assertions.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
-        Assertions.assertEquals("{\"1\":\"2\",\"2\":3}", JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
+        Assertions.assertEquals("{\"1\":\"2\",\"2\":3}",
+                JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
     }
 
     @Test
@@ -216,7 +217,8 @@ public class JSONUtilsTest {
         Assertions.assertEquals("{\"foo\":\"bar\"}", JSONUtils.toJsonString(map));
         Assertions.assertEquals(String.valueOf((Object) null), JSONUtils.toJsonString(null));
 
-        Assertions.assertEquals("{\"foo\":\"bar\"}", JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
+        Assertions.assertEquals("{\"foo\":\"bar\"}",
+                JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
     }
 
     @Test

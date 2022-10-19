@@ -183,8 +183,8 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
-            Flag.NO,
-            processInstance.getTestFlag());
+                Flag.NO,
+                processInstance.getTestFlag());
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
         Assertions.assertNotEquals(taskInstances.size(), 0);

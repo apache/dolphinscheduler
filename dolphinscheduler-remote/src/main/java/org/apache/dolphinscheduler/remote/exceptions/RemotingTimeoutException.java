@@ -17,16 +17,14 @@
 
 package org.apache.dolphinscheduler.remote.exceptions;
 
-
 /**
  *  timeout exception
  */
-public class RemotingTimeoutException extends RemotingException{
+public class RemotingTimeoutException extends RemotingException {
 
     public RemotingTimeoutException(String message) {
         super(message);
     }
-
 
     public RemotingTimeoutException(String address, long timeoutMillis) {
         this(address, timeoutMillis, null);

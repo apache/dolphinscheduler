@@ -36,3 +36,4 @@ python release.py -h
 * Auto cherry-pick: `python release.py cherry-pick`, will cause error when your default branch is not up-to-date, or cherry-pick with conflict. But if you fix you can directly re-run this command, it will continue the pick
 * Generate changelog: `python release.py changelog`
 * Generate contributor: `python release.py contributor`
+

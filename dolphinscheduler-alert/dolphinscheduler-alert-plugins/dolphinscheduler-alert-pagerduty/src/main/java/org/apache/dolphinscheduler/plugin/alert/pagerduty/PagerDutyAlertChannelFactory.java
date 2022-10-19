@@ -17,17 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
-import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
+
 import java.util.Collections;
 import java.util.List;
 
+import com.google.auto.service.AutoService;
+
 @AutoService(AlertChannelFactory.class)
 public final class PagerDutyAlertChannelFactory implements AlertChannelFactory {
+
     @Override
     public String name() {
         return "PagerDuty";
@@ -35,7 +38,9 @@ public final class PagerDutyAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public List<PluginParams> params() {
-        InputParam integrationKey = InputParam.newBuilder(PagerDutyParamsConstants.NAME_PAGER_DUTY_INTEGRATION_KEY_NAME, PagerDutyParamsConstants.PAGER_DUTY_INTEGRATION_KEY)
+        InputParam integrationKey = InputParam
+                .newBuilder(PagerDutyParamsConstants.NAME_PAGER_DUTY_INTEGRATION_KEY_NAME,
+                        PagerDutyParamsConstants.PAGER_DUTY_INTEGRATION_KEY)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())

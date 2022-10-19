@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class RedshiftDataSourceClient extends CommonDataSourceClient {
+
     public RedshiftDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }

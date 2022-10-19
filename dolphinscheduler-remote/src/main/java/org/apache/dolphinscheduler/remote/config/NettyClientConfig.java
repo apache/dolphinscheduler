@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.remote.config;
 
+import org.apache.dolphinscheduler.remote.utils.Constants;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.dolphinscheduler.remote.utils.Constants;
 
 @Data
 @Builder

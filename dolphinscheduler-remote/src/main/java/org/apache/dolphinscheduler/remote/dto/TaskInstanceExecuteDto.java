@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.remote.dto;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Date;
 import java.util.Map;
 
 import lombok.Data;
-
-import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 @Data
 public class TaskInstanceExecuteDto {
