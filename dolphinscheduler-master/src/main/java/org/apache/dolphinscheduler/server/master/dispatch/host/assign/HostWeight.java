@@ -39,7 +39,8 @@ public class HostWeight {
 
     private final int waitingTaskCount;
 
-    public HostWeight(HostWorker hostWorker, double cpu, double memory, double loadAverage, int waitingTaskCount, long startTime) {
+    public HostWeight(HostWorker hostWorker, double cpu, double memory, double loadAverage, int waitingTaskCount,
+                      long startTime) {
         this.hostWorker = hostWorker;
         this.weight = calculateWeight(cpu, memory, loadAverage, startTime);
         this.currentWeight = this.weight;
@@ -63,7 +64,7 @@ public class HostWeight {
     }
 
     public Host getHost() {
-        return (Host)hostWorker;
+        return (Host) hostWorker;
     }
 
     public int getWaitingTaskCount() {
@@ -73,11 +74,11 @@ public class HostWeight {
     @Override
     public String toString() {
         return "HostWeight{"
-            + "hostWorker=" + hostWorker
-            + ", weight=" + weight
-            + ", currentWeight=" + currentWeight
-            + ", waitingTaskCount=" + waitingTaskCount
-            + '}';
+                + "hostWorker=" + hostWorker
+                + ", weight=" + weight
+                + ", currentWeight=" + currentWeight
+                + ", waitingTaskCount=" + waitingTaskCount
+                + '}';
     }
 
     private double calculateWeight(double cpu, double memory, double loadAverage, long startTime) {

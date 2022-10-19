@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DolphinSchedulerManager {
+
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerManager.class);
 
     private final UpgradeDao upgradeDao;
@@ -40,11 +41,10 @@ public class DolphinSchedulerManager {
     public DolphinSchedulerManager(DataSource dataSource, List<UpgradeDao> daos) throws Exception {
         final DbType type = getCurrentDbType(dataSource);
         upgradeDao = daos.stream()
-                         .filter(it -> it.getDbType() == type)
-                         .findFirst()
-                         .orElseThrow(() -> new RuntimeException(
-                             "Cannot find UpgradeDao implementation for db type: " + type
-                         ));
+                .filter(it -> it.getDbType() == type)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(
+                        "Cannot find UpgradeDao implementation for db type: " + type));
     }
 
     private DbType getCurrentDbType(DataSource dataSource) throws Exception {
@@ -65,8 +65,8 @@ public class DolphinSchedulerManager {
     public boolean schemaIsInitialized() {
         // Determines whether the dolphinscheduler table structure has been init
         if (upgradeDao.isExistsTable("t_escheduler_version")
-            || upgradeDao.isExistsTable("t_ds_version")
-            || upgradeDao.isExistsTable("t_escheduler_queue")) {
+                || upgradeDao.isExistsTable("t_ds_version")
+                || upgradeDao.isExistsTable("t_escheduler_queue")) {
             logger.info("The database has been initialized. Skip the initialization step");
             return true;
         }
@@ -106,7 +106,7 @@ public class DolphinSchedulerManager {
                 if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
                     logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
                     logger.info("Begin upgrading DolphinScheduler's table structure");
-                     upgradeDao.upgradeDolphinScheduler(schemaDir);
+                    upgradeDao.upgradeDolphinScheduler(schemaDir);
                     if ("1.3.0".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                     } else if ("1.3.2".equals(schemaVersion)) {
@@ -118,7 +118,8 @@ public class DolphinSchedulerManager {
                 }
             }
 
-            if (SchemaUtils.isAGreatVersion("2.0.6", currentVersion) && SchemaUtils.isAGreatVersion(SchemaUtils.getSoftVersion(), currentVersion)) {
+            if (SchemaUtils.isAGreatVersion("2.0.6", currentVersion)
+                    && SchemaUtils.isAGreatVersion(SchemaUtils.getSoftVersion(), currentVersion)) {
                 upgradeDao.upgradeDolphinSchedulerResourceFileSize();
             }
         }

@@ -33,13 +33,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoundRobinSelector extends AbstractSelector<HostWorker> {
 
-    private ConcurrentMap<String, ConcurrentMap<String, WeightedRoundRobin>> workGroupWeightMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, ConcurrentMap<String, WeightedRoundRobin>> workGroupWeightMap =
+            new ConcurrentHashMap<>();
 
     private static final int RECYCLE_PERIOD = 100000;
 
     private AtomicBoolean updateLock = new AtomicBoolean();
 
     protected static class WeightedRoundRobin {
+
         private int weight;
         private AtomicLong current = new AtomicLong(0);
         private long lastUpdate;

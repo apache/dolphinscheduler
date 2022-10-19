@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutionContextTestUtils;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+
 import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,9 +30,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.common.collect.Sets;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * round robin host manager test

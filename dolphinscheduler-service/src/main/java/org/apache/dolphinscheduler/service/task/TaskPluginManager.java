@@ -22,9 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,8 +29,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 @Component
 public class TaskPluginManager {
+
     private static final Logger logger = LoggerFactory.getLogger(TaskPluginManager.class);
 
     private final Map<String, TaskChannelFactory> taskChannelFactoryMap = new HashMap<>();
