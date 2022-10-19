@@ -256,6 +256,14 @@ public enum Status {
     SCHEDULE_ALREADY_EXISTS(10024, "workflow {0} schedule {1} already exist, please update or delete it",
             "工作流 {0} 的定时 {1} 已经存在，请更新或删除"),
 
+    CREATE_BATCH_RESOURCE_NOTES(10204, "create batch resource error", "创建资源错误"),
+
+    FILE_TYPE_IS_RESTRICTIONS(10205, "The file [{0}] type is restrictions", "文件[{0}]类型为限制类型"),
+
+    BATCH_RESOURCE_NAME_REPEAT(10206, "duplicate file names in this batch", "此批处理中存在重复的文件名"),
+
+    FILE_NAME_CONTAIN_RESTRICTIONS(10207, "The file name [{0}] contain restrictions", "文件命名[{0}]包含限制内容"),
+
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),

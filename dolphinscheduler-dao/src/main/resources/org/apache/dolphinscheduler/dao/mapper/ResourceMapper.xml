@@ -195,4 +195,14 @@
         where full_name = #{fullName}
         and type = #{type} limit 1
     </select>
+
+    <select id="existResources" resultType="java.lang.String">
+        select r.file_name
+        from t_ds_resources r
+        where type = #{type}
+        and r.full_name in
+        <foreach collection="fullNames" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </select>
 </mapper>

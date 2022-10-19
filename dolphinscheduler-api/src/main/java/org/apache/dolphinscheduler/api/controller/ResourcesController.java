@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_FILE_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZE_RESOURCE_TREE;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_BATCH_RESOURCE_NOTES;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_UDF_FUNCTION_ERROR;
@@ -57,6 +58,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -155,6 +157,29 @@ public class ResourcesController extends BaseController {
                                          @RequestParam(value = "currentDir") String currentDir) {
         // todo verify the file name
         return resourceService.createResource(loginUser, alias, description, type, file, pid, currentDir);
+    }
+
+    /**
+     * create batch resource
+     *
+     * @return create batch result code
+     */
+    @ApiOperation(value = "createBatchResource", notes = "CREATE_BATCH_RESOURCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
+            @ApiImplicitParam(name = "files", value = "RESOURCE_FILE", required = true, dataType = "List"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataType = "String")
+    })
+    @PostMapping(value = "/batch-upload")
+    @ApiException(CREATE_BATCH_RESOURCE_NOTES)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<Object> createBatchResources(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @RequestParam(value = "type") ResourceType type,
+                                               @RequestParam(value = "files")  MultipartFile[] files,
+                                               @RequestParam(value = "pid") int pid,
+                                               @RequestParam(value = "currentDir") String currentDir) {
+        return resourceService.createBatchResources(loginUser, type, Arrays.asList(files), pid, currentDir);
     }
 
     /**

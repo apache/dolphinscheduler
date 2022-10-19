@@ -24,6 +24,10 @@ import java.util.regex.Pattern;
 
 public final class Constants {
 
+    public static final String FILE_NAME_RESTRICTED_CONTENT= "file.name.restricted.content";
+
+    public static final String FILE_TYPE_RESTRICTED_LIST = "file.type.restricted.list";
+
     private Constants() {
         throw new UnsupportedOperationException("Construct Constants");
     }

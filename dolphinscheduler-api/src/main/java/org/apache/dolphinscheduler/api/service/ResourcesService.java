@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -70,6 +71,22 @@ public interface ResourcesService {
                                   MultipartFile file,
                                   int pid,
                                   String currentDir);
+
+    /**
+     * create batch resource
+     *
+     * @param loginUser login user
+     * @param files files
+     * @param type type
+     * @param pid parent id
+     * @param currentDir current directory
+     * @return create result code
+     */
+    Result<Object> createBatchResources(User loginUser,
+                                        ResourceType type,
+                                        List<MultipartFile> files,
+                                        int pid,
+                                        String currentDir);
 
     /**
      * update resource
