@@ -46,7 +46,7 @@ public class HiveDataSourceE2ETest {
 
     private static final String password = "dolphinscheduler123";
 
-    private static final String dataSourceType = "HIVE";
+    private static final String dataSourceType = "HIVE/IMPALA";
 
     private static final String dataSourceName = "hive_test";
 
