@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -30,31 +34,12 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.ColumnInfo;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Optional;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +47,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.sql.*;
+import java.util.Date;
+import java.util.*;
 
 /**
  * data source service impl
@@ -340,14 +325,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;
             }
-            if (connectionParam.toString().contains("hdfsPath")) {
-                String[] tmp = connectionParam.toString().split("hdfsPath='");
-                String hdfsPath = tmp[1].split("', principal")[0];
-                if (!checkHDFSPath(hdfsPath)){
-                    logger.error("Invalid hdfsPath");
-                    return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), "Invalid hdfsPath");
-                }
-            }
             putMsg(result, Status.SUCCESS);
             return result;
         } catch (Exception e) {
@@ -601,7 +578,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Connection connection =
                 DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
         Map<String, Object> data = new HashMap<>();
-        Map<String, String> columnList = new HashMap<>();
+        List<ColumnInfo> columnList = new ArrayList<>();
         ResultSet rs = null;
         Statement statement = null;
 
@@ -610,21 +587,27 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 // hive need to distinguish the partition columns
                 statement = connection.createStatement();
                 // can't pass the table name as a binding parameter
-                rs = statement.executeQuery("describe " + tableName);
-                Map<String, String> columns = new HashMap<>();
-                Map<String, String> partitionColumns = new HashMap<>();
-                Map<String, String> insertMap = columns;
+                rs = statement.executeQuery(String.format("describe %s", tableName));
+                List<ColumnInfo> columns = new ArrayList<>();
+                List<ColumnInfo> partitionColumns = new ArrayList<>();
+                List<ColumnInfo> insertList = columns;
                 String columnName;
+                int index = 0;
                 while (rs.next()) {
                     columnName = rs.getString("col_name");
                     if (StringUtils.isEmpty(columnName) || columnName.startsWith("#")) {
-                        insertMap = partitionColumns;
+                        insertList = partitionColumns;
                         continue;
                     }
-                    insertMap.put(columnName, rs.getString("data_type"));
+                    insertList.add(new ColumnInfo(index++, columnName, rs.getString("data_type")));
                 }
-                for (String partitionColumn : partitionColumns.keySet()) {
-                    columns.remove(partitionColumn);
+                for (ColumnInfo partitionColumn: partitionColumns){
+                    for (int i = columns.size() - 1; i >= 0 ; i--) {
+                        if (columns.get(i).getColumnName().equals(partitionColumn.getColumnName())){
+                            columns.remove(i);
+                            break;
+                        }
+                    }
                 }
                 if (partitionColumns.isEmpty()) {
                     data.put("partitionTable", false);
@@ -649,8 +632,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 if (rs == null) {
                     return result;
                 }
+                int index = 0;
                 while (rs.next()) {
-                    columnList.put(rs.getString(COLUMN_NAME), JDBCType.valueOf(rs.getInt(DATA_TYPE)).getName());
+                    columnList.add(new ColumnInfo(
+                            index++,
+                            rs.getString(COLUMN_NAME),
+                            JDBCType.valueOf(rs.getInt(DATA_TYPE)).getName()));
                 }
                 data.put("partitionTable", false);
                 data.put("columns", columnList);
@@ -732,22 +719,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
     }
 
-    private Boolean checkHDFSPath(String hdfsPath) throws URISyntaxException, IOException, InterruptedException {
-        Configuration conf = new Configuration();
-        System.setProperty("hadoop.home.dir", "/");
-        String[] tmp = hdfsPath.split(":");
-        String hdfsURI = tmp[0] + ":" + tmp[1] + ":" + tmp[2].split("/")[0];
-        FileSystem fs = FileSystem.get(new URI(hdfsURI), conf, "root");
-        logger.warn(hdfsURI);
-        logger.warn(hdfsPath);
-        if (fs.exists(new Path(hdfsPath))) {
-            logger.warn("hdfsPath Exist");
-            return true;
-        } else {
-            logger.warn("hdfsPath Not Exist");
-            return false;
-        }
-    }
     private static void closeStatement(Statement statement) {
         if (statement != null) {
             try {
