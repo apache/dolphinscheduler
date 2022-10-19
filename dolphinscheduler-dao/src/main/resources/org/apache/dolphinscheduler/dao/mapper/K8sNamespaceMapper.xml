@@ -66,14 +66,8 @@
         <include refid="baseSqlV2">
             <property name="alias" value="p"/>
         </include>
-        from t_ds_k8s_namespace p
-        where 1=1
-        <if test="userId != 0">
-            and p.id in
-            (
-            select namespace_id from t_ds_relation_namespace_user where user_id=#{userId}
-            )
-        </if>
+        from t_ds_k8s_namespace p,t_ds_relation_namespace_user rel
+        where p.id = rel.namespace_id and rel.user_id= #{userId}
     </select>
 
     <select id="queryByNamespaceCode" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">

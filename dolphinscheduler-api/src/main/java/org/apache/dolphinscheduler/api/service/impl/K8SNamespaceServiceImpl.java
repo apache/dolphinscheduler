@@ -441,7 +441,12 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      */
     @Override
     public List<K8sNamespace> queryNamespaceAvailable(User loginUser) {
-        List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(loginUser.getId());
+        List<K8sNamespace> k8sNamespaces;
+        if (isAdmin(loginUser)) {
+            k8sNamespaces = k8sNamespaceMapper.selectList(null);
+        } else {
+             k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(loginUser.getId());
+        }
         setClusterName(k8sNamespaces);
         return k8sNamespaces;
     }
