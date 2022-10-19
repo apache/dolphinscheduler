@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
@@ -393,11 +394,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             } else if (taskInstance.getState().isFailure()) {
                 completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-                // There are child nodes and the failure policy is: CONTINUE
-                if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
-                        Long.toString(taskInstance.getTaskCode()),
-                        dag)) {
-                    submitPostNode(Long.toString(taskInstance.getTaskCode()));
+                if (FailureStrategy.CONTINUE.equals(processInstance.getFailureStrategy())) {
+                    failureContinueSubmitPostNodes(taskInstance);
                 } else {
                     if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                         killAllTasks();
@@ -416,6 +414,28 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             // remove the task from complete map, so that we can finish in the next time.
             completeTaskMap.remove(taskInstance.getTaskCode());
             throw ex;
+        }
+    }
+
+    /**
+     * continue to submit subsequent tasks after failure
+     *
+     * if there are subsequent tasks:
+     *      1. the execution type is parallel;
+     *      2. the execution type is serial and failed task type is condition;
+     *      3. the execution type is serial and next task type is condition;
+     */
+    private void failureContinueSubmitPostNodes(TaskInstance taskInstance) throws StateEventHandleException {
+        if (!DagHelper.haveAnyNodeAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
+            return;
+        }
+        if (ProcessExecutionTypeEnum.PARALLEL.equals(processDefinition.getExecutionType())) {
+            submitPostNode(Long.toString(taskInstance.getTaskCode()));
+        } else {
+            if (taskInstance.isConditionsTask()
+                    || DagHelper.haveConditionsAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
+                submitPostNode(Long.toString(taskInstance.getTaskCode()));
+            }
         }
     }
 

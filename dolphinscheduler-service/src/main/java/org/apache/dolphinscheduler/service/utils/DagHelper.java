@@ -574,9 +574,9 @@ public class DagHelper {
     }
 
     /**
-     * is there have all node after the parent node
+     * is there any sub nodes
      */
-    public static boolean haveAllNodeAfterNode(String parentNodeCode,
+    public static boolean haveAnyNodeAfterNode(String parentNodeCode,
                                                DAG<String, TaskNode, TaskNodeRelation> dag) {
         return haveSubAfterNode(parentNodeCode, dag, null);
     }
