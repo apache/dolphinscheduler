@@ -425,8 +425,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      *      3. nodes are serial and next task type is condition;
      */
     private void failureContinueSubmitPostNodes(TaskInstance taskInstance) throws StateEventHandleException {
-        boolean haveAnyNodeAfterNode = DagHelper.haveAnyNodeAfterNode(Long.toString(taskInstance.getTaskCode()), dag);
-        System.out.println("===haveAnyNodeAfterNode===" + haveAnyNodeAfterNode);
         if (!DagHelper.haveAnyNodeAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
             submitPostNode(Long.toString(taskInstance.getTaskCode()));
         } else {
