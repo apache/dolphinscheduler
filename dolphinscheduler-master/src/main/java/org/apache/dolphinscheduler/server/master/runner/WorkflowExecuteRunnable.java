@@ -110,14 +110,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import lombok.NonNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import lombok.NonNull;
 
 /**
  * Workflow execute task, used to execute a workflow instance.
