@@ -32,6 +32,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -135,7 +136,6 @@ import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -410,17 +410,18 @@ public class ProcessServiceImpl implements ProcessService {
     @Counted("ds.workflow.create.command.count")
     public int createCommand(Command command) {
         int result = 0;
-        if (command != null) {
-            // add command timezone
-            Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
-            Map<String, String> commandParams = JSONUtils.toMap(command.getCommandParam());
-            if (commandParams != null && schedule != null) {
-                commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
-                command.setCommandParam(JSONUtils.toJsonString(commandParams));
-            }
-            command.setId(null);
-            result = commandMapper.insert(command);
+        if (command == null) {
+            return result;
         }
+        // add command timezone
+        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
+        if (schedule != null) {
+            Map<String, String> commandParams = StringUtils.isNotBlank(command.getCommandParam()) ? JSONUtils.toMap(command.getCommandParam()) : new HashMap<>();
+            commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
+            command.setCommandParam(JSONUtils.toJsonString(commandParams));
+        }
+        command.setId(null);
+        result = commandMapper.insert(command);
         return result;
     }
 
