@@ -16,14 +16,16 @@
  */
 package org.apache.dolphinscheduler.common.os;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+
+import org.apache.commons.lang3.SystemUtils;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * OSUtilsTest

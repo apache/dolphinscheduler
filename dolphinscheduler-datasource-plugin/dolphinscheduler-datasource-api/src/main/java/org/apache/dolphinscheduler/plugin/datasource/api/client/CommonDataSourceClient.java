@@ -89,14 +89,15 @@ public class CommonDataSourceClient implements DataSourceClient {
 
     @Override
     public void checkClient() {
-        //Checking data source client
+        // Checking data source client
         Stopwatch stopwatch = Stopwatch.createStarted();
         try {
             this.jdbcTemplate.execute(this.baseConnectionParam.getValidationQuery());
         } catch (Exception e) {
             throw new RuntimeException("JDBC connect failed", e);
         } finally {
-            logger.info("Time to execute check jdbc client with sql {} for {} ms ", this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            logger.info("Time to execute check jdbc client with sql {} for {} ms ",
+                    this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
         }
     }
 

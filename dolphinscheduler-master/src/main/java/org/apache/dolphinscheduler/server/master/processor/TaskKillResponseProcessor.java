@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
 /**
@@ -48,11 +47,13 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
 
-        TaskKillResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
+        TaskKillResponseCommand responseCommand =
+                JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
         logger.info("[TaskInstance-{}] Received task kill response command : {}",
-            responseCommand.getTaskInstanceId(), responseCommand);
+                responseCommand.getTaskInstanceId(), responseCommand);
     }
 
 }

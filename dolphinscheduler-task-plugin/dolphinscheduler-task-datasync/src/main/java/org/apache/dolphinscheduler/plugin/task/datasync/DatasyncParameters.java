@@ -17,15 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Setter
 @Getter
@@ -56,7 +58,8 @@ public class DatasyncParameters extends AbstractParameters {
         if (jsonFormat) {
             return StringUtils.isNotEmpty(json);
         } else {
-            return StringUtils.isNotEmpty(destinationLocationArn) && StringUtils.isNotEmpty(sourceLocationArn) && StringUtils.isNotEmpty(name);
+            return StringUtils.isNotEmpty(destinationLocationArn) && StringUtils.isNotEmpty(sourceLocationArn)
+                    && StringUtils.isNotEmpty(name);
         }
     }
 
@@ -64,7 +67,8 @@ public class DatasyncParameters extends AbstractParameters {
     @Getter
     @NoArgsConstructor
     @ToString
-    public class Options{
+    public class Options {
+
         private String verifyMode;
         private String overwriteMode;
         private String atime;
@@ -85,14 +89,16 @@ public class DatasyncParameters extends AbstractParameters {
     @Getter
     @NoArgsConstructor
     @ToString
-    public static class TaskSchedule{
+    public static class TaskSchedule {
+
         private String scheduleExpression;
     }
     @Setter
     @Getter
     @NoArgsConstructor
     @ToString
-    public static class FilterRule{
+    public static class FilterRule {
+
         private String filterType;
         private String value;
     }
@@ -100,7 +106,8 @@ public class DatasyncParameters extends AbstractParameters {
     @Getter
     @NoArgsConstructor
     @ToString
-    public static class TagListEntry{
+    public static class TagListEntry {
+
         private String key;
         private String value;
     }

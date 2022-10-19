@@ -42,16 +42,12 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
-import org.testcontainers.containers.ContainerState;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
@@ -67,10 +63,11 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     private final boolean M1_CHIP_FLAG = Objects.equals(System.getProperty("m1_chip"), "true");
 
+    private final int LOCAL_PORT = 5173;
+
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
     private BrowserWebDriverContainer<?> browser;
-    private Network network;
     private HostAndPort address;
     private String rootPath;
 
@@ -92,8 +89,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
         setBrowserContainerByOsName();
 
-        if (network != null) {
-            browser.withNetwork(network);
+        if (compose != null) {
+            Testcontainers.exposeHostPorts(compose.getServicePort("dolphinscheduler_1", 12345));
+            browser.withAccessToHost(true);
         }
         browser.start();
 
@@ -117,8 +115,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     }
 
     private void runInLocal() {
-        Testcontainers.exposeHostPorts(3000);
-        address = HostAndPort.fromParts("host.testcontainers.internal", 3000);
+        Testcontainers.exposeHostPorts(LOCAL_PORT);
+        address = HostAndPort.fromParts("host.testcontainers.internal", LOCAL_PORT);
         rootPath = "/";
     }
 
@@ -126,25 +124,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = createDockerCompose(context);
         compose.start();
 
-        final ContainerState dsContainer = compose.getContainerByServiceName("dolphinscheduler_1")
-                .orElseThrow(() -> new RuntimeException("Failed to find a container named 'dolphinscheduler'"));
-        final String networkId = dsContainer.getContainerInfo().getNetworkSettings().getNetworks().keySet().iterator().next();
-        network = new Network() {
-            @Override
-            public String getId() {
-                return networkId;
-            }
-
-            @Override
-            public void close() {
-            }
-
-            @Override
-            public Statement apply(Statement base, Description description) {
-                return null;
-            }
-        };
-        address = HostAndPort.fromParts("dolphinscheduler", 12345);
+        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort("dolphinscheduler_1", 12345));
         rootPath = "/dolphinscheduler/ui/";
     }
 
@@ -221,6 +201,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = new DockerComposeContainer<>(files)
             .withPull(true)
             .withTailChildContainers(true)
+            .withExposedService("dolphinscheduler_1", 12345)
             .withLogConsumer("dolphinscheduler_1", outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
             .waitingFor("dolphinscheduler_1", Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(180)));
 

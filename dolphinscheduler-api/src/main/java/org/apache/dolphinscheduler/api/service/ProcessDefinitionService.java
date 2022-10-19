@@ -245,8 +245,8 @@ public interface ProcessDefinitionService {
      * @return delete result code
      */
     Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser,
-                                                           long projectCode,
-                                                           String codes);
+                                                            long projectCode,
+                                                            String codes);
 
     /**
      * delete process definition by code

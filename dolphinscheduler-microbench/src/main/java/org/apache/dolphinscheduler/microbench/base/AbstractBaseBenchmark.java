@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.microbench.base;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Scope;
@@ -122,4 +122,3 @@ public abstract class AbstractBaseBenchmark {
     }
 
 }
-
