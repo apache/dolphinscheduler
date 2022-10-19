@@ -37,9 +37,10 @@
     </delete>
 
     <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select
-        <include refid="baseSql"/>
-        from t_ds_process_definition
+        select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
+               pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.tenant_id, pd.update_time, pd.execution_type, tenant.tenant_code
+        from t_ds_process_definition pd
+                 join t_ds_tenant tenant on pd.tenant_id = tenant.id
         where code = #{code}
     </select>
     <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
