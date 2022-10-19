@@ -12,3 +12,4 @@
 - 数据库名：输入连接 ORACLE 的 ServiceName 或 SID
 - Jdbc 连接参数：用于 ORACLE 连接的参数设置，以 JSON 形式填写
   - 比如 `{"schema": "abc"}` 指定使用 `username` 用户下的 `abc` 数据库
+

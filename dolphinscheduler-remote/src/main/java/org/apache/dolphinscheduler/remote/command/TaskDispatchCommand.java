@@ -25,7 +25,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-
 /**
  * The task dispatch message, means dispatch a task to worker.
  */

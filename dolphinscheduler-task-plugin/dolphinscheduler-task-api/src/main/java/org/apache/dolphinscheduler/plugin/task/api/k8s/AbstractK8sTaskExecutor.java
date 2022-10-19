@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
 import org.slf4j.Logger;
 
 public abstract class AbstractK8sTaskExecutor {
+
     protected Logger logger;
     protected TaskExecutionContext taskRequest;
     protected K8sUtils k8sUtils;

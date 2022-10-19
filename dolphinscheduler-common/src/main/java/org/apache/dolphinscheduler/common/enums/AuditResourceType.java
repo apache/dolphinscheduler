@@ -23,6 +23,7 @@ import java.util.HashMap;
  * Audit Module type
  */
 public enum AuditResourceType {
+
     // TODO: add other audit resource enums
     USER_MODULE(0, "USER"),
     PROJECT_MODULE(1, "PROJECT");

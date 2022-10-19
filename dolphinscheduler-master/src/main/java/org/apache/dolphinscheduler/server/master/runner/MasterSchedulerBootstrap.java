@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -135,7 +136,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
                     // the current server is not at running status, cannot consume command.
-                    logger.warn("The current server {} is not at running status, cannot consumes commands.", this.masterAddress);
+                    logger.warn("The current server {} is not at running status, cannot consumes commands.",
+                            this.masterAddress);
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure

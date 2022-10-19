@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.dao.utils;
 
-import java.util.Date;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+
+import java.util.Date;
 
 /**
  * workflow utils
@@ -33,11 +34,10 @@ public class WorkflowUtils {
      * @param processInstance workflow instance
      * @return workflow duration
      */
-    public static String getWorkflowInstanceDuration (ProcessInstance processInstance) {
-        return processInstance.getState() != null && processInstance.getState().isFinished() ?
-            DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()) :
-            DateUtils.format2Duration(processInstance.getStartTime(), new Date());
+    public static String getWorkflowInstanceDuration(ProcessInstance processInstance) {
+        return processInstance.getState() != null && processInstance.getState().isFinished()
+                ? DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())
+                : DateUtils.format2Duration(processInstance.getStartTime(), new Date());
     }
 
 }
-

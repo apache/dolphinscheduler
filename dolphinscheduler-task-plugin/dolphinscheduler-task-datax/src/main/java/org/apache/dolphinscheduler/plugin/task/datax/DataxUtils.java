@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import com.alibaba.druid.sql.dialect.presto.parser.PrestoStatementParser;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.alibaba.druid.sql.dialect.clickhouse.parser.ClickhouseStatementParser;
@@ -25,6 +24,7 @@ import com.alibaba.druid.sql.dialect.hive.parser.HiveStatementParser;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
 import com.alibaba.druid.sql.dialect.oracle.parser.OracleStatementParser;
 import com.alibaba.druid.sql.dialect.postgresql.parser.PGSQLStatementParser;
+import com.alibaba.druid.sql.dialect.presto.parser.PrestoStatementParser;
 import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 

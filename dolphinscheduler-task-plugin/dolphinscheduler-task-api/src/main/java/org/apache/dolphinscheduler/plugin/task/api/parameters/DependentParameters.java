@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 
 import java.util.List;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

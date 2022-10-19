@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.api.dto.queue;
 
+import lombok.Data;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 /**
  * queue verify request

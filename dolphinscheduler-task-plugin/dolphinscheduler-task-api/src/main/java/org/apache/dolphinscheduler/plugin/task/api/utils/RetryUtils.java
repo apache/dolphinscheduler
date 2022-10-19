@@ -62,6 +62,7 @@ public class RetryUtils {
 
     @Data
     public static final class RetryPolicy {
+
         /**
          * The max retry times
          */
