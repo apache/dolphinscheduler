@@ -56,6 +56,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     })
     private WebElement buttonConfirm;
 
+    @FindBys({
+        @FindBy(className = "dialog-source-modal"),
+    })
+    private WebElement dataSourceModal;
+
     private final CreateDataSourceForm createDataSourceForm;
 
     public DataSourcePage(RemoteWebDriver driver) {
@@ -69,18 +74,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         buttonCreateDataSource().click();
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(
-            new By.ByClassName("dialog-create-data-source")));
+            new By.ByClassName("dialog-source-modal")));
 
-        createDataSourceForm().btnDataSourceTypeDropdown().click();
+        dataSourceModal().findElement(By.className(dataSourceType.toUpperCase()+"-box")).click();
 
         new WebDriverWait(driver, 10).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
-
-        createDataSourceForm().selectDataSourceType()
-            .stream()
-            .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("No %s in data source type list", dataSourceType.toUpperCase())))
-            .click();
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);

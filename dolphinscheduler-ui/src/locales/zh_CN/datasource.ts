@@ -17,13 +17,14 @@
 
 export default {
   datasource: '数据源',
-  create_datasource: '创建数据源',
+  create_datasource: '创建源',
+  choose_datasource_type: '选择源类型',
   search_input_tips: '请输入关键字',
-  datasource_name: '数据源名称',
+  datasource_name: '源名称',
   datasource_name_tips: '请输入数据源名称',
   datasource_user_name: '所属用户',
-  datasource_type: '数据源类型',
-  datasource_parameter: '数据源参数',
+  datasource_type: '源类型',
+  datasource_parameter: '参数',
   description: '描述',
   description_tips: '请输入描述',
   test_datasource: '测试数据源',

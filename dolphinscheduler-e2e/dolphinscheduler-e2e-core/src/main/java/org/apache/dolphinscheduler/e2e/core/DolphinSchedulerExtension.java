@@ -67,6 +67,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     private final boolean M1_CHIP_FLAG = Objects.equals(System.getProperty("m1_chip"), "true");
 
+    private final int LOCAL_PORT = 5173;
+
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
     private BrowserWebDriverContainer<?> browser;
@@ -117,8 +119,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     }
 
     private void runInLocal() {
-        Testcontainers.exposeHostPorts(3000);
-        address = HostAndPort.fromParts("host.testcontainers.internal", 3000);
+        Testcontainers.exposeHostPorts(LOCAL_PORT);
+        address = HostAndPort.fromParts("host.testcontainers.internal", LOCAL_PORT);
         rootPath = "/";
     }
 

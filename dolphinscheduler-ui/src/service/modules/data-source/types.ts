@@ -28,9 +28,23 @@ type IDataBase =
   | 'REDSHIFT'
   | 'ATHENA'
 
+type IDataBaseLabel =
+| 'MYSQL'
+| 'POSTGRESQL'
+| 'HIVE'
+| 'SPARK'
+| 'CLICKHOUSE'
+| 'ORACLE'
+| 'SQLSERVER'
+| 'DB2'
+| 'PRESTO'
+| 'REDSHIFT'
+| 'ATHENA'
+
 interface IDataSource {
   id?: number
   type?: IDataBase
+  label?: IDataBaseLabel
   name?: string
   note?: string
   host?: string
