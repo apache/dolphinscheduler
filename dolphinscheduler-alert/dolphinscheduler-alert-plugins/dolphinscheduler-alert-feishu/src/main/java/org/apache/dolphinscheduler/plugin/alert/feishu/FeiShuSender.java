@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
@@ -108,7 +109,7 @@ public final class FeiShuSender {
         if (alertData.getContent() != null) {
 
             List<Map> list = JSONUtils.toList(alertData.getContent(), Map.class);
-            if (list.isEmpty()) {
+            if (CollectionUtils.isEmpty(list)) {
                 return alertData.getTitle() + alertData.getContent();
             }
 

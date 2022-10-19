@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
@@ -101,7 +102,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
     public void run() {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
-                if (needToRetryMessages.isEmpty()) {
+                if (MapUtils.isEmpty(needToRetryMessages)) {
                     Thread.sleep(MESSAGE_RETRY_WINDOW);
                 }
 

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
@@ -280,7 +281,7 @@ public class PropertyUtils {
             return null;
         }
         Set<Object> keys = properties.keySet();
-        if (keys.isEmpty()) {
+        if (CollectionUtils.isEmpty(keys)) {
             return null;
         }
         Map<String, String> propertiesMap = new HashMap<>();
