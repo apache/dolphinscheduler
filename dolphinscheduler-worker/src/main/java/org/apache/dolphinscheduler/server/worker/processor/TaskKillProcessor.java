@@ -231,8 +231,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                                                     String executePath,
                                                     String tenantCode) {
         if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {
-            logger.error("Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
-                host, logPath, appInfoPath, executePath, tenantCode);
+            logger.error(
+                    "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
+                    host, logPath, appInfoPath, executePath, tenantCode);
             return Pair.of(false, Collections.emptyList());
         }
         try {

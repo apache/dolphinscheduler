@@ -171,7 +171,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 if (!checkPathSecurity(appInfoPath) || !checkPathSecurity(logPath)) {
                     throw new IllegalArgumentException("Illegal path");
                 }
-                List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath, PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
+                List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
+                        PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 channel.writeAndFlush(
                         new GetAppIdResponseCommand(appIds).convert2Command(command.getOpaque()));
                 break;

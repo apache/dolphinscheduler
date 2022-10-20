@@ -33,8 +33,6 @@ import org.aspectj.lang.annotation.Aspect;
 @Aspect
 public class YarnClientAspect {
 
-    // public static final Logger logger = LoggerFactory.getLogger(YarnClientAspect.class);
-
     /**
      * The current application report when application submitted successfully
      */

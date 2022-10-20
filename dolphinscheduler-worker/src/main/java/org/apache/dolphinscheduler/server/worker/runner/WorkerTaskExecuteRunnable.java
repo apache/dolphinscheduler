@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-
-import static org.apache.dolphinscheduler.common.Constants.DRY_RUN_FLAG_YES;
 import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.common.Constants.DRY_RUN_FLAG_YES;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -62,8 +62,6 @@ import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.common.base.Strings;
-
-
 
 public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
