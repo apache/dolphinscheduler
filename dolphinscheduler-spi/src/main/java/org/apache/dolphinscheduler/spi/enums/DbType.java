@@ -37,7 +37,8 @@ public enum DbType {
     PRESTO(8, "presto"),
     H2(9, "h2"),
     REDSHIFT(10,"redshift"),
-    ELASTICSEARCH(11, "elasticsearch")
+    ELASTICSEARCH(11, "elasticsearch"),
+    DM(12, "dm")
     ;
 
     @EnumValue
