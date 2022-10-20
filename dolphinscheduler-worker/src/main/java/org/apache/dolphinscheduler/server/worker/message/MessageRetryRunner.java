@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.time.Duration;
 import java.util.HashMap;

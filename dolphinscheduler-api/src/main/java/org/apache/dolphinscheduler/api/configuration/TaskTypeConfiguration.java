@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

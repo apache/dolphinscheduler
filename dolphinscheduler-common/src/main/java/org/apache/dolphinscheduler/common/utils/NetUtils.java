@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static java.util.Collections.emptyList;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import java.io.IOException;

@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.alert.webexteams;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.util.Map;
 

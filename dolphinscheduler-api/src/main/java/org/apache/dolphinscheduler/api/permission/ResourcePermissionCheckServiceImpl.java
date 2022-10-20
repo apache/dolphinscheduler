@@ -180,7 +180,8 @@ public class ResourcePermissionCheckServiceImpl
                 return Collections.emptySet();
             }
             List<Queue> queues = queueMapper.selectList(null);
-            return CollectionUtils.isEmpty(queues) ? Collections.emptySet() : queues.stream().map(Queue::getId).collect(toSet());
+            return CollectionUtils.isEmpty(queues) ? Collections.emptySet()
+                    : queues.stream().map(Queue::getId).collect(toSet());
         }
     }
 
