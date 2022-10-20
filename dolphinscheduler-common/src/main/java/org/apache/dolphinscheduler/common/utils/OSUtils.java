@@ -241,7 +241,7 @@ public class OSUtils {
         int startPos = 0;
         int endPos = lines.length - 2;
         for (int i = 0; i < lines.length; i++) {
-            if (lines[i].isEmpty()) {
+            if (StringUtils.isEmpty(lines[i])) {
                 continue;
             }
 
