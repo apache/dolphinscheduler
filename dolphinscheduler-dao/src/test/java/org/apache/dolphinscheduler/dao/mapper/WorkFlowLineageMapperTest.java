@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 
 import java.util.Date;
@@ -48,6 +49,8 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
+    @Autowired
+    private TenantMapper tenantMapper;
     /**
      * insert
      *
@@ -75,6 +78,12 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
      *
      */
     private void insertOneProcessDefinition() {
+        Tenant tenant = new Tenant();
+        tenant.setTenantCode("tenant");
+        tenant.setId(1);
+        tenant.setDescription("t");
+        tenantMapper.insert(tenant);
+
         // insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
@@ -83,6 +92,8 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         processDefinition.setUserId(101);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
+        processDefinition.setTenantId(1);
+        processDefinition.setTenantCode("test");
         processDefinitionMapper.insert(processDefinition);
     }
 
