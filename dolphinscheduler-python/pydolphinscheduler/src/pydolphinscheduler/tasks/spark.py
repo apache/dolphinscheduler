@@ -23,13 +23,6 @@ from pydolphinscheduler.constants import TaskType
 from pydolphinscheduler.core.engine import Engine, ProgramType
 
 
-class SparkVersion(str):
-    """Spark version, for now it just contain `SPARK1` and `SPARK2`."""
-
-    SPARK1 = "SPARK1"
-    SPARK2 = "SPARK2"
-
-
 class DeployMode(str):
     """SPARK deploy mode, for now it just contain `LOCAL`, `CLIENT` and `CLUSTER`."""
 
@@ -43,7 +36,6 @@ class Spark(Engine):
 
     _task_custom_attr = {
         "deploy_mode",
-        "spark_version",
         "driver_cores",
         "driver_memory",
         "num_executors",
@@ -61,7 +53,6 @@ class Spark(Engine):
         main_package: str,
         program_type: Optional[ProgramType] = ProgramType.SCALA,
         deploy_mode: Optional[DeployMode] = DeployMode.CLUSTER,
-        spark_version: Optional[SparkVersion] = SparkVersion.SPARK2,
         app_name: Optional[str] = None,
         driver_cores: Optional[int] = 1,
         driver_memory: Optional[str] = "512M",
@@ -83,7 +74,6 @@ class Spark(Engine):
             **kwargs
         )
         self.deploy_mode = deploy_mode
-        self.spark_version = spark_version
         self.app_name = app_name
         self.driver_cores = driver_cores
         self.driver_memory = driver_memory

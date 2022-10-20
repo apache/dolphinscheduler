@@ -18,11 +18,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_UPDATE;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -51,22 +46,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * project service test
  **/
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProjectServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceTest.class);
@@ -90,6 +88,7 @@ public class ProjectServiceTest {
     private String projectName = "ProjectServiceTest";
 
     private String userName = "ProjectServiceTest";
+    protected Exception exception;
 
     @Test
     public void testCreateProject() {
@@ -102,92 +101,19 @@ public class ProjectServiceTest {
                 baseServiceLogger)).thenReturn(true);
         Result result = projectService.createProject(loginUser, projectName, getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 10001);
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 10001);
 
         // project name exist
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject());
         result = projectService.createProject(loginUser, projectName, projectName);
         logger.info(result.toString());
-        Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.PROJECT_ALREADY_EXISTS.getCode(), result.getCode().intValue());
 
         // success
         Mockito.when(projectMapper.insert(Mockito.any(Project.class))).thenReturn(1);
         result = projectService.createProject(loginUser, "test", "test");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-
-    }
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
-    @Test
-    public void testCheckProjectAndAuth() {
-
-        long projectCode = 1L;
-        User loginUser = getLoginUser();
-        exception.expect(ServiceException.class);
-        exception.expectMessage(Status.PROJECT_NOT_FOUND.getMsg());
-        projectService.hasProjectAndPerm(loginUser, projectCode, PROJECT);
-
-        Project project = getProject();
-        // USER_NO_OPERATION_PROJECT_PERM
-        project.setUserId(2);
-        exception.expectMessage(MessageFormat.format(Status.USER_NO_OPERATION_PROJECT_PERM.getMsg(), loginUser.getUserName(), project.getName()));
-        projectService.hasProjectAndPerm(loginUser, project, PROJECT);
-
-        // success
-        project.setUserId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
-                project.getUserId(), PROJECT, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
-                0, baseServiceLogger)).thenReturn(true);
-        projectService.hasProjectAndPerm(loginUser, project, PROJECT);
-
-    }
-
-    @Test
-    public void testHasProjectAndPermToNotFound() {
-
-        long projectCode = 1L;
-        User loginUser = getLoginUser();
-        exception.expectMessage(Status.PROJECT_NOT_FOUND.getMsg());
-        projectService.hasProjectAndPerm(loginUser, projectCode, PROJECT);
-
-        Project project = getProject();
-        //USER_NO_OPERATION_PROJECT_PERM
-        project.setUserId(2);
-        //exception.expectMessage(MessageFormat.format(Status.USER_NO_OPERATION_PROJECT_PERM.getMsg(), loginUser.getUserName(), project.getName()));
-        projectService.hasProjectAndPerm(loginUser, project, PROJECT);
-
-    }
-
-    @Test
-    public void testHasProjectAndPermToNoOperation() {
-        User loginUser = getLoginUser();
-        Project project = getProject();
-        //USER_NO_OPERATION_PROJECT_PERM
-        project.setUserId(2);
-        exception.expectMessage(MessageFormat.format(Status.USER_NO_OPERATION_PROJECT_PERM.getMsg(), loginUser.getUserName(), project.getName()));
-        projectService.hasProjectAndPerm(loginUser, project, PROJECT);
-    }
-
-    @Test
-    public void testHasProjectAndPermToSuccess() {
-
-        User loginUser = getLoginUser();
-        Project project = getProject();
-        //success
-        project.setUserId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, new Object[]{project.getId()},
-                project.getUserId(), PROJECT, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{project.getId()},
-                0, baseServiceLogger)).thenReturn(true);
-        projectService.hasProjectAndPerm(loginUser, project, PROJECT);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
     }
 
@@ -199,6 +125,14 @@ public class ProjectServiceTest {
                 new Object[]{1}, loginUser.getId(),
                 PROJECT_DELETE, baseServiceLogger)).thenReturn(true);
 
+        // PROJECT_NOT_FOUNT
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND)).when(projectService)
+                .hasProjectAndPerm(loginUser, 11L, PROJECT_DELETE);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.deleteProject(loginUser, 11L));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
+        loginUser.setId(2);
+
         // DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
         Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -209,14 +143,14 @@ public class ProjectServiceTest {
                 .thenReturn(true);
         Result result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertTrue(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL.getCode() == result.getCode());
+        Assertions.assertTrue(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL.getCode() == result.getCode());
 
         // success
         Mockito.when(projectMapper.deleteById(1)).thenReturn(1);
         Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
     }
 
     @Test
@@ -238,11 +172,11 @@ public class ProjectServiceTest {
         //PROJECT_ALREADY_EXISTS
         Result result = projectService.update(loginUser, 2L, projectName, "desc", userName);
         logger.info(result.toString());
-        Assert.assertTrue(Status.PROJECT_ALREADY_EXISTS.getCode() == result.getCode());
+        Assertions.assertTrue(Status.PROJECT_ALREADY_EXISTS.getCode() == result.getCode());
 
         Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
         result = projectService.update(loginUser, 2L, "test", "desc", "testuser");
-        Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
 
         // success
         Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
@@ -250,7 +184,7 @@ public class ProjectServiceTest {
         Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
         result = projectService.update(loginUser, 2L, "test", "desc", "testUser");
         logger.info(result.toString());
-        Assert.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
 
     }
 
@@ -265,20 +199,19 @@ public class ProjectServiceTest {
         Result result = projectService.queryAuthorizedProject(loginUser, 2);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
 
         // test non-admin user
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setId(3);
         result = projectService.queryAuthorizedProject(loginUser, 2);
         projects = (List<Project>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
 
     @Test
     public void testQueryAuthorizedUser() {
         final User loginUser = this.getLoginUser();
-
         Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(this.getProject());
         // SUCCESS
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -292,7 +225,7 @@ public class ProjectServiceTest {
         Result result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
         logger.info("SUCCESS 1: {}", result.toString());
         List<User> users = (List<User>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(users));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(users));
 
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -305,7 +238,7 @@ public class ProjectServiceTest {
         result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
         logger.info("SUCCESS 2: {}", result.toString());
         users = (List<User>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(users));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(users));
     }
 
     @Test
@@ -320,7 +253,7 @@ public class ProjectServiceTest {
         Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
 
     }
 
@@ -339,7 +272,7 @@ public class ProjectServiceTest {
         Mockito.when(projectMapper.selectBatchIds(set)).thenReturn(getList());
         result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         List<Project> notAdminUserResult = (List<Project>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(notAdminUserResult));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(notAdminUserResult));
 
         // admin user
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -349,7 +282,7 @@ public class ProjectServiceTest {
         result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         List<Project> projects = (List<Project>) result.getData();
 
-        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
 
     }
 
@@ -362,7 +295,17 @@ public class ProjectServiceTest {
         Result result = projectService.queryAllProjectList(user);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
+
+    }
+    @Test
+    public void queryAllProjectListForDependent() {
+        Mockito.when(projectMapper.queryAllProjectForDependent()).thenReturn(getList());
+
+        Result result = projectService.queryAllProjectListForDependent();
+        logger.info(result.toString());
+        List<Project> projects = (List<Project>) result.getData();
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
 
     }
 
@@ -384,7 +327,7 @@ public class ProjectServiceTest {
         Result result = projectService.queryUnauthorizedProject(loginUser, 2);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
 
         // test non-admin user
         loginUser.setId(2);
@@ -397,7 +340,7 @@ public class ProjectServiceTest {
         result = projectService.queryUnauthorizedProject(loginUser, 3);
         logger.info(result.toString());
         projects = (List<Project>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
 
     private Project getProject() {

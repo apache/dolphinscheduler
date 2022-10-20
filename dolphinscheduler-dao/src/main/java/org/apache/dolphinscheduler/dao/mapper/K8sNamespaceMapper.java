@@ -30,6 +30,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
  * namespace interface
  */
 public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
+
     /**
      * k8s namespace page
      *

@@ -26,7 +26,6 @@
     <artifactId>dolphinscheduler-alert-server</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -97,18 +96,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-kubernetes-fabric8-config</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -158,4 +145,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>

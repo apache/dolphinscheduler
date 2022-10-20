@@ -24,13 +24,13 @@ export default {
   port: 8080,
   domain: 'dolphinscheduler.apache.org',
   copyToDist: ['asset', 'img', 'file', '.asf.yaml', 'sitemap.xml', '.nojekyll', '.htaccess', 'googled0df7b96f277a143.html'],
-  docsLatest: '3.0.0',
+  docsLatest: '3.1.0',
   defaultSearch: 'google', // default search engine
   defaultLanguage: 'en-us',
   'en-us': {
     banner: {
       text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to disscuss them ',
-      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg'
+      link: 'https://s.apache.org/dolphinscheduler-slack'
     },
     pageMenu: [
       {
@@ -45,11 +45,16 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.0.0)',
+            text: 'latest(3.1.0)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
+            text: '3.0.1',
+            link: '/en-us/docs/3.0.1/user_doc/about/introduction.html',
+          },
+          {
+            key: 'docs2',
             text: '2.0.6',
             link: '/en-us/docs/2.0.6/user_doc/guide/quick-start.html',
           },
@@ -132,7 +137,7 @@ export default {
           name: 'Slack',
           img1: '/img/slack.png',
           img2: '/img/slack-selected.png',
-          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg',
+          link: 'https://s.apache.org/dolphinscheduler-slack',
         },
         {
           name: 'Email List',
@@ -153,7 +158,7 @@ export default {
   'zh-cn': {
     banner: {
       text: '🤔 有关于 Apache DolphinScheduler 的疑问，加入 Slack 频道来讨论他们 ',
-      link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg'
+      link: 'https://s.apache.org/dolphinscheduler-slack'
     },
     pageMenu: [
       {
@@ -168,11 +173,16 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.0.0)',
+            text: '最新版本latest(3.1.0)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
             key: 'docs1',
+            text: '3.0.1',
+            link: '/zh-cn/docs/3.0.1/user_doc/about/introduction.html',
+          },
+          {
+            key: 'docs2',
             text: '2.0.6',
             link: '/zh-cn/docs/2.0.6/user_doc/guide/quick-start.html',
           },
@@ -257,7 +267,7 @@ export default {
           name: 'Slack',
           img1: '/img/slack.png',
           img2: '/img/slack-selected.png',
-          link: 'https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-1e36toy4n-5n9U2R__FDM05R~MJFFVBg',
+          link: 'https://s.apache.org/dolphinscheduler-slack',
         },
         {
           name: '邮件列表',

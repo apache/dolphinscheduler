@@ -17,57 +17,76 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import junit.framework.TestCase;
-import org.apache.dolphinscheduler.dao.AlertDao;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import org.apache.dolphinscheduler.dao.PluginDao;
-import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingServerFactory;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.reflect.Whitebox;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
+@ExtendWith(MockitoExtension.class)
+public class AlertServerTest {
 
-
-@RunWith(MockitoJUnitRunner.class)
-public class AlertServerTest extends TestCase {
-    
-    @InjectMocks
-    private AlertServer alertServer;
-    
     @Mock
     private PluginDao pluginDao;
-    
+
     @Mock
     private AlertConfig alertConfig;
 
     @Mock
     private AlertSenderService alertSenderService;
-    
+
+    @Mock
+    private NettyRemotingServer nettyRemotingServer;
+
+    @InjectMocks
+    @Spy
+    private AlertServer alertServer;
+
+    @BeforeEach
+    void init() {
+        Mockito.lenient().when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
+
+        Mockito.lenient().when(alertConfig.getPort()).thenReturn(50052);
+    }
+
     @Test
-    public void testStart() {
-
-        Mockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
-
-        Mockito.when(alertConfig.getPort()).thenReturn(50052);
-
-        Mockito.doNothing().when(alertSenderService).start();
+    public void alertServerRunSuccessfully() {
+        doNothing().when(alertServer).checkTable();
+        doNothing().when(alertServer).startServer();
 
         alertServer.run(null);
-    
-        NettyRemotingServer nettyRemotingServer = Whitebox.getInternalState(alertServer, "nettyRemotingServer");
-    
-        NettyServerConfig nettyServerConfig = Whitebox.getInternalState(nettyRemotingServer, "serverConfig");
-        
-        Assert.assertEquals(50052, nettyServerConfig.getListenPort());
 
+        Mockito.verify(alertServer, times(1)).checkTable();
+        Mockito.verify(alertServer, times(1)).startServer();
+        Mockito.verify(alertSenderService, times(1)).start();
+    }
+
+    @Test
+    public void alertServerServerStartWithExpectedListeningPort() {
+        try (
+                MockedStatic<NettyRemotingServerFactory> mockedNettyRemotingServerFactory =
+                        mockStatic(NettyRemotingServerFactory.class)) {
+            mockedNettyRemotingServerFactory.when(() -> NettyRemotingServerFactory.buildNettyRemotingServer(anyInt()))
+                    .thenReturn(nettyRemotingServer);
+            alertServer.startServer();
+            mockedNettyRemotingServerFactory.verify(() -> NettyRemotingServerFactory.buildNettyRemotingServer(50052));
+            verify(nettyRemotingServer, times(1)).registerProcessor(any(), any());
+            verify(nettyRemotingServer, times(1)).start();
+        }
     }
 }

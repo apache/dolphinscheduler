@@ -18,13 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.pytorch;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -36,34 +33,20 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({JSONUtils.class, PropertyUtils.class,})
-@PowerMockIgnore({"javax.*"})
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
+@ExtendWith(MockitoExtension.class)
 public class PytorchTaskTest {
 
     private final String pythonPath = ".";
     private final String requirementPath = "requirements.txt";
-
-    @Before
-    public void before() {
-        PowerMockito.mockStatic(PropertyUtils.class);
-    }
 
     @Test
     public void testPythonEnvManager() {
@@ -72,37 +55,42 @@ public class PytorchTaskTest {
         envManager.setPythonEnvTool(PythonEnvManager.ENV_TOOL_CONDA);
         envManager.setCondaPythonVersion("3.9");
         String condaEnvCommand39 = envManager.getBuildEnvCommand(requirementPath);
-        Assert.assertEquals(condaEnvCommand39, "conda create -y python=3.9 -p ./venv && source activate ./venv && python -m pip install -r " + requirementPath);
+        Assertions.assertEquals(condaEnvCommand39,
+                "conda create -y python=3.9 -p ./venv && source activate ./venv && ./venv/bin/python -m pip install -r "
+                        + requirementPath);
 
         envManager.setCondaPythonVersion("3.8");
         String condaEnvCommand38 = envManager.getBuildEnvCommand(requirementPath);
-        Assert.assertEquals(condaEnvCommand38, "conda create -y python=3.8 -p ./venv && source activate ./venv && python -m pip install -r " + requirementPath);
-
+        Assertions.assertEquals(condaEnvCommand38,
+                "conda create -y python=3.8 -p ./venv && source activate ./venv && ./venv/bin/python -m pip install -r "
+                        + requirementPath);
 
         envManager.setPythonEnvTool(PythonEnvManager.ENV_TOOL_VENV);
         String venvEnvCommand = envManager.getBuildEnvCommand(requirementPath);
-        Assert.assertEquals(venvEnvCommand, "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && python -m pip install -r " + requirementPath);
+        Assertions.assertEquals(venvEnvCommand,
+                "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r "
+                        + requirementPath);
 
     }
 
     @Test
     public void testGitProject() {
 
-        assertFalse(GitProjectManager.isGitPath("dolphinscheduler/test"));
-        assertFalse(GitProjectManager.isGitPath("/dolphinscheduler/test"));
-        assertTrue(GitProjectManager.isGitPath("https://github.com/apache/dolphinscheduler.git"));
-        assertTrue(GitProjectManager.isGitPath("git@github.com:apache/dolphinscheduler.git"));
-        assertTrue(GitProjectManager.isGitPath("git@github.com:apache/dolphinscheduler.git#doc"));
+        Assertions.assertFalse(GitProjectManager.isGitPath("dolphinscheduler/test"));
+        Assertions.assertFalse(GitProjectManager.isGitPath("/dolphinscheduler/test"));
+        Assertions.assertTrue(GitProjectManager.isGitPath("https://github.com/apache/dolphinscheduler.git"));
+        Assertions.assertTrue(GitProjectManager.isGitPath("git@github.com:apache/dolphinscheduler.git"));
+        Assertions.assertTrue(GitProjectManager.isGitPath("git@github.com:apache/dolphinscheduler.git#doc"));
 
         GitProjectManager gpm1 = new GitProjectManager();
         gpm1.setPath("git@github.com:apache/dolphinscheduler.git#doc");
-        Assert.assertEquals("git@github.com:apache/dolphinscheduler.git", gpm1.getGitUrl());
-        Assert.assertEquals("./GIT_PROJECT/doc", gpm1.getGitLocalPath());
+        Assertions.assertEquals("git@github.com:apache/dolphinscheduler.git", gpm1.getGitUrl());
+        Assertions.assertEquals("./GIT_PROJECT/doc", gpm1.getGitLocalPath());
 
         GitProjectManager gpm2 = new GitProjectManager();
         gpm2.setPath("git@github.com:apache/dolphinscheduler.git");
-        Assert.assertEquals("git@github.com:apache/dolphinscheduler.git", gpm2.getGitUrl());
-        Assert.assertEquals("./GIT_PROJECT", gpm2.getGitLocalPath());
+        Assertions.assertEquals("git@github.com:apache/dolphinscheduler.git", gpm2.getGitUrl());
+        Assertions.assertEquals("./GIT_PROJECT", gpm2.getGitLocalPath());
 
     }
 
@@ -113,24 +101,23 @@ public class PytorchTaskTest {
         parameters.setScriptParams("--epochs=1 --dry-run");
 
         PytorchTask task1 = initTask(parameters);
-        Assert.assertEquals(task1.buildPythonExecuteCommand(),
-            "export PYTHONPATH=.\n" +
-                "${PYTHON_HOME} main.py --epochs=1 --dry-run");
+        Assertions.assertEquals(task1.buildPythonExecuteCommand(),
+                "export PYTHONPATH=.\n" +
+                        "${PYTHON_HOME} main.py --epochs=1 --dry-run");
 
         parameters.setPythonCommand("");
         PytorchTask task2 = initTask(parameters);
-        Assert.assertEquals(task2.buildPythonExecuteCommand(),
-            "export PYTHONPATH=.\n" +
-                "${PYTHON_HOME} main.py --epochs=1 --dry-run");
+        Assertions.assertEquals(task2.buildPythonExecuteCommand(),
+                "export PYTHONPATH=.\n" +
+                        "${PYTHON_HOME} main.py --epochs=1 --dry-run");
 
         parameters.setPythonCommand("/usr/bin/python");
         PytorchTask task3 = initTask(parameters);
-        Assert.assertEquals(task3.buildPythonExecuteCommand(),
-            "export PYTHONPATH=.\n" +
-                "/usr/bin/python main.py --epochs=1 --dry-run");
+        Assertions.assertEquals(task3.buildPythonExecuteCommand(),
+                "export PYTHONPATH=.\n" +
+                        "/usr/bin/python main.py --epochs=1 --dry-run");
 
     }
-
 
     @Test
     public void testBuildPythonCommandWithCreateCondeEnv() throws Exception {
@@ -144,10 +131,11 @@ public class PytorchTaskTest {
         parameters.setScriptParams("--epochs=1 --dry-run");
 
         PytorchTask task = initTask(parameters);
-        Assert.assertEquals(task.buildPythonExecuteCommand(),
-            "export PYTHONPATH=.\n" +
-                "conda create -y python=3.6 -p ./venv && source activate ./venv && python -m pip install -r requirements.txt\n" +
-                "./venv/bin/python main.py --epochs=1 --dry-run");
+        Assertions.assertEquals(task.buildPythonExecuteCommand(),
+                "export PYTHONPATH=.\n" +
+                        "conda create -y python=3.6 -p ./venv && source activate ./venv && ./venv/bin/python -m pip install -r requirements.txt\n"
+                        +
+                        "./venv/bin/python main.py --epochs=1 --dry-run");
     }
 
     @Test
@@ -161,10 +149,11 @@ public class PytorchTaskTest {
         parameters.setScriptParams("--epochs=1 --dry-run");
 
         PytorchTask task = initTask(parameters);
-        Assert.assertEquals(task.buildPythonExecuteCommand(),
-            "export PYTHONPATH=.\n" +
-                "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && python -m pip install -r requirements.txt\n" +
-                "./venv/bin/python main.py --epochs=1 --dry-run");
+        Assertions.assertEquals(task.buildPythonExecuteCommand(),
+                "export PYTHONPATH=.\n" +
+                        "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r requirements.txt\n"
+                        +
+                        "./venv/bin/python main.py --epochs=1 --dry-run");
 
     }
 
@@ -189,13 +178,14 @@ public class PytorchTaskTest {
         createFile(scriptFile);
 
         String expected = "export PYTHONPATH=%s\n" +
-            "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && python -m pip install -r %s\n" +
-            "./venv/bin/python %s";
+                "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r %s\n"
+                +
+                "./venv/bin/python %s";
         System.out.println(task.buildPythonExecuteCommand());
-        Assert.assertEquals(String.format(expected, pythonPath, requirementFile, scriptFile), task.buildPythonExecuteCommand());
+        Assertions.assertEquals(String.format(expected, pythonPath, requirementFile, scriptFile),
+                task.buildPythonExecuteCommand());
 
     }
-
 
     private PytorchTask initTask(PytorchParameters pytorchParameters) {
         TaskExecutionContext taskExecutionContext = createContext(pytorchParameters);
@@ -207,22 +197,7 @@ public class PytorchTaskTest {
     public TaskExecutionContext createContext(PytorchParameters pytorchParameters) {
         String parameters = JSONUtils.toJsonString(pytorchParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("PytorchTest");
-        String APP_ID = UUID.randomUUID().toString();
-        String folder = String.format("/tmp/dolphinscheduler_PytorchTest_%s", APP_ID);
-        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn(folder);
-        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(APP_ID);
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
-        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
-        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
-        Mockito.when(taskExecutionContext.getLogPath()).thenReturn(folder + "/log");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        String envirementConfig = "export PATH=$HOME/anaconda3/bin:$PATH\n" + "export PYTHON_HOME=/bin/python";
-        Mockito.when(taskExecutionContext.getEnvironmentConfig()).thenReturn(envirementConfig);
-
-        String userName = System.getenv().get("USER");
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn(userName);
-
         TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
         return taskExecutionContext;
     }
@@ -248,5 +223,3 @@ public class PytorchTaskTest {
     }
 
 }
-
-

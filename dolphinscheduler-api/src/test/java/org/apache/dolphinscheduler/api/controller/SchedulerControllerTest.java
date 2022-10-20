@@ -37,9 +37,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +49,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 public class SchedulerControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
 
     @MockBean(name = "schedulerService")
@@ -58,21 +58,22 @@ public class SchedulerControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateSchedule() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode","40");
-        paramsMap.add("schedule","{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 6 * * ? *'}");
-        paramsMap.add("warningType",String.valueOf(WarningType.NONE));
-        paramsMap.add("warningGroupId","1");
-        paramsMap.add("failureStrategy",String.valueOf(FailureStrategy.CONTINUE));
-        paramsMap.add("receivers","");
-        paramsMap.add("receiversCc","");
-        paramsMap.add("workerGroupId","1");
-        paramsMap.add("processInstancePriority",String.valueOf(Priority.HIGH));
+        paramsMap.add("processDefinitionCode", "40");
+        paramsMap.add("schedule",
+                "{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 6 * * ? *'}");
+        paramsMap.add("warningType", String.valueOf(WarningType.NONE));
+        paramsMap.add("warningGroupId", "1");
+        paramsMap.add("failureStrategy", String.valueOf(FailureStrategy.CONTINUE));
+        paramsMap.add("receivers", "");
+        paramsMap.add("receiversCc", "");
+        paramsMap.add("workerGroupId", "1");
+        paramsMap.add("processInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class), isA(Long.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/", 123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -80,23 +81,23 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    @Ignore
     public void testUpdateSchedule() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","37");
-        paramsMap.add("schedule","{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 7 * * ? *'}");
-        paramsMap.add("warningType",String.valueOf(WarningType.NONE));
-        paramsMap.add("warningGroupId","1");
-        paramsMap.add("failureStrategy",String.valueOf(FailureStrategy.CONTINUE));
-        paramsMap.add("receivers","");
-        paramsMap.add("receiversCc","");
-        paramsMap.add("workerGroupId","1");
-        paramsMap.add("processInstancePriority",String.valueOf(Priority.HIGH));
+        paramsMap.add("id", "37");
+        paramsMap.add("schedule",
+                "{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 7 * * ? *'}");
+        paramsMap.add("warningType", String.valueOf(WarningType.NONE));
+        paramsMap.add("warningGroupId", "1");
+        paramsMap.add("failureStrategy", String.valueOf(FailureStrategy.CONTINUE));
+        paramsMap.add("receivers", "");
+        paramsMap.add("receiversCc", "");
+        paramsMap.add("workerGroupId", "1");
+        paramsMap.add("processInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.updateSchedule(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
@@ -110,19 +111,19 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testOnline() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","37");
+        paramsMap.add("id", "37");
 
         Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(ReleaseState.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/online",123, 37)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/online", 123, 37)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -130,19 +131,19 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testOffline() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","28");
+        paramsMap.add("id", "28");
 
         Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(ReleaseState.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/offline",123, 28)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/offline", 123, 28)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -150,17 +151,17 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryScheduleListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode","40");
-        paramsMap.add("searchVal","test");
-        paramsMap.add("pageNo","1");
-        paramsMap.add("pageSize","30");
+        paramsMap.add("processDefinitionCode", "40");
+        paramsMap.add("searchVal", "test");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("pageSize", "30");
 
         PageInfo<Resource> pageInfo = new PageInfo<>(1, 10);
         Result mockResult = Result.success(pageInfo);
@@ -168,7 +169,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.querySchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(Integer.class), isA(Integer.class))).thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedules/",123)
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedules/", 123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -176,7 +177,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -184,14 +185,14 @@ public class SchedulerControllerTest extends AbstractControllerTest {
     public void testQueryScheduleList() throws Exception {
         Mockito.when(schedulerService.queryScheduleList(isA(User.class), isA(Long.class))).thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/list",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/list", 123)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -200,27 +201,27 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Mockito.when(schedulerService.previewSchedule(isA(User.class), isA(String.class)))
                 .thenReturn(success());
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/preview",123)
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/preview", 123)
                 .header(SESSION_ID, sessionId)
-                .param("schedule","{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *','timezoneId':'Asia/Shanghai'}"))
+                .param("schedule",
+                        "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *','timezoneId':'Asia/Shanghai'}"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testDeleteScheduleById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("scheduleId","37");
+        paramsMap.add("scheduleId", "37");
 
-        Mockito.when(schedulerService.deleteScheduleById(isA(User.class), isA(Long.class), isA(Integer.class)))
-                .thenReturn(success());
+        Mockito.doNothing().when(schedulerService).deleteSchedulesById(isA(User.class), isA(Integer.class));
 
-        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/schedules/{id}",123, 37)
+        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/schedules/{id}", 123, 37)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -228,7 +229,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

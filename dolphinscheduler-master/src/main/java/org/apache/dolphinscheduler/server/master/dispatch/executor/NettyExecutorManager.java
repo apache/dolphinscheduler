@@ -27,8 +27,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
@@ -114,7 +112,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 // is not belongs to the down worker ISSUE-10842.
                 context.getTaskInstance().setHost(host.getAddress());
             } catch (ExecuteException ex) {
-                logger.error(String.format("execute command : %s error", command), ex);
+                logger.error("Execute command {} error", command, ex);
                 try {
                     failNodeSet.add(host.getAddress());
                     Set<String> tmpAllIps = new HashSet<>(allNodes);
@@ -156,7 +154,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 nettyRemotingClient.send(host, command);
                 success = true;
             } catch (Exception ex) {
-                logger.error(String.format("send command : %s to %s error", command, host), ex);
+                logger.error("Send command to {} error, command: {}", host, command, ex);
                 retryCount--;
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }

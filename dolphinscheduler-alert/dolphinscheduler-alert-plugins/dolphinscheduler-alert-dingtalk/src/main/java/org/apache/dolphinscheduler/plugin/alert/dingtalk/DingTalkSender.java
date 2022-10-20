@@ -171,7 +171,8 @@ public final class DingTalkSender {
 
         String msg = generateMsgJson(title, content);
 
-        HttpPost httpPost = constructHttpPost(org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
+        HttpPost httpPost = constructHttpPost(
+                org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
@@ -289,8 +290,12 @@ public final class DingTalkSender {
     private void setMsgAt(Map<String, Object> items) {
         Map<String, Object> at = new HashMap<>();
 
-        String[] atMobileArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",") : new String[0];
-        String[] atUserArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",") : new String[0];
+        String[] atMobileArray =
+                org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
+                        : new String[0];
+        String[] atUserArray =
+                org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
+                        : new String[0];
         boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
 
         at.put("atMobiles", atMobileArray);
@@ -313,7 +318,7 @@ public final class DingTalkSender {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
             byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
-            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)),"UTF-8");
+            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8");
         } catch (Exception e) {
             logger.error("generate sign error, message:{}", e);
         }
@@ -321,6 +326,7 @@ public final class DingTalkSender {
     }
 
     static final class DingTalkSendMsgResponse {
+
         private Integer errcode;
         private String errmsg;
 
@@ -378,7 +384,8 @@ public final class DingTalkSender {
 
         @Override
         public String toString() {
-            return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg=" + this.getErrmsg() + ")";
+            return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg="
+                    + this.getErrmsg() + ")";
         }
     }
 }

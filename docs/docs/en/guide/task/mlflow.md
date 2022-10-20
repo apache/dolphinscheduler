@@ -20,7 +20,6 @@ The MLflow plugin currently supports and will support the following:
 - MLflow Models
   - MLFLOW: Use `MLflow models serve` to deploy a model service
   - Docker: Run the container after packaging the docker image
-  - Docker Compose: Use docker compose to run the container, it will replace the docker run above
 
 ## Create Task
 
@@ -29,7 +28,10 @@ The MLflow plugin currently supports and will support the following:
 
 ## Task Parameters and Example
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |       **Parameter**        |                                                                    **Description**                                                                     |
 |----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -98,22 +100,26 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 
 ![mlflow-models-docker](../../../../img/tasks/demo/mlflow-models-docker.png)
 
-#### DOCKER COMPOSE
-
-![mlflow-models-docker-compose](../../../../img/tasks/demo/mlflow-models-docker-compose.png)
-
-|  **Parameter**   |                     **Description**                      |
-|------------------|----------------------------------------------------------|
-| Max Cpu Limit    | For example, `1.0` or `0.5`, the same as docker compose. |
-| Max Memory Limit | For example `1G` or `500M`, the same as docker compose.  |
-
 ## Environment to Prepare
 
 ### Conda Environment
 
-You need to enter the admin account to configure a conda environment variable（Please
-install [anaconda](https://docs.continuum.io/anaconda/install/)
-or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance).
+Please install [anaconda](https://docs.continuum.io/anaconda/install/) or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance.
+
+**Method A:**
+
+Config anaconda environment in `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+
+Add the following content to the file:
+
+```bash
+# config anaconda environment
+export PATH=/opt/anaconda3/bin:$PATH
+```
+
+**Method B:**
+
+You need to enter the admin account to configure a conda environment variable.
 
 ![mlflow-conda-env](../../../../img/tasks/demo/mlflow-conda-env.png)
 
@@ -139,3 +145,15 @@ After running, an MLflow service is started.
 After this, you can visit the MLflow service (`http://localhost:5000`) page to view the experiments and models.
 
 ![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)
+
+### Preset Algorithm Repository Configuration
+
+If you can't access github, you can modify the following fields in the `commom.properties` configuration file to replace the github address with an accessible address.
+
+```yaml
+# mlflow task plugin preset repository
+ml.mlflow.preset_repository=https://github.com/apache/dolphinscheduler-mlflow
+# mlflow task plugin preset repository version
+ml.mlflow.preset_repository_version="main"
+```
+

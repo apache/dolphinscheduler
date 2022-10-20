@@ -36,8 +36,10 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import springfox.documentation.annotations.ApiIgnore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,7 +57,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * queue controller
@@ -93,9 +94,9 @@ public class QueueV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryQueueListPaging", notes = "QUERY_QUEUE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -109,7 +110,8 @@ public class QueueV2Controller extends BaseController {
         }
 
         String searchVal = ParameterUtils.handleEscapes(queueQueryRequest.getSearchVal());
-        result = queueService.queryList(loginUser, searchVal, queueQueryRequest.getPageNo(), queueQueryRequest.getPageSize());
+        result = queueService.queryList(loginUser, searchVal, queueQueryRequest.getPageNo(),
+                queueQueryRequest.getPageSize());
         return new QueueListPagingResponse(result);
     }
 
@@ -127,7 +129,8 @@ public class QueueV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public QueueCreateResponse createQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody QueueCreateRequest queueCreateRequest) {
-        Result result = queueService.createQueue(loginUser, queueCreateRequest.getQueue(), queueCreateRequest.getQueueName());
+        Result result =
+                queueService.createQueue(loginUser, queueCreateRequest.getQueue(), queueCreateRequest.getQueueName());
         return new QueueCreateResponse(result);
     }
 
@@ -141,16 +144,17 @@ public class QueueV2Controller extends BaseController {
      */
     @ApiOperation(value = "updateQueue", notes = "UPDATE_QUEUE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataTypeClass = int.class, example = "100")
+            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataTypeClass = int.class, example = "100")
     })
     @PutMapping(value = "/{id}", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public QueueUpdateResponse updateQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @PathVariable(value = "id") int id, @RequestBody QueueUpdateRequest queueUpdateRequest) {
+                                           @PathVariable(value = "id") int id,
+                                           @RequestBody QueueUpdateRequest queueUpdateRequest) {
         Result result = queueService.updateQueue(loginUser, id, queueUpdateRequest.getQueue(),
-            queueUpdateRequest.getQueueName());
+                queueUpdateRequest.getQueueName());
         return new QueueUpdateResponse(result);
     }
 

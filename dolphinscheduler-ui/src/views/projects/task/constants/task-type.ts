@@ -46,6 +46,8 @@ export type TaskType =
   | 'FLINK_STREAM'
   | 'PYTORCH'
   | 'HIVECLI'
+  | 'DMS'
+  | 'DATASYNC'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -159,6 +161,14 @@ export const TASK_TYPES_MAP = {
   },
   HIVECLI: {
     alias: 'HIVECLI',
+    helperLinkDisable: true
+  },
+  DMS: {
+    alias: 'DMS',
+    helperLinkDisable: true
+  },
+  DATASYNC: {
+    alias: 'DATASYNC',
     helperLinkDisable: true
   }
 } as {

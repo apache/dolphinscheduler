@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -27,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -53,7 +52,7 @@ public class TaskExecutionCheckerUtils {
             if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX) {
                 // use the id command to judge in linux
                 osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
-            } else if (CommonUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
+            } else if (OSUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
                 // if not exists this user, then create
                 OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
                 osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());

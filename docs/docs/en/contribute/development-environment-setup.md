@@ -38,9 +38,20 @@ the code style and formatting errors for you:
 ./mvnw spotless:apply
 ```
 
-You could copy the `pre-commit hook` file `/style/pre-commit` to your `.git/hooks/`
-directory so that every time you commit your code with `git commit`, `Spotless` will automatically
-fix things for you.
+We also have provided a `pre-commit` config file for easy configuration. To use it, you need to have python installed
+and then install `pre-commit` by running the following command:
+
+```shell
+python -m pip install pre-commit
+```
+
+After that, you can run the following command to install the `pre-commit` hook:
+
+```shell
+pre-commit install
+```
+
+Now, every time you commit your code, `pre-commit` will automatically run `Spotless` to check the code style and formatting.
 
 ## Docker image build
 
@@ -133,7 +144,7 @@ pnpm install
 pnpm run dev
 ```
 
-The browser access address [http://localhost:3000](http://localhost:3000) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+The browser access address [http://localhost:5173](http://localhost:5173) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
 
 ## DolphinScheduler Normal Mode
 
@@ -223,4 +234,4 @@ pnpm install
 pnpm run dev
 ```
 
-The browser access address [http://localhost:3000](http://localhost:3000) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**
+The browser access address [http://localhost:5173](http://localhost:5173) can login DolphinScheduler UI. The default username and password are **admin/dolphinscheduler123**

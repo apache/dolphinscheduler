@@ -77,7 +77,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <springfox.version>3.0.0</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
-        <reflections.version>0.9.12</reflections.version>
+        <reflections.version>0.10.2</reflections.version>
         <py4j.version>0.10.9</py4j.version>
         <jsr305.version>3.0.0</jsr305.version>
         <commons-compress.version>1.21</commons-compress.version>
@@ -85,6 +85,7 @@
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <hibernate-validator.version>6.2.2.Final</hibernate-validator.version>
         <aws-sdk.version>1.12.300</aws-sdk.version>
+        <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
         <joda-time.version>2.10.13</joda-time.version>
         <okhttp.version>3.14.9</okhttp.version>
         <json-path.version>2.7.0</json-path.version>
@@ -95,6 +96,8 @@
         <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
         <snakeyaml.version>1.31</snakeyaml.version>
+        <htrace.version>4.1.1</htrace.version>
+        <datasync.version>2.17.282</datasync.version>
     </properties>
 
     <dependencyManagement>
@@ -159,6 +162,12 @@
                 <groupId>com.cronutils</groupId>
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -625,6 +634,17 @@
                 <artifactId>aws-java-sdk-sagemaker</artifactId>
                 <version>${aws-sdk.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-dms</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun-sdk-oss.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>joda-time</groupId>
@@ -644,14 +664,6 @@
                 <version>${spring-cloud-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>3.12.4</version>
-                <!-- TODO: remove this dependency management after removing powermock -->
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -734,6 +746,12 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/datasync -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>datasync</artifactId>
+                <version>${datasync.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -26,7 +26,6 @@
     <artifactId>dolphinscheduler-api</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -38,7 +37,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -187,12 +185,17 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.hbase.thirdparty</groupId>
+            <artifactId>hbase-noop-htrace</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
-    </dependencies>
 
+    </dependencies>
     <build>
         <testResources>
             <testResource>

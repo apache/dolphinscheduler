@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import java.util.List;
 
 public class PythonParameters extends AbstractParameters {
+
     /**
      * origin python script
      */

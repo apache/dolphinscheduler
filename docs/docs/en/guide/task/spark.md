@@ -15,12 +15,14 @@ Spark task type for executing Spark application. When executing the Spark task, 
 
 ## Task Parameters
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |       **Parameter**        |                                                                  **Description**                                                                  |
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | Program type               | Supports Java, Scala, Python, and SQL.                                                                                                            |
-| Spark version              | Support Spark1 and Spark2.                                                                                                                        |
 | The class of main function | The **full path** of Main Class, the entry point of the Spark program.                                                                            |
 | Main jar package           | The Spark jar package (upload by Resource Center).                                                                                                |
 | SQL scripts                | SQL statements in .sql files that Spark sql runs.                                                                                                 |

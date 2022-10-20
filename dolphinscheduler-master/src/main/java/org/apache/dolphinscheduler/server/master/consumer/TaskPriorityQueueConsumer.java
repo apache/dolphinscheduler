@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
@@ -40,12 +39,9 @@ import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +50,13 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * TaskUpdateQueue consumer
@@ -128,12 +131,14 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
                 if (CollectionUtils.isNotEmpty(failedDispatchTasks)) {
+                    logger.info("{} tasks dispatch failed, will retry to dispatch", failedDispatchTasks.size());
                     TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
                     // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
                     if (fetchTaskNum == failedDispatchTasks.size()) {
+                        logger.info("All tasks dispatch failed, will sleep a while to avoid the master cpu higher");
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
@@ -209,6 +214,8 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
             if (isTaskNeedToCheck(taskPriority)) {
                 if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
                     // when task finish, ignore this task, there is no need to dispatch anymore
+                    logger.info("Task {} is already finished, no need to dispatch, task instance id: {}",
+                            taskInstance.getName(), taskInstance.getId());
                     return true;
                 }
             }

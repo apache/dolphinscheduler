@@ -26,3 +26,7 @@ In this section
    develop
    resource-plugin
    local
+   github
+   gitlab
+   oss
+   s3

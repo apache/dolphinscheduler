@@ -121,7 +121,7 @@ public class ExecutorController extends BaseController {
             @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),
             @ApiImplicitParam(name = "environmentCode", value = "ENVIRONMENT_CODE", dataType = "Long", example = "-1"),
             @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int" , example = "8"),
+            @ApiImplicitParam(name = "expectedParallelismNumber", value = "EXPECTED_PARALLELISM_NUMBER", dataType = "Int", example = "8"),
             @ApiImplicitParam(name = "dryRun", value = "DRY_RUN", dataType = "Int", example = "0"),
             @ApiImplicitParam(name = "testFlag", value = "TEST_FLAG", dataType = "Int", example = "0"),
             @ApiImplicitParam(name = "complementDependentMode", value = "COMPLEMENT_DEPENDENT_MODE", dataType = "complementDependentMode")
@@ -139,7 +139,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "taskDependType", required = false) TaskDependType taskDependType,
                                        @RequestParam(value = "execType", required = false) CommandType execType,
                                        @RequestParam(value = "warningType") WarningType warningType,
-                                       @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
+                                       @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
@@ -166,7 +166,8 @@ public class ExecutorController extends BaseController {
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag, complementDependentMode);
+                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
+                complementDependentMode);
         return returnDataList(result);
     }
 
@@ -226,7 +227,7 @@ public class ExecutorController extends BaseController {
                                             @RequestParam(value = "taskDependType", required = false) TaskDependType taskDependType,
                                             @RequestParam(value = "execType", required = false) CommandType execType,
                                             @RequestParam(value = "warningType") WarningType warningType,
-                                            @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
+                                            @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
                                             @RequestParam(value = "runMode", required = false) RunMode runMode,
                                             @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                             @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
@@ -268,10 +269,12 @@ public class ExecutorController extends BaseController {
                     complementDependentMode);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
-                logger.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode, processDefinitionCode);
+                logger.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                        processDefinitionCode);
                 startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
             } else
-                logger.info("Start process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode, processDefinitionCode);
+                logger.info("Start process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                        processDefinitionCode);
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
@@ -303,9 +306,9 @@ public class ExecutorController extends BaseController {
     public Result execute(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
-                          @RequestParam("executeType") ExecuteType executeType
-    ) {
-        logger.info("Start to execute process instance, projectCode:{}, processInstanceId:{}.", projectCode, processInstanceId);
+                          @RequestParam("executeType") ExecuteType executeType) {
+        logger.info("Start to execute process instance, projectCode:{}, processInstanceId:{}.", projectCode,
+                processInstanceId);
         Map<String, Object> result = execService.execute(loginUser, projectCode, processInstanceId, executeType);
         return returnDataList(result);
     }
@@ -344,10 +347,12 @@ public class ExecutorController extends BaseController {
                     Map<String, Object> singleResult =
                             execService.execute(loginUser, projectCode, processInstanceId, executeType);
                     if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
-                        logger.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.", projectCode, processInstanceId);
+                        logger.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.",
+                                projectCode, processInstanceId);
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
                     } else
-                        logger.info("Start to execute process instance complete, projectCode:{}, processInstanceId:{}.", projectCode, processInstanceId);
+                        logger.info("Start to execute process instance complete, projectCode:{}, processInstanceId:{}.",
+                                projectCode, processInstanceId);
                 } catch (Exception e) {
                     executeFailedIdList
                             .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
@@ -440,7 +445,8 @@ public class ExecutorController extends BaseController {
             startParamMap = JSONUtils.toMap(startParams);
         }
 
-        logger.info("Start to execute stream task instance, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}.", projectCode, code, version);
+        logger.info("Start to execute stream task instance, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}.",
+                projectCode, code, version);
         Map<String, Object> result = execService.execStreamTaskInstance(loginUser, projectCode, code, version,
                 warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);

@@ -23,12 +23,14 @@ import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.dao.entity.FavTask;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.FavTaskMapper;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
 
 @Service
 public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskService {
@@ -43,12 +45,20 @@ public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskServic
         Set<String> userFavTaskTypes = favMapper.getUserFavTaskTypes(loginUser.getId());
 
         List<FavTaskDto> defaultTaskTypes = taskTypeConfiguration.getDefaultTaskTypes();
+        List<FavTaskDto> result = new ArrayList<>();
+        // clone default list and modify fav task type flag
         defaultTaskTypes.forEach(e -> {
-            if (userFavTaskTypes.contains(e.getTaskName())) {
-                e.setCollection(true);
+            try {
+                FavTaskDto clone = (FavTaskDto) e.clone();
+                if (userFavTaskTypes.contains(clone.getTaskName())) {
+                    clone.setCollection(true);
+                }
+                result.add(clone);
+            } catch (CloneNotSupportedException ex) {
+                throw new RuntimeException(ex);
             }
         });
-        return defaultTaskTypes;
+        return result;
     }
 
     @Override

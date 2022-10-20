@@ -17,64 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
-import java.util.Collections;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import java.util.Collections;
 
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({
-    JSONUtils.class
-})
-@PowerMockIgnore({"javax.*"})
-
+@ExtendWith(MockitoExtension.class)
 public class SparkTaskTest {
 
     @Test
-    public void testBuildCommandWithSpark2Sql() throws Exception {
-        String parameters = buildSparkParametersWithSparkSql(ProgramType.SQL, "SPARK2");
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
+    public void testBuildCommandWithSparkSql() throws Exception {
+        String parameters = buildSparkParametersWithSparkSql();
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
+        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
 
-        SparkTask sparkTask = spy(new SparkTask(taskExecutionContext));
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
-        Assert.assertEquals(sparkTask.buildCommand(),
-            "${SPARK_HOME2}/bin/spark-sql " +
-                "--master yarn " +
-                "--deploy-mode client " +
-                "--driver-cores 1 " +
-                "--driver-memory 512M " +
-                "--num-executors 2 " +
-                "--executor-cores 2 " +
-                "--executor-memory 1G " +
-                "--name sparksql " +
-                "-f /tmp/5536_node.sql");
-    }
-    @Test
-    public void testBuildCommandWithSpark1Sql() throws Exception {
-        String parameters = buildSparkParametersWithSparkSql(ProgramType.SQL, "SPARK1");
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
-        SparkTask sparkTask = spy(new SparkTask(taskExecutionContext));
-        sparkTask.init();
-        Assert.assertEquals(sparkTask.buildCommand(),
-                "${SPARK_HOME1}/bin/spark-sql " +
+        Assertions.assertEquals(sparkTask.buildCommand(),
+                "${SPARK_HOME}/bin/spark-sql " +
                         "--master yarn " +
                         "--deploy-mode client " +
                         "--driver-cores 1 " +
@@ -87,16 +56,14 @@ public class SparkTaskTest {
     }
 
     @Test
-    public void testBuildCommandWithSpark2Submit() throws Exception {
-        String parameters = buildSparkParametersWithSparkSubmit(ProgramType.SCALA, "SPARK2");
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
-        SparkTask sparkTask = spy(new SparkTask(taskExecutionContext));
+    public void testBuildCommandWithSparkSubmit() {
+        String parameters = buildSparkParametersWithSparkSubmit();
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
-        Assert.assertEquals(sparkTask.buildCommand(),
-                "${SPARK_HOME2}/bin/spark-submit " +
+        Assertions.assertEquals(sparkTask.buildCommand(),
+                "${SPARK_HOME}/bin/spark-submit " +
                         "--master yarn " +
                         "--deploy-mode client " +
                         "--class org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest " +
@@ -108,38 +75,16 @@ public class SparkTaskTest {
                         "--name spark " +
                         "lib/dolphinscheduler-task-spark.jar");
     }
-    @Test
-    public void testBuildCommandWithSpark1Submit() throws Exception {
-        String parameters = buildSparkParametersWithSparkSubmit(ProgramType.SCALA, "SPARK1");
-        TaskExecutionContext taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("5536");
-        SparkTask sparkTask = spy(new SparkTask(taskExecutionContext));
-        sparkTask.init();
-        Assert.assertEquals(sparkTask.buildCommand(),
-                "${SPARK_HOME1}/bin/spark-submit " +
-                        "--master yarn " +
-                        "--deploy-mode client " +
-                        "--class org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest " +
-                        "--driver-cores 1 " +
-                        "--driver-memory 512M " +
-                        "--num-executors 2 " +
-                        "--executor-cores 2 " +
-                        "--executor-memory 1G " +
-                        "--name spark " +
-                        "lib/dolphinscheduler-task-spark.jar");
-    }
-    private String buildSparkParametersWithSparkSql(ProgramType programType, String sparkVersion) {
+
+    private String buildSparkParametersWithSparkSql() {
         SparkParameters sparkParameters = new SparkParameters();
         sparkParameters.setLocalParams(Collections.emptyList());
         sparkParameters.setRawScript("selcet 11111;");
-        sparkParameters.setProgramType(programType);
+        sparkParameters.setProgramType(ProgramType.SQL);
         sparkParameters.setMainClass("");
         sparkParameters.setDeployMode("client");
         sparkParameters.setAppName("sparksql");
         sparkParameters.setOthers("");
-        sparkParameters.setSparkVersion(sparkVersion);
         sparkParameters.setDriverCores(1);
         sparkParameters.setDriverMemory("512M");
         sparkParameters.setNumExecutors(2);
@@ -147,15 +92,15 @@ public class SparkTaskTest {
         sparkParameters.setExecutorCores(2);
         return JSONUtils.toJsonString(sparkParameters);
     }
-    private String buildSparkParametersWithSparkSubmit(ProgramType programType, String sparkVersion) {
+
+    private String buildSparkParametersWithSparkSubmit() {
         SparkParameters sparkParameters = new SparkParameters();
         sparkParameters.setLocalParams(Collections.emptyList());
-        sparkParameters.setProgramType(programType);
+        sparkParameters.setProgramType(ProgramType.SCALA);
         sparkParameters.setMainClass("org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest");
         sparkParameters.setDeployMode("client");
         sparkParameters.setAppName("spark");
         sparkParameters.setOthers("");
-        sparkParameters.setSparkVersion(sparkVersion);
         sparkParameters.setDriverCores(1);
         sparkParameters.setDriverMemory("512M");
         sparkParameters.setNumExecutors(2);
