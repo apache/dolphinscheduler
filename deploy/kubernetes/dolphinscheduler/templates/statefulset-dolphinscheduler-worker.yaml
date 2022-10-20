@@ -64,11 +64,10 @@ spec:
               value: {{ .Values.timezone }}
             - name: SPRING_JACKSON_TIME_ZONE
               value: {{ .Values.timezone }}
-            - name: ALERT_LISTEN_HOST
+            - name: WORKER_ALERT_LISTEN_HOST
               value: {{ include "dolphinscheduler.fullname" . }}-alert
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
-            {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
             {{ range $key, $value :=  .Values.worker.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -111,6 +110,7 @@ spec:
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
       volumes:
+        {{- if .Values.worker.persistentVolumeClaim.enabled }}
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
           {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
           persistentVolumeClaim:
@@ -125,6 +125,12 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- else }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          emptyDir: {}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          emptyDir: {}
+        {{- end }}
         - name: config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs

@@ -18,18 +18,17 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.mockito.Mockito;
 
-import java.util.Date;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 public class DefaultWorkerDelayTaskExecuteRunnableTest {
 
@@ -53,7 +52,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .dryRun(Constants.DRY_RUN_FLAG_YES)
                 .taskInstanceId(0)
                 .processDefineId(0)
-                .firstSubmitTime(new Date())
+                .firstSubmitTime(System.currentTimeMillis())
                 .taskLogName("TestLogName")
                 .build();
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
@@ -63,11 +62,35 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 workerMessageSender,
                 alertClientService,
                 taskPluginManager,
-                storageOperate
-        );
+                storageOperate);
 
         Assertions.assertAll(workerTaskExecuteRunnable::run);
         Assertions.assertEquals(TaskExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
     }
 
+    @Test
+    public void testErrorboundTestDataSource() {
+        TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
+                .dryRun(Constants.DRY_RUN_FLAG_NO)
+                .testFlag(Constants.TEST_FLAG_YES)
+                .taskInstanceId(0)
+                .processDefineId(0)
+                .firstSubmitTime(System.currentTimeMillis())
+                .taskLogName("TestLogName")
+                .taskType("SQL")
+                .taskParams(
+                        "{\"localParams\":[],\"resourceList\":[],\"type\":\"POSTGRESQL\",\"datasource\":null,\"sql\":\"select * from t_ds_user\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}")
+                .build();
+        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
+                taskExecutionContext,
+                workerConfig,
+                masterAddress,
+                workerMessageSender,
+                alertClientService,
+                taskPluginManager,
+                storageOperate);
+
+        Assertions.assertAll(workerTaskExecuteRunnable::run);
+        Assertions.assertEquals(TaskExecutionStatus.FAILURE, taskExecutionContext.getCurrentExecutionStatus());
+    }
 }

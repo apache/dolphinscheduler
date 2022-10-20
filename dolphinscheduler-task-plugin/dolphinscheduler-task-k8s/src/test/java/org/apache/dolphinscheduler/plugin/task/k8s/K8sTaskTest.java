@@ -21,16 +21,18 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class K8sTaskTest {
+
     private K8sTaskParameters k8sTaskParameters = null;
 
     private K8sTask k8sTask = null;
@@ -46,7 +48,7 @@ public class K8sTaskTest {
 
     private final String DAY = "day";
     private final String date = "20220507";
-    @Before
+    @BeforeEach
     public void before() {
         k8sTaskParameters = new K8sTaskParameters();
         k8sTaskParameters.setImage(image);
@@ -63,7 +65,7 @@ public class K8sTaskTest {
         property.setType(DataType.VARCHAR);
         property.setValue(date);
         Map<String, Property> paramsMap = new HashMap<>();
-        paramsMap.put(DAY,property);
+        paramsMap.put(DAY, property);
         taskRequest.setParamsMap(paramsMap);
 
         Map<String, Property> prepareParamsMap = new HashMap<>();
@@ -77,16 +79,18 @@ public class K8sTaskTest {
 
     @Test
     public void testBuildCommandNormal() {
-        String expectedStr = "{\"image\":\"ds-dev\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"}}";
+        String expectedStr =
+                "{\"image\":\"ds-dev\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"}}";
         String commandStr = k8sTask.buildCommand();
-        Assert.assertEquals(expectedStr, commandStr);
+        Assertions.assertEquals(expectedStr, commandStr);
     }
 
     @Test
     public void testGetParametersNormal() {
-        String expectedStr = "K8sTaskParameters{image='ds-dev', namespace='{\"name\":\"default\",\"cluster\":\"lab\"}', minCpuCores=2.0, minMemorySpace=10.0}";
+        String expectedStr =
+                "K8sTaskParameters{image='ds-dev', namespace='{\"name\":\"default\",\"cluster\":\"lab\"}', minCpuCores=2.0, minMemorySpace=10.0}";
         String result = k8sTask.getParameters().toString();
-        Assert.assertEquals(expectedStr, result);
+        Assertions.assertEquals(expectedStr, result);
     }
 
 }

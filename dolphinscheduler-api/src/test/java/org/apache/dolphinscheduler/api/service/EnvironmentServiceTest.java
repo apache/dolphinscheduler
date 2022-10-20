@@ -46,13 +46,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.assertj.core.util.Lists;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * environment service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class EnvironmentServiceTest {
 
     public static final Logger logger = LoggerFactory.getLogger(EnvironmentServiceTest.class);
@@ -96,78 +99,84 @@ public class EnvironmentServiceTest {
     public void testCreateEnvironment() {
         User loginUser = getGeneralUser();
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
-                loginUser.getId(),ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
+                loginUser.getId(), ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc(),workerGroups);
+        Map<String, Object> result =
+                environmentService.createEnvironment(loginUser, environmentName, getConfig(), getDesc(), workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
-        result = environmentService.createEnvironment(loginUser,environmentName,"",getDesc(),workerGroups);
+        result = environmentService.createEnvironment(loginUser, environmentName, "", getDesc(), workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
 
-        result = environmentService.createEnvironment(loginUser,"",getConfig(),getDesc(),workerGroups);
+        result = environmentService.createEnvironment(loginUser, "", getConfig(), getDesc(), workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
 
-        result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc(),"test");
+        result = environmentService.createEnvironment(loginUser, environmentName, getConfig(), getDesc(), "test");
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.createEnvironment(loginUser,environmentName,getConfig(),getDesc(),workerGroups);
+        result = environmentService.createEnvironment(loginUser, environmentName, getConfig(), getDesc(), workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.insert(Mockito.any(Environment.class))).thenReturn(1);
         Mockito.when(relationMapper.insert(Mockito.any(EnvironmentWorkerGroupRelation.class))).thenReturn(1);
-        result = environmentService.createEnvironment(loginUser,"testName","test","test",workerGroups);
+        result = environmentService.createEnvironment(loginUser, "testName", "test", "test", workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
     }
 
     @Test
     public void testCheckParams() {
-        Map<String, Object> result = environmentService.checkParams(environmentName,getConfig(),"test");
-        Assert.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+        Map<String, Object> result = environmentService.checkParams(environmentName, getConfig(), "test");
+        Assertions.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
     }
 
     @Test
     public void testUpdateEnvironmentByCode() {
         User loginUser = getGeneralUser();
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
-                loginUser.getId(),ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
+                loginUser.getId(), ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,getConfig(),getDesc(),workerGroups);
+        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser, 1L, environmentName,
+                getConfig(), getDesc(), workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
-        result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,"",getDesc(),workerGroups);
+        result = environmentService.updateEnvironmentByCode(loginUser, 1L, environmentName, "", getDesc(),
+                workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
 
-        result = environmentService.updateEnvironmentByCode(loginUser,1L,"",getConfig(),getDesc(),workerGroups);
+        result = environmentService.updateEnvironmentByCode(loginUser, 1L, "", getConfig(), getDesc(), workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
 
-        result = environmentService.updateEnvironmentByCode(loginUser,1L,environmentName,getConfig(),getDesc(),"test");
+        result = environmentService.updateEnvironmentByCode(loginUser, 1L, environmentName, getConfig(), getDesc(),
+                "test");
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.updateEnvironmentByCode(loginUser,2L,environmentName,getConfig(),getDesc(),workerGroups);
+        result = environmentService.updateEnvironmentByCode(loginUser, 2L, environmentName, getConfig(), getDesc(),
+                workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
 
-        Mockito.when(environmentMapper.update(Mockito.any(Environment.class),Mockito.any(Wrapper.class))).thenReturn(1);
-        result = environmentService.updateEnvironmentByCode(loginUser,1L,"testName","test","test",workerGroups);
+        Mockito.when(environmentMapper.update(Mockito.any(Environment.class), Mockito.any(Wrapper.class)))
+                .thenReturn(1);
+        result = environmentService.updateEnvironmentByCode(loginUser, 1L, "testName", "test", "test", workerGroups);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -178,12 +187,12 @@ public class EnvironmentServiceTest {
                 1, environmentServiceLogger)).thenReturn(ids);
         Mockito.when(environmentMapper.selectBatchIds(ids)).thenReturn(Lists.newArrayList(getEnvironment()));
 
-        Map<String, Object> result  = environmentService.queryAllEnvironmentList(getAdminUser());
+        Map<String, Object> result = environmentService.queryAllEnvironmentList(getAdminUser());
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
-        List<Environment> list = (List<Environment>)(result.get(Constants.DATA_LIST));
-        Assert.assertEquals(1,list.size());
+        List<Environment> list = (List<Environment>) (result.get(Constants.DATA_LIST));
+        Assertions.assertEquals(1, list.size());
     }
 
     @Test
@@ -191,12 +200,13 @@ public class EnvironmentServiceTest {
         IPage<Environment> page = new Page<>(1, 10);
         page.setRecords(getList());
         page.setTotal(1L);
-        Mockito.when(environmentMapper.queryEnvironmentListPaging(Mockito.any(Page.class), Mockito.eq(environmentName))).thenReturn(page);
+        Mockito.when(environmentMapper.queryEnvironmentListPaging(Mockito.any(Page.class), Mockito.eq(environmentName)))
+                .thenReturn(page);
 
         Result result = environmentService.queryEnvironmentListPaging(getAdminUser(), 1, 10, environmentName);
         logger.info(result.toString());
         PageInfo<Environment> pageInfo = (PageInfo<Environment>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
 
     @Test
@@ -204,12 +214,12 @@ public class EnvironmentServiceTest {
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
         Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
         logger.info(result.toString());
-        Assert.assertEquals(Status.QUERY_ENVIRONMENT_BY_NAME_ERROR,result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_NAME_ERROR, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
         result = environmentService.queryEnvironmentByName(environmentName);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -217,12 +227,12 @@ public class EnvironmentServiceTest {
         Mockito.when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(null);
         Map<String, Object> result = environmentService.queryEnvironmentByCode(1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR,result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(getEnvironment());
         result = environmentService.queryEnvironmentByCode(1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -232,33 +242,33 @@ public class EnvironmentServiceTest {
                 loginUser.getId(), ENVIRONMENT_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser,1L);
+        Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
-        Mockito.when(taskDefinitionMapper.selectCount(Mockito.any(LambdaQueryWrapper.class))).thenReturn(1);
-        result = environmentService.deleteEnvironmentByCode(loginUser,1L);
+        Mockito.when(taskDefinitionMapper.selectCount(Mockito.any(LambdaQueryWrapper.class))).thenReturn(1L);
+        result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS, result.get(Constants.STATUS));
 
-        Mockito.when(taskDefinitionMapper.selectCount(Mockito.any(LambdaQueryWrapper.class))).thenReturn(0);
+        Mockito.when(taskDefinitionMapper.selectCount(Mockito.any(LambdaQueryWrapper.class))).thenReturn(0L);
         Mockito.when(environmentMapper.deleteByCode(1L)).thenReturn(1);
-        result = environmentService.deleteEnvironmentByCode(loginUser,1L);
+        result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testVerifyEnvironment() {
         Map<String, Object> result = environmentService.verifyEnvironment("");
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
 
         Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
         result = environmentService.verifyEnvironment(environmentName);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
     }
 
     private Environment getEnvironment() {
@@ -285,8 +295,7 @@ public class EnvironmentServiceTest {
     private String getConfig() {
         return "export HADOOP_HOME=/opt/hadoop-2.6.5\n"
                 + "export HADOOP_CONF_DIR=/etc/hadoop/conf\n"
-                + "export SPARK_HOME1=/opt/soft/spark1\n"
-                + "export SPARK_HOME2=/opt/soft/spark2\n"
+                + "export SPARK_HOME=/opt/soft/spark\n"
                 + "export PYTHON_HOME=/opt/soft/python\n"
                 + "export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n"
                 + "export HIVE_HOME=/opt/soft/hive\n"
@@ -294,7 +303,7 @@ public class EnvironmentServiceTest {
                 + "export DATAX_HOME=/opt/soft/datax\n"
                 + "export YARN_CONF_DIR=\"/etc/hadoop/conf\"\n"
                 + "\n"
-                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
+                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
                 + "\n"
                 + "export HADOOP_CLASSPATH=`hadoop classpath`\n"
                 + "\n"

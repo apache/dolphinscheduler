@@ -1,7 +1,7 @@
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
+ * this work for additional information regarding copyright ownership
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -38,11 +38,11 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +66,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceServiceImpl.class);
 
     @Autowired
     ProjectMapper projectMapper;
@@ -204,18 +208,24 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         // check whether the task instance can be found
         TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
         if (task == null) {
+            logger.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
+            logger.error("Task definition can not be found, projectCode:{}, taskDefinitionCode:{}.", projectCode,
+                    task.getTaskCode());
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstanceId);
             return result;
         }
 
         // check whether the task instance state type is failure or cancel
         if (!task.getState().isFailure() && !task.getState().isKill()) {
+            logger.warn("{} type task instance can not perform force success, projectCode:{}, taskInstanceId:{}.",
+                    task.getState().getDesc(), projectCode, taskInstanceId);
             putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
             return result;
         }
@@ -225,8 +235,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         int changedNum = taskInstanceMapper.updateById(task);
         if (changedNum > 0) {
             processService.forceProcessInstanceSuccessByTaskInstanceId(taskInstanceId);
+            logger.info("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}", projectCode,
+                    taskInstanceId);
             putMsg(result, Status.SUCCESS);
         } else {
+            logger.error("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}",
+                    projectCode, taskInstanceId);
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
         return result;
@@ -247,6 +261,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
         if (taskInstance == null) {
+            logger.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
@@ -275,6 +291,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
         if (taskInstance == null) {
+            logger.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }

@@ -15,14 +15,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-dist</artifactId>
     <name>${project.artifactId}</name>
@@ -30,11 +30,19 @@
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-server</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
@@ -72,6 +80,10 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
+    </build>
+
     <profiles>
         <profile>
             <id>release</id>
@@ -82,10 +94,10 @@
                         <executions>
                             <execution>
                                 <id>dolphinscheduler-bin</id>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <phase>package</phase>
 
                                 <configuration>
                                     <descriptors>
@@ -97,10 +109,10 @@
 
                             <execution>
                                 <id>src</id>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <phase>package</phase>
                                 <configuration>
                                     <descriptors>
                                         <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
@@ -125,10 +137,10 @@
 
                             <execution>
                                 <id>python</id>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <phase>package</phase>
                                 <configuration>
                                     <!-- Make final directory with simple name `python`, and without any addtion information -->
                                     <finalName>python</finalName>
@@ -145,8 +157,4 @@
             </build>
         </profile>
     </profiles>
-
-    <build>
-        <finalName>apache-dolphinscheduler-${project.version}</finalName>
-    </build>
 </project>

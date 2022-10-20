@@ -19,30 +19,10 @@ The task plugin picture is as follows
 
 ![pytorch](../../../../img/tasks/demo/pytorch_en.png)
 
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
-First, introduce some general parameters of DolphinScheduler:
-
-- **Node name**: The node name in a workflow definition is unique.
-- **Run flag**: Identifies whether this node schedules normally, if it does not need to execute, select
-  the `prohibition execution`.
-- **Descriptive information**: Describe the function of the node.
-- **Task priority**: When the number of worker threads is insufficient, execute in the order of priority from high
-  to low, and tasks with the same priority will execute in a first-in first-out order.
-- **Worker grouping**: Assign tasks to the machines of the worker group to execute. If `Default` is selected,
-  randomly select a worker machine for execution.
-- **Environment Name**: Configure the environment name in which run the script.
-- **Times of failed retry attempts**: The number of times the task failed to resubmit.
-- **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
-- **Delayed execution time**: The time (unit minute) that a task delays in execution.
-- **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm
-  email will send and the task execution will fail.
-- **Resource**: Refers to the list of resource files that need to be called in the script, and the files uploaded or created in Resource Center - File Management.
-- **User-defined parameters**: It is a user-defined parameter of Shell, which will replace the content with `${variable}` in the script.
-- **Predecessor task**: Selecting a predecessor task for the current task, will set the selected predecessor task as
-  upstream of the current task.
-
-
-Here are some specific parameters for the Pytorch plugin:
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 #### Run time parameters
 
@@ -70,7 +50,6 @@ The preceding two parameters are used to minimize the running of the configurati
   - if choose `conda`, ，that may use `conda` to create a new environment，And you need to specify the Python version.
 - **Requirement File** ：The defualt is requirements.txt。
 
-
 We can use relative paths of `Python Script` and `Requirement File` if we set `Project Path` which contains the python script or required requirement file.
 
 #### Demo
@@ -80,7 +59,6 @@ Now if we want to run the mnist subproject under `https://github.com/pytorch/exa
 We can run task like below:
 
 ![pytorch_note](../../../../img/tasks/demo/pytorch_note_en.png)
-
 
 In addition, if the code is stored in the `Resource`, you can use the `Resource` parameter to download the code, and write the related parameters into the path of the corresponding resource.
 

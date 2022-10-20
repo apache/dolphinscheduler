@@ -17,8 +17,6 @@
 spring:
   banner:
     charset: UTF-8
-  application:
-    name: worker-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -70,13 +68,6 @@ worker:
   max-cpu-load-avg: -1
   # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
   reserved-memory: 0.3
-  # for multiple worker groups, use hyphen before group name, e.g.
-  # groups:
-  #   - default
-  #   - group1
-  #   - group2
-  groups:
-    - default
   # alert server listen host
   alert-listen-host: localhost
   alert-listen-port: 50052

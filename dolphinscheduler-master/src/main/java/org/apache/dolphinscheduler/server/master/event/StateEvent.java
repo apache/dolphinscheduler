@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.event;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 
-import io.netty.channel.Channel;
-
 import javax.annotation.Nullable;
+
+import lombok.NonNull;
+import io.netty.channel.Channel;
 
 /**
  * state event

@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 @ConfigurationProperties(prefix = "registry")
 public class ZookeeperRegistryProperties {
+
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
 
     public ZookeeperProperties getZookeeper() {
@@ -38,6 +39,7 @@ public class ZookeeperRegistryProperties {
     }
 
     public static final class ZookeeperProperties {
+
         private String namespace;
         private String connectString;
         private RetryPolicy retryPolicy = new RetryPolicy();
@@ -103,6 +105,7 @@ public class ZookeeperRegistryProperties {
         }
 
         public static final class RetryPolicy {
+
             private Duration baseSleepTime = Duration.ofMillis(60);
             private int maxRetries;
             private Duration maxSleep = Duration.ofMillis(300);

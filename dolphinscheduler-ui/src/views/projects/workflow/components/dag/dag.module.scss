@@ -177,6 +177,9 @@ $bgLight: #ffffff;
     &.icon-dvc {
       background-image: url('/images/task-icons/dvc.png');
     }
+    &.icon-java {
+      background-image: url('/images/task-icons/java.png');
+    }
     &.icon-dinky {
       background-image: url('/images/task-icons/dinky.png');
     }
@@ -188,6 +191,12 @@ $bgLight: #ffffff;
     }
     &.icon-pytorch {
       background-image: url('/images/task-icons/pytorch.png');
+    }
+    &.icon-dms {
+      background-image: url('/images/task-icons/dms.png');
+    }
+    &.icon-datasync {
+      background-image: url('/images/task-icons/datasync_hover.png');
     }
   }
 
@@ -272,6 +281,9 @@ $bgLight: #ffffff;
       &.icon-dinky {
         background-image: url('/images/task-icons/dinky_hover.png');
       }
+      &.icon-java {
+        background-image: url('/images/task-icons/java.png');
+      }
       &.icon-sagemaker {
         background-image: url('/images/task-icons/sagemaker_hover.png');
       }
@@ -281,7 +293,23 @@ $bgLight: #ffffff;
       &.icon-pytorch {
         background-image: url('/images/task-icons/pytorch_hover.png');
       }
+      &.icon-dms {
+        background-image: url('/images/task-icons/dms_hover.png');
+      }
+      &.icon-datasync {
+        background-image: url('/images/task-icons/datasync.png');
+      }
     }
+  }
+
+  span {
+    display: flex;
+    flex: 1;
+  }
+
+  .stars {
+    display: flex;
+    cursor: pointer;
   }
 }
 

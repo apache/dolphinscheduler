@@ -11,46 +11,37 @@ MapReduce(MR) task type used for executing MapReduce programs. For MapReduce nod
 
 ## Task Parameters
 
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+
 ### General
 
-| **Parameter** | **Description** |
-| ------- | ---------- |
-| Node Name | Set the name of the task. Node names within a workflow definition are unique. |
-| Run flag | Indicates whether the node can be scheduled normally. If it is not necessary to execute, you can turn on the prohibiting execution switch. |
-| Description | Describes the function of this node. |
-| Task priority | When the number of worker threads is insufficient, they are executed in order from high to low according to the priority, and they are executed according to the first-in, first-out principle when the priority is the same. |
-| Worker group | The task is assigned to the machines in the worker group for execution. If Default is selected, a worker machine will be randomly selected for execution. |
-| Task group name | The group in Resources, if not configured, it will not be used. | 
-| Environment Name | Configure the environment in which to run the script. |
-| Number of failed retries | The number of times the task is resubmitted after failure. It supports drop-down and manual filling. | 
-| Failure Retry Interval | The time interval for resubmitting the task if the task fails. It supports drop-down and manual filling. | 
-| Timeout alarm | Check Timeout Alarm and Timeout Failure. When the task exceeds the "timeout duration", an alarm email will be sent and the task execution will fail. |
-| Resource | Refers to the list of resource files that called in the script, and upload or create files by the Resource Center file management. |
+|   **Parameter**   |                                                  **Description**                                                   |
+|-------------------|--------------------------------------------------------------------------------------------------------------------|
 | Custom parameters | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script. |
-| Predecessor task | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task. |
 
 ### JAVA or SCALA Program
 
-| **Parameter** | **Description** |
-| ------- | ---------- |
-| Program type | Select JAVA or SCALA program. |
-| The class of the main function | The **full path** of Main Class, the entry point of the MapReduce program. |
-| Main jar package | The jar package of the MapReduce program. |
-| Task name | MapReduce task name. |
-| Command line parameters | Set the input parameters of the MapReduce program and support the substitution of custom parameter variables. |
-| Other parameters | Support `-D`, `-files`, `-libjars`, `-archives` format. |
-| Resource | Appoint resource files in the `Resource` if parameters refer to them. |
-| User-defined parameter | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script. |
+|         **Parameter**          |                                                  **Description**                                                   |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| Program type                   | Select JAVA or SCALA program.                                                                                      |
+| The class of the main function | The **full path** of Main Class, the entry point of the MapReduce program.                                         |
+| Main jar package               | The jar package of the MapReduce program.                                                                          |
+| Task name                      | MapReduce task name.                                                                                               |
+| Command line parameters        | Set the input parameters of the MapReduce program and support the substitution of custom parameter variables.      |
+| Other parameters               | Support `-D`, `-files`, `-libjars`, `-archives` format.                                                            |
+| User-defined parameter         | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script. |
 
 ### Python Program
 
-| **Parameter** | **Description** |
-| ------- | ---------- |
-| Program type | Select Python language. |
-| Main jar package | The Python jar package for running MapReduce. |
-| Other parameters | Support `-D`, `-mapper`, `-reducer,` `-input` `-output` format, and you can set the input of user-defined parameters, such as:<ul><li>`-mapper "mapper.py 1"` `-file mapper.py` `-reducer reducer.py` `-file reducer.py` `–input /journey/words.txt` `-output /journey/out/mr/${currentTimeMillis}`</li><li>The `mapper.py 1` after `-mapper` is two parameters, the first parameter is `mapper.py`, and the second parameter is `1`. </li></ul> |
-| Resource | Appoint resource files in the `Resource` if parameters refer to them. |
-| User-defined parameter | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script. |
+|     **Parameter**      |                                                                                                                                                                                                                 **Description**                                                                                                                                                                                                                  |
+|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Program type           | Select Python language.                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Main jar package       | The Python jar package for running MapReduce.                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Other parameters       | Support `-D`, `-mapper`, `-reducer,` `-input` `-output` format, and you can set the input of user-defined parameters, such as:<ul><li>`-mapper "mapper.py 1"` `-file mapper.py` `-reducer reducer.py` `-file reducer.py` `–input /journey/words.txt` `-output /journey/out/mr/${currentTimeMillis}`</li><li>The `mapper.py 1` after `-mapper` is two parameters, the first parameter is `mapper.py`, and the second parameter is `1`. </li></ul> |
+| User-defined parameter | It is a local user-defined parameter for MapReduce, and will replace the content with `${variable}` in the script.                                                                                                                                                                                                                                                                                                                               |
 
 ## Task Example
 

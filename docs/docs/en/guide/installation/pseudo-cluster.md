@@ -11,7 +11,7 @@ Pseudo-cluster deployment of DolphinScheduler requires external software support
 * JDK：download [JDK][jdk] (1.8+), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
 * Binary package: Download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/download.html)
 * Database: [PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) or [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+), you can choose one of the two, such as MySQL requires JDBC Driver 8.0.16
-* Registry Center: [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.4.6+)，[download link][zookeeper]
+* Registry Center: [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0+)，[download link][zookeeper]
 * Process tree analysis
   * `pstree` for macOS
   * `psmisc` for Fedora/Red/Hat/CentOS/Ubuntu/Debian
@@ -37,6 +37,7 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 # Modify directory permissions and grant permissions for user you created above
 chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
+chmod -R 755 apache-dolphinscheduler-*-bin
 ```
 
 > **_NOTICE:_**
@@ -131,14 +132,13 @@ export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-lo
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
-export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
-export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
 export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 ```
 
 ## Initialize the Database
@@ -154,7 +154,7 @@ bash ./bin/install.sh
 ```
 
 > **_Note:_** For the first time deployment, there maybe occur five times of `sh: bin/dolphinscheduler-daemon.sh: No such file or directory` in the terminal,
- this is non-important information that you can ignore.
+> this is non-important information that you can ignore.
 
 ## Login DolphinScheduler
 
@@ -190,11 +190,12 @@ bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 > for micro-services need. It means that you could start all servers by command `<service>/bin/start.sh` with different
 > environment variable from `<service>/conf/dolphinscheduler_env.sh`. But it will use file `bin/env/dolphinscheduler_env.sh` overwrite
 > `<service>/conf/dolphinscheduler_env.sh` if you start server with command `/bin/dolphinscheduler-daemon.sh start <service>`.
-
+>
 > **_Note2:_**: Please refer to the section of "System Architecture Design" for service usage. Python gateway service is
 > started along with the api-server, and if you do not want to start Python gateway service please disabled it by changing
-> the yaml config `python-gateway.enabled : false` in api-server's configuration path `api-server/conf/application.yaml` 
+> the yaml config `python-gateway.enabled : false` in api-server's configuration path `api-server/conf/application.yaml`
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
 [issue]: https://github.com/apache/dolphinscheduler/issues/6597
+

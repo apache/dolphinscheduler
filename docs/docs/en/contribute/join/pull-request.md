@@ -1,6 +1,7 @@
 # Pull Request Notice
 
 ## Preface
+
 Pull Request is a way of software cooperation, which is a process of bringing code involving different functions into the trunk. During this process, the code can be discussed, reviewed, and modified.
 
 In Pull Request, we try not to discuss the implementation of the code. The general implementation of the code and its logic should be determined in Issue. In the Pull Request, we only focus on the code format and code specification, so as to avoid wasting time caused by different opinions on implementation.
@@ -62,8 +63,12 @@ Please refer to the commit message section.
 
 ### Pull Request Code Style
 
-DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors, 
-see [Code Style](../development-environment-setup.md#code-style) for details. 
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors,)
+[//]: # (see [Development Environment Setup]&#40;../development-environment-setup.md#code-style&#41; `Code Style` section for details.)
+
+DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors,
+see [Development Environment Setup](../development-environment-setup.md) `Code Style` section for details.
 
 ### Question
 
@@ -75,3 +80,4 @@ see [Code Style](../development-environment-setup.md#code-style) for details.
   the second is multiple issues have subtle differences.
   In this scenario, the responsibilities of each issue can be clearly divided. The type of each issue is marked as Sub-Task, and then these sub task type issues are associated with one issue.
   And each Pull Request is submitted should be associated with only one issue of a sub task.
+

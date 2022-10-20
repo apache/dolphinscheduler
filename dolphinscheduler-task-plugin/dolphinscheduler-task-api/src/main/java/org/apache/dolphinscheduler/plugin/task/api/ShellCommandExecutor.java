@@ -38,9 +38,9 @@ import com.google.common.base.Strings;
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
-     * For Unix-like, using sh
+     * For Unix-like, using bash
      */
-    private static final String SH = "sh";
+    private static final String SH = "bash";
 
     /**
      * For Windows, using cmd.exe
@@ -67,10 +67,8 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String buildCommandFilePath() {
         // command file
-        return String.format("%s/%s.%s"
-                , taskRequest.getExecutePath()
-                , taskRequest.getTaskAppId()
-                , SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
+        return String.format("%s/%s.%s", taskRequest.getExecutePath(), taskRequest.getTaskAppId(),
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
     }
 
     /**
@@ -101,7 +99,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
                     }
                 }
             } else {
-                sb.append("#!/bin/sh\n");
+                sb.append("#!/bin/bash\n");
                 sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
                 sb.append("cd $BASEDIR\n");
                 if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {

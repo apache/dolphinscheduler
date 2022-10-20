@@ -22,58 +22,58 @@
 
 ### Architecture Description
 
-* **MasterServer** 
+* **MasterServer**
 
-    MasterServer adopts a distributed and decentralized design concept. MasterServer is mainly responsible for DAG task segmentation, task submission monitoring, and monitoring the health status of other MasterServer and WorkerServer at the same time.
-    When the MasterServer service starts, register a temporary node with ZooKeeper, and perform fault tolerance by monitoring changes in the temporary node of ZooKeeper.
-    MasterServer provides monitoring services based on netty.
+  MasterServer adopts a distributed and decentralized design concept. MasterServer is mainly responsible for DAG task segmentation, task submission monitoring, and monitoring the health status of other MasterServer and WorkerServer at the same time.
+  When the MasterServer service starts, register a temporary node with ZooKeeper, and perform fault tolerance by monitoring changes in the temporary node of ZooKeeper.
+  MasterServer provides monitoring services based on netty.
 
-    #### The Service Mainly Includes:
-  
-    - **DistributedQuartz** distributed scheduling component, which is mainly responsible for the start and stop operations of scheduled tasks. When quartz start the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task;
+  #### The Service Mainly Includes:
 
-    - **MasterSchedulerService** is a scanning thread that regularly scans the `t_ds_command` table in the database, runs different business operations according to different **command types**;
+  - **DistributedQuartz** distributed scheduling component, which is mainly responsible for the start and stop operations of scheduled tasks. When quartz start the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task;
 
-    - **WorkflowExecuteRunnable** is mainly responsible for DAG task segmentation, task submission monitoring, and logical processing of different event types;
+  - **MasterSchedulerService** is a scanning thread that regularly scans the `t_ds_command` table in the database, runs different business operations according to different **command types**;
 
-    - **TaskExecuteRunnable** is mainly responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the process instance;
+  - **WorkflowExecuteRunnable** is mainly responsible for DAG task segmentation, task submission monitoring, and logical processing of different event types;
 
-    - **EventExecuteService** is mainly responsible for the polling of the event queue of the process instances;
+  - **TaskExecuteRunnable** is mainly responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the process instance;
 
-    - **StateWheelExecuteThread** is mainly responsible for process instance and task timeout, task retry, task-dependent polling, and generates the corresponding process instance or task event and submits it to the event queue of the process instance;
+  - **EventExecuteService** is mainly responsible for the polling of the event queue of the process instances;
 
-    - **FailoverExecuteThread** is mainly responsible for the logic of Master fault tolerance and Worker fault tolerance;
+  - **StateWheelExecuteThread** is mainly responsible for process instance and task timeout, task retry, task-dependent polling, and generates the corresponding process instance or task event and submits it to the event queue of the process instance;
 
-* **WorkerServer** 
+  - **FailoverExecuteThread** is mainly responsible for the logic of Master fault tolerance and Worker fault tolerance;
 
-     WorkerServer also adopts a distributed and decentralized design concept. WorkerServer is mainly responsible for task execution and providing log services.
+* **WorkerServer**
 
-     When the WorkerServer service starts, register a temporary node with ZooKeeper and maintain a heartbeat.
-     WorkerServer provides monitoring services based on netty.
-  
-     #### The Service Mainly Includes:
+  WorkerServer also adopts a distributed and decentralized design concept. WorkerServer is mainly responsible for task execution and providing log services.
 
-    - **WorkerManagerThread** is mainly responsible for the submission of the task queue, continuously receives tasks from the task queue, and submits them to the thread pool for processing;
+  When the WorkerServer service starts, register a temporary node with ZooKeeper and maintain a heartbeat.
+  WorkerServer provides monitoring services based on netty.
 
-    - **TaskExecuteThread** is mainly responsible for the process of task execution, and the actual processing of tasks according to different task types;
+  #### The Service Mainly Includes:
 
-    - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
+  - **WorkerManagerThread** is mainly responsible for the submission of the task queue, continuously receives tasks from the task queue, and submits them to the thread pool for processing;
 
-* **ZooKeeper** 
+  - **TaskExecuteThread** is mainly responsible for the process of task execution, and the actual processing of tasks according to different task types;
 
-    ZooKeeper service, MasterServer and WorkerServer nodes in the system all use ZooKeeper for cluster management and fault tolerance. In addition, the system implements event monitoring and distributed locks based on ZooKeeper.
+  - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
 
-    We have also implemented queues based on Redis, but we hope DolphinScheduler depends on as few components as possible, so we finally removed the Redis implementation.
+* **ZooKeeper**
 
-* **AlertServer** 
+  ZooKeeper service, MasterServer and WorkerServer nodes in the system all use ZooKeeper for cluster management and fault tolerance. In addition, the system implements event monitoring and distributed locks based on ZooKeeper.
+
+  We have also implemented queues based on Redis, but we hope DolphinScheduler depends on as few components as possible, so we finally removed the Redis implementation.
+
+* **AlertServer**
 
   Provides alarm services, and implements rich alarm methods through alarm plugins.
 
-* **API** 
+* **API**
 
-    The API interface layer is mainly responsible for processing requests from the front-end UI layer. The service uniformly provides RESTful APIs to provide request services to external.
+  The API interface layer is mainly responsible for processing requests from the front-end UI layer. The service uniformly provides RESTful APIs to provide request services to external.
 
-* **UI** 
+* **UI**
 
   The front-end page of the system provides various visual operation interfaces of the system, see more at [Introduction to Functions](../guide/homepage.md) section.
 
@@ -84,6 +84,7 @@
 ##### Centralized Thinking
 
 The centralized design concept is relatively simple. The nodes in the distributed cluster are roughly divided into two roles according to responsibilities:
+
 <p align="center">
    <img src="https://analysys.github.io/easyscheduler_docs_cn/images/master_slave.png" alt="master-slave character"  width="50%" />
  </p>
@@ -120,8 +121,6 @@ The service fault-tolerance design relies on ZooKeeper's Watcher mechanism, and 
  </p>
 Among them, the Master monitors the directories of other Masters and Workers. If the remove event is triggered, perform fault tolerance of the process instance or task instance according to the specific business logic.
 
-
-
 - Master fault tolerance：
 
 <p align="center">
@@ -146,7 +145,7 @@ Fault-tolerant content: When sending the remove event of the Worker node, the Ma
 
 Fault-tolerant post-processing: Once the Master Scheduler thread finds that the task instance is in the "fault-tolerant" state, it takes over the task and resubmits it.
 
- Note: Due to "network jitter", the node may lose heartbeat with ZooKeeper in a short period of time, and the node's remove event may occur. For this situation, we use the simplest way, that is, once the node and ZooKeeper timeout connection occurs, then directly stop the Master or Worker service.
+Note: Due to "network jitter", the node may lose heartbeat with ZooKeeper in a short period of time, and the node's remove event may occur. For this situation, we use the simplest way, that is, once the node and ZooKeeper timeout connection occurs, then directly stop the Master or Worker service.
 
 ##### Task Failed and Try Again
 
@@ -170,26 +169,26 @@ If there is a task failure in the workflow that reaches the maximum retry times,
 
 In the early schedule design, if there is no priority design and use the fair scheduling, the task submitted first may complete at the same time with the task submitted later, thus invalid the priority of process or task. So we have re-designed this, and the following is our current design:
 
--  According to **the priority of different process instances** prior over **priority of the same process instance** prior over **priority of tasks within the same process** prior over **tasks within the same process**, process task submission order from highest to Lowest.
-    - The specific implementation is to parse the priority according to the JSON of the task instance, and then save the **process instance priority_process instance id_task priority_task id** information to the ZooKeeper task queue. When obtain from the task queue, we can get the highest priority task by comparing string.
+- According to **the priority of different process instances** prior over **priority of the same process instance** prior over **priority of tasks within the same process** prior over **tasks within the same process**, process task submission order from highest to Lowest.
+  - The specific implementation is to parse the priority according to the JSON of the task instance, and then save the **process instance priority_process instance id_task priority_task id** information to the ZooKeeper task queue. When obtain from the task queue, we can get the highest priority task by comparing string.
+    - The priority of the process definition is to consider that some processes need to process before other processes. Configure the priority when the process starts or schedules. There are 5 levels in total, which are HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
 
-          - The priority of the process definition is to consider that some processes need to process before other processes. Configure the priority when the process starts or schedules. There are 5 levels in total, which are HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
-            <p align="center">
-               <img src="https://user-images.githubusercontent.com/10797147/146744784-eb351b14-c94a-4ed6-8ba4-5132c2a3d116.png" alt="Process priority configuration"  width="40%" />
-             </p>
+      <p align="center">
+         <img src="https://user-images.githubusercontent.com/10797147/146744784-eb351b14-c94a-4ed6-8ba4-5132c2a3d116.png" alt="Process priority configuration"  width="40%" />
+       </p>
 
-        - The priority of the task is also divides into 5 levels, ordered by HIGHEST, HIGH, MEDIUM, LOW, LOWEST. As shown below:
-            <p align="center">
-               <img src="https://user-images.githubusercontent.com/10797147/146744830-5eac611f-5933-4f53-a0c6-31613c283708.png" alt="Task priority configuration"  width="35%" />
-             </p>
+    - The priority of the task is also divides into 5 levels, ordered by HIGHEST, HIGH, MEDIUM, LOW, LOWEST. As shown below:
+
+        <p align="center">
+           <img src="https://user-images.githubusercontent.com/10797147/146744830-5eac611f-5933-4f53-a0c6-31613c283708.png" alt="Task priority configuration"  width="35%" />
+         </p>
 
 #### Logback and Netty Implement Log Access
 
--  Since Web (UI) and Worker are not always on the same machine, to view the log cannot be like querying a local file. There are two options:
-  -  Put logs on the ES search engine.
-  -  Obtain remote log information through netty communication.
-
--  In consideration of the lightness of DolphinScheduler as much as possible, so choose gRPC to achieve remote access to log information.
+- Since Web (UI) and Worker are not always on the same machine, to view the log cannot be like querying a local file. There are two options:
+- Put logs on the ES search engine.
+- Obtain remote log information through netty communication.
+- In consideration of the lightness of DolphinScheduler as much as possible, so choose gRPC to achieve remote access to log information.
 
  <p align="center">
    <img src="https://analysys.github.io/easyscheduler_docs_cn/images/grpc.png" alt="grpc remote access"  width="50%" />
@@ -198,10 +197,10 @@ In the early schedule design, if there is no priority design and use the fair sc
 - For details, please refer to the logback configuration of Master and Worker, as shown in the following example:
 
 ```xml
-<conversionRule conversionWord="messsage" converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
+<conversionRule conversionWord="messsage" converterClass="org.apache.dolphinscheduler.service.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
-    <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
+    <filter class="org.apache.dolphinscheduler.service.log.TaskLogFilter"/>
+    <Discriminator class="org.apache.dolphinscheduler.service.log.TaskLogDiscriminator">
         <key>taskAppId</key>
         <logBase>${log.base}</logBase>
     </Discriminator>

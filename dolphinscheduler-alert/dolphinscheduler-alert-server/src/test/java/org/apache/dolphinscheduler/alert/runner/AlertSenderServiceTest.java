@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -63,7 +63,7 @@ public class AlertSenderServiceTest {
     @InjectMocks
     private AlertSenderService alertSenderService;
 
-    @Before
+    @BeforeEach
     public void before() {
         MockitoAnnotations.initMocks(this);
     }
@@ -81,7 +81,7 @@ public class AlertSenderServiceTest {
 
         AlertSendResponseCommand alertSendResponseCommand =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -92,6 +92,7 @@ public class AlertSenderServiceTest {
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
                 pluginDefineId, pluginInstanceParams, pluginInstanceName);
+        alertPluginInstance.setId(1);
         alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);
 
@@ -101,7 +102,7 @@ public class AlertSenderServiceTest {
 
         alertSendResponseCommand =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -113,7 +114,7 @@ public class AlertSenderServiceTest {
 
         alertSendResponseCommand =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -126,7 +127,7 @@ public class AlertSenderServiceTest {
 
         alertSendResponseCommand =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -140,7 +141,7 @@ public class AlertSenderServiceTest {
 
         alertSendResponseCommand =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assert.assertTrue(alertSendResponseCommand.isSuccess());
+        Assertions.assertTrue(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -153,6 +154,7 @@ public class AlertSenderServiceTest {
         String content = "alert mail test content";
         List<Alert> alertList = new ArrayList<>();
         Alert alert = new Alert();
+        alert.setId(1);
         alert.setAlertGroupId(alertGroupId);
         alert.setTitle(title);
         alert.setContent(content);
@@ -180,7 +182,7 @@ public class AlertSenderServiceTest {
         AlertChannel alertChannelMock = mock(AlertChannel.class);
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
-        Assert.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
+        Assertions.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(new ArrayList<>());
         alertSenderService.send(alertList);
     }

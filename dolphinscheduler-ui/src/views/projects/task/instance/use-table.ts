@@ -23,7 +23,14 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
+import {
+  NButton,
+  NIcon,
+  NSpace,
+  NTooltip,
+  NSpin,
+  NEllipsis
+} from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
@@ -32,13 +39,19 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import { parseTime, renderTableTime, tasksState } from '@/common/common'
+import {
+  parseTime,
+  renderTableTime,
+  tasksState
+} from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
+import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+
 
 export function useTable() {
   const { t } = useI18n()
@@ -46,6 +59,7 @@ export function useTable() {
   const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
   const processInstanceId = Number(route.params.processInstanceId)
+  const taskName = route.params.taskName
 
   const variables = reactive({
     columns: [],
@@ -53,7 +67,7 @@ export function useTable() {
     tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
-    searchVal: ref(null),
+    searchVal: ref(taskName || null),
     processInstanceId: ref(processInstanceId ? processInstanceId : null),
     host: ref(null),
     stateType: ref(null),
@@ -115,6 +129,13 @@ export function useTable() {
         title: t('project.task.executor'),
         key: 'executorName',
         ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
+        title: t('project.task.operating_environment'),
+        key: 'testFlag',
+        width: 160,
+        render: (_row: IRecord) =>
+          renderEnvironmentalDistinctionCell(_row.testFlag, t)
       },
       {
         title: t('project.task.node_type'),

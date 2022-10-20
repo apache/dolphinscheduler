@@ -16,13 +16,28 @@
 # under the License.
 
 """Test Task Sql."""
-
-
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+from pydolphinscheduler.resources_plugin import Local
 from pydolphinscheduler.tasks.sql import Sql, SqlType
+from pydolphinscheduler.utils import file
+from tests.testing.file import delete_file
+
+file_name = "local_res.sql"
+file_content = "select 1"
+res_plugin_prefix = Path(__file__).parent
+file_path = res_plugin_prefix.joinpath(file_name)
+
+
+@pytest.fixture
+def setup_crt_first():
+    """Set up and teardown about create file first and then delete it."""
+    file.write(content=file_content, to_path=file_path)
+    yield
+    delete_file(file_path)
 
 
 @pytest.mark.parametrize(
@@ -152,6 +167,7 @@ def test_sql_get_define(mock_datasource):
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
@@ -164,3 +180,29 @@ def test_sql_get_define(mock_datasource):
     ):
         task = Sql(name, datasource_name, command)
         assert task.get_define() == expect
+
+
+@pytest.mark.parametrize(
+    "attr, expect",
+    [
+        (
+            {
+                "name": "test-sql-local-res",
+                "sql": file_name,
+                "datasource_name": "test_datasource",
+                "resource_plugin": Local(str(res_plugin_prefix)),
+            },
+            file_content,
+        )
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_resources_local_sql_command_content(
+    mock_code_version, attr, expect, setup_crt_first
+):
+    """Test sql content through the local resource plug-in."""
+    sql = Sql(**attr)
+    assert expect == getattr(sql, "sql")

@@ -17,10 +17,7 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-import type {
-  TaskExecuteType,
-  TaskType
-} from '@/views/projects/task/constants/task-type'
+import type { TaskExecuteType, TaskType } from '@/store/project/types'
 import type { IDataBase } from '@/service/modules/data-source/types'
 import type {
   IFormItem,
@@ -223,10 +220,12 @@ interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
   localParams?: ILocalParam[]
+  runType?: string
+  jvmArgs?: string
+  isModulePath?: boolean
   rawScript?: string
   initScript?: string
   programType?: string
-  sparkVersion?: string
   flinkVersion?: string
   jobManagerMemory?: string
   taskManagerMemory?: string
@@ -254,7 +253,6 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
-  segmentSeparator?: string
   sendEmail?: boolean
   displayRows?: number
   title?: string
@@ -375,6 +373,21 @@ interface ITaskParams {
   pythonEnvTool?: string
   requirements?: string
   condaPythonVersion?: string
+  isRestartTask?: boolean
+  isJsonFormat?: boolean
+  jsonData?: string
+  migrationType?: string
+  replicationTaskIdentifier?: string
+  sourceEndpointArn?: string
+  targetEndpointArn?: string
+  replicationInstanceArn?: string
+  tableMappings?: string
+  replicationTaskArn?: string
+  jsonFormat?: boolean
+  destinationLocationArn?: string
+  sourceLocationArn?: string
+  name?: string
+  cloudWatchLogGroupArn?: string
 }
 
 interface INodeData

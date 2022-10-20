@@ -216,88 +216,84 @@ The following components are provided under the Apache License. See project link
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     accessors-smart 2.4.8: https://github.com/netplex/json-smart-v2, Apache 2.0
-    apacheds-i18n 2.0.0-M15: https://mvnrepository.com/artifact/org.apache.directory.server/apacheds-i18n/2.0.0-M15, Apache 2.0
-    apacheds-kerberos-codec 2.0.0-M15: https://mvnrepository.com/artifact/org.apache.directory.server/apacheds-kerberos-codec/2.0.0-M15, Apache 2.0
+    failureaccess 1.0.1: https://mvnrepository.com/artifact/com.google.guava/failureaccess/1.0.1, Apache 2.0
     tomcat-embed-el 9.0.65: https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-el/9.0.65, Apache 2.0
-    api-asn1-api 1.0.0-M20: https://mvnrepository.com/artifact/org.apache.directory.api/api-asn1-api/1.0.0-M20, Apache 2.0
-    api-util 1.0.0-M20: https://mvnrepository.com/artifact/org.apache.directory.api/api-util/1.0.0-M20, Apache 2.0
-    audience-annotations 0.5.0: https://mvnrepository.com/artifact/org.apache.yetus/audience-annotations/0.5.0, Apache 2.0
-    avro 1.7.4: https://github.com/apache/avro, Apache 2.0
+    audience-annotations 0.12.0: https://mvnrepository.com/artifact/org.apache.yetus/audience-annotations/0.12.0, Apache 2.0
+    avro 1.7.7: https://github.com/apache/avro, Apache 2.0
     bonecp 0.8.0.RELEASE: https://github.com/wwadge/bonecp, Apache 2.0
     byte-buddy 1.9.16: https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy/1.9.16, Apache 2.0
     caffeine 2.9.3: https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine/2.9.3, Apache 2.0
     classmate 1.5.1: https://mvnrepository.com/artifact/com.fasterxml/classmate/1.5.1, Apache 2.0
     clickhouse-jdbc 0.1.52: https://mvnrepository.com/artifact/ru.yandex.clickhouse/clickhouse-jdbc/0.1.52, Apache 2.0
+    lz4-java 1.4.0: https://mvnrepository.com/artifact/org.lz4/lz4-java/1.4.0, Apache 2.0
     commons-beanutils 1.9.4 https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils/1.9.4, Apache 2.0
     commons-cli 1.2: https://mvnrepository.com/artifact/commons-cli/commons-cli/1.2, Apache 2.0
     commons-codec 1.11: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11, Apache 2.0
     commons-collections4 4.1: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.1, Apache 2.0
     commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
-    commons-configuration 1.10: https://mvnrepository.com/artifact/commons-configuration/commons-configuration/1.10, Apache 2.0
+    commons-configuration2 2.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2/2.1.1, Apache 2.0
+    commons-daemon 1.0.13: https://github.com/apache/commons-daemon, Apache 2.0
     commons-dbcp 1.4: https://github.com/apache/commons-dbcp, Apache 2.0
     commons-email 1.5: https://github.com/apache/commons-email, Apache 2.0
-    commons-httpclient 3.0.1: https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient/3.0.1, Apache 2.0
     commons-io 2.11.0: https://github.com/apache/commons-io, Apache 2.0
     commons-lang 2.6: https://github.com/apache/commons-lang, Apache 2.0
     commons-logging 1.1.1: https://github.com/apache/commons-logging, Apache 2.0
     commons-math3 3.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.1.1, Apache 2.0
-    commons-net 3.1: https://github.com/apache/commons-net, Apache 2.0
+    commons-net 3.6: https://github.com/apache/commons-net, Apache 2.0
     commons-pool 1.6: https://github.com/apache/commons-pool, Apache 2.0
-    cron-utils 9.1.3: https://mvnrepository.com/artifact/com.cronutils/cron-utils/9.1.3, Apache 2.0
+    commons-text 1.4: https://github.com/apache/commons-text, Apache 2.0
+    commons-text 1.8: https://github.com/apache/commons-text, Apache 2.0
+    cron-utils 9.1.6: https://mvnrepository.com/artifact/com.cronutils/cron-utils/9.1.6, Apache 2.0
     commons-lang3 3.12.0: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.12.0, Apache 2.0
-    curator-client 4.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-client/4.3.0, Apache 2.0
-    curator-framework 4.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-framework/4.3.0, Apache 2.0
-    curator-recipes 4.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-recipes/4.3.0, Apache 2.0
-    curator-test 2.12.0: https://mvnrepository.com/artifact/org.apache.curator/curator-test/2.12.0, Apache 2.0
-    datanucleus-api-jdo 4.2.1: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-api-jdo/4.2.1, Apache 2.0
-    datanucleus-core 4.1.6: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-core/4.1.6, Apache 2.0
-    datanucleus-rdbms 4.1.7: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-rdbms/4.1.7, Apache 2.0
+    curator-client 5.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-client/5.3.0, Apache 2.0
+    curator-framework 5.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-framework/5.3.0, Apache 2.0
+    curator-recipes 5.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-recipes/5.3.0, Apache 2.0
+    curator-test 5.3.0: https://mvnrepository.com/artifact/org.apache.curator/curator-test/5.3.0, Apache 2.0
+    datanucleus-api-jdo 4.2.4: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-api-jdo/4.2.4, Apache 2.0
+    datanucleus-core 4.1.17: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-core/4.1.17, Apache 2.0
+    datanucleus-rdbms 4.1.19: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-rdbms/4.1.19, Apache 2.0
     derby 10.14.2.0: https://github.com/apache/derby, Apache 2.0
     druid 1.1.14: https://mvnrepository.com/artifact/com.alibaba/druid/1.1.14, Apache 2.0
+    metrics-core 4.2.11: https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core, Apache 2.0
     error_prone_annotations 2.1.3 https://mvnrepository.com/artifact/com.google.errorprone/error_prone_annotations/2.1.3, Apache 2.0
     gson 2.9.1: https://github.com/google/gson, Apache 2.0
-    guava 24.1-jre: https://mvnrepository.com/artifact/com.google.guava/guava/24.1-jre, Apache 2.0
+    guava 31.1-jre: https://mvnrepository.com/artifact/com.google.guava/guava/31.1-jre, Apache 2.0
     guava-retrying 2.0.0: https://mvnrepository.com/artifact/com.github.rholder/guava-retrying/2.0.0, Apache 2.0
-    hadoop-annotations 2.7.3:https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-annotations/2.7.3, Apache 2.0
-    hadoop-auth 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-auth/2.7.3, Apache 2.0
-    hadoop-client 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client/2.7.3, Apache 2.0
-    hadoop-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common/2.7.3, Apache 2.0
-    hadoop-hdfs 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-app 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-app/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-common/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-core 2.7.3: https://mvnrepository.com/artifact/io.hops/hadoop-mapreduce-client-core/2.7.3, Apache 2.0
-    hadoop-mapreduce-client-jobclient 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-jobclient/2.7.3, Apache 2.0
-    hadoop-yarn-api 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-api/2.7.3, Apache 2.0
-    hadoop-yarn-client 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-client/2.7.3, Apache 2.0
-    hadoop-yarn-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-common/2.7.3, Apache 2.0
-    hadoop-yarn-server-common 2.7.3: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-server-common/2.7.3, Apache 2.0
+    hadoop-annotations 3.2.4:https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-annotations/3.2.4, Apache 2.0
+    hadoop-auth 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-auth/3.2.4, Apache 2.0
+    hadoop-client 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client/3.2.4, Apache 2.0
+    hadoop-common 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common/3.2.4, Apache 2.0
+    hadoop-hdfs 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs/3.2.4, Apache 2.0
+    hadoop-hdfs-client 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs-client/3.2.4, Apache 2.0
+    hadoop-mapreduce-client-common 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-common/3.2.4, Apache 2.0
+    hadoop-mapreduce-client-core 3.2.4: https://mvnrepository.com/artifact/io.hops/hadoop-mapreduce-client-core/3.2.4, Apache 2.0
+    hadoop-mapreduce-client-jobclient 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-jobclient/3.2.4, Apache 2.0
+    hadoop-yarn-api 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-api/3.2.4, Apache 2.0
+    hadoop-yarn-client 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-client/3.2.4, Apache 2.0
+    hadoop-yarn-common 3.2.4: https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-yarn-common/3.2.4, Apache 2.0
     HikariCP 4.0.3: https://mvnrepository.com/artifact/com.zaxxer/HikariCP/4.0.3, Apache 2.0
-    hive-common 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-common/2.1.0, Apache 2.0
-    hive-jdbc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-jdbc/2.1.0, Apache 2.0
-    hive-metastore 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-metastore/2.1.0, Apache 2.0
-    hive-orc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-orc/2.1.0, Apache 2.0
-    hive-serde 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-serde/2.1.0, Apache 2.0
-    hive-service 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-service/2.1.0, Apache 2.0
-    hive-service-rpc 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-service-rpc/2.1.0, Apache 2.0
-    hive-storage-api 2.1.0: https://mvnrepository.com/artifact/org.apache.hive/hive-storage-api/2.1.0, Apache 2.0
-    htrace-core 3.1.0-incubating: https://mvnrepository.com/artifact/org.apache.htrace/htrace-core/3.1.0-incubating, Apache 2.0
+    hive-common 2.3.9: https://mvnrepository.com/artifact/org.apache.hive/hive-common/2.3.9, Apache 2.0
+    hive-jdbc 2.3.9: https://mvnrepository.com/artifact/org.apache.hive/hive-jdbc/2.3.9, Apache 2.0
+    hive-metastore 2.3.9: https://mvnrepository.com/artifact/org.apache.hive/hive-metastore/2.3.9, Apache 2.0
+    hive-serde 2.3.9: https://mvnrepository.com/artifact/org.apache.hive/hive-serde/2.3.9, Apache 2.0
+    hive-service 2.3.9: https://mvnrepository.com/artifact/org.apache.hive/hive-service/2.3.9, Apache 2.0
+    hive-service-rpc 2.3.9: https://mvnrepository.com/artifact/org.apache.hive/hive-service-rpc/2.3.9, Apache 2.0
+    hive-storage-api 2.4.0: https://mvnrepository.com/artifact/org.apache.hive/hive-storage-api/2.4.0, Apache 2.0
     httpclient 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.5.13, Apache 2.0
     httpcore 4.4.15: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore/4.4.15, Apache 2.0
     httpmime 4.5.13: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime/4.5.13, Apache 2.0
-    jackson-annotations 2.13.0: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.13.0, Apache 2.0
-    jackson-core 2.13.0: https://github.com/FasterXML/jackson-core, Apache 2.0
+    jackson-annotations 2.13.4: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.13.4, Apache 2.0
+    jackson-core 2.13.4: https://github.com/FasterXML/jackson-core, Apache 2.0
     jackson-core-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl/1.9.13, Apache 2.0
-    jackson-databind 2.13.0: https://github.com/FasterXML/jackson-databind, Apache 2.0
+    jackson-databind 2.13.4: https://github.com/FasterXML/jackson-databind, Apache 2.0
     jackson-datatype-jdk8 2.13.0: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.13.0, Apache 2.0
     jackson-datatype-jsr310 2.13.0: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.13.0, Apache 2.0
     jackson-mapper-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl/1.9.13, Apache 2.0
     jackson-module-parameter-names 2.13.0: https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-parameter-names/2.13.0, Apache 2.0
     javax.jdo-3.2.0-m3: https://mvnrepository.com/artifact/org.datanucleus/javax.jdo/3.2.0-m3, Apache 2.0
-    java-xmlbuilder 0.4 : https://mvnrepository.com/artifact/com.jamesmurty.utils/java-xmlbuilder/0.4, Apache 2.0
+    jcip-annotations 1.0-1: https://github.com/stephenc/jcip-annotations/blob/jcip-annotations-1.0-1/LICENSE.txt, Apache 2.0
     jdo-api 3.0.1: https://mvnrepository.com/artifact/javax.jdo/jdo-api/3.0.1, Apache 2.0
-    jets3t 0.9.0: https://mvnrepository.com/artifact/net.java.dev.jets3t/jets3t/0.9.0, Apache 2.0
     jettison 1.1: https://github.com/jettison-json/jettison, Apache 2.0
-    jetty 6.1.26: https://mvnrepository.com/artifact/org.mortbay.jetty/jetty/6.1.26, Apache 2.0 and EPL 1.0
     jetty-continuation 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-continuation/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jetty-http 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-http/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jetty-io 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-io/9.4.48.v20220622, Apache 2.0 and EPL 1.0
@@ -305,8 +301,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jetty-server 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jetty-servlet 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-servlet/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jetty-servlets 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-servlets/9.4.48.v20220622, Apache 2.0 and EPL 1.0
-    jetty-util 6.1.26: https://mvnrepository.com/artifact/org.mortbay.jetty/jetty-util/6.1.26, Apache 2.0 and EPL 1.0
-    jetty-util 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jetty-util-ajax 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-util-ajax/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jetty-webapp 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-webapp/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jetty-xml 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-xml/9.4.48.v20220622, Apache 2.0 and EPL 1.0
@@ -314,40 +308,56 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jna-platform 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.10.0, Apache 2.0 and LGPL 2.1
     joda-time 2.10.13: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
+    json 1.8: https://mvnrepository.com/artifact/com.tdunning/json, Apache 2.0
     json-path 2.7.0: https://github.com/json-path/JsonPath, Apache 2.0
     json-smart 2.4.8: https://github.com/netplex/json-smart-v2, Apache 2.0
-    jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
+    jsqlparser 4.4: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 4.4
     jsr305 3.0.0: https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305, Apache 2.0
-    j2objc-annotations 1.1 https://mvnrepository.com/artifact/com.google.j2objc/j2objc-annotations/1.1, Apache 2.0
+    j2objc-annotations 1.3 https://mvnrepository.com/artifact/com.google.j2objc/j2objc-annotations/1.3, Apache 2.0
+    kerb-admin 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-admin/1.0.1, Apache 2.0
+    kerb-client 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-client/1.0.1, Apache 2.0
+    kerb-common 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-common/1.0.1, Apache 2.0
+    kerb-core 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-core/1.0.1, Apache 2.0
+    kerb-crypto 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-crypto/1.0.1, Apache 2.0
+    kerb-identity 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-identity/1.0.1, Apache 2.0
+    kerb-server 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-server/1.0.1, Apache 2.0
+    kerb-simplekdc 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-simplekdc/1.0.1, Apache 2.0
+    kerb-util 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerb-util/1.0.1, Apache 2.0
+    kerby-asn1 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerby-asn1/1.0.1, Apache 2.0
+    kerby-config 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerby-config/1.0.1, Apache 2.0
+    kerby-pkix 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerby-pkix/1.0.1, Apache 2.0
+    kerby-util 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerby-util/1.0.1, Apache 2.0
+    kerby-xdr 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/kerby-xdr/1.0.1, Apache 2.0
     libfb303 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libfb303/0.9.3, Apache 2.0
     libthrift 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libthrift/0.9.3, Apache 2.0
     log4j-api 2.11.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api/2.11.2, Apache 2.0
     log4j-core-2.11.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core/2.11.2, Apache 2.0
-    log4j 1.2.17: https://mvnrepository.com/artifact/log4j/log4j/1.2.17, Apache 2.0
     log4j-1.2-api 2.17.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-1.2-api/2.17.2, Apache 2.0
     lz4 1.3.0: https://mvnrepository.com/artifact/net.jpountz.lz4/lz4/1.3.0, Apache 2.0
     mapstruct 1.3.1.Final: https://github.com/mapstruct/mapstruct, Apache 2.0
-    mybatis 3.5.2 https://mvnrepository.com/artifact/org.mybatis/mybatis/3.5.2, Apache 2.0
-    mybatis-plus 3.2.0: https://github.com/baomidou/mybatis-plus, Apache 2.0
-    mybatis-plus-annotation 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-annotation/3.2.0, Apache 2.0
-    mybatis-plus-boot-starter 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter/3.2.0, Apache 2.0
-    mybatis-plus-core 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-core/3.2.0, Apache 2.0
-    mybatis-plus-extension 3.2.0: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-extension/3.2.0, Apache 2.0
-    mybatis-spring 2.0.2: https://mvnrepository.com/artifact/org.mybatis/mybatis-spring/2.0.2, Apache 2.0
-    netty 3.6.2.Final: https://github.com/netty/netty, Apache 2.0
+    mybatis 3.5.10 https://mvnrepository.com/artifact/org.mybatis/mybatis/3.5.10, Apache 2.0
+    mybatis-plus 3.5.2: https://github.com/baomidou/mybatis-plus, Apache 2.0
+    mybatis-plus-annotation 3.5.2: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-annotation/3.5.2, Apache 2.0
+    mybatis-plus-boot-starter 3.5.2: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter/3.5.2, Apache 2.0
+    mybatis-plus-core 3.5.2: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-core/3.5.2, Apache 2.0
+    mybatis-plus-extension 3.5.2: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-extension/3.5.2, Apache 2.0
+    mybatis-spring 2.0.7: https://mvnrepository.com/artifact/org.mybatis/mybatis-spring/2.0.7, Apache 2.0
+    netty 3.10.6.Final: https://github.com/netty/netty, Apache 2.0
     netty 4.1.53.Final: https://github.com/netty/netty/blob/netty-4.1.53.Final/LICENSE.txt, Apache 2.0
+    nimbus-jose-jwt 9.8.1: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.8.1, Apache 2.0
+    okhttp 3.14.9: https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp/3.14.9, Apache 2.0
     opencsv 2.3: https://mvnrepository.com/artifact/net.sf.opencsv/opencsv/2.3, Apache 2.0
     parquet-hadoop-bundle 1.8.1: https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop-bundle/1.8.1, Apache 2.0
     poi 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi/4.1.2, Apache 2.0
     poi-ooxml 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml/4.1.2, Apache 2.0
     poi-ooxml-schemas-4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas/4.1.2, Apache 2.0
     quartz 2.3.2: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz/2.3.2, Apache 2.0
-    snakeyaml 1.30: https://mvnrepository.com/artifact/org.yaml/snakeyaml/1.30, Apache 2.0
-    snappy 0.2: https://mvnrepository.com/artifact/org.iq80.snappy/snappy/0.2, Apache 2.0
-    snappy-java 1.0.4.1: https://github.com/xerial/snappy-java, Apache 2.0
+    reload4j 1.2.18.3: https://mvnrepository.com/artifact/ch.qos.reload4j/reload4j/1.2.18.3, Apache 2.0
+    snakeyaml 1.31: https://mvnrepository.com/artifact/org.yaml/snakeyaml/1.31, Apache 2.0
+    snappy-java 1.1.8.4: https://github.com/xerial/snappy-java, Apache 2.0
     SparseBitSet 1.2: https://mvnrepository.com/artifact/com.zaxxer/SparseBitSet/1.2, Apache 2.0
     spring-aop 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-aop/5.3.13, Apache 2.0
-    spring-beans 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-beans/5.3.19, Apache 2.0
+    spring-beans 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-beans/5.3.22, Apache 2.0
     spring-boot 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot/2.7.3, Apache 2.0
     spring-boot-actuator 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator/2.7.3, Apache 2.0
     spring-boot-actuator-autoconfigure 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator-autoconfigure/2.7.3, Apache 2.0
@@ -363,9 +373,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-boot-starter-quartz 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz/2.7.3, Apache 2.0
     spring-boot-starter-web 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.7.3, Apache 2.0
     spring-boot-starter-cache 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache/2.7.3, Apache 2.0
-    spring-context 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.19, Apache 2.0
+    spring-context 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.22, Apache 2.0
     spring-context-support 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.13, Apache 2.0
-    spring-core 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-core/5.3.19, Apache 2.0
+    spring-core 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-core/5.3.22, Apache 2.0
     spring-expression 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-expression/5.3.13, Apache 2.0
     springfox-core 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-core/3.0.0, Apache 2.0
     springfox-schema 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-schema/3.0.0, Apache 2.0
@@ -375,20 +385,20 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     springfox-swagger-common 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-swagger-common/3.0.0, Apache 2.0
     springfox-swagger-ui 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui/3.0.0, Apache 2.0
     spring-jcl 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-jcl/5.3.13, Apache 2.0
-    spring-jdbc 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-jdbc/5.3.19, Apache 2.0
+    spring-jdbc 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-jdbc/5.3.22, Apache 2.0
     spring-plugin-core 2.0.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-core/2.0.0.RELEASE, Apache 2.0
     spring-plugin-metadata 2.0.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-metadata/2.0.0.RELEASE, Apache 2.0
-    spring-tx 5.3.19: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.3.19, Apache 2.0
+    spring-tx 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.3.22, Apache 2.0
     spring-web 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-web/5.3.13, Apache 2.0
     spring-webmvc 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-webmvc/5.3.13, Apache 2.0
     swagger-annotations 1.5.20: https://mvnrepository.com/artifact/io.swagger/swagger-annotations/1.5.20, Apache 2.0
     swagger-models 1.5.24: https://mvnrepository.com/artifact/io.swagger/swagger-models/1.5.24, Apache 2.0
     tephra-api 0.6.0: https://mvnrepository.com/artifact/co.cask.tephra/tephra-api/0.6.0, Apache 2.0
+    token-provider 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/token-provider/1.0.1, Apache 2.0
     tomcat-embed-el 9.0.65: https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-el/9.0.65, Apache 2.0
-    xercesImpl 2.9.1: https://mvnrepository.com/artifact/xerces/xercesImpl/2.9.1, Apache 2.0
     xmlbeans 3.1.0: https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans/3.1.0, Apache 2.0
-    xml-apis 1.3.04: https://mvnrepository.com/artifact/xml-apis/xml-apis/1.3.04, Apache 2.0 and W3C
-    zookeeper 3.4.14: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper/3.4.14, Apache 2.0
+    woodstox-core 5.3.0: https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/5.3.0, Apache 2.0
+    zookeeper 3.8.0: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper/3.8.0, Apache 2.0
     presto-jdbc 0.238.1 https://mvnrepository.com/artifact/com.facebook.presto/presto-jdbc/0.238.1
     protostuff-core 1.7.2: https://github.com/protostuff/protostuff/protostuff-core Apache-2.0
     protostuff-runtime 1.7.2: https://github.com/protostuff/protostuff/protostuff-core Apache-2.0
@@ -427,14 +437,16 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jakarta.validation-api 2.0.2 https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api/2.0.2, Apache 2.0
     jboss-logging:jar 3.4.3.Final https://mvnrepository.com/artifact/org.jboss.logging/jboss-logging/3.4.3.Final, Apache 2.0
     ion-java 1.0.2  https://mvnrepository.com/artifact/software.amazon.ion/ion-java/1.0.2  Apache 2.0
-    jmespath-java 1.12.160 https://mvnrepository.com/artifact/com.amazonaws/jmespath-java/1.12.160 Apache 2.0
+    jmespath-java 1.12.300 https://mvnrepository.com/artifact/com.amazonaws/jmespath-java/1.12.300 Apache 2.0
     jackson-dataformat-cbor 2.13.0 https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.13.0 Apache 2.0
-    aws-java-sdk-emr 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-emr/1.12.160 Apache 2.0
-    aws-java-sdk-core 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
-    aws-java-sdk-s3 1.12.160  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3/1.12.160  Apache 2.0
-    aws-java-sdk-core-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.160  Apache 2.0
-    aws-java-sdk-kms-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.160  Apache 2.0
-    aws-java-sdk-sagemaker-1.12.160 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sagemaker/1.12.160  Apache 2.0
+    aws-java-sdk-emr 1.12.300  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-emr/1.12.300 Apache 2.0
+    aws-java-sdk-core 1.12.300  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.300  Apache 2.0
+    aws-java-sdk-s3 1.12.300  https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3/1.12.300  Apache 2.0
+    aws-java-sdk-core-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core/1.12.300  Apache 2.0
+    aws-java-sdk-kms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-kms/1.12.300  Apache 2.0
+    aws-java-sdk-sagemaker-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sagemaker/1.12.300  Apache 2.0
+    aws-java-sdk-dms-1.12.300 https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dms/1.12.300  Apache 2.0
+    datasync-2.17.282 https://mvnrepository.com/artifact/software.amazon.awssdk/datasync/2.17.282  Apache 2.0
     commons-text 1.8: https://mvnrepository.com/artifact/org.apache.commons/commons-text/1.8, Apache 2.0
     httpasyncclient 4.1.5: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient/4.1.4, Apache 2.0
     httpcore-nio 4.4.15: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio/4.4.15, Apache 2.0
@@ -444,8 +456,53 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     websocket-common 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-common/9.4.48.v20220622, Apache 2.0
     zeppelin-client 0.10.1: https://mvnrepository.com/artifact/org.apache.zeppelin/zeppelin-client/0.10.1, Apache 2.0
     zeppelin-common 0.10.1: https://mvnrepository.com/artifact/org.apache.zeppelin/zeppelin-common/0.10.1, Apache 2.0
+    jetcd-common 0.5.11: https://mvnrepository.com/artifact/io.etcd/jetcd-common/0.5.11, Apache 2.0
+    jetcd-core 0.5.11: https://mvnrepository.com/artifact/io.etcd/jetcd-core/0.5.11, Apache 2.0
+    grpc-api 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-api/1.41.0 Apache 2.0
+    grpc-context 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-context/1.41.0 Apache 2.0
+    grpc-core 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-core/1.41.0 Apache 2.0
+    grpc-grpclb 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-grpclb/1.41.0 Apache 2.0
+    grpc-netty 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-netty/1.41.0 Apache 2.0
+    grpc-protobuf 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-protobuf/1.41.0 Apache 2.0
+    grpc-protobuf-lite 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-protobuf-lite/1.41.0 Apache 2.0
+    grpc-stub 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-stub/1.41.0 Apache 2.0
+    failsafe 2.4.4: https://mvnrepository.com/artifact/net.jodah/failsafe/2.4.4 Apache 2.0
+    auto-service-annotations 1.0.1: https://mvnrepository.com/artifact/com.google.auto.service/auto-service-annotations/1.0.1 Apache 2.0
+    annotations 4.1.1.4: https://mvnrepository.com/artifact/com.google.android/annotations/4.1.1.4 Apache 2.0
+    perfmark-api 0.23.0: https://mvnrepository.com/artifact/io.perfmark/perfmark-api/0.23.0 Apache 2.0
+    proto-google-common-protos 2.0.1: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-common-protos/2.0.1 Apache 2.0
     kotlin 1.6.21: https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib, Apache 2.0
     JetBrains annotations: https://mvnrepository.com/artifact/org.jetbrains/annotations, Apache 2.0
+    aliyun-java-sdk-core 4.5.10: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-java-sdk-kms 2.11.0: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-java-sdk-ram 3.1.0: https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license, Apache 2.0
+    aliyun-sdk-oss 3.15.1: https://github.com/aliyun/aliyun-oss-java-sdk/blob/master/README.md#license, Apache 2.0
+    ini4j 0.5.4: https://mvnrepository.com/artifact/org.ini4j/ini4j/0.5.4, Apache 2.0
+    opentracing-api 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    opentracing-noop 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    opentracing-util 0.33.0: https://github.com/opentracing/opentracing-java/blob/master/LICENSE, Apache 2.0
+    jettison 1.1: https://github.com/jettison-json/jettison/blob/master/LICENSE, Apache 2.0
+    stax-api 1.0.1: https://mvnrepository.com/artifact/stax/stax-api/1.0.1, Apache 2.0
+    hbase-noop-htrace 4.1.1: https://mvnrepository.com/artifact/org.apache.hbase.thirdparty/hbase-noop-htrace/4.1.1, Apache 2.0
+    annotations 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/annotations/2.17.282, Apache 2.0
+    apache-client 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/apache-client/2.17.282, Apache 2.0
+    auth 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/auth/2.17.282, Apache 2.0
+    aws-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/aws-core/2.17.282, Apache 2.0
+    aws-json-protocol 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/aws-json-protocol/2.17.282, Apache 2.0
+    eventstream 1.0.1: https://mvnrepository.com/artifact/software.amazon.eventstream/eventstream/1.0.1, Apache 2.0
+    http-client-spi 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/http-client-spi/2.17.282, Apache 2.0
+    json-utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/json-utils/2.17.282, Apache 2.0
+    metrics-spi 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/metrics-spi/2.17.282, Apache 2.0
+    netty-codec-http 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http/4.1.53.Final, Apache 2.0
+    netty-codec-http2 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http2/4.1.53.Final, Apache 2.0
+    netty-nio-client 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/netty-nio-client/2.17.282, Apache 2.0
+    netty-transport-classes-epoll 4.1.79.Final: https://mvnrepository.com/artifact/io.netty/netty-transport-classes-epoll/4.1.79.Final, Apache 2.0
+    profiles 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/profiles/2.17.282, Apache 2.0
+    protocol-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/protocol-core/2.17.282, Apache 2.0
+    regions 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/regions/2.17.282, Apache 2.0
+    sdk-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core/2.17.282, Apache 2.0
+    third-party-jackson-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/third-party-jackson-core/2.17.282, Apache 2.0
+    utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/utils/2.17.282, Apache 2.0
 
 ========================================================================
 BSD licenses
@@ -457,19 +514,26 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     asm 9.1: https://gitlab.ow2.org/asm/asm, BSD 3-Clause
     click 8.0: https://github.com/pallets/click, BSD 3-Clause
     curvesapi 1.06: https://mvnrepository.com/artifact/com.github.virtuald/curvesapi/1.06, BSD 3-clause
+    dnsjava 2.1.7: https://mvnrepository.com/artifact/dnsjava/dnsjava/2.1.7, BSD 2-clause
+    jakarta.activation-api 1.2.2: https://github.com/eclipse-ee4j/jaf/blob/1.2.2/LICENSE.md, BSD 3-clause
+    jakarta.xml.bind-api 2.3.3: https://github.com/eclipse-ee4j/jaxb-api/blob/2.3.3/LICENSE.md, BSD 3-clause
     javolution 5.5.1: https://mvnrepository.com/artifact/javolution/javolution/5.5.1, BSD
-    jline 0.9.94: https://github.com/jline/jline3, BSD
+    jline 2.12: https://github.com/jline/jline3, BSD
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
-    postgresql 42.3.4: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.3.4, BSD 2-clause
+    leveldbjni-all 1.8: https://mvnrepository.com/artifact/org.fusesource.leveldbjni/leveldbjni-all/1.8, BSD 3-clause
+    postgresql 42.4.1: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.4.1, BSD 2-clause
     protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
+    re2j 1.1: https://github.com/google/re2j/blob/re2j-1.1/LICENSE, BSD 3-clause
+    stax2-api 4.2.1: https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api/4.2.1, BSD
     threetenbp 1.3.6: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.3.6,  BSD 3-clause
-    xmlenc 0.52: https://mvnrepository.com/artifact/xmlenc/xmlenc/0.52, BSD
     py4j 0.10.9: https://mvnrepository.com/artifact/net.sf.py4j/py4j/0.10.9, BSD 2-clause
     LatencyUtils 2.0.3: https://github.com/LatencyUtils/LatencyUtils, BSD-2-Clause
-    janino 3.1.7: https://mvnrepository.com/artifact/org.codehaus.janino/janino/3.1.7, BSD 3-clause
-    commons-compiler 3.1.7: https://mvnrepository.com/artifact/org.codehaus.janino/janino/3.1.7, BSD 3-clause
+    janino 3.0.16: https://mvnrepository.com/artifact/org.codehaus.janino/janino/3.0.16, BSD 3-clause
+    commons-compiler 3.1.7: https://mvnrepository.com/artifact/org.codehaus.janino/janino/3.0.16, BSD 3-clause
     automaton 1.11-8 https://mvnrepository.com/artifact/dk.brics.automaton/automaton/1.11-8, BSD 2-clause
+    protobuf-java 3.17.2: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/3.17.2 BSD 3-clause
+    protobuf-java-util 3.17.2: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util/3.17.2 BSD 3-clause
 
 ========================================================================
 CDDL licenses
@@ -488,6 +552,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jersey-core 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-core/1.9, CDDL 1.1 and GPL 1.1
     jersey-json 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-json/1.9, CDDL 1.1 and GPL 1.1
     jersey-server 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-server/1.9, CDDL 1.1 and GPL 1.1
+    jersey-servlet 1.19: https://mvnrepository.com/artifact/com.sun.jersey/jersey-servlet/1.19, CDDL 1.1 and GPL 1.1
     jta 1.1: https://mvnrepository.com/artifact/javax.transaction/jta/1.1, CDDL 1.0
     transaction-api 1.1: https://mvnrepository.com/artifact/javax.transaction/transaction-api/1.1, CDDL 1.0
     javax.el 3.0.0: https://mvnrepository.com/artifact/org.glassfish/javax.el/3.0.0, CDDL and GPL and GPL 2.0
@@ -501,7 +566,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aspectjweaver 1.9.7:https://mvnrepository.com/artifact/org.aspectj/aspectjweaver/1.9.7, EPL 1.0
     logback-classic 1.2.11: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic/1.2.11, EPL 1.0 and LGPL 2.1
     logback-core 1.2.11: https://mvnrepository.com/artifact/ch.qos.logback/logback-core/1.2.11, EPL 1.0 and LGPL 2.1
-    h2-1.4.200 https://github.com/h2database/h2database/blob/master/LICENSE.txt, MPL 2.0 or EPL 1.0
+    h2-2.1.210 https://github.com/h2database/h2database/blob/master/LICENSE.txt, MPL 2.0 or EPL 1.0
 
 ========================================================================
 MIT licenses
@@ -514,13 +579,15 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/6.1.0.jre8, MIT
     ruamel.yaml 0.17: https://sourceforge.net/projects/ruamel-yaml, MIT
     slf4j-api 1.7.36: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.36, MIT
-    animal-sniffer-annotations 1.14 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.14, MIT
-    checker-compat-qual 2.0.0 https://mvnrepository.com/artifact/org.checkerframework/checker-compat-qual/2.0.0, MIT + GPLv2
-    checker-qual 3.19.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.19.0, MIT + GPLv2
-    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket  MIT
+    animal-sniffer-annotations 1.19 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.19, MIT
+    checker-qual 3.12.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.12.0, MIT + GPLv2
+    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket,  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
     classgraph 4.8.83: https://mvnrepository.com/artifact/io.github.classgraph/classgraph, MIT
+    bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on, MIT
+    bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on, MIT
+    reactive-streams 1.0.4: https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams/1.0.4, MIT
 
 ========================================================================
 MPL 1.1 licenses
@@ -555,47 +622,47 @@ MIT licenses
 ========================================
     @antv/layout 0.1.31: https://github.com/antvis/layout MIT
     @types/js-cookie 3.0.2: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
-    @antv/x6 1.32.7: https://github.com/antvis/x6 MIT
-    @vueuse/core 8.8.0: https://github.com/vueuse/vueuse MIT
+    @antv/x6 1.34.1: https://github.com/antvis/x6 MIT
+    @vueuse/core 9.2.0: https://github.com/vueuse/vueuse MIT
     axios 0.27.2: https://github.com/axios/axios MIT
-    date-fns 2.28.0: https://github.com/date-fns/date-fns MIT
+    date-fns 2.29.3: https://github.com/date-fns/date-fns MIT
     lodash 4.17.21: https://github.com/lodash/lodash MIT
-    monaco-editor 0.33.0: https://github.com/microsoft/monaco-editor MIT
-    naive-ui 2.30.8: https://github.com/TuSimple/naive-ui MIT
+    monaco-editor 0.34.0: https://github.com/microsoft/monaco-editor MIT
+    naive-ui 2.30.7: https://github.com/TuSimple/naive-ui MIT
     nprogress 0.2.0: https://github.com/rstacruz/nprogress MIT
-    pinia 2.0.14: https://github.com/vuejs/pinia MIT
-    pinia-plugin-persistedstate 1.6.1: https://github.com/prazdevs/pinia-plugin-persistedstate MIT
+    pinia 2.0.22: https://github.com/vuejs/pinia MIT
+    pinia-plugin-persistedstate 2.2.0: https://github.com/prazdevs/pinia-plugin-persistedstate MIT
     vfonts 0.0.3: https://www.npmjs.com/package/vfonts MIT
-    vue 3.2.37: https://github.com/vuejs/core MIT
-    vue-i18n 9.1.10: https://github.com/kazupon/vue-i18n MIT
-    vue-router 4.1.1: https://github.com/vuejs/router MIT
-    @types/node 18.0.3: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
+    vue 3.2.39: https://github.com/vuejs/core MIT
+    vue-i18n 9.2.2: https://github.com/kazupon/vue-i18n MIT
+    vue-router 4.1.5: https://github.com/vuejs/router MIT
+    @types/node 18.7.18: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @types/nprogress 0.2.0: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @types/qs 6.9.7: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
     @vicons/antd 0.12.0: https://www.npmjs.com/package/@vicons/antd MIT
-    @vitejs/plugin-vue 2.3.3: https://github.com/vitejs/vite MIT
-    @vitejs/plugin-vue-jsx 1.3.10: https://github.com/vitejs/vite MIT
+    @vitejs/plugin-vue 3.1.0: https://github.com/vitejs/vite MIT
+    @vitejs/plugin-vue-jsx 2.0.1: https://github.com/vitejs/vite MIT
     dart-sass 1.25.0: https://github.com/sass/dart-sass MIT
-    eslint 8.19.0: https://github.com/eslint/eslint MIT
+    eslint 8.23.1: https://github.com/eslint/eslint MIT
     eslint-config-prettier 8.5.0: https://github.com/prettier/eslint-config-prettier MIT
     eslint-plugin-prettier 4.2.1: https://github.com/prettier/eslint-plugin-prettier MIT
-    eslint-plugin-vue 9.2.0: https://github.com/vuejs/eslint-plugin-vue MIT
+    eslint-plugin-vue 9.5.1: https://github.com/vuejs/eslint-plugin-vue MIT
     prettier 2.7.1: https://github.com/prettier/prettier MIT
-    sass 1.53.0: https://github.com/sass/dart-sass MIT
+    sass 1.54.9: https://github.com/sass/dart-sass MIT
     sass-loader 13.0.2: https://github.com/webpack-contrib/sass-loader MIT
     typescript-plugin-css-modules 3.4.0: https://github.com/mrmckeb/typescript-plugin-css-modules MIT
-    vite 2.9.13: https://github.com/vitejs/vite MIT
+    vite 3.1.2: https://github.com/vitejs/vite MIT
     vite-plugin-compression 0.5.1: https://github.com/vbenjs/vite-plugin-compression MIT
-    vue-tsc 0.38.2: https://github.com/johnsoncodehk/volar MIT
-    date-fns-tz 1.3.5: https://github.com/marnusw/date-fns-tz MIT
+    vue-tsc 0.40.13: https://github.com/johnsoncodehk/volar MIT
+    date-fns-tz 1.3.7: https://github.com/marnusw/date-fns-tz MIT
     screenfull 6.0.2: https://github.com/sindresorhus/screenfull MIT
-    @types/lodash 4.14.182: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
+    @types/lodash 4.14.185: https://github.com/DefinitelyTyped/DefinitelyTyped MIT
 
 ========================================
 Apache 2.0 licenses
 ========================================
     echarts	5.3.3: https://github.com/apache/echarts Apache-2.0
-    typescript 4.7.4: https://github.com/Microsoft/TypeScript Apache-2.0
+    typescript 4.8.3: https://github.com/Microsoft/TypeScript Apache-2.0
     open-sans: Apache-2.0
     roboto: Apache-2.0
 
@@ -606,8 +673,8 @@ BSD licenses
 The following components are provided under a BSD license. See project link for details.
 The text of each license is also included at licenses/ui-licenses/LICENSE-[project].txt.
     qs 6.11.0: https://github.com/ljharb/qs BSD 3-Clause
-    @typescript-eslint/eslint-plugin 5.30.5: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
-    @typescript-eslint/parser 5.30.5: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
+    @typescript-eslint/eslint-plugin 5.37.0: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
+    @typescript-eslint/parser 5.37.0: https://github.com/typescript-eslint/typescript-eslint BSD 2-clause
 
 ========================================
 SIL licenses
@@ -617,3 +684,8 @@ SIL licenses
     ibm-plex: SIL
     inter: https://github.com/rsms/inter SIL
     lato: SIL
+
+========================================
+JDOM licenses
+========================================
+    jdom2 2.0.6.1: https://github.com/hunterhacker/jdom/blob/master/LICENSE.txt JDOM

@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -30,24 +31,20 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.DateUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class JupyterTask extends AbstractTaskExecutor {
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-    /**
-     * jupyter parameters
-     */
+public class JupyterTask extends AbstractRemoteTask {
+
     private JupyterParameters jupyterParameters;
 
-    /**
-     * taskExecutionContext
-     */
     private TaskExecutionContext taskExecutionContext;
 
     private ShellCommandExecutor shellCommandExecutor;
@@ -58,6 +55,11 @@ public class JupyterTask extends AbstractTaskExecutor {
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
                 logger);
+    }
+
+    @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
@@ -76,10 +78,10 @@ public class JupyterTask extends AbstractTaskExecutor {
         }
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            // SHELL task exit code
             TaskResponse response = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
@@ -96,17 +98,23 @@ public class JupyterTask extends AbstractTaskExecutor {
         }
     }
 
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
+    }
+
     /**
-     * create command
-     *
-     * @return command
+     * command will be like: papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
      */
     protected String buildCommand() throws IOException {
-        /**
-         * papermill [OPTIONS] NOTEBOOK_PATH [OUTPUT_PATH]
-         */
+
         List<String> args = new ArrayList<>();
-        final String condaPath = PropertyUtils.getString(TaskConstants.CONDA_PATH);
+        final String condaPath = readCondaPath();
         final String timestamp = DateUtils.getTimestampString();
         String condaEnvName = jupyterParameters.getCondaEnvName();
         if (condaEnvName.endsWith(JupyterConstants.TXT_SUFFIX)) {
@@ -130,11 +138,7 @@ public class JupyterTask extends AbstractTaskExecutor {
         args.add(JupyterConstants.PAPERMILL);
         args.add(jupyterParameters.getInputNotePath());
         args.add(jupyterParameters.getOutputNotePath());
-
-        // populate jupyter parameterization
         args.addAll(populateJupyterParameterization());
-
-        // populate jupyter options
         args.addAll(populateJupyterOptions());
 
         // remove tmp conda env, if created from requirements.txt
@@ -145,7 +149,6 @@ public class JupyterTask extends AbstractTaskExecutor {
 
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
@@ -154,12 +157,11 @@ public class JupyterTask extends AbstractTaskExecutor {
         return command;
     }
 
-    /**
-     * build jupyter parameterization
-     *
-     * @return argument list
-     */
-    private List<String> populateJupyterParameterization() throws IOException {
+    protected String readCondaPath() {
+        return PropertyUtils.getString(TaskConstants.CONDA_PATH);
+    }
+
+    protected List<String> populateJupyterParameterization() throws IOException {
         List<String> args = new ArrayList<>();
         String parameters = jupyterParameters.getParameters();
         if (StringUtils.isNotEmpty(parameters)) {
@@ -181,12 +183,7 @@ public class JupyterTask extends AbstractTaskExecutor {
         return args;
     }
 
-    /**
-     * build jupyter options
-     *
-     * @return argument list
-     */
-    private List<String> populateJupyterOptions() {
+    protected List<String> populateJupyterOptions() {
         List<String> args = new ArrayList<>();
         String kernel = jupyterParameters.getKernel();
         if (StringUtils.isNotEmpty(kernel)) {
@@ -223,9 +220,13 @@ public class JupyterTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     @Override

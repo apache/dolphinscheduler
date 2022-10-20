@@ -74,8 +74,44 @@ conf:
     # resource storage type: HDFS, S3, NONE
     resource.storage.type: HDFS
 
-    # resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
-    resource.upload.path: /dolphinscheduler
+    # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
+    resource.storage.upload.base.path: /dolphinscheduler
+
+    # The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+    resource.aws.access.key.id: minioadmin
+
+    # The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+    resource.aws.secret.access.key: minioadmin
+
+    # The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+    resource.aws.region: cn-north-1
+
+    # The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
+    resource.aws.s3.bucket.name: dolphinscheduler
+
+    # You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
+    resource.aws.s3.endpoint: http://localhost:9000
+
+    # alibaba cloud access key id, required if you set resource.storage.type=OSS
+    resource.alibaba.cloud.access.key.id: <your-access-key-id>
+
+    # alibaba cloud access key secret, required if you set resource.storage.type=OSS
+    resource.alibaba.cloud.access.key.secret: <your-access-key-secret>
+
+    # alibaba cloud region, required if you set resource.storage.type=OSS
+    resource.alibaba.cloud.region: cn-hangzhou
+
+    # oss bucket name, required if you set resource.storage.type=OSS
+    resource.alibaba.cloud.oss.bucket.name: dolphinscheduler
+
+    # oss bucket endpoint, required if you set resource.storage.type=OSS
+    resource.alibaba.cloud.oss.endpoint: https://oss-cn-hangzhou.aliyuncs.com
+
+    # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
+    resource.hdfs.root.user: hdfs
+
+    # if resource.storage.type=S3, the value like: s3a://dolphinscheduler; if resource.storage.type=HDFS and namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
+    resource.hdfs.fs.defaultFS: hdfs://mycluster:8020
 
     # whether to startup kerberos
     hadoop.security.authentication.startup.state: false
@@ -91,22 +127,16 @@ conf:
 
     # kerberos expire time, the unit is hour
     kerberos.expire.time: 2
-    # resource view suffixs
-    #resource.view.suffixs: txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
-    # if resource.storage.type: HDFS, the user must have the permission to create directories under the HDFS root path
-    hdfs.root.user: hdfs
-    # if resource.storage.type: S3, the value like: s3a://dolphinscheduler; if resource.storage.type: HDFS and namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
-    fs.defaultFS: file:///
-    aws.access.key.id: minioadmin
-    aws.secret.access.key: minioadmin
-    aws.region: us-east-1
-    aws.endpoint: http://localhost:9000
+
     # resourcemanager port, the default value is 8088 if not specified
     resource.manager.httpaddress.port: 8088
+
     # if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty
     yarn.resourcemanager.ha.rm.ids: 192.168.xx.xx,192.168.xx.xx
+
     # if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname
     yarn.application.status.address: http://ds1:%s/ws/v1/cluster/apps/%s
+
     # job history status url when application number threshold is reached(default 10000, maybe it was set to 1000)
     yarn.job.history.status.address: http://ds1:19888/ws/v1/history/mapreduce/jobs/%s
 
@@ -119,60 +149,41 @@ conf:
     # data quality option
     data-quality.jar.name: dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 
-    #data-quality.error.output.path: /tmp/data-quality-error-data
-
-    # Network IP gets priority, default inner outer
-
     # Whether hive SQL is executed in the same session
     support.hive.oneSession: false
 
     # use sudo or not, if set true, executing user is tenant user and deploy user needs sudo permissions; if set false, executing user is the deploy user and doesn't need sudo permissions
     sudo.enable: true
 
-    # network interface preferred like eth0, default: empty
-    #dolphin.scheduler.network.interface.preferred:
-
-    # network IP gets priority, default: inner outer
-    #dolphin.scheduler.network.priority.strategy: default
-
-    # system env path
-    #dolphinscheduler.env.path: dolphinscheduler_env.sh
     # development state
     development.state: false
+
     # rpc port
     alert.rpc.port: 50052
-    # Url endpoint for zeppelin RESTful API
-    zeppelin.rest.url: http://localhost:8080
+
+    # set path of conda.sh
+    conda.path: /opt/anaconda3/etc/profile.d/conda.sh
+
+    # Task resource limit state
+    task.resource.limit.state: false
+
+    # mlflow task plugin preset repository
+    ml.mlflow.preset_repository: https://github.com/apache/dolphinscheduler-mlflow
+
+    # mlflow task plugin preset repository version
+    ml.mlflow.preset_repository_version: "main"
 
 common:
   ## Configmap
   configmap:
     DOLPHINSCHEDULER_OPTS: ""
     DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
-    RESOURCE_STORAGE_TYPE: "HDFS"
     RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
-    FS_DEFAULT_FS: "file:///"
-    FS_S3A_ENDPOINT: "s3.xxx.amazonaws.com"
-    FS_S3A_ACCESS_KEY: "xxxxxxx"
-    FS_S3A_SECRET_KEY: "xxxxxxx"
-    HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE: "false"
-    JAVA_SECURITY_KRB5_CONF_PATH: "/opt/krb5.conf"
-    LOGIN_USER_KEYTAB_USERNAME: "hdfs@HADOOP.COM"
-    LOGIN_USER_KEYTAB_PATH: "/opt/hdfs.keytab"
-    KERBEROS_EXPIRE_TIME: "2"
-    HDFS_ROOT_USER: "hdfs"
-    RESOURCE_MANAGER_HTTPADDRESS_PORT: "8088"
-    YARN_RESOURCEMANAGER_HA_RM_IDS: ""
-    YARN_APPLICATION_STATUS_ADDRESS: "http://ds1:%s/ws/v1/cluster/apps/%s"
-    YARN_JOB_HISTORY_STATUS_ADDRESS: "http://ds1:19888/ws/v1/history/mapreduce/jobs/%s"
-    DATASOURCE_ENCRYPTION_ENABLE: "false"
-    DATASOURCE_ENCRYPTION_SALT: "!@#$%^&*"
-    SUDO_ENABLE: "true"
+
     # dolphinscheduler env
     HADOOP_HOME: "/opt/soft/hadoop"
     HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
-    SPARK_HOME1: "/opt/soft/spark1"
-    SPARK_HOME2: "/opt/soft/spark2"
+    SPARK_HOME: "/opt/soft/spark"
     PYTHON_HOME: "/usr/bin/python"
     JAVA_HOME: "/usr/local/openjdk-8"
     HIVE_HOME: "/opt/soft/hive"

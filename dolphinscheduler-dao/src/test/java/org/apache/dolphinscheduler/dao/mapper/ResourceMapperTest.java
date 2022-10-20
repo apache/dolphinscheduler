@@ -18,18 +18,15 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -38,8 +35,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -65,7 +62,7 @@ public class ResourceMapperTest extends BaseDaoTest {
      * @return Resource
      */
     private Resource insertOne() {
-        //insertOne
+        // insertOne
         Resource resource = new Resource();
         resource.setAlias("ut-resource");
         resource.setFullName("/ut-resource");
@@ -75,7 +72,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         resource.setUserId(111);
         int status = resourceMapper.insert(resource);
         if (status != 1) {
-            Assert.fail("insert data error");
+            Assertions.fail("insert data error");
         }
         return resource;
     }
@@ -86,8 +83,9 @@ public class ResourceMapperTest extends BaseDaoTest {
      * @param user user
      * @return Resource
      */
-    private Resource createResource(User user, boolean isDirectory, ResourceType resourceType, int pid, String alias, String fullName) {
-        //insertOne
+    private Resource createResource(User user, boolean isDirectory, ResourceType resourceType, int pid, String alias,
+                                    String fullName) {
+        // insertOne
         Resource resource = new Resource();
         resource.setDirectory(isDirectory);
         resource.setType(resourceType);
@@ -96,7 +94,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         resource.setUserId(user.getId());
         int status = resourceMapper.insert(resource);
         if (status != 1) {
-            Assert.fail("insert data error");
+            Assertions.fail("insert data error");
         }
         return resource;
     }
@@ -108,7 +106,7 @@ public class ResourceMapperTest extends BaseDaoTest {
      * @return Resource
      */
     private Resource createResource(User user) {
-        //insertOne
+        // insertOne
         String alias = String.format("ut-resource-%s", user.getUserName());
         String fullName = String.format("/%s", alias);
 
@@ -133,7 +131,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         int status = userMapper.insert(user);
 
         if (status != 1) {
-            Assert.fail("insert data error");
+            Assertions.fail("insert data error");
         }
         return user;
     }
@@ -144,7 +142,7 @@ public class ResourceMapperTest extends BaseDaoTest {
      * @return ResourcesUser
      */
     private ResourcesUser createResourcesUser(Resource resource, User user) {
-        //insertOne
+        // insertOne
         ResourcesUser resourcesUser = new ResourcesUser();
         resourcesUser.setCreateTime(new Date());
         resourcesUser.setUpdateTime(new Date());
@@ -158,8 +156,8 @@ public class ResourceMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         Resource resource = insertOne();
-        assertNotNull(resource.getId());
-        assertThat(resource.getId(), greaterThan(0));
+        Assertions.assertNotNull(resource.getId());
+        Assertions.assertTrue(resource.getId() > 0);
     }
 
     /**
@@ -167,12 +165,12 @@ public class ResourceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Resource resource = insertOne();
         resource.setCreateTime(new Date());
-        //update
+        // update
         int update = resourceMapper.updateById(resource);
-        Assert.assertEquals(1, update);
+        Assertions.assertEquals(1, update);
     }
 
     /**
@@ -182,7 +180,7 @@ public class ResourceMapperTest extends BaseDaoTest {
     public void testDelete() {
         Resource resourceMap = insertOne();
         int delete = resourceMapper.deleteById(resourceMap.getId());
-        Assert.assertEquals(1, delete);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -191,9 +189,9 @@ public class ResourceMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Resource resource = insertOne();
-        //query
+        // query
         List<Resource> resources = resourceMapper.selectList(null);
-        Assert.assertNotEquals(resources.size(), 0);
+        Assertions.assertNotEquals(resources.size(), 0);
     }
 
     /**
@@ -210,10 +208,9 @@ public class ResourceMapperTest extends BaseDaoTest {
         List<Resource> resources = resourceMapper.queryResourceList(
                 alias,
                 userId,
-                type
-        );
+                type);
 
-        Assert.assertNotEquals(resources.size(), 0);
+        Assertions.assertNotEquals(resources.size(), 0);
     }
 
     /**
@@ -246,17 +243,15 @@ public class ResourceMapperTest extends BaseDaoTest {
                 -1,
                 resource.getType().ordinal(),
                 "",
-                new ArrayList<>(resource.getId())
-        );
+                new ArrayList<>(resource.getId()));
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
                 -1,
                 resource.getType().ordinal(),
                 "",
-                null
-        );
-        Assert.assertEquals(resourceIPage.getTotal(), 1);
-        Assert.assertEquals(resourceIPage1.getTotal(), 1);
+                null);
+        Assertions.assertEquals(resourceIPage.getTotal(), 1);
+        Assertions.assertEquals(resourceIPage1.getTotal(), 1);
 
     }
 
@@ -267,8 +262,10 @@ public class ResourceMapperTest extends BaseDaoTest {
     public void testQueryResourceListAuthored() {
         Resource resource = insertOne();
 
-        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(), Constants.AUTHORIZE_WRITABLE_PERM);
-        List<Resource> resources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(),
+                Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources =
+                CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
 
         ResourcesUser resourcesUser = new ResourcesUser();
 
@@ -277,11 +274,13 @@ public class ResourceMapperTest extends BaseDaoTest {
         resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
         resourceUserMapper.insert(resourcesUser);
 
-        List<Integer> resIds1 = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(1110, Constants.AUTHORIZE_WRITABLE_PERM);
-        List<Resource> resources1 = CollectionUtils.isEmpty(resIds1) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds1);
+        List<Integer> resIds1 =
+                resourceUserMapper.queryResourcesIdListByUserIdAndPerm(1110, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources1 =
+                CollectionUtils.isEmpty(resIds1) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds1);
 
-        Assert.assertEquals(0, resources.size());
-        Assert.assertNotEquals(0, resources1.size());
+        Assertions.assertEquals(0, resources.size());
+        Assertions.assertNotEquals(0, resources1.size());
 
     }
 
@@ -292,11 +291,13 @@ public class ResourceMapperTest extends BaseDaoTest {
     public void testQueryAuthorizedResourceList() {
         Resource resource = insertOne();
 
-        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(), Constants.AUTHORIZE_WRITABLE_PERM);
-        List<Resource> resources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(),
+                Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources =
+                CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
 
         resourceMapper.deleteById(resource.getId());
-        Assert.assertEquals(0, resources.size());
+        Assertions.assertEquals(0, resources.size());
     }
 
     /**
@@ -306,9 +307,8 @@ public class ResourceMapperTest extends BaseDaoTest {
     public void testQueryResourceExceptUserId() {
         Resource resource = insertOne();
         List<Resource> resources = resourceMapper.queryResourceExceptUserId(
-                11111
-        );
-        Assert.assertNotEquals(resources.size(), 0);
+                11111);
+        Assertions.assertNotEquals(resources.size(), 0);
     }
 
     /**
@@ -322,7 +322,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         int tenantInsertStatus = tenantMapper.insert(tenant);
 
         if (tenantInsertStatus != 1) {
-            Assert.fail("insert tenant data error");
+            Assertions.fail("insert tenant data error");
         }
 
         User user = new User();
@@ -331,14 +331,14 @@ public class ResourceMapperTest extends BaseDaoTest {
         int userInsertStatus = userMapper.insert(user);
 
         if (userInsertStatus != 1) {
-            Assert.fail("insert user data error");
+            Assertions.fail("insert user data error");
         }
 
         Resource resource = insertOne();
         resource.setUserId(user.getId());
         int userUpdateStatus = resourceMapper.updateById(resource);
         if (userUpdateStatus != 1) {
-            Assert.fail("update user data error");
+            Assertions.fail("update user data error");
         }
 
         List<Resource> resourceList = resourceMapper.queryResource(resource.getFullName(), ResourceType.FILE.ordinal());
@@ -347,7 +347,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         User resourceUser = userMapper.selectById(resourceUserId);
         Tenant resourceTenant = tenantMapper.selectById(resourceUser.getTenantId());
 
-        Assert.assertEquals("ut tenant code for resource", resourceTenant.getTenantCode());
+        Assertions.assertEquals("ut tenant code for resource", resourceTenant.getTenantCode());
 
     }
 
@@ -365,13 +365,15 @@ public class ResourceMapperTest extends BaseDaoTest {
 
         List<Resource> resources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
 
-        Assert.assertEquals(generalUser2.getId(), resource.getUserId());
-        Assert.assertFalse(resources.stream().map(t -> t.getFullName()).collect(toList()).containsAll(Arrays.asList(resNames)));
+        Assertions.assertEquals(generalUser2.getId().intValue(), resource.getUserId());
+        Assertions.assertFalse(
+                resources.stream().map(t -> t.getFullName()).collect(toList()).containsAll(Arrays.asList(resNames)));
 
         // authorize object unauthorizedResource to generalUser
         createResourcesUser(unauthorizedResource, generalUser2);
         List<Resource> authorizedResources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
-        Assert.assertTrue(authorizedResources.stream().map(t -> t.getFullName()).collect(toList()).containsAll(Arrays.asList(resource.getFullName())));
+        Assertions.assertTrue(authorizedResources.stream().map(t -> t.getFullName()).collect(toList())
+                .containsAll(Arrays.asList(resource.getFullName())));
 
     }
 
@@ -388,7 +390,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         resourceList.add(resource.getId());
         resourceList.add(resource1.getId());
         int result = resourceMapper.deleteIds(resourceList.toArray(new Integer[resourceList.size()]));
-        Assert.assertEquals(result, 2);
+        Assertions.assertEquals(result, 2);
     }
 
     @Test
@@ -400,11 +402,12 @@ public class ResourceMapperTest extends BaseDaoTest {
         Resource resource = createResource(generalUser1);
         createResourcesUser(resource, generalUser2);
 
-        List<Resource> resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal());
-        Assert.assertNotNull(resourceList);
+        List<Resource> resourceList =
+                resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal());
+        Assertions.assertNotNull(resourceList);
 
         resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal());
-        Assert.assertFalse(resourceList.contains(resource));
+        Assertions.assertFalse(resourceList.contains(resource));
     }
 
     @Test
@@ -419,7 +422,7 @@ public class ResourceMapperTest extends BaseDaoTest {
         resourceList.add(resource);
         int result = resourceMapper.batchUpdateResource(resourceList);
         if (result != resourceList.size()) {
-            Assert.fail("batch update resource  data error");
+            Assertions.fail("batch update resource  data error");
         }
     }
 
@@ -428,11 +431,10 @@ public class ResourceMapperTest extends BaseDaoTest {
         String fullName = "/ut-resource";
         int userId = 111;
         int type = ResourceType.FILE.getCode();
-        Assert.assertNull(resourceMapper.existResourceByUser(fullName, userId, type));
-        Assert.assertNull(resourceMapper.existResource(fullName, type));
+        Assertions.assertNull(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assertions.assertNull(resourceMapper.existResource(fullName, type));
         insertOne();
-        Assert.assertTrue(resourceMapper.existResourceByUser(fullName, userId, type));
-        Assert.assertTrue(resourceMapper.existResource(fullName, type));
+        Assertions.assertTrue(resourceMapper.existResourceByUser(fullName, userId, type));
+        Assertions.assertTrue(resourceMapper.existResource(fullName, type));
     }
 }
-

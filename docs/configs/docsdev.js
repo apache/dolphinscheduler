@@ -90,6 +90,10 @@ export default {
                         title: 'Task',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/en-us/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/en-us/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -186,6 +190,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
                             {
+                                title: 'Java',
+                                link: '/en-us/docs/dev/user_doc/guide/task/java.html',
+                            },
+                            {
                                 title: 'SageMaker',
                                 link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
@@ -196,6 +204,14 @@ export default {
                             {
                                 title: 'Pytorch',
                                 link: '/en-us/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
+                            {
+                                title: 'Amazon DMS',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dms.html',
+                            },
+                            {
+                                title: 'AWS Datasync',
+                                link: '/en-us/docs/dev/user_doc/guide/task/datasync.html',
                             },
                         ],
                     },
@@ -266,6 +282,10 @@ export default {
                             {
                                 title: 'Oracle',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/oracle.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
                             },
                         ],
                     },
@@ -714,6 +734,10 @@ export default {
                         title: '任务类型',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -810,6 +834,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
                             },
                             {
+                                title: 'Java',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/java.html',
+                            },
+                            {
                                 title: 'SageMaker',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
@@ -820,6 +848,14 @@ export default {
                             {
                                 title: 'Pytorch',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
+                            {
+                                title: 'Amazon DMS',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dms.html',
+                            },
+                            {
+                                title: 'AWS Datasync',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/datasync.html',
                             },
                         ],
                     },
@@ -866,6 +902,10 @@ export default {
                             {
                                 title: 'Spark',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
                             },
                         ],
                     },

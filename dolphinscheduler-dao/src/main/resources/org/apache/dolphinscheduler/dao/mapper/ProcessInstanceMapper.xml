@@ -24,7 +24,7 @@
         warning_group_id, schedule_time, command_start_time, global_params, flag,
         update_time, is_sub_process, executor_id, history_cmd,
         process_instance_priority, worker_group,environment_code, timeout, tenant_id, var_pool,
-        dry_run, next_process_instance_id, restart_time
+        dry_run, test_flag, next_process_instance_id, restart_time, state_history
     </sql>
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
@@ -110,8 +110,8 @@
     <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select instance.id, instance.command_type, instance.executor_id, instance.process_definition_version,
         instance.process_definition_code, instance.name, instance.state, instance.schedule_time, instance.start_time,
-        instance.end_time, instance.run_times, instance.recovery, instance.host, instance.dry_run ,instance.next_process_instance_id,
-        restart_time
+        instance.end_time, instance.run_times, instance.recovery, instance.host, instance.dry_run , instance.test_flag ,instance.next_process_instance_id,
+        restart_time, instance.state_history
         from t_ds_process_instance instance
         join t_ds_process_definition define ON instance.process_definition_code = define.code
         where instance.is_sub_process=0
@@ -122,8 +122,11 @@
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')
         </if>
-        <if test="startTime != null ">
-            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+        <if test="startTime != null">
+            and instance.start_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null">
+            and instance.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="states != null and states.length > 0">
             and instance.state in
@@ -197,7 +200,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode}
+        where process_definition_code=#{processDefinitionCode} and test_flag=#{testFlag}
         <if test="startTime!=null and endTime != null ">
             and schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>
@@ -207,7 +210,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode}
+        where process_definition_code=#{processDefinitionCode} and test_flag=#{testFlag}
         <if test="states !=null and states.length != 0">
             and state in
             <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
@@ -224,7 +227,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode}
+        where process_definition_code=#{processDefinitionCode} and test_flag=#{testFlag}
         and schedule_time is null
         <if test="startTime!=null and endTime != null ">
             and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
@@ -257,7 +260,9 @@
             </foreach>
         </if>
         and next_process_instance_id=0
-        and id <![CDATA[ < ]]> #{id}
+        <if test="id != null">
+            and id <![CDATA[ < ]]> #{id}
+        </if>
         order by id desc
     </select>
     <select id="loadNextProcess4Serial" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">

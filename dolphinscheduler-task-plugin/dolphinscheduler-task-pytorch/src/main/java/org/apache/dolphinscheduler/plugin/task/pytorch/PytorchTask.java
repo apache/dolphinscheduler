@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.pytorch;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PytorchTask extends AbstractTaskExecutor {
+public class PytorchTask extends AbstractTask {
 
     private final ShellCommandExecutor shellCommandExecutor;
     protected PytorchParameters pytorchParameters;
@@ -45,8 +46,8 @@ public class PytorchTask extends AbstractTaskExecutor {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext,
-            logger);
+                taskExecutionContext,
+                logger);
     }
 
     @Override
@@ -65,12 +66,11 @@ public class PytorchTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             String command = buildPythonExecuteCommand();
             TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
-            setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
@@ -84,6 +84,10 @@ public class PytorchTask extends AbstractTaskExecutor {
         }
     }
 
+    @Override
+    public void cancel() throws TaskException {
+
+    }
 
     public String buildPythonExecuteCommand() throws Exception {
         List<String> args = new ArrayList<>();
@@ -107,7 +111,8 @@ public class PytorchTask extends AbstractTaskExecutor {
 
         String scriptParams = pytorchParameters.getScriptParams();
         if (scriptParams != null && !scriptParams.isEmpty()) {
-            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(), pytorchParameters.getScriptParams()));
+            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(),
+                    pytorchParameters.getScriptParams()));
         } else {
             args.add(String.format("%s %s", getPythonCommand(), pytorchParameters.getScriptPath()));
 
@@ -128,10 +133,8 @@ public class PytorchTask extends AbstractTaskExecutor {
 
     }
 
-
     @Override
     public AbstractParameters getParameters() {
         return pytorchParameters;
     }
 }
-

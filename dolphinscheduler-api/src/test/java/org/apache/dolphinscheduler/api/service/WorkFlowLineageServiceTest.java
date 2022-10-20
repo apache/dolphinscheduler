@@ -35,18 +35,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * work flow lineage service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WorkFlowLineageServiceTest {
 
     @InjectMocks
@@ -81,10 +81,11 @@ public class WorkFlowLineageServiceTest {
         Project project = getProject("test");
         String name = "test";
         when(projectMapper.queryByCode(1L)).thenReturn(project);
-        when(workFlowLineageMapper.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any())).thenReturn(getWorkFlowLineages());
+        when(workFlowLineageMapper.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
+                .thenReturn(getWorkFlowLineages());
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(1L, name);
         List<WorkFlowLineage> workFlowLineageList = (List<WorkFlowLineage>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(workFlowLineageList.size() > 0);
+        Assertions.assertTrue(workFlowLineageList.size() > 0);
     }
 
     @Test
@@ -114,10 +115,12 @@ public class WorkFlowLineageServiceTest {
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(1L);
 
         Map<String, Object> workFlowLists = (Map<String, Object>) result.get(Constants.DATA_LIST);
-        Collection<WorkFlowLineage> workFlowLineageList = (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
-        Set<WorkFlowRelation> workFlowRelations = (Set<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
-        Assert.assertTrue(workFlowLineageList.size() > 0);
-        Assert.assertTrue(workFlowRelations.size() > 0);
+        Collection<WorkFlowLineage> workFlowLineageList =
+                (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
+        Set<WorkFlowRelation> workFlowRelations =
+                (Set<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
+        Assertions.assertTrue(workFlowLineageList.size() > 0);
+        Assertions.assertTrue(workFlowRelations.size() > 0);
     }
 
     private List<WorkFlowLineage> getWorkFlowLineages() {

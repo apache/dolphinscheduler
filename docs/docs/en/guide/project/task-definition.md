@@ -1,6 +1,7 @@
 # Task Definition
 
 ## Batch Task Definition
+
 Task definition allows to modify or operate tasks at the task level rather than modifying them in the workflow definition.
 We already have workflow level task editor in [workflow definition](workflow-definition.md) which you can click the specific
 workflow and then edit its task definition. It is depressing when you want to edit the task definition but do not remember
@@ -14,6 +15,7 @@ name but forget which workflow it belongs to. It is also supported query by the 
 `Workflow Name`
 
 ## Stream Task Definition
+
 Stream task definitions are created in the workflow definition, and can be modified and executed.
 
 ![task-definition](../../../../img/new_ui/dev/project/stream-task-definition.png)

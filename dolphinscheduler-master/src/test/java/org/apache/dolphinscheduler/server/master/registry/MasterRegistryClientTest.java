@@ -18,75 +18,55 @@
 package org.apache.dolphinscheduler.server.master.registry;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.ScheduledExecutorService;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * MasterRegistryClientTest
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({RegistryClient.class})
-@PowerMockIgnore({"javax.management.*"})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class MasterRegistryClientTest {
 
     @InjectMocks
     private MasterRegistryClient masterRegistryClient;
 
     @Mock
-    private MasterConfig masterConfig;
-
-    @Mock
     private RegistryClient registryClient;
-
-    @Mock
-    private ScheduledExecutorService heartBeatExecutor;
 
     @Mock
     private ProcessService processService;
 
     @Mock
-    private MasterConnectStrategy masterConnectStrategy;
-
-    @Mock
     private MasterHeartBeatTask masterHeartBeatTask;
 
     @Mock
-    private ProcessInstanceExecCacheManagerImpl processInstanceExecCacheManager;
+    private MasterConfig masterConfig;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
-        given(registryClient.getLock(Mockito.anyString())).willReturn(true);
-        given(registryClient.releaseLock(Mockito.anyString())).willReturn(true);
         given(registryClient.getHostByEventDataPath(Mockito.anyString())).willReturn("127.0.0.1:8080");
-        given(registryClient.getStoppable()).willReturn(cause -> {
-
-        });
         ReflectionTestUtils.setField(masterRegistryClient, "registryClient", registryClient);
         ReflectionTestUtils.setField(masterRegistryClient, "masterHeartBeatTask", masterHeartBeatTask);
 
@@ -96,23 +76,15 @@ public class MasterRegistryClientTest {
         processInstance.setRestartTime(new Date());
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
-        given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
-                .willReturn(Arrays.asList(processInstance));
-        doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setStartTime(new Date());
         taskInstance.setHost("127.0.0.1:8080");
-        given(processService.queryNeedFailoverTaskInstances(Mockito.anyString()))
-                .willReturn(Arrays.asList(taskInstance));
-        given(processService.findProcessInstanceDetailById(Mockito.anyInt())).willReturn(processInstance);
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any())).willReturn(true);
         Server server = new Server();
         server.setHost("127.0.0.1");
         server.setPort(8080);
         server.setCreateTime(new Date());
-        given(registryClient.getServerList(NodeType.WORKER)).willReturn(Arrays.asList(server));
-        given(registryClient.getServerList(NodeType.MASTER)).willReturn(Arrays.asList(server));
     }
 
     @Test

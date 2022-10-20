@@ -38,8 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * DataQualityTaskTest
@@ -51,28 +51,29 @@ public class DataQualityTaskTest {
     public void testSingleTable() throws Exception {
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = getSingleTableContext();
 
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","0");
-        inputParameterValue.put("src_datasource_id","2");
-        inputParameterValue.put("src_table","src_result");
-        inputParameterValue.put("check_type","0");
-        inputParameterValue.put("operator","3");
-        inputParameterValue.put("threshold","1");
-        inputParameterValue.put("failure_strategy","0");
-        inputParameterValue.put("comparison_type","1");
-        inputParameterValue.put("comparison_name","10");
-        inputParameterValue.put("rule_id","10");
-        inputParameterValue.put("rule_type","0");
-        inputParameterValue.put("rule_name","'表行数校验'");
-        inputParameterValue.put("create_time","'2021-08-12 10:15:48'");
-        inputParameterValue.put("update_time","'2021-08-12 10:15:48'");
-        inputParameterValue.put("process_definition_id","21");
-        inputParameterValue.put("process_instance_id","284");
-        inputParameterValue.put("task_instance_id","287");
-        inputParameterValue.put("data_time","'2021-08-12 10:15:48'");
-        inputParameterValue.put("error_output_path","hdfs://192.168.0.1:8022/user/ods/data_quality_error_data/21_284_287");
+        Map<String, String> inputParameterValue = new HashMap<>();
+        inputParameterValue.put("src_connector_type", "0");
+        inputParameterValue.put("src_datasource_id", "2");
+        inputParameterValue.put("src_table", "src_result");
+        inputParameterValue.put("check_type", "0");
+        inputParameterValue.put("operator", "3");
+        inputParameterValue.put("threshold", "1");
+        inputParameterValue.put("failure_strategy", "0");
+        inputParameterValue.put("comparison_type", "1");
+        inputParameterValue.put("comparison_name", "10");
+        inputParameterValue.put("rule_id", "10");
+        inputParameterValue.put("rule_type", "0");
+        inputParameterValue.put("rule_name", "'表行数校验'");
+        inputParameterValue.put("create_time", "'2021-08-12 10:15:48'");
+        inputParameterValue.put("update_time", "'2021-08-12 10:15:48'");
+        inputParameterValue.put("process_definition_id", "21");
+        inputParameterValue.put("process_instance_id", "284");
+        inputParameterValue.put("task_instance_id", "287");
+        inputParameterValue.put("data_time", "'2021-08-12 10:15:48'");
+        inputParameterValue.put("error_output_path",
+                "hdfs://192.168.0.1:8022/user/ods/data_quality_error_data/21_284_287");
 
-        RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
+        RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
         String expect = "{\"name\":\"表行数校验\",\"env\":{\"type\":\"batch\",\"config\":null},"
                 + "\"readers\":[{\"type\":\"JDBC\",\"config\":"
                 + "{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.cj.jdbc.Driver\","
@@ -95,7 +96,7 @@ public class DataQualityTaskTest {
                 + "as unique_code,'table_count.total'AS statistics_name,"
                 + "table_count.total AS statistics_value,'2021-08-12 10:15:48' as data_time,'2021-08-12 10:15:48' as create_time,"
                 + "'2021-08-12 10:15:48' as update_time from table_count\"}}]}";
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     private DataQualityTaskExecutionContext getSingleTableContext() {
@@ -111,7 +112,7 @@ public class DataQualityTaskTest {
         srcConnectorType.setField("src_connector_type");
         srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
-        srcConnectorType.setShow(true);
+        srcConnectorType.setIsShow(true);
         srcConnectorType.setValue(null);
         srcConnectorType.setPlaceholder("${src_connector_type}");
         srcConnectorType.setOptionSourceType(OptionSourceType.DATASOURCE_TYPE.getCode());
@@ -126,7 +127,7 @@ public class DataQualityTaskTest {
         srcDatasourceId.setField("src_datasource_id");
         srcDatasourceId.setType(FormType.CASCADER.getFormType());
         srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setShow(true);
+        srcDatasourceId.setIsShow(true);
         srcDatasourceId.setValue(null);
         srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
         srcDatasourceId.setInputType(InputType.DEFAULT.getCode());
@@ -139,7 +140,7 @@ public class DataQualityTaskTest {
         srcTable.setField("src_table");
         srcTable.setType(FormType.INPUT.getFormType());
         srcTable.setCanEdit(true);
-        srcTable.setShow(true);
+        srcTable.setIsShow(true);
         srcTable.setPlaceholder("Please enter source table name");
         srcTable.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcTable.setInputType(InputType.DEFAULT.getCode());
@@ -152,7 +153,7 @@ public class DataQualityTaskTest {
         srcFilter.setField("src_filter");
         srcFilter.setType(FormType.INPUT.getFormType());
         srcFilter.setCanEdit(true);
-        srcFilter.setShow(true);
+        srcFilter.setIsShow(true);
         srcFilter.setPlaceholder("Please enter filter expression");
         srcFilter.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcFilter.setInputType(InputType.DEFAULT.getCode());
@@ -165,7 +166,7 @@ public class DataQualityTaskTest {
         srcField.setField(SRC_FIELD);
         srcField.setType(FormType.INPUT.getFormType());
         srcField.setCanEdit(true);
-        srcField.setShow(true);
+        srcField.setIsShow(true);
         srcField.setValue("");
         srcField.setPlaceholder("Please enter column, only single column is supported");
         srcField.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
@@ -179,7 +180,7 @@ public class DataQualityTaskTest {
         statisticsName.setField("statistics_name");
         statisticsName.setType(FormType.INPUT.getFormType());
         statisticsName.setCanEdit(false);
-        statisticsName.setShow(false);
+        statisticsName.setIsShow(false);
         statisticsName.setValue("table_count.total");
         statisticsName.setPlaceholder("${statistics_name}");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
@@ -193,10 +194,11 @@ public class DataQualityTaskTest {
         checkType.setField("check_type");
         checkType.setType(FormType.SELECT.getFormType());
         checkType.setCanEdit(true);
-        checkType.setShow(true);
+        checkType.setIsShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\","
-                + "\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
+        checkType.setOptions(
+                "[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\","
+                        + "\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK.getCode());
         checkType.setValueType(ValueType.STRING.getCode());
@@ -209,7 +211,7 @@ public class DataQualityTaskTest {
         operator.setField("operator");
         operator.setType(FormType.SELECT.getFormType());
         operator.setCanEdit(true);
-        operator.setShow(true);
+        operator.setIsShow(true);
         operator.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         operator.setOptions("[{\"label\":\"=\",\"value\":\"0\"},"
                 + "{\"label\":\"<\",\"value\":\"1\"},{\"label\":\"<=\",\"value\":\"2\"},"
@@ -227,7 +229,7 @@ public class DataQualityTaskTest {
         threshold.setField("threshold");
         threshold.setType(FormType.INPUT.getFormType());
         threshold.setCanEdit(true);
-        threshold.setShow(true);
+        threshold.setIsShow(true);
         threshold.setPlaceholder("Please enter threshold, number is needed");
         threshold.setInputType(InputType.CHECK.getCode());
         threshold.setValueType(ValueType.NUMBER.getCode());
@@ -239,7 +241,7 @@ public class DataQualityTaskTest {
         afterFailure.setField("failure_strategy");
         afterFailure.setType(FormType.SELECT.getFormType());
         afterFailure.setCanEdit(true);
-        afterFailure.setShow(true);
+        afterFailure.setIsShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
@@ -295,10 +297,10 @@ public class DataQualityTaskTest {
         dataQualityTaskExecutionContext.setStatisticsValueTable("dqc_statistics_value");
         dataQualityTaskExecutionContext.setStatisticsValueWriterConnectionParams(
                 "{\"address\":\"jdbc:mysql://localhost:3306\","
-                + "\"database\":\"test\","
-                + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
-                + "\"user\":\"test\","
-                + "\"password\":\"test\"}");
+                        + "\"database\":\"test\","
+                        + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
+                        + "\"user\":\"test\","
+                        + "\"password\":\"test\"}");
 
         dataQualityTaskExecutionContext.setCompareWithFixedValue(true);
         return dataQualityTaskExecutionContext;
@@ -318,7 +320,7 @@ public class DataQualityTaskTest {
         srcConnectorType.setField("src_connector_type");
         srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
-        srcConnectorType.setShow(true);
+        srcConnectorType.setIsShow(true);
         srcConnectorType.setValue(null);
         srcConnectorType.setPlaceholder("${src_connector_type}");
         srcConnectorType.setOptionSourceType(OptionSourceType.DATASOURCE_TYPE.getCode());
@@ -333,7 +335,7 @@ public class DataQualityTaskTest {
         srcDatasourceId.setField("src_datasource_id");
         srcDatasourceId.setType(FormType.CASCADER.getFormType());
         srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setShow(true);
+        srcDatasourceId.setIsShow(true);
         srcDatasourceId.setValue(null);
         srcDatasourceId.setPlaceholder("${comparison_value}");
         srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
@@ -347,7 +349,7 @@ public class DataQualityTaskTest {
         srcTable.setField("src_table");
         srcTable.setType(FormType.INPUT.getFormType());
         srcTable.setCanEdit(true);
-        srcTable.setShow(true);
+        srcTable.setIsShow(true);
         srcTable.setPlaceholder("Please enter source table name");
         srcTable.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcTable.setInputType(InputType.DEFAULT.getCode());
@@ -360,7 +362,7 @@ public class DataQualityTaskTest {
         srcFilter.setField("src_filter");
         srcFilter.setType(FormType.INPUT.getFormType());
         srcFilter.setCanEdit(true);
-        srcFilter.setShow(true);
+        srcFilter.setIsShow(true);
         srcFilter.setPlaceholder("Please enter source filter expression");
         srcFilter.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcFilter.setInputType(InputType.DEFAULT.getCode());
@@ -371,7 +373,7 @@ public class DataQualityTaskTest {
         statisticsName.setField("statistics_name");
         statisticsName.setType(FormType.INPUT.getFormType());
         statisticsName.setCanEdit(true);
-        statisticsName.setShow(true);
+        statisticsName.setIsShow(true);
         statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsName.setInputType(InputType.DEFAULT.getCode());
@@ -382,7 +384,7 @@ public class DataQualityTaskTest {
         statisticsExecuteSql.setField("statistics_execute_sql");
         statisticsExecuteSql.setType(FormType.TEXTAREA.getFormType());
         statisticsExecuteSql.setCanEdit(true);
-        statisticsExecuteSql.setShow(true);
+        statisticsExecuteSql.setIsShow(true);
         statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
         statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
@@ -392,7 +394,7 @@ public class DataQualityTaskTest {
         checkType.setField("check_type");
         checkType.setType(FormType.SELECT.getFormType());
         checkType.setCanEdit(true);
-        checkType.setShow(true);
+        checkType.setIsShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},"
                 + "{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
@@ -406,7 +408,7 @@ public class DataQualityTaskTest {
         operator.setField("operator");
         operator.setType(FormType.SELECT.getFormType());
         operator.setCanEdit(true);
-        operator.setShow(true);
+        operator.setIsShow(true);
         operator.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         operator.setOptions("[{\"label\":\"=\",\"value\":\"0\"},"
                 + "{\"label\":\"<\",\"value\":\"1\"},{\"label\":\"<=\",\"value\":\"2\"},"
@@ -422,7 +424,7 @@ public class DataQualityTaskTest {
         threshold.setField("threshold");
         threshold.setType(FormType.INPUT.getFormType());
         threshold.setCanEdit(true);
-        threshold.setShow(true);
+        threshold.setIsShow(true);
         threshold.setPlaceholder("Please enter threshold value, number is needed");
         threshold.setInputType(InputType.CHECK.getCode());
         threshold.setValueType(ValueType.NUMBER.getCode());
@@ -432,7 +434,7 @@ public class DataQualityTaskTest {
         afterFailure.setField("failure_strategy");
         afterFailure.setType(FormType.SELECT.getFormType());
         afterFailure.setCanEdit(true);
-        afterFailure.setShow(true);
+        afterFailure.setIsShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
@@ -451,29 +453,31 @@ public class DataQualityTaskTest {
         defaultInputEntryList.add(statisticsExecuteSql);
         defaultInputEntryList.add(srcFilter);
 
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","0");
-        inputParameterValue.put("src_datasource_id","2");
-        inputParameterValue.put("src_table","person");
-        inputParameterValue.put("statistics_name","miss");
-        inputParameterValue.put("statistics_execute_sql","select count(*) as miss from ${src_table} where (sex = null or sex='') and age=1");
-        inputParameterValue.put("src_filter","age=1");
-        inputParameterValue.put("check_type","2");
-        inputParameterValue.put("operator","3");
-        inputParameterValue.put("threshold","50");
-        inputParameterValue.put("failure_strategy","1");
-        inputParameterValue.put("comparison_type","1");
-        inputParameterValue.put("comparison_name","3");
-        inputParameterValue.put("rule_id","1");
-        inputParameterValue.put("rule_type","1");
-        inputParameterValue.put("rule_name","'自定义SQL'");
-        inputParameterValue.put("create_time","'2021-08-30 00:00:00'");
-        inputParameterValue.put("update_time","'2021-08-30 00:00:00'");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("process_instance_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("data_time","'2021-08-30 00:00:00'");
-        inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test2");
+        Map<String, String> inputParameterValue = new HashMap<>();
+        inputParameterValue.put("src_connector_type", "0");
+        inputParameterValue.put("src_datasource_id", "2");
+        inputParameterValue.put("src_table", "person");
+        inputParameterValue.put("statistics_name", "miss");
+        inputParameterValue.put("statistics_execute_sql",
+                "select count(*) as miss from ${src_table} where (sex = null or sex='') and age=1");
+        inputParameterValue.put("src_filter", "age=1");
+        inputParameterValue.put("check_type", "2");
+        inputParameterValue.put("operator", "3");
+        inputParameterValue.put("threshold", "50");
+        inputParameterValue.put("failure_strategy", "1");
+        inputParameterValue.put("comparison_type", "1");
+        inputParameterValue.put("comparison_name", "3");
+        inputParameterValue.put("rule_id", "1");
+        inputParameterValue.put("rule_type", "1");
+        inputParameterValue.put("rule_name", "'自定义SQL'");
+        inputParameterValue.put("create_time", "'2021-08-30 00:00:00'");
+        inputParameterValue.put("update_time", "'2021-08-30 00:00:00'");
+        inputParameterValue.put("process_definition_id", "1");
+        inputParameterValue.put("process_instance_id", "1");
+        inputParameterValue.put("task_instance_id", "1");
+        inputParameterValue.put("data_time", "'2021-08-30 00:00:00'");
+        inputParameterValue.put("error_output_path",
+                "hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test2");
 
         dataQualityTaskExecutionContext.setRuleInputEntryList(JSONUtils.toJsonString(defaultInputEntryList));
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
@@ -509,33 +513,34 @@ public class DataQualityTaskTest {
 
         dataQualityTaskExecutionContext.setCompareWithFixedValue(true);
 
-        RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
-        String expect = "{\"name\":\"自定义SQL\",\"env\":{\"type\":\"batch\",\"config\":null},\"readers\":[{\"type\":\"JDBC\","
-                + "\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.cj.jdbc.Driver\",\"user\":"
-                + "\"test\",\"output_table\":\"test_person\",\"table\":\"person\",\"url\":"
-                + "\"jdbc:mysql://localhost:3306/test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\"}}],"
-                + "\"transformers\":[{\"type\":\"sql\",\"config\":"
-                + "{\"index\":2,\"output_table\":\"test_person\",\"sql\":\"select count(*) as "
-                + "miss from test_person where (sex = null or sex='') and age=1\"}}],\"writers\":"
-                + "[{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\",\"password\":"
-                + "\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
-                + "\"t_ds_dq_execute_result\",\"url\":"
-                + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding"
-                + "=UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as rule_type,'自定义SQL' as rule_name,1 "
-                + "as process_definition_id,1 as process_instance_id,1 as task_instance_id,miss AS "
-                + "statistics_value,3 AS comparison_value,1 AS comparison_type,2 as check_type,50 as "
-                + "threshold,3 as operator,1 as failure_strategy,'hdfs://localhost:8022/user/ods/"
-                + "data_quality_error_data/1_1_test2' as error_output_path,'2021-08-30 00:00:00' as "
-                + "create_time,'2021-08-30 00:00:00' as update_time from ( test_person ) tmp1 \"}},"
-                + "{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\",\"password\":\"test\",\"driver\":"
-                + "\"org.postgresql.Driver\",\"user\":\"test\",\"table\":\"t_ds_dq_task_statistics_value\",\"url\":"
-                + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding="
-                + "UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as "
-                + "task_instance_id,1 as rule_id,'FNWZLNCPWWF4ZWKO/LYENOPL6JPV1SHPPWQ9YSYLOCU=' as unique_code,'miss'AS statistics_name,miss AS statistics_value,"
-                + "'2021-08-30 00:00:00' as data_time,'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' "
-                + "as update_time from test_person\"}}]}";
+        RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
+        String expect =
+                "{\"name\":\"自定义SQL\",\"env\":{\"type\":\"batch\",\"config\":null},\"readers\":[{\"type\":\"JDBC\","
+                        + "\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.cj.jdbc.Driver\",\"user\":"
+                        + "\"test\",\"output_table\":\"test_person\",\"table\":\"person\",\"url\":"
+                        + "\"jdbc:mysql://localhost:3306/test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\"}}],"
+                        + "\"transformers\":[{\"type\":\"sql\",\"config\":"
+                        + "{\"index\":2,\"output_table\":\"test_person\",\"sql\":\"select count(*) as "
+                        + "miss from test_person where (sex = null or sex='') and age=1\"}}],\"writers\":"
+                        + "[{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\",\"password\":"
+                        + "\"test\",\"driver\":\"org.postgresql.Driver\",\"user\":\"test\",\"table\":"
+                        + "\"t_ds_dq_execute_result\",\"url\":"
+                        + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding"
+                        + "=UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as rule_type,'自定义SQL' as rule_name,1 "
+                        + "as process_definition_id,1 as process_instance_id,1 as task_instance_id,miss AS "
+                        + "statistics_value,3 AS comparison_value,1 AS comparison_type,2 as check_type,50 as "
+                        + "threshold,3 as operator,1 as failure_strategy,'hdfs://localhost:8022/user/ods/"
+                        + "data_quality_error_data/1_1_test2' as error_output_path,'2021-08-30 00:00:00' as "
+                        + "create_time,'2021-08-30 00:00:00' as update_time from ( test_person ) tmp1 \"}},"
+                        + "{\"type\":\"JDBC\",\"config\":{\"database\":\"dolphinscheduler\",\"password\":\"test\",\"driver\":"
+                        + "\"org.postgresql.Driver\",\"user\":\"test\",\"table\":\"t_ds_dq_task_statistics_value\",\"url\":"
+                        + "\"jdbc:postgresql://localhost:5432/dolphinscheduler?stringtype=unspecified&characterEncoding="
+                        + "UTF-8&allowMultiQueries=true\",\"sql\":\"select 1 as process_definition_id,1 as "
+                        + "task_instance_id,1 as rule_id,'FNWZLNCPWWF4ZWKO/LYENOPL6JPV1SHPPWQ9YSYLOCU=' as unique_code,'miss'AS statistics_name,miss AS statistics_value,"
+                        + "'2021-08-30 00:00:00' as data_time,'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' "
+                        + "as update_time from test_person\"}}]}";
 
-        Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     @Test
@@ -551,7 +556,7 @@ public class DataQualityTaskTest {
         srcConnectorType.setField("src_connector_type");
         srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
-        srcConnectorType.setShow(true);
+        srcConnectorType.setIsShow(true);
         srcConnectorType.setValue(null);
         srcConnectorType.setPlaceholder("${src_connector_type}");
         srcConnectorType.setOptionSourceType(OptionSourceType.DATASOURCE_TYPE.getCode());
@@ -566,7 +571,7 @@ public class DataQualityTaskTest {
         srcDatasourceId.setField("src_datasource_id");
         srcDatasourceId.setType(FormType.CASCADER.getFormType());
         srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setShow(true);
+        srcDatasourceId.setIsShow(true);
         srcDatasourceId.setValue(null);
         srcDatasourceId.setPlaceholder("${comparison_value}");
         srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
@@ -580,7 +585,7 @@ public class DataQualityTaskTest {
         srcTable.setField("src_table");
         srcTable.setType(FormType.INPUT.getFormType());
         srcTable.setCanEdit(true);
-        srcTable.setShow(true);
+        srcTable.setIsShow(true);
         srcTable.setPlaceholder("Please enter source table name");
         srcTable.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcTable.setInputType(InputType.DEFAULT.getCode());
@@ -593,7 +598,7 @@ public class DataQualityTaskTest {
         statisticsName.setField("statistics_name");
         statisticsName.setType(FormType.INPUT.getFormType());
         statisticsName.setCanEdit(true);
-        statisticsName.setShow(true);
+        statisticsName.setIsShow(true);
         statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsName.setValueType(ValueType.STRING.getCode());
@@ -604,7 +609,7 @@ public class DataQualityTaskTest {
         statisticsExecuteSql.setField("statistics_execute_sql");
         statisticsExecuteSql.setType(FormType.TEXTAREA.getFormType());
         statisticsExecuteSql.setCanEdit(true);
-        statisticsExecuteSql.setShow(true);
+        statisticsExecuteSql.setIsShow(true);
         statisticsExecuteSql.setPlaceholder("Please enter statistics execute sql");
         statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
@@ -615,7 +620,7 @@ public class DataQualityTaskTest {
         targetConnectorType.setField("target_connector_type");
         targetConnectorType.setType(FormType.SELECT.getFormType());
         targetConnectorType.setCanEdit(true);
-        targetConnectorType.setShow(true);
+        targetConnectorType.setIsShow(true);
         targetConnectorType.setValue("JDBC");
         targetConnectorType.setPlaceholder("Please select target connector type");
         targetConnectorType.setOptionSourceType(OptionSourceType.DATASOURCE_TYPE.getCode());
@@ -627,7 +632,7 @@ public class DataQualityTaskTest {
         targetDatasourceId.setField("target_datasource_id");
         targetDatasourceId.setType(FormType.SELECT.getFormType());
         targetDatasourceId.setCanEdit(true);
-        targetDatasourceId.setShow(true);
+        targetDatasourceId.setIsShow(true);
         targetDatasourceId.setValue("1");
         targetDatasourceId.setPlaceholder("Please select target datasource");
         targetDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
@@ -638,7 +643,7 @@ public class DataQualityTaskTest {
         targetTable.setField("target_table");
         targetTable.setType(FormType.INPUT.getFormType());
         targetTable.setCanEdit(true);
-        targetTable.setShow(true);
+        targetTable.setIsShow(true);
         targetTable.setPlaceholder("Please enter target table");
         targetTable.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         targetTable.setValueType(ValueType.STRING.getCode());
@@ -649,7 +654,7 @@ public class DataQualityTaskTest {
         comparisonName.setField("comparison_name");
         comparisonName.setType(FormType.INPUT.getFormType());
         comparisonName.setCanEdit(true);
-        comparisonName.setShow(true);
+        comparisonName.setIsShow(true);
         comparisonName.setPlaceholder("Please enter comparison name, the alias in comparison execute sql");
         comparisonName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         comparisonName.setValueType(ValueType.STRING.getCode());
@@ -660,7 +665,7 @@ public class DataQualityTaskTest {
         comparisonExecuteSql.setField("comparison_execute_sql");
         comparisonExecuteSql.setType(FormType.TEXTAREA.getFormType());
         comparisonExecuteSql.setCanEdit(true);
-        comparisonExecuteSql.setShow(true);
+        comparisonExecuteSql.setIsShow(true);
         comparisonExecuteSql.setPlaceholder("Please enter comparison execute sql");
         comparisonExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         comparisonExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
@@ -671,7 +676,7 @@ public class DataQualityTaskTest {
         checkType.setField("check_type");
         checkType.setType(FormType.SELECT.getFormType());
         checkType.setCanEdit(true);
-        checkType.setShow(true);
+        checkType.setIsShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},"
                 + "{\"label\":\"统计值 / 比对值\",\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
@@ -685,7 +690,7 @@ public class DataQualityTaskTest {
         operator.setField("operator");
         operator.setType(FormType.SELECT.getFormType());
         operator.setCanEdit(true);
-        operator.setShow(true);
+        operator.setIsShow(true);
         operator.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         operator.setOptions("[{\"label\":\"=\",\"value\":\"0\"},"
                 + "{\"label\":\"<\",\"value\":\"1\"},{\"label\":\"<=\",\"value\":\"2\"},"
@@ -701,7 +706,7 @@ public class DataQualityTaskTest {
         threshold.setField("threshold");
         threshold.setType(FormType.INPUT.getFormType());
         threshold.setCanEdit(true);
-        threshold.setShow(true);
+        threshold.setIsShow(true);
         threshold.setInputType(InputType.CHECK.getCode());
         threshold.setValueType(ValueType.NUMBER.getCode());
         threshold.setPlaceholder("Please enter threshold, number is needed");
@@ -711,7 +716,7 @@ public class DataQualityTaskTest {
         afterFailure.setField("failure_strategy");
         afterFailure.setType(FormType.SELECT.getFormType());
         afterFailure.setCanEdit(true);
-        afterFailure.setShow(true);
+        afterFailure.setIsShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
@@ -738,31 +743,31 @@ public class DataQualityTaskTest {
 
         dataQualityTaskExecutionContext.setRuleInputEntryList(JSONUtils.toJsonString(defaultInputEntryList));
 
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","0");
-        inputParameterValue.put("src_datasource_id","2");
-        inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("statistics_name","src");
-        inputParameterValue.put("statistics_execute_sql","select count(*) as src from ${src_table} where c1>20");
-        inputParameterValue.put("target_connector_type","2");
-        inputParameterValue.put("target_datasource_id","3");
-        inputParameterValue.put("target_table","test1_1");
-        inputParameterValue.put("comparison_name","target");
-        inputParameterValue.put("comparison_execute_sql","select count(*) as target from ${target_table} where c1>20");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("operator","3");
-        inputParameterValue.put("threshold","2");
-        inputParameterValue.put("failure_strategy","0");
-        inputParameterValue.put("rule_id","4");
-        inputParameterValue.put("rule_type","3");
-        inputParameterValue.put("rule_name","'跨表值比对'");
-        inputParameterValue.put("create_time","'2021-08-25 00:00:00'");
-        inputParameterValue.put("update_time","'2021-08-25 00:00:00'");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("process_instance_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("data_time","'2021-08-25 00:00:00'");
-        inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_1");
+        Map<String, String> inputParameterValue = new HashMap<>();
+        inputParameterValue.put("src_connector_type", "0");
+        inputParameterValue.put("src_datasource_id", "2");
+        inputParameterValue.put("src_table", "test1");
+        inputParameterValue.put("statistics_name", "src");
+        inputParameterValue.put("statistics_execute_sql", "select count(*) as src from ${src_table} where c1>20");
+        inputParameterValue.put("target_connector_type", "2");
+        inputParameterValue.put("target_datasource_id", "3");
+        inputParameterValue.put("target_table", "test1_1");
+        inputParameterValue.put("comparison_name", "target");
+        inputParameterValue.put("comparison_execute_sql", "select count(*) as target from ${target_table} where c1>20");
+        inputParameterValue.put("check_type", "1");
+        inputParameterValue.put("operator", "3");
+        inputParameterValue.put("threshold", "2");
+        inputParameterValue.put("failure_strategy", "0");
+        inputParameterValue.put("rule_id", "4");
+        inputParameterValue.put("rule_type", "3");
+        inputParameterValue.put("rule_name", "'跨表值比对'");
+        inputParameterValue.put("create_time", "'2021-08-25 00:00:00'");
+        inputParameterValue.put("update_time", "'2021-08-25 00:00:00'");
+        inputParameterValue.put("process_definition_id", "1");
+        inputParameterValue.put("process_instance_id", "1");
+        inputParameterValue.put("task_instance_id", "1");
+        inputParameterValue.put("data_time", "'2021-08-25 00:00:00'");
+        inputParameterValue.put("error_output_path", "hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_1");
 
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
         dataQualityTaskExecutionContext.setSourceType(0);
@@ -813,8 +818,8 @@ public class DataQualityTaskTest {
                 + "from ( select count(*) as src from test_test1 where c1>20 ) tmp1 join ( select count(*) as target from default_test1_1 "
                 + "where c1>20 ) tmp2\"}}]}";
 
-        RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
-        Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     @Test
@@ -829,7 +834,7 @@ public class DataQualityTaskTest {
         srcConnectorType.setField("src_connector_type");
         srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
-        srcConnectorType.setShow(true);
+        srcConnectorType.setIsShow(true);
         srcConnectorType.setValue("JDBC");
         srcConnectorType.setPlaceholder("Please select source connector type");
         srcConnectorType.setOptionSourceType(OptionSourceType.DATASOURCE_TYPE.getCode());
@@ -842,7 +847,7 @@ public class DataQualityTaskTest {
         srcDatasourceId.setField("src_datasource_id");
         srcDatasourceId.setType(FormType.SELECT.getFormType());
         srcDatasourceId.setCanEdit(true);
-        srcDatasourceId.setShow(true);
+        srcDatasourceId.setIsShow(true);
         srcDatasourceId.setValue("1");
         srcDatasourceId.setPlaceholder("Please select source datasource");
         srcDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
@@ -854,7 +859,7 @@ public class DataQualityTaskTest {
         srcTable.setField("src_table");
         srcTable.setType(FormType.INPUT.getFormType());
         srcTable.setCanEdit(true);
-        srcTable.setShow(true);
+        srcTable.setIsShow(true);
         srcTable.setPlaceholder("Please enter source table");
         srcTable.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcTable.setInputType(InputType.DEFAULT.getCode());
@@ -865,7 +870,7 @@ public class DataQualityTaskTest {
         srcFilter.setField("src_filter");
         srcFilter.setType(FormType.INPUT.getFormType());
         srcFilter.setCanEdit(true);
-        srcFilter.setShow(true);
+        srcFilter.setIsShow(true);
         srcFilter.setPlaceholder("Please enter source filter expression");
         srcFilter.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcFilter.setInputType(InputType.DEFAULT.getCode());
@@ -876,7 +881,7 @@ public class DataQualityTaskTest {
         targetConnectorType.setField("target_connector_type");
         targetConnectorType.setType(FormType.SELECT.getFormType());
         targetConnectorType.setCanEdit(true);
-        targetConnectorType.setShow(true);
+        targetConnectorType.setIsShow(true);
         targetConnectorType.setValue("JDBC");
         targetConnectorType.setPlaceholder("Please select target connector type");
         targetConnectorType.setOptionSourceType(OptionSourceType.DATASOURCE_TYPE.getCode());
@@ -889,7 +894,7 @@ public class DataQualityTaskTest {
         targetDatasourceId.setField("target_datasource_id");
         targetDatasourceId.setType(FormType.CASCADER.getFormType());
         targetDatasourceId.setCanEdit(true);
-        targetDatasourceId.setShow(true);
+        targetDatasourceId.setIsShow(true);
         targetDatasourceId.setValue("1");
         targetDatasourceId.setPlaceholder("Please select target datasource");
         targetDatasourceId.setOptionSourceType(OptionSourceType.DATASOURCE_ID.getCode());
@@ -901,7 +906,7 @@ public class DataQualityTaskTest {
         targetTable.setField("target_table");
         targetTable.setType(FormType.INPUT.getFormType());
         targetTable.setCanEdit(true);
-        targetTable.setShow(true);
+        targetTable.setIsShow(true);
         targetTable.setPlaceholder("Please enter target table");
         targetTable.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         targetTable.setInputType(InputType.DEFAULT.getCode());
@@ -912,7 +917,7 @@ public class DataQualityTaskTest {
         targetFilter.setField("target_filter");
         targetFilter.setType(FormType.INPUT.getFormType());
         targetFilter.setCanEdit(true);
-        targetFilter.setShow(true);
+        targetFilter.setIsShow(true);
         targetFilter.setPlaceholder("Please enter target filter expression");
         targetFilter.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         targetFilter.setInputType(InputType.DEFAULT.getCode());
@@ -923,7 +928,7 @@ public class DataQualityTaskTest {
         mappingColumns.setField("mapping_columns");
         mappingColumns.setType(FormType.INPUT.getFormType());
         mappingColumns.setCanEdit(true);
-        mappingColumns.setShow(true);
+        mappingColumns.setIsShow(true);
         mappingColumns.setPlaceholder("${mapping_columns}");
         mappingColumns.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         mappingColumns.setInputType(InputType.DEFAULT.getCode());
@@ -934,7 +939,7 @@ public class DataQualityTaskTest {
         statisticsName.setField("statistics_name");
         statisticsName.setType(FormType.INPUT.getFormType());
         statisticsName.setCanEdit(false);
-        statisticsName.setShow(false);
+        statisticsName.setIsShow(false);
         statisticsName.setValue("miss_count.miss");
         statisticsName.setPlaceholder("${statistics_name}");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
@@ -978,7 +983,7 @@ public class DataQualityTaskTest {
         comparisonTitle.setField("comparison_title");
         comparisonTitle.setType(FormType.INPUT.getFormType());
         comparisonTitle.setCanEdit(false);
-        comparisonTitle.setShow(true);
+        comparisonTitle.setIsShow(true);
         comparisonTitle.setPlaceholder("${comparison_title}");
         comparisonTitle.setValue("目标表总行数");
 
@@ -987,7 +992,7 @@ public class DataQualityTaskTest {
         comparisonName.setField("comparison_name");
         comparisonName.setType(FormType.INPUT.getFormType());
         comparisonName.setCanEdit(false);
-        comparisonName.setShow(false);
+        comparisonName.setIsShow(false);
         comparisonName.setValue("total_count.total");
         comparisonName.setPlaceholder("${comparison_name}");
 
@@ -1000,10 +1005,11 @@ public class DataQualityTaskTest {
         checkType.setField("check_type");
         checkType.setType(FormType.SELECT.getFormType());
         checkType.setCanEdit(true);
-        checkType.setShow(true);
+        checkType.setIsShow(true);
         checkType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        checkType.setOptions("[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\","
-                + "\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
+        checkType.setOptions(
+                "[{\"label\":\"比对值 - 统计值\",\"value\":\"0\"},{\"label\":\"统计值 - 比对值\",\"value\":\"1\"},{\"label\":\"统计值 / 比对值\","
+                        + "\"value\":\"2\"},{\"label\":\"(比对值-统计值) / 比对值\",\"value\":\"3\"}]");
         checkType.setValue("0");
         checkType.setInputType(InputType.CHECK.getCode());
         checkType.setValueType(ValueType.STRING.getCode());
@@ -1014,7 +1020,7 @@ public class DataQualityTaskTest {
         operator.setField("operator");
         operator.setType(FormType.SELECT.getFormType());
         operator.setCanEdit(true);
-        operator.setShow(true);
+        operator.setIsShow(true);
         operator.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         operator.setOptions("[{\"label\":\"=\",\"value\":\"0\"},"
                 + "{\"label\":\"<\",\"value\":\"1\"},{\"label\":\"<=\",\"value\":\"2\"},"
@@ -1029,7 +1035,7 @@ public class DataQualityTaskTest {
         threshold.setField("threshold");
         threshold.setType(FormType.INPUT.getFormType());
         threshold.setCanEdit(true);
-        threshold.setShow(true);
+        threshold.setIsShow(true);
         threshold.setInputType(InputType.CHECK.getCode());
         threshold.setValueType(ValueType.NUMBER.getCode());
         threshold.setPlaceholder("Please enter threshold, number is needed");
@@ -1039,7 +1045,7 @@ public class DataQualityTaskTest {
         afterFailure.setField("failure_strategy");
         afterFailure.setType(FormType.SELECT.getFormType());
         afterFailure.setCanEdit(true);
-        afterFailure.setShow(true);
+        afterFailure.setIsShow(true);
         afterFailure.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         afterFailure.setOptions("[{\"label\":\"告警\",\"value\":\"0\"},{\"label\":\"阻断\",\"value\":\"1\"}]");
         afterFailure.setValue("0");
@@ -1062,31 +1068,32 @@ public class DataQualityTaskTest {
         dataQualityTaskExecutionContext.setExecuteSqlList(JSONUtils.toJsonString(executeSqlList));
         dataQualityTaskExecutionContext.setRuleInputEntryList(JSONUtils.toJsonString(defaultInputEntryList));
 
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","0");
-        inputParameterValue.put("src_datasource_id","2");
-        inputParameterValue.put("src_table","demo_src");
-        inputParameterValue.put("src_filter","age<100");
-        inputParameterValue.put("target_connector_type","2");
-        inputParameterValue.put("target_datasource_id","3");
-        inputParameterValue.put("target_table","demo_src");
-        inputParameterValue.put("target_filter","age<100");
-        inputParameterValue.put("mapping_columns","[{\"src_field\":\"hour\",\"operator\":\"=\",\"target_field\":\"hour\"}]");
-        inputParameterValue.put("check_type","2");
-        inputParameterValue.put("operator","3");
-        inputParameterValue.put("threshold","3");
-        inputParameterValue.put("failure_strategy","0");
-        inputParameterValue.put("comparison_type","7");
-        inputParameterValue.put("rule_id","3");
-        inputParameterValue.put("rule_type","2");
-        inputParameterValue.put("rule_name","'跨表准确性'");
-        inputParameterValue.put("create_time","'2021-08-30 00:00:00'");
-        inputParameterValue.put("update_time","'2021-08-30 00:00:00'");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("process_instance_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("data_time","'2021-08-30 00:00:00'");
-        inputParameterValue.put("error_output_path","hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test");
+        Map<String, String> inputParameterValue = new HashMap<>();
+        inputParameterValue.put("src_connector_type", "0");
+        inputParameterValue.put("src_datasource_id", "2");
+        inputParameterValue.put("src_table", "demo_src");
+        inputParameterValue.put("src_filter", "age<100");
+        inputParameterValue.put("target_connector_type", "2");
+        inputParameterValue.put("target_datasource_id", "3");
+        inputParameterValue.put("target_table", "demo_src");
+        inputParameterValue.put("target_filter", "age<100");
+        inputParameterValue.put("mapping_columns",
+                "[{\"src_field\":\"hour\",\"operator\":\"=\",\"target_field\":\"hour\"}]");
+        inputParameterValue.put("check_type", "2");
+        inputParameterValue.put("operator", "3");
+        inputParameterValue.put("threshold", "3");
+        inputParameterValue.put("failure_strategy", "0");
+        inputParameterValue.put("comparison_type", "7");
+        inputParameterValue.put("rule_id", "3");
+        inputParameterValue.put("rule_type", "2");
+        inputParameterValue.put("rule_name", "'跨表准确性'");
+        inputParameterValue.put("create_time", "'2021-08-30 00:00:00'");
+        inputParameterValue.put("update_time", "'2021-08-30 00:00:00'");
+        inputParameterValue.put("process_definition_id", "1");
+        inputParameterValue.put("process_instance_id", "1");
+        inputParameterValue.put("task_instance_id", "1");
+        inputParameterValue.put("data_time", "'2021-08-30 00:00:00'");
+        inputParameterValue.put("error_output_path", "hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test");
 
         dataQualityTaskExecutionContext.setSourceConnectorType("JDBC");
         dataQualityTaskExecutionContext.setSourceType(0);
@@ -1163,7 +1170,7 @@ public class DataQualityTaskTest {
                 + "'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' as update_time from miss_count\"}},{\"type\":\"hdfs_file\","
                 + "\"config\":{\"path\":\"hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test\",\"input_table\":\"miss_items\"}}]}";
 
-        RuleManager ruleManager = new RuleManager(inputParameterValue,dataQualityTaskExecutionContext);
-        Assert.assertEquals(expect,JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 }

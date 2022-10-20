@@ -2,25 +2,27 @@
 
 ### 1. The Benefits of Writing Unit Tests
 
--    Unit tests help everyone to get into the details of the code and understand how it works.
--    Through test cases we can find bugs and submit robust code.
--    The test case is also a demo usage of the code.
+- Unit tests help everyone to get into the details of the code and understand how it works.
+- Through test cases we can find bugs and submit robust code.
+- The test case is also a demo usage of the code.
 
 ### 2. Some design principles for unit test cases
 
--    The steps, granularity and combination of conditions should be carefully designed.
--    Pay attention to boundary conditions.
--    Unit tests should be well designed as well as avoiding useless code.
--    When you find a `method` is difficult to write unit test, and if you confirm that the `method` is `bad code`, then refactor it with the developer.
+- The steps, granularity and combination of conditions should be carefully designed.
+- Pay attention to boundary conditions.
+- Unit tests should be well designed as well as avoiding useless code.
+- When you find a `method` is difficult to write unit test, and if you confirm that the `method` is `bad code`, then refactor it with the developer.
+
 <!-- markdown-link-check-disable -->
--    DolphinScheduler: [mockito](http://site.mockito.org/). Here are some development guides: [mockito tutorial](http://www.baeldung.com/bdd-mockito), [mockito refcard](https://dzone.com/refcardz/mockito)
+- DolphinScheduler: [mockito](http://site.mockito.org/). Here are some development guides: [mockito tutorial](http://www.baeldung.com/bdd-mockito), [mockito refcard](https://dzone.com/refcardz/mockito)
+
 <!-- markdown-link-check-enable -->
--    TDD(option): When you start writing a new feature, you can try writing test cases first.
+- TDD(option): When you start writing a new feature, you can try writing test cases first.
 
 ### 3. Test coverage setpoint
 
--    At this stage, the default value for test coverage of Delta change codes is >= 60%, the higher the better.
--    We can see the test reports on this page:  https://codecov.io/gh/apache/dolphinscheduler
+- At this stage, the default value for test coverage of Delta change codes is >= 60%, the higher the better.
+- We can see the test reports on this page:  https://codecov.io/gh/apache/dolphinscheduler
 
 ## Fundamental guidelines for unit test
 
@@ -64,13 +66,13 @@ Invalid assertions make the test itself meaningless, it has little to do with wh
 
 There are several types of invalid assertions:
 
-1.   Different types of comparisons.
+1. Different types of comparisons.
 
-2.   Determines that an object or variable with a default value is not null.
+2. Determines that an object or variable with a default value is not null.
 
-     This seems meaningless. Therefore, when making the relevant judgements you should pay attention to whether it contains a default value itself.
+   This seems meaningless. Therefore, when making the relevant judgements you should pay attention to whether it contains a default value itself.
 
-3.   Assertions should be affirmative rather than negative if possible. Assertions should be within a range of predicted results, or exact values, whenever possible (otherwise you may end up with something that doesn't match your actual expectations but passes the assertion) unless your code only cares about whether it is empty or not.
+3. Assertions should be affirmative rather than negative if possible. Assertions should be within a range of predicted results, or exact values, whenever possible (otherwise you may end up with something that doesn't match your actual expectations but passes the assertion) unless your code only cares about whether it is empty or not.
 
 ### 8. Some points to note for unit tests
 
@@ -82,25 +84,26 @@ Try not to use Thread.sleep in your test code, it makes the test unstable and ma
 
 2: Ignore some test classes
 
-The @Ignore annotation should be linked to the relevant issue address so that subsequent developers can track the history of why the test was ignored.
+The @Disabled annotation should be linked to the relevant issue address so that subsequent developers can track the history of why the test was ignored.
 
-For example @Ignore("see #1").
+For example @Disabled("see #1").
 
 3: try-catch Unit test exception
 
 The test will fail when the code in the unit test throws an exception. Therefore, there is no need to use try-catch to catch exceptions.
 
-     ```java
-     @Test
-     public void testMethod() {
-       try {
-                 // Some code
-       } catch (MyException e) {
-         Assert.fail(e.getMessage());  // Noncompliant
-       }
-     }
-     ```
-You should this: 
+        ```java
+        @Test
+        public void testMethod() {
+          try {
+                    // Some code
+          } catch (MyException e) {
+            Assert.fail(e.getMessage());  // Noncompliant
+          }
+        }
+        ```
+
+You should this:
 
 ```java
 @Test

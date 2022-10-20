@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * ScriptSenderTest
@@ -35,7 +35,7 @@ public class ScriptSenderTest {
     private static final String shellFilPath = rootPath + "/src/test/script/shell/scriptExample.sh";
     private static Map<String, String> scriptConfig = new HashMap<>();
 
-    @Before
+    @BeforeEach
     public void initScriptConfig() {
 
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, String.valueOf(ScriptType.SHELL.getDescp()));
@@ -48,9 +48,17 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assertions.assertEquals("true", alertResult.getStatus());
         alertResult = scriptSender.sendScriptAlert("error msg title", "test content");
-        Assert.assertEquals("false", alertResult.getStatus());
+        Assertions.assertEquals("false", alertResult.getStatus());
+    }
+
+    @Test
+    public void testScriptSenderInjectionTest() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "' ; calc.exe ; '");
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
+        Assertions.assertEquals("false", alertResult.getStatus());
     }
 
 }

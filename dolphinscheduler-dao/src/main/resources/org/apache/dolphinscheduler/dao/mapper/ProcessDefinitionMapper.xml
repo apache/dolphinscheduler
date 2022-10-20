@@ -68,23 +68,40 @@
         and pd.name = #{processDefinitionName}
     </select>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        SELECT td.id, td.code, td.name, td.version, td.release_state, td.project_code, td.user_id, td.description,
-        td.global_params, td.flag, td.warning_group_id, td.timeout, td.tenant_id, td.update_time, td.create_time,
-        sc.schedule_release_state, tu.user_name ,td.execution_type
-        FROM t_ds_process_definition td
-        left join (select process_definition_code,release_state as schedule_release_state from t_ds_schedules group by
-        process_definition_code,release_state) sc on sc.process_definition_code = td.code
-        left join t_ds_user tu on td.user_id = tu.id
-        where td.project_code = #{projectCode}
-        <if test=" searchVal != null and searchVal != ''">
-            AND (td.name like concat('%', #{searchVal}, '%')
-            OR td.description like concat('%', #{searchVal}, '%')
-            )
-        </if>
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_process_definition
+        where project_code = #{projectCode}
+        AND project_code = #{projectCode}
         <if test=" userId != 0">
-            and td.user_id = #{userId}
+            AND user_id = #{userId}
         </if>
-        order by td.update_time desc,td.id asc
+        <if test=" searchVal != null and searchVal != ''">
+            AND (
+                name like concat('%', #{searchVal}, '%') OR description like concat('%', #{searchVal}, '%')
+                )
+        </if>
+        order by update_time desc
+    </select>
+    <select id="filterProcessDefinition"
+            parameterType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
+    >
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_process_definition
+        <where>
+            <if test=" pd.projectCode != 0">
+                and project_code = #{pd.projectCode}
+            </if>
+            <if test=" pd.name != null and pd.name != ''">
+                and name like concat('%', #{pd.name}, '%')
+            </if>
+            <if test=" pd.releaseState != null and pd.releaseState != ''">
+                and release_state = #{pd.releaseState}
+            </if>
+        </where>
+        order by update_time desc, id asc
     </select>
 
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">

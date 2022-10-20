@@ -34,6 +34,9 @@ class CustomDataX(Task):
 
     _task_custom_attr = {"custom_config", "json", "xms", "xmx"}
 
+    ext: set = {".json"}
+    ext_attr: str = "_json"
+
     def __init__(
         self,
         name: str,
@@ -43,9 +46,9 @@ class CustomDataX(Task):
         *args,
         **kwargs
     ):
+        self._json = json
         super().__init__(name, TaskType.DATAX, *args, **kwargs)
         self.custom_config = self.CUSTOM_CONFIG
-        self.json = json
         self.xms = xms
         self.xmx = xmx
 
@@ -76,6 +79,9 @@ class DataX(Task):
         "xmx",
     }
 
+    ext: set = {".sql"}
+    ext_attr: str = "_sql"
+
     def __init__(
         self,
         name: str,
@@ -92,8 +98,8 @@ class DataX(Task):
         *args,
         **kwargs
     ):
+        self._sql = sql
         super().__init__(name, TaskType.DATAX, *args, **kwargs)
-        self.sql = sql
         self.custom_config = self.CUSTOM_CONFIG
         self.datasource_name = datasource_name
         self.datatarget_name = datatarget_name

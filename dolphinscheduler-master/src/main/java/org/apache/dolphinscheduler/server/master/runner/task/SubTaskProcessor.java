@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.auto.service.AutoService;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -31,8 +31,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.utils.LogUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -41,8 +43,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.auto.service.AutoService;
 
 /**
  * subtask processor
@@ -179,8 +181,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (subProcessInstance == null || taskInstance.getState().isFinished()) {
             return false;
         }
-        subProcessInstance.setState(WorkflowExecutionStatus.READY_PAUSE);
-        processService.updateProcessInstance(subProcessInstance);
+        subProcessInstance.setStateWithDesc(WorkflowExecutionStatus.READY_PAUSE, "ready pause sub workflow");
+        processInstanceDao.updateProcessInstance(subProcessInstance);
         sendToSubProcess();
         return true;
     }
@@ -215,8 +217,8 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         if (subProcessInstance == null || taskInstance.getState().isFinished()) {
             return false;
         }
-        subProcessInstance.setState(WorkflowExecutionStatus.READY_STOP);
-        processService.updateProcessInstance(subProcessInstance);
+        subProcessInstance.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, "ready stop by kill task");
+        processInstanceDao.updateProcessInstance(subProcessInstance);
         sendToSubProcess();
         return true;
     }

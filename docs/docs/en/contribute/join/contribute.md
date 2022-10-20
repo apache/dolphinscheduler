@@ -13,8 +13,8 @@ We encourage any form of participation in the community that will eventually bec
 * Help promote DolphinScheduler, participate in technical conferences or meetup, sharing and more.
 
 Welcome to the contributing team and join open source starting with submitting your first PR.
- - For example, add code comments or find "easy to fix" tags or some very simple issue (misspellings, etc.) and so on, first familiarize yourself with the submission process through the first simple PR.
- 
+- For example, add code comments or find "easy to fix" tags or some very simple issue (misspellings, etc.) and so on, first familiarize yourself with the submission process through the first simple PR.
+
 Note: Contributions are not limited to PR Only, but contribute to the development of the project.
 
 I'm sure you'll benefit from open source by participating in DolphinScheduler!
@@ -31,7 +31,7 @@ Refer to the [Submit Guide-Issue Notice](./issue.md), [Submit Guide-Pull Request
 
 If you want to implement a Feature or fix a Bug. Please refer to the following:
 
-* All Bugs and the new Features are recommended and managed using the Issues Page.
+* All bugs and the features are recommended and managed using the GitHub issues(https://github.com/apache/dolphinscheduler/issues).
 * If you want to develop a Feature, first reply to the Issue associated with that feature, indicating that you are currently working on it. And set yourself a "deadline" when to Submit the Feature, and add it in the reply comment.
 * It's a good idea to find a mentor (or an instructor) in the core contributors who gives immediate feedback on design and functional implementation.
 * You should create a new branch to start your work, to get the name of the branch refer to the [Submit Guide-Pull Request Notice](./pull-request.md). For example, if you want to complete the feature and submit Issue 111, your branch name should be feature-111. The feature name can be determined after discussion with the instructor.

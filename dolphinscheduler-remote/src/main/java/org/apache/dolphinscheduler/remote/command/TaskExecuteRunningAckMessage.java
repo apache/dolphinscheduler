@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.io.Serializable;
 
 /**
  * task execute running ack command

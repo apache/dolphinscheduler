@@ -31,3 +31,17 @@ Dive Into
 ---------
 
 .. automodule:: pydolphinscheduler.tasks.dependent
+
+
+YAML file example
+-----------------
+
+.. literalinclude:: ../../../examples/yaml_define/Dependent.yaml
+   :start-after: # under the License.
+   :language: yaml
+
+Dependent_External.yaml:
+
+.. literalinclude:: ../../../examples/yaml_define/Dependent_External.yaml
+   :start-after: # under the License.
+   :language: yaml

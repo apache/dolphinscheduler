@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -55,12 +54,12 @@ public class TaskExecutionContext implements Serializable {
     /**
      * task first submit time.
      */
-    private Date firstSubmitTime;
+    private long firstSubmitTime;
 
     /**
      * task start time
      */
-    private Date startTime;
+    private long startTime;
 
     /**
      * task type
@@ -115,7 +114,7 @@ public class TaskExecutionContext implements Serializable {
     /**
      * process instance schedule time
      */
-    private Date scheduleTime;
+    private long scheduleTime;
 
     /**
      * process instance global parameters
@@ -223,7 +222,7 @@ public class TaskExecutionContext implements Serializable {
     /**
      * endTime
      */
-    private Date endTime;
+    private long endTime;
 
     /**
      * sql TaskExecutionContext
@@ -261,4 +260,9 @@ public class TaskExecutionContext implements Serializable {
      * max memory
      */
     private Integer memoryMax;
+
+    /**
+     * test flag
+     */
+    private int testFlag;
 }

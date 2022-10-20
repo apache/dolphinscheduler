@@ -58,6 +58,10 @@ class TaskType(str):
     SPARK = "SPARK"
     MR = "MR"
     SAGEMAKER = "SAGEMAKER"
+    MLFLOW = "MLFLOW"
+    OPENMLDB = "OPENMLDB"
+    PYTORCH = "PYTORCH"
+    DVC = "DVC"
 
 
 class DefaultTaskCodeNum(str):
@@ -107,3 +111,12 @@ class ResourceKey(str):
     """Constants for key of resource."""
 
     ID = "id"
+
+
+class Symbol(str):
+    """Constants for symbol."""
+
+    SLASH = "/"
+    POINT = "."
+    COMMA = ","
+    UNDERLINE = "_"
