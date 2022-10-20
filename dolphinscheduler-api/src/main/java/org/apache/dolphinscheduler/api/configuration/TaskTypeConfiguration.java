@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +57,7 @@ public class TaskTypeConfiguration {
     private static final List<FavTaskDto> defaultTaskTypes = new ArrayList<>();
 
     public List<FavTaskDto> getDefaultTaskTypes() {
-        if (!defaultTaskTypes.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(defaultTaskTypes)) {
             return defaultTaskTypes;
         }
         printDefaultTypes();

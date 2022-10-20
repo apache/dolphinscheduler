@@ -266,7 +266,7 @@ public class TimePlaceholderUtils {
             if (Character.isDigit(expression.charAt(i))) {
                 num = num + expression.charAt(i);
             } else {
-                if (!num.isEmpty()) {
+                if (!StringUtils.isEmpty(num)) {
                     result.add(num);
                 }
                 result.add(expression.charAt(i) + "");

@@ -889,7 +889,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ganttDto.setTaskNames(nodeList);
 
         List<Task> taskList = new ArrayList<>();
-        if (!nodeList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(nodeList)) {
             List<Long> taskCodes = nodeList.stream().map(Long::parseLong).collect(Collectors.toList());
             List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
                     Collections.singletonList(processInstanceId), taskCodes);

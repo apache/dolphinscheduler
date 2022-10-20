@@ -25,6 +25,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.apache.dolphinscheduler.common.Constants;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -339,7 +341,7 @@ public class JSONUtils {
 
     public static ObjectNode parseObject(String text) {
         try {
-            if (text.isEmpty()) {
+            if (StringUtils.isEmpty(text)) {
                 return parseObject(text, ObjectNode.class);
             } else {
                 return (ObjectNode) objectMapper.readTree(text);

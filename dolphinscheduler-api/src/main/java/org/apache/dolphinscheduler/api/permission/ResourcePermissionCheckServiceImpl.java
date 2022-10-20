@@ -114,7 +114,7 @@ public class ResourcePermissionCheckServiceImpl
             originResSet.removeAll(ownResSets);
             if (CollectionUtils.isNotEmpty(originResSet))
                 logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
-            return originResSet.isEmpty();
+            return CollectionUtils.isEmpty(originResSet);
         }
         return true;
     }
@@ -180,7 +180,8 @@ public class ResourcePermissionCheckServiceImpl
                 return Collections.emptySet();
             }
             List<Queue> queues = queueMapper.selectList(null);
-            return queues.isEmpty() ? Collections.emptySet() : queues.stream().map(Queue::getId).collect(toSet());
+            return CollectionUtils.isEmpty(queues) ? Collections.emptySet()
+                    : queues.stream().map(Queue::getId).collect(toSet());
         }
     }
 
@@ -266,7 +267,7 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<UdfFunc> udfFuncList = udfFuncMapper.listAuthorizedUdfByUserId(userId);
-            if (udfFuncList.isEmpty()) {
+            if (CollectionUtils.isEmpty(udfFuncList)) {
                 return Collections.emptySet();
             }
             return udfFuncList.stream().map(UdfFunc::getId).collect(toSet());
@@ -295,7 +296,7 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<TaskGroup> taskGroupList = taskGroupMapper.listAuthorizedResource(userId);
-            if (taskGroupList.isEmpty()) {
+            if (CollectionUtils.isEmpty(taskGroupList)) {
                 return Collections.emptySet();
             }
             return taskGroupList.stream().map(TaskGroup::getId).collect(Collectors.toSet());
@@ -354,7 +355,7 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<Environment> environments = environmentMapper.queryAllEnvironmentList();
-            if (environments.isEmpty()) {
+            if (CollectionUtils.isEmpty(environments)) {
                 return Collections.emptySet();
             }
             return environments.stream().map(Environment::getId).collect(Collectors.toSet());
