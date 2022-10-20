@@ -38,6 +38,6 @@ for d in alert-server api-server master-server worker-server; do
   done
 done
 
-$JAVA_HOME/bin/java $JAVA_OPTS \
+exec $JAVA_HOME/bin/java $JAVA_OPTS \
   -cp "$DOLPHINSCHEDULER_HOME/conf":"$CP" \
   org.apache.dolphinscheduler.StandaloneServer

@@ -35,6 +35,6 @@ for d in $DOLPHINSCHEDULER_HOME/libs/*; do
   done
 done
 
-$JAVA_HOME/bin/java $JAVA_OPTS \
+exec $JAVA_HOME/bin/java $JAVA_OPTS \
   -cp "$DOLPHINSCHEDULER_HOME/conf":"$CP" \
   org.apache.dolphinscheduler.StandaloneServer
