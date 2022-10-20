@@ -300,8 +300,7 @@ public class TaskInstanceServiceTest {
         putMsg(mockFailure, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockFailure);
         Result authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertNotSame(Status.SUCCESS.getCode(), authFailRes.getCode());
-
+        Assertions.assertNotSame(Status.SUCCESS.getCode(), authFailRes.getCode());
 
         // test task not found
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockSuccess);
@@ -310,7 +309,7 @@ public class TaskInstanceServiceTest {
         taskDefinition.setProjectCode(projectCode);
         when(taskDefinitionMapper.queryByCode(task.getTaskCode())).thenReturn(taskDefinition);
         Result taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), taskNotFoundRes.getCode().intValue());
+        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), taskNotFoundRes.getCode().intValue());
 
         // test task instance state error
         task.setState(TaskExecutionStatus.SUCCESS);
@@ -320,7 +319,8 @@ public class TaskInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
         Result taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR.getCode(), taskStateErrorRes.getCode().intValue());
+        Assertions.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR.getCode(),
+                taskStateErrorRes.getCode().intValue());
 
         // test error
         task.setState(TaskExecutionStatus.FAILURE);
@@ -329,7 +329,7 @@ public class TaskInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
         Result errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR.getCode(), errorRes.getCode().intValue());
+        Assertions.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR.getCode(), errorRes.getCode().intValue());
 
         // test success
         task.setState(TaskExecutionStatus.FAILURE);
@@ -338,7 +338,7 @@ public class TaskInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
         Result successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assert.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
 
     }
 }

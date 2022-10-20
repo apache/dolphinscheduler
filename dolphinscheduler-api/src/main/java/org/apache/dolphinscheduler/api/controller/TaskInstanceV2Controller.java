@@ -29,9 +29,11 @@ import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import springfox.documentation.annotations.ApiIgnore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,7 +50,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * task instance controller
@@ -71,18 +72,18 @@ public class TaskInstanceV2Controller extends BaseController {
      */
     @ApiOperation(value = "queryTaskListPaging", notes = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataTypeClass = int.class, example = "100"),
-        @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataTypeClass = String.class),
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "taskName", value = "TASK_NAME", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", dataTypeClass = TaskExecutionStatus.class),
-        @ApiImplicitParam(name = "host", value = "HOST", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
-        @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataTypeClass = TaskExecuteType.class, example = "STREAM"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20"),
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "taskName", value = "TASK_NAME", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", dataTypeClass = TaskExecutionStatus.class),
+            @ApiImplicitParam(name = "host", value = "HOST", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "taskExecuteType", value = "TASK_EXECUTE_TYPE", required = false, dataTypeClass = TaskExecuteType.class, example = "STREAM"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20"),
     })
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
@@ -97,13 +98,13 @@ public class TaskInstanceV2Controller extends BaseController {
         }
         String searchVal = ParameterUtils.handleEscapes(taskInstanceQueryReq.getSearchVal());
         result = taskInstanceService.queryTaskListPaging(loginUser, projectCode,
-            taskInstanceQueryReq.getProcessInstanceId(), taskInstanceQueryReq.getProcessInstanceName(),
-            taskInstanceQueryReq.getProcessDefinitionName(),
-            taskInstanceQueryReq.getTaskName(), taskInstanceQueryReq.getExecutorName(),
-            taskInstanceQueryReq.getStartTime(), taskInstanceQueryReq.getEndTime(), searchVal,
-            taskInstanceQueryReq.getStateType(), taskInstanceQueryReq.getHost(),
-            taskInstanceQueryReq.getTaskExecuteType(), taskInstanceQueryReq.getPageNo(),
-            taskInstanceQueryReq.getPageSize());
+                taskInstanceQueryReq.getProcessInstanceId(), taskInstanceQueryReq.getProcessInstanceName(),
+                taskInstanceQueryReq.getProcessDefinitionName(),
+                taskInstanceQueryReq.getTaskName(), taskInstanceQueryReq.getExecutorName(),
+                taskInstanceQueryReq.getStartTime(), taskInstanceQueryReq.getEndTime(), searchVal,
+                taskInstanceQueryReq.getStateType(), taskInstanceQueryReq.getHost(),
+                taskInstanceQueryReq.getTaskExecuteType(), taskInstanceQueryReq.getPageNo(),
+                taskInstanceQueryReq.getPageSize());
         return new TaskInstanceListPagingResponse(result);
     }
 
@@ -117,7 +118,7 @@ public class TaskInstanceV2Controller extends BaseController {
      */
     @ApiOperation(value = "force-success", notes = "FORCE_TASK_SUCCESS")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "12")
+            @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "12")
     })
     @PostMapping(value = "/{id}/force-success", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)

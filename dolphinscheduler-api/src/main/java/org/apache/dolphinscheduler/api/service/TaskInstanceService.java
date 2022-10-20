@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import java.util.Map;
-
 /**
  * task instance service
  */
@@ -71,8 +69,8 @@ public interface TaskInstanceService {
      * @return the result code and msg
      */
     Result forceTaskSuccess(User loginUser,
-                                         long projectCode,
-                                         Integer taskInstanceId);
+                            long projectCode,
+                            Integer taskInstanceId);
 
     /**
      * task savepoint

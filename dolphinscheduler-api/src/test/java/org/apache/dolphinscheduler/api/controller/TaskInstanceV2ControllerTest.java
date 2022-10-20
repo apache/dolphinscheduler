@@ -31,16 +31,11 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
 
@@ -81,12 +76,11 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
                 eq(taskInstanceQueryReq.getSearchVal()), Mockito.any(), eq(taskInstanceQueryReq.getHost()),
                 eq(taskInstanceQueryReq.getTaskExecuteType()), any(), any())).thenReturn(result);
         Result taskResult = taskInstanceV2Controller.queryTaskListPaging(null, 1L, taskInstanceQueryReq);
-        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
     }
 
-
     @Test
-    public void testForceTaskSuccess(){
+    public void testForceTaskSuccess() {
 
         Result mockResult = new Result();
         putMsg(mockResult, Status.SUCCESS);
@@ -94,7 +88,7 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
         when(taskInstanceService.forceTaskSuccess(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
 
         Result taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
-        Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
 
     }
 
