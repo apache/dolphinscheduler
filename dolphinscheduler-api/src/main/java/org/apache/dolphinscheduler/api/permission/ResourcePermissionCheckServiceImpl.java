@@ -116,7 +116,7 @@ public class ResourcePermissionCheckServiceImpl
             originResSet.removeAll(ownResSets);
             if (CollectionUtils.isNotEmpty(originResSet))
                 logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
-            return originResSet.isEmpty();
+            return CollectionUtils.isEmpty(originResSet);
         }
         return true;
     }

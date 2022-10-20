@@ -331,7 +331,7 @@ public class JSONUtils {
 
     public static ObjectNode parseObject(String text) {
         try {
-            if (text.isEmpty()) {
+            if (StringUtils.isEmpty(text)) {
                 return parseObject(text, ObjectNode.class);
             } else {
                 return (ObjectNode) objectMapper.readTree(text);
