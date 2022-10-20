@@ -29,6 +29,6 @@ public class ElasticSearchDataSourceChannelFactory implements DataSourceChannelF
     }
 
     public DataSourceChannel create() {
-        return (DataSourceChannel) new ElasticSearchDataSourceChannel();
+        return new ElasticSearchDataSourceChannel();
     }
 }

@@ -46,7 +46,6 @@ public class DataSourcePluginManager {
         ServiceLoader.load(DataSourceChannelFactory.class).forEach(factory -> {
             final String name = factory.getName();
             logger.info("Registering datasource plugin: {}", name);
-
             if (!names.add(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }

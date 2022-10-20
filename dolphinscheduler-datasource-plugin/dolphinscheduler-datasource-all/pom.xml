@@ -81,5 +81,10 @@
             <artifactId>dolphinscheduler-datasource-elasticsearch</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-dm</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
