@@ -266,7 +266,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
         if (fullName.length() > Constants.RESOURCE_FULL_NAME_MAX_LENGTH) {
-            logger.warn("Resource file's name is longer than max full name length, fullName:{}, fullNameSize:{}, maxFullNameSize:{}",
+            logger.warn(
+                    "Resource file's name is longer than max full name length, fullName:{}, fullNameSize:{}, maxFullNameSize:{}",
                     RegexUtils.escapeNRT(name), fullName.length(), Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
             putMsg(result, Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
             return result;
@@ -298,7 +299,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             logger.error("Upload resource file failed, resourceName:{}, fileName:{}.",
                     RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
             putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
-            throw new ServiceException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
+            throw new ServiceException(
+                    String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
         } else
             logger.info("Upload resource file complete, resourceName:{}, fileName:{}.",
                     RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
@@ -327,7 +329,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                             parentResource.setSize(0L);
                         }
                         resourcesMapper.updateById(parentResource);
-                        logger.info("Resource size update complete, resourceFullName:{}, newSize:{}.", parentResource.getFullName(), parentResource.getSize());
+                        logger.info("Resource size update complete, resourceFullName:{}, newSize:{}.",
+                                parentResource.getFullName(), parentResource.getSize());
                     }
                 }
             }
@@ -427,7 +430,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("Storage does not start up, resource upload startup state: {}.", PropertyUtils.getResUploadStartupState());
+            logger.error("Storage does not start up, resource upload startup state: {}.",
+                    PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
@@ -474,7 +478,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String originFileName = storageOperate.getFileName(resource.getType(), tenantCode, originFullName);
         try {
             if (!storageOperate.exists(tenantCode, originFileName)) {
-                logger.error("Resource file does not exist in {} storage, tenantCode:{}, resourceId:{}, originFileName:{}.",
+                logger.error(
+                        "Resource file does not exist in {} storage, tenantCode:{}, resourceId:{}, originFileName:{}.",
                         resource.getType(), tenantCode, resourceId, originFileName);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
@@ -635,7 +640,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         if (file != null && FileUtils.directoryTraversal(Objects.requireNonNull(file.getOriginalFilename()))) {
-            logger.warn("File original name verify failed, fileOriginalName:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
+            logger.warn("File original name verify failed, fileOriginalName:{}.",
+                    RegexUtils.escapeNRT(file.getOriginalFilename()));
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
@@ -643,7 +649,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (file != null) {
             // file is empty
             if (file.isEmpty()) {
-                logger.warn("Parameter file is empty, fileOriginalName:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
+                logger.warn("Parameter file is empty, fileOriginalName:{}.",
+                        RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.RESOURCE_FILE_IS_EMPTY);
                 return result;
             }
@@ -668,7 +675,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return result;
             }
             if (file.getSize() > Constants.MAX_FILE_SIZE) {
-                logger.warn("Resource file size is larger than max file size, fileOriginalName:{}, fileSize:{}, maxFileSize:{}.",
+                logger.warn(
+                        "Resource file size is larger than max file size, fileOriginalName:{}, fileSize:{}, maxFileSize:{}.",
                         RegexUtils.escapeNRT(file.getOriginalFilename()), file.getSize(), Constants.MAX_FILE_SIZE);
                 putMsg(result, Status.RESOURCE_SIZE_EXCEED_LIMIT);
                 return result;
@@ -904,7 +912,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
         if (needDeleteResourceIdArray.length >= 2) {
-            logger.warn("Resource can not be deleted because there are files or folders {} in the current directory.", resource.getFileName());
+            logger.warn("Resource can not be deleted because there are files or folders {} in the current directory.",
+                    resource.getFileName());
             putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
             return result;
         }
@@ -914,14 +923,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
             List<Integer> udfFuncIds = udfFuncs.stream().map(UdfFunc::getId).collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(udfFuncs)) {
-                logger.warn("Resource can not be deleted because it is bound by UDF functions, udfFuncIds:{}", udfFuncIds);
+                logger.warn("Resource can not be deleted because it is bound by UDF functions, udfFuncIds:{}",
+                        udfFuncIds);
                 putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
                 return result;
             }
         }
 
         if (resourceIdSet.contains(resource.getPid())) {
-            logger.warn("Resource can not be deleted because it is used by process definition, resourceId:{}, processDefinitionCode:{}.",
+            logger.warn(
+                    "Resource can not be deleted because it is used by process definition, resourceId:{}, processDefinitionCode:{}.",
                     resource.getId(), resource.getPid());
             putMsg(result, Status.RESOURCE_IS_USED);
             return result;
@@ -929,7 +940,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resourceIdSet.retainAll(allChildren);
         if (CollectionUtils.isNotEmpty(resourceIdSet)) {
             for (Integer resId : resourceIdSet) {
-                logger.warn("Resource can not be deleted because it is used by process definition, resourceId:{}, processDefinitionCode:{}.",
+                logger.warn(
+                        "Resource can not be deleted because it is used by process definition, resourceId:{}, processDefinitionCode:{}.",
                         resId, resourceProcessMap.get(resId));
             }
             putMsg(result, Status.RESOURCE_IS_USED);
@@ -987,7 +999,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 try {
                     String filename = storageOperate.getFileName(type, tenantCode, fullName);
                     if (storageOperate.exists(tenantCode, filename)) {
-                        logger.warn("Resource file with same name exists so can not create again, tenantCode:{}, resourceName:{}.",
+                        logger.warn(
+                                "Resource file with same name exists so can not create again, tenantCode:{}, resourceName:{}.",
                                 tenantCode, RegexUtils.escapeNRT(filename));
                         putMsg(result, Status.RESOURCE_FILE_EXIST, filename);
                     }
@@ -997,7 +1010,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
                 }
             } else {
-                logger.error("Tenant does not exist or tenant of current login user does not specified, loginUserName:{}.", loginUser.getUserName());
+                logger.error(
+                        "Tenant does not exist or tenant of current login user does not specified, loginUserName:{}.",
+                        loginUser.getUserName());
                 putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             }
         }
@@ -1142,7 +1157,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (storageOperate.exists(tenantCode, resourceFileName)) {
                 List<String> content = storageOperate.vimFile(tenantCode, resourceFileName, skipLineNum, limit);
 
-                logger.info("Vim file content in path {} success, tenantCode:{}, fileName:{}, skipLineNum:{}, limit:{}.",
+                logger.info(
+                        "Vim file content in path {} success, tenantCode:{}, fileName:{}, skipLineNum:{}, limit:{}.",
                         resourceFileName, tenantCode, resourceFileName, skipLineNum, limit);
                 putMsg(result, Status.SUCCESS);
                 Map<String, Object> map = new HashMap<>();
@@ -1353,7 +1369,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         putMsg(result, Status.SUCCESS);
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("Storage does not start up, resource upload startup state: {}.", PropertyUtils.getResUploadStartupState());
+            logger.error("Storage does not start up, resource upload startup state: {}.",
+                    PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
@@ -1472,7 +1489,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             if (!FileUtils.writeContent2File(content, localFilename)) {
                 // write file fail
-                logger.error("Write file error, fileName:{}, content:{}.", localFilename, RegexUtils.escapeNRT(content));
+                logger.error("Write file error, fileName:{}, content:{}.", localFilename,
+                        RegexUtils.escapeNRT(content));
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
@@ -1485,7 +1503,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (!storageOperate.exists(tenantCode, resourcePath)) {
                 // create if tenant dir not exists
                 storageOperate.createTenantDirIfNotExists(tenantCode);
-                logger.info("Create tenant dir because path {} does not exist, tenantCode:{}.", resourcePath, tenantCode);
+                logger.info("Create tenant dir because path {} does not exist, tenantCode:{}.", resourcePath,
+                        tenantCode);
             }
             if (storageOperate.exists(tenantCode, storageFileName)) {
                 storageOperate.delete(tenantCode, storageFileName, false);
@@ -1493,7 +1512,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             storageOperate.upload(tenantCode, localFilename, storageFileName, true, true);
         } catch (Exception e) {
-            logger.error("Upload content to storage error, tenantCode:{}, destFileName:{}.", tenantCode, storageFileName, e);
+            logger.error("Upload content to storage error, tenantCode:{}, destFileName:{}.", tenantCode,
+                    storageFileName, e);
             result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
             result.setMsg(String.format("copy %s to hdfs %s fail", localFilename, storageFileName));
             return result;
@@ -1514,7 +1534,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId) throws IOException {
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
-            logger.warn("Storage does not start up, resource upload startup state: {}.", PropertyUtils.getResUploadStartupState());
+            logger.warn("Storage does not start up, resource upload startup state: {}.",
+                    PropertyUtils.getResUploadStartupState());
             throw new ServiceException("hdfs not startup");
         }
 
@@ -1549,7 +1570,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
             logger.error("Tenant does not exists, tenantId:{}.", user.getTenantId());
-            throw new ServiceException(String.format("The tenant id %d of resource owner does not exist", user.getTenantId()));
+            throw new ServiceException(
+                    String.format("The tenant id %d of resource owner does not exist", user.getTenantId()));
         }
 
         String tenantCode = tenant.getTenantCode();
@@ -1561,7 +1583,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         try {
             storageOperate.download(tenantCode, fileName, localFileName, false, true);
-            org.springframework.core.io.Resource file2Resource = org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
+            org.springframework.core.io.Resource file2Resource =
+                    org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
             if (file2Resource != null) {
                 logger.info("Download resource complete, path:{}, localFileName:{}.", fileName, localFileName);
             }
@@ -1613,7 +1636,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.queryByUserNameAccurately(userName);
         Result<Object> resourceResponse = this.queryResource(user, fullName, null, ResourceType.FILE);
         if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
-            String msg = String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fullName);
+            String msg =
+                    String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fullName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }

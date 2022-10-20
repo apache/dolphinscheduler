@@ -69,6 +69,7 @@ import org.slf4j.LoggerFactory;
  * time place holder utils
  */
 public class TimePlaceholderUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(TimePlaceholderUtils.class);
 
     /**
@@ -105,7 +106,8 @@ public class TimePlaceholderUtils {
      *                                       be ignored ({@code true}) or cause an exception ({@code false})
      */
     private static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
-        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null, ignoreUnresolvablePlaceholders);
+        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null,
+                ignoreUnresolvablePlaceholders);
     }
 
     /**
@@ -139,7 +141,8 @@ public class TimePlaceholderUtils {
                     arr[i] = N;
                 } else {
                     char c = arr[i - 1];
-                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR || c == LEFT_BRACE_CHAR) {
+                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR
+                            || c == LEFT_BRACE_CHAR) {
                         arr[i] = N;
                     }
                 }
@@ -148,7 +151,8 @@ public class TimePlaceholderUtils {
                     arr[i] = P;
                 } else {
                     char c = arr[i - 1];
-                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR || c == LEFT_BRACE_CHAR) {
+                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR
+                            || c == LEFT_BRACE_CHAR) {
                         arr[i] = P;
                     }
                 }
@@ -262,7 +266,7 @@ public class TimePlaceholderUtils {
             if (Character.isDigit(expression.charAt(i))) {
                 num = num + expression.charAt(i);
             } else {
-                if (!num.isEmpty()) {
+                if (!StringUtils.isEmpty(num)) {
                     result.add(num);
                 }
                 result.add(expression.charAt(i) + "");
@@ -285,9 +289,11 @@ public class TimePlaceholderUtils {
      * @return true or false
      */
     private static boolean compare(String peek, String cur) {
-        if (MULTIPLY_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur) || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
+        if (MULTIPLY_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur)
+                || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
             return true;
-        } else if (DIVISION_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur) || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
+        } else if (DIVISION_STRING.equals(peek) && (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur)
+                || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
             return true;
         } else if (ADD_STRING.equals(peek) && (ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {
             return true;
@@ -300,8 +306,9 @@ public class TimePlaceholderUtils {
     /**
      * Placeholder replacement resolver
      */
-    private static class TimePlaceholderResolver implements
-        PropertyPlaceholderHelper.PlaceholderResolver {
+    private static class TimePlaceholderResolver
+            implements
+                PropertyPlaceholderHelper.PlaceholderResolver {
 
         private final String value;
 
@@ -362,7 +369,7 @@ public class TimePlaceholderUtils {
 
                 value = String.valueOf(timestamp.getTime() / 1000);
             } else if (expression.startsWith(YEAR_WEEK)) {
-                value = calculateYearWeek(expression,date);
+                value = calculateYearWeek(expression, date);
             } else {
                 Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
                 value = DateUtils.format(entry.getKey(), entry.getValue());
@@ -388,7 +395,7 @@ public class TimePlaceholderUtils {
         String targetDate = "";
         try {
 
-            if(dataFormat.contains(COMMA)) {
+            if (dataFormat.contains(COMMA)) {
                 String param1 = dataFormat.split(COMMA)[0];
                 String param2 = dataFormat.split(COMMA)[1];
                 dataFormat = param1;
@@ -414,10 +421,10 @@ public class TimePlaceholderUtils {
      */
     private static String transformYearWeek(Date date, String format, int weekDay) {
         Calendar calendar = Calendar.getInstance();
-        //Minimum number of days required for the first week of the year
+        // Minimum number of days required for the first week of the year
         calendar.setMinimalDaysInFirstWeek(4);
 
-        //By default ,Set Monday as the first day of the week
+        // By default ,Set Monday as the first day of the week
         switch (weekDay) {
             case 2:
                 calendar.setFirstDayOfWeek(Calendar.TUESDAY);
@@ -449,13 +456,13 @@ public class TimePlaceholderUtils {
 
         String weekYearStr = "";
         if (weekOfYear < 10 && format.contains(HYPHEN)) {
-            weekYearStr = String.format("%d%s0%d",year,HYPHEN,weekOfYear);
-        } else if (weekOfYear >= 10 && format.contains(HYPHEN)){
-            weekYearStr = String.format("%d%s%d",year,HYPHEN,weekOfYear);
-        } else if (weekOfYear < 10){
-            weekYearStr = String.format("%d0%d",year,weekOfYear);
+            weekYearStr = String.format("%d%s0%d", year, HYPHEN, weekOfYear);
+        } else if (weekOfYear >= 10 && format.contains(HYPHEN)) {
+            weekYearStr = String.format("%d%s%d", year, HYPHEN, weekOfYear);
+        } else if (weekOfYear < 10) {
+            weekYearStr = String.format("%d0%d", year, weekOfYear);
         } else {
-            weekYearStr = String.format("%d%d",year,weekOfYear);
+            weekYearStr = String.format("%d%d", year, weekOfYear);
         }
 
         return weekYearStr;
@@ -482,17 +489,17 @@ public class TimePlaceholderUtils {
         } else if (expression.startsWith(WEEK_END)) {
             resultEntry = calcWeekEnd(expression, date);
         } else if (expression.startsWith(MONTH_FIRST_DAY)) {
-            resultEntry = calcCustomDay(expression,MONTH_FIRST_DAY, date);
+            resultEntry = calcCustomDay(expression, MONTH_FIRST_DAY, date);
         } else if (expression.startsWith(MONTH_LAST_DAY)) {
-            resultEntry = calcCustomDay(expression,MONTH_LAST_DAY, date);
+            resultEntry = calcCustomDay(expression, MONTH_LAST_DAY, date);
         } else if (expression.startsWith(THIS_DAY)) {
-            resultEntry = calcCustomDay(expression,THIS_DAY, date);
+            resultEntry = calcCustomDay(expression, THIS_DAY, date);
         } else if (expression.startsWith(LAST_DAY)) {
-            resultEntry = calcCustomDay(expression,LAST_DAY, date);
+            resultEntry = calcCustomDay(expression, LAST_DAY, date);
         } else if (expression.startsWith(WEEK_FIRST_DAY)) {
-            resultEntry = calcCustomDay(expression,WEEK_FIRST_DAY, date);
+            resultEntry = calcCustomDay(expression, WEEK_FIRST_DAY, date);
         } else if (expression.startsWith(WEEK_LAST_DAY)) {
-            resultEntry = calcCustomDay(expression,WEEK_LAST_DAY, date);
+            resultEntry = calcCustomDay(expression, WEEK_LAST_DAY, date);
         } else {
             resultEntry = calcMinutes(expression, date);
         }
@@ -555,7 +562,7 @@ public class TimePlaceholderUtils {
      * @param date       date
      * @return calculate time expression with date,format
      */
-    public static Map.Entry<Date, String> calcCustomDay(String expression,String keyDate, Date date) {
+    public static Map.Entry<Date, String> calcCustomDay(String expression, String keyDate, Date date) {
         String dataFormat = "yyyy-MM-dd";
         Date targetDate = new Date();
 
@@ -563,12 +570,12 @@ public class TimePlaceholderUtils {
             case MONTH_FIRST_DAY:
                 dataFormat = expression.substring(MONTH_FIRST_DAY.length() + 1, expression.length() - 1);
 
-                if(dataFormat.contains(COMMA)) {
+                if (dataFormat.contains(COMMA)) {
                     String param1 = dataFormat.split(COMMA)[0];
                     String param2 = dataFormat.split(COMMA)[1];
                     dataFormat = param1;
 
-                    targetDate = addMonths(DateUtils.getFirstDayOfMonth(date),calculate(param2));
+                    targetDate = addMonths(DateUtils.getFirstDayOfMonth(date), calculate(param2));
                 } else {
                     targetDate = DateUtils.getFirstDayOfMonth(date);
                 }
@@ -577,12 +584,12 @@ public class TimePlaceholderUtils {
             case MONTH_LAST_DAY:
                 dataFormat = expression.substring(MONTH_LAST_DAY.length() + 1, expression.length() - 1);
 
-                if(dataFormat.contains(COMMA)) {
+                if (dataFormat.contains(COMMA)) {
                     String param1 = dataFormat.split(COMMA)[0];
                     String param2 = dataFormat.split(COMMA)[1];
                     dataFormat = param1;
 
-                    Date lastMonthDay = addMonths(date,calculate(param2));
+                    Date lastMonthDay = addMonths(date, calculate(param2));
 
                     targetDate = DateUtils.getLastDayOfMonth(lastMonthDay);
 
@@ -601,7 +608,7 @@ public class TimePlaceholderUtils {
             case WEEK_FIRST_DAY:
                 dataFormat = expression.substring(WEEK_FIRST_DAY.length() + 1, expression.length() - 1);
 
-                if(dataFormat.contains(COMMA)) {
+                if (dataFormat.contains(COMMA)) {
                     String param1 = dataFormat.split(COMMA)[0];
                     String param2 = dataFormat.split(COMMA)[1];
                     dataFormat = param1;
@@ -614,7 +621,7 @@ public class TimePlaceholderUtils {
             case WEEK_LAST_DAY:
                 dataFormat = expression.substring(WEEK_LAST_DAY.length() + 1, expression.length() - 1);
 
-                if(dataFormat.contains(COMMA)) {
+                if (dataFormat.contains(COMMA)) {
                     String param1 = dataFormat.split(COMMA)[0];
                     String param2 = dataFormat.split(COMMA)[1];
                     dataFormat = param1;
@@ -755,7 +762,7 @@ public class TimePlaceholderUtils {
         } else {
 
             calcExpression = String.format("60*24*(%s)%s", minuteExpression.substring(0, index),
-                minuteExpression.substring(index));
+                    minuteExpression.substring(index));
         }
 
         return calculate(calcExpression);

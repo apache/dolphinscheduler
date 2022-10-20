@@ -32,6 +32,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class ShellTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public TaskChannel create() {
         return new ShellTaskChannel();

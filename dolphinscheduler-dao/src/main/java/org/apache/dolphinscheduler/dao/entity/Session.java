@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
 
 /**
  * session
@@ -31,7 +31,7 @@ public class Session {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private String id;
 
     /**

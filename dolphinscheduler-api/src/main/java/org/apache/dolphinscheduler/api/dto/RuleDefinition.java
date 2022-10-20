@@ -40,7 +40,7 @@ public class RuleDefinition {
     public RuleDefinition() {
     }
 
-    public RuleDefinition(List<DqRuleInputEntry> ruleInputEntryList,List<DqRuleExecuteSql> executeSqlList) {
+    public RuleDefinition(List<DqRuleInputEntry> ruleInputEntryList, List<DqRuleExecuteSql> executeSqlList) {
         this.ruleInputEntryList = ruleInputEntryList;
         this.executeSqlList = executeSqlList;
     }

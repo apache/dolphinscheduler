@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 public final class ScriptParamsConstants {
+
     static final String SCRIPT_TYPE = "$t('scriptType')";
 
     static final String NAME_SCRIPT_TYPE = "type";

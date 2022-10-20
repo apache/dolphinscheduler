@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
@@ -60,6 +59,7 @@ public class StreamTaskExecuteThreadPool extends ThreadPoolTaskExecutor {
         int taskInstanceId = streamTaskExecuteRunnable.getTaskInstance().getId();
         ListenableFuture<?> future = this.submitListenable(streamTaskExecuteRunnable::handleEvents);
         future.addCallback(new ListenableFutureCallback() {
+
             @Override
             public void onFailure(Throwable ex) {
                 LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
