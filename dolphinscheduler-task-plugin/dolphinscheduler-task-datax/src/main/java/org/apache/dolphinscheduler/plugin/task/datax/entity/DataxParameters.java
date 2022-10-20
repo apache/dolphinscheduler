@@ -15,23 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.datax;
+package org.apache.dolphinscheduler.plugin.task.datax.entity;
 
+import lombok.Data;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.datax.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.ColumnInfo;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * DataX parameter
  */
+@Data
 public class DataxParameters extends AbstractParameters {
 
     /**
@@ -40,9 +45,16 @@ public class DataxParameters extends AbstractParameters {
     private int customConfig;
 
     /**
+     * if custom SQL，eg  0, 1
+     */
+    private int customSQL;
+
+    /**
      * if customConfig eq 1 ,then json is usable
      */
     private String json;
+
+    // Note: for reader part
 
     /**
      * data source type，eg  MYSQL, POSTGRES ...
@@ -55,6 +67,33 @@ public class DataxParameters extends AbstractParameters {
     private int dataSource;
 
     /**
+     * source table
+     */
+    private String sourceTable;
+
+    /**
+     * where condition for select from source table
+     */
+    private String where;
+
+    /**
+     * split key. eg id
+     */
+    private String splitPk;
+
+    /**
+     * column infos of source table
+     */
+    private List<ColumnInfo> dsColumns;
+
+    /**
+     * partition values of source table
+     */
+    private List<String> dsPartitions;
+
+    // Note: for writer part
+
+    /**
      * data target type，eg  MYSQL, POSTGRES ...
      */
     private String dtType;
@@ -63,6 +102,16 @@ public class DataxParameters extends AbstractParameters {
      * datatarget id
      */
     private int dataTarget;
+
+    /**
+     * column infos of target table
+     */
+    private List<ColumnInfo> dtColumns;
+
+    /**
+     * partition values of target table
+     */
+    private List<String> dtPartitions;
 
     /**
      * sql
@@ -85,6 +134,23 @@ public class DataxParameters extends AbstractParameters {
     private List<String> postStatements;
 
     /**
+     * Write Mode. eg INSERT INTO, UPDATE ON DUPLICATE ...
+     */
+    private int writeMode;
+
+    /**
+     * batch size for one commit
+     */
+    private int batchSize;
+
+    // Note: for setting part
+
+    /**
+     * channel
+     */
+    private int channel;
+
+    /**
      * speed byte num
      */
     private int jobSpeedByte;
@@ -104,128 +170,34 @@ public class DataxParameters extends AbstractParameters {
      */
     private int xmx;
 
-    public int getCustomConfig() {
-        return customConfig;
-    }
-
-    public void setCustomConfig(int customConfig) {
-        this.customConfig = customConfig;
-    }
-
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
-
-    public String getDsType() {
-        return dsType;
-    }
-
-    public void setDsType(String dsType) {
-        this.dsType = dsType;
-    }
-
-    public int getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(int dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public String getDtType() {
-        return dtType;
-    }
-
-    public void setDtType(String dtType) {
-        this.dtType = dtType;
-    }
-
-    public int getDataTarget() {
-        return dataTarget;
-    }
-
-    public void setDataTarget(int dataTarget) {
-        this.dataTarget = dataTarget;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public String getTargetTable() {
-        return targetTable;
-    }
-
-    public void setTargetTable(String targetTable) {
-        this.targetTable = targetTable;
-    }
-
-    public List<String> getPreStatements() {
-        return preStatements;
-    }
-
-    public void setPreStatements(List<String> preStatements) {
-        this.preStatements = preStatements;
-    }
-
-    public List<String> getPostStatements() {
-        return postStatements;
-    }
-
-    public void setPostStatements(List<String> postStatements) {
-        this.postStatements = postStatements;
-    }
-
-    public int getJobSpeedByte() {
-        return jobSpeedByte;
-    }
-
-    public void setJobSpeedByte(int jobSpeedByte) {
-        this.jobSpeedByte = jobSpeedByte;
-    }
-
-    public int getJobSpeedRecord() {
-        return jobSpeedRecord;
-    }
-
-    public void setJobSpeedRecord(int jobSpeedRecord) {
-        this.jobSpeedRecord = jobSpeedRecord;
-    }
-
-    public int getXms() {
-        return xms;
-    }
-
-    public void setXms(int xms) {
-        this.xms = xms;
-    }
-
-    public int getXmx() {
-        return xmx;
-    }
-
-    public void setXmx(int xmx) {
-        this.xmx = xmx;
-    }
-
     @Override
     public boolean checkParameters() {
-        if (customConfig == Flag.NO.ordinal()) {
+        //TODO: 待前端接入后更新
+        if(customConfig == Flag.YES.ordinal()){
+            return StringUtils.isNotEmpty(json);
+        }
+        else {
             return dataSource != 0
                     && dataTarget != 0
                     && StringUtils.isNotEmpty(sql)
                     && StringUtils.isNotEmpty(targetTable);
-        } else {
-            return StringUtils.isNotEmpty(json);
         }
+//        if(customConfig == Flag.YES.ordinal()){
+//            return StringUtils.isNotEmpty(json);
+//        }
+//        else if(customSQL == Flag.YES.ordinal()) {
+//            return dataSource != 0
+//                    && dataTarget != 0
+//                    && StringUtils.isNotEmpty(sql)
+//                    && StringUtils.isNotEmpty(targetTable);
+//        }else {
+//            return dataSource != 0
+//                    && dataTarget != 0
+//                    && StringUtils.isNotEmpty(sourceTable)
+//                    && StringUtils.isNotEmpty(targetTable)
+//                    && CollectionUtils.isNotEmpty(dsColumns)
+//                    && CollectionUtils.isNotEmpty(dtColumns);
+//        }
     }
 
     @Override
@@ -235,22 +207,31 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "DataxParameters{"
-                + "customConfig=" + customConfig
-                + ", json='" + json + '\''
-                + ", dsType='" + dsType + '\''
-                + ", dataSource=" + dataSource
-                + ", dtType='" + dtType + '\''
-                + ", dataTarget=" + dataTarget
-                + ", sql='" + sql + '\''
-                + ", targetTable='" + targetTable + '\''
-                + ", preStatements=" + preStatements
-                + ", postStatements=" + postStatements
-                + ", jobSpeedByte=" + jobSpeedByte
-                + ", jobSpeedRecord=" + jobSpeedRecord
-                + ", xms=" + xms
-                + ", xmx=" + xmx
-                + '}';
+        return "DataxParameters{" +
+                "customConfig=" + customConfig +
+                ", customSQL=" + customSQL +
+                ", json='" + json + '\'' +
+                ", dsType='" + dsType + '\'' +
+                ", dataSource=" + dataSource +
+                ", sourceTable='" + sourceTable + '\'' +
+                ", where='" + where + '\'' +
+                ", splitKey='" + splitPk + '\'' +
+                ", dsColumns=" + dsColumns +
+                ", dtType='" + dtType + '\'' +
+                ", dataTarget=" + dataTarget +
+                ", dtColumns=" + dtColumns +
+                ", sql='" + sql + '\'' +
+                ", targetTable='" + targetTable + '\'' +
+                ", preStatements=" + preStatements +
+                ", postStatements=" + postStatements +
+                ", writeMode=" + writeMode +
+                ", batchSize=" + batchSize +
+                ", channel=" + channel +
+                ", jobSpeedByte=" + jobSpeedByte +
+                ", jobSpeedRecord=" + jobSpeedRecord +
+                ", xms=" + xms +
+                ", xmx=" + xmx +
+                '}';
     }
 
     @Override
@@ -268,7 +249,6 @@ public class DataxParameters extends AbstractParameters {
     public DataxTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
 
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
-
         if (customConfig == Flag.YES.ordinal()) {
             return dataxTaskExecutionContext;
         }

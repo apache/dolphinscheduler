@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.DataxParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 public class DataxTaskChannel implements TaskChannel {

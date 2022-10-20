@@ -32,7 +32,6 @@ public class HiveConnectionParam extends BaseHDFSConnectionParam {
                 + ", driverClassName='" + driverClassName + '\''
                 + ", validationQuery='" + validationQuery + '\''
                 + ", other='" + other + '\''
-                + ", hdfsPath='" + hdfsPath + '\''
                 + ", principal='" + principal + '\''
                 + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
                 + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''

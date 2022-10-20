@@ -84,12 +84,6 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     protected Map<String, String> other;
 
-    protected String hdfsPath;
-
-    public String getHdfsPath() { return hdfsPath; }
-
-    public void setHdfsPath(String hdfsPath) { this.hdfsPath = hdfsPath; }
-
     public Integer getId() {
         return id;
     }
