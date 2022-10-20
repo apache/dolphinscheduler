@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -26,6 +25,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
