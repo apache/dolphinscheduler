@@ -120,7 +120,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
@@ -173,7 +173,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
@@ -226,7 +226,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
@@ -279,7 +279,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
@@ -332,7 +332,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
@@ -385,7 +385,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
@@ -438,7 +438,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
@@ -491,7 +491,7 @@ export default defineComponent({
                           styles['icon-' + task.type.toLocaleLowerCase()]
                         ]}
                       />
-                      <span>{task.taskName}</span>
+                      <span>{task.taskType}</span>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {
