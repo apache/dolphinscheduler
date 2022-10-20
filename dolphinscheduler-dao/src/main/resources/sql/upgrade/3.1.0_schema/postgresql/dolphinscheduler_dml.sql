@@ -14,3 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+delimiter d//
+CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
+	)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+v_schema varchar;
+BEGIN
+    ---get schema name
+    v_schema =current_schema();
+
+EXECUTE 'ALTER TABLE IF EXISTS ' || quote_ident(v_schema) ||'.t_ds_fav_task RENAME COLUMN task_name to task_type';
+
+return 'Success!';
+exception when others then
+		---Raise EXCEPTION '(%)',SQLERRM;
+        return SQLERRM;
+END;
+$BODY$;
+
+select dolphin_update_metadata();
+
+d//
