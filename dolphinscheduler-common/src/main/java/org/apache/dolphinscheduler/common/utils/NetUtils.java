@@ -21,6 +21,8 @@ import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -264,7 +266,7 @@ public class NetUtils {
     }
 
     private static NetworkInterface findAddress(List<NetworkInterface> validNetworkInterfaces) {
-        if (validNetworkInterfaces.isEmpty()) {
+        if (CollectionUtils.isEmpty(validNetworkInterfaces)) {
             return null;
         }
         String networkPriority = PropertyUtils.getString(Constants.DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY, NETWORK_PRIORITY_DEFAULT);

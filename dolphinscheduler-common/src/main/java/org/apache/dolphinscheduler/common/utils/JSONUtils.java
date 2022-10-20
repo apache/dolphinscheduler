@@ -24,6 +24,8 @@ import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_G
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -346,7 +348,7 @@ public class JSONUtils {
 
     public static ObjectNode parseObject(String text) {
         try {
-            if (text.isEmpty()) {
+            if (StringUtils.isEmpty(text)) {
                 return parseObject(text, ObjectNode.class);
             } else {
                 return (ObjectNode) objectMapper.readTree(text);

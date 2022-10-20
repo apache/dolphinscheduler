@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.List;
 
 public class SwitchParameters extends AbstractParameters {
@@ -88,8 +90,10 @@ public class SwitchParameters extends AbstractParameters {
         }
         //validate conditions must have next node
         List<SwitchCondition> conditions = this.switchResult.getDependTaskList();
-        if (conditions != null && conditions.size() != 0) {
-            if (conditions.stream().anyMatch(e -> (StringUtils.isNotEmpty(e.getCondition()) && e.getNextNode() == null))) {
+
+        if (CollectionUtils.isNotEmpty(conditions)) {
+            if (conditions.stream()
+                    .anyMatch(e -> (StringUtils.isNotEmpty(e.getCondition()) && e.getNextNode() == null))) {
                 return false;
             }
         }

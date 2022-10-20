@@ -146,6 +146,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
+import org.apache.commons.collections.MapUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -729,7 +731,7 @@ public class ProcessServiceImpl implements ProcessService {
                     queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
             List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
 
-            if (complementDateList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(complementDateList)) {
                 scheduleTime = complementDateList.get(0);
             } else {
                 logger.error("set scheduler time error: complement date list is empty, command: {}",
@@ -823,7 +825,7 @@ public class ProcessServiceImpl implements ProcessService {
         // set start param into global params
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
         List<Property> globalParamList = processDefinition.getGlobalParamList();
-        if (startParamMap.size() > 0 && globalMap != null) {
+        if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
             // start param to overwrite global param
             for (Map.Entry<String, String> param : globalMap.entrySet()) {
                 String val = startParamMap.get(param.getKey());
@@ -1137,7 +1139,7 @@ public class ProcessServiceImpl implements ProcessService {
             complementDate = CronUtils.getSelfScheduleDateList(cmdParam);
         }
 
-        if (complementDate.size() > 0 && Flag.NO == processInstance.getIsSubProcess()) {
+        if (CollectionUtils.isNotEmpty(complementDate) && Flag.NO == processInstance.getIsSubProcess()) {
             processInstance.setScheduleTime(complementDate.get(0));
         }
 
@@ -1451,7 +1453,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
             processMapStr = JSONUtils.toJsonString(cmdParam);
         }
-        if (fatherParams.size() != 0) {
+        if (MapUtils.isNotEmpty(fatherParams)) {
             cmdParam.put(CMD_PARAM_FATHER_PARAMS, JSONUtils.toJsonString(fatherParams));
             processMapStr = JSONUtils.toJsonString(cmdParam);
         }
