@@ -968,7 +968,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Set<Long> diffCode =
                 definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
 
-        if (!diffCode.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(diffCode)) {
             logger.error("Process definition does not exist, processCodes:{}.",
                     diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA)));
             throw new ServiceException(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR,

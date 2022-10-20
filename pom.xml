@@ -646,11 +646,6 @@
                 <version>${spotless.version}</version>
                 <configuration>
                     <java>
-                        <!--TODO: Remove the following excludes section when junit4 removed from e2e and microbench module-->
-                        <excludes>
-                            <exclude>**/e2e/**/*.java</exclude>
-                            <exclude>**/microbench/**/*.java</exclude>
-                        </excludes>
                         <eclipse>
                             <file>style/spotless_dolphinscheduler_formatter.xml</file>
                         </eclipse>
@@ -699,7 +694,6 @@
                             <include>docs/**/*.md</include>
                         </includes>
                         <excludes>
-                            <!--Avoid conflicts with formatting tools in some special modules-->
                             <exclude>**/.github/**/*.md</exclude>
                         </excludes>
                         <flexmark />

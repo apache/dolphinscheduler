@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -108,7 +109,7 @@ public final class FeiShuSender {
         if (alertData.getContent() != null) {
 
             List<Map> list = JSONUtils.toList(alertData.getContent(), Map.class);
-            if (list.isEmpty()) {
+            if (CollectionUtils.isEmpty(list)) {
                 return alertData.getTitle() + alertData.getContent();
             }
 
