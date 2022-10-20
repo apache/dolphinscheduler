@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import lombok.experimental.UtilityClass;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
-import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class MasterServerMetrics {

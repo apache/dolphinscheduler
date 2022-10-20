@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
 import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
 
 public interface DataSourceChannelFactory extends PrioritySPI {
+
     /**
      * get datasource client
      */

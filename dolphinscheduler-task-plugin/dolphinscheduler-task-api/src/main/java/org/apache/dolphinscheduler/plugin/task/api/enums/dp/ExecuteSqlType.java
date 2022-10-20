@@ -26,14 +26,15 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * execute sql type
  */
 public enum ExecuteSqlType {
+
     /**
      * 0-middle
      * 1-statistics
      * 2-comparison
      */
-    MIDDLE(0,"middle"),
-    STATISTICS(1,"statistics"),
-    COMPARISON(2,"comparison");
+    MIDDLE(0, "middle"),
+    STATISTICS(1, "statistics"),
+    COMPARISON(2, "comparison");
 
     ExecuteSqlType(int code, String description) {
         this.code = code;
@@ -56,7 +57,7 @@ public enum ExecuteSqlType {
 
     static {
         for (ExecuteSqlType type : ExecuteSqlType.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

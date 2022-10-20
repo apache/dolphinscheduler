@@ -17,15 +17,17 @@
 
 package org.apache.dolphinscheduler.server.master.event;
 
-import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
 public class TaskRetryStateEventHandler implements StateEventHandler {

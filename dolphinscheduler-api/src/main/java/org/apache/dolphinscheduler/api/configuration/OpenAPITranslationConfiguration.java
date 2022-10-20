@@ -18,20 +18,24 @@ package org.apache.dolphinscheduler.api.configuration;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-import lombok.RequiredArgsConstructor;
+
 import springfox.documentation.service.Operation;
 import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.OperationBuilderPlugin;
 import springfox.documentation.spi.service.contexts.OperationContext;
+
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Set;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OpenAPITranslationConfiguration {
@@ -60,20 +64,20 @@ public class OpenAPITranslationConfiguration {
                     .collect(toSet());
 
             Collection<RequestParameter> parameters = operation.getRequestParameters().stream()
-            .map(it -> new RequestParameter(
-                it.getName(),
-                it.getIn(),
-                messageSource.getMessage(it.getDescription(), null, it.getDescription(), locale),
-                it.getRequired(),
-                it.getDeprecated(),
-                it.getHidden(),
-                it.getParameterSpecification(),
-                it.getScalarExample(),
-                it.getExamples(),
-                it.getPrecedence(),
-                it.getExtensions(),
-                it.getParameterIndex()))
-                .collect(toList());
+                    .map(it -> new RequestParameter(
+                            it.getName(),
+                            it.getIn(),
+                            messageSource.getMessage(it.getDescription(), null, it.getDescription(), locale),
+                            it.getRequired(),
+                            it.getDeprecated(),
+                            it.getHidden(),
+                            it.getParameterSpecification(),
+                            it.getScalarExample(),
+                            it.getExamples(),
+                            it.getPrecedence(),
+                            it.getExtensions(),
+                            it.getParameterIndex()))
+                    .collect(toList());
 
             context.operationBuilder()
                     .notes(notes)

@@ -17,17 +17,19 @@
 
 package org.apache.dolphinscheduler.spi.plugin;
 
-import com.google.auto.service.AutoService;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
+import com.google.auto.service.AutoService;
 
 public class PrioritySPIFactoryTest {
 
     @Test
     public void loadHighPriority() {
-        PrioritySPIFactory<LoadHighPriorityConflictTestSPI> factory = new PrioritySPIFactory<>(LoadHighPriorityConflictTestSPI.class);
+        PrioritySPIFactory<LoadHighPriorityConflictTestSPI> factory =
+                new PrioritySPIFactory<>(LoadHighPriorityConflictTestSPI.class);
         Map<String, LoadHighPriorityConflictTestSPI> spiMap = factory.getSPIMap();
         Assertions.assertEquals(1, spiMap.get("A").getIdentify().getPriority());
     }
@@ -38,7 +40,6 @@ public class PrioritySPIFactoryTest {
             new PrioritySPIFactory<>(ThrowExceptionConflictTestSPI.class);
         });
     }
-
 
     public interface LoadHighPriorityConflictTestSPI extends PrioritySPI {
 
@@ -83,6 +84,5 @@ public class PrioritySPIFactoryTest {
             return SPIIdentify.builder().name("B").priority(0).build();
         }
     }
-
 
 }

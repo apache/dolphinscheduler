@@ -49,6 +49,7 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -61,7 +62,6 @@ import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
-import org.apache.dolphinscheduler.dao.entity.K8s;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -80,6 +80,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
@@ -90,7 +91,6 @@ import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
@@ -135,9 +135,10 @@ import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -276,7 +277,7 @@ public class ProcessServiceImpl implements ProcessService {
     private TaskPluginManager taskPluginManager;
 
     @Autowired
-    private K8sMapper k8sMapper;
+    private ClusterMapper clusterMapper;
 
     @Autowired
     private CuringParamsService curingGlobalParamsService;
@@ -410,17 +411,20 @@ public class ProcessServiceImpl implements ProcessService {
     @Counted("ds.workflow.create.command.count")
     public int createCommand(Command command) {
         int result = 0;
-        if (command != null) {
-            // add command timezone
-            Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
-            Map<String, String> commandParams = JSONUtils.toMap(command.getCommandParam());
-            if (commandParams != null && schedule != null) {
-                commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
-                command.setCommandParam(JSONUtils.toJsonString(commandParams));
-            }
-            command.setId(null);
-            result = commandMapper.insert(command);
+        if (command == null) {
+            return result;
         }
+        // add command timezone
+        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
+        if (schedule != null) {
+            Map<String, String> commandParams =
+                    StringUtils.isNotBlank(command.getCommandParam()) ? JSONUtils.toMap(command.getCommandParam())
+                            : new HashMap<>();
+            commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
+            command.setCommandParam(JSONUtils.toJsonString(commandParams));
+        }
+        command.setId(null);
+        result = commandMapper.insert(command);
         return result;
     }
 
@@ -743,7 +747,7 @@ public class ProcessServiceImpl implements ProcessService {
                     queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
             List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
 
-            if (complementDateList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(complementDateList)) {
                 scheduleTime = complementDateList.get(0);
             } else {
                 logger.error("set scheduler time error: complement date list is empty, command: {}",
@@ -838,7 +842,7 @@ public class ProcessServiceImpl implements ProcessService {
         // set start param into global params
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
         List<Property> globalParamList = processDefinition.getGlobalParamList();
-        if (startParamMap.size() > 0 && globalMap != null) {
+        if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
             // start param to overwrite global param
             for (Map.Entry<String, String> param : globalMap.entrySet()) {
                 String val = startParamMap.get(param.getKey());
@@ -1156,7 +1160,7 @@ public class ProcessServiceImpl implements ProcessService {
             complementDate = CronUtils.getSelfScheduleDateList(cmdParam);
         }
 
-        if (complementDate.size() > 0 && Flag.NO == processInstance.getIsSubProcess()) {
+        if (CollectionUtils.isNotEmpty(complementDate) && Flag.NO == processInstance.getIsSubProcess()) {
             processInstance.setScheduleTime(complementDate.get(0));
         }
 
@@ -1470,7 +1474,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
             processMapStr = JSONUtils.toJsonString(cmdParam);
         }
-        if (fatherParams.size() != 0) {
+        if (MapUtils.isNotEmpty(fatherParams)) {
             cmdParam.put(CMD_PARAM_FATHER_PARAMS, JSONUtils.toJsonString(fatherParams));
             processMapStr = JSONUtils.toJsonString(cmdParam);
         }
@@ -3169,10 +3173,11 @@ public class ProcessServiceImpl implements ProcessService {
         if (Strings.isNullOrEmpty(clusterName)) {
             return null;
         }
-        QueryWrapper<K8s> nodeWrapper = new QueryWrapper<>();
-        nodeWrapper.eq("k8s_name", clusterName);
-        K8s k8s = k8sMapper.selectOne(nodeWrapper);
-        return k8s.getK8sConfig();
+
+        QueryWrapper<Cluster> nodeWrapper = new QueryWrapper<>();
+        nodeWrapper.eq("name", clusterName);
+        Cluster cluster = clusterMapper.selectOne(nodeWrapper);
+        return cluster == null ? null : cluster.getConfig();
     }
 
     @Override

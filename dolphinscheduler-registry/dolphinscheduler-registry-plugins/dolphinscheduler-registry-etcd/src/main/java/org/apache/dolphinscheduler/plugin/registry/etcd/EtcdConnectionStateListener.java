@@ -29,10 +29,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import io.etcd.jetcd.Client;
 
 public class EtcdConnectionStateListener implements AutoCloseable {
+
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
     // A thread pool that periodically obtains connection status
     private final ScheduledExecutorService scheduledExecutorService;
