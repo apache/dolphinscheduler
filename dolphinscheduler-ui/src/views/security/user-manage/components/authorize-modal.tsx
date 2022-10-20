@@ -109,15 +109,6 @@ export const AuthorizeModal = defineComponent({
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
       >
-        {/* {type === 'authorize_project' && (
-          <NTransfer
-            virtualScroll
-            options={this.unauthorizedProjects}
-            filterable
-            v-model={[this.authorizedProjects, 'value']}
-            class={styles.transfer}
-          />
-        )} */}
         {type === 'authorize_project' && (
 
           <NSpace vertical>
@@ -133,7 +124,6 @@ export const AuthorizeModal = defineComponent({
               </NButton>
               <NInput
                 size='small'
-                // v-model={[this.searchVal, 'value']}s
                 placeholder={t('project.list.project_tips')}
                 clearable
                 v-model:value={this.searchVal}
@@ -151,7 +141,6 @@ export const AuthorizeModal = defineComponent({
             columns={this.columnsRef.columns}
             data={this.projectWithAuthorizedLevel}
             loading={this.loading}
-            // scrollX={this.columnsRef.tableWidth}
             max-height="250"
             row-key={this.rowKey}
             on-update:checked-row-keys={this.handleCheck}
