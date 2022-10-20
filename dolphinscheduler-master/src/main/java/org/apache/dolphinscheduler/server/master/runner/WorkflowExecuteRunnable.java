@@ -76,6 +76,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -126,6 +127,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteRunnable.class);
 
     private final ProcessService processService;
+
+    private final CommandService commandService;
 
     private ProcessInstanceDao processInstanceDao;
 
@@ -233,6 +236,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public WorkflowExecuteRunnable(
                                    @NonNull ProcessInstance processInstance,
+                                   @NonNull CommandService commandService,
                                    @NonNull ProcessService processService,
                                    @NonNull ProcessInstanceDao processInstanceDao,
                                    @NonNull NettyExecutorManager nettyExecutorManager,
@@ -241,6 +245,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                                    @NonNull StateWheelExecuteThread stateWheelExecuteThread,
                                    @NonNull CuringParamsService curingParamsService) {
         this.processService = processService;
+        this.commandService = commandService;
         this.processInstanceDao = processInstanceDao;
         this.processInstance = processInstance;
         this.nettyExecutorManager = nettyExecutorManager;
@@ -657,7 +662,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         command.setTestFlag(processInstance.getTestFlag());
-        return processService.createCommand(command);
+        return commandService.createCommand(command);
     }
 
     private boolean needComplementProcess() {
@@ -750,7 +755,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessDefinitionCode(processDefinition.getCode());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-        processService.createCommand(command);
+        commandService.createCommand(command);
     }
 
     /**
