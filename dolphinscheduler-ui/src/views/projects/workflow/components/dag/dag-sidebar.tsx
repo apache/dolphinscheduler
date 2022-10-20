@@ -51,29 +51,29 @@ export default defineComponent({
           return {
             ...item,
             starHover: false,
-            type: item.taskName
+            type: item.taskType
           }
         })
         variables.universal = variables.dataList.filter(
-          (item: any) => item.taskType === 'Universal'
+          (item: any) => item.taskCategory === 'Universal'
         )
         variables.cloud = variables.dataList.filter(
-          (item: any) => item.taskType === 'Cloud'
+          (item: any) => item.taskCategory === 'Cloud'
         )
         variables.logic = variables.dataList.filter(
-          (item: any) => item.taskType === 'Logic'
+          (item: any) => item.taskCategory === 'Logic'
         )
         variables.di = variables.dataList.filter(
-          (item: any) => item.taskType === 'DataIntegration'
+          (item: any) => item.taskCategory === 'DataIntegration'
         )
         variables.dq = variables.dataList.filter(
-          (item: any) => item.taskType === 'DataQuality'
+          (item: any) => item.taskCategory === 'DataQuality'
         )
         variables.ml = variables.dataList.filter(
-          (item: any) => item.taskType === 'MachineLearning'
+          (item: any) => item.taskCategory === 'MachineLearning'
         )
         variables.other = variables.dataList.filter(
-          (item: any) => item.taskType === 'Other'
+          (item: any) => item.taskCategory === 'Other'
         )
         variables.fav = variables.dataList.filter(
           (item: any) => item.collection === true
@@ -83,10 +83,10 @@ export default defineComponent({
 
     const handleCollection = (item: any) => {
       item.collection
-        ? CancelCollection(item.taskName).then(() => {
+        ? CancelCollection(item.taskType).then(() => {
             handleDagMenu()
           })
-        : Collection(item.taskName).then(() => {
+        : Collection(item.taskType).then(() => {
             handleDagMenu()
           })
       item.collection = !item.collection
