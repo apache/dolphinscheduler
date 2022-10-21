@@ -65,6 +65,6 @@ public interface ResourceUserMapper extends BaseMapper<ResourcesUser> {
      * @return resource user relation
      */
     ResourcesUser queryResourceRelation(@Param("resourceId") int resourceId,
-                                     @Param("userId") int userId);
+                                        @Param("userId") int userId);
 
 }
