@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -49,6 +50,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
@@ -172,7 +174,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
                 return Collections.emptySet();
             }
             List<Queue> queues = queueMapper.selectList(null);
-            return queues.isEmpty() ? Collections.emptySet() : queues.stream().map(Queue::getId).collect(toSet());
+            return queues.stream().map(Queue::getId).collect(toSet());
         }
     }
 
@@ -257,9 +259,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<UdfFunc> udfFuncList = udfFuncMapper.listAuthorizedUdfByUserId(userId);
-            if (udfFuncList.isEmpty()){
-                return Collections.emptySet();
-            }
             return udfFuncList.stream().map(UdfFunc::getId).collect(toSet());
         }
 
@@ -286,9 +285,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<TaskGroup> taskGroupList = taskGroupMapper.listAuthorizedResource(userId);
-            if (taskGroupList.isEmpty()) {
-                return Collections.emptySet();
-            }
             return taskGroupList.stream().map(TaskGroup::getId).collect(Collectors.toSet());
         }
 
@@ -319,7 +315,8 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return Collections.emptySet();
+            List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+            return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
         }
     }
 
@@ -346,9 +343,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<Environment> environments = environmentMapper.queryAllEnvironmentList();
-            if (environments.isEmpty()) {
-                return Collections.emptySet();
-            }
             return environments.stream().map(Environment::getId).collect(Collectors.toSet());
         }
     }
@@ -375,7 +369,8 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return Collections.emptySet();
+            List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
+            return workerGroups.stream().map(WorkerGroup::getId).collect(Collectors.toSet());
         }
     }
 
@@ -463,9 +458,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            if (userId != 0) {
-                return Collections.emptySet();
-            }
             List<Tenant> tenantList = tenantMapper.queryAll();
             return tenantList.stream().map(Tenant::getId).collect(Collectors.toSet());
         }
