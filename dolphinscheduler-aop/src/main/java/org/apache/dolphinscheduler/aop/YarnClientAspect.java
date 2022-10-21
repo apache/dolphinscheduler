@@ -38,7 +38,7 @@ public class YarnClientAspect {
      */
     private ApplicationReport currentApplicationReport = null;
 
-    private String appInfoFilePath;
+    private final String appInfoFilePath;
     private boolean debug;
 
     public YarnClientAspect() {
@@ -64,7 +64,7 @@ public class YarnClientAspect {
                         StandardOpenOption.WRITE,
                         StandardOpenOption.APPEND);
             } catch (IOException ioException) {
-                System.out.println(
+                System.err.println(
                         "YarnClientAspect[registerAppInfo]: can't output current application information, because "
                                 + ioException.getMessage());
             }
