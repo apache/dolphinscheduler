@@ -33,7 +33,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <aspectj.version>1.9.7</aspectj.version>
-        <yarn.version>3.2.0</yarn.version>
+        <yarn.version>3.2.4</yarn.version>
     </properties>
 
     <dependencies>
