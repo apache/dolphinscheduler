@@ -61,6 +61,7 @@ const service = axios.create(baseRequestConfig)
 const err = (err: AxiosError): Promise<AxiosError> => {
   if (err.response?.status === 401 || err.response?.status === 504) {
     userStore.setSessionId('')
+    userStore.setSecurityConfigType('')
     userStore.setUserInfo({})
     router.push({ path: '/login' })
   }
