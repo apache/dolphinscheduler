@@ -72,6 +72,5 @@ ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS task_execute_type int DE
 ALTER TABLE t_ds_task_instance DROP CONSTRAINT IF EXISTS foreign_key_instance_id;
 ALTER TABLE t_ds_project alter COLUMN description type varchar(255);
 ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
-ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS description varchar(255) DEFAULT NULL;
 ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS other_params_json text DEFAULT NULL;
 ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL;
