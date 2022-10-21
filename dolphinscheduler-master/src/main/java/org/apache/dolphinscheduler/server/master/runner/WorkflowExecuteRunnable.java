@@ -605,9 +605,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 return true;
             }
             int index = complementListDate.indexOf(scheduleDate);
-            if (index >= complementListDate.size() - 1 || !processInstance.getState().isSuccess()) {
+            if (index >= complementListDate.size() - 1) {
                 logger.info("process complement end. process id:{}", processInstance.getId());
-                // complement data ends || no success
+                // complement data ends
                 return true;
             }
             logger.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
