@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
-
-import com.fasterxml.jackson.databind.util.RawValue;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.hive.HiveConnectionParam;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.parser.SQLStatementParser;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
@@ -37,16 +40,15 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.datax.entity.ColumnInfo;
 import org.apache.dolphinscheduler.plugin.task.datax.entity.DataxParameters;
+import org.apache.dolphinscheduler.plugin.task.datax.entity.ElasticSearchDataxParams;
 import org.apache.dolphinscheduler.plugin.task.datax.entity.HiveMetadata;
+import org.apache.dolphinscheduler.plugin.task.datax.enums.AliasMode;
 import org.apache.dolphinscheduler.plugin.task.datax.enums.WriteMode;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -58,26 +60,14 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
-import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
-import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 public class DataxTask extends AbstractTaskExecutor {
     /**
@@ -279,25 +269,19 @@ public class DataxTask extends AbstractTaskExecutor {
             readerParam.put("username", dataSourceCfg.getUser());
             readerParam.put("password", decodePassword(dataSourceCfg.getPassword()));
 
-            if (dataXParameters.getCustomSQL() == Flag.YES.ordinal()) {
-                ArrayNode sqlArr = readerConn.putArray("querySql");
-                for (String sql : new String[]{dataXParameters.getSql()}) {
-                    sqlArr.add(sql);
-                }
-            } else {
-                ArrayNode columnArr = readerParam.putArray("column");
-                for (ColumnInfo columnInfo : dataXParameters.getDsColumns()) {
-                    if (columnInfo.isEnable()) {
-                        columnArr.add(columnInfo.getColumnName());
-                    }
-                }
-                if (StringUtils.isNotEmpty(dataXParameters.getWhere())) {
-                    readerParam.put("where", dataXParameters.getWhere());
+            ArrayNode columnArr = readerParam.putArray("column");
+            for (ColumnInfo columnInfo : dataXParameters.getDsColumns()) {
+                if (columnInfo.isEnable()) {
+                    columnArr.add(columnInfo.getColumnName());
                 }
             }
-            if (StringUtils.isNotEmpty(dataXParameters.getSplitPk())) {
-                readerParam.put("splitPk", dataXParameters.getSplitPk());
+            if (StringUtils.isNotEmpty(dataXParameters.getWhere())) {
+                readerParam.put("where", dataXParameters.getWhere());
             }
+
+        if (StringUtils.isNotEmpty(dataXParameters.getSplitPk())) {
+            readerParam.put("splitPk", dataXParameters.getSplitPk());
+        }
 
             readerParam.putArray("connection").addAll(readerConnArr);
         }
@@ -327,6 +311,45 @@ public class DataxTask extends AbstractTaskExecutor {
             writerParam.put("fileType", hiveMetadata.getFileType());
             writerParam.put("fieldDelimiter", hiveMetadata.getFieldDelimiter());
             writerParam.put("writeMode", WriteMode.valueOf(dataXParameters.getWriteMode()).getDescp());
+        } else if (dataxTaskExecutionContext.getTargetType().isElasticsearch()) {
+            ArrayNode columnArr = writerParam.putArray("column");
+            for (ColumnInfo columnInfo : dataXParameters.getDtColumns()) {
+                if (columnInfo.isEnable()) {
+                    columnArr.add(JSONUtils.parseObject(columnInfo.getJson()));
+                }
+            }
+            ElasticSearchDataxParams elasticSearchDataxParams = dataXParameters.getElasticSearchDataxParams();
+            writerParam.put("endpoint", dataTargetCfg.getAddress());
+            writerParam.put("accessId", dataTargetCfg.getUser());
+            writerParam.put("accessKey", dataTargetCfg.getPassword());
+            writerParam.put("index", elasticSearchDataxParams.getIndex());
+            writerParam.put("type", elasticSearchDataxParams.getType());
+            writerParam.put("cleanup", elasticSearchDataxParams.isClearnUp());
+            if (elasticSearchDataxParams.getTyrSize() > 0) {
+                writerParam.put("trySize", elasticSearchDataxParams.getTyrSize());
+            }
+            if (elasticSearchDataxParams.getTimeout() > 0) {
+                writerParam.put("timeout", elasticSearchDataxParams.getTimeout());
+            }
+            writerParam.put("discovery", elasticSearchDataxParams.isDiscovery());
+            writerParam.put("compression", elasticSearchDataxParams.isCompression());
+            writerParam.put("multiThread", elasticSearchDataxParams.isMultiThread());
+            writerParam.put("ignoreWriteError", elasticSearchDataxParams.isIgnoreWriteError());
+            writerParam.put("ignoreParseError", elasticSearchDataxParams.isIgnoreParseError());
+            if (StringUtils.isNotEmpty(elasticSearchDataxParams.getAlias())) {
+                writerParam.put("alias", elasticSearchDataxParams.getAlias());
+                writerParam.put("aliasMode", AliasMode.valueOf(elasticSearchDataxParams.getAliasMode()).getDescp());
+            }
+            if (StringUtils.isNotEmpty(elasticSearchDataxParams.getSettings())) {
+                writerParam.put("settings", elasticSearchDataxParams.getSettings());
+            }
+            if (StringUtils.isNotEmpty(elasticSearchDataxParams.getSplitter())) {
+                writerParam.put("splitter", elasticSearchDataxParams.getSplitter());
+            }
+            writerParam.put("dynamic", elasticSearchDataxParams.isDynamic());
+            if (dataXParameters.getBatchSize() > 0) {
+                writerParam.put("batchSize", dataXParameters.getBatchSize());
+            }
         } else {
             List<ObjectNode> writerConnArr = new ArrayList<>();
             ObjectNode writerConn = JSONUtils.createObjectNode();

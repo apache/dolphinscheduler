@@ -75,4 +75,7 @@ public enum DbType {
     public boolean isMysql() {
         return this == DbType.MYSQL;
     }
+    public boolean isElasticsearch() {
+        return this == DbType.ELASTICSEARCH;
+    }
 }

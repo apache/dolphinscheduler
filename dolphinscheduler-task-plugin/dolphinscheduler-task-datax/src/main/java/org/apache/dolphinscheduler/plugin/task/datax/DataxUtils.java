@@ -39,6 +39,7 @@ public class DataxUtils {
     public static final String DATAX_READER_PLUGIN_CLICKHOUSE = "clickhousereader";
 
     public static final String DATAX_READER_PLUGIN_HDFS = "hdfsreader";
+    public static final String DATAX_READER_PLUGIN_RDBMS = "rdbmsreader";
 
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
@@ -50,6 +51,8 @@ public class DataxUtils {
 
     public static final String DATAX_WRITER_PLUGIN_CLICKHOUSE = "clickhousewriter";
     public static final String DATAX_WRITER_PLUGIN_HDFS = "hdfswriter";
+    public static final String DATAX_WRITER_PLUGIN_ELASTICSEARCH = "elasticsearchwriter";
+    public static final String DATAX_WRITER_PLUGIN_RDBMS = "rdbmswriter";
 
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
@@ -65,6 +68,8 @@ public class DataxUtils {
                 return DATAX_READER_PLUGIN_CLICKHOUSE;
             case HIVE:
                 return DATAX_READER_PLUGIN_HDFS;
+            case DM:
+                return DATAX_READER_PLUGIN_RDBMS;
             default:
                 return null;
         }
@@ -84,6 +89,10 @@ public class DataxUtils {
                 return DATAX_WRITER_PLUGIN_CLICKHOUSE;
             case HIVE:
                 return DATAX_WRITER_PLUGIN_HDFS;
+            case ELASTICSEARCH:
+                return DATAX_WRITER_PLUGIN_ELASTICSEARCH;
+            case DM:
+                return DATAX_WRITER_PLUGIN_RDBMS;
             default:
                 return null;
         }
