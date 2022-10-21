@@ -23,12 +23,16 @@ export const useUserStore = defineStore({
   id: 'user',
   state: (): UserState => ({
     sessionId: '',
+    securityConfigType: '',
     userInfo: {}
   }),
   persist: true,
   getters: {
     getSessionId(): string {
       return this.sessionId
+    },
+    getSecurityConfigType(): string {
+      return this.securityConfigType
     },
     getUserInfo(): UserInfoRes | {} {
       return this.userInfo
@@ -37,6 +41,9 @@ export const useUserStore = defineStore({
   actions: {
     setSessionId(sessionId: string): void {
       this.sessionId = sessionId
+    },
+    setSecurityConfigType(securityConfigType: string): void {
+      this.securityConfigType = securityConfigType
     },
     setUserInfo(userInfo: UserInfoRes | {}): void {
       this.userInfo = userInfo
