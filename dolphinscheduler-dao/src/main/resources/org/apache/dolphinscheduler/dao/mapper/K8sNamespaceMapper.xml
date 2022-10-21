@@ -70,16 +70,6 @@
         where p.id = rel.namespace_id and rel.user_id= #{userId}
     </select>
 
-    <select id="queryNamespaceAvailable" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
-        select
-        <include refid="baseSqlV2">
-            <property name="alias" value="b"/>
-        </include>
-        from ( select namespace_id  from t_ds_relation_namespace_user where user_id= #{userId} ) a
-        left join  t_ds_k8s_namespace b
-        on b.id = a.namespace_id
-        where b.id is not null
-    </select>
     <select id="queryByNamespaceCode" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
         select
         <include refid="baseSql"/>
