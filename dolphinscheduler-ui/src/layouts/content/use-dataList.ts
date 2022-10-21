@@ -349,9 +349,7 @@ export function useDataList() {
         label: t('user_dropdown.password'),
         key: 'password',
         icon: renderIcon(KeyOutlined),
-        disabled:
-          (userStore.getUserInfo as UserInfoRes).securityConfigType !==
-          'PASSWORD'
+        disabled: userStore.getSecurityConfigType !== 'PASSWORD'
       },
       {
         label: t('user_dropdown.logout'),
