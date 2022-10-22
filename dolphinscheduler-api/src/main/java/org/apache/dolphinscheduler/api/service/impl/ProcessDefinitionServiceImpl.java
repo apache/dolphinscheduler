@@ -968,13 +968,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Set<Long> diffCode =
                 definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
 
-        if (!diffCode.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(diffCode)) {
             logger.error("Process definition does not exist, processCodes:{}.",
                     diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA)));
             throw new ServiceException(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR,
                     diffCode.stream().map(code -> code + "[process definition not exist]")
-                            .collect(Collectors.joining(Constants.COMMA))
-            );
+                            .collect(Collectors.joining(Constants.COMMA)));
         }
 
         for (ProcessDefinition process : processDefinitionList) {
@@ -1003,7 +1002,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // check process instances is already running
         List<ProcessInstance> processInstances = processInstanceService
-                .queryByProcessDefineCodeAndStatus(processDefinition.getCode(), org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
+                .queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
+                        org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, processInstances.size());
         }

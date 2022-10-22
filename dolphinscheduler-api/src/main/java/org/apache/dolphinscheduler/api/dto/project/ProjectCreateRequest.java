@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.dto.project;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * project create request

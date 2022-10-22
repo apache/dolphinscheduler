@@ -49,4 +49,5 @@ DolphinScheduler provides the following network port configurations for normal o
 The minimum supported version of Google Chrome is version 85, but version 90 or above is recommended.
 
 ## Synchronize clocks
+
 To avoid problems with internal cluster communications that can impact your task execution, make sure that the clocks on all of the cluster nodes are synchronized from a common clock source, such as using Chrony and/or NTP. Synchronizing the time ensures that every node in the cluster has the same time.

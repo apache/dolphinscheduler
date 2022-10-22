@@ -98,7 +98,8 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo,
+                                   Integer pageSize);
 
     /**
      * query resource list
@@ -135,7 +136,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    Result<Object> verifyResourceName(String fullName, ResourceType type,User loginUser);
+    Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser);
 
     /**
      * verify resource by full name or pid and type
@@ -144,7 +145,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    Result<Object> queryResource(User loginUser,String fullName,Integer id,ResourceType type);
+    Result<Object> queryResource(User loginUser, String fullName, Integer id, ResourceType type);
 
     /**
      * view resource file online
@@ -154,7 +155,7 @@ public interface ResourcesService {
      * @param limit limit
      * @return resource content
      */
-    Result<Object> readResource(User loginUser,int resourceId, int skipLineNum, int limit);
+    Result<Object> readResource(User loginUser, int resourceId, int skipLineNum, int limit);
 
     /**
      * create resource file online
@@ -167,7 +168,8 @@ public interface ResourcesService {
      * @param content content
      * @return create result code
      */
-    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory);
+    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
+                                        String desc, String content, int pid, String currentDirectory);
 
     /**
      * create or update resource.
@@ -179,7 +181,8 @@ public interface ResourcesService {
      * @param content content of resource
      * @return create result code
      */
-    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc, String content);
+    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc,
+                                                       String content);
 
     /**
      * create or update resource.
@@ -200,7 +203,7 @@ public interface ResourcesService {
      * @param content content
      * @return update result cod
      */
-    Result<Object> updateResourceContent(User loginUser,int resourceId, String content);
+    Result<Object> updateResourceContent(User loginUser, int resourceId, String content);
 
     /**
      * download file

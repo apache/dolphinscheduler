@@ -27,6 +27,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class FlinkStreamTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public TaskChannel create() {
         return new FlinkStreamTaskChannel();

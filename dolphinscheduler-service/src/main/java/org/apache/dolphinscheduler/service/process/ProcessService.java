@@ -65,16 +65,6 @@ public interface ProcessService {
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
-    void moveToErrorCommand(Command command, String message);
-
-    int createCommand(Command command);
-
-    List<Command> findCommandPage(int pageSize, int pageNumber);
-
-    List<Command> findCommandPageBySlot(int pageSize, int pageNumber, int masterCount, int thisMasterSlot);
-
-    boolean verifyIsNeedCreateCommand(Command command);
-
     Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
     List<TaskDefinition> getTaskNodeListByDefinition(long defineCode);
@@ -99,8 +89,6 @@ public interface ProcessService {
 
     void recurseFindSubProcess(long parentCode, List<Long> ids);
 
-    void createRecoveryWaitingThreadCommand(Command originCommand, ProcessInstance processInstance);
-
     Tenant getTenantForProcess(int tenantId, int userId);
 
     Environment findEnvironmentByCode(Long environmentCode);
@@ -115,18 +103,9 @@ public interface ProcessService {
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
 
-    Map<String, String> getGlobalParamMap(String globalParams);
-
-    Command createSubProcessCommand(ProcessInstance parentProcessInstance,
-                                    ProcessInstance childInstance,
-                                    ProcessInstanceMap instanceMap,
-                                    TaskInstance task);
-
     TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
 
     TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance);
-
-    int saveCommand(Command command);
 
     boolean saveTaskInstance(TaskInstance taskInstance);
 

@@ -153,7 +153,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
              */
             Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(), ip);
 
-            //delete session
+            // delete session
             sessionMapper.deleteById(session.getId());
         } catch (Exception e) {
             logger.warn("userId : {} , ip : {} , find more one session", loginUser.getId(), ip, e);

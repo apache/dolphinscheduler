@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -134,7 +133,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         workerGroup.setId(12);
         workerGroup.setName("测试");
         Mockito.when(workerGroupMapper.selectById(12)).thenReturn(workerGroup);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试",
+                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
                 .thenReturn(null);
         Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
         Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);

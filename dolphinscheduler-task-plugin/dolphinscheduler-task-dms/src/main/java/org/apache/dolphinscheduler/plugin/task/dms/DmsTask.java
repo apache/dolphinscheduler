@@ -44,11 +44,11 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 public class DmsTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
-        new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
     /**
      * taskExecutionContext
      */
@@ -102,7 +102,8 @@ public class DmsTask extends AbstractRemoteTask {
         dmsHook.setReplicationTaskArn(appId.getReplicationTaskArn());
         // if CdcStopPosition is not set, the task will not continue to check the running status
         if (isStopTaskWhenCdc()) {
-            logger.info("This is a cdc task and cdcStopPosition is not set, the task will not continue to check the running status");
+            logger.info(
+                    "This is a cdc task and cdcStopPosition is not set, the task will not continue to check the running status");
             exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
             return;
         }
@@ -166,7 +167,8 @@ public class DmsTask extends AbstractRemoteTask {
         } catch (InvalidResourceStateException e) {
             logger.error("Failed to start a task, error message: {}", e.getErrorMessage());
 
-            // Only restart task when the error contains "Test connection", means instance can not connect to source or target
+            // Only restart task when the error contains "Test connection", means instance can not connect to source or
+            // target
             if (!e.getErrorMessage().contains("Test connection")) {
                 return TaskConstants.EXIT_CODE_FAILURE;
             }
@@ -231,7 +233,8 @@ public class DmsTask extends AbstractRemoteTask {
         // create a new parameter object using the json data if the json data is not empty
         if (parameters.getIsJsonFormat() && parameters.getJsonData() != null) {
             // combining local and global parameters
-            String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(), ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
+            String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(),
+                    ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
 
             boolean isRestartTask = parameters.getIsRestartTask();
             try {
