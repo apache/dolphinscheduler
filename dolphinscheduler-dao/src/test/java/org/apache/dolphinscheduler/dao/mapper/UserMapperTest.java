@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -73,13 +74,7 @@ public class UserMapperTest extends BaseDaoTest {
         return user;
     }
 
-    /**
-     * insert one user
-     *
-     * @param tenant tenant
-     * @return User
-     */
-    private User insertOne(Tenant tenant) {
+    private User insertOneUser(Tenant tenant) {
         User user = new User();
         user.setUserName("user1");
         user.setUserPassword("1");
@@ -87,6 +82,7 @@ public class UserMapperTest extends BaseDaoTest {
         user.setUserType(UserType.GENERAL_USER);
         user.setCreateTime(new Date());
         user.setTenantId(tenant.getId());
+        user.setTenantCode(tenant.getTenantCode());
         user.setUpdateTime(new Date());
         userMapper.insert(user);
         return user;
@@ -286,9 +282,9 @@ public class UserMapperTest extends BaseDaoTest {
     public void testQueryTenantCodeByUserId() {
         //insertOneTenant
         Tenant tenant = insertOneTenant();
-        //insertOne
-        User user = insertOne(tenant);
-        //queryTenantCodeByUserId
+        // insertOne
+        User user = insertOneUser(tenant);
+        // queryTenantCodeByUserId
         User queryUser = userMapper.queryTenantCodeByUserId(user.getId());
         Assert.assertEquals(queryUser, user);
     }
@@ -304,8 +300,7 @@ public class UserMapperTest extends BaseDaoTest {
         AccessToken accessToken = insertOneAccessToken(user);
         //queryUserByToken
         User userToken = userMapper.queryUserByToken(accessToken.getToken(), new Date());
-        Assert.assertEquals(userToken, user);
-
+        Assertions.assertEquals(userToken.getId(), user.getId());
     }
 
     @Test

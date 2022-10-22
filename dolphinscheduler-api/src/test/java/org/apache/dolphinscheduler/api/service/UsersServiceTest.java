@@ -62,6 +62,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -294,26 +295,20 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testUpdateUser() {
+    public void testUpdateUser() throws IOException {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
-        try {
-            // user not exist
-            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword,
-                    "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
-            Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-            logger.info(result.toString());
+        // user not exist
+        Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword,
+                "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
-            // success
-            when(userMapper.selectById(1)).thenReturn(getUser());
-            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
-                    "13457864543", "queue", 1, "Asia/Shanghai");
-            logger.info(result.toString());
-            Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        } catch (Exception e) {
-            logger.error("update user error", e);
-            Assert.fail();
-        }
+        // success
+        when(userMapper.selectById(1)).thenReturn(getUser());
+        when(userMapper.updateById(any())).thenReturn(1);
+        result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
+                "13457864543", "queue", 1, "Asia/Shanghai");
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
