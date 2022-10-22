@@ -48,6 +48,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,6 +63,8 @@ import io.micrometer.core.annotation.Counted;
  */
 @Component
 public class CommandServiceImpl implements CommandService {
+
+    private final Logger logger = LoggerFactory.getLogger(CommandServiceImpl.class);
 
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
@@ -99,11 +104,6 @@ public class CommandServiceImpl implements CommandService {
         command.setId(null);
         result = commandMapper.insert(command);
         return result;
-    }
-
-    @Override
-    public List<Command> findCommandPage(int pageSize, int pageNumber) {
-        return commandMapper.queryCommandPage(pageSize, pageNumber * pageSize);
     }
 
     @Override
@@ -147,15 +147,6 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public int saveCommand(Command command) {
-        if (command.getId() != null) {
-            return commandMapper.updateById(command);
-        } else {
-            return commandMapper.insert(command);
-        }
-    }
-
-    @Override
     public void createRecoveryWaitingThreadCommand(Command originCommand, ProcessInstance processInstance) {
         // sub process doesn't need to create wait command
         if (processInstance.getIsSubProcess() == Flag.YES) {
@@ -185,14 +176,14 @@ public class CommandServiceImpl implements CommandService {
                     processInstance.getId(),
                     processInstance.getProcessDefinitionVersion(),
                     processInstance.getTestFlag());
-            saveCommand(command);
+            upsertCommand(command);
             return;
         }
 
-        // update the command time if current command if recover from waiting
+        // update the command time if current command is recover from waiting
         if (originCommand.getCommandType() == CommandType.RECOVER_WAITING_THREAD) {
             originCommand.setUpdateTime(new Date());
-            saveCommand(originCommand);
+            upsertCommand(originCommand);
         } else {
             // delete old command and create new waiting thread command
             commandMapper.deleteById(originCommand.getId());
@@ -201,7 +192,15 @@ public class CommandServiceImpl implements CommandService {
             originCommand.setUpdateTime(new Date());
             originCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
             originCommand.setProcessInstancePriority(processInstance.getProcessInstancePriority());
-            saveCommand(originCommand);
+            upsertCommand(originCommand);
+        }
+    }
+
+    private int upsertCommand(@NotNull Command command) {
+        if (command.getId() != null) {
+            return commandMapper.updateById(command);
+        } else {
+            return commandMapper.insert(command);
         }
     }
 
@@ -212,8 +211,13 @@ public class CommandServiceImpl implements CommandService {
         Map<String, Object> subProcessParam = JSONUtils.toMap(task.getTaskParams(), String.class, Object.class);
         long childDefineCode = 0L;
         if (subProcessParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
-            childDefineCode =
-                    Long.parseLong(String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
+            try {
+                childDefineCode =
+                        Long.parseLong(String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
+            } catch (NumberFormatException nfe) {
+                logger.error("processDefinitionCode is not a number", nfe);
+                return null;
+            }
         }
         ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
 

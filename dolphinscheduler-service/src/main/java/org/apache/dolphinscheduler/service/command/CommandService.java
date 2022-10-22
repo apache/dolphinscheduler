@@ -48,14 +48,6 @@ public interface CommandService {
      * Get command page
      * @param pageSize page size
      * @param pageNumber page number
-     * @return command page
-     */
-    List<Command> findCommandPage(int pageSize, int pageNumber);
-
-    /**
-     * Get command page
-     * @param pageSize page size
-     * @param pageNumber page number
      * @param masterCount master count
      * @param thisMasterSlot master slot
      * @return command page
@@ -69,14 +61,6 @@ public interface CommandService {
      * @return create command result
      */
     boolean verifyIsNeedCreateCommand(Command command);
-
-    /**
-     * insert or update command
-     *
-     * @param command command
-     * @return save command result
-     */
-    int saveCommand(Command command);
 
     /**
      * create recovery waiting thread command when thread pool is not enough for the process instance.

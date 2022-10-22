@@ -1290,6 +1290,10 @@ public class ProcessServiceImpl implements ProcessService {
         }
         Command subProcessCommand =
                 commandService.createSubProcessCommand(parentProcessInstance, childInstance, instanceMap, task);
+        if (subProcessCommand == null) {
+            logger.error("create sub process command failed, so skip creating command");
+            return;
+        }
         updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionCode());
         initSubInstanceState(childInstance);
         commandService.createCommand(subProcessCommand);
