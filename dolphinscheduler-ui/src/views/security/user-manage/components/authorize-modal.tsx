@@ -50,7 +50,6 @@ const props = {
     default: 'auth_project'
   }
 }
-let projectIds: string
 export const AuthorizeModal = defineComponent({
   name: 'authorize-project-modal',
   props,
@@ -66,7 +65,7 @@ export const AuthorizeModal = defineComponent({
       if (result) onCancel()
     }
 
-    // 新增部分
+    let projectIds!: string
     const { columnsRef } = useColumns()
     const handleCheck = (rowKeys: Array<number>) => {
       projectIds = rowKeys.join()
@@ -83,6 +82,7 @@ export const AuthorizeModal = defineComponent({
     return {
       t,
       columnsRef,
+      projectIds,
       rowKey: (row: any) => row.id,
       ...toRefs(state),
       onCancel,
@@ -113,13 +113,13 @@ export const AuthorizeModal = defineComponent({
 
           <NSpace vertical>
             <NSpace>
-              <NButton size='small' type='primary' onClick={() => this.revokeProjectByIdRequest(userId, projectIds)}>
+              <NButton size='small' type='primary' onClick={() => this.revokeProjectByIdRequest(userId, this.projectIds)}>
                 {t('security.user.revoke_auth')}
               </NButton>
-              <NButton size='small' type='primary' onClick={() => this.grantProjectWithReadPermRequest(userId, projectIds)}>
+              <NButton size='small' type='primary' onClick={() => this.grantProjectWithReadPermRequest(userId, this.projectIds)}>
               {t('security.user.grant_read')}
               </NButton>
-              <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, projectIds)}>
+              <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, this.projectIds)}>
               {t('security.user.grant_all')}
               </NButton>
               <NInput
