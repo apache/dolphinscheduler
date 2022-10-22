@@ -21,16 +21,13 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * http parameter
- */
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 public class HttpParametersTest {
 
     @Test
@@ -99,14 +96,14 @@ public class HttpParametersTest {
         httpParameters.setLocalParams(localParams);
         String result = httpParameters.setBodyReturn(body, httpParameters.getLocalParams());
 
-        Assert.assertTrue(httpParameters.checkParameters());
-        Assert.assertEquals(10000,httpParameters.getConnectTimeout());
-        Assert.assertEquals(10000,httpParameters.getSocketTimeout());
-        Assert.assertEquals("https://www.baidu.com/",httpParameters.getUrl());
-        Assert.assertEquals(HttpMethod.GET,httpParameters.getHttpMethod());
-        Assert.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT,httpParameters.getHttpCheckCondition());
-        Assert.assertEquals("",httpParameters.getCondition());
-        Assert.assertEquals(1,httpParameters.getLocalParametersMap().size());
-        Assert.assertEquals(0,httpParameters.getResourceFilesList().size());
+        Assertions.assertTrue(httpParameters.checkParameters());
+        Assertions.assertEquals(10000, httpParameters.getConnectTimeout());
+        Assertions.assertEquals(10000, httpParameters.getSocketTimeout());
+        Assertions.assertEquals("https://www.baidu.com/", httpParameters.getUrl());
+        Assertions.assertEquals(HttpMethod.GET, httpParameters.getHttpMethod());
+        Assertions.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT, httpParameters.getHttpCheckCondition());
+        Assertions.assertEquals("", httpParameters.getCondition());
+        Assertions.assertEquals(1, httpParameters.getLocalParametersMap().size());
+        Assertions.assertEquals(0, httpParameters.getResourceFilesList().size());
     }
 }
