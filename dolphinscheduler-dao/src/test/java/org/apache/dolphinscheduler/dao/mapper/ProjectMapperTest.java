@@ -50,7 +50,7 @@ public class ProjectMapperTest extends BaseDaoTest {
      * @return Project
      */
     private Project insertOne() {
-        //insertOne
+        // insertOne
         Project project = new Project();
         project.setName("ut project");
         project.setUserId(111);
@@ -66,10 +66,10 @@ public class ProjectMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Project project = insertOne();
         project.setCreateTime(new Date());
-        //update
+        // update
         int update = projectMapper.updateById(project);
         Assertions.assertEquals(update, 1);
     }
@@ -90,7 +90,7 @@ public class ProjectMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Project project = insertOne();
-        //query
+        // query
         List<Project> projects = projectMapper.selectList(null);
         Assertions.assertNotEquals(projects.size(), 0);
     }
@@ -146,15 +146,13 @@ public class ProjectMapperTest extends BaseDaoTest {
 
         Page<Project> page = new Page(1, 3);
         IPage<Project> projectIPage = projectMapper.queryProjectListPaging(
-            page,
-            null,
-            null
-        );
+                page,
+                null,
+                null);
         IPage<Project> projectIPage1 = projectMapper.queryProjectListPaging(
-            page,
-            null,
-            project.getName()
-        );
+                page,
+                null,
+                project.getName());
         Assertions.assertEquals(projectIPage.getTotal(), 1);
         Assertions.assertEquals(projectIPage1.getTotal(), 1);
     }
@@ -192,8 +190,7 @@ public class ProjectMapperTest extends BaseDaoTest {
         Project project = insertOne();
 
         List<Project> projects = projectMapper.queryProjectExceptUserId(
-            100000
-        );
+                100000);
 
         Assertions.assertNotEquals(projects.size(), 0);
     }

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * Authorization type
  */
 public enum AuthorizationType {
+
     /**
      * 0 RESOURCE_FILE_ID;
      * 1 RESOURCE_FILE_NAME;
@@ -53,14 +54,14 @@ public enum AuthorizationType {
     ALERT_GROUP(7, "alert group"),
     ENVIRONMENT(8, "environment"),
     ACCESS_TOKEN(9, "access token"),
-    QUEUE(10,"queue"),
-    DATA_ANALYSIS(11,"data analysis"),
-    K8S_NAMESPACE(12,"k8s namespace"),
-    MONITOR(13,"monitor"),
-    ALERT_PLUGIN_INSTANCE(14,"alert plugin instance"),
-    TENANT(15,"tenant"),
-    DATA_QUALITY(16,"data quality"),
-    TASK_GROUP(17,"task group"),
+    QUEUE(10, "queue"),
+    DATA_ANALYSIS(11, "data analysis"),
+    K8S_NAMESPACE(12, "k8s namespace"),
+    MONITOR(13, "monitor"),
+    ALERT_PLUGIN_INSTANCE(14, "alert plugin instance"),
+    TENANT(15, "tenant"),
+    DATA_QUALITY(16, "data quality"),
+    TASK_GROUP(17, "task group"),
     ;
 
     AuthorizationType(int code, String descp) {

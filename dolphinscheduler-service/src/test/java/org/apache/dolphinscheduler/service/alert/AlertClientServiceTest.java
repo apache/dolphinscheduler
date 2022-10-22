@@ -24,6 +24,11 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,10 +39,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @ExtendWith(MockitoExtension.class)
 public class AlertClientServiceTest {

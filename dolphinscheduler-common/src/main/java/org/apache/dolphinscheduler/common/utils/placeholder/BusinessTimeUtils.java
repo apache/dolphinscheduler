@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
+import static org.apache.commons.lang3.time.DateUtils.addDays;
 import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_DATE;
 import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME;
 import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
-
-import static org.apache.commons.lang3.time.DateUtils.addDays;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -34,6 +33,7 @@ import java.util.Map;
  * business time utils
  */
 public class BusinessTimeUtils {
+
     private BusinessTimeUtils() {
         throw new IllegalStateException("BusinessTimeUtils class");
     }

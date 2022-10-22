@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Date;
 
 public class AuditMessage {
+
     private User user;
 
     private Date auditDate;
@@ -34,7 +35,8 @@ public class AuditMessage {
 
     private Integer resourceId;
 
-    public AuditMessage(User user, Date auditDate, AuditResourceType resourceType, AuditOperationType operation, Integer resourceId) {
+    public AuditMessage(User user, Date auditDate, AuditResourceType resourceType, AuditOperationType operation,
+                        Integer resourceId) {
         this.user = user;
         this.auditDate = auditDate;
         this.resourceType = resourceType;

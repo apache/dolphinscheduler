@@ -44,10 +44,10 @@ public class TaskExecuteResultMessageSender implements MessageSender<TaskExecute
 
     public TaskExecuteResultCommand buildMessage(TaskExecutionContext taskExecutionContext,
                                                  String messageReceiverAddress) {
-        TaskExecuteResultCommand taskExecuteResultMessage
-            = new TaskExecuteResultCommand(workerConfig.getWorkerAddress(),
-                                           messageReceiverAddress,
-                                           System.currentTimeMillis());
+        TaskExecuteResultCommand taskExecuteResultMessage =
+                new TaskExecuteResultCommand(workerConfig.getWorkerAddress(),
+                        messageReceiverAddress,
+                        System.currentTimeMillis());
         taskExecuteResultMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskExecuteResultMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecuteResultMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());

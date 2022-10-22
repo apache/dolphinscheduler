@@ -62,20 +62,20 @@ public class LowerWeightRoundRobin extends AbstractSelector<HostWeight> {
         if (CollectionUtils.isEmpty(sources)) {
             return Collections.emptyList();
         }
-        List<HostWeight> zeroWaitingTask = sources.stream().filter(h -> h.getWaitingTaskCount() == 0).collect(Collectors.toList());
+        List<HostWeight> zeroWaitingTask =
+                sources.stream().filter(h -> h.getWaitingTaskCount() == 0).collect(Collectors.toList());
         if (!zeroWaitingTask.isEmpty()) {
             return zeroWaitingTask;
         }
         HostWeight hostWeight = sources.stream().min(Comparator.comparing(HostWeight::getWaitingTaskCount)).get();
         List<HostWeight> waitingTask = Lists.newArrayList(hostWeight);
-        List<HostWeight> equalWaitingTask = sources.stream().filter(h -> !h.getHost().equals(hostWeight.getHost()) && h.getWaitingTaskCount() == hostWeight.getWaitingTaskCount())
-            .collect(Collectors.toList());
+        List<HostWeight> equalWaitingTask = sources.stream()
+                .filter(h -> !h.getHost().equals(hostWeight.getHost())
+                        && h.getWaitingTaskCount() == hostWeight.getWaitingTaskCount())
+                .collect(Collectors.toList());
         if (!equalWaitingTask.isEmpty()) {
             waitingTask.addAll(equalWaitingTask);
         }
         return waitingTask;
     }
 }
-
-
-

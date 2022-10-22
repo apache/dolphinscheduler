@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.microbench.base;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Scope;
@@ -117,9 +117,17 @@ public abstract class AbstractBaseBenchmark {
     }
 
     private static int getForks() {
-        String value = System.getProperty("forkCount");
-        return null != value ? Integer.parseInt(value) : -1;
+        String forkCount = System.getProperty("forkCount");
+        if (forkCount == null) {
+            return -1;
+        }
+
+        try {
+            return Integer.parseInt(forkCount);
+        } catch (NumberFormatException e) {
+            logger.error("fail to convert forkCount into int", e);
+        }
+
+        return -1;
     }
-
 }
-
