@@ -485,6 +485,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * update process instance
      *
      * @param loginUser login user
+     * @param name project name
+     * @param description description
      * @param projectCode project code
      * @param taskRelationJson process task relation json
      * @param taskDefinitionJson taskDefinitionJson
@@ -499,7 +501,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     @Transactional
     @Override
-    public Map<String, Object> updateProcessInstance(User loginUser, long projectCode, Integer processInstanceId,
+    public Map<String, Object> updateProcessInstance(User loginUser, String name, String description, long projectCode,
+                                                     Integer processInstanceId,
                                                      String taskRelationJson,
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine,
                                                      String globalParams,
@@ -585,7 +588,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             }
             tenantId = tenant.getId();
         }
-        processDefinition.set(projectCode, processDefinition.getName(), processDefinition.getDescription(),
+        processDefinition.set(projectCode, name, description,
                 globalParams, locations, timeout, tenantId);
         processDefinition.setUpdateTime(new Date());
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, syncDefine, Boolean.FALSE);
