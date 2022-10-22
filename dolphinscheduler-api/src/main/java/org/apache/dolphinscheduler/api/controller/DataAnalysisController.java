@@ -23,18 +23,12 @@ import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_INSTANC
 import static org.apache.dolphinscheduler.api.enums.Status.QUEUE_COUNT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_INSTANCE_STATE_COUNT_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
 
 import java.util.Map;
 
@@ -47,6 +41,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * data analysis controller
@@ -70,9 +69,9 @@ public class DataAnalysisController extends BaseController {
      */
     @Operation(summary = "countTaskState", description = "COUNT_TASK_STATE_NOTES")
     @Parameters({
-            @Parameter(name = "startDate", description = "START_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endDate", description = "END_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/task-state-count")
     @ResponseStatus(HttpStatus.OK)
@@ -99,9 +98,9 @@ public class DataAnalysisController extends BaseController {
      */
     @Operation(summary = "countProcessInstanceState", description = "COUNT_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "startDate", description = "START_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endDate", description = "END_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/process-state-count")
     @ResponseStatus(HttpStatus.OK)
@@ -126,7 +125,7 @@ public class DataAnalysisController extends BaseController {
      */
     @Operation(summary = "countDefinitionByUser", description = "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/define-user-count")
     @ResponseStatus(HttpStatus.OK)

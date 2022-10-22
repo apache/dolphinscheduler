@@ -23,11 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTE_RESULT_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RULE_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RULE_LIST_PAGING_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
@@ -35,7 +30,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-
 
 import java.util.Map;
 
@@ -48,6 +42,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * data quality controller
@@ -70,7 +69,7 @@ public class DataQualityController extends BaseController {
      */
     @Operation(summary = "getRuleFormCreateJson", description = "GET_RULE_FORM_CREATE_JSON_NOTES")
     @Parameters({
-            @Parameter(name = "ruleId", description = "RULE_ID", schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "ruleId", description = "RULE_ID", schema = @Schema(implementation = int.class, example = "1"))
     })
     @GetMapping(value = "/getRuleFormCreateJson")
     @ResponseStatus(HttpStatus.OK)
@@ -91,12 +90,12 @@ public class DataQualityController extends BaseController {
      */
     @Operation(summary = "queryRuleListPaging", description = "QUERY_RULE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "ruleType", description = "RULE_TYPE", schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "startDate", description = "START_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endDate", description = "END_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", schema =@Schema( implementation = int.class, example = "10"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "ruleType", description = "RULE_TYPE", schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping(value = "/rule/page")
     @ResponseStatus(HttpStatus.OK)
@@ -145,13 +144,13 @@ public class DataQualityController extends BaseController {
      */
     @Operation(summary = "queryExecuteResultListPaging", description = "QUERY_EXECUTE_RESULT_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "ruleType", description = "RULE_TYPE", schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "state", description = "STATE", schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "startDate", description = "START_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endDate", description = "END_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", schema =@Schema( implementation = int.class, example = "10"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "ruleType", description = "RULE_TYPE", schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "state", description = "STATE", schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping(value = "/result/page")
     @ResponseStatus(HttpStatus.OK)
@@ -182,7 +181,7 @@ public class DataQualityController extends BaseController {
      */
     @Operation(summary = "getDatasourceOptionsById", description = "GET_DATASOURCE_OPTIONS_NOTES")
     @Parameters({
-            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", schema = @Schema(implementation = int.class, example = "1"))
     })
     @GetMapping(value = "/getDatasourceOptionsById")
     @ResponseStatus(HttpStatus.OK)

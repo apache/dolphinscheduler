@@ -19,10 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.CreateTokenRequest;
 import org.apache.dolphinscheduler.api.dto.CreateTokenResponse;
@@ -31,7 +27,6 @@ import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,6 +37,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * access token controller
@@ -64,7 +63,7 @@ public class AccessTokenV2Controller extends BaseController {
     @Operation(summary = "createTokenV2", description = "CREATE_TOKEN_V2")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @Parameter(name = "createTokenRequest", description = "createTokenRequest", required = true, schema =@Schema( implementation = CreateTokenRequest.class))
+    @Parameter(name = "createTokenRequest", description = "createTokenRequest", required = true, schema = @Schema(implementation = CreateTokenRequest.class))
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public CreateTokenResponse createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,

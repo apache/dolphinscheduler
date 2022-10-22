@@ -21,11 +21,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_R
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationDeleteRequest;
@@ -50,6 +45,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * process task relation controller
@@ -90,7 +91,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
      */
     @Operation(summary = "delete", description = "DELETE_PROCESS_TASK_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "code-pair", description = "TASK_DEFINITION_CODE", schema =@Schema( implementation = long.class, example = "123456,78901", required = true))
+            @Parameter(name = "code-pair", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456,78901", required = true))
     })
     @DeleteMapping(value = "/{code-pair}")
     @ResponseStatus(HttpStatus.OK)
@@ -114,7 +115,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
      */
     @Operation(summary = "update", description = "UPDATE_PROCESS_TASK_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "DOWMSTREAM_TASK_DEFINITION_CODE", schema =@Schema( implementation = long.class, example = "123456", required = true))
+            @Parameter(name = "code", description = "DOWMSTREAM_TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)

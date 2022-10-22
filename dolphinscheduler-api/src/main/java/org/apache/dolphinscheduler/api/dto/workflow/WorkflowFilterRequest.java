@@ -25,14 +25,12 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.v3.oas.annotations.media.Schema;;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * workflow query response
  */
-@Schema(name ="WORKFLOW-QUERY")
+@Schema(name = "WORKFLOW-QUERY")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data

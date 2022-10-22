@@ -41,11 +41,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_UDF_FUNCTION_N
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
@@ -82,6 +77,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * resources controller
  */
@@ -108,11 +109,11 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "createDirectory", description = "CREATE_RESOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class)),
-            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "RESOURCE_DESC", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/directory")
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -134,12 +135,12 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "createResource", description = "CREATE_RESOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class)),
-            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "RESOURCE_DESC", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema =@Schema( implementation = MultipartFile.class)),
-            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class)),
+            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping()
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -168,11 +169,11 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "updateResource", description = "UPDATE_RESOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class)),
-            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "RESOURCE_DESC", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema =@Schema( implementation = MultipartFile.class))
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class))
     })
     @PutMapping(value = "/{id}")
     @ApiException(UPDATE_RESOURCE_ERROR)
@@ -196,7 +197,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "queryResourceList", description = "QUERY_RESOURCE_LIST_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
@@ -220,11 +221,11 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "queryResourceListPaging", description = "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class)),
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -255,7 +256,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "deleteResource", description = "DELETE_RESOURCE_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -276,8 +277,8 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "verifyResourceName", description = "VERIFY_RESOURCE_NAME_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class)),
-            @Parameter(name = "fullName", description = "RESOURCE_FULL_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "fullName", description = "RESOURCE_FULL_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
@@ -298,7 +299,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "queryResourceByProgramType", description = "QUERY_RESOURCE_LIST_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
     })
     @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.OK)
@@ -321,9 +322,9 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "queryResource", description = "QUERY_BY_RESOURCE_NAME")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class)),
-            @Parameter(name = "fullName", description = "RESOURCE_FULL_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "id", description = "RESOURCE_ID", required = false, schema =@Schema( implementation = int.class, example = "10"))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "fullName", description = "RESOURCE_FULL_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "id", description = "RESOURCE_ID", required = false, schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -348,9 +349,9 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "viewResource", description = "VIEW_RESOURCE_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "skipLineNum", description = "SKIP_LINE_NUM", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "limit", description = "LIMIT", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "skipLineNum", description = "SKIP_LINE_NUM", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/view")
     @ApiException(VIEW_RESOURCE_FILE_ON_LINE_ERROR)
@@ -369,13 +370,13 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "onlineCreateResource", description = "ONLINE_CREATE_RESOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema =@Schema( implementation = ResourceType.class)),
-            @Parameter(name = "fileName", description = "RESOURCE_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "suffix", description = "SUFFIX", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "RESOURCE_DESC", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "content", description = "CONTENT", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "currentDir", description = "RESOURCE_CURRENTDIR", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "fileName", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "suffix", description = "SUFFIX", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "content", description = "CONTENT", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "currentDir", description = "RESOURCE_CURRENTDIR", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/online-create")
     @ApiException(CREATE_RESOURCE_FILE_ON_LINE_ERROR)
@@ -406,8 +407,8 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "updateResourceContent", description = "UPDATE_RESOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "content", description = "CONTENT", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "content", description = "CONTENT", required = true, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{id}/update-content")
     @ApiException(EDIT_RESOURCE_FILE_ON_LINE_ERROR)
@@ -431,7 +432,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "downloadResource", description = "DOWNLOAD_RESOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/download")
     @ResponseBody
@@ -464,13 +465,13 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "createUdfFunc", description = "CREATE_UDF_FUNCTION_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema =@Schema( implementation = UdfType.class)),
-            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "argTypes", description = "ARG_TYPES", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "database", description = "DATABASE_NAME", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "UDF_DESC", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "resourceId", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class)),
+            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "argTypes", description = "ARG_TYPES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "database", description = "DATABASE_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "UDF_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "resourceId", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
 
     })
     @PostMapping(value = "/{resourceId}/udf-func")
@@ -499,7 +500,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "viewUIUdfFunction", description = "VIEW_UDF_FUNCTION_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
 
     })
     @GetMapping(value = "/{id}/udf-func")
@@ -527,14 +528,14 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "updateUdfFunc", description = "UPDATE_UDF_FUNCTION_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "UDF_ID", required = true, schema =@Schema( implementation = int.class)),
-            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema =@Schema( implementation = UdfType.class)),
-            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "argTypes", description = "ARG_TYPES", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "database", description = "DATABASE_NAME", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "UDF_DESC", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "resourceId", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "UDF_ID", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class)),
+            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "argTypes", description = "ARG_TYPES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "database", description = "DATABASE_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "UDF_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "resourceId", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
 
     })
     @PutMapping(value = "/{resourceId}/udf-func/{id}")
@@ -564,9 +565,9 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "queryUdfFuncListPaging", description = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping(value = "/udf-func")
     @ResponseStatus(HttpStatus.OK)
@@ -592,7 +593,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "queryUdfFuncList", description = "QUERY_UDF_FUNC_LIST_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema =@Schema( implementation = UdfType.class))
+            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class))
     })
     @GetMapping(value = "/udf-func/list")
     @ResponseStatus(HttpStatus.OK)
@@ -612,7 +613,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "verifyUdfFuncName", description = "VERIFY_UDF_FUNCTION_NAME_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "FUNC_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "name", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class))
 
     })
     @GetMapping(value = "/udf-func/verify-name")
@@ -633,7 +634,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "deleteUdfFunc", description = "DELETE_UDF_FUNCTION_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "UDF_FUNC_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "UDF_FUNC_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/udf-func/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -653,7 +654,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "authorizedFile", description = "AUTHORIZED_FILE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-file")
     @ResponseStatus(HttpStatus.CREATED)
@@ -674,7 +675,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "authorizeResourceTree", description = "AUTHORIZE_RESOURCE_TREE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-resource-tree")
     @ResponseStatus(HttpStatus.CREATED)
@@ -695,7 +696,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "unauthUDFFunc", description = "UNAUTHORIZED_UDF_FUNC_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/unauth-udf-func")
     @ResponseStatus(HttpStatus.CREATED)
@@ -717,7 +718,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "authUDFFunc", description = "AUTHORIZED_UDF_FUNC_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-udf-func")
     @ResponseStatus(HttpStatus.CREATED)
@@ -738,7 +739,7 @@ public class ResourcesController extends BaseController {
      */
     @Operation(summary = "queryResourceById", description = "QUERY_BY_RESOURCE_NAME")
     @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "10"))
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping(value = "/{id}/query")
     @ResponseStatus(HttpStatus.OK)

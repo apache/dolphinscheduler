@@ -24,11 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_PLU
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_PLUGIN_INSTANCE_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -55,6 +50,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * alert plugin instance controller
@@ -80,9 +80,9 @@ public class AlertPluginInstanceController extends BaseController {
      */
     @Operation(summary = "createAlertPluginInstance", description = "CREATE_ALERT_PLUGIN_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "pluginDefineId", description = "ALERT_PLUGIN_DEFINE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "instanceName", description = "ALERT_PLUGIN_INSTANCE_NAME", required = true, schema =@Schema( implementation = String.class, example = "DING TALK")),
-            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema =@Schema( implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
+            @Parameter(name = "pluginDefineId", description = "ALERT_PLUGIN_DEFINE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "instanceName", description = "ALERT_PLUGIN_INSTANCE_NAME", required = true, schema = @Schema(implementation = String.class, example = "DING TALK")),
+            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema = @Schema(implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -108,9 +108,9 @@ public class AlertPluginInstanceController extends BaseController {
      */
     @Operation(summary = "updateAlertPluginInstance", description = "UPDATE_ALERT_PLUGIN_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "alertPluginInstanceId", description = "ALERT_PLUGIN_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "instanceName", description = "ALERT_PLUGIN_INSTANCE_NAME", required = true, schema =@Schema( implementation = String.class, example = "DING TALK")),
-            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema =@Schema( implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
+            @Parameter(name = "alertPluginInstanceId", description = "ALERT_PLUGIN_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "instanceName", description = "ALERT_PLUGIN_INSTANCE_NAME", required = true, schema = @Schema(implementation = String.class, example = "DING TALK")),
+            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema = @Schema(implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -134,7 +134,7 @@ public class AlertPluginInstanceController extends BaseController {
      */
     @Operation(summary = "deleteAlertPluginInstance", description = "DELETE_ALERT_PLUGIN_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "ALERT_PLUGIN_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "ALERT_PLUGIN_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -190,7 +190,7 @@ public class AlertPluginInstanceController extends BaseController {
      */
     @Operation(summary = "verifyAlertInstanceName", description = "VERIFY_ALERT_INSTANCE_NAME_NOTES")
     @Parameters({
-            @Parameter(name = "alertInstanceName", description = "ALERT_INSTANCE_NAME", required = true, schema =@Schema( implementation = String.class)),
+            @Parameter(name = "alertInstanceName", description = "ALERT_INSTANCE_NAME", required = true, schema = @Schema(implementation = String.class)),
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
@@ -218,9 +218,9 @@ public class AlertPluginInstanceController extends BaseController {
      */
     @Operation(summary = "queryAlertPluginInstanceListPaging", description = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)

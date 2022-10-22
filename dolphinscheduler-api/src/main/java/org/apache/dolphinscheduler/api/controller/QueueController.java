@@ -22,11 +22,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_QUEUE_LIST_ERRO
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
@@ -46,6 +41,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * queue controller
@@ -84,9 +85,9 @@ public class QueueController extends BaseController {
      */
     @Operation(summary = "queryQueueListPaging", description = "QUERY_QUEUE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -116,8 +117,8 @@ public class QueueController extends BaseController {
      */
     @Operation(summary = "createQueue", description = "CREATE_QUEUE_NOTES")
     @Parameters({
-            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -140,9 +141,9 @@ public class QueueController extends BaseController {
      */
     @Operation(summary = "updateQueue", description = "UPDATE_QUEUE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "QUEUE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "id", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -165,8 +166,8 @@ public class QueueController extends BaseController {
      */
     @Operation(summary = "verifyQueue", description = "VERIFY_QUEUE_NOTES")
     @Parameters({
-            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)

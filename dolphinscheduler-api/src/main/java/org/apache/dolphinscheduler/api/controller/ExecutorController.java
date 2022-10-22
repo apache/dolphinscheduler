@@ -23,11 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTA
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -69,6 +64,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * executor controller
  */
@@ -105,23 +106,23 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "startProcessInstance", description = "RUN_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = Long.class), example = "100"),
-            @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", required = true, schema =@Schema( implementation = String.class), example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
-            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema =@Schema( implementation = FailureStrategy.class)),
-            @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", schema =@Schema( implementation = TaskDependType.class)),
-            @Parameter(name = "execType", description = "COMMAND_TYPE", schema =@Schema( implementation = CommandType.class)),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema =@Schema( implementation = WarningType.class)),
-            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "runMode", description = "RUN_MODE", schema =@Schema( implementation = RunMode.class)),
-            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema =@Schema( implementation = Priority.class)),
-            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema =@Schema( implementation = String.class, example = "default")),
-            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema =@Schema( implementation = Long.class, example = "-1")),
-            @Parameter(name = "timeout", description = "TIMEOUT", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema =@Schema( implementation = int.class , example = "8")),
-            @Parameter(name = "dryRun", description = "DRY_RUN", schema =@Schema( implementation = int.class, example = "0")),
-            @Parameter(name = "testFlag", description = "TEST_FLAG", schema =@Schema( implementation = int.class, example = "0")),
-            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema =@Schema( implementation = ComplementDependentMode.class))
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class), example = "100"),
+            @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", required = true, schema = @Schema(implementation = String.class), example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
+            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema = @Schema(implementation = FailureStrategy.class)),
+            @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", schema = @Schema(implementation = TaskDependType.class)),
+            @Parameter(name = "execType", description = "COMMAND_TYPE", schema = @Schema(implementation = CommandType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
+            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = Long.class, example = "-1")),
+            @Parameter(name = "timeout", description = "TIMEOUT", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
+            @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
+            @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
+            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class))
     })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -193,23 +194,23 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "batchStartProcessInstance", description = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCodes", description = "PROCESS_DEFINITION_CODES", required = true, schema =@Schema( implementation = String.class, example = "1,2,3")),
-            @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", required = true, schema =@Schema( implementation = String.class, example = "2022-04-06 00:00:00,2022-04-06 00:00:00")),
-            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema =@Schema( implementation = FailureStrategy.class)),
-            @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", schema =@Schema( implementation = TaskDependType.class)),
-            @Parameter(name = "execType", description = "COMMAND_TYPE", schema =@Schema( implementation = CommandType.class)),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema =@Schema( implementation = WarningType.class)),
-            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "runMode", description = "RUN_MODE", schema =@Schema( implementation = RunMode.class)),
-            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema =@Schema( implementation = Priority.class)),
-            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema =@Schema( implementation = String.class, example = "default")),
-            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema =@Schema( implementation = Long.class, example = "-1")),
-            @Parameter(name = "timeout", description = "TIMEOUT", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema =@Schema( implementation = int.class, example = "8")),
-            @Parameter(name = "dryRun", description = "DRY_RUN", schema =@Schema( implementation = int.class, example = "0")),
-            @Parameter(name = "testFlag", description = "TEST_FLAG", schema =@Schema( implementation = int.class, example = "0")),
-            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema =@Schema( implementation = ComplementDependentMode.class))
+            @Parameter(name = "processDefinitionCodes", description = "PROCESS_DEFINITION_CODES", required = true, schema = @Schema(implementation = String.class, example = "1,2,3")),
+            @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", required = true, schema = @Schema(implementation = String.class, example = "2022-04-06 00:00:00,2022-04-06 00:00:00")),
+            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema = @Schema(implementation = FailureStrategy.class)),
+            @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", schema = @Schema(implementation = TaskDependType.class)),
+            @Parameter(name = "execType", description = "COMMAND_TYPE", schema = @Schema(implementation = CommandType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
+            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = Long.class, example = "-1")),
+            @Parameter(name = "timeout", description = "TIMEOUT", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
+            @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
+            @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
+            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class))
     })
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -294,8 +295,8 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "execute", description = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "executeType", description = "EXECUTE_TYPE", required = true, schema =@Schema( implementation = ExecuteType.class))
+            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "executeType", description = "EXECUTE_TYPE", required = true, schema = @Schema(implementation = ExecuteType.class))
     })
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
@@ -304,9 +305,9 @@ public class ExecutorController extends BaseController {
     public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
-                          @RequestParam("executeType") ExecuteType executeType
-    ) {
-        logger.info("Start to execute process instance, projectCode:{}, processInstanceId:{}.", projectCode, processInstanceId);
+                          @RequestParam("executeType") ExecuteType executeType) {
+        logger.info("Start to execute process instance, projectCode:{}, processInstanceId:{}.", projectCode,
+                processInstanceId);
         Map<String, Object> result = execService.execute(loginUser, projectCode, processInstanceId, executeType);
         return returnDataList(result);
     }
@@ -322,9 +323,9 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "batchExecute", description = "BATCH_EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = int.class)),
-            @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "executeType", description = "EXECUTE_TYPE", required = true, schema =@Schema( implementation = ExecuteType.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "executeType", description = "EXECUTE_TYPE", required = true, schema = @Schema(implementation = ExecuteType.class))
     })
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
@@ -373,7 +374,7 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "startCheckProcessDefinition", description = "START_CHECK_PROCESS_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
     @PostMapping(value = "/start-check")
     @ResponseStatus(HttpStatus.OK)
@@ -389,7 +390,7 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "queryExecutingWorkflow", description = "QUERY_WORKFLOW_EXECUTE_DATA")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/query-executing-workflow")
     @ResponseStatus(HttpStatus.OK)
@@ -414,15 +415,15 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "startTaskInstance", description = "RUN_TASK_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "version", description = "VERSION", schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema =@Schema( implementation = FailureStrategy.class)),
-            @Parameter(name = "execType", description = "COMMAND_TYPE", schema =@Schema( implementation = CommandType.class)),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema =@Schema( implementation = WarningType.class)),
-            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema =@Schema( implementation = String.class, example = "default")),
-            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema =@Schema( implementation = long.class, example = "-1")),
-            @Parameter(name = "timeout", description = "TIMEOUT", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "dryRun", description = "DRY_RUN", schema =@Schema( implementation = int.class, example = "0")),
+            @Parameter(name = "version", description = "VERSION", schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema = @Schema(implementation = FailureStrategy.class)),
+            @Parameter(name = "execType", description = "COMMAND_TYPE", schema = @Schema(implementation = CommandType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class, example = "-1")),
+            @Parameter(name = "timeout", description = "TIMEOUT", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
     })
     @PostMapping(value = "/task-instance/{code}/start")
     @ResponseStatus(HttpStatus.OK)

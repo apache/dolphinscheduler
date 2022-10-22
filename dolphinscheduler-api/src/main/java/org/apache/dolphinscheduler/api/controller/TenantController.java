@@ -24,11 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAG
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
@@ -52,6 +47,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * tenant controller
  */
@@ -74,9 +75,9 @@ public class TenantController extends BaseController {
      */
     @Operation(summary = "createTenant", description = "CREATE_TENANT_NOTES")
     @Parameters({
-            @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "queueId", description = "QUEUE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "description", description = "TENANT_DESC", schema =@Schema( implementation = String.class))
+            @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueId", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "description", description = "TENANT_DESC", schema = @Schema(implementation = String.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -102,9 +103,9 @@ public class TenantController extends BaseController {
      */
     @Operation(summary = "queryTenantlistPaging", description = "QUERY_TENANT_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -152,10 +153,10 @@ public class TenantController extends BaseController {
      */
     @Operation(summary = "updateTenant", description = "UPDATE_TENANT_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "TENANT_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "queueId", description = "QUEUE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "description", description = "TENANT_DESC", schema =@Schema( implementation = String.class))
+            @Parameter(name = "id", description = "TENANT_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueId", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "description", description = "TENANT_DESC", schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -180,7 +181,7 @@ public class TenantController extends BaseController {
      */
     @Operation(summary = "deleteTenantById", description = "DELETE_TENANT_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "TENANT_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "TENANT_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -201,7 +202,7 @@ public class TenantController extends BaseController {
      */
     @Operation(summary = "verifyTenantCode", description = "VERIFY_TENANT_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/verify-code")
     @ResponseStatus(HttpStatus.OK)

@@ -23,11 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_EDGE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
@@ -49,6 +44,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * process task relation controller
@@ -73,10 +74,10 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @Operation(summary = "save", description = "CREATE_PROCESS_TASK_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -110,9 +111,9 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @Operation(summary = "deleteRelation", description = "DELETE_PROCESS_TASK_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @DeleteMapping(value = "/{taskCode}")
     @ResponseStatus(HttpStatus.OK)
@@ -137,9 +138,9 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @Operation(summary = "deleteUpstreamRelation", description = "DELETE_UPSTREAM_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "preTaskCodes", description = "PRE_TASK_CODES", required = true, schema =@Schema( implementation = String.class, example = "1,2")),
-            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "preTaskCodes", description = "PRE_TASK_CODES", required = true, schema = @Schema(implementation = String.class, example = "1,2")),
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @DeleteMapping(value = "/{taskCode}/upstream")
     @ResponseStatus(HttpStatus.OK)
@@ -164,9 +165,9 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @Operation(summary = "deleteDownstreamRelation", description = "DELETE_DOWNSTREAM_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "postTaskCodes", description = "POST_TASK_CODES", required = true, schema =@Schema( implementation = String.class, example = "1,2")),
-            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "postTaskCodes", description = "POST_TASK_CODES", required = true, schema = @Schema(implementation = String.class, example = "1,2")),
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @DeleteMapping(value = "/{taskCode}/downstream")
     @ResponseStatus(HttpStatus.OK)
@@ -190,8 +191,8 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @Operation(summary = "queryUpstreamRelation", description = "QUERY_UPSTREAM_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @GetMapping(value = "/{taskCode}/upstream")
     @ResponseStatus(HttpStatus.OK)
@@ -213,8 +214,8 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @Operation(summary = "queryDownstreamRelation", description = "QUERY_DOWNSTREAM_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @GetMapping(value = "/{taskCode}/downstream")
     @ResponseStatus(HttpStatus.OK)
@@ -238,10 +239,10 @@ public class ProcessTaskRelationController extends BaseController {
      */
     @Operation(summary = "deleteEdge", description = "DELETE_EDGE_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @DeleteMapping(value = "/{processDefinitionCode}/{preTaskCode}/{postTaskCode}")
     @ResponseStatus(HttpStatus.OK)

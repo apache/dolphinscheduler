@@ -22,11 +22,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGIN
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -49,6 +44,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * task instance controller
@@ -80,18 +81,18 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "queryTaskListPaging", description = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = false, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "taskName", description = "TASK_NAME", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema =@Schema( implementation = TaskExecutionStatus.class)),
-            @Parameter(name = "host", description = "HOST", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "startDate", description = "START_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endDate", description = "END_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", required = false, schema =@Schema( implementation = TaskExecuteType.class, example = "STREAM")),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20")),
+            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = false, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskName", description = "TASK_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema = @Schema(implementation = TaskExecutionStatus.class)),
+            @Parameter(name = "host", description = "HOST", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", required = false, schema = @Schema(implementation = TaskExecuteType.class, example = "STREAM")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20")),
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -134,7 +135,7 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "force-success", description = "FORCE_TASK_SUCCESS")
     @Parameters({
-            @Parameter(name = "id", description = "TASK_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "12"))
+            @Parameter(name = "id", description = "TASK_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "12"))
     })
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
@@ -157,7 +158,7 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "savepoint", description = "TASK_SAVEPOINT")
     @Parameters({
-            @Parameter(name = "id", description = "TASK_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "12"))
+            @Parameter(name = "id", description = "TASK_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "12"))
     })
     @PostMapping(value = "/{id}/savepoint")
     @ResponseStatus(HttpStatus.OK)
@@ -179,7 +180,7 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "stop", description = "TASK_STOP")
     @Parameters({
-            @Parameter(name = "id", description = "TASK_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "12"))
+            @Parameter(name = "id", description = "TASK_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "12"))
     })
     @PostMapping(value = "/{id}/stop")
     @ResponseStatus(HttpStatus.OK)

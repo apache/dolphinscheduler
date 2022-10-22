@@ -17,12 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -30,14 +26,11 @@ import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -46,7 +39,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.api.enums.Status.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * process instance controller
@@ -79,15 +92,15 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "queryProcessInstanceListPaging", description = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @Parameters({
-            @Parameter(name = "processDefineCode", description = "PROCESS_DEFINITION_CODE", schema =@Schema( implementation = long.class, example = "100")),
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema =@Schema( implementation = WorkflowExecutionStatus.class)),
-            @Parameter(name = "host", description = "HOST", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "startDate", description = "START_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endDate", description = "END_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10"))
+            @Parameter(name = "processDefineCode", description = "PROCESS_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema = @Schema(implementation = WorkflowExecutionStatus.class)),
+            @Parameter(name = "host", description = "HOST", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -127,7 +140,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "queryTaskListByProcessId", description = "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/tasks")
     @ResponseStatus(HttpStatus.OK)
@@ -156,15 +169,15 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "updateProcessInstance", description = "UPDATE_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "taskRelationJson", description = "TASK_RELATION_JSON", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "taskDefinitionJson", description = "TASK_DEFINITION_JSON", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "syncDefine", description = "SYNC_DEFINE", required = true, schema =@Schema( implementation = boolean.class, example = "false")),
-            @Parameter(name = "globalParams", description = "PROCESS_GLOBAL_PARAMS", schema =@Schema( implementation = String.class, example = "[]")),
-            @Parameter(name = "locations", description = "PROCESS_INSTANCE_LOCATIONS", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "timeout", description = "PROCESS_TIMEOUT", schema =@Schema( implementation = int.class, example = "0")),
-            @Parameter(name = "tenantCode", description = "TENANT_CODE", schema =@Schema( implementation = String.class, example = "default"))
+            @Parameter(name = "taskRelationJson", description = "TASK_RELATION_JSON", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskDefinitionJson", description = "TASK_DEFINITION_JSON", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "syncDefine", description = "SYNC_DEFINE", required = true, schema = @Schema(implementation = boolean.class, example = "false")),
+            @Parameter(name = "globalParams", description = "PROCESS_GLOBAL_PARAMS", schema = @Schema(implementation = String.class, example = "[]")),
+            @Parameter(name = "locations", description = "PROCESS_INSTANCE_LOCATIONS", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "timeout", description = "PROCESS_TIMEOUT", schema = @Schema(implementation = int.class, example = "0")),
+            @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default"))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -197,7 +210,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "queryProcessInstanceById", description = "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -222,9 +235,9 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "queryTopNLongestRunningProcessInstance", description = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "size", description = "PROCESS_INSTANCE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "startTime", description = "PROCESS_INSTANCE_START_TIME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endTime", description = "PROCESS_INSTANCE_END_TIME", required = true, schema =@Schema( implementation = String.class)),
+            @Parameter(name = "size", description = "PROCESS_INSTANCE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "startTime", description = "PROCESS_INSTANCE_START_TIME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endTime", description = "PROCESS_INSTANCE_END_TIME", required = true, schema = @Schema(implementation = String.class)),
     })
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
@@ -251,7 +264,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "deleteProcessInstanceById", description = "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -274,7 +287,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "querySubProcessInstanceByTaskCode", description = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/query-sub-by-parent")
     @ResponseStatus(HttpStatus.OK)
@@ -298,7 +311,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "queryParentInstanceBySubId", description = "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
     @Parameters({
-            @Parameter(name = "subId", description = "SUB_PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "subId", description = "SUB_PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/query-parent-by-sub")
     @ResponseStatus(HttpStatus.OK)
@@ -320,7 +333,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "viewVariables", description = "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/view-variables")
     @ResponseStatus(HttpStatus.OK)
@@ -343,7 +356,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "vieGanttTree", description = "VIEW_GANTT_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/view-gantt")
     @ResponseStatus(HttpStatus.OK)
@@ -367,8 +380,8 @@ public class ProcessInstanceController extends BaseController {
      */
     @Operation(summary = "batchDeleteProcessInstanceByIds", description = "BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = int.class)),
-            @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema =@Schema( implementation = String.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class)),
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)

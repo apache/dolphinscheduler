@@ -28,11 +28,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_TASK_DEFINITI
 import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_TASK_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -61,6 +56,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * task definition controller
  */
@@ -82,8 +83,8 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "save", description = "CREATE_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "taskDefinitionJson", description = "TASK_DEFINITION_JSON", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskDefinitionJson", description = "TASK_DEFINITION_JSON", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -109,10 +110,10 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "saveSingle", description = "CREATE_SINGLE_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "taskDefinitionJsonObj", description = "TASK_DEFINITION_JSON", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "upstreamCodes", description = "UPSTREAM_CODES", required = false, schema =@Schema( implementation = String.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskDefinitionJsonObj", description = "TASK_DEFINITION_JSON", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "upstreamCodes", description = "UPSTREAM_CODES", required = false, schema = @Schema(implementation = String.class))
     })
     @PostMapping("/save-single")
     @ResponseStatus(HttpStatus.CREATED)
@@ -139,9 +140,9 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "update", description = "UPDATE_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1")),
-            @Parameter(name = "taskDefinitionJsonObj", description = "TASK_DEFINITION_JSON", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
+            @Parameter(name = "taskDefinitionJsonObj", description = "TASK_DEFINITION_JSON", required = true, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -168,10 +169,10 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "updateWithUpstream", description = "UPDATE_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1")),
-            @Parameter(name = "taskDefinitionJsonObj", description = "TASK_DEFINITION_JSON", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "upstreamCodes", description = "UPSTREAM_CODES", required = false, schema =@Schema( implementation = String.class))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
+            @Parameter(name = "taskDefinitionJsonObj", description = "TASK_DEFINITION_JSON", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "upstreamCodes", description = "UPSTREAM_CODES", required = false, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{code}/with-upstream")
     @ResponseStatus(HttpStatus.OK)
@@ -200,9 +201,9 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "queryVersions", description = "QUERY_TASK_DEFINITION_VERSIONS_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1")),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10"))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
@@ -231,8 +232,8 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "switchVersion", description = "SWITCH_TASK_DEFINITION_VERSION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1")),
-            @Parameter(name = "version", description = "VERSION", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
+            @Parameter(name = "version", description = "VERSION", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
@@ -257,8 +258,8 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "deleteVersion", description = "DELETE_TASK_DEFINITION_VERSION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1")),
-            @Parameter(name = "version", description = "VERSION", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
+            @Parameter(name = "version", description = "VERSION", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
@@ -283,7 +284,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "deleteTaskDefinition", description = "DELETE_TASK_DEFINITION_BY_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1"))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1"))
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -306,7 +307,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "queryTaskDefinitionByCode", description = "QUERY_TASK_DEFINITION_DETAIL_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1"))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1"))
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -334,13 +335,13 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "queryTaskDefinitionListPaging", description = "QUERY_TASK_DEFINITION_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = false, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "searchWorkflowName", description = "SEARCH_WORKFLOW_NAME", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "searchTaskName", description = "SEARCH_TASK_NAME", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "taskType", description = "TASK_TYPE", required = false, schema =@Schema( implementation = String.class, example = "SHELL")),
-            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", required = false, schema =@Schema( implementation = TaskExecuteType.class, example = "STREAM")),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10"))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = false, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "searchWorkflowName", description = "SEARCH_WORKFLOW_NAME", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "searchTaskName", description = "SEARCH_TASK_NAME", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskType", description = "TASK_TYPE", required = false, schema = @Schema(implementation = String.class, example = "SHELL")),
+            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", required = false, schema = @Schema(implementation = TaskExecuteType.class, example = "STREAM")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -373,7 +374,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "genTaskCodeList", description = "GEN_TASK_CODE_LIST_NOTES")
     @Parameters({
-            @Parameter(name = "genNum", description = "GEN_NUM", required = true, schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "genNum", description = "GEN_NUM", required = true, schema = @Schema(implementation = int.class, example = "1"))
     })
     @GetMapping(value = "/gen-task-codes")
     @ResponseStatus(HttpStatus.OK)
@@ -396,9 +397,9 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "releaseTaskDefinition", description = "RELEASE_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "123456789")),
-            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, schema =@Schema( implementation = ReleaseState.class))
+            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, schema = @Schema(implementation = ReleaseState.class))
     })
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)

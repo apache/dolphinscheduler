@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class CreateTokenRequest {
+
     @Schema(example = "1", required = true)
     Integer userId;
 

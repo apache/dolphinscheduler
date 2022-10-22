@@ -27,11 +27,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_P
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
 import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -58,6 +53,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * scheduler controller
@@ -91,14 +92,14 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "createSchedule", description = "CREATE_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "100")),
-            @Parameter(name = "schedule", description = "SCHEDULE", schema =@Schema( implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','timezoneId':'America/Phoenix','crontab':'0 0 3/6 * * ? *'}")),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", schema =@Schema( implementation = WarningType.class)),
-            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema =@Schema( implementation = FailureStrategy.class)),
-            @Parameter(name = "workerGroupId", description = "WORKER_GROUP_ID", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema =@Schema( implementation = long.class)),
-            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", schema =@Schema( implementation = Priority.class)),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','timezoneId':'America/Phoenix','crontab':'0 0 3/6 * * ? *'}")),
+            @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
+            @Parameter(name = "workerGroupId", description = "WORKER_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -137,14 +138,14 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "updateSchedule", description = "UPDATE_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "schedule", description = "SCHEDULE", schema =@Schema( implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", schema =@Schema( implementation = WarningType.class)),
-            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema =@Schema( implementation = FailureStrategy.class)),
-            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema =@Schema( implementation = String.class, example = "default")),
-            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", schema =@Schema( implementation = Priority.class)),
-            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema =@Schema( implementation = long.class)),
+            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
+            @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
+            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class)),
     })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -176,7 +177,7 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "online", description = "ONLINE_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @PostMapping("/{id}/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
@@ -198,7 +199,7 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "offline", description = "OFFLINE_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @PostMapping("/{id}/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
@@ -225,10 +226,10 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "queryScheduleListPaging", description = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionId", description = "PROCESS_DEFINITION_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "processDefinitionId", description = "PROCESS_DEFINITION_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
@@ -260,7 +261,7 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "deleteScheduleById", description = "DELETE_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -299,7 +300,7 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "previewSchedule", description = "PREVIEW_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "schedule", description = "SCHEDULE", schema =@Schema( implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
+            @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
     })
     @PostMapping("/preview")
     @ResponseStatus(HttpStatus.CREATED)
@@ -327,14 +328,14 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "updateScheduleByProcessDefinitionCode", description = "UPDATE_SCHEDULE_BY_PROCESS_DEFINITION_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "12345678")),
-            @Parameter(name = "schedule", description = "SCHEDULE", schema =@Schema( implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", schema =@Schema( implementation = WarningType.class)),
-            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema =@Schema( implementation = FailureStrategy.class)),
-            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema =@Schema( implementation = String.class, example = "default")),
-            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", schema =@Schema( implementation = Priority.class)),
-            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema =@Schema( implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "12345678")),
+            @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
+            @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
+            @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class)),
     })
     @PutMapping("/update/{code}")
     @ResponseStatus(HttpStatus.OK)

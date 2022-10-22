@@ -19,16 +19,16 @@ package org.apache.dolphinscheduler.api.dto.project;
 
 import org.apache.dolphinscheduler.api.dto.PageQueryDto;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.v3.oas.annotations.media.Schema;;
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * project query request
  */
-@Schema(name ="PROJECT-QUERY")
+@Schema(name = "PROJECT-QUERY")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data

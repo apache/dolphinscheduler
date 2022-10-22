@@ -18,13 +18,12 @@
 package org.apache.dolphinscheduler.api.dto;
 
 import lombok.Data;
-import io.swagger.v3.oas.annotations.media.Schema;;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * page query dto
  */
-@Schema(name ="QUERY-PAGE-INFO")
+@Schema(name = "QUERY-PAGE-INFO")
 @Data
 public class PageQueryDto {
 

@@ -22,11 +22,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
@@ -51,6 +46,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * workflow controller
@@ -91,7 +92,7 @@ public class WorkflowV2Controller extends BaseController {
      */
     @Operation(summary = "delete", description = "DELETE_WORKFLOWS_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "WORKFLOW_CODE", schema =@Schema( implementation = long.class, example = "123456", required = true))
+            @Parameter(name = "code", description = "WORKFLOW_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)

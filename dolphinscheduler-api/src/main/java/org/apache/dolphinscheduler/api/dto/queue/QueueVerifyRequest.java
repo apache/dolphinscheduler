@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.api.dto.queue;
 
-import io.swagger.v3.oas.annotations.media.Schema;;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * queue verify request
  */
-@Schema(name ="QUEUE-Verify")
+@Schema(name = "QUEUE-Verify")
 @Data
 public class QueueVerifyRequest {
 

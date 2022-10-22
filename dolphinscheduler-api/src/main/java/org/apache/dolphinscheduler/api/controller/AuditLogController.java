@@ -19,11 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUDIT_LOG_LIST_PAGING;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
@@ -32,7 +27,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,6 +37,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "AUDIT_LOG_TAG")
 @RestController
@@ -67,13 +66,13 @@ public class AuditLogController extends BaseController {
      */
     @Operation(summary = "queryAuditLogListPaging", description = "QUERY_AUDIT_LOG")
     @Parameters({
-            @Parameter(name = "startDate", description = "START_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "endDate", description = "END_DATE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "resourceType", description = "RESOURCE_TYPE", schema =@Schema( implementation = AuditResourceType.class)),
-            @Parameter(name = "operationType", description = "OPERATION_TYPE", schema =@Schema( implementation = AuditOperationType.class)),
-            @Parameter(name = "userName", description = "USER_NAME", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "resourceType", description = "RESOURCE_TYPE", schema = @Schema(implementation = AuditResourceType.class)),
+            @Parameter(name = "operationType", description = "OPERATION_TYPE", schema = @Schema(implementation = AuditOperationType.class)),
+            @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping(value = "/audit-log-list")
     @ResponseStatus(HttpStatus.OK)

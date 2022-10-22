@@ -33,11 +33,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -63,6 +58,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * users controller
@@ -91,13 +92,13 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "createUser", description = "CREATE_USER_NOTES")
     @Parameters({
-            @Parameter(name = "userName", description = "USER_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "tenantId", description = "TENANT_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "queue", description = "QUEUE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "email", description = "EMAIL", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "phone", description = "PHONE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "state", description = "STATE", schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "userName", description = "USER_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "tenantId", description = "TENANT_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "queue", description = "QUEUE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "email", description = "EMAIL", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "phone", description = "PHONE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "state", description = "STATE", schema = @Schema(implementation = int.class, example = "1"))
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -127,9 +128,9 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "queryUserList", description = "QUERY_USER_LIST_NOTES")
     @Parameters({
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class))
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -164,14 +165,14 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "updateUser", description = "UPDATE_USER_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "userName", description = "USER_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "tenantId", description = "TENANT_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "queue", description = "QUEUE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "email", description = "EMAIL", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "phone", description = "PHONE", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "state", description = "STATE", schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "id", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "userName", description = "USER_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "tenantId", description = "TENANT_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "queue", description = "QUEUE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "email", description = "EMAIL", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "phone", description = "PHONE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "state", description = "STATE", schema = @Schema(implementation = int.class, example = "1"))
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -201,7 +202,7 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "delUserById", description = "DELETE_USER_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -223,8 +224,8 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "grantProject", description = "GRANT_PROJECT_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "projectIds", description = "PROJECT_IDS", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectIds", description = "PROJECT_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/grant-project")
     @ResponseStatus(HttpStatus.OK)
@@ -247,8 +248,8 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "grantProjectByCode", description = "GRANT_PROJECT_BY_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @PostMapping(value = "/grant-project-by-code")
     @ResponseStatus(HttpStatus.OK)
@@ -271,8 +272,8 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "revokeProject", description = "REVOKE_PROJECT_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
     @PostMapping(value = "/revoke-project")
     @ResponseStatus(HttpStatus.OK)
@@ -295,8 +296,8 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "grantResource", description = "GRANT_RESOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "resourceIds", description = "RESOURCE_IDS", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "resourceIds", description = "RESOURCE_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/grant-file")
     @ResponseStatus(HttpStatus.OK)
@@ -319,8 +320,8 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "grantUDFFunc", description = "GRANT_UDF_FUNC_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "udfIds", description = "UDF_IDS", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "udfIds", description = "UDF_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/grant-udf-func")
     @ResponseStatus(HttpStatus.OK)
@@ -343,8 +344,8 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "grantNamespace", description = "GRANT_NAMESPACE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "namespaceIds", description = "NAMESPACE_IDS", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "namespaceIds", description = "NAMESPACE_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/grant-namespace")
     @ResponseStatus(HttpStatus.OK)
@@ -367,8 +368,8 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "grantDataSource", description = "GRANT_DATASOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "datasourceIds", description = "DATASOURCE_IDS", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "datasourceIds", description = "DATASOURCE_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/grant-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -437,7 +438,7 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "verifyUserName", description = "VERIFY_USER_NAME_NOTES")
     @Parameters({
-            @Parameter(name = "userName", description = "USER_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "userName", description = "USER_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/verify-user-name")
     @ResponseStatus(HttpStatus.OK)
@@ -457,7 +458,7 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "unauthorizedUser", description = "UNAUTHORIZED_USER_NOTES")
     @Parameters({
-            @Parameter(name = "alertgroupId", description = "ALERT_GROUP_ID", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "alertgroupId", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/unauth-user")
     @ResponseStatus(HttpStatus.OK)
@@ -478,7 +479,7 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "authorizedUser", description = "AUTHORIZED_USER_NOTES")
     @Parameters({
-            @Parameter(name = "alertgroupId", description = "ALERT_GROUP_ID", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "alertgroupId", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/authed-user")
     @ResponseStatus(HttpStatus.OK)
@@ -505,10 +506,10 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "registerUser", description = "REGISTER_USER_NOTES")
     @Parameters({
-            @Parameter(name = "userName", description = "USER_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "repeatPassword", description = "REPEAT_PASSWORD", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "email", description = "EMAIL", required = true, schema =@Schema( implementation = String.class)),
+            @Parameter(name = "userName", description = "USER_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "repeatPassword", description = "REPEAT_PASSWORD", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "email", description = "EMAIL", required = true, schema = @Schema(implementation = String.class)),
     })
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.OK)
@@ -533,7 +534,7 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "activateUser", description = "ACTIVATE_USER_NOTES")
     @Parameters({
-            @Parameter(name = "userName", description = "USER_NAME", schema =@Schema( implementation = String.class)),
+            @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
     })
     @PostMapping("/activate")
     @ResponseStatus(HttpStatus.OK)
@@ -553,7 +554,7 @@ public class UsersController extends BaseController {
      */
     @Operation(summary = "batchActivateUser", description = "BATCH_ACTIVATE_USER_NOTES")
     @Parameters({
-            @Parameter(name = "userNames", description = "USER_NAMES", required = true, schema =@Schema( implementation = List.class)),
+            @Parameter(name = "userNames", description = "USER_NAMES", required = true, schema = @Schema(implementation = List.class)),
     })
     @PostMapping("/batch/activate")
     @ResponseStatus(HttpStatus.OK)

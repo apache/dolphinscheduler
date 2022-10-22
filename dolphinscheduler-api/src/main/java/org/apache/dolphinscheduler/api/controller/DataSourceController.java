@@ -30,11 +30,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOUR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -64,6 +59,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * data source controller
@@ -106,8 +107,8 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "updateDataSource", description = "UPDATE_DATA_SOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema =@Schema( implementation = int.class)),
-            @Parameter(name = "dataSourceParam", description = "DATA_SOURCE_PARAM", required = true, schema =@Schema( implementation = BaseDataSourceParamDTO.class))
+            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "dataSourceParam", description = "DATA_SOURCE_PARAM", required = true, schema = @Schema(implementation = BaseDataSourceParamDTO.class))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -130,7 +131,7 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "queryDataSource", description = "QUERY_DATA_SOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
 
     })
     @GetMapping(value = "/{id}")
@@ -153,8 +154,8 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "queryDataSourceList", description = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @Parameters({
-            @Parameter(name = "type", description = "DB_TYPE", required = true, schema = @Schema (implementation = DbType.class)),
-            @Parameter(name = "testFlag", description = "DB_TEST_FLAG", required = true, schema = @Schema (implementation = int.class))
+            @Parameter(name = "type", description = "DB_TYPE", required = true, schema = @Schema(implementation = DbType.class)),
+            @Parameter(name = "testFlag", description = "DB_TEST_FLAG", required = true, schema = @Schema(implementation = int.class))
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
@@ -178,9 +179,9 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "queryDataSourceListPaging", description = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -228,7 +229,7 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "connectionTest", description = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/connect-test")
     @ResponseStatus(HttpStatus.OK)
@@ -248,7 +249,7 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "deleteDataSource", description = "DELETE_DATA_SOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -268,7 +269,7 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "verifyDataSourceName", description = "VERIFY_DATA_SOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "DATA_SOURCE_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "name", description = "DATA_SOURCE_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
@@ -288,7 +289,7 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "unauthDatasource", description = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -310,7 +311,7 @@ public class DataSourceController extends BaseController {
      */
     @Operation(summary = "authedDatasource", description = "AUTHORIZED_DATA_SOURCE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
@@ -341,7 +342,7 @@ public class DataSourceController extends BaseController {
 
     @Operation(summary = "tables", description = "GET_DATASOURCE_TABLES_NOTES")
     @Parameters({
-            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1"))
     })
     @GetMapping(value = "/tables")
     @ResponseStatus(HttpStatus.OK)
@@ -353,8 +354,8 @@ public class DataSourceController extends BaseController {
 
     @Operation(summary = "tableColumns", description = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
     @Parameters({
-            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "tableName", description = "TABLE_NAME", required = true, schema =@Schema( implementation = String.class, example = "test"))
+            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "tableName", description = "TABLE_NAME", required = true, schema = @Schema(implementation = String.class, example = "test"))
     })
     @GetMapping(value = "/tableColumns")
     @ResponseStatus(HttpStatus.OK)

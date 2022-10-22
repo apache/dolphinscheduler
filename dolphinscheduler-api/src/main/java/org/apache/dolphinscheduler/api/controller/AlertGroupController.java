@@ -24,11 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALERT_GROUP_ERR
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERTGROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_GROUP_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -38,15 +33,30 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 /**
  * alert group controller
@@ -72,7 +82,7 @@ public class AlertGroupController extends BaseController {
     @Operation(summary = "createAlertgroup", description = "CREATE_ALERT_GROUP_NOTES")
     @Parameters({
             @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "DESC", schema = @Schema( implementation = String.class)),
+            @Parameter(name = "description", description = "DESC", schema = @Schema(implementation = String.class)),
             @Parameter(name = "alertInstanceIds", description = "alertInstanceIds", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping()
@@ -116,9 +126,9 @@ public class AlertGroupController extends BaseController {
      */
     @Operation(summary = "queryAlertGroupListPaging", description = "QUERY_ALERT_GROUP_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -145,7 +155,7 @@ public class AlertGroupController extends BaseController {
 
     @Operation(summary = "queryAlertGroupById", description = "QUERY_ALERT_GROUP_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "ALERT_GROUP_ID", schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "id", description = "ALERT_GROUP_ID", schema = @Schema(implementation = int.class, example = "1"))
     })
     @PostMapping(value = "/query")
     @ResponseStatus(HttpStatus.OK)
@@ -169,10 +179,10 @@ public class AlertGroupController extends BaseController {
      */
     @Operation(summary = "updateAlertgroup", description = "UPDATE_ALERT_GROUP_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "ALERT_GROUP_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "DESC", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "alertInstanceIds", description = "alertInstanceIds", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "id", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "alertInstanceIds", description = "alertInstanceIds", required = true, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -198,7 +208,7 @@ public class AlertGroupController extends BaseController {
      */
     @Operation(summary = "delAlertgroupById", description = "DELETE_ALERT_GROUP_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "ALERT_GROUP_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -219,7 +229,7 @@ public class AlertGroupController extends BaseController {
      */
     @Operation(summary = "verifyGroupName", description = "VERIFY_ALERT_GROUP_NAME_NOTES")
     @Parameters({
-            @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema =@Schema( implementation = String.class)),
+            @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)

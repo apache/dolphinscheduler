@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.api.dto.project;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 /**
  * project update request

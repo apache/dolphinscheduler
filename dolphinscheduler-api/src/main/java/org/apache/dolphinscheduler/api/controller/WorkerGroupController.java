@@ -22,18 +22,13 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_ADDRESS_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FAIL;
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
@@ -48,6 +43,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * worker group controller
@@ -71,11 +72,11 @@ public class WorkerGroupController extends BaseController {
      */
     @Operation(summary = "saveWorkerGroup", description = "CREATE_WORKER_GROUP_NOTES")
     @Parameters({
-        @Parameter(name = "id", description = "WORKER_GROUP_ID", schema =@Schema( implementation = int.class, example = "10", defaultValue = "0")),
-        @Parameter(name = "name", description = "WORKER_GROUP_NAME", required = true, schema =@Schema( implementation = String.class)),
-        @Parameter(name = "addrList", description = "WORKER_ADDR_LIST", required = true, schema =@Schema( implementation = String.class)),
-        @Parameter(name = "description", description = "WORKER_DESC", required = false, schema =@Schema( implementation = String.class)),
-        @Parameter(name = "otherParamsJson", description = "WORKER_PARMS_JSON", required = false, schema =@Schema( implementation = String.class)),
+            @Parameter(name = "id", description = "WORKER_GROUP_ID", schema = @Schema(implementation = int.class, example = "10", defaultValue = "0")),
+            @Parameter(name = "name", description = "WORKER_GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "addrList", description = "WORKER_ADDR_LIST", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "WORKER_DESC", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "otherParamsJson", description = "WORKER_PARMS_JSON", required = false, schema = @Schema(implementation = String.class)),
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -103,9 +104,9 @@ public class WorkerGroupController extends BaseController {
      */
     @Operation(summary = "queryAllWorkerGroupsPaging", description = "QUERY_WORKER_GROUP_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "20")),
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class))
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -150,7 +151,7 @@ public class WorkerGroupController extends BaseController {
      */
     @Operation(summary = "deleteWorkerGroupById", description = "DELETE_WORKER_GROUP_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "WORKER_GROUP_ID", required = true, schema =@Schema( implementation = int.class, example = "10")),
+            @Parameter(name = "id", description = "WORKER_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "10")),
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)

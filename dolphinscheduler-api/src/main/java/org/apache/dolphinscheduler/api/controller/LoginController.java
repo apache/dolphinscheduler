@@ -21,11 +21,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
 import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -50,6 +45,12 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * login controller
@@ -76,8 +77,8 @@ public class LoginController extends BaseController {
      */
     @Operation(summary = "login", description = "LOGIN_NOTES")
     @Parameters({
-            @Parameter(name = "userName", description = "USER_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "userName", description = "USER_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)

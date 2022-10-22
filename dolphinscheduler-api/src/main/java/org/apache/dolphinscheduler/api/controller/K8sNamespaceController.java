@@ -26,11 +26,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_NA
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_K8S_NAMESPACE_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
@@ -55,6 +50,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * k8s namespace controller
  */
@@ -77,9 +78,9 @@ public class K8sNamespaceController extends BaseController {
      */
     @Operation(summary = "queryNamespaceListPaging", description = "QUERY_NAMESPACE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema =@Schema( implementation = String.class)),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1"))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -111,10 +112,10 @@ public class K8sNamespaceController extends BaseController {
      */
     @Operation(summary = "createK8sNamespace", description = "CREATE_NAMESPACE_NOTES")
     @Parameters({
-            @Parameter(name = "namespace", description = "NAMESPACE", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "limits_cpu", description = "LIMITS_CPU", required = false, schema =@Schema( implementation = double.class)),
-            @Parameter(name = "limits_memory", description = "LIMITS_MEMORY", required = false, schema =@Schema( implementation = int.class))
+            @Parameter(name = "namespace", description = "NAMESPACE", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "limits_cpu", description = "LIMITS_CPU", required = false, schema = @Schema(implementation = double.class)),
+            @Parameter(name = "limits_memory", description = "LIMITS_MEMORY", required = false, schema = @Schema(implementation = int.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -141,10 +142,10 @@ public class K8sNamespaceController extends BaseController {
      */
     @Operation(summary = "updateK8sNamespace", description = "UPDATE_NAMESPACE_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "K8S_NAMESPACE_ID", required = true, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "userName", description = "OWNER", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "limitsCpu", description = "LIMITS_CPU", required = false, schema =@Schema( implementation = double.class)),
-            @Parameter(name = "limitsMemory", description = "LIMITS_MEMORY", required = false, schema =@Schema( implementation = int.class))})
+            @Parameter(name = "id", description = "K8S_NAMESPACE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "userName", description = "OWNER", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "limitsCpu", description = "LIMITS_CPU", required = false, schema = @Schema(implementation = double.class)),
+            @Parameter(name = "limitsMemory", description = "LIMITS_MEMORY", required = false, schema = @Schema(implementation = int.class))})
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_K8S_NAMESPACE_ERROR)
@@ -170,8 +171,8 @@ public class K8sNamespaceController extends BaseController {
      */
     @Operation(summary = "verifyNamespaceK8s", description = "VERIFY_NAMESPACE_K8S_NOTES")
     @Parameters({
-            @Parameter(name = "namespace", description = "NAMESPACE", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema =@Schema( implementation = long.class)),
+            @Parameter(name = "namespace", description = "NAMESPACE", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema = @Schema(implementation = long.class)),
     })
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
@@ -193,7 +194,7 @@ public class K8sNamespaceController extends BaseController {
      */
     @Operation(summary = "delNamespaceById", description = "DELETE_NAMESPACE_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "NAMESPACE_ID", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "NAMESPACE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -214,7 +215,7 @@ public class K8sNamespaceController extends BaseController {
      */
     @Operation(summary = "queryUnauthorizedNamespace", description = "QUERY_UNAUTHORIZED_NAMESPACE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/unauth-namespace")
     @ResponseStatus(HttpStatus.OK)
@@ -235,7 +236,7 @@ public class K8sNamespaceController extends BaseController {
      */
     @Operation(summary = "queryAuthorizedNamespace", description = "QUERY_AUTHORIZED_NAMESPACE_NOTES")
     @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-namespace")
     @ResponseStatus(HttpStatus.OK)

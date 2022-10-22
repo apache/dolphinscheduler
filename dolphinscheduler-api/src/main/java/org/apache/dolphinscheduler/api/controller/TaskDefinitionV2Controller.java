@@ -23,11 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
@@ -52,6 +47,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * task definition controller
@@ -90,7 +91,7 @@ public class TaskDefinitionV2Controller extends BaseController {
      */
     @Operation(summary = "delete", description = "DELETE_TASK_DEFINITION_VERSION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema =@Schema( implementation = long.class, example = "123456", required = true))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -112,7 +113,7 @@ public class TaskDefinitionV2Controller extends BaseController {
      */
     @Operation(summary = "update", description = "UPDATE_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema =@Schema( implementation = long.class, example = "123456", required = true))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -135,7 +136,7 @@ public class TaskDefinitionV2Controller extends BaseController {
      */
     @Operation(summary = "get", description = "GET_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema =@Schema( implementation = long.class, example = "123456", required = true))
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)

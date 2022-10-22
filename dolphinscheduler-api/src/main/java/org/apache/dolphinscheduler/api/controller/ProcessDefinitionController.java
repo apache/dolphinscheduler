@@ -35,11 +35,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINI
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -74,6 +69,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * process definition controller
  */
@@ -105,10 +106,10 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "createProcessDefinition", description = "CREATE_PROCESS_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "locations", description = "PROCESS_DEFINITION_LOCATIONS", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema =@Schema( implementation = String.class))
+            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "locations", description = "PROCESS_DEFINITION_LOCATIONS", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -143,8 +144,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "batchCopyByCodes", description = "COPY_PROCESS_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODES", required = true, schema =@Schema( implementation = String.class, example = "3,4")),
-            @Parameter(name = "targetProjectCode", description = "TARGET_PROJECT_CODE", required = true, schema =@Schema( implementation = long.class, example = "123"))
+            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODES", required = true, schema = @Schema(implementation = String.class, example = "3,4")),
+            @Parameter(name = "targetProjectCode", description = "TARGET_PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "123"))
     })
     @PostMapping(value = "/batch-copy")
     @ResponseStatus(HttpStatus.OK)
@@ -169,8 +170,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "batchMoveByCodes", description = "MOVE_PROCESS_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODES", required = true, schema =@Schema( implementation = String.class, example = "3,4")),
-            @Parameter(name = "targetProjectCode", description = "TARGET_PROJECT_CODE", required = true, schema =@Schema( implementation = long.class, example = "123"))
+            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODES", required = true, schema = @Schema(implementation = String.class, example = "3,4")),
+            @Parameter(name = "targetProjectCode", description = "TARGET_PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "123"))
     })
     @PostMapping(value = "/batch-move")
     @ResponseStatus(HttpStatus.OK)
@@ -194,8 +195,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "verify-name", description = "VERIFY_PROCESS_DEFINITION_NAME_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = false, schema =@Schema( implementation = Long.class)),
+            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = false, schema = @Schema(implementation = Long.class)),
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
@@ -229,12 +230,12 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "update", description = "UPDATE_PROCESS_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "123456789")),
-            @Parameter(name = "locations", description = "PROCESS_DEFINITION_LOCATIONS", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, schema =@Schema( implementation = ReleaseState.class)),
-            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema =@Schema( implementation = String.class))
+            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+            @Parameter(name = "locations", description = "PROCESS_DEFINITION_LOCATIONS", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, schema = @Schema(implementation = ReleaseState.class)),
+            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -282,9 +283,9 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "queryVersions", description = "QUERY_PROCESS_DEFINITION_VERSIONS_NOTES")
     @Parameters({
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1"))
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1"))
     })
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
@@ -317,8 +318,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "switchVersion", description = "SWITCH_PROCESS_DEFINITION_VERSION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1")),
-            @Parameter(name = "version", description = "VERSION", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
+            @Parameter(name = "version", description = "VERSION", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
@@ -344,8 +345,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "deleteVersion", description = "DELETE_PROCESS_DEFINITION_VERSION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "1")),
-            @Parameter(name = "version", description = "VERSION", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
+            @Parameter(name = "version", description = "VERSION", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
@@ -371,9 +372,9 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "release", description = "RELEASE_PROCESS_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "123456789")),
-            @Parameter(name = "releaseState", description = "PROCESS_DEFINITION_RELEASE", required = true, schema =@Schema( implementation = ReleaseState.class)),
+            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+            @Parameter(name = "releaseState", description = "PROCESS_DEFINITION_RELEASE", required = true, schema = @Schema(implementation = ReleaseState.class)),
     })
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)
@@ -398,7 +399,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "queryProcessDefinitionByCode", description = "QUERY_PROCESS_DEFINITION_BY_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "123456789"))
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789"))
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -422,7 +423,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "queryProcessDefinitionByName", description = "QUERY_PROCESS_DEFINITION_BY_NAME_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
@@ -486,11 +487,11 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "queryListPaging", description = "QUERY_PROCESS_DEFINITION_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "userId", description = "USER_ID", required = false, schema =@Schema( implementation = int.class, example = "100")),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema =@Schema( implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema =@Schema( implementation = int.class, example = "10")),
-            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema =@Schema( implementation = String.class))
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "userId", description = "USER_ID", required = false, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -528,8 +529,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "viewTree", description = "VIEW_TREE_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "100")),
-            @Parameter(name = "limit", description = "LIMIT", required = true, schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{code}/view-tree")
     @ResponseStatus(HttpStatus.OK)
@@ -553,7 +554,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "getTasksByDefinitionCode", description = "GET_TASK_LIST_BY_DEFINITION_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/{code}/tasks")
     @ResponseStatus(HttpStatus.OK)
@@ -576,7 +577,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "getTaskListByDefinitionCodes", description = "GET_TASK_LIST_BY_DEFINITION_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODES", required = true, schema =@Schema( implementation = String.class, example = "100,200,300"))
+            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODES", required = true, schema = @Schema(implementation = String.class, example = "100,200,300"))
     })
     @GetMapping(value = "/batch-query-tasks")
     @ResponseStatus(HttpStatus.OK)
@@ -598,7 +599,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "getProcessListByProjectCode", description = "GET_PROCESS_LIST_BY_PROCESS_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class, example = "100"))
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/query-process-definition-list")
     @ResponseStatus(HttpStatus.OK)
@@ -618,8 +619,8 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "getTaskListByProcessDefinitionCode", description = "GET_TASK_LIST_BY_PROCESS_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class, example = "100")),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "100")),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
     })
     @GetMapping(value = "/query-task-definition-list")
     @ResponseStatus(HttpStatus.OK)
@@ -642,7 +643,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "deleteByCode", description = "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", schema =@Schema( implementation = int.class, example = "100"))
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -665,7 +666,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "batchDeleteByCodes", description = "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
     @Parameters({
-            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
@@ -690,7 +691,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "batchExportByCodes", description = "BATCH_EXPORT_PROCESS_DEFINITION_BY_CODES_NOTES")
     @Parameters({
-            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = String.class))
+            @Parameter(name = "codes", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/batch-export")
     @ResponseBody
@@ -735,7 +736,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "importProcessDefinition", description = "IMPORT_PROCESS_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema =@Schema( implementation = MultipartFile.class))
+            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class))
     })
     @PostMapping(value = "/import")
     @ApiException(IMPORT_PROCESS_DEFINE_ERROR)
@@ -767,9 +768,9 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "createEmptyProcessDefinition", description = "CREATE_EMPTY_PROCESS_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema =@Schema( implementation = long.class, example = "123456789")),
-            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema =@Schema( implementation = String.class))
+            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/empty")
     @ResponseStatus(HttpStatus.OK)
@@ -808,11 +809,11 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "updateBasicInfo", description = "UPDATE_PROCESS_DEFINITION_BASIC_INFO_NOTES")
     @Parameters({
-            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "123456789")),
-            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema =@Schema( implementation = String.class)),
-            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, schema =@Schema( implementation = ReleaseState.class)),
-            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema =@Schema( implementation = String.class))
+            @Parameter(name = "name", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+            @Parameter(name = "description", description = "PROCESS_DEFINITION_DESC", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, schema = @Schema(implementation = ReleaseState.class)),
+            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{code}/basic-info")
     @ResponseStatus(HttpStatus.OK)
@@ -856,9 +857,9 @@ public class ProcessDefinitionController extends BaseController {
      */
     @Operation(summary = "releaseWorkflowAndSchedule", description = "RELEASE_WORKFLOW_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema =@Schema( implementation = long.class)),
-            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema =@Schema( implementation = long.class, example = "123456789")),
-            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, schema =@Schema( implementation = ReleaseState.class))
+            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, schema = @Schema(implementation = ReleaseState.class))
     })
     @PostMapping(value = "/{code}/release-workflow")
     @ResponseStatus(HttpStatus.OK)
