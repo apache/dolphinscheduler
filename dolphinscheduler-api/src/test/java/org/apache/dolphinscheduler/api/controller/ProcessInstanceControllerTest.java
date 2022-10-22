@@ -106,7 +106,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(processInstanceService
-                .updateProcessInstance(Mockito.any(), Mockito.anyString(),Mockito.anyString(),Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
+                .updateProcessInstance(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyLong(),
+                        Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
                 .thenReturn(mockResult);

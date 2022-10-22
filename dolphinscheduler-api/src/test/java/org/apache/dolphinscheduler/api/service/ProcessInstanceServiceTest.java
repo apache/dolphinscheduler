@@ -508,8 +508,9 @@ public class ProcessInstanceServiceTest {
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE)).thenReturn(result);
-        Map<String, Object> projectAuthFailRes = processInstanceService.updateProcessInstance(loginUser,"","",projectCode, 1,
-                shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
+        Map<String, Object> projectAuthFailRes =
+                processInstanceService.updateProcessInstance(loginUser, "", "", projectCode, 1,
+                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
         Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailRes.get(Constants.STATUS));
 
         // process instance null
@@ -520,7 +521,7 @@ public class ProcessInstanceServiceTest {
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.empty());
         try {
             Map<String, Object> processInstanceNullRes =
-                    processInstanceService.updateProcessInstance(loginUser, "","",projectCode, 1,
+                    processInstanceService.updateProcessInstance(loginUser, "", "", projectCode, 1,
                             shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
             Assertions.fail();
         } catch (ServiceException ex) {
@@ -532,7 +533,7 @@ public class ProcessInstanceServiceTest {
         processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceNotFinishRes =
-                processInstanceService.updateProcessInstance(loginUser, "","",projectCode, 1,
+                processInstanceService.updateProcessInstance(loginUser, "", "", projectCode, 1,
                         shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
         Assertions.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR,
                 processInstanceNotFinishRes.get(Constants.STATUS));
@@ -559,7 +560,7 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> processInstanceFinishRes =
-                processInstanceService.updateProcessInstance(loginUser, "","",projectCode, 1,
+                processInstanceService.updateProcessInstance(loginUser, "", "", projectCode, 1,
                         taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0, "root");
         Assertions.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
 
@@ -569,7 +570,7 @@ public class ProcessInstanceServiceTest {
 
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.FALSE, Boolean.FALSE))
                 .thenReturn(1);
-        Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, "","",projectCode, 1,
+        Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, "", "", projectCode, 1,
                 taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0, "root");
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }

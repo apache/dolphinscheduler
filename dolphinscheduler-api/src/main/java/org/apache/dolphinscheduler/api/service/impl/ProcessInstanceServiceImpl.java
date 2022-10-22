@@ -501,7 +501,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     @Transactional
     @Override
-    public Map<String, Object> updateProcessInstance(User loginUser, String name, String description, long projectCode, Integer processInstanceId,
+    public Map<String, Object> updateProcessInstance(User loginUser, String name, String description, long projectCode,
+                                                     Integer processInstanceId,
                                                      String taskRelationJson,
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine,
                                                      String globalParams,

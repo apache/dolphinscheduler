@@ -210,7 +210,8 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "locations", required = false) String locations,
                                         @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                         @RequestParam(value = "tenantCode", required = true) String tenantCode) {
-        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, name, description, projectCode, id,
+        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, name, description,
+                projectCode, id,
                 taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout,
                 tenantCode);
         return returnDataList(result);
