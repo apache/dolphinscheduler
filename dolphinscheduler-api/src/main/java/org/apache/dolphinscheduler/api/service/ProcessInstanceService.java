@@ -115,6 +115,8 @@ public interface ProcessInstanceService {
      * update process instance
      *
      * @param loginUser login user
+     * @param name project name
+     * @param description description
      * @param projectCode project code
      * @param taskRelationJson process task relation json
      * @param taskDefinitionJson taskDefinitionJson
@@ -128,6 +130,8 @@ public interface ProcessInstanceService {
      * @return update result code
      */
     Map<String, Object> updateProcessInstance(User loginUser,
+                                              String name,
+                                              String description,
                                               long projectCode,
                                               Integer processInstanceId,
                                               String taskRelationJson,

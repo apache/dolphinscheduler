@@ -167,6 +167,8 @@ public class ProcessInstanceController extends BaseController {
      * update process instance
      *
      * @param loginUser login user
+     * @param name process name
+     * @param description description
      * @param projectCode project code
      * @param taskRelationJson process task relation json
      * @param taskDefinitionJson taskDefinitionJson
@@ -181,6 +183,8 @@ public class ProcessInstanceController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskRelationJson", value = "TASK_RELATION_JSON", dataTypeClass = String.class),
             @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, dataTypeClass = String.class),
             @ApiImplicitParam(name = "id", value = "PROCESS_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", dataTypeClass = String.class),
             @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", required = true, dataTypeClass = boolean.class, example = "false"),
@@ -195,6 +199,8 @@ public class ProcessInstanceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                        @RequestParam(value = "name", required = true) String name,
+                                        @RequestParam(value = "description", required = false) String description,
                                         @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                         @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
                                         @PathVariable(value = "id") Integer id,
@@ -204,7 +210,7 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "locations", required = false) String locations,
                                         @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                         @RequestParam(value = "tenantCode", required = true) String tenantCode) {
-        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
+        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, name, description, projectCode, id,
                 taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout,
                 tenantCode);
         return returnDataList(result);

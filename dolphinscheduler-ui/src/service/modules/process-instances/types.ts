@@ -72,6 +72,8 @@ interface IdReq {
 }
 
 interface ProcessInstanceReq {
+  name: String
+  description?: string
   syncDefine: boolean
   flag?: string
   globalParams?: string
