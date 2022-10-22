@@ -213,7 +213,8 @@ public class CommandServiceImpl implements CommandService {
         if (subProcessParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
             try {
                 childDefineCode =
-                        Long.parseLong(String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
+                        Long.parseLong(
+                                String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
             } catch (NumberFormatException nfe) {
                 logger.error("processDefinitionCode is not a number", nfe);
                 return null;
