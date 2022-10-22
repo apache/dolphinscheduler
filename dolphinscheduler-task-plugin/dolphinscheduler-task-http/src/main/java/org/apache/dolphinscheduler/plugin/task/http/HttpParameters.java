@@ -36,6 +36,7 @@ import java.util.Map;
  * http parameter
  */
 public class HttpParameters extends AbstractParameters {
+
     /**
      * url
      */

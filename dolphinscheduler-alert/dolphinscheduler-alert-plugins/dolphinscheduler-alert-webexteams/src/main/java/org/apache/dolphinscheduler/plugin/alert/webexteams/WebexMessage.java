@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.webexteams;
 
 public class WebexMessage {
+
     private String roomId;
     private String toPersonId;
     private String toPersonEmail;

@@ -43,6 +43,7 @@ public class SeatunnelSparkParameters extends SeatunnelParameters {
     }
 
     public static enum MasterTypeEnum {
+
         YARN("yarn"),
         LOCAL("local"),
         SPARK("spark://"),

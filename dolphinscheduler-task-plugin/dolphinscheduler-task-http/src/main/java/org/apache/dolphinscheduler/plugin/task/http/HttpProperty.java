@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.http;
 import java.util.Objects;
 
 public class HttpProperty {
+
     /**
      * key
      */

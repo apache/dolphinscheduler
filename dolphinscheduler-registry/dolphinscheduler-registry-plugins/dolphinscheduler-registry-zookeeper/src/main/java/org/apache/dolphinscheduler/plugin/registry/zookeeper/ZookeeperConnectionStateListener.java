@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class ZookeeperConnectionStateListener implements ConnectionStateListener {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
 
     private final ConnectionListener listener;

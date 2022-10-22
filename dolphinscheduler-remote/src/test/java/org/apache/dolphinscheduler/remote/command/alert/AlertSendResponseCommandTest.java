@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AlertSendResponseCommandTest {
 
@@ -43,6 +43,6 @@ public class AlertSendResponseCommandTest {
         alertSendResponseCommand.setResResults(responseResults);
 
         Command command = alertSendResponseCommand.convert2Command(1);
-        Assert.assertEquals(CommandType.ALERT_SEND_RESPONSE, command.getType());
+        Assertions.assertEquals(CommandType.ALERT_SEND_RESPONSE, command.getType());
     }
 }

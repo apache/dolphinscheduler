@@ -43,8 +43,8 @@ public class TenantMapperTest extends BaseDaoTest {
      * insert
      * @return Tenant
      */
-    private Tenant insertOne(){
-        //insertOne
+    private Tenant insertOne() {
+        // insertOne
         Tenant tenant = new Tenant();
         tenant.setCreateTime(new Date());
         tenant.setUpdateTime(new Date());
@@ -57,11 +57,11 @@ public class TenantMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOne
+    public void testUpdate() {
+        // insertOne
         Tenant tenant = insertOne();
         tenant.setUpdateTime(new Date());
-        //update
+        // update
         int update = tenantMapper.updateById(tenant);
         Assertions.assertEquals(1, update);
     }
@@ -70,7 +70,7 @@ public class TenantMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Tenant tenant = insertOne();
         int delete = tenantMapper.deleteById(tenant.getId());
         Assertions.assertEquals(1, delete);
@@ -82,7 +82,7 @@ public class TenantMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Tenant tenant = insertOne();
-        //query
+        // query
         List<Tenant> tenants = tenantMapper.selectList(null);
         Assertions.assertNotEquals(tenants.size(), 0);
     }
@@ -97,7 +97,6 @@ public class TenantMapperTest extends BaseDaoTest {
         queue.setQueueName("ut queue name");
         queue.setQueue("ut queue");
         queueMapper.insert(queue);
-
 
         Tenant tenant = insertOne();
         tenant.setQueueId(queue.getId());
@@ -136,8 +135,9 @@ public class TenantMapperTest extends BaseDaoTest {
         tenantMapper.updateById(tenant);
         Page<Tenant> page = new Page(1, 3);
 
-        //tenant.getTenantCode() used instead of tenant.getTenantName()
-        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
+        // tenant.getTenantCode() used instead of tenant.getTenantName()
+        IPage<Tenant> tenantIPage =
+                tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
 
         Assertions.assertNotEquals(tenantIPage.getTotal(), 0);
     }

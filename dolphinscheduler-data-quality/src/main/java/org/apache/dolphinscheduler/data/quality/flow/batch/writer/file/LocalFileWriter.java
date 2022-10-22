@@ -37,7 +37,7 @@ public class LocalFileWriter extends BaseFileWriter {
 
     @Override
     public void write(Dataset<Row> data, SparkRuntimeEnvironment environment) {
-        outputImpl(data,"file://");
+        outputImpl(data, "file://");
     }
 
     @Override

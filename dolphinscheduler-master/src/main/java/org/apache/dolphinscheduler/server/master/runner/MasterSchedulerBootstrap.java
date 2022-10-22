@@ -38,9 +38,11 @@ import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -64,6 +66,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private CommandService commandService;
 
     @Autowired
     private ProcessInstanceDao processInstanceDao;
@@ -135,7 +140,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
                     // the current server is not at running status, cannot consume command.
-                    logger.warn("The current server {} is not at running status, cannot consumes commands.", this.masterAddress);
+                    logger.warn("The current server {} is not at running status, cannot consumes commands.",
+                            this.masterAddress);
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
@@ -170,6 +176,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                                     "The workflow instance is already been cached, this case shouldn't be happened");
                         }
                         WorkflowExecuteRunnable workflowRunnable = new WorkflowExecuteRunnable(processInstance,
+                                commandService,
                                 processService,
                                 processInstanceDao,
                                 nettyExecutorManager,
@@ -223,7 +230,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     }
                 } catch (Exception e) {
                     logger.error("Master handle command {} error ", command.getId(), e);
-                    processService.moveToErrorCommand(command, e.toString());
+                    commandService.moveToErrorCommand(command, e.toString());
                 } finally {
                     latch.countDown();
                 }
@@ -252,7 +259,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
             int pageNumber = 0;
             int pageSize = masterConfig.getFetchCommandNum();
             final List<Command> result =
-                    processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+                    commandService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
             if (CollectionUtils.isNotEmpty(result)) {
                 logger.info(
                         "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",

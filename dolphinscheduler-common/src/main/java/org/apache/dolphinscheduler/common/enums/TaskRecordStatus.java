@@ -29,7 +29,6 @@ public enum TaskRecordStatus {
      * 1 failure
      * 2 exception
      */
-    SUCCESS,FAILURE,EXCEPTION
-
+    SUCCESS, FAILURE, EXCEPTION
 
 }
