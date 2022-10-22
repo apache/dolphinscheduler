@@ -13,7 +13,7 @@ Dolphin Scheduler Official Website
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 
 
-## Design Features
+## Features
 
 Apache DolphinScheduler is the modern data workflow orchestration platform with powerful user interface, dedicated to solving complex task dependencies in the data pipeline and providing various types of jobs available `out of the box`
 
