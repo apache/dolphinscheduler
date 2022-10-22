@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
@@ -223,7 +224,7 @@ public final class AlertSenderService extends Thread {
         Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
         String instanceWarnType = WarningType.ALL.getDescp();
 
-        if (paramsMap != null) {
+        if (MapUtils.isNotEmpty(paramsMap)) {
             instanceWarnType = paramsMap.getOrDefault(AlertConstants.NAME_WARNING_TYPE, WarningType.ALL.getDescp());
         }
 

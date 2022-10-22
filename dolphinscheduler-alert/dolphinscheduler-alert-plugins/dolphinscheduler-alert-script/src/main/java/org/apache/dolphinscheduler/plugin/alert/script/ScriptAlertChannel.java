@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
@@ -30,8 +31,8 @@ public final class ScriptAlertChannel implements AlertChannel {
     public AlertResult process(AlertInfo alertinfo) {
         AlertData alertData = alertinfo.getAlertData();
         Map<String, String> paramsMap = alertinfo.getAlertParams();
-        if (null == paramsMap) {
-            return new AlertResult("false", "script params is null");
+        if (MapUtils.isEmpty(paramsMap)) {
+            return new AlertResult("false", "script params is empty");
         }
         return new ScriptSender(paramsMap).sendScriptAlert(alertData.getTitle(), alertData.getContent());
     }

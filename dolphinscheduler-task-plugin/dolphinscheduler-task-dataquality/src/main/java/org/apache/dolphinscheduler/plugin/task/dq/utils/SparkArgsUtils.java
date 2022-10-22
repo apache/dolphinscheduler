@@ -60,8 +60,7 @@ public class SparkArgsUtils {
         args.add(deployMode);
 
         ProgramType programType = param.getProgramType();
-        String mainClass = StringUtils.isNotEmpty(param.getMainClass()) ? param.getMainClass()
-                : SparkConstants.DEFAULT_MAIN_CLASS_NAME;
+        String mainClass = param.getMainClass();
         if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
             args.add(SparkConstants.MAIN_CLASS);
             args.add(mainClass);
