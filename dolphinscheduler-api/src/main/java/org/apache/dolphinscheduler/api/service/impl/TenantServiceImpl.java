@@ -142,7 +142,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @throws Exception exception
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
                                             int queueId,
@@ -233,9 +233,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         updateTenantValid(existsTenant, updateTenant);
 
         // updateProcessInstance tenant
-        /**
-         * if the tenant code is modified, the original resource needs to be copied to the new tenant.
-         */
+        // if the tenant code is modified, the original resource needs to be copied to the new tenant.
         if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())
                 && PropertyUtils.getResUploadStartupState()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
@@ -260,7 +258,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @throws Exception exception
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
@@ -387,7 +385,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
     /**
      * Make sure tenant with given name exists, and create the tenant if not exists
-     *
      * ONLY for python gateway server, and should not use this in web ui function
      *
      * @param tenantCode tenant code
