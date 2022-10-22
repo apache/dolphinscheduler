@@ -74,13 +74,7 @@ public class UserMapperTest extends BaseDaoTest {
         return user;
     }
 
-    /**
-     * insert one user
-     *
-     * @param tenant tenant
-     * @return User
-     */
-    private User insertOne(Tenant tenant) {
+    private User insertOneUser(Tenant tenant) {
         User user = new User();
         user.setUserName("user1");
         user.setUserPassword("1");
@@ -88,6 +82,7 @@ public class UserMapperTest extends BaseDaoTest {
         user.setUserType(UserType.GENERAL_USER);
         user.setCreateTime(new Date());
         user.setTenantId(tenant.getId());
+        user.setTenantCode(tenant.getTenantCode());
         user.setUpdateTime(new Date());
         userMapper.insert(user);
         return user;
@@ -287,7 +282,7 @@ public class UserMapperTest extends BaseDaoTest {
         // insertOneTenant
         Tenant tenant = insertOneTenant();
         // insertOne
-        User user = insertOne(tenant);
+        User user = insertOneUser(tenant);
         // queryTenantCodeByUserId
         User queryUser = userMapper.queryTenantCodeByUserId(user.getId());
         Assertions.assertEquals(queryUser, user);
@@ -304,7 +299,7 @@ public class UserMapperTest extends BaseDaoTest {
         AccessToken accessToken = insertOneAccessToken(user);
         // queryUserByToken
         User userToken = userMapper.queryUserByToken(accessToken.getToken(), new Date());
-        Assertions.assertEquals(userToken, user);
+        Assertions.assertEquals(userToken.getId(), user.getId());
 
     }
 

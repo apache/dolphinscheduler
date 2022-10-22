@@ -77,6 +77,7 @@ import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeComman
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -129,6 +130,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private CommandService commandService;
 
     @Autowired
     private ProcessInstanceDao processInstanceDao;
@@ -626,7 +630,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setProcessDefinitionVersion(processVersion);
         command.setProcessInstanceId(instanceId);
         command.setTestFlag(testFlag);
-        if (!processService.verifyIsNeedCreateCommand(command)) {
+        if (!commandService.verifyIsNeedCreateCommand(command)) {
             logger.warn(
                     "Process instance is executing the command, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}.",
                     processDefinitionCode, processVersion, instanceId);
@@ -635,7 +639,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         logger.info("Creating command, commandInfo:{}.", command);
-        int create = processService.createCommand(command);
+        int create = commandService.createCommand(command);
 
         if (create > 0) {
             logger.info("Create {} command complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
@@ -784,7 +788,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
             logger.info("Creating command, commandInfo:{}.", command);
-            return processService.createCommand(command);
+            return commandService.createCommand(command);
         }
     }
 
@@ -824,26 +828,28 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateList);
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     logger.info("Creating command, commandInfo:{}.", command);
-                    createCount = processService.createCommand(command);
-                    if (createCount > 0)
+                    createCount = commandService.createCommand(command);
+                    if (createCount > 0) {
                         logger.info("Create {} command complete, processDefinitionCode:{}",
                                 command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                    else
+                    } else {
                         logger.error("Create {} command error, processDefinitionCode:{}",
                                 command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    }
                 }
                 if (startDate != null && endDate != null) {
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startDate);
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, endDate);
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     logger.info("Creating command, commandInfo:{}.", command);
-                    createCount = processService.createCommand(command);
-                    if (createCount > 0)
+                    createCount = commandService.createCommand(command);
+                    if (createCount > 0) {
                         logger.info("Create {} command complete, processDefinitionCode:{}",
                                 command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                    else
+                    } else {
                         logger.error("Create {} command error, processDefinitionCode:{}",
                                 command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    }
                     // dependent process definition
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
                             command.getProcessDefinitionCode());
@@ -904,12 +910,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                     DateUtils.dateToString(listDate.get(endDateIndex)));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             logger.info("Creating command, commandInfo:{}.", command);
-                            if (processService.createCommand(command) > 0)
+                            if (commandService.createCommand(command) > 0) {
                                 logger.info("Create {} command complete, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                            else
+                            } else {
                                 logger.error("Create {} command error, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            }
                             if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
                                 logger.info(
                                         "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, processDefinitionCode:{}.",
@@ -937,12 +944,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(COMMA, stringDate));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             logger.info("Creating command, commandInfo:{}.", command);
-                            if (processService.createCommand(command) > 0)
+                            if (commandService.createCommand(command) > 0) {
                                 logger.info("Create {} command complete, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                            else
+                            } else {
                                 logger.error("Create {} command error, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            }
                         }
                     }
                 }
@@ -985,7 +993,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentProcessDefinition.getTaskDefinitionCode()));
             dependentCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
             logger.info("Creating complement dependent command, commandInfo:{}.", command);
-            dependentProcessDefinitionCreateCount += processService.createCommand(dependentCommand);
+            dependentProcessDefinitionCreateCount += commandService.createCommand(dependentCommand);
         }
 
         return dependentProcessDefinitionCreateCount;

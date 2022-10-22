@@ -32,107 +32,38 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_user")
 public class User {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * user name
-     */
     private String userName;
 
-    /**
-     * user password
-     */
     private String userPassword;
 
-    /**
-     * mail
-     */
     private String email;
 
-    /**
-     * phone
-     */
     private String phone;
 
-    /**
-     * user type
-     */
     private UserType userType;
 
-    /**
-     *  tenant id
-     */
     private int tenantId;
 
-    /**
-     * user state
-     */
     private int state;
 
-    /**
-     * tenant code
-     */
     @TableField(exist = false)
     private String tenantCode;
 
-    /**
-     * queue name
-     */
     @TableField(exist = false)
     private String queueName;
 
-    /**
-     * alert group
-     */
     @TableField(exist = false)
     private String alertGroup;
 
-    /**
-     * user specified queue
-     */
     private String queue;
 
-    /**
-     * time zone
-     */
     private String timeZone;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        User user = (User) o;
-
-        if (id != user.id) {
-            return false;
-        }
-        return userName.equals(user.userName);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id == null ? 0 : id;
-        result = 31 * result + userName.hashCode();
-        return result;
-    }
 }
