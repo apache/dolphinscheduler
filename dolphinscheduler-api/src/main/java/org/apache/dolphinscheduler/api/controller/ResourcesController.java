@@ -662,7 +662,7 @@ public class ResourcesController extends BaseController {
     @ApiException(AUTHORIZED_FILE_RESOURCE_ERROR)
     @AccessLogAnnotation
     public Result authorizedFileWithReadPerm(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                 @RequestParam("userId") Integer userId) {
+                                             @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizedFileWithReadPerm(loginUser, userId);
         return returnDataList(result);
     }

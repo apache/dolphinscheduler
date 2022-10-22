@@ -106,7 +106,8 @@ public interface ProjectService {
      * @param pageNo page number
      * @return project list which with the login user's authorized level
      */
-    Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize, Integer pageNo, String searchVal);
+    Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize, Integer pageNo,
+                                                     String searchVal);
 
     /**
      * delete project by code

@@ -233,8 +233,8 @@ public class UsersController extends BaseController {
     @ApiException(REVOKE_PROJECT_ERROR)
     @AccessLogAnnotation
     public Result revokeProjectById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                               @RequestParam(value = "userId") int userId,
-                               @RequestParam(value = "projectIds") String projectIds) {
+                                    @RequestParam(value = "userId") int userId,
+                                    @RequestParam(value = "projectIds") String projectIds) {
         Map<String, Object> result = usersService.revokeProjectById(loginUser, userId, projectIds);
         return returnDataList(result);
     }
@@ -257,8 +257,8 @@ public class UsersController extends BaseController {
     @ApiException(GRANT_PROJECT_ERROR)
     @AccessLogAnnotation
     public Result grantProjectWithReadPerm(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                               @RequestParam(value = "userId") int userId,
-                               @RequestParam(value = "projectIds") String projectIds) {
+                                           @RequestParam(value = "userId") int userId,
+                                           @RequestParam(value = "projectIds") String projectIds) {
         Map<String, Object> result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         return returnDataList(result);
     }
@@ -355,10 +355,11 @@ public class UsersController extends BaseController {
     @ApiException(GRANT_RESOURCE_ERROR)
     @AccessLogAnnotation
     public Result grantResourceWithPermLevel(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam(value = "userId") int userId,
-                                @RequestParam(value = "readPermResourceIds") String readPermResourceIds,
-                                @RequestParam(value = "allPermResourceIds") String allPermResourceIds) {
-        Map<String, Object> result = usersService.grantResourceWithPermLevel(loginUser, userId, readPermResourceIds, allPermResourceIds);
+                                             @RequestParam(value = "userId") int userId,
+                                             @RequestParam(value = "readPermResourceIds") String readPermResourceIds,
+                                             @RequestParam(value = "allPermResourceIds") String allPermResourceIds) {
+        Map<String, Object> result =
+                usersService.grantResourceWithPermLevel(loginUser, userId, readPermResourceIds, allPermResourceIds);
         return returnDataList(result);
     }
 

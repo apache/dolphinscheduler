@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_UPDATE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -273,7 +272,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
             // case 3: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if(projectUser == null || projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION) {
+            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
@@ -300,7 +299,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
             // case 3: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if(projectUser == null || projectUser.getPerm()!=Constants.DEFAULT_ADMIN_PERMISSION) {
+            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
@@ -375,33 +374,35 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return project list which with the login user's authorized level
      */
     @Override
-    public Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
+    public Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize,
+                                                            Integer pageNo, String searchVal) {
         Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
-        Set<Integer> allProjectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-        Set<Integer> userProjectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, userId, logger);
+        Set<Integer> allProjectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        Set<Integer> userProjectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, userId, logger);
         if (allProjectIds.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
+        IPage<Project> projectIPage =
+                projectMapper.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
 
         for (Project project : projectList) {
-            if(userProjectIds.contains(project.getId())){
+            if (userProjectIds.contains(project.getId())) {
                 ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
                 if (projectUser == null) {
                     // in this case, the user is the project owner, maybe it's better to set it to ALL_PERMISSION.
                     project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
-                }
-                else {
+                } else {
                     project.setPerm(projectUser.getPerm());
                 }
-            }
-            else{
+            } else {
                 project.setPerm(0);
             }
         }
@@ -531,11 +532,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return project list
      */
     @Override
-    public Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId){
+    public Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId) {
         Result result = new Result();
 
-        Set<Integer> projectIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-        List<Project> projectList = projectMapper.listAuthorizedProjects(loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), new ArrayList<>(projectIds));
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        List<Project> projectList = projectMapper.listAuthorizedProjects(
+                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
+                new ArrayList<>(projectIds));
 
         List<Project> unauthorizedProjectsList = new ArrayList<>();
         List<Project> authedProjectList = new ArrayList<>();

@@ -197,18 +197,18 @@ public class ProjectController extends BaseController {
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectWithAuthorizedLevelListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam("userId") Integer userId,
-                                         @RequestParam(value = "searchVal", required = false) String searchVal,
-                                         @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo
-    ) {
+                                                            @RequestParam("userId") Integer userId,
+                                                            @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                            @RequestParam("pageSize") Integer pageSize,
+                                                            @RequestParam("pageNo") Integer pageNo) {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo, searchVal);
+        result = projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
+                searchVal);
         return result;
     }
 
@@ -288,7 +288,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectWithAuthorizedLevel(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam("userId") Integer userId) {
+                                                  @RequestParam("userId") Integer userId) {
         return projectService.queryProjectWithAuthorizedLevel(loginUser, userId);
     }
 

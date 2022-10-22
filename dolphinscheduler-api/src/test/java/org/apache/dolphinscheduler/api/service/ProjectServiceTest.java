@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -54,7 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -225,14 +223,17 @@ public class ProjectServiceTest {
         Integer pageNo = 1;
         String searchVal = "testVal";
         Result result = new Result();
-        Mockito.when(projectMapper.queryProjectListPaging(any(Page.class), Mockito.anyList(), eq(searchVal))).thenReturn(page);
+        Mockito.when(projectMapper.queryProjectListPaging(any(Page.class), Mockito.anyList(), eq(searchVal)))
+                .thenReturn(page);
 
         Set<Integer> allProjectIds = new HashSet();
         allProjectIds.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), projectLogger)).thenReturn(allProjectIds);
+        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
+                loginUser.getId(), projectLogger)).thenReturn(allProjectIds);
 
-        //SUCCESS
-        result = projectService.queryProjectWithAuthorizedLevelListPaging(loginUser.getId(),loginUser,pageSize,pageNo,searchVal);
+        // SUCCESS
+        result = projectService.queryProjectWithAuthorizedLevelListPaging(loginUser.getId(), loginUser, pageSize,
+                pageNo, searchVal);
         logger.info(result.toString());
         PageInfo<Project> pageInfo = (PageInfo<Project>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
@@ -250,22 +251,22 @@ public class ProjectServiceTest {
         tempUser.setId(Integer.MAX_VALUE);
         tempUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-            new Object[]{project.getId()},
-            tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
+                new Object[]{project.getId()},
+                tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
         boolean checkResult = projectService.hasProjectAndWritePerm(tempUser, project, result);
         logger.info(result.toString());
         Assert.assertFalse(checkResult);
 
-        //success
+        // success
         result = new HashMap<>();
         project.setUserId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-            new Object[]{project.getId()},
-            loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
+                new Object[]{project.getId()},
+                loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
-            new Object[]{project.getId()},
-            0, baseServiceLogger)).thenReturn(true);
+                new Object[]{project.getId()},
+                0, baseServiceLogger)).thenReturn(true);
         checkResult = projectService.hasProjectAndWritePerm(loginUser, project, result);
         logger.info(result.toString());
         Assert.assertTrue(checkResult);
@@ -484,7 +485,7 @@ public class ProjectServiceTest {
     }
 
     @Test
-    public void testQueryProjectWithAuthorizedLevel(){
+    public void testQueryProjectWithAuthorizedLevel() {
         Set<Integer> set = new HashSet();
         set.add(1);
         // test admin user
@@ -494,10 +495,10 @@ public class ProjectServiceTest {
         List<Integer> list = new ArrayList<>(1);
         list.add(1);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-            loginUser.getId(), projectLogger)).thenReturn(set);
+                loginUser.getId(), projectLogger)).thenReturn(set);
         Mockito.when(projectMapper.listAuthorizedProjects(
                 loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), list))
-            .thenReturn(getList());
+                .thenReturn(getList());
         Result result = projectService.queryProjectWithAuthorizedLevel(loginUser, 2);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.getData();
@@ -507,10 +508,10 @@ public class ProjectServiceTest {
         loginUser.setId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-            loginUser.getId(), projectLogger)).thenReturn(set);
+                loginUser.getId(), projectLogger)).thenReturn(set);
         Mockito.when(projectMapper.listAuthorizedProjects(
                 loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), list))
-            .thenReturn(getList());
+                .thenReturn(getList());
         result = projectService.queryProjectWithAuthorizedLevel(loginUser, 3);
         logger.info(result.toString());
         projects = (List<Project>) result.getData();

@@ -258,9 +258,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
 
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -750,9 +750,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String otherParamsJson,
                                                        ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -2397,9 +2397,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     public Map<String, Object> deleteProcessDefinitionVersion(User loginUser, long projectCode, long code,
                                                               int version) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_DELETE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_DELETE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -2461,9 +2461,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                             String scheduleJson,
                                                             ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -2609,9 +2609,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                 String otherParamsJson,
                                                                 ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;

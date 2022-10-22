@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -63,7 +62,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.rmi.ServerException;
 import java.text.MessageFormat;
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -360,17 +358,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 return true;
             }
             // case 2: user is resource owner
-            if(Integer.valueOf(resource.getUserId()).equals(loginUser.getId())) {
+            if (Integer.valueOf(resource.getUserId()).equals(loginUser.getId())) {
                 return true;
             }
             // case 3: check user permission level
             ResourcesUser resourcesUser = resourceUserMapper.queryResourceRelation(resource.getId(), loginUser.getId());
 
-            if(resourcesUser == null || resourcesUser.getPerm()!=Constants.AUTHORIZE_WRITABLE_PERM) {
+            if (resourcesUser == null || resourcesUser.getPerm() != Constants.AUTHORIZE_WRITABLE_PERM) {
                 putMsg(result, Status.USER_NO_WRITE_RESOURCE_PERM, loginUser.getUserName(), resource.getFileName());
                 checkResult = false;
-            }
-            else {
+            } else {
                 checkResult = true;
             }
         }
@@ -423,7 +420,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        //Check User's permission level on the file
+        // Check User's permission level on the file
         boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, result);
         if (!hasResourceAndWritePerm) {
             return result;
@@ -881,7 +878,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return resultCheck;
         }
 
-        //Check User's permission level on the file
+        // Check User's permission level on the file
         boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, resultCheck);
         if (!hasResourceAndWritePerm) {
             return resultCheck;
@@ -1435,7 +1432,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        //Check User's permission level on the file
+        // Check User's permission level on the file
         boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, result);
         if (!hasResourceAndWritePerm) {
             return result;
@@ -1746,16 +1743,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedFileWithReadPerm(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
 
         List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_READABLE_PERM);
         Iterator<Resource> iterator = authedResources.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Resource currentResource = iterator.next();
-            if(currentResource.isDirectory()){
+            if (currentResource.isDirectory()) {
                 iterator.remove();
             }
         }
@@ -1763,7 +1760,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Visitor visitor = new ResourceTreeVisitor(authedResources);
         String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
-        String jsonTreeStr = JSONUtils.toJsonString(visitor.visit().getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        String jsonTreeStr =
+                JSONUtils.toJsonString(visitor.visit().getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(jsonTreeStr);
         result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result, Status.SUCCESS);

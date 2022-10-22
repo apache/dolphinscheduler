@@ -200,7 +200,8 @@ public interface UsersService {
      * @param allPermResourceIds resource id array with all permission
      * @return grant result code
      */
-    Map<String, Object> grantResourceWithPermLevel(User loginUser, int userId, String readPermResourceIds, String allPermResourceIds);
+    Map<String, Object> grantResourceWithPermLevel(User loginUser, int userId, String readPermResourceIds,
+                                                   String allPermResourceIds);
 
     /**
      * grant resource

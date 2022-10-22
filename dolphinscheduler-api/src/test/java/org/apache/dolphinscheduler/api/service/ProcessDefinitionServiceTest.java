@@ -771,12 +771,12 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Project project = getProject(projectCode);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_UPDATE))
-            .thenReturn(result);
-        Mockito.when(projectService.hasProjectAndWritePerm(user,project,result)).thenReturn(true);
+                .thenReturn(result);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, result)).thenReturn(true);
 
         try {
             processDefinitionService.updateProcessDefinition(user, projectCode, "test", 1,
-                "", "", "", 0, "root", null, "", null, ProcessExecutionTypeEnum.PARALLEL);
+                    "", "", "", 0, "root", null, "", null, ProcessExecutionTypeEnum.PARALLEL);
             Assertions.fail();
         } catch (ServiceException ex) {
             Assertions.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), ex.getCode());

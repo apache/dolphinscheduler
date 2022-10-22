@@ -542,11 +542,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds){
+    public Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -567,8 +567,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             Project project = this.projectMapper.queryDetailById(Integer.parseInt(projectId));
             if (project == null) {
                 this.putMsg(result, Status.PROJECT_NOT_FOUND, Integer.parseInt(projectId));
-            }
-            else{
+            } else {
                 // 4. delete the relationship between project and user
                 this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
             }
@@ -592,11 +591,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-        //check exist
+        // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
@@ -785,7 +784,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param ResourceIds resource id array that need authorize
      * @return Integer Set of resource ids
      */
-    private Set<Integer> getNeedAuthorizeResIds(String ResourceIds){
+    private Set<Integer> getNeedAuthorizeResIds(String ResourceIds) {
         Set<Integer> needAuthorizeResIds = new HashSet<>();
         if (StringUtils.isNotBlank(ResourceIds)) {
             String[] resourceFullIdArr = ResourceIds.split(",");
@@ -801,7 +800,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         return needAuthorizeResIds;
     }
 
-    private void insertNeedAuthorizeResources(Resource resource, int userId, int resourceIdValue, int permLevel){
+    private void insertNeedAuthorizeResources(Resource resource, int userId, int resourceIdValue, int permLevel) {
         Date now = new Date();
         ResourcesUser resourcesUser = new ResourcesUser();
         resourcesUser.setUserId(userId);
@@ -827,10 +826,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> grantResourceWithPermLevel(User loginUser, int userId, String readPermResourceIds, String allPermResourceIds) {
+    public Map<String, Object> grantResourceWithPermLevel(User loginUser, int userId, String readPermResourceIds,
+                                                          String allPermResourceIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if(resourcePermissionCheckService.functionDisabled()){
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -844,35 +844,40 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Set<Integer> needAuthorizeAllPermResIds = getNeedAuthorizeResIds(allPermResourceIds);
 
-        //If a resource appears in the set of read-only and the set of all permissions, its place in the set with higher permissions is retained
+        // If a resource appears in the set of read-only and the set of all permissions, its place in the set with
+        // higher permissions is retained
         needAuthorizeReadPermResIds.removeAll(needAuthorizeAllPermResIds);
 
-        //Merge the two sets for subsequent operations
+        // Merge the two sets for subsequent operations
         Set<Integer> needAuthorizeResIds = new HashSet<>();
         needAuthorizeResIds.addAll(needAuthorizeReadPermResIds);
         needAuthorizeResIds.addAll(needAuthorizeAllPermResIds);
 
-        //get the authorized resource id list by user id
-        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
-        List<Resource> oldAuthorizedRes = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
-        //if resource type is UDF,need check whether it is bound by UDF function
+        // get the authorized resource id list by user id
+        List<Integer> resIds =
+                resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> oldAuthorizedRes =
+                CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
+        // if resource type is UDF,need check whether it is bound by UDF function
         Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
 
-        //get the unauthorized resource id list
+        // get the unauthorized resource id list
         oldAuthorizedResIds.removeAll(needAuthorizeResIds);
 
         if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
 
             // get all resource id of process definitions those is released
             List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
-            Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Map<Integer, Set<Long>> resourceProcessMap =
+                    ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
             resourceIdSet.retainAll(oldAuthorizedResIds);
             if (CollectionUtils.isNotEmpty(resourceIdSet)) {
                 logger.error("can't be deleted,because it is used of process definition");
                 for (Integer resId : resourceIdSet) {
-                    logger.error("resource id:{} is used of process definition {}", resId, resourceProcessMap.get(resId));
+                    logger.error("resource id:{} is used of process definition {}", resId,
+                            resourceProcessMap.get(resId));
                 }
                 putMsg(result, Status.RESOURCE_IS_USED);
                 return result;

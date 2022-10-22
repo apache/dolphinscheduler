@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -383,7 +382,7 @@ public class UsersServiceTest {
         User loginUser = new User();
         int userId = 3;
 
-        //user not exist
+        // user not exist
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         when(userMapper.selectById(userId)).thenReturn(null);
@@ -391,7 +390,7 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
-        //SUCCESS
+        // SUCCESS
         when(userMapper.selectById(userId)).thenReturn(getUser());
         result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
@@ -521,12 +520,13 @@ public class UsersServiceTest {
         when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
 
-        //user not exist
+        // user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = usersService.grantResourceWithPermLevel(loginUser, 2, readPermResourceIds, allPermResourceIds);
+        Map<String, Object> result =
+                usersService.grantResourceWithPermLevel(loginUser, 2, readPermResourceIds, allPermResourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        //success
+        // success
         when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
         when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
         result = usersService.grantResourceWithPermLevel(loginUser, 1, readPermResourceIds, allPermResourceIds);

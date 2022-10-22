@@ -446,7 +446,8 @@ public class ResourcesServiceTest {
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource(1));
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourceUserMapper.queryResourceRelation(Mockito.anyInt(),Mockito.anyInt())).thenReturn(getResourceUser());
+        Mockito.when(resourceUserMapper.queryResourceRelation(Mockito.anyInt(), Mockito.anyInt()))
+                .thenReturn(getResourceUser());
 
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null,
                 0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);

@@ -143,9 +143,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                     long projectCode,
                                                     String taskDefinitionJson) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -286,9 +286,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                        String taskDefinitionJsonObj,
                                                        String upstreamCodes) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -432,7 +432,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // check user access for project
         Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(user, project, TASK_DEFINITION_DELETE);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result = new HashMap<>();
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
@@ -692,7 +692,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                          Map<String, Object> result) {
         Project project = projectMapper.queryByCode(projectCode);
 
-        //check if user have write perm for project
+        // check if user have write perm for project
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return null;
@@ -953,9 +953,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
-        //check if user have write perm for project
+        // check if user have write perm for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_DELETE);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_DELETE);
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
