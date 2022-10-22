@@ -297,27 +297,20 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testUpdateUser() {
+    public void testUpdateUser() throws IOException {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
-        try {
-            // user not exist
-            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword,
-                    "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
-            Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-            logger.info(result.toString());
+        // user not exist
+        Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword,
+                "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
-            // success
-            when(userMapper.selectById(1)).thenReturn(getUser());
-            when(userMapper.updateById(getUser())).thenReturn(1);
-            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
-                    "13457864543", "queue", 1, "Asia/Shanghai");
-            logger.info(result.toString());
-            Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        } catch (Exception e) {
-            logger.error("update user error", e);
-            Assertions.fail();
-        }
+        // success
+        when(userMapper.selectById(1)).thenReturn(getUser());
+        when(userMapper.updateById(any())).thenReturn(1);
+        result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
+                "13457864543", "queue", 1, "Asia/Shanghai");
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
