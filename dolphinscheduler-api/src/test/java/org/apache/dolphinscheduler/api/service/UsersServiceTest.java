@@ -388,13 +388,13 @@ public class UsersServiceTest {
         when(userMapper.selectById(userId)).thenReturn(null);
         Map<String, Object> result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // SUCCESS
         when(userMapper.selectById(userId)).thenReturn(getUser());
         result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -478,19 +478,19 @@ public class UsersServiceTest {
         User loginUser = new User();
         Map<String, Object> result = this.usersService.revokeProjectById(loginUser, 1, projectId);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         // user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
         result = this.usersService.revokeProjectById(loginUser, 2, projectId);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // success
         Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(new Project());
         result = this.usersService.revokeProjectById(loginUser, 1, projectId);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -525,13 +525,13 @@ public class UsersServiceTest {
         Map<String, Object> result =
                 usersService.grantResourceWithPermLevel(loginUser, 2, readPermResourceIds, allPermResourceIds);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         // success
         when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
         when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
         result = usersService.grantResourceWithPermLevel(loginUser, 1, readPermResourceIds, allPermResourceIds);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test

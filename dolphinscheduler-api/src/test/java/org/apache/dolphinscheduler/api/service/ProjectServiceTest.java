@@ -255,7 +255,7 @@ public class ProjectServiceTest {
                 tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
         boolean checkResult = projectService.hasProjectAndWritePerm(tempUser, project, result);
         logger.info(result.toString());
-        Assert.assertFalse(checkResult);
+        Assertions.assertFalse(checkResult);
 
         // success
         result = new HashMap<>();
@@ -269,7 +269,7 @@ public class ProjectServiceTest {
                 0, baseServiceLogger)).thenReturn(true);
         checkResult = projectService.hasProjectAndWritePerm(loginUser, project, result);
         logger.info(result.toString());
-        Assert.assertTrue(checkResult);
+        Assertions.assertTrue(checkResult);
     }
 
     @Test
