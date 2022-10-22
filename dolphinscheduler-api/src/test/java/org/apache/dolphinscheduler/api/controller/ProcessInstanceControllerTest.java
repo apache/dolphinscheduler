@@ -106,7 +106,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(processInstanceService
-                .updateProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
+                .updateProcessInstance(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyLong(),
+                        Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
                 .thenReturn(mockResult);
@@ -119,6 +120,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("name", "");
+        paramsMap.add("description", "");
         paramsMap.add("taskRelationJson", json);
         paramsMap.add("taskDefinitionJson", "");
         paramsMap.add("processInstanceId", "91");

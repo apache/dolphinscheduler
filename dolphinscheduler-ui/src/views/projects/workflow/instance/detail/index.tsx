@@ -89,6 +89,8 @@ export default defineComponent({
 
       updateProcessInstance(
         {
+          name: saveForm.name,
+          description: saveForm.description,
           syncDefine: saveForm.sync,
           globalParams: JSON.stringify(globalParams),
           locations: JSON.stringify(locations),
