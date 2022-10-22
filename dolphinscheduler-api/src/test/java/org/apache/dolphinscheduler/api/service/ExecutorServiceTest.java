@@ -107,6 +107,9 @@ public class ExecutorServiceTest {
     private CommandService commandService;
 
     @Mock
+    private WorkerGroupService workerGroupService;
+
+    @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Mock
@@ -289,7 +292,7 @@ public class ExecutorServiceTest {
 
         Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
         processDefinitionWorkerGroupMap.put(1L, Constants.DEFAULT_WORKER_GROUP);
-        Mockito.when(processService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
+        Mockito.when(workerGroupService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
                 .thenReturn(processDefinitionWorkerGroupMap);
 
         Command command = new Command();
