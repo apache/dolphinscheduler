@@ -55,10 +55,7 @@ import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +84,8 @@ public interface ProcessService {
     ProcessDefinition findProcessDefineById(int processDefinitionId);
 
     ProcessDefinition findProcessDefinition(Long processDefinitionCode, int processDefinitionVersion);
+
+    List<ProcessDefinition> findProcessDefinitions(Map<Long, Integer> codeVersionMap);
 
     ProcessDefinition findProcessDefinitionByCode(Long processDefinitionCode);
 

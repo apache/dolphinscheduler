@@ -45,10 +45,9 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.NonNull;
@@ -149,6 +148,13 @@ public class MasterFailoverService {
                 needFailoverProcessInstanceList.size(),
                 needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
 
+        Map<Long, Integer> codeVersionMap = new HashMap<>();
+        needFailoverProcessInstanceList
+                .forEach(processInstance -> codeVersionMap.put(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion()));
+        List<ProcessDefinition> processDefinitions = processService.findProcessDefinitions(codeVersionMap);
+        Map<Long, ProcessDefinition> codeProcessDefinitionMap = processDefinitions
+                .stream()
+                .collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             try {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
@@ -157,10 +163,7 @@ public class MasterFailoverService {
                     LOGGER.info("WorkflowInstance doesn't need to failover");
                     continue;
                 }
-                // todo: use batch query
-                ProcessDefinition processDefinition =
-                        processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                                processInstance.getProcessDefinitionVersion());
+                ProcessDefinition processDefinition = codeProcessDefinitionMap.get(processInstance.getProcessDefinitionCode());
                 processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
                 List<TaskInstance> taskInstanceList =

@@ -139,18 +139,8 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -554,6 +544,40 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         return processDefinition;
+    }
+
+    /**
+     * find a batch of process definitions by a map of <code, version>.
+     * @param codeVersionMap Map<code, version>
+     * @return
+     */
+    @Override
+    public List<ProcessDefinition> findProcessDefinitions(Map<Long, Integer> codeVersionMap) {
+        Set<Long> codes = codeVersionMap.keySet();
+        List<ProcessDefinition> processDefinitions = processDefineMapper.queryByCodes(codes);
+        Map<Long, Integer> codeVersionNeedToRetrieve = new HashMap<>();
+        codeVersionNeedToRetrieve.putAll(codeVersionMap);
+        // filter out the code/version entry that don't need to retrieve
+        processDefinitions.forEach(processDefinition -> {
+            long code = processDefinition.getCode();
+            if (codeVersionNeedToRetrieve.containsKey(code) && processDefinition.getVersion() == codeVersionNeedToRetrieve.get(code).intValue()) {
+                codeVersionNeedToRetrieve.remove(code);
+            }
+        });
+        if (!codeVersionNeedToRetrieve.isEmpty()) {
+            List<ProcessDefinition> complementProcessDefinitions = codeVersionNeedToRetrieve.entrySet()
+                    .stream()
+                    .map(entry -> {
+                        ProcessDefinition processDefinition = processDefineLogMapper.queryByDefinitionCodeAndVersion(entry.getKey(), entry.getValue());
+                        if (processDefinition != null) {
+                            processDefinition.setId(0);
+                        }
+                        return processDefinition;
+                    })
+                    .collect(Collectors.toList());
+            processDefinitions.addAll(complementProcessDefinitions);
+        }
+        return processDefinitions;
     }
 
     /**
