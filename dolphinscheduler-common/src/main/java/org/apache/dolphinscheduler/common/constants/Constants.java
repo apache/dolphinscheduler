@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common;
+package org.apache.dolphinscheduler.common.constants;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -202,25 +202,11 @@ public final class Constants {
      */
     public static final String SEMICOLON = ";";
 
-    /**
-     * date format of yyyy-MM-dd HH:mm:ss
-     */
-    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
-
-    /**
-     * date format of yyyyMMdd
-     */
-    public static final String YYYYMMDD = "yyyyMMdd";
-
-    /**
-     * date format of yyyyMMddHHmmss
-     */
-    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
-
-    /**
-     * date format of yyyyMMddHHmmssSSS
-     */
-    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+    public static final String ADDRESS = "address";
+    public static final String DATABASE = "database";
+    public static final String OTHER = "other";
+    public static final String USER = "user";
+    public static final String JDBC_URL = "jdbcUrl";
 
     public static final String IMPORT_SUFFIX = "_import_";
 
@@ -342,44 +328,6 @@ public final class Constants {
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
 
     /**
-     * command parameter keys
-     */
-    public static final String CMD_PARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
-
-    public static final String CMD_PARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
-
-    public static final String CMD_PARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
-
-    public static final String CMD_PARAM_SUB_PROCESS = "processInstanceId";
-
-    public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
-
-    public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
-
-    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_CODE = "processDefinitionCode";
-
-    public static final String CMD_PARAM_START_NODES = "StartNodeList";
-
-    public static final String CMD_PARAM_START_PARAMS = "StartParams";
-
-    public static final String CMD_PARAM_FATHER_PARAMS = "fatherParams";
-
-    /**
-     * complement data start date
-     */
-    public static final String CMDPARAM_COMPLEMENT_DATA_START_DATE = "complementStartDate";
-
-    /**
-     * complement data end date
-     */
-    public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
-
-    /**
-     * complement data Schedule date
-     */
-    public static final String CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST = "complementScheduleDateList";
-
-    /**
      * complement date default cron string
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
@@ -449,31 +397,6 @@ public final class Constants {
     public static final int VERSION_FIRST = 1;
 
     /**
-     * date format of yyyyMMdd
-     */
-    public static final String PARAMETER_FORMAT_DATE = "yyyyMMdd";
-
-    /**
-     * date format of yyyyMMddHHmmss
-     */
-    public static final String PARAMETER_FORMAT_TIME = "yyyyMMddHHmmss";
-
-    /**
-     * system date(yyyyMMddHHmmss)
-     */
-    public static final String PARAMETER_DATETIME = "system.datetime";
-
-    /**
-     * system date(yyyymmdd) today
-     */
-    public static final String PARAMETER_CURRENT_DATE = "system.biz.curdate";
-
-    /**
-     * system date(yyyymmdd) yesterday
-     */
-    public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
-
-    /**
      * ACCEPTED
      */
     public static final String ACCEPTED = "ACCEPTED";
@@ -519,30 +442,7 @@ public final class Constants {
      */
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
     public static final String PID = SystemUtils.IS_OS_WINDOWS ? "handle" : "pid";
-    /**
-     * month_begin
-     */
-    public static final String MONTH_BEGIN = "month_begin";
-    /**
-     * add_months
-     */
-    public static final String ADD_MONTHS = "add_months";
-    /**
-     * month_end
-     */
-    public static final String MONTH_END = "month_end";
-    /**
-     * week_begin
-     */
-    public static final String WEEK_BEGIN = "week_begin";
-    /**
-     * week_end
-     */
-    public static final String WEEK_END = "week_end";
-    /**
-     * timestamp
-     */
-    public static final String TIMESTAMP = "timestamp";
+
     public static final char SUBTRACT_CHAR = '-';
     public static final char ADD_CHAR = '+';
     public static final char MULTIPLY_CHAR = '*';
@@ -721,30 +621,12 @@ public final class Constants {
     public static final String LOCALE_LANGUAGE = "language";
 
     /**
-     * database type
-     */
-    public static final String MYSQL = "MYSQL";
-    public static final String HIVE = "HIVE";
-
-    public static final String ADDRESS = "address";
-    public static final String DATABASE = "database";
-    public static final String OTHER = "other";
-    public static final String USER = "user";
-    public static final String JDBC_URL = "jdbcUrl";
-
-    /**
      * session timeout
      */
     public static final int SESSION_TIME_OUT = 7200;
     public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
     public static final String UDF = "UDF";
     public static final String CLASS = "class";
-
-    /**
-     * dataSource sensitive param
-     */
-    public static final String DATASOURCE_PASSWORD_REGEX =
-            "(?<=((?i)password((\":\")|(=')))).*?(?=((\")|(')))";
 
     /**
      * default worker group
@@ -771,13 +653,6 @@ public final class Constants {
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-    /**
-     * datasource encryption salt
-     */
-    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
-    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
-    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
     /**
      * network interface preferred
@@ -876,8 +751,6 @@ public final class Constants {
     public static final String TYPE_OTHER = "Other";
     public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
 
-    public static final String DATASOUCE = "datasource";
-
     /**
      * spi constants
      */
@@ -913,60 +786,10 @@ public final class Constants {
 
     public static final String CHANGE = "change";
 
-    public static final String SPRING_DATASOURCE_MIN_IDLE = "spring.datasource.minIdle";
-
-    public static final String SPRING_DATASOURCE_MAX_ACTIVE = "spring.datasource.maxActive";
-
-    public static final String SPRING_DATASOURCE_TEST_ON_BORROW = "spring.datasource.testOnBorrow";
-
     /**
      *  support hive datasource in one session
      */
     public static final String SUPPORT_HIVE_ONE_SESSION = "support.hive.oneSession";
-
-    /**
-     * driver
-     */
-    public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
-    public static final String COM_MYSQL_CJ_JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    public static final String COM_MYSQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
-    public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.OracleDriver";
-    public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
-    public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
-    public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
-    public static final String COM_ATHENA_JDBC_DRIVER = "com.simba.athena.jdbc.Driver";
-
-    /**
-     * validation Query
-     */
-    public static final String POSTGRESQL_VALIDATION_QUERY = "select version()";
-    public static final String MYSQL_VALIDATION_QUERY = "select 1";
-    public static final String HIVE_VALIDATION_QUERY = "select 1";
-    public static final String CLICKHOUSE_VALIDATION_QUERY = "select 1";
-    public static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
-    public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
-    public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
-    public static final String PRESTO_VALIDATION_QUERY = "select 1";
-    public static final String REDHIFT_VALIDATION_QUERY = "select 1";
-    public static final String ATHENA_VALIDATION_QUERY = "select 1";
-
-    /**
-     * jdbc url
-     */
-    public static final String JDBC_MYSQL = "jdbc:mysql://";
-    public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
-    public static final String JDBC_HIVE_2 = "jdbc:hive2://";
-    public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
-    public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
-    public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
-    public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
-    public static final String JDBC_DB2 = "jdbc:db2://";
-    public static final String JDBC_PRESTO = "jdbc:presto://";
-    public static final String JDBC_REDSHIFT = "jdbc:redshift://";
-    public static final String JDBC_ATHENA = "jdbc:awsathena://";
 
     public static final String PRINCIPAL = "principal";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";

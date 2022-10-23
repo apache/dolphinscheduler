@@ -52,7 +52,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_LAS
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.YEAR_WEEK;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;

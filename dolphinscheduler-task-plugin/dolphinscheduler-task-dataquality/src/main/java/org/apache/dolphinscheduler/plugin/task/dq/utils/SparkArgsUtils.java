@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.ProgramType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkConstants;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

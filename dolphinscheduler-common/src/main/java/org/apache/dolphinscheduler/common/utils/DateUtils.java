@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +50,7 @@ public final class DateUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
     private static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS =
-            DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS);
+            DateTimeFormatter.ofPattern(DateConstants.YYYY_MM_DD_HH_MM_SS);
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
@@ -195,7 +195,7 @@ public final class DateUtils {
      * @return zone date time string
      */
     public static String dateToString(ZonedDateTime zonedDateTime, ZoneId zoneId) {
-        return DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS).withZone(zoneId).format(zonedDateTime);
+        return DateTimeFormatter.ofPattern(DateConstants.YYYY_MM_DD_HH_MM_SS).withZone(zoneId).format(zonedDateTime);
     }
 
     /**
@@ -591,7 +591,7 @@ public final class DateUtils {
      * @return date string
      */
     public static String getCurrentTimeStamp() {
-        return getCurrentTime(Constants.YYYYMMDDHHMMSSSSS);
+        return getCurrentTime(DateConstants.YYYYMMDDHHMMSSSSS);
     }
 
     /**
@@ -615,7 +615,7 @@ public final class DateUtils {
         }
         String dateToString = dateToString(date, sourceTimezoneId);
         LocalDateTime localDateTime =
-                LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
+                LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(DateConstants.YYYY_MM_DD_HH_MM_SS));
         ZonedDateTime zonedDateTime =
                 ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
         return Date.from(zonedDateTime.toInstant());

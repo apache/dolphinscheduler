@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -70,7 +70,8 @@ public class RedshiftDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.COM_REDSHIFT_JDBC_DRIVER, redshiftDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER,
+                redshiftDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -90,6 +91,7 @@ public class RedshiftDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.REDHIFT_VALIDATION_QUERY, redshiftDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.REDHIFT_VALIDATION_QUERY,
+                redshiftDatasourceProcessor.getValidationQuery());
     }
 }

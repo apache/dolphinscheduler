@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.spark.param;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -75,7 +75,7 @@ public class SparkDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER,
+        Assertions.assertEquals(DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER,
                 sparkDatasourceProcessor.getDatasourceDriver());
     }
 
@@ -95,6 +95,7 @@ public class SparkDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.HIVE_VALIDATION_QUERY, sparkDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.HIVE_VALIDATION_QUERY,
+                sparkDatasourceProcessor.getValidationQuery());
     }
 }

@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -66,7 +67,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PostgreSQLDataSourceParamDTO postgreSqlParam = (PostgreSQLDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_POSTGRESQL, postgreSqlParam.getHost(),
+        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_POSTGRESQL, postgreSqlParam.getHost(),
                 postgreSqlParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, postgreSqlParam.getDatabase());
 
@@ -91,12 +92,12 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_POSTGRESQL_DRIVER;
+        return DataSourceConstants.ORG_POSTGRESQL_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.POSTGRESQL_VALIDATION_QUERY;
+        return DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
     }
 
     @Override

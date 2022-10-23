@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -44,6 +43,7 @@ import software.amazon.awssdk.services.datasync.model.TaskSchedule;
 import software.amazon.awssdk.services.datasync.model.TaskStatus;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

@@ -23,9 +23,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.util.Date;

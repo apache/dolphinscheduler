@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,11 +103,12 @@ public class StringUtilsTest {
 
     @Test
     public void testEscapeJava() {
-        Assertions.assertEquals("str", StringUtils.escapeJava("str"));
+        Assertions.assertEquals("str", org.apache.dolphinscheduler.common.utils.StringUtils.escapeJava("str"));
     }
 
     @Test
     public void testReplaceDoubleBrackets() {
-        Assertions.assertEquals("{ {a} }", StringUtils.replaceDoubleBrackets("{{a}}"));
+        Assertions.assertEquals("{ {a} }",
+                org.apache.dolphinscheduler.common.utils.StringUtils.replaceDoubleBrackets("{{a}}"));
     }
 }

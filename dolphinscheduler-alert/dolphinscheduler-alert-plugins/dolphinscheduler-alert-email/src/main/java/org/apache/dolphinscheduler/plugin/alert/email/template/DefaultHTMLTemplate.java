@@ -21,8 +21,9 @@ import static java.util.Objects.requireNonNull;
 
 import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.Iterator;

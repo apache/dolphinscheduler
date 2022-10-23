@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.clickhouse.param;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -65,7 +66,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public ConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         ClickHouseDataSourceParamDTO clickHouseParam = (ClickHouseDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_CLICKHOUSE, clickHouseParam.getHost(),
+        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_CLICKHOUSE, clickHouseParam.getHost(),
                 clickHouseParam.getPort());
         String jdbcUrl = address + "/" + clickHouseParam.getDatabase();
 
@@ -89,12 +90,12 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_CLICKHOUSE_JDBC_DRIVER;
+        return DataSourceConstants.COM_CLICKHOUSE_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.CLICKHOUSE_VALIDATION_QUERY;
+        return DataSourceConstants.CLICKHOUSE_VALIDATION_QUERY;
     }
 
     @Override

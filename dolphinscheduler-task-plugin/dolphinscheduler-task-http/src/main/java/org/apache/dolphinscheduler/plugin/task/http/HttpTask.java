@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.plugin.task.http.HttpTaskConstants.APP
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -33,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.Charsets;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;

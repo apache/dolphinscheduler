@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle.param;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -73,7 +73,8 @@ public class OracleDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.COM_ORACLE_JDBC_DRIVER, oracleDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_ORACLE_JDBC_DRIVER,
+                oracleDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -92,6 +93,7 @@ public class OracleDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.ORACLE_VALIDATION_QUERY, oracleDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.ORACLE_VALIDATION_QUERY,
+                oracleDatasourceProcessor.getValidationQuery());
     }
 }

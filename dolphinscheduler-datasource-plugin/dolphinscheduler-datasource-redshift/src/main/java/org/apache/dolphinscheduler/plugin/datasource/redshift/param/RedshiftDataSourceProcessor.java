@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -69,7 +70,8 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         RedshiftDataSourceParamDTO redshiftParam = (RedshiftDataSourceParamDTO) datasourceParam;
         String address =
-                String.format("%s%s:%s", Constants.JDBC_REDSHIFT, redshiftParam.getHost(), redshiftParam.getPort());
+                String.format("%s%s:%s", DataSourceConstants.JDBC_REDSHIFT, redshiftParam.getHost(),
+                        redshiftParam.getPort());
         String jdbcUrl = address + Constants.SLASH + redshiftParam.getDatabase();
 
         RedshiftConnectionParam redshiftConnectionParam = new RedshiftConnectionParam();
@@ -93,12 +95,12 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_REDSHIFT_JDBC_DRIVER;
+        return DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.REDHIFT_VALIDATION_QUERY;
+        return DataSourceConstants.REDHIFT_VALIDATION_QUERY;
     }
 
     @Override

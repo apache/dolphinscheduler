@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq;
 
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SLASH;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNDERLINE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.CREATE_TIME;
@@ -33,7 +33,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.UPDATE_TIME;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
@@ -48,6 +47,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -115,8 +116,9 @@ public class DataQualityTask extends AbstractYarnTask {
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs("\""
-                        + StringUtils.replaceDoubleBrackets(
-                                StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
+                        + org.apache.dolphinscheduler.common.utils.StringUtils.replaceDoubleBrackets(
+                                org.apache.dolphinscheduler.common.utils.StringUtils
+                                        .escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
                         + "\"");
 
         dataQualityParameters
@@ -147,7 +149,9 @@ public class DataQualityTask extends AbstractYarnTask {
 
         if (StringUtils.isNotEmpty(inputParameter.get(REGEXP_PATTERN))) {
             inputParameter.put(REGEXP_PATTERN,
-                    StringUtils.escapeJava(StringUtils.escapeJava(inputParameter.get(REGEXP_PATTERN))));
+                    org.apache.dolphinscheduler.common.utils.StringUtils
+                            .escapeJava(org.apache.dolphinscheduler.common.utils.StringUtils
+                                    .escapeJava(inputParameter.get(REGEXP_PATTERN))));
         }
 
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getHdfsPath())) {

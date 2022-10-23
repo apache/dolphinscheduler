@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class BlockingParameters extends AbstractParameters {
 

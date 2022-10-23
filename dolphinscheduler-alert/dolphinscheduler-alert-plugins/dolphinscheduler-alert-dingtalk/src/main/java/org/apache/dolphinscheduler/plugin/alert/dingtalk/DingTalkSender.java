@@ -172,7 +172,7 @@ public final class DingTalkSender {
         String msg = generateMsgJson(title, content);
 
         HttpPost httpPost = constructHttpPost(
-                org.apache.dolphinscheduler.common.utils.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
+                org.apache.commons.lang3.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
@@ -208,7 +208,7 @@ public final class DingTalkSender {
      * @return msg
      */
     private String generateMsgJson(String title, String content) {
-        if (org.apache.dolphinscheduler.common.utils.StringUtils.isBlank(msgType)) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(msgType)) {
             msgType = DingTalkParamsConstants.DING_TALK_MSG_TYPE_TEXT;
         }
         Map<String, Object> items = new HashMap<>();
@@ -238,7 +238,7 @@ public final class DingTalkSender {
         StringBuilder builder = new StringBuilder(title);
         builder.append("\n");
         builder.append(content);
-        if (org.apache.dolphinscheduler.common.utils.StringUtils.isNotBlank(keyword)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {
             builder.append(" ");
             builder.append(keyword);
         }
@@ -256,19 +256,19 @@ public final class DingTalkSender {
      */
     private void generateMarkdownMsg(String title, String content, Map<String, Object> text) {
         StringBuilder builder = new StringBuilder(content);
-        if (org.apache.dolphinscheduler.common.utils.StringUtils.isNotBlank(keyword)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {
             builder.append(" ");
             builder.append(keyword);
         }
         builder.append("\n\n");
-        if (org.apache.dolphinscheduler.common.utils.StringUtils.isNotBlank(atMobiles)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles)) {
             Arrays.stream(atMobiles.split(",")).forEach(value -> {
                 builder.append("@");
                 builder.append(value);
                 builder.append(" ");
             });
         }
-        if (org.apache.dolphinscheduler.common.utils.StringUtils.isNotBlank(atUserIds)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds)) {
             Arrays.stream(atUserIds.split(",")).forEach(value -> {
                 builder.append("@");
                 builder.append(value);
@@ -291,10 +291,10 @@ public final class DingTalkSender {
         Map<String, Object> at = new HashMap<>();
 
         String[] atMobileArray =
-                org.apache.dolphinscheduler.common.utils.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
+                org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
                         : new String[0];
         String[] atUserArray =
-                org.apache.dolphinscheduler.common.utils.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
+                org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
                         : new String[0];
         boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
 

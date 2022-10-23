@@ -22,8 +22,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 import static java.nio.charset.StandardCharsets.UTF_8;
-
-import org.apache.dolphinscheduler.common.Constants;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -87,7 +86,7 @@ public class JSONUtils {
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .registerModule(LOCAL_DATE_TIME_MODULE)
             .setTimeZone(TimeZone.getDefault())
-            .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
+            .setDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS));
 
     private JSONUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");
@@ -398,7 +397,7 @@ public class JSONUtils {
 
     public static class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS);
 
         @Override
         public void serialize(LocalDateTime value,
@@ -410,7 +409,7 @@ public class JSONUtils {
 
     public static class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS);
 
         @Override
         public LocalDateTime deserialize(JsonParser p, DeserializationContext context) throws IOException {
