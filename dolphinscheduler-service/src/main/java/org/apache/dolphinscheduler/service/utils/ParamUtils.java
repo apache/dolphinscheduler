@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_FATHER_PARAMS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -68,15 +71,15 @@ public class ParamUtils {
         Map<String, String> cmdParam = JSONUtils.toMap(processMapStr);
         if (parentProcessInstance.isComplementData()) {
             Map<String, String> parentParam = JSONUtils.toMap(parentProcessInstance.getCommandParam());
-            String endTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
-            String startTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
-            String scheduleTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
+            String endTime = parentParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE);
+            String startTime = parentParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
+            String scheduleTime = parentParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
             if (StringUtils.isNotEmpty(startTime) && StringUtils.isNotEmpty(endTime)) {
-                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, endTime);
-                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
+                cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, endTime);
+                cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, startTime);
             }
             if (StringUtils.isNotEmpty(scheduleTime)) {
-                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, scheduleTime);
+                cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, scheduleTime);
             }
             processMapStr = JSONUtils.toJsonString(cmdParam);
         }

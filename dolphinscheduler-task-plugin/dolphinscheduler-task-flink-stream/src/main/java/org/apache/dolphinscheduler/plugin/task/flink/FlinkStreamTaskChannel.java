@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTaskChannel;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 public class FlinkStreamTaskChannel implements StreamTaskChannel {
 

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.taskRelation;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 
 import java.util.stream.Stream;
 
