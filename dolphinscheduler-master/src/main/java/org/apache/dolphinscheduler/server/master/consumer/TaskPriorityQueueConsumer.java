@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 
@@ -75,7 +74,6 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      */
     @Autowired
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
-
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
