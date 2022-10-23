@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;

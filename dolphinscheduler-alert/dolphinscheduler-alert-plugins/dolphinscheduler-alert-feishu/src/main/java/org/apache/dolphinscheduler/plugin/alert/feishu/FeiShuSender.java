@@ -82,7 +82,7 @@ public final class FeiShuSender {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
 
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(result)) {
+        if (org.apache.dolphinscheduler.common.utils.StringUtils.isBlank(result)) {
             alertResult.setMessage("send fei shu msg error");
             logger.info("send fei shu msg error,fei shu server resp is null");
             return alertResult;

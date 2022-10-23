@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
 

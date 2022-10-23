@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.Map;
 import java.util.Objects;

@@ -29,6 +29,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import javax.annotation.Nonnull;
@@ -670,6 +671,85 @@ public final class DateUtils {
      */
     public static long dateToTimeStamp(Date date) {
         return date == null ? 0L : date.getTime();
+    }
+
+    /**
+     * a default datetime formatter for the timestamp
+     */
+    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    /**
+     * @param timeMillis timeMillis like System.currentTimeMillis()
+     * @return string formatted as yyyy-MM-dd HH:mm:ss
+     */
+    public static String formatTimeStamp(long timeMillis) {
+        return formatTimeStamp(timeMillis, DEFAULT_DATETIME_FORMATTER);
+    }
+
+    /**
+     * @param timeMillis timeMillis like System.currentTimeMillis()
+     * @param dateTimeFormatter expect formatter, like yyyy-MM-dd HH:mm:ss
+     * @return formatted string
+     */
+    public static String formatTimeStamp(long timeMillis, DateTimeFormatter dateTimeFormatter) {
+        Objects.requireNonNull(dateTimeFormatter);
+        return dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis),
+                ZoneId.systemDefault()));
+    }
+
+    /**
+     * get the formatted date string
+     *
+     * @param date date
+     * @param format e.g. yyyy-MM-dd HH:mm:ss
+     * @return date string
+     */
+    public static String format(Date date, String format) {
+        return format(date2LocalDateTime(date), format);
+    }
+
+    /**
+     * convert string to date and time
+     *
+     * @param date date
+     * @param format format
+     * @return date
+     */
+    public static Date parse(String date, String format) {
+        try {
+            LocalDateTime ldt = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
+            return localDateTime2Date(ldt);
+        } catch (Exception e) {
+            logger.error("error while parse date:" + date, e);
+        }
+        return null;
+    }
+
+    /**
+     * convert schedule string to date
+     *
+     * @param schedule schedule
+     * @return convert schedule string to date
+     */
+    public static Date getScheduleDate(String schedule) {
+        return stringToDate(schedule);
+    }
+
+    public static Date addMonths(Date date, int amount) {
+        return add(date, 2, amount);
+    }
+
+    public static Date addDays(Date date, int amount) {
+        return add(date, 5, amount);
+    }
+
+    public static Date addMinutes(Date date, int amount) {
+        return add(date, 12, amount);
+    }
+
+    public static String getTimestampString() {
+        return String.valueOf(System.currentTimeMillis());
     }
 
 }

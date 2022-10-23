@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.telegram;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;

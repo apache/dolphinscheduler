@@ -25,9 +25,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_S
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.MYSQL;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.POSTGRESQL;
 
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 /**
  * JdbcUrlParser

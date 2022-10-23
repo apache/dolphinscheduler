@@ -27,11 +27,11 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.LINES
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TARGET_DIR;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 public class OracleDataSourceClient extends CommonDataSourceClient {
 

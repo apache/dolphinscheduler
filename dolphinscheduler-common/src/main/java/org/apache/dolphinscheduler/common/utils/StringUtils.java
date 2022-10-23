@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.utils;
+package org.apache.dolphinscheduler.common.utils;
+
+import org.apache.dolphinscheduler.common.Constants;
 
 import java.io.IOException;
 import java.io.StringWriter;

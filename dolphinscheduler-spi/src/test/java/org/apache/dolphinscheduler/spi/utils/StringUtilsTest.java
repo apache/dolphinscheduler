@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.utils;
 
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
