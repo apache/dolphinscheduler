@@ -708,7 +708,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
 
-        if (isAdmin(loginUser) && "".equals(fullName)) {
+        if (isAdmin(loginUser) && StringUtils.isBlank(fullName)) {
             // list all tenants' resources to admin users in the root directory
             List<User> userList = userMapper.selectList(null);
             Set<String> visitedTenantEntityCode = new HashSet<>();
@@ -739,7 +739,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             try {
-                if ("".equals(fullName)) {
+                if (StringUtils.isBlank(fullName)) {
                     resourcesList = storageOperate.listFilesStatus(defaultPath, defaultPath, tenantCode, type);
                 } else {
                     resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
@@ -866,7 +866,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
 
-        if ("".equals(fullName)) {
+        if (StringUtils.isBlank(fullName)) {
             if (isAdmin(loginUser)) {
                 List<User> userList = userMapper.selectList(null);
                 Set<String> visitedTenantEntityCode = new HashSet<>();
@@ -2092,7 +2092,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                       String resTenantCode) throws ServiceException {
         if (!isAdmin) {
             resTenantCode = resTenantCode == null ? "" : resTenantCode;
-            if (!"".equals(resTenantCode) && !resTenantCode.equals(userTenantCode)) {
+            if (!StringUtils.isBlank(resTenantCode) && !resTenantCode.equals(userTenantCode)) {
                 // if an ordinary user directly send a query API with a different tenantCode and fullName "",
                 // still he/she does not have read permission.
                 return false;

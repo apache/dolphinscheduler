@@ -30,6 +30,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -1574,7 +1575,7 @@ public class ProcessServiceImpl implements ProcessService {
         // only if mainJar is not null and does not contains "resourceName" field
         if (res != null) {
             String resourceFullName = res.getResourceName();
-            if ("".equals(resourceFullName)) {
+            if (StringUtils.isBlank(resourceFullName)) {
                 logger.error("invalid resourceId, {}", resourceFullName);
                 return null;
             }
@@ -3011,7 +3012,7 @@ public class ProcessServiceImpl implements ProcessService {
 
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
             resourceFullNames = params.getResourceFilesList().stream()
-                    .filter(t -> !"".equals(t.getResourceName()))
+                    .filter(t -> !StringUtils.isBlank(t.getResourceName()))
                     .map(ResourceInfo::getResourceName)
                     .collect(toSet());
         }
