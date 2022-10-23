@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import lombok.Data;
 
@@ -265,4 +266,33 @@ public class TaskDefinition {
         return memoryMax == null ? -1 : memoryMax;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        TaskDefinition that = (TaskDefinition) o;
+        return failRetryTimes == that.failRetryTimes
+                && failRetryInterval == that.failRetryInterval
+                && timeout == that.timeout
+                && delayTime == that.delayTime
+                && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description)
+                && Objects.equals(taskType, that.taskType)
+                && Objects.equals(taskParams, that.taskParams)
+                && flag == that.flag
+                && taskPriority == that.taskPriority
+                && Objects.equals(workerGroup, that.workerGroup)
+                && timeoutFlag == that.timeoutFlag
+                && timeoutNotifyStrategy == that.timeoutNotifyStrategy
+                && (Objects.equals(resourceIds, that.resourceIds)
+                        || ("".equals(resourceIds) && that.resourceIds == null)
+                        || ("".equals(that.resourceIds) && resourceIds == null))
+                && environmentCode == that.environmentCode
+                && taskGroupId == that.taskGroupId
+                && taskGroupPriority == that.taskGroupPriority
+                && Objects.equals(cpuQuota, that.cpuQuota)
+                && Objects.equals(memoryMax, that.memoryMax)
+                && Objects.equals(taskExecuteType, that.taskExecuteType);
+    }
 }
