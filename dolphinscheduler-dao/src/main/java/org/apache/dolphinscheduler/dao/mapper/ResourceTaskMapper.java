@@ -20,20 +20,22 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * resource task relation mapper interface
  */
 public interface ResourceTaskMapper extends BaseMapper<ResourcesTask> {
+
     Integer existResourceByTaskIdNFullName(@Param("taskId") int task_id, @Param("fullName") String fullName);
 
-    int deleteIds(@Param("resIds")Integer[] resIds);
+    int deleteIds(@Param("resIds") Integer[] resIds);
 
     int updateResource(@Param("id") int id, @Param("fullName") String fullName);
 

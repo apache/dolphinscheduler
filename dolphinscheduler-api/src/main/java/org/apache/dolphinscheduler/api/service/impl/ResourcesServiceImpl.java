@@ -942,7 +942,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
         // Transform into StorageEntity for compatibility
         List<StorageEntity> transformedResourceList = resources.stream()
-                 .map(this::createStorageEntityBasedOnResource)
+                .map(this::createStorageEntityBasedOnResource)
                 .collect(Collectors.toList());
         Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
         result.setData(visitor.visit("").getChildren());
@@ -956,11 +956,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param resource  a resource object
      * @return a storageEntity object
      */
-    private StorageEntity createStorageEntityBasedOnResource (Resource resource) {
+    private StorageEntity createStorageEntityBasedOnResource(Resource resource) {
         StorageEntity entity = new StorageEntity();
         entity.setFullName(resource.getFullName());
         entity.setPfullName(resource.getPid() == -1 ? ""
-                                                    : resourcesMapper.selectById(resource.getPid()).getFullName());
+                : resourcesMapper.selectById(resource.getPid()).getFullName());
         entity.setDirectory(resource.isDirectory());
         entity.setAlias(resource.getAlias());
         entity.setId(resource.getId());

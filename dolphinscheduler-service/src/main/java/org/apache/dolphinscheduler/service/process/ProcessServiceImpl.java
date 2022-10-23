@@ -312,7 +312,7 @@ public class ProcessServiceImpl implements ProcessService {
         processInstance.setTestFlag(command.getTestFlag());
         // if the processDefinition is serial
         ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                                                                         processInstance.getProcessDefinitionVersion());
+                processInstance.getProcessDefinitionVersion());
         if (processDefinition.getExecutionType().typeIsSerial()) {
             saveSerialProcess(processInstance, processDefinition);
             if (processInstance.getState() != WorkflowExecutionStatus.SUBMITTED_SUCCESS) {
@@ -2336,14 +2336,14 @@ public class ProcessServiceImpl implements ProcessService {
         if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
 
-            for (TaskDefinitionLog newTaskDefinitionLog: newTaskDefinitionLogs) {
+            for (TaskDefinitionLog newTaskDefinitionLog : newTaskDefinitionLogs) {
                 Set<String> resourceFullNameSet = getResourceFullNames(newTaskDefinitionLog);
                 for (String resourceFullName : resourceFullNameSet) {
-                        List<TaskDefinition> taskDefinitionList =  taskDefinitionMapper.selectByMap(
-                                Collections.singletonMap("code", newTaskDefinitionLog.getCode()));
-                        if (taskDefinitionList.size() > 0) {
-                            createRelationTaskResourcesIfNotExist(
-                                    taskDefinitionList.get(0).getId(),resourceFullName);
+                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
+                            Collections.singletonMap("code", newTaskDefinitionLog.getCode()));
+                    if (taskDefinitionList.size() > 0) {
+                        createRelationTaskResourcesIfNotExist(
+                                taskDefinitionList.get(0).getId(), resourceFullName);
                     }
                 }
             }
@@ -2354,21 +2354,21 @@ public class ProcessServiceImpl implements ProcessService {
                 Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionLog);
 
                 // remove resources that user deselected.
-                for (ResourcesTask resourcesTask: resourceTaskMapper.selectByMap(
+                for (ResourcesTask resourcesTask : resourceTaskMapper.selectByMap(
                         Collections.singletonMap("task_id",
                                 taskDefinitionMapper.queryByCode(taskDefinitionLog.getCode()).getId()))) {
-                    if (!resourceFullNameSet.contains(resourcesTask.getFullName())){
+                    if (!resourceFullNameSet.contains(resourcesTask.getFullName())) {
                         resourceTaskMapper.deleteById(resourcesTask.getId());
                     }
                 }
 
                 for (String resourceFullName : resourceFullNameSet) {
-                        List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
-                                Collections.singletonMap("code", taskDefinitionLog.getCode()));
-                        if (taskDefinitionList.size() > 0) {
-                            createRelationTaskResourcesIfNotExist(
-                                    taskDefinitionList.get(0).getId(),resourceFullName);
-                        }
+                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
+                            Collections.singletonMap("code", taskDefinitionLog.getCode()));
+                    if (taskDefinitionList.size() > 0) {
+                        createRelationTaskResourcesIfNotExist(
+                                taskDefinitionList.get(0).getId(), resourceFullName);
+                    }
                 }
 
                 updateResult += taskDefinitionMapper.updateById(taskDefinitionLog);
@@ -3006,11 +3006,11 @@ public class ProcessServiceImpl implements ProcessService {
 
     private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
         Set<String> resourceFullNames = null;
-        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
+        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder()
+                .taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
 
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-            resourceFullNames = params.getResourceFilesList().
-                    stream()
+            resourceFullNames = params.getResourceFilesList().stream()
                     .filter(t -> !"".equals(t.getResourceName()))
                     .map(ResourceInfo::getResourceName)
                     .collect(toSet());
@@ -3026,7 +3026,7 @@ public class ProcessServiceImpl implements ProcessService {
     private Integer createRelationTaskResourcesIfNotExist(int taskId, String resourceFullName) {
 
         Integer resourceId = resourceTaskMapper.existResourceByTaskIdNFullName(taskId, resourceFullName);
-        if ( null == resourceId) {
+        if (null == resourceId) {
             // create the relation if not exist
             ResourcesTask resourcesTask = new ResourcesTask(taskId, resourceFullName, ResourceType.FILE);
             resourceTaskMapper.insert(resourcesTask);

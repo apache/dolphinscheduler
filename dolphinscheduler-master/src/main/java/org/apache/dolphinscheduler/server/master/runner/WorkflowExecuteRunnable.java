@@ -1881,7 +1881,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         // todo: Can we use a better way to set the recover taskInstanceId list? rather then use the cmdParam
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
             List<Integer> startTaskInstanceIds = Arrays.stream(paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING)
-                            .split(COMMA))
+                    .split(COMMA))
                     .filter(StringUtils::isNotEmpty)
                     .map(Integer::valueOf)
                     .collect(Collectors.toList());

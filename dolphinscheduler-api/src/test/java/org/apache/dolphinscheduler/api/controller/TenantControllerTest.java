@@ -27,8 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -51,9 +51,9 @@ public class TenantControllerTest extends AbstractControllerTest {
         mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tenantCode","hayden");
-        paramsMap.add("queueId","1");
-        paramsMap.add("description","tenant description");
+        paramsMap.add("tenantCode", "hayden");
+        paramsMap.add("queueId", "1");
+        paramsMap.add("description", "tenant description");
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
         MvcResult mvcResult = mockMvc.perform(post("/tenants")

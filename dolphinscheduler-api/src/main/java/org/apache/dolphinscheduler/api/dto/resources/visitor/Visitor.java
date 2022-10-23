@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.dao.entity.User;
 
 /**
  * Visitor

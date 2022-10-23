@@ -1188,8 +1188,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
                     if (CollectionUtils.isEmpty(component.getChildren())) {
                         // if not exist,need create it
-                        if (!storageOperate.exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
-                            storageOperate.mkdir(newTenantCode, String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
+                        if (!storageOperate
+                                .exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
+                            storageOperate.mkdir(newTenantCode,
+                                    String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
                         }
                     } else {
                         copyResourceFiles(oldTenantCode, newTenantCode, component, srcBasePath, dstBasePath);

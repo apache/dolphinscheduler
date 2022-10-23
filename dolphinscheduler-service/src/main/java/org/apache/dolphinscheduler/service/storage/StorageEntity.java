@@ -20,10 +20,11 @@
 
 package org.apache.dolphinscheduler.service.storage;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
+
+import lombok.Data;
 
 // StorageEneity is an entity representing a resource in the third-part storage service.
 // It is only stored in t_ds_relation_resources_task if the resource is used by a task.
@@ -32,6 +33,7 @@ import java.util.Date;
 
 @Data
 public class StorageEntity {
+
     /**
      * exist only if it is stored in t_ds_relation_resources_task.
      *

@@ -20,11 +20,13 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 @Data
 @TableName("t_ds_relation_resources_task")

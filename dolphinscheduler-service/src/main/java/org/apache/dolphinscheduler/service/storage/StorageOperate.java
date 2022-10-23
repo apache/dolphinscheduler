@@ -90,7 +90,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    boolean exists(String fullName) throws IOException ;
+    boolean exists(String fullName) throws IOException;
 
     /**
      * delete the resource of  filePath
@@ -177,15 +177,18 @@ public interface StorageOperate {
     /**
      * return files and folders in the current directory and subdirectories
      * */
-    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode, ResourceType type);
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type);
 
     /**
     * return files and folders in the current directory
     * */
-    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws Exception;
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws Exception;
 
     /**
      * return a file status
      * */
-    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode, ResourceType type) throws Exception;
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
+                                       ResourceType type) throws Exception;
 }
