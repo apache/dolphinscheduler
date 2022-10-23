@@ -24,7 +24,7 @@ import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstan
 
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.http.HttpEntity;
