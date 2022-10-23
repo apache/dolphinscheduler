@@ -88,23 +88,29 @@ public class FileUtils {
     /**
      * directory of process execution
      *
-     * @param projectCode project code
-     * @param processDefineCode process definition Code
+     * @param tenant               tenant
+     * @param projectCode          project code
+     * @param processDefineCode    process definition Code
      * @param processDefineVersion process definition version
-     * @param processInstanceId process instance id
-     * @param taskInstanceId task instance id
+     * @param processInstanceId    process instance id
+     * @param taskInstanceId       task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion,
-                                           int processInstanceId, int taskInstanceId) {
-        String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
-                projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        return fileName;
+    public static String getProcessExecDir(String tenant,
+                                           long projectCode,
+                                           long processDefineCode,
+                                           int processDefineVersion,
+                                           int processInstanceId,
+                                           int taskInstanceId) {
+        return String.format(
+                "%s/exec/process/%s/%d/%d_%d/%d/%d",
+                DATA_BASEDIR,
+                tenant,
+                projectCode,
+                processDefineCode,
+                processDefineVersion,
+                processInstanceId,
+                taskInstanceId);
     }
 
     /**
