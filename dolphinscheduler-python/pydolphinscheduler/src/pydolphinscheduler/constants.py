@@ -62,6 +62,7 @@ class TaskType(str):
     OPENMLDB = "OPENMLDB"
     PYTORCH = "PYTORCH"
     DVC = "DVC"
+    KUBERNETES = "K8S"
 
 
 class DefaultTaskCodeNum(str):

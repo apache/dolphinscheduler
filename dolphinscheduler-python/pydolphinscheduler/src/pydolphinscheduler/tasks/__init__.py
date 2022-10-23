@@ -23,6 +23,7 @@ from pydolphinscheduler.tasks.dependent import Dependent
 from pydolphinscheduler.tasks.dvc import DVCDownload, DVCInit, DVCUpload
 from pydolphinscheduler.tasks.flink import Flink
 from pydolphinscheduler.tasks.http import Http
+from pydolphinscheduler.tasks.kubernetes import Kubernetes
 from pydolphinscheduler.tasks.map_reduce import MR
 from pydolphinscheduler.tasks.mlflow import (
     MLflowModels,
@@ -66,4 +67,5 @@ __all__ = [
     "SubProcess",
     "Switch",
     "SageMaker",
+    "Kubernetes",
 ]
