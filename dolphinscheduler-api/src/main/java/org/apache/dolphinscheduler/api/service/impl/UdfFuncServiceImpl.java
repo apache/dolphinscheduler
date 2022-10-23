@@ -261,7 +261,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             }
         }
 
-        // Resource resource = resourceMapper.selectById(resourceId);
         Boolean doesResExist = false;
         try {
             doesResExist = storageOperate.exists(fullName);

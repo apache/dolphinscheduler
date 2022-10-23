@@ -942,21 +942,32 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
         // Transform into StorageEntity for compatibility
         List<StorageEntity> transformedResourceList = resources.stream()
-                .map(resource -> new StorageEntity.Builder()
-                        .fullName(resource.getFullName())
-                        .pfullName(resource.getPid() == -1 ? ""
-                                : resourcesMapper.selectById(resource.getPid()).getFullName())
-                        .isDirectory(resource.isDirectory())
-                        .alias(resource.getAlias())
-                        .id(resource.getId())
-                        .type(resource.getType())
-                        .description(resource.getDescription())
-                        .build())
+                 .map(this::createStorageEntityBasedOnResource)
                 .collect(Collectors.toList());
         Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
         result.setData(visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * transform resource object into StorageEntity object
+     *
+     * @param resource  a resource object
+     * @return a storageEntity object
+     */
+    private StorageEntity createStorageEntityBasedOnResource (Resource resource) {
+        StorageEntity entity = new StorageEntity();
+        entity.setFullName(resource.getFullName());
+        entity.setPfullName(resource.getPid() == -1 ? ""
+                                                    : resourcesMapper.selectById(resource.getPid()).getFullName());
+        entity.setDirectory(resource.isDirectory());
+        entity.setAlias(resource.getAlias());
+        entity.setId(resource.getId());
+        entity.setType(resource.getType());
+        entity.setDescription(resource.getDescription());
+
+        return entity;
     }
 
     /**
@@ -1833,16 +1844,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (CollectionUtils.isNotEmpty(resourceList)) {
             // Transform into StorageEntity for compatibility
             List<StorageEntity> transformedResourceList = resourceList.stream()
-                    .map(resource -> new StorageEntity.Builder()
-                            .fullName(resource.getFullName())
-                            .pfullName(resource.getPid() == -1 ? ""
-                                    : resourcesMapper.selectById(resource.getPid()).getFullName())
-                            .isDirectory(resource.isDirectory())
-                            .alias(resource.getAlias())
-                            .id(resource.getId())
-                            .type(resource.getType())
-                            .description(resource.getDescription())
-                            .build())
+                    .map(this::createStorageEntityBasedOnResource)
                     .collect(Collectors.toList());
             Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
             list = visitor.visit("").getChildren();
@@ -1899,16 +1901,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         // Transform into StorageEntity for compatibility
         List<StorageEntity> transformedResourceList = list.stream()
-                .map(resource -> new StorageEntity.Builder()
-                        .fullName(resource.getFullName())
-                        .pfullName(resource.getPid() == -1 ? ""
-                                : resourcesMapper.selectById(resource.getPid()).getFullName())
-                        .isDirectory(resource.isDirectory())
-                        .alias(resource.getAlias())
-                        .id(resource.getId())
-                        .type(resource.getType())
-                        .description(resource.getDescription())
-                        .build())
+                .map(this::createStorageEntityBasedOnResource)
                 .collect(Collectors.toList());
         Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
         result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
@@ -1992,16 +1985,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
         // Transform into StorageEntity for compatibility
         List<StorageEntity> transformedResourceList = authedResources.stream()
-                .map(resource -> new StorageEntity.Builder()
-                        .fullName(resource.getFullName())
-                        .pfullName(resource.getPid() == -1 ? ""
-                                : resourcesMapper.selectById(resource.getPid()).getFullName())
-                        .isDirectory(resource.isDirectory())
-                        .alias(resource.getAlias())
-                        .id(resource.getId())
-                        .type(resource.getType())
-                        .description(resource.getDescription())
-                        .build())
+                .map(this::createStorageEntityBasedOnResource)
                 .collect(Collectors.toList());
         Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
         String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);

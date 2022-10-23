@@ -801,7 +801,7 @@ CREATE TABLE `t_ds_relation_resources_task` (
   `type` tinyint DEFAULT NULL COMMENT 'resource type,0:FILE,1:UDF',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_relation_resources_task_un` (`task_id`, `full_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of t_ds_relation_resources_task

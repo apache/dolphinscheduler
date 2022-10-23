@@ -497,18 +497,20 @@ public class HadoopUtils implements Closeable, StorageOperate {
                     String suffix = StringUtils.difference(path, fullName);
                     String fileName = StringUtils.difference(defaultPath, fullName);
 
-                    storageEntityList.add(new StorageEntity.Builder()
-                            .alias(suffix)
-                            .fileName(fileName)
-                            .fullName(fullName)
-                            .isDirectory(true)
-                            .description("")
-                            .userName(tenantCode)
-                            .type(type)
-                            .size(fileStatus.getLen())
-                            .updateTime(new Date(fileStatus.getModificationTime()))
-                            .pfullName(path)
-                            .build());
+                    StorageEntity entity = new StorageEntity();
+                    entity.setAlias(suffix);
+                    entity.setFileName(fileName);
+                    entity.setFullName(fullName);
+                    entity.setDirectory(true);
+                    entity.setDescription("");
+                    entity.setUserName(tenantCode);
+                    entity.setType(type);
+                    entity.setSize(fileStatus.getLen());
+                    entity.setCreateTime(new Date(fileStatus.getModificationTime()));
+                    entity.setUpdateTime(new Date(fileStatus.getModificationTime()));
+                    entity.setPfullName(path);
+
+                    storageEntityList.add(entity);
                 } else {
                     // the path is a file
                     String fullName = fileStatus.getPath().toString();
@@ -517,18 +519,20 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
                     String fileName = StringUtils.difference(defaultPath, fullName);
 
-                    storageEntityList.add(new StorageEntity.Builder()
-                            .alias(alias)
-                            .fileName(fileName)
-                            .fullName(fullName)
-                            .isDirectory(false)
-                            .description("")
-                            .userName(tenantCode)
-                            .type(type)
-                            .size(fileStatus.getLen())
-                            .updateTime(new Date(fileStatus.getModificationTime()))
-                            .pfullName(path)
-                            .build());
+                    StorageEntity entity = new StorageEntity();
+                    entity.setAlias(alias);
+                    entity.setFileName(fileName);
+                    entity.setFullName(fullName);
+                    entity.setDirectory(false);
+                    entity.setDescription("");
+                    entity.setUserName(tenantCode);
+                    entity.setType(type);
+                    entity.setSize(fileStatus.getLen());
+                    entity.setCreateTime(new Date(fileStatus.getModificationTime()));
+                    entity.setUpdateTime(new Date(fileStatus.getModificationTime()));
+                    entity.setPfullName(path);
+
+                    storageEntityList.add(entity);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -558,18 +562,20 @@ public class HadoopUtils implements Closeable, StorageOperate {
                 fileName = StringUtils.difference(prefix, fileStatus.getPath().toString());
             }
 
-            return new StorageEntity.Builder()
-                    .alias(alias)
-                    .fileName(fileName)
-                    .size(fileStatus.getLen())
-                    .isDirectory(fileStatus.isDirectory())
-                    .description("")
-                    .userName(tenantCode)
-                    .type(type)
-                    .fullName(fullName)
-                    .createTime(new Date(fileStatus.getModificationTime()))
-                    .updateTime(new Date(fileStatus.getModificationTime()))
-                    .build();
+            StorageEntity entity = new StorageEntity();
+            entity.setAlias(alias);
+            entity.setFileName(fileName);
+            entity.setFullName(fullName);
+            entity.setDirectory(fileStatus.isDirectory());
+            entity.setDescription("");
+            entity.setUserName(tenantCode);
+            entity.setType(type);
+            entity.setSize(fileStatus.getLen());
+            entity.setCreateTime(new Date(fileStatus.getModificationTime()));
+            entity.setUpdateTime(new Date(fileStatus.getModificationTime()));
+            entity.setPfullName(path);
+
+            return entity;
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException("The path does not exist.");
         } catch (IOException e) {

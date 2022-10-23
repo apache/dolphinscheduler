@@ -928,15 +928,16 @@ public class ResourcesServiceTest {
     }
 
     private StorageEntity getStorageEntityResource() {
-        return new StorageEntity.Builder()
-                .alias("ResourcesServiceTest")
-                .fileName("ResourcesServiceTest")
-                .isDirectory(false)
-                .description("")
-                .userName("123")
-                .type(ResourceType.FILE)
-                .fullName("/dolphinscheduler/123/resources/ResourcesServiceTest")
-                .build();
+        StorageEntity entity = new StorageEntity();
+        entity.setAlias("ResourcesServiceTest");
+        entity.setFileName("ResourcesServiceTest");
+        entity.setDirectory(false);
+        entity.setDescription("");
+        entity.setUserName("123");
+        entity.setType(ResourceType.FILE);
+        entity.setFullName("/dolphinscheduler/123/resources/ResourcesServiceTest");
+
+        return entity;
     }
 
     private Resource getResource(int resourceId) {
@@ -977,15 +978,16 @@ public class ResourcesServiceTest {
     }
 
     private StorageEntity getStorageEntityUdfResource() {
-        return new StorageEntity.Builder()
-                .alias("ResourcesServiceTest1.jar")
-                .fileName("ResourcesServiceTest1.jar")
-                .isDirectory(false)
-                .description("")
-                .userName("123")
-                .type(ResourceType.FILE)
-                .fullName("/dolphinscheduler/123/resources/ResourcesServiceTest1.jar")
-                .build();
+        StorageEntity entity = new StorageEntity();
+        entity.setAlias("ResourcesServiceTest1.jar");
+        entity.setFileName("ResourcesServiceTest1.jar");
+        entity.setDirectory(false);
+        entity.setDescription("");
+        entity.setUserName("123");
+        entity.setType(ResourceType.UDF);
+        entity.setFullName("/dolphinscheduler/123/resources/ResourcesServiceTest1.jar");
+
+        return entity;
     }
 
     private UdfFunc getUdfFunc() {

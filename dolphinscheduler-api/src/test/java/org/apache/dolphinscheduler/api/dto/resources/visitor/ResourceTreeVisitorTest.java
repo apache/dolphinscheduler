@@ -34,14 +34,14 @@ public class ResourceTreeVisitorTest {
     public void visit() {
         List<StorageEntity> resourceList = new ArrayList<>();
 
-        StorageEntity resource1 = new StorageEntity.Builder()
-                .fullName("/default/a")
-                .pfullName("/default")
-                .build();
-        StorageEntity resource2 = new StorageEntity.Builder()
-                .fullName("/default/a/a1.txt")
-                .pfullName("/default/a")
-                .build();
+        StorageEntity resource1 = new StorageEntity();
+        resource1.setFullName("/default/a");
+        resource1.setPfullName("/default");
+
+        StorageEntity resource2 = new StorageEntity();
+        resource1.setFullName("/default/a/a1.txt");
+        resource1.setPfullName("/default/a");
+
         resourceList.add(resource1);
         resourceList.add(resource2);
 
@@ -54,14 +54,14 @@ public class ResourceTreeVisitorTest {
     public void rootNode() {
         List<StorageEntity> resourceList = new ArrayList<>();
 
-        StorageEntity resource1 = new StorageEntity.Builder()
-                .fullName("/default/a")
-                .pfullName("/default")
-                .build();
-        StorageEntity resource2 = new StorageEntity.Builder()
-                .fullName("/default/a/a1.txt")
-                .pfullName("/default/a")
-                .build();
+        StorageEntity resource1 = new StorageEntity();
+        resource1.setFullName("/default/a");
+        resource1.setPfullName("/default");
+
+        StorageEntity resource2 = new StorageEntity();
+        resource1.setFullName("/default/a/a1.txt");
+        resource1.setPfullName("/default/a");
+
         resourceList.add(resource1);
         resourceList.add(resource2);
 

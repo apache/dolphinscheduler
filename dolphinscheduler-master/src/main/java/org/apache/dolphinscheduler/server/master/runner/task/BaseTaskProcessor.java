@@ -44,7 +44,6 @@ import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -91,9 +90,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.NonNull;
 
@@ -620,27 +616,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
-
-                // filter the resources that the resource id equals 0
-                // TODO: Modify this part to accomodate oldversionresources in the future.
-//                Set<ResourceInfo> oldVersionResources =
-//                        projectResourceFiles.stream().filter(t -> t.getId() == null).collect(Collectors.toSet());
-//                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-//                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(),
-//                            processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
-//                }
-//
-//                // get the resource id in order to get the resource names in batch
-//                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
-//                Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
-//
-//                if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
-//                    Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
-//
-//                    List<Resource> resources = processService.listResourceByIds(resourceIds);
-//                    resources.forEach(t -> resourcesMap.put(t.getFullName(),
-//                            processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
-//                }
+                // TODO: Modify this part to accomodate(migrate) oldversionresources in the future.
                 projectResourceFiles.forEach(file -> resourcesMap.put(file.getResourceName(),processService.queryTenantCodeByResName(file.getResourceName(), ResourceType.FILE)));            }
         }
 

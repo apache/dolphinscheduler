@@ -82,9 +82,6 @@ export function useModal(
   const filterEmptyDirectory = (list: any) => {
     for (const item of list) {
       if (item.children) {
-//         if (!/\.jar$/.test(item.name)) {
-//           item.disabled = true
-//         }
         filterEmptyDirectory(item.children)
       }
     }

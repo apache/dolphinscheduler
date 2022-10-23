@@ -496,21 +496,22 @@ public class S3Utils implements Closeable, StorageOperate {
                     // the path is a file
                     String[] aliasArr = summary.getKey().split("/");
                     String alias = aliasArr[aliasArr.length - 1];
-
                     String fileName = StringUtils.difference(defaultPath, summary.getKey());
-                    storageEntityList.add(new StorageEntity.Builder()
-                            .alias(alias)
-                            .fileName(fileName)
-                            .fullName(summary.getKey())
-                            .isDirectory(false)
-                            .description("")
-                            .userName(tenantCode)
-                            .type(type)
-                            .size(summary.getSize())
-                            .createTime(summary.getLastModified())
-                            .updateTime(summary.getLastModified())
-                            .pfullName(path)
-                            .build());
+
+                    StorageEntity entity = new StorageEntity();
+                    entity.setAlias(alias);
+                    entity.setFileName(fileName);
+                    entity.setFullName(summary.getKey());
+                    entity.setDirectory(false);
+                    entity.setDescription("");
+                    entity.setUserName(tenantCode);
+                    entity.setType(type);
+                    entity.setSize(summary.getSize());
+                    entity.setCreateTime(summary.getLastModified());
+                    entity.setUpdateTime(summary.getLastModified());
+                    entity.setPfullName(path);
+
+                    storageEntityList.add(entity);
                 }
             }
 
@@ -519,19 +520,20 @@ public class S3Utils implements Closeable, StorageOperate {
                 String suffix = StringUtils.difference(path, commonPrefix);
                 String fileName = StringUtils.difference(defaultPath, commonPrefix);
 
-                storageEntityList.add(new StorageEntity.Builder()
-                        .alias(suffix)
-                        .fileName(fileName)
-                        .fullName(commonPrefix)
-                        .isDirectory(true)
-                        .description("")
-                        .userName(tenantCode)
-                        .type(type)
-                        .size(0)
-                        .createTime(null)
-                        .updateTime(null)
-                        .pfullName(path)
-                        .build());
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(suffix);
+                entity.setFileName(fileName);
+                entity.setFullName(commonPrefix);
+                entity.setDirectory(true);
+                entity.setDescription("");
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(0);
+                entity.setCreateTime(null);
+                entity.setUpdateTime(null);
+                entity.setPfullName(path);
+
+                storageEntityList.add(entity);
             }
 
             request.setContinuationToken(v2Result.getContinuationToken());
@@ -566,16 +568,19 @@ public class S3Utils implements Closeable, StorageOperate {
             // the path is a directory that may or may not exist in S3
             String alias = findDirAlias(path);
             String fileName = StringUtils.difference(defaultPath, path);
-            return new StorageEntity.Builder()
-                    .alias(alias)
-                    .fileName(fileName)
-                    .fullName(path)
-                    .isDirectory(true)
-                    .description("")
-                    .userName(tenantCode)
-                    .type(type)
-                    .size(0)
-                    .build();
+
+            StorageEntity entity = new StorageEntity();
+            entity.setAlias(alias);
+            entity.setFileName(fileName);
+            entity.setFullName(path);
+            entity.setDirectory(true);
+            entity.setDescription("");
+            entity.setUserName(tenantCode);
+            entity.setType(type);
+            entity.setSize(0);
+
+            return entity;
+
         } else {
             // the path is a file
             if (summaries.size() > 0) {
@@ -583,18 +588,20 @@ public class S3Utils implements Closeable, StorageOperate {
                 String[] aliasArr = summary.getKey().split("/");
                 String alias = aliasArr[aliasArr.length - 1];
                 String fileName = StringUtils.difference(defaultPath, summary.getKey());
-                return new StorageEntity.Builder()
-                        .alias(alias)
-                        .fileName(fileName)
-                        .fullName(summary.getKey())
-                        .isDirectory(false)
-                        .description("")
-                        .userName(tenantCode)
-                        .type(type)
-                        .size(summary.getSize())
-                        .createTime(summary.getLastModified())
-                        .updateTime(summary.getLastModified())
-                        .build();
+
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(alias);
+                entity.setFileName(fileName);
+                entity.setFullName(summary.getKey());
+                entity.setDirectory(false);
+                entity.setDescription("");
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(summary.getSize());
+                entity.setCreateTime(summary.getLastModified());
+                entity.setUpdateTime(summary.getLastModified());
+
+                return entity;
             }
         }
 
