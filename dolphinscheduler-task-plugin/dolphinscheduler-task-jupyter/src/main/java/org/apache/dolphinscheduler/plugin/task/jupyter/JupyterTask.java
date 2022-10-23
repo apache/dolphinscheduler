@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
@@ -29,9 +31,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

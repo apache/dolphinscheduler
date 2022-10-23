@@ -19,7 +19,10 @@ package org.apache.dolphinscheduler.service.utils;
 
 import static org.powermock.api.mockito.PowerMockito.when;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.dolphinscheduler.common.Constants;
+
+import static org.mockito.ArgumentMatchers.anyString;
+
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -28,7 +31,6 @@ import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

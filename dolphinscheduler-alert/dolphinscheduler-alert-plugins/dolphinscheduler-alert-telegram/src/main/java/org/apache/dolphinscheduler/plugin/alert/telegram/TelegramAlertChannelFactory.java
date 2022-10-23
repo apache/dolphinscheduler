@@ -18,6 +18,12 @@
 package org.apache.dolphinscheduler.plugin.alert.telegram;
 
 import com.google.auto.service.AutoService;
+
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_FALSE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_NO;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_TRUE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_YES;
+
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
@@ -30,8 +36,6 @@ import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.apache.dolphinscheduler.spi.utils.Constants.*;
 
 @AutoService(AlertChannelFactory.class)
 public final class TelegramAlertChannelFactory implements AlertChannelFactory {

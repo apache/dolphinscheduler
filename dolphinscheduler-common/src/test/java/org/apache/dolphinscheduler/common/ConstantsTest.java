@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import org.junit.Assert;

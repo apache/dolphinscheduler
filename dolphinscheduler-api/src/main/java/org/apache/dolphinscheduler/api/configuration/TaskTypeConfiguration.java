@@ -20,8 +20,19 @@ package org.apache.dolphinscheduler.api.configuration;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
+import org.apache.dolphinscheduler.common.constants.Constants;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;

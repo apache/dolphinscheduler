@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
 import java.io.IOException;

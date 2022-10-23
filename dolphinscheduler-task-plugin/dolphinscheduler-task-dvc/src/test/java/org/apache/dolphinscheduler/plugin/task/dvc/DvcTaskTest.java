@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.dvc;
 import java.util.Date;
 import java.util.UUID;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.junit.Assert;
@@ -27,16 +28,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 
 
 @RunWith(PowerMockRunner.class)

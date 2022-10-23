@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.tools.datasource.dao;
 import java.sql.SQLException;
 import java.util.Objects;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

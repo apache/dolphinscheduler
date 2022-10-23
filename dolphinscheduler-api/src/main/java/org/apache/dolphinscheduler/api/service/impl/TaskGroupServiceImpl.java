@@ -23,14 +23,15 @@ import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

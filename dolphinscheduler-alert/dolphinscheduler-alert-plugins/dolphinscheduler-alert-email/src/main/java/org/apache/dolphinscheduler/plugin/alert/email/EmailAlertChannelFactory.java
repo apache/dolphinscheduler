@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_FALSE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_NO;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_TRUE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_YES;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_FALSE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_NO;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_TRUE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_YES;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;

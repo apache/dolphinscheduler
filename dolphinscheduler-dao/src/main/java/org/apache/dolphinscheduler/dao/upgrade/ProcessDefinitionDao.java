@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;

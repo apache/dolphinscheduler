@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.processor;
 
-import static org.apache.dolphinscheduler.common.Constants.HTTP_CONNECTION_REQUEST_TIMEOUT;
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
+import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_CONNECTION_REQUEST_TIMEOUT;
+import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;

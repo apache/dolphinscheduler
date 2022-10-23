@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;

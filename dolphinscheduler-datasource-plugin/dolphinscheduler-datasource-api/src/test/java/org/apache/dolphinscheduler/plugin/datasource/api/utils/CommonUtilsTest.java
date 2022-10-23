@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.DATASOURCE_ENCRYPTION_ENABLE;
+import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE;
 
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;

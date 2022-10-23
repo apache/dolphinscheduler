@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;

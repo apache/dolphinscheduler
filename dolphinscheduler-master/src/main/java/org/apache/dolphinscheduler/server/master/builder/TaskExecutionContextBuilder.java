@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.builder;
 
-import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+import static org.apache.dolphinscheduler.common.constants.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;

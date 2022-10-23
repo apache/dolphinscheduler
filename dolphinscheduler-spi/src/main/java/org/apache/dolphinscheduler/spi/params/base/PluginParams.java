@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_EMIT;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_NAME;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_PROPS;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_TITLE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_TYPE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALIDATE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALUE;
-
 import static java.util.Objects.requireNonNull;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_EMIT;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_FIELD;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_NAME;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_PROPS;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_TITLE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_VALIDATE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_VALUE;
 
 import java.util.List;
 

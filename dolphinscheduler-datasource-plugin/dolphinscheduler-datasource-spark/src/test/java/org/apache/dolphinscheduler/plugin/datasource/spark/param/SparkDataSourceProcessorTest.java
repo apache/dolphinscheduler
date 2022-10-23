@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.plugin.datasource.spark.param;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
 import java.util.HashMap;
@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -75,7 +76,8 @@ public class SparkDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER, sparkDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER,
+                sparkDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -94,6 +96,7 @@ public class SparkDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.HIVE_VALIDATION_QUERY, sparkDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.HIVE_VALIDATION_QUERY,
+                sparkDatasourceProcessor.getValidationQuery());
     }
 }

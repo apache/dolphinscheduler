@@ -28,9 +28,12 @@ import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
+
+import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -47,8 +50,11 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -71,10 +77,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 public class DataxTask extends AbstractTask {
     /**

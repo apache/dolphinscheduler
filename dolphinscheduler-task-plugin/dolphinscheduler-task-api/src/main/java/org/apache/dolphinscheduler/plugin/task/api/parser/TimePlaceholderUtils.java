@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
+import static org.apache.commons.lang3.time.DateUtils.addWeeks;
+import static org.apache.dolphinscheduler.common.utils.DateUtils.addDays;
+import static org.apache.dolphinscheduler.common.utils.DateUtils.addMinutes;
+import static org.apache.dolphinscheduler.common.utils.DateUtils.addMonths;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_MONTHS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_STRING;
@@ -38,12 +42,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TIMESTAMP;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_BEGIN;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_END;
-import static org.apache.dolphinscheduler.spi.utils.DateUtils.addDays;
-import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMinutes;
-import static org.apache.dolphinscheduler.spi.utils.DateUtils.addMonths;
 
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;

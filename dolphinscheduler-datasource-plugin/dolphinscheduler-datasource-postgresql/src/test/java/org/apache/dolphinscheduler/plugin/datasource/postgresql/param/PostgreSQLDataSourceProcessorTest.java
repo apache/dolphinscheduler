@@ -20,9 +20,11 @@ package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.ORG_POSTGRESQL_DRIVER;
+import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
+
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -74,7 +77,7 @@ public class PostgreSQLDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.ORG_POSTGRESQL_DRIVER, postgreSqlDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(ORG_POSTGRESQL_DRIVER, postgreSqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -95,6 +98,7 @@ public class PostgreSQLDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.POSTGRESQL_VALIDATION_QUERY, postgreSqlDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(POSTGRESQL_VALIDATION_QUERY,
+                postgreSqlDatasourceProcessor.getValidationQuery());
     }
 }

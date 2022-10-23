@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import org.junit.Assert;
 import org.junit.Test;

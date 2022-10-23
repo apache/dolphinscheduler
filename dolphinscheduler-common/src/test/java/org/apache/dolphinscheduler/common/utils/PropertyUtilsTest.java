@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import org.junit.Assert;
 import org.junit.Test;

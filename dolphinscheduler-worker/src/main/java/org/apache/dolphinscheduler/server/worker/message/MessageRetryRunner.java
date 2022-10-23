@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.message;
 
 import lombok.NonNull;
-import org.apache.dolphinscheduler.common.Constants;
+
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;

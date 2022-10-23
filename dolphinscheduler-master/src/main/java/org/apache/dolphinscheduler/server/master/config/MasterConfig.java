@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+
 import lombok.Data;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
@@ -32,8 +34,6 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
-
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 
 @Data
 @Validated
