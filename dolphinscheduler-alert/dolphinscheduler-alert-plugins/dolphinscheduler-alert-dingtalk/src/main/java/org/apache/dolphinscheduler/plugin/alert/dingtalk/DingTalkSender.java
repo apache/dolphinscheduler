@@ -313,7 +313,7 @@ public final class DingTalkSender {
     private String generateSignedUrl() {
         Long timestamp = System.currentTimeMillis();
         String stringToSign = timestamp + "\n" + secret;
-        String sign = org.apache.dolphinscheduler.common.utils.StringUtils.EMPTY;
+        String sign = org.apache.commons.lang3.StringUtils.EMPTY;
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));

@@ -15,10 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.utils;
-
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+package org.apache.dolphinscheduler.common.utils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

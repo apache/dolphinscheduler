@@ -32,6 +32,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TASK_INSTANCE_ID;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.UPDATE_TIME;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
@@ -48,6 +49,7 @@ import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -116,9 +118,8 @@ public class DataQualityTask extends AbstractYarnTask {
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs("\""
-                        + org.apache.dolphinscheduler.common.utils.StringUtils.replaceDoubleBrackets(
-                                org.apache.dolphinscheduler.common.utils.StringUtils
-                                        .escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
+                        + replaceDoubleBrackets(
+                                StringEscapeUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
                         + "\"");
 
         dataQualityParameters
@@ -149,9 +150,7 @@ public class DataQualityTask extends AbstractYarnTask {
 
         if (StringUtils.isNotEmpty(inputParameter.get(REGEXP_PATTERN))) {
             inputParameter.put(REGEXP_PATTERN,
-                    org.apache.dolphinscheduler.common.utils.StringUtils
-                            .escapeJava(org.apache.dolphinscheduler.common.utils.StringUtils
-                                    .escapeJava(inputParameter.get(REGEXP_PATTERN))));
+                    StringEscapeUtils.escapeJava(StringEscapeUtils.escapeJava(inputParameter.get(REGEXP_PATTERN))));
         }
 
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getHdfsPath())) {
@@ -192,5 +191,17 @@ public class DataQualityTask extends AbstractYarnTask {
     @Override
     public AbstractParameters getParameters() {
         return dataQualityParameters;
+    }
+
+    private static String replaceDoubleBrackets(String mainParameter) {
+        mainParameter = mainParameter
+                .replace(Constants.DOUBLE_BRACKETS_LEFT, Constants.DOUBLE_BRACKETS_LEFT_SPACE)
+                .replace(Constants.DOUBLE_BRACKETS_RIGHT, Constants.DOUBLE_BRACKETS_RIGHT_SPACE);
+        if (mainParameter.contains(Constants.DOUBLE_BRACKETS_LEFT)
+                || mainParameter.contains(Constants.DOUBLE_BRACKETS_RIGHT)) {
+            return replaceDoubleBrackets(mainParameter);
+        } else {
+            return mainParameter;
+        }
     }
 }
