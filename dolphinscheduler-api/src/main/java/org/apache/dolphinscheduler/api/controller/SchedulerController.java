@@ -25,7 +25,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.PUBLISH_SCHEDULE_ONLI
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
+import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USER;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;

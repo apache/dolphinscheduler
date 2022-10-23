@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.ALIAS;
-import static org.apache.dolphinscheduler.common.Constants.CONTENT;
-import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_SS;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.JAR;
-import static org.apache.dolphinscheduler.common.Constants.PERIOD;
+import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
+import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_SS;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
+import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;

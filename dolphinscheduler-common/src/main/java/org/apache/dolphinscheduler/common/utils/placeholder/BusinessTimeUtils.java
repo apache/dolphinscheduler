@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
 import static org.apache.commons.lang3.time.DateUtils.addDays;
-import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_DATE;
-import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.PARAMETER_FORMAT_DATE;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.PARAMETER_FORMAT_TIME;
 import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 
 import java.util.Date;
@@ -71,9 +71,9 @@ public class BusinessTimeUtils {
                 break;
         }
         Date businessCurrentDate = addDays(businessDate, 1);
-        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE, timezone));
-        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE, timezone));
-        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME, timezone));
+        result.put(DateConstants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE, timezone));
+        result.put(DateConstants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE, timezone));
+        result.put(DateConstants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME, timezone));
         return result;
     }
 }

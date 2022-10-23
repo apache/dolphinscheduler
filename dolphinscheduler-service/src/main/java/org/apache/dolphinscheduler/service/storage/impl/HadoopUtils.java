@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.service.storage.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
 import org.apache.dolphinscheduler.common.utils.HttpUtils;

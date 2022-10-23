@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters.resource;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Date;
 

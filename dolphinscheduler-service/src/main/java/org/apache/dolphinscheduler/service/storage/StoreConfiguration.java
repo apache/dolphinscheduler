@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.service.storage;
 
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_OSS;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STORAGE_HDFS;
+import static org.apache.dolphinscheduler.common.constants.Constants.STORAGE_OSS;
+import static org.apache.dolphinscheduler.common.constants.Constants.STORAGE_S3;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;

@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.User;

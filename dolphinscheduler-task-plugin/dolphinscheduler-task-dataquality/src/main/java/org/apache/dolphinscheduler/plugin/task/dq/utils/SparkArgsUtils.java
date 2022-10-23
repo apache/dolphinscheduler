@@ -22,7 +22,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkConstants;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +73,7 @@ public class SQLServerDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.COM_SQLSERVER_JDBC_DRIVER,
+        Assertions.assertEquals(DataSourceConstants.COM_SQLSERVER_JDBC_DRIVER,
                 sqlServerDatasourceProcessor.getDatasourceDriver());
     }
 
@@ -93,7 +93,7 @@ public class SQLServerDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.SQLSERVER_VALIDATION_QUERY,
+        Assertions.assertEquals(DataSourceConstants.SQLSERVER_VALIDATION_QUERY,
                 sqlServerDatasourceProcessor.getValidationQuery());
     }
 }

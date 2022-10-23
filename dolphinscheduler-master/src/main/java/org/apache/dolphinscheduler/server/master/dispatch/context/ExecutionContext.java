@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.context;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.Command;

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.api.dto.task;
 
-import static org.apache.dolphinscheduler.common.Constants.VERSION_FIRST;
+import static org.apache.dolphinscheduler.common.constants.Constants.VERSION_FIRST;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;

@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.plugin.alert.email.template;
 
 import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

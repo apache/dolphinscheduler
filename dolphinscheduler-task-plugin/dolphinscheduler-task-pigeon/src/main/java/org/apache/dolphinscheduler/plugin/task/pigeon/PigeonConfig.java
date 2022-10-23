@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.pigeon;
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ResourceBundle;
 

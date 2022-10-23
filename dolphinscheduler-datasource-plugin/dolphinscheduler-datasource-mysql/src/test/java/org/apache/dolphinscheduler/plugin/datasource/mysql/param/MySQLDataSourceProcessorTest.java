@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +68,8 @@ public class MySQLDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.COM_MYSQL_CJ_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_MYSQL_CJ_JDBC_DRIVER,
+                mysqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -87,7 +88,8 @@ public class MySQLDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.MYSQL_VALIDATION_QUERY, mysqlDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.MYSQL_VALIDATION_QUERY,
+                mysqlDatasourceProcessor.getValidationQuery());
     }
 
     @Test

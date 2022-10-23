@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
@@ -61,10 +61,10 @@ public class ParameterUtils {
             // replace variable ${} form,refers to the replacement of system variables and custom variables
             parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
         }
-        if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
+        if (parameterMap != null && null != parameterMap.get(DateConstants.PARAMETER_DATETIME)) {
             // Get current time, schedule execute time
-            String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
-            cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME, null);
+            String cronTimeStr = parameterMap.get(DateConstants.PARAMETER_DATETIME);
+            cronTime = DateUtils.parse(cronTimeStr, DateConstants.PARAMETER_FORMAT_TIME, null);
         } else {
             cronTime = new Date();
         }

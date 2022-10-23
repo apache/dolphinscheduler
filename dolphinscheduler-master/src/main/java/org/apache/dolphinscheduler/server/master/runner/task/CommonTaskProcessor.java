@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -118,7 +119,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(), taskInstance.getTaskGroupPriority(),
-                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+                    Constants.DEFAULT_WORKER_GROUP);
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
             if (taskExecutionContext == null) {
@@ -192,10 +193,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             Map<String, Object> taskInstanceParams =
                     JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
                     });
-            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(Constants.DATASOUCE);
+            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(DataSourceConstants.DATASOURCE);
             Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
-            taskDefinitionParams.put(Constants.DATASOUCE, testDataSourceId);
-            taskInstanceParams.put(Constants.DATASOUCE, testDataSourceId);
+            taskDefinitionParams.put(DataSourceConstants.DATASOURCE, testDataSourceId);
+            taskInstanceParams.put(DataSourceConstants.DATASOURCE, testDataSourceId);
             taskInstance.getTaskDefine().setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
             taskInstance.setTaskParams(JSONUtils.toJsonString(taskInstanceParams));
             if (null == testDataSourceId) {

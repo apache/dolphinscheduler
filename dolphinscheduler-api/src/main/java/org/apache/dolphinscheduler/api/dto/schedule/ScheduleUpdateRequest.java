@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.schedule;
 
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
 import static org.apache.dolphinscheduler.common.utils.DateUtils.stringToDate;
 

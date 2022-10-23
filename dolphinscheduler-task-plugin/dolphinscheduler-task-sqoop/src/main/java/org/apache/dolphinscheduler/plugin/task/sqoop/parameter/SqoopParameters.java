@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -26,8 +27,8 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopJobType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;

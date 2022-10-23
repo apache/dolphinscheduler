@@ -27,7 +27,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * JdbcUrlParser

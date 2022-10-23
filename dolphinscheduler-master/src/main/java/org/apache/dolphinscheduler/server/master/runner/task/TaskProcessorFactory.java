@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_TASK_TYPE;
 
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 

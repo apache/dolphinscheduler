@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;

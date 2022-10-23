@@ -24,8 +24,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.datasync.DataSyncClient;

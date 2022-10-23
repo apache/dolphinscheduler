@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.params.select;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_OPTIONS;
 import static org.apache.dolphinscheduler.spi.params.base.FormType.SELECT;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_OPTIONS;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;

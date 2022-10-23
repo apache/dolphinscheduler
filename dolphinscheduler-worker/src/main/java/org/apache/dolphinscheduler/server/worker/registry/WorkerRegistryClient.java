@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
+import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;

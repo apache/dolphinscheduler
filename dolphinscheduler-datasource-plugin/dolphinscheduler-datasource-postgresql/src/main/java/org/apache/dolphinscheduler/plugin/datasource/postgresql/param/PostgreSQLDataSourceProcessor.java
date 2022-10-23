@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,8 +27,6 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -66,7 +67,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PostgreSQLDataSourceParamDTO postgreSqlParam = (PostgreSQLDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_POSTGRESQL, postgreSqlParam.getHost(),
+        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_POSTGRESQL, postgreSqlParam.getHost(),
                 postgreSqlParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, postgreSqlParam.getDatabase());
 
@@ -91,12 +92,12 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_POSTGRESQL_DRIVER;
+        return DataSourceConstants.ORG_POSTGRESQL_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.POSTGRESQL_VALIDATION_QUERY;
+        return DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
     }
 
     @Override

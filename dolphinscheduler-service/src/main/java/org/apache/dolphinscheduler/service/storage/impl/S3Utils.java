@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.service.storage.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.AWS_END_POINT;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
+import static org.apache.dolphinscheduler.common.constants.Constants.AWS_END_POINT;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
+import static org.apache.dolphinscheduler.common.constants.Constants.STORAGE_S3;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;

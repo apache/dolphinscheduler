@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpStatus;
 
