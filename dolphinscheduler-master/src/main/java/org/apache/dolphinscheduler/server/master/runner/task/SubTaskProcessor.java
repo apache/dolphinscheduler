@@ -133,7 +133,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
             taskInstance.setState(TaskExecutionStatus.of(subProcessInstance.getState().getCode()));
             taskInstance.setEndTime(new Date());
             dealFinish();
-            processService.saveTaskInstance(taskInstance);
+            taskInstanceDao.upsertTaskInstance(taskInstance);
         }
     }
 
@@ -201,7 +201,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
         logger.info("set sub work flow {} task {} state: {}",
                 processInstance.getId(),
                 taskInstance.getId(),

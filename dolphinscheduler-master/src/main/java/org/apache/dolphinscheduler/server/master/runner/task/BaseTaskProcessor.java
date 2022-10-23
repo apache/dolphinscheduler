@@ -49,6 +49,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -123,6 +124,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessService processService;
 
+    protected TaskInstanceDao taskInstanceDao;
+
     protected ProcessInstanceDao processInstanceDao;
 
     protected MasterConfig masterConfig;
@@ -140,6 +143,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
+        taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
@@ -306,7 +310,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (verifyTenantIsNull(tenant, taskInstance)) {
             logger.info("Task state changes to {}", TaskExecutionStatus.FAILURE);
             taskInstance.setState(TaskExecutionStatus.FAILURE);
-            processService.saveTaskInstance(taskInstance);
+            taskInstanceDao.upsertTaskInstance(taskInstance);
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue

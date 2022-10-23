@@ -66,6 +66,9 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
@@ -121,6 +124,16 @@ public class ProcessServiceTest {
     private ProcessInstanceMapper processInstanceMapper;
     @Mock
     private ProcessInstanceDao processInstanceDao;
+
+    @Mock
+    private TaskInstanceDao taskInstanceDao;
+
+    @Mock
+    private TaskDefinitionLogDao taskDefinitionLogDao;
+
+    @Mock
+    private TaskDefinitionDao taskDefinitionDao;
+
     @Mock
     private UserMapper userMapper;
     @Mock
@@ -652,7 +665,7 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(taskDefinition);
         taskDefinitionLogs.add(td2);
 
-        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
+        Mockito.when(taskDefinitionLogDao.getTaskDefineLogList(any())).thenReturn(taskDefinitionLogs);
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(list);
 
@@ -727,23 +740,6 @@ public class ProcessServiceTest {
 
         processService.releaseTaskGroup(taskInstance);
 
-    }
-
-    @Test
-    public void testFindTaskInstanceByIdList() {
-        List<Integer> emptyList = new ArrayList<>();
-        Mockito.when(taskInstanceMapper.selectBatchIds(emptyList)).thenReturn(new ArrayList<>());
-        Assertions.assertEquals(0, processService.findTaskInstanceByIdList(emptyList).size());
-
-        List<Integer> idList = Collections.singletonList(1);
-        TaskInstance instance = new TaskInstance();
-        instance.setId(1);
-
-        Mockito.when(taskInstanceMapper.selectBatchIds(idList)).thenReturn(Collections.singletonList(instance));
-        List<TaskInstance> taskInstanceByIdList = processService.findTaskInstanceByIdList(idList);
-
-        Assertions.assertEquals(1, taskInstanceByIdList.size());
-        Assertions.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
     }
 
     @Test

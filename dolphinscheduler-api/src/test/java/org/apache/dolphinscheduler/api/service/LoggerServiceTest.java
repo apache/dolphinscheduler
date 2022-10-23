@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -63,7 +64,7 @@ public class LoggerServiceTest {
     private LoggerServiceImpl loggerService;
 
     @Mock
-    private ProcessService processService;
+    private TaskInstanceDao taskInstanceDao;
 
     @Mock
     private ProjectMapper projectMapper;
@@ -81,7 +82,7 @@ public class LoggerServiceTest {
     public void testQueryDataSourceList() {
 
         TaskInstance taskInstance = new TaskInstance();
-        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
         Result result = loggerService.queryLog(2, 1, 1);
         // TASK_INSTANCE_NOT_FOUND
         Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
@@ -98,7 +99,7 @@ public class LoggerServiceTest {
         // SUCCESS
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
         result = loggerService.queryLog(1, 1, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
@@ -107,7 +108,7 @@ public class LoggerServiceTest {
     public void testGetLogBytes() {
 
         TaskInstance taskInstance = new TaskInstance();
-        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
 
         // task instance is null
         try {
@@ -146,7 +147,7 @@ public class LoggerServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, projectCode);
         TaskInstance taskInstance = new TaskInstance();
-        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         taskDefinition.setCode(1L);
@@ -156,7 +157,7 @@ public class LoggerServiceTest {
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, VIEW_LOG)).thenReturn(result);
-        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         result = loggerService.queryLog(loginUser, projectCode, 1, 1, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
@@ -184,7 +185,7 @@ public class LoggerServiceTest {
         taskInstance.setLogPath("/temp/log");
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, DOWNLOAD_LOG))
                 .thenReturn(result);
-        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         Mockito.when(logClient.getLogBytes(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
                 .thenReturn(new byte[0]);

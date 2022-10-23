@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
@@ -75,11 +76,9 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     @Autowired
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
-    /**
-     * processService
-     */
+
     @Autowired
-    private ProcessService processService;
+    private TaskInstanceDao taskInstanceDao;
 
     /**
      * executor dispatcher
@@ -264,7 +263,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      * @return taskInstance is final state
      */
     public boolean taskInstanceIsFinalState(int taskInstanceId) {
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().isFinished();
     }
 
