@@ -24,26 +24,24 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * task query request
  */
-@ApiModel("TASK-QUERY")
+@Schema(name = "TASK-QUERY")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class TaskFilterRequest extends PageQueryDto {
 
-    @ApiModelProperty(example = "project-name")
+    @Schema(example = "project-name")
     private String projectName;
 
-    @ApiModelProperty(example = "task-name")
+    @Schema(example = "task-name")
     private String name;
 
-    @ApiModelProperty(example = "SHELL")
+    @Schema(example = "SHELL")
     private String taskType;
 
     public TaskDefinition convert2TaskDefinition() {

@@ -25,26 +25,24 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * schedule query request
  */
-@ApiModel("SCHEDULE-QUERY")
+@Schema(name = "SCHEDULE-QUERY")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class ScheduleFilterRequest extends PageQueryDto {
 
-    @ApiModelProperty(example = "project-name")
+    @Schema(example = "project-name")
     private String projectName;
 
-    @ApiModelProperty(example = "process-definition-name")
+    @Schema(example = "process-definition-name")
     private String processDefinitionName;
 
-    @ApiModelProperty(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", notes = "default OFFLINE if value not provide.")
+    @Schema(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", description = "default OFFLINE if value not provide.")
     private String releaseState;
 
     public Schedule convert2Schedule() {
