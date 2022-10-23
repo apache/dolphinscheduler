@@ -44,6 +44,7 @@ public class K8sUtils {
     public void createJob(String namespace, Job job) {
         try {
             client.batch()
+                    .v1()
                     .jobs()
                     .inNamespace(namespace)
                     .create(job);
@@ -55,6 +56,7 @@ public class K8sUtils {
     public void deleteJob(String jobName, String namespace) {
         try {
             client.batch()
+                    .v1()
                     .jobs()
                     .inNamespace(namespace)
                     .withName(jobName)
@@ -81,7 +83,10 @@ public class K8sUtils {
     public Watch createBatchJobWatcher(String jobName, Watcher<Job> watcher) {
         try {
             return client.batch()
-                    .jobs().withName(jobName).watch(watcher);
+                    .v1()
+                    .jobs()
+                    .withName(jobName)
+                    .watch(watcher);
         } catch (Exception e) {
             throw new TaskException("fail to register batch job watcher", e);
         }

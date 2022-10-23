@@ -31,6 +31,7 @@ import java.util.List;
 import org.slf4j.Logger;
 
 public class PermissionCheck<T> {
+
     /**
      * logger
      */
@@ -74,7 +75,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
+                           int userId) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.needChecks = needChecks;
@@ -84,7 +86,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId, Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
+                           int userId, Logger logger) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.needChecks = needChecks;
@@ -95,7 +98,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, List<ResourceInfo> resourceList, int userId, Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService,
+                           List<ResourceInfo> resourceList, int userId, Logger logger) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.resourceList = resourceList;

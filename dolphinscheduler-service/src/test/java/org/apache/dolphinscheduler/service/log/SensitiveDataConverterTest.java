@@ -17,15 +17,16 @@
 
 package org.apache.dolphinscheduler.service.log;
 
+import static org.apache.dolphinscheduler.service.log.SensitiveDataConverter.passwordHandler;
+
 import org.apache.dolphinscheduler.common.Constants;
+
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.regex.Pattern;
-
-import static org.apache.dolphinscheduler.service.log.SensitiveDataConverter.passwordHandler;
 
 public class SensitiveDataConverterTest {
 

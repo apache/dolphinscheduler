@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.common.model;
 
-import lombok.Data;
-
 import java.util.Date;
+
+import lombok.Data;
 
 @Data
 public class Server {

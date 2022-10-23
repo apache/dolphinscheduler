@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 
 public class TaskConstants {
 
@@ -438,9 +436,6 @@ public class TaskConstants {
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
     public static final String TASK_TYPE_STREAM = "STREAM";
-
-    public static final List<String> COMPLEX_TASK_TYPES = Arrays
-            .asList(new String[]{TASK_TYPE_CONDITIONS, TASK_TYPE_SWITCH, TASK_TYPE_SUB_PROCESS, TASK_TYPE_DEPENDENT});
 
     /**
      * aws config

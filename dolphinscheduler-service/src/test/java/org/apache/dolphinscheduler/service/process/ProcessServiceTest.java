@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
@@ -63,7 +62,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -91,7 +89,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -105,7 +102,6 @@ import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * process service test
@@ -168,130 +164,10 @@ public class ProcessServiceTest {
     private DqComparisonTypeMapper dqComparisonTypeMapper;
 
     @Mock
-    private ScheduleMapper scheduleMapper;
-
-    @Mock
     CuringParamsService curingGlobalParamsService;
 
     @Mock
     TaskPluginManager taskPluginManager;
-
-    @Test
-    public void testCreateSubCommand() {
-        ProcessInstance parentInstance = new ProcessInstance();
-        parentInstance.setWarningType(WarningType.SUCCESS);
-        parentInstance.setWarningGroupId(0);
-
-        TaskInstance task = new TaskInstance();
-        task.setTaskParams("{\"processDefinitionCode\":10}}");
-        task.setId(10);
-        task.setTaskCode(1L);
-        task.setTaskDefinitionVersion(1);
-
-        ProcessInstance childInstance = null;
-        ProcessInstanceMap instanceMap = new ProcessInstanceMap();
-        instanceMap.setParentProcessInstanceId(1);
-        instanceMap.setParentTaskInstanceId(10);
-        Command command;
-
-        // father history: start; child null == command type: start
-        parentInstance.setHistoryCmd("START_PROCESS");
-        parentInstance.setCommandType(CommandType.START_PROCESS);
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(10L);
-        Mockito.when(processDefineMapper.queryByDefineId(100)).thenReturn(processDefinition);
-        Mockito.when(processDefineMapper.queryByCode(10L)).thenReturn(processDefinition);
-        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.START_PROCESS, command.getCommandType());
-
-        // father history: start,start failure; child null == command type: start
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
-        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.START_PROCESS, command.getCommandType());
-
-        // father history: scheduler,start failure; child null == command type: scheduler
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        parentInstance.setHistoryCmd("SCHEDULER,START_FAILURE_TASK_PROCESS");
-        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.SCHEDULER, command.getCommandType());
-
-        // father history: complement,start failure; child null == command type: complement
-
-        String startString = "2020-01-01 00:00:00";
-        String endString = "2020-01-10 00:00:00";
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        parentInstance.setHistoryCmd("COMPLEMENT_DATA,START_FAILURE_TASK_PROCESS");
-        Map<String, String> complementMap = new HashMap<>();
-        complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE, startString);
-        complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE, endString);
-        parentInstance.setCommandParam(JSONUtils.toJsonString(complementMap));
-        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.COMPLEMENT_DATA, command.getCommandType());
-
-        JsonNode complementDate = JSONUtils.parseObject(command.getCommandParam());
-        Date start = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE).asText());
-        Date end = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE).asText());
-        Assertions.assertEquals(startString, DateUtils.dateToString(start));
-        Assertions.assertEquals(endString, DateUtils.dateToString(end));
-
-        // father history: start,failure,start failure; child not null == command type: start failure
-        childInstance = new ProcessInstance();
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
-        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command.getCommandType());
-    }
-
-    @Test
-    public void testVerifyIsNeedCreateCommand() {
-
-        List<Command> commands = new ArrayList<>();
-
-        Command command = new Command();
-        command.setCommandType(CommandType.REPEAT_RUNNING);
-        command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\"}");
-        commands.add(command);
-        Mockito.when(commandMapper.selectList(null)).thenReturn(commands);
-        Assertions.assertFalse(processService.verifyIsNeedCreateCommand(command));
-
-        Command command1 = new Command();
-        command1.setCommandType(CommandType.REPEAT_RUNNING);
-        command1.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"222\"}");
-        Assertions.assertTrue(processService.verifyIsNeedCreateCommand(command1));
-
-        Command command2 = new Command();
-        command2.setCommandType(CommandType.PAUSE);
-        Assertions.assertTrue(processService.verifyIsNeedCreateCommand(command2));
-    }
-
-    @Test
-    public void testCreateRecoveryWaitingThreadCommand() {
-        int id = 123;
-        Mockito.when(commandMapper.deleteById(id)).thenReturn(1);
-        ProcessInstance subProcessInstance = new ProcessInstance();
-        subProcessInstance.setIsSubProcess(Flag.YES);
-        Command originCommand = new Command();
-        originCommand.setId(id);
-        processService.createRecoveryWaitingThreadCommand(originCommand, subProcessInstance);
-
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(111);
-        processService.createRecoveryWaitingThreadCommand(null, subProcessInstance);
-
-        Command recoverCommand = new Command();
-        recoverCommand.setCommandType(CommandType.RECOVER_WAITING_THREAD);
-        processService.createRecoveryWaitingThreadCommand(recoverCommand, subProcessInstance);
-
-        Command repeatRunningCommand = new Command();
-        recoverCommand.setCommandType(CommandType.REPEAT_RUNNING);
-        processService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance);
-
-        ProcessInstance subProcessInstance2 = new ProcessInstance();
-        subProcessInstance2.setId(111);
-        subProcessInstance2.setIsSubProcess(Flag.NO);
-        processService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance2);
-    }
 
     @Test
     public void testHandleCommand() throws CronParseException, CodeGenerateUtils.CodeGenerateException {
@@ -793,19 +669,6 @@ public class ProcessServiceTest {
     }
 
     @Test
-    public void testCreateCommand() {
-        Command command = new Command();
-        command.setProcessDefinitionCode(123);
-        command.setCommandParam("{\"ProcessInstanceId\":222}");
-        command.setCommandType(CommandType.START_PROCESS);
-        int mockResult = 1;
-        Mockito.when(commandMapper.insert(command)).thenReturn(mockResult);
-        int exeMethodResult = processService.createCommand(command);
-        Assertions.assertEquals(mockResult, exeMethodResult);
-        Mockito.verify(commandMapper, Mockito.times(1)).insert(command);
-    }
-
-    @Test
     public void testChangeOutParam() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setProcessInstanceId(62);
@@ -886,17 +749,6 @@ public class ProcessServiceTest {
 
         Assertions.assertEquals(1, taskInstanceByIdList.size());
         Assertions.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
-    }
-
-    @Test
-    public void testFindCommandPageBySlot() {
-        int pageSize = 1;
-        int pageNumber = 0;
-        int masterCount = 0;
-        int thisMasterSlot = 2;
-        List<Command> commandList =
-                processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
-        Assertions.assertEquals(0, commandList.size());
     }
 
     @Test

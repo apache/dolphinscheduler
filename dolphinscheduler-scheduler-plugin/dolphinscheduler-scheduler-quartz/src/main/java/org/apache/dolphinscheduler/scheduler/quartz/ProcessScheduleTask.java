@@ -24,7 +24,10 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -36,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.util.StringUtils;
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
@@ -47,6 +49,9 @@ public class ProcessScheduleTask extends QuartzJobBean {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private CommandService commandService;
 
     @Counted(value = "ds.master.quartz.job.executed")
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
@@ -66,16 +71,21 @@ public class ProcessScheduleTask extends QuartzJobBean {
         // query schedule
         Schedule schedule = processService.querySchedule(scheduleId);
         if (schedule == null || ReleaseState.OFFLINE == schedule.getReleaseState()) {
-            logger.warn("process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}", projectId, scheduleId);
+            logger.warn(
+                    "process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}",
+                    projectId, scheduleId);
             deleteJob(context, projectId, scheduleId);
             return;
         }
 
-        ProcessDefinition processDefinition = processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
+        ProcessDefinition processDefinition =
+                processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
         // release state : online/offline
         ReleaseState releaseState = processDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {
-            logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processDefinitionId:{}", projectId, processDefinition.getId());
+            logger.warn(
+                    "process definition does not exist in db or offline，need not to create command, projectId:{}, processDefinitionId:{}",
+                    projectId, processDefinition.getId());
             return;
         }
 
@@ -87,13 +97,14 @@ public class ProcessScheduleTask extends QuartzJobBean {
         command.setScheduleTime(scheduledFireTime);
         command.setStartTime(fireTime);
         command.setWarningGroupId(schedule.getWarningGroupId());
-        String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : schedule.getWorkerGroup();
+        String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP
+                : schedule.getWorkerGroup();
         command.setWorkerGroup(workerGroup);
         command.setWarningType(schedule.getWarningType());
         command.setProcessInstancePriority(schedule.getProcessInstancePriority());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
 
-        processService.createCommand(command);
+        commandService.createCommand(command);
     }
 
     private void deleteJob(JobExecutionContext context, int projectId, int scheduleId) {

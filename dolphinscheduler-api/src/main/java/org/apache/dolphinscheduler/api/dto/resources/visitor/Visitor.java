@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
  * Visitor
  */
 public interface Visitor {
+
     /**
      * visit
      * @return resource component

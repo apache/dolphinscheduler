@@ -55,7 +55,8 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
-    private static final String APPEND_PARAMS = "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
+    private static final String APPEND_PARAMS =
+            "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -64,10 +65,8 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        MySQLConnectionParam
-                connectionParams = (MySQLConnectionParam) createConnectionParams(connectionJson);
-        MySQLDataSourceParamDTO
-                mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
+        MySQLConnectionParam connectionParams = (MySQLConnectionParam) createConnectionParams(connectionJson);
+        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
 
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
@@ -85,11 +84,11 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         MySQLDataSourceParamDTO mysqlDatasourceParam = (MySQLDataSourceParamDTO) dataSourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDatasourceParam.getHost(), mysqlDatasourceParam.getPort());
+        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDatasourceParam.getHost(),
+                mysqlDatasourceParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, mysqlDatasourceParam.getDatabase());
 
-        MySQLConnectionParam
-                mysqlConnectionParam = new MySQLConnectionParam();
+        MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl(jdbcUrl);
         mysqlConnectionParam.setDatabase(mysqlDatasourceParam.getDatabase());
         mysqlConnectionParam.setAddress(address);
@@ -120,8 +119,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        MySQLConnectionParam
-                mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
+        MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
         String jdbcUrl = mysqlConnectionParam.getJdbcUrl();
         if (!StringUtils.isEmpty(mysqlConnectionParam.getOther())) {
             return String.format("%s?%s&%s", jdbcUrl, mysqlConnectionParam.getOther(), APPEND_PARAMS);

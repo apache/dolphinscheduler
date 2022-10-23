@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class DataQualityParameters extends AbstractParameters {
     /**
      * rule input entry value map
      */
-    private Map<String,String> ruleInputParameter;
+    private Map<String, String> ruleInputParameter;
     /**
      * spark parameters
      */

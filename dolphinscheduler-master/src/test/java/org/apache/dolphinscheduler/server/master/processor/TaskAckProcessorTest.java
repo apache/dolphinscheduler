@@ -24,20 +24,20 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventServic
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.netty.channel.Channel;
 
 /**
  * task ack processor test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TaskAckProcessorTest {
 
     private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
@@ -49,7 +49,7 @@ public class TaskAckProcessorTest {
 
     private MockedStatic<SpringApplicationContext> mockedStaticSpringApplicationContext;
 
-    @Before
+    @BeforeEach
     public void before() {
         mockedStaticSpringApplicationContext = Mockito.mockStatic(SpringApplicationContext.class);
 
@@ -78,7 +78,7 @@ public class TaskAckProcessorTest {
         taskExecuteRunningMessage.setProcessInstanceId(1);
     }
 
-    @After
+    @AfterEach
     public void after() {
         mockedStaticSpringApplicationContext.close();
     }

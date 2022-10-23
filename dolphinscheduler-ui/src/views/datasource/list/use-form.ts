@@ -36,6 +36,7 @@ export function useForm(id?: number) {
 
   const initialValues = {
     type: 'MYSQL',
+    label: 'MYSQL',
     name: '',
     note: '',
     host: '',
