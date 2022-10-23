@@ -21,7 +21,8 @@ import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSource
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;

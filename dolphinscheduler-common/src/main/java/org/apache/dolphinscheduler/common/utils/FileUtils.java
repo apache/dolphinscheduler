@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
-import static org.apache.dolphinscheduler.common.Constants.UTF_8;
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
+import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
 import org.apache.commons.io.IOUtils;
 

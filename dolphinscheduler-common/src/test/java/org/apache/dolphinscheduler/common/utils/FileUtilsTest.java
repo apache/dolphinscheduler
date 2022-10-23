@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -68,10 +68,10 @@ public class FileUtilsTest {
     @Test
     public void testSetValue() {
         try {
-            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
-            Assertions.assertTrue(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
-            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
-            Assertions.assertFalse(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
+            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "true");
+            Assertions.assertTrue(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
+            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "false");
+            Assertions.assertFalse(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
         } catch (Exception e) {
             Assertions.fail();
         }

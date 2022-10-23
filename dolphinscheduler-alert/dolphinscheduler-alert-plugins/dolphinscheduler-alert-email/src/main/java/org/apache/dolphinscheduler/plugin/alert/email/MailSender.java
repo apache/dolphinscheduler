@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 
