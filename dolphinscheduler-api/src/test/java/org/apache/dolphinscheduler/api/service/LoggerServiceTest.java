@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.service.log.LogClient;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
