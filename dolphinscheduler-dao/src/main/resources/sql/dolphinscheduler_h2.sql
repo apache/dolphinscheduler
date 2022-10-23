@@ -460,7 +460,8 @@ CREATE TABLE t_ds_process_definition_log
     operate_time     datetime     DEFAULT NULL,
     create_time      datetime NOT NULL,
     update_time      datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_idx_code_version (code, version) USING BTREE
 );
 
 -- ----------------------------

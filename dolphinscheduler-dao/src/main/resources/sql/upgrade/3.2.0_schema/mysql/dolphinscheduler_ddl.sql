@@ -120,3 +120,23 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_R_test_flag;
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_R_test_flag;
+
+-- add unique key to t_ds_process_definition_log
+drop PROCEDURE if EXISTS add_t_ds_process_definition_log_uk_uniq_idx_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_definition_log_uk_uniq_idx_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_process_definition_log'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='uniq_idx_code_version')
+    THEN
+ALTER TABLE t_ds_process_definition_log ADD UNIQUE KEY uniq_idx_code_version(`code`,`version`);
+END IF;
+END;
+
+d//
+
+delimiter ;
+CALL add_t_ds_process_definition_log_uk_uniq_idx_code_version;
+DROP PROCEDURE add_t_ds_process_definition_log_uk_uniq_idx_code_version;
