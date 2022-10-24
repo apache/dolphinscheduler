@@ -253,12 +253,12 @@ public class MasterRegistryClient {
     }
 
     /**
-     * task needs failover if task start before worker starts
+     * task needs failover if task start before server starts
      *
      * @param taskInstance task instance
      * @return true if task instance need fail over
      */
-    private boolean checkTaskInstanceNeedFailover(List<Server> workerServers, TaskInstance taskInstance) {
+    private boolean checkTaskInstanceNeedFailover(List<Server> servers, TaskInstance taskInstance) {
 
         // first submit: host is null
         // dispatch succeed: host is not null &&  submit_time is null
@@ -274,8 +274,8 @@ public class MasterRegistryClient {
         if (taskInstance.getSubmitTime() == null) {
             return false;
         }
-        //if task start after worker starts, there is no need to failover the task.
-        if (checkTaskAfterWorkerStart(workerServers, taskInstance)) {
+        //if task start after server starts, there is no need to failover the task.
+        if (checkTaskAfterServerStart(servers, taskInstance)) {
             taskNeedFailover = false;
         }
 
@@ -307,21 +307,21 @@ public class MasterRegistryClient {
     }
 
     /**
-     * check task start after the worker server starts.
+     * check task start after the server starts.
      *
      * @param taskInstance task instance
-     * @return true if task instance start time after worker server start date
+     * @return true if task instance start time after server start date
      */
-    private boolean checkTaskAfterWorkerStart(List<Server> workerServers, TaskInstance taskInstance) {
+    private boolean checkTaskAfterServerStart(List<Server> servers, TaskInstance taskInstance) {
         if (StringUtils.isEmpty(taskInstance.getHost())) {
             return false;
         }
 
         Date taskTime = taskInstance.getStartTime() == null ? taskInstance.getSubmitTime() : taskInstance.getStartTime();
 
-        Date workerServerStartDate = getServerStartupTime(workerServers, taskInstance.getHost());
-        if (workerServerStartDate != null) {
-            return taskTime.after(workerServerStartDate);
+        Date serverStartDate = getServerStartupTime(servers, taskInstance.getHost());
+        if (serverStartDate != null) {
+            return taskTime.after(serverStartDate);
         }
         return false;
     }
@@ -417,7 +417,10 @@ public class MasterRegistryClient {
         }
 
         Date serverStartupTime = getServerStartupTime(NodeType.MASTER, masterHost);
-        List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
+
+        // servers need to contains master hosts and worker hosts, otherwise the logic task will failover fail.
+        List<Server> servers = registryClient.getServerList(NodeType.WORKER);
+        servers.addAll(registryClient.getServerList(NodeType.MASTER));
 
         long startTime = System.currentTimeMillis();
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
@@ -436,7 +439,7 @@ public class MasterRegistryClient {
                 if (taskInstance.getState().typeIsFinished()) {
                     continue;
                 }
-                if (!checkTaskInstanceNeedFailover(workerServers, taskInstance)) {
+                if (!checkTaskInstanceNeedFailover(servers, taskInstance)) {
                     continue;
                 }
                 logger.info("failover task instance id: {}, process instance id: {}", taskInstance.getId(), taskInstance.getProcessInstanceId());
