@@ -3,7 +3,6 @@ package org.apache.dolphinscheduler.tools.demo;
 
 import static org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum.PARALLEL;
 
-
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -57,9 +56,12 @@ public class ProcessDefinitionDemo {
 
         //create and get demo projectCode
         Project project = projectMapper.queryByName("demo");
+        if (project != null) {
+            logger.warn("Project {} already exists.", project.getName());
+        }
         try {
             project = Project
-                    .newBuilder()
+                    .builder()
                     .name("demo")
                     .code(CodeGenerateUtils.getInstance().genCode())
                     .description("")

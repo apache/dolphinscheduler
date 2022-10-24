@@ -45,6 +45,7 @@ public class ProxyProcessDefinitionController {
         requestBodyMap.put("tenantCode", tenantCode);
         requestBodyMap.put("taskRelationJson", taskRelationJson);
         requestBodyMap.put("taskDefinitionJson", taskDefinitionJson);
+        requestBodyMap.put("otherParamsJson", null);
         requestBodyMap.put("executionType", executionType);
 
         try {

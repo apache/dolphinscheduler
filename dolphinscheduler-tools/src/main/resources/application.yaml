@@ -37,6 +37,9 @@ spring:
 create-demo:
   tenant-code: default
 
+server:
+  port: 5173
+
 # Override by profile
 
 ---
