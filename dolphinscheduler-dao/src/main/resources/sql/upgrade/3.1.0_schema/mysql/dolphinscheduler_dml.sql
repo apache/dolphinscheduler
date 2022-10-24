@@ -14,4 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-ALTER TABLE `t_ds_fav_task` change `task_name` `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name';
