@@ -199,7 +199,9 @@ public class ProcessUtils {
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                            .setExecutePath(FileUtils.getProcessExecDir(
+                                    taskExecutionContext.getTenantCode(),
+                                    taskExecutionContext.getProjectCode(),
                                     taskExecutionContext.getProcessDefineCode(),
                                     taskExecutionContext.getProcessDefineVersion(),
                                     taskExecutionContext.getProcessInstanceId(),
