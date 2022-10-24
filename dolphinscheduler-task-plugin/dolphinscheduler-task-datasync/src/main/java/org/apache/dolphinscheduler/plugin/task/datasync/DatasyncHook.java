@@ -17,14 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
-import lombok.Data;
-import lombok.SneakyThrows;
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -47,17 +42,28 @@ import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 import software.amazon.awssdk.services.datasync.model.TaskSchedule;
 import software.amazon.awssdk.services.datasync.model.TaskStatus;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.Data;
+import lombok.SneakyThrows;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Data
 public class DatasyncHook {
 
-    public static TaskExecutionStatus[] doneStatus = {TaskExecutionStatus.ERROR, TaskExecutionStatus.SUCCESS, TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
+    public static TaskExecutionStatus[] doneStatus =
+            {TaskExecutionStatus.ERROR, TaskExecutionStatus.SUCCESS, TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
     public static TaskStatus[] taskFinishFlags = {TaskStatus.UNAVAILABLE, TaskStatus.UNKNOWN_TO_SDK_VERSION};
-    protected final Logger logger = LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private DataSyncClient client;
     private String taskArn;
     private String taskExecArn;
@@ -75,7 +81,8 @@ public class DatasyncHook {
         final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
 
         // create a datasync client
-        return DataSyncClient.builder().region(Region.of(awsRegion)).credentialsProvider(awsCredentialsProvider).build();
+        return DataSyncClient.builder().region(Region.of(awsRegion)).credentialsProvider(awsCredentialsProvider)
+                .build();
     }
 
     public Boolean createDatasyncTask(DatasyncParameters parameters) {
@@ -109,7 +116,6 @@ public class DatasyncHook {
         return doubleCheckExecStatus(TaskExecutionStatus.LAUNCHING, doneStatus);
     }
 
-
     public Boolean cancelDatasyncTask() {
         logger.info("cancelTask ......");
         CancelTaskExecutionRequest cancel = CancelTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
@@ -135,7 +141,8 @@ public class DatasyncHook {
 
     public TaskExecutionStatus queryDatasyncTaskExecStatus() {
         logger.info("queryDatasyncTaskExecStatus ......");
-        DescribeTaskExecutionRequest request = DescribeTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
+        DescribeTaskExecutionRequest request =
+                DescribeTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
         DescribeTaskExecutionResponse describe = client.describeTaskExecution(request);
 
         if (describe.sdkHttpResponse().isSuccessful()) {
@@ -215,10 +222,12 @@ public class DatasyncHook {
         return false;
     }
 
-    private static void castParamPropertyPackage(DatasyncParameters parameters, CreateTaskRequest.Builder builder){
+    private static void castParamPropertyPackage(DatasyncParameters parameters, CreateTaskRequest.Builder builder) {
         List<DatasyncParameters.TagListEntry> tags = parameters.getTags();
         if (tags != null && tags.size() > 0) {
-            List<TagListEntry> collect = tags.stream().map(e -> TagListEntry.builder().key(e.getKey()).value(e.getValue()).build()).collect(Collectors.toList());
+            List<TagListEntry> collect =
+                    tags.stream().map(e -> TagListEntry.builder().key(e.getKey()).value(e.getValue()).build())
+                            .collect(Collectors.toList());
             builder.tags(collect);
         }
         DatasyncParameters.Options options = parameters.getOptions();
@@ -235,16 +244,21 @@ public class DatasyncHook {
         }
         List<DatasyncParameters.FilterRule> excludes = parameters.getExcludes();
         if (excludes != null && excludes.size() > 0) {
-            List<FilterRule> collect = excludes.stream().map(e->FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build()).collect(Collectors.toList());
+            List<FilterRule> collect = excludes.stream()
+                    .map(e -> FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build())
+                    .collect(Collectors.toList());
             builder.excludes(collect);
         }
         List<DatasyncParameters.FilterRule> includes = parameters.getIncludes();
         if (includes != null && includes.size() > 0) {
-            List<FilterRule> collect = includes.stream().map(e->FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build()).collect(Collectors.toList());
+            List<FilterRule> collect = includes.stream()
+                    .map(e -> FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build())
+                    .collect(Collectors.toList());
             builder.excludes(collect);
         }
         if (parameters.getSchedule() != null) {
-            builder.schedule(TaskSchedule.builder().scheduleExpression(parameters.getSchedule().getScheduleExpression()).build());
+            builder.schedule(TaskSchedule.builder().scheduleExpression(parameters.getSchedule().getScheduleExpression())
+                    .build());
         }
     }
 }

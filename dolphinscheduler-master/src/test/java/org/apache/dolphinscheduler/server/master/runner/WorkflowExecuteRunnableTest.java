@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -52,15 +53,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class WorkflowExecuteRunnableTest {
 
     private WorkflowExecuteRunnable workflowExecuteThread;
@@ -68,6 +72,8 @@ public class WorkflowExecuteRunnableTest {
     private ProcessInstance processInstance;
 
     private ProcessService processService;
+
+    private CommandService commandService;
 
     private ProcessInstanceDao processInstanceDao;
 
@@ -79,7 +85,7 @@ public class WorkflowExecuteRunnableTest {
 
     private CuringParamsService curingGlobalParamsService;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -87,11 +93,12 @@ public class WorkflowExecuteRunnableTest {
 
         config = new MasterConfig();
         processService = Mockito.mock(ProcessService.class);
+        commandService = Mockito.mock(CommandService.class);
         processInstanceDao = Mockito.mock(ProcessInstanceDao.class);
         processInstance = Mockito.mock(ProcessInstance.class);
         Map<String, String> cmdParam = new HashMap<>();
-        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
-        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
+        cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
+        cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setGlobalParamMap(Collections.emptyMap());
         processDefinition.setGlobalParamList(Collections.emptyList());
@@ -102,7 +109,8 @@ public class WorkflowExecuteRunnableTest {
         NettyExecutorManager nettyExecutorManager = Mockito.mock(NettyExecutorManager.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
         workflowExecuteThread = Mockito.spy(
-                new WorkflowExecuteRunnable(processInstance, processService, processInstanceDao, nettyExecutorManager,
+                new WorkflowExecuteRunnable(processInstance, commandService, processService, processInstanceDao,
+                        nettyExecutorManager,
                         processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService));
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
@@ -119,9 +127,9 @@ public class WorkflowExecuteRunnableTest {
             method.setAccessible(true);
             List<String> nodeNames =
                     (List<String>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
-            Assert.assertEquals(3, nodeNames.size());
+            Assertions.assertEquals(3, nodeNames.size());
         } catch (Exception e) {
-            Assert.fail();
+            Assertions.fail();
         }
     }
 
@@ -147,15 +155,15 @@ public class WorkflowExecuteRunnableTest {
             method.setAccessible(true);
             List<TaskInstance> taskInstances =
                     workflowExecuteThread.getRecoverTaskInstanceList(JSONUtils.toJsonString(cmdParam));
-            Assert.assertEquals(4, taskInstances.size());
+            Assertions.assertEquals(4, taskInstances.size());
 
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1");
             List<TaskInstance> taskInstanceEmpty =
                     (List<TaskInstance>) method.invoke(workflowExecuteThread, JSONUtils.toJsonString(cmdParam));
-            Assert.assertTrue(taskInstanceEmpty.isEmpty());
+            Assertions.assertTrue(taskInstanceEmpty.isEmpty());
 
         } catch (Exception e) {
-            Assert.fail();
+            Assertions.fail();
         }
     }
 
@@ -199,7 +207,7 @@ public class WorkflowExecuteRunnableTest {
             taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
 
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
-            Assert.assertNotNull(taskInstance.getVarPool());
+            Assertions.assertNotNull(taskInstance.getVarPool());
 
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
             completeTaskList.put(taskInstance2.getTaskCode(), taskInstance2.getId());
@@ -210,9 +218,9 @@ public class WorkflowExecuteRunnableTest {
             taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
 
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
-            Assert.assertNotNull(taskInstance.getVarPool());
+            Assertions.assertNotNull(taskInstance.getVarPool());
         } catch (Exception e) {
-            Assert.fail();
+            Assertions.fail();
         }
     }
 
@@ -238,7 +246,7 @@ public class WorkflowExecuteRunnableTest {
             Mockito.when(processService.findProcessInstanceById(222)).thenReturn(processInstance9);
             workflowExecuteThread.checkSerialProcess(processDefinition1);
         } catch (Exception e) {
-            Assert.fail();
+            Assertions.fail();
         }
     }
 

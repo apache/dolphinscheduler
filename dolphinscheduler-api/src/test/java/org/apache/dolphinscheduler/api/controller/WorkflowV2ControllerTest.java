@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
@@ -35,20 +35,19 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * project v2 controller test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class WorkflowV2ControllerTest {
 
     protected User user;
@@ -69,7 +68,7 @@ public class WorkflowV2ControllerTest {
     private final static int warningGroupId = 0;
     private final static String executionType = "PARALLEL";
 
-    @Before
+    @BeforeEach
     public void before() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -94,7 +93,7 @@ public class WorkflowV2ControllerTest {
         Mockito.when(processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest))
                 .thenReturn(this.getProcessDefinition(name));
         Result<ProcessDefinition> resourceResponse = workflowV2Controller.createWorkflow(user, workflowCreateRequest);
-        Assert.assertEquals(this.getProcessDefinition(name), resourceResponse.getData());
+        Assertions.assertEquals(this.getProcessDefinition(name), resourceResponse.getData());
     }
 
     @Test
@@ -107,7 +106,7 @@ public class WorkflowV2ControllerTest {
         Result<ProcessDefinition> resourceResponse =
                 workflowV2Controller.updateWorkflow(user, 1L, workflowUpdateRequest);
 
-        Assert.assertEquals(this.getProcessDefinition(newName), resourceResponse.getData());
+        Assertions.assertEquals(this.getProcessDefinition(newName), resourceResponse.getData());
     }
 
     @Test

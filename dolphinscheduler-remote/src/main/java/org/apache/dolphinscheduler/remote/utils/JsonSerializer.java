@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * json serialize or deserialize
  */
 public class JsonSerializer {
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(JsonSerializer.class);
 

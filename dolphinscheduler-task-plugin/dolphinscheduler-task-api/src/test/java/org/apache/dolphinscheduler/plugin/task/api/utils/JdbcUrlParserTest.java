@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * JdbcUrlParserTest
@@ -38,7 +38,7 @@ public class JdbcUrlParserTest {
                     + "driverName='mysql', database='dolphinscheduler', "
                     + "params='useUnicode=true&characterEncoding=UTF-8', "
                     + "address='jdbc:mysql://localhost:3306'}";
-            Assert.assertEquals(expected,jdbcInfoStr);
+            Assertions.assertEquals(expected, jdbcInfoStr);
         }
     }
 }

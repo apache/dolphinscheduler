@@ -24,18 +24,18 @@ import static org.mockito.Mockito.spy;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HttpAlertChannelTest {
 
@@ -47,7 +47,7 @@ public class HttpAlertChannelTest {
         alertData.setContent("Fault tolerance warning");
         alertInfo.setAlertData(alertData);
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assert.assertEquals("http params is null", alertResult.getMessage());
+        Assertions.assertEquals("http params is null", alertResult.getMessage());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class HttpAlertChannelTest {
         // it
         doReturn(new AlertResult("true", "success")).when(alertChannel).process(any());
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assertions.assertEquals("true", alertResult.getStatus());
     }
 
     /**

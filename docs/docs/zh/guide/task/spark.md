@@ -16,7 +16,10 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 - 程序类型：支持 Java、Scala、Python 和 SQL 四种语言。
 - 主函数的 Class：Spark 程序的入口 Main class 的全路径。
 - 主程序包：执行 Spark 程序的 jar 包（通过资源中心上传）。
@@ -29,7 +32,7 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 - Executor 数量：用于设置 Executor 的数量，可根据实际生产环境设置对应的内存数。
 - Executor 内存数：用于设置 Executor 内存数，可根据实际生产环境设置对应的内存数。
 - 主程序参数：设置 Spark 程序的输入参数，支持自定义参数变量的替换。
-- 选项参数：支持 `--jar`、`--files`、`--archives`、`--conf` 格式。
+- 选项参数：支持 `--jars`、`--files`、`--archives`、`--conf` 格式。
 - 资源：如果其他参数中引用了资源文件，需要在资源中选择指定。
 - 自定义参数：是 Spark 局部的用户自定义参数，会替换脚本中以 ${变量} 的内容。
 

@@ -17,18 +17,21 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_TASK_TYPE;
+
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
+import lombok.experimental.UtilityClass;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * the factory to create task processor
@@ -47,10 +50,12 @@ public final class TaskProcessorFactory {
         for (Map.Entry<String, ITaskProcessor> entry : prioritySPIFactory.getSPIMap().entrySet()) {
             try {
                 logger.info("Registering task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
-                PROCESS_MAP.put(entry.getKey(), (Constructor<ITaskProcessor>) entry.getValue().getClass().getConstructor());
+                PROCESS_MAP.put(entry.getKey(),
+                        (Constructor<ITaskProcessor>) entry.getValue().getClass().getConstructor());
                 logger.info("Registered task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
             } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException(String.format("The task processor: %s should has a no args constructor", entry.getKey()));
+                throw new IllegalArgumentException(
+                        String.format("The task processor: %s should has a no args constructor", entry.getKey()));
             }
         }
     }

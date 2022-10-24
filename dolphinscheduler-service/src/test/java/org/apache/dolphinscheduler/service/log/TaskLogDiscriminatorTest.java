@@ -18,9 +18,9 @@ package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.LoggingEvent;
@@ -34,7 +34,7 @@ public class TaskLogDiscriminatorTest {
 
     TaskLogDiscriminator taskLogDiscriminator;
 
-    @Before
+    @BeforeEach
     public void before() {
         taskLogDiscriminator = new TaskLogDiscriminator();
         taskLogDiscriminator.setLogBase("logs");
@@ -75,18 +75,18 @@ public class TaskLogDiscriminatorTest {
                 return TaskConstants.TASK_LOG_LOGGER_NAME;
             }
         });
-        Assert.assertEquals("20220105/101-1-1001", result);
+        Assertions.assertEquals("20220105/101-1-1001", result);
     }
 
     @Test
     public void start() {
         taskLogDiscriminator.start();
-        Assert.assertEquals(true, taskLogDiscriminator.isStarted());
+        Assertions.assertEquals(true, taskLogDiscriminator.isStarted());
     }
 
     @Test
     public void getKey() {
-        Assert.assertEquals("123", taskLogDiscriminator.getKey());
+        Assertions.assertEquals("123", taskLogDiscriminator.getKey());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class TaskLogDiscriminatorTest {
 
     @Test
     public void getLogBase() {
-        Assert.assertEquals("logs", taskLogDiscriminator.getLogBase());
+        Assertions.assertEquals("logs", taskLogDiscriminator.getLogBase());
     }
 
     @Test

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpStatus;
 
@@ -58,7 +58,7 @@ public class OkHttpUtils {
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
         if (requestBodyMap != null) {
             requestBuilder = requestBuilder.post(RequestBody.create(MediaType.parse("application/json"),
-                                                                    JSONUtils.toJsonString(requestBodyMap)));
+                    JSONUtils.toJsonString(requestBodyMap)));
         }
         try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
             return getResponseBody(response);
@@ -91,8 +91,8 @@ public class OkHttpUtils {
     private static String getResponseBody(@NonNull Response response) throws IOException {
         if (response.code() != HttpStatus.SC_OK || response.body() == null) {
             throw new RuntimeException(String.format("Request execute failed, httpCode: %s, httpBody: %s",
-                                                     response.code(),
-                                                     response.body()));
+                    response.code(),
+                    response.body()));
         }
         return response.body().string();
     }

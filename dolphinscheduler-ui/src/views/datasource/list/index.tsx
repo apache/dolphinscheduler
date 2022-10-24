@@ -39,12 +39,15 @@ import { DefaultTableWidth } from '@/common/column-width-config'
 import Card from '@/components/card'
 import DetailModal from './detail'
 import type { TableColumns } from './types'
+import SourceModal from './source-modal'
 
 const list = defineComponent({
   name: 'list',
   setup() {
     const { t } = useI18n()
     const showDetailModal = ref(false)
+    const showSourceModal = ref(false)
+    const selectType = ref('MYSQL')
     const selectId = ref()
     const columns = ref({
       columns: [] as TableColumns,
@@ -64,10 +67,20 @@ const list = defineComponent({
 
     const onCreate = () => {
       selectId.value = null
-      showDetailModal.value = true
+      showSourceModal.value = true
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
+    const handleSelectSourceType = (value: string) => {
+      selectType.value = value
+      showSourceModal.value = false
+      showDetailModal.value = true
+    }
+
+    const handleSourceModalOpen = () => {
+      showSourceModal.value = true
+    }
 
     onMounted(() => {
       changePage(1)
@@ -81,6 +94,7 @@ const list = defineComponent({
     return {
       t,
       showDetailModal,
+      showSourceModal,
       id: selectId,
       columns,
       ...toRefs(data),
@@ -88,7 +102,10 @@ const list = defineComponent({
       changePageSize,
       onCreate,
       onUpdatedList: updateList,
-      trim
+      trim,
+      handleSelectSourceType,
+      selectType,
+      handleSourceModalOpen
     }
   },
   render() {
@@ -96,6 +113,7 @@ const list = defineComponent({
       t,
       id,
       showDetailModal,
+      showSourceModal,
       columns,
       list,
       page,
@@ -105,7 +123,10 @@ const list = defineComponent({
       changePage,
       changePageSize,
       onCreate,
-      onUpdatedList
+      onUpdatedList,
+      handleSelectSourceType,
+      selectType,
+      handleSourceModalOpen
     } = this
 
     return (
@@ -159,11 +180,14 @@ const list = defineComponent({
             </NSpace>
           </NSpace>
         </Card>
+        <SourceModal show={showSourceModal} onChange={handleSelectSourceType}></SourceModal>
         <DetailModal
           show={showDetailModal}
           id={id}
+          selectType={selectType}
           onCancel={() => void (this.showDetailModal = false)}
           onUpdate={onUpdatedList}
+          onOpen={handleSourceModalOpen}
         />
       </NSpace>
     )

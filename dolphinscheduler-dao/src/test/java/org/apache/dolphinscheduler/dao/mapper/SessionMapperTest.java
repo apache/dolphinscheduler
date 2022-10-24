@@ -23,8 +23,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class SessionMapperTest extends BaseDaoTest {
@@ -38,7 +38,7 @@ public class SessionMapperTest extends BaseDaoTest {
      * @return Session
      */
     private Session insertOne() {
-        //insertOne
+        // insertOne
         Session session = new Session();
         session.setId(UUID.randomUUID().toString());
         session.setLastLoginTime(new Date());
@@ -51,23 +51,23 @@ public class SessionMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOne
+    public void testUpdate() {
+        // insertOne
         Session session = insertOne();
         session.setLastLoginTime(new Date());
-        //update
+        // update
         int update = sessionMapper.updateById(session);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Session session = insertOne();
         int delete = sessionMapper.deleteById(session.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -76,9 +76,9 @@ public class SessionMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Session session = insertOne();
-        //query
+        // query
         List<Session> sessions = sessionMapper.selectList(null);
-        Assert.assertNotEquals(sessions.size(), 0);
+        Assertions.assertNotEquals(sessions.size(), 0);
     }
 
     /**
@@ -88,7 +88,7 @@ public class SessionMapperTest extends BaseDaoTest {
     public void testQueryByUserId() {
         Session session = insertOne();
         List<Session> sessions = sessionMapper.queryByUserId(session.getUserId());
-        Assert.assertNotEquals(sessions.size(), 0);
+        Assertions.assertNotEquals(sessions.size(), 0);
 
     }
 }

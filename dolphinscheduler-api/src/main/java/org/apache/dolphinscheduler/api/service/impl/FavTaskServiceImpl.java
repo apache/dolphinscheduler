@@ -23,12 +23,14 @@ import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.dao.entity.FavTask;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.FavTaskMapper;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
 
 @Service
 public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskService {

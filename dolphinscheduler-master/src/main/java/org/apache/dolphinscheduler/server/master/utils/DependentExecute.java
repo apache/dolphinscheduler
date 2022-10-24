@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -153,7 +153,8 @@ public class DependentExecute {
     private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance, int testFlag) {
         DependResult result;
         TaskInstance taskInstance = null;
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId(), testFlag);
+        List<TaskInstance> taskInstanceList =
+                processService.findValidTaskListByProcessId(processInstance.getId(), testFlag);
 
         for (TaskInstance task : taskInstanceList) {
             if (task.getTaskCode() == taskCode) {
@@ -191,7 +192,8 @@ public class DependentExecute {
         ProcessInstance lastSchedulerProcess =
                 processService.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
-        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+        ProcessInstance lastManualProcess =
+                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;
