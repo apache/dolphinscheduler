@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -48,14 +49,17 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.micrometer.core.annotation.Counted;
@@ -77,6 +81,9 @@ public class MasterFailoverService {
     private final LogClient logClient;
 
     private final TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private ProcessDefinitionDao processDefinitionDao;
 
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
@@ -153,6 +160,12 @@ public class MasterFailoverService {
                 needFailoverProcessInstanceList.size(),
                 needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
 
+        List<ProcessDefinition> processDefinitions =
+                processDefinitionDao.queryProcessDefinitionsByCodesAndVersions(needFailoverProcessInstanceList);
+        Map<Long, ProcessDefinition> codeDefinitionMap = processDefinitions
+                .stream()
+                .collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
+
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             try {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
@@ -161,10 +174,7 @@ public class MasterFailoverService {
                     LOGGER.info("WorkflowInstance doesn't need to failover");
                     continue;
                 }
-                // todo: use batch query
-                ProcessDefinition processDefinition =
-                        processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                                processInstance.getProcessDefinitionVersion());
+                ProcessDefinition processDefinition = codeDefinitionMap.get(processInstance.getProcessDefinitionCode());
                 processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
                 List<TaskInstance> taskInstanceList =
