@@ -29,4 +29,6 @@ END IF;
 END;
 d//
 delimiter ;
+CALL modify_t_ds_fav_task_task_name;
+DROP PROCEDURE modify_t_ds_fav_task_task_name;
 
