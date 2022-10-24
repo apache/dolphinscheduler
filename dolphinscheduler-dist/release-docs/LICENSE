@@ -334,7 +334,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     log4j-core-2.11.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core/2.11.2, Apache 2.0
     log4j-1.2-api 2.17.2: https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-1.2-api/2.17.2, Apache 2.0
     lz4 1.3.0: https://mvnrepository.com/artifact/net.jpountz.lz4/lz4/1.3.0, Apache 2.0
-    mapstruct 1.3.1.Final: https://github.com/mapstruct/mapstruct, Apache 2.0
     mybatis 3.5.10 https://mvnrepository.com/artifact/org.mybatis/mybatis/3.5.10, Apache 2.0
     mybatis-plus 3.5.2: https://github.com/baomidou/mybatis-plus, Apache 2.0
     mybatis-plus-annotation 3.5.2: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-annotation/3.5.2, Apache 2.0
@@ -377,22 +376,18 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-context-support 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.13, Apache 2.0
     spring-core 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-core/5.3.22, Apache 2.0
     spring-expression 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-expression/5.3.13, Apache 2.0
-    springfox-core 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-core/3.0.0, Apache 2.0
-    springfox-schema 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-schema/3.0.0, Apache 2.0
-    springfox-spi 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-spi/3.0.0, Apache 2.0
-    springfox-spring-web 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-spring-web/3.0.0, Apache 2.0
-    springfox-swagger2 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-swagger2/3.0.0, Apache 2.0
-    springfox-swagger-common 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-swagger-common/3.0.0, Apache 2.0
-    springfox-swagger-ui 3.0.0: https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui/3.0.0, Apache 2.0
+    springdoc-openapi-ui 1.6.9: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui/1.6.9, Apache 2.0
+    springdoc-openapi-common 1.6.9: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-common/1.6.9, Apache 2.0
+    springdoc-openapi-webmvc-core 1.6.9: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webmvc-core/1.6.9, Apache 2.0
     spring-jcl 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-jcl/5.3.13, Apache 2.0
     spring-jdbc 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-jdbc/5.3.22, Apache 2.0
-    spring-plugin-core 2.0.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-core/2.0.0.RELEASE, Apache 2.0
-    spring-plugin-metadata 2.0.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-metadata/2.0.0.RELEASE, Apache 2.0
     spring-tx 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.3.22, Apache 2.0
     spring-web 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-web/5.3.13, Apache 2.0
     spring-webmvc 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-webmvc/5.3.13, Apache 2.0
-    swagger-annotations 1.5.20: https://mvnrepository.com/artifact/io.swagger/swagger-annotations/1.5.20, Apache 2.0
-    swagger-models 1.5.24: https://mvnrepository.com/artifact/io.swagger/swagger-models/1.5.24, Apache 2.0
+    swagger-annotations 2.2.0: https://mvnrepository.com/artifact/io.swagger/swagger-annotations/2.2.0, Apache 2.0
+    swagger-models 2.2.0: https://mvnrepository.com/artifact/io.swagger/swagger-models/2.2.0, Apache 2.0
+    swagger-core 2.2.0: https://mvnrepository.com/artifact/io.swagger/swagger-core/2.2.0, Apache 2.0
+    swagger-ui 4.11.1: https://mvnrepository.com/artifact/io.swagger/swagger-ui/4.11.1, Apache 2.0
     tephra-api 0.6.0: https://mvnrepository.com/artifact/co.cask.tephra/tephra-api/0.6.0, Apache 2.0
     token-provider 1.0.1: https://mvnrepository.com/artifact/org.apache.kerby/token-provider/1.0.1, Apache 2.0
     tomcat-embed-el 9.0.65: https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-el/9.0.65, Apache 2.0
@@ -589,6 +584,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on, MIT
     bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on, MIT
     reactive-streams 1.0.4: https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams/1.0.4, MIT
+    webjars-locator-core 0.50 https://mvnrepository.com/artifact/org.webjars/webjars-locator-core/0.50, MIT
 
 ========================================================================
 MPL 1.1 licenses

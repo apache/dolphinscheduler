@@ -46,14 +46,12 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
-
-import springfox.documentation.annotations.ApiIgnore;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,15 +77,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * resources controller
  */
-@Api(tags = "RESOURCES_TAG")
+@Tag(name = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
 public class ResourcesController extends BaseController {
@@ -108,18 +107,18 @@ public class ResourcesController extends BaseController {
      * @param currentDir current directory
      * @return create result code
      */
-    @ApiOperation(value = "createDirectory", notes = "CREATE_RESOURCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataTypeClass = int.class, example = "10"),
-            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataTypeClass = String.class)
+    @Operation(summary = "createDirectory", description = "CREATE_RESOURCE_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/directory")
     @ApiException(CREATE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> createDirectory(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> createDirectory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "type") ResourceType type,
                                           @RequestParam(value = "name") String alias,
                                           @RequestParam(value = "description", required = false) String description,
@@ -134,19 +133,19 @@ public class ResourcesController extends BaseController {
      *
      * @return create result code
      */
-    @ApiOperation(value = "createResource", notes = "CREATE_RESOURCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataTypeClass = MultipartFile.class),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataTypeClass = int.class, example = "10"),
-            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENT_DIR", required = true, dataTypeClass = String.class)
+    @Operation(summary = "createResource", description = "CREATE_RESOURCE_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class)),
+            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping()
     @ApiException(CREATE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> createResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> createResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "type") ResourceType type,
                                          @RequestParam(value = "name") String alias,
                                          @RequestParam(value = "description", required = false) String description,
@@ -168,18 +167,18 @@ public class ResourcesController extends BaseController {
      * @param file resource file
      * @return update result code
      */
-    @ApiOperation(value = "updateResource", notes = "UPDATE_RESOURCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataTypeClass = MultipartFile.class)
+    @Operation(summary = "updateResource", description = "UPDATE_RESOURCE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class))
     })
     @PutMapping(value = "/{id}")
     @ApiException(UPDATE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> updateResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> updateResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @PathVariable(value = "id") int resourceId,
                                          @RequestParam(value = "type") ResourceType type,
                                          @RequestParam(value = "name") String alias,
@@ -196,15 +195,15 @@ public class ResourcesController extends BaseController {
      * @param type resource type
      * @return resource list
      */
-    @ApiOperation(value = "queryResourceList", notes = "QUERY_RESOURCE_LIST_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class)
+    @Operation(summary = "queryResourceList", description = "QUERY_RESOURCE_LIST_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryResourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "type") ResourceType type) {
         Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
         return returnDataList(result);
@@ -220,19 +219,19 @@ public class ResourcesController extends BaseController {
      * @param pageSize page size
      * @return resource list page
      */
-    @ApiOperation(value = "queryResourceListPaging", notes = "QUERY_RESOURCE_LIST_PAGING_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "10"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
+    @Operation(summary = "queryResourceListPaging", description = "QUERY_RESOURCE_LIST_PAGING_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_PAGING)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryResourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryResourceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestParam(value = "type") ResourceType type,
                                                   @RequestParam(value = "id") int id,
                                                   @RequestParam("pageNo") Integer pageNo,
@@ -255,15 +254,15 @@ public class ResourcesController extends BaseController {
      * @param resourceId resource id
      * @return delete result code
      */
-    @ApiOperation(value = "deleteResource", notes = "DELETE_RESOURCE_BY_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "deleteResource", description = "DELETE_RESOURCE_BY_ID_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> deleteResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> deleteResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @PathVariable(value = "id") int resourceId) throws Exception {
         return resourceService.delete(loginUser, resourceId);
     }
@@ -276,16 +275,16 @@ public class ResourcesController extends BaseController {
      * @param type resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    @ApiOperation(value = "verifyResourceName", notes = "VERIFY_RESOURCE_NAME_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataTypeClass = String.class)
+    @Operation(summary = "verifyResourceName", description = "VERIFY_RESOURCE_NAME_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "fullName", description = "RESOURCE_FULL_NAME", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> verifyResourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> verifyResourceName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam(value = "fullName") String fullName,
                                              @RequestParam(value = "type") ResourceType type) {
         return resourceService.verifyResourceName(fullName, type, loginUser);
@@ -298,15 +297,15 @@ public class ResourcesController extends BaseController {
      * @param type resource type
      * @return resource list
      */
-    @ApiOperation(value = "queryResourceByProgramType", notes = "QUERY_RESOURCE_LIST_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class)
+    @Operation(summary = "queryResourceByProgramType", description = "QUERY_RESOURCE_LIST_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
     })
     @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryResourceJarList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryResourceJarList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestParam(value = "type") ResourceType type,
                                                @RequestParam(value = "programType", required = false) ProgramType programType) {
         return resourceService.queryResourceByProgramType(loginUser, type, programType);
@@ -321,17 +320,17 @@ public class ResourcesController extends BaseController {
      * @param id resource id
      * @return true if the resource name not exists, otherwise return false
      */
-    @ApiOperation(value = "queryResource", notes = "QUERY_BY_RESOURCE_NAME")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataTypeClass = int.class, example = "10")
+    @Operation(summary = "queryResource", description = "QUERY_BY_RESOURCE_NAME")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "fullName", description = "RESOURCE_FULL_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "id", description = "RESOURCE_ID", required = false, schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "fullName", required = false) String fullName,
                                         @PathVariable(value = "id", required = false) Integer id,
                                         @RequestParam(value = "type") ResourceType type) {
@@ -348,16 +347,16 @@ public class ResourcesController extends BaseController {
      * @param limit limit
      * @return resource content
      */
-    @ApiOperation(value = "viewResource", notes = "VIEW_RESOURCE_BY_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "viewResource", description = "VIEW_RESOURCE_BY_ID_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "skipLineNum", description = "SKIP_LINE_NUM", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/view")
     @ApiException(VIEW_RESOURCE_FILE_ON_LINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result viewResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result viewResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable(value = "id") int resourceId,
                                @RequestParam(value = "skipLineNum") int skipLineNum,
                                @RequestParam(value = "limit") int limit) {
@@ -369,20 +368,20 @@ public class ResourcesController extends BaseController {
      *
      * @return create result code
      */
-    @ApiOperation(value = "onlineCreateResource", notes = "ONLINE_CREATE_RESOURCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataTypeClass = ResourceType.class),
-            @ApiImplicitParam(name = "fileName", value = "RESOURCE_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "suffix", value = "SUFFIX", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataTypeClass = int.class, example = "10"),
-            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataTypeClass = String.class)
+    @Operation(summary = "onlineCreateResource", description = "ONLINE_CREATE_RESOURCE_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
+            @Parameter(name = "fileName", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "suffix", description = "SUFFIX", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "content", description = "CONTENT", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "currentDir", description = "RESOURCE_CURRENTDIR", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/online-create")
     @ApiException(CREATE_RESOURCE_FILE_ON_LINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result onlineCreateResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result onlineCreateResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "type") ResourceType type,
                                        @RequestParam(value = "fileName") String fileName,
                                        @RequestParam(value = "suffix") String fileSuffix,
@@ -406,15 +405,15 @@ public class ResourcesController extends BaseController {
      * @param content content
      * @return update result code
      */
-    @ApiOperation(value = "updateResourceContent", notes = "UPDATE_RESOURCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100"),
-            @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataTypeClass = String.class)
+    @Operation(summary = "updateResourceContent", description = "UPDATE_RESOURCE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "content", description = "CONTENT", required = true, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{id}/update-content")
     @ApiException(EDIT_RESOURCE_FILE_ON_LINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateResourceContent(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result updateResourceContent(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable(value = "id") int resourceId,
                                         @RequestParam(value = "content") String content) {
         if (StringUtils.isEmpty(content)) {
@@ -431,15 +430,15 @@ public class ResourcesController extends BaseController {
      * @param resourceId resource id
      * @return resource content
      */
-    @ApiOperation(value = "downloadResource", notes = "DOWNLOAD_RESOURCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "downloadResource", description = "DOWNLOAD_RESOURCE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/download")
     @ResponseBody
     @ApiException(DOWNLOAD_RESOURCE_FILE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ResponseEntity downloadResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ResponseEntity downloadResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int resourceId) throws Exception {
         Resource file = resourceService.downloadResource(loginUser, resourceId);
         if (file == null) {
@@ -464,22 +463,22 @@ public class ResourcesController extends BaseController {
      * @param resourceId resource id
      * @return create result code
      */
-    @ApiOperation(value = "createUdfFunc", notes = "CREATE_UDF_FUNCTION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataTypeClass = UdfType.class),
-            @ApiImplicitParam(name = "funcName", value = "FUNC_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "className", value = "CLASS_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "database", value = "DATABASE_NAME", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "UDF_DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "createUdfFunc", description = "CREATE_UDF_FUNCTION_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class)),
+            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "argTypes", description = "ARG_TYPES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "database", description = "DATABASE_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "UDF_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "resourceId", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
 
     })
     @PostMapping(value = "/{resourceId}/udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createUdfFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result createUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "type") UdfType type,
                                 @RequestParam(value = "funcName") String funcName,
                                 @RequestParam(value = "className") String className,
@@ -499,16 +498,16 @@ public class ResourcesController extends BaseController {
      * @param id resource id
      * @return udf function detail
      */
-    @ApiOperation(value = "viewUIUdfFunction", notes = "VIEW_UDF_FUNCTION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "viewUIUdfFunction", description = "VIEW_UDF_FUNCTION_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
 
     })
     @GetMapping(value = "/{id}/udf-func")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VIEW_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result viewUIUdfFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result viewUIUdfFunction(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @PathVariable("id") int id) {
         return udfFuncService.queryUdfFuncDetail(loginUser, id);
     }
@@ -527,22 +526,22 @@ public class ResourcesController extends BaseController {
      * @param udfFuncId udf function id
      * @return update result code
      */
-    @ApiOperation(value = "updateUdfFunc", notes = "UPDATE_UDF_FUNCTION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "UDF_ID", required = true, dataTypeClass = int.class),
-            @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataTypeClass = UdfType.class),
-            @ApiImplicitParam(name = "funcName", value = "FUNC_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "className", value = "CLASS_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "database", value = "DATABASE_NAME", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "UDF_DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "updateUdfFunc", description = "UPDATE_UDF_FUNCTION_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "UDF_ID", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class)),
+            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "argTypes", description = "ARG_TYPES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "database", description = "DATABASE_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "UDF_DESC", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "resourceId", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
 
     })
     @PutMapping(value = "/{resourceId}/udf-func/{id}")
     @ApiException(UPDATE_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateUdfFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result updateUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId,
                                 @RequestParam(value = "type") UdfType type,
                                 @RequestParam(value = "funcName") String funcName,
@@ -564,17 +563,17 @@ public class ResourcesController extends BaseController {
      * @param pageSize page size
      * @return udf function list page
      */
-    @ApiOperation(value = "queryUdfFuncListPaging", notes = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
+    @Operation(summary = "queryUdfFuncListPaging", description = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
+    @Parameters({
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping(value = "/udf-func")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UDF_FUNCTION_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryUdfFuncListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryUdfFuncListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @RequestParam("pageNo") Integer pageNo,
                                                  @RequestParam(value = "searchVal", required = false) String searchVal,
                                                  @RequestParam("pageSize") Integer pageSize) {
@@ -592,15 +591,15 @@ public class ResourcesController extends BaseController {
      * @param type resource type
      * @return resource list
      */
-    @ApiOperation(value = "queryUdfFuncList", notes = "QUERY_UDF_FUNC_LIST_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataTypeClass = UdfType.class)
+    @Operation(summary = "queryUdfFuncList", description = "QUERY_UDF_FUNC_LIST_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class))
     })
     @GetMapping(value = "/udf-func/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryUdfFuncList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("type") UdfType type) {
         return udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
     }
@@ -612,16 +611,16 @@ public class ResourcesController extends BaseController {
      * @param name name
      * @return true if the name can user, otherwise return false
      */
-    @ApiOperation(value = "verifyUdfFuncName", notes = "VERIFY_UDF_FUNCTION_NAME_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "FUNC_NAME", required = true, dataTypeClass = String.class)
+    @Operation(summary = "verifyUdfFuncName", description = "VERIFY_UDF_FUNCTION_NAME_NOTES")
+    @Parameters({
+            @Parameter(name = "name", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class))
 
     })
     @GetMapping(value = "/udf-func/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_UDF_FUNCTION_NAME_ERROR)
     @AccessLogAnnotation
-    public Result verifyUdfFuncName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result verifyUdfFuncName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "name") String name) {
         return udfFuncService.verifyUdfFuncByName(loginUser, name);
     }
@@ -633,15 +632,15 @@ public class ResourcesController extends BaseController {
      * @param udfFuncId udf function id
      * @return delete result code
      */
-    @ApiOperation(value = "deleteUdfFunc", notes = "DELETE_UDF_FUNCTION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "UDF_FUNC_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "deleteUdfFunc", description = "DELETE_UDF_FUNCTION_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "UDF_FUNC_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/udf-func/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation
-    public Result deleteUdfFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result deleteUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId) {
         return udfFuncService.delete(loginUser, udfFuncId);
     }
@@ -653,15 +652,15 @@ public class ResourcesController extends BaseController {
      * @param userId user id
      * @return authorized result
      */
-    @ApiOperation(value = "authorizedFile", notes = "AUTHORIZED_FILE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "authorizedFile", description = "AUTHORIZED_FILE_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-file")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(AUTHORIZED_FILE_RESOURCE_ERROR)
     @AccessLogAnnotation
-    public Result authorizedFile(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result authorizedFile(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizedFile(loginUser, userId);
         return returnDataList(result);
@@ -674,15 +673,15 @@ public class ResourcesController extends BaseController {
      * @param userId user id
      * @return unauthorized result code
      */
-    @ApiOperation(value = "authorizeResourceTree", notes = "AUTHORIZE_RESOURCE_TREE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "authorizeResourceTree", description = "AUTHORIZE_RESOURCE_TREE_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-resource-tree")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(AUTHORIZE_RESOURCE_TREE)
     @AccessLogAnnotation
-    public Result authorizeResourceTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result authorizeResourceTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizeResourceTree(loginUser, userId);
         return returnDataList(result);
@@ -695,15 +694,15 @@ public class ResourcesController extends BaseController {
      * @param userId user id
      * @return unauthorized result code
      */
-    @ApiOperation(value = "unauthUDFFunc", notes = "UNAUTHORIZED_UDF_FUNC_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "unauthUDFFunc", description = "UNAUTHORIZED_UDF_FUNC_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/unauth-udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UNAUTHORIZED_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation
-    public Result unauthUDFFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result unauthUDFFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("userId") Integer userId) {
 
         Map<String, Object> result = resourceService.unauthorizedUDFFunction(loginUser, userId);
@@ -717,15 +716,15 @@ public class ResourcesController extends BaseController {
      * @param userId user id
      * @return authorized result code
      */
-    @ApiOperation(value = "authUDFFunc", notes = "AUTHORIZED_UDF_FUNC_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class, example = "100")
+    @Operation(summary = "authUDFFunc", description = "AUTHORIZED_UDF_FUNC_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(AUTHORIZED_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation
-    public Result authorizedUDFFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result authorizedUDFFunction(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizedUDFFunction(loginUser, userId);
         return returnDataList(result);
@@ -738,15 +737,15 @@ public class ResourcesController extends BaseController {
      * @param id resource id
      * @return resource
      */
-    @ApiOperation(value = "queryResourceById", notes = "QUERY_BY_RESOURCE_NAME")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataTypeClass = int.class, example = "10")
+    @Operation(summary = "queryResourceById", description = "QUERY_BY_RESOURCE_NAME")
+    @Parameters({
+            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "10"))
     })
     @GetMapping(value = "/{id}/query")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryResourceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryResourceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @PathVariable(value = "id", required = true) Integer id) {
 
         return resourceService.queryResourceById(loginUser, id);

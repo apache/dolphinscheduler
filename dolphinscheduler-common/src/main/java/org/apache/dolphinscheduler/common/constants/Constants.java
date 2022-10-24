@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common;
+package org.apache.dolphinscheduler.common.constants;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -137,11 +137,6 @@ public final class Constants {
     public static final String SUDO_ENABLE = "sudo.enable";
 
     /**
-     * string true
-     */
-    public static final String STRING_TRUE = "true";
-
-    /**
      * resource storage type
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
@@ -204,24 +199,20 @@ public final class Constants {
     public static final String AT_SIGN = "@";
 
     /**
-     * date format of yyyy-MM-dd HH:mm:ss
+     * SLASH /
      */
-    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    public static final String SLASH = "/";
 
     /**
-     * date format of yyyyMMdd
+     * SEMICOLON ;
      */
-    public static final String YYYYMMDD = "yyyyMMdd";
+    public static final String SEMICOLON = ";";
 
-    /**
-     * date format of yyyyMMddHHmmss
-     */
-    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
-
-    /**
-     * date format of yyyyMMddHHmmssSSS
-     */
-    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+    public static final String ADDRESS = "address";
+    public static final String DATABASE = "database";
+    public static final String OTHER = "other";
+    public static final String USER = "user";
+    public static final String JDBC_URL = "jdbcUrl";
 
     public static final String IMPORT_SUFFIX = "_import_";
 
@@ -343,44 +334,6 @@ public final class Constants {
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
 
     /**
-     * command parameter keys
-     */
-    public static final String CMD_PARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
-
-    public static final String CMD_PARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
-
-    public static final String CMD_PARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
-
-    public static final String CMD_PARAM_SUB_PROCESS = "processInstanceId";
-
-    public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
-
-    public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
-
-    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_CODE = "processDefinitionCode";
-
-    public static final String CMD_PARAM_START_NODES = "StartNodeList";
-
-    public static final String CMD_PARAM_START_PARAMS = "StartParams";
-
-    public static final String CMD_PARAM_FATHER_PARAMS = "fatherParams";
-
-    /**
-     * complement data start date
-     */
-    public static final String CMDPARAM_COMPLEMENT_DATA_START_DATE = "complementStartDate";
-
-    /**
-     * complement data end date
-     */
-    public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
-
-    /**
-     * complement data Schedule date
-     */
-    public static final String CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST = "complementScheduleDateList";
-
-    /**
      * complement date default cron string
      */
     public static final String DEFAULT_CRON_STRING = "0 0 0 * * ? *";
@@ -450,31 +403,6 @@ public final class Constants {
     public static final int VERSION_FIRST = 1;
 
     /**
-     * date format of yyyyMMdd
-     */
-    public static final String PARAMETER_FORMAT_DATE = "yyyyMMdd";
-
-    /**
-     * date format of yyyyMMddHHmmss
-     */
-    public static final String PARAMETER_FORMAT_TIME = "yyyyMMddHHmmss";
-
-    /**
-     * system date(yyyyMMddHHmmss)
-     */
-    public static final String PARAMETER_DATETIME = "system.datetime";
-
-    /**
-     * system date(yyyymmdd) today
-     */
-    public static final String PARAMETER_CURRENT_DATE = "system.biz.curdate";
-
-    /**
-     * system date(yyyymmdd) yesterday
-     */
-    public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
-
-    /**
      * ACCEPTED
      */
     public static final String ACCEPTED = "ACCEPTED";
@@ -520,30 +448,7 @@ public final class Constants {
      */
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
     public static final String PID = SystemUtils.IS_OS_WINDOWS ? "handle" : "pid";
-    /**
-     * month_begin
-     */
-    public static final String MONTH_BEGIN = "month_begin";
-    /**
-     * add_months
-     */
-    public static final String ADD_MONTHS = "add_months";
-    /**
-     * month_end
-     */
-    public static final String MONTH_END = "month_end";
-    /**
-     * week_begin
-     */
-    public static final String WEEK_BEGIN = "week_begin";
-    /**
-     * week_end
-     */
-    public static final String WEEK_END = "week_end";
-    /**
-     * timestamp
-     */
-    public static final String TIMESTAMP = "timestamp";
+
     public static final char SUBTRACT_CHAR = '-';
     public static final char ADD_CHAR = '+';
     public static final char MULTIPLY_CHAR = '*';
@@ -646,6 +551,26 @@ public final class Constants {
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
     /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_LEFT = "{{";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_RIGHT = "}}";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_LEFT_SPACE = "{ {";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_RIGHT_SPACE = "} }";
+
+    /**
      * status
      */
     public static final String STATUS = "status";
@@ -702,30 +627,12 @@ public final class Constants {
     public static final String LOCALE_LANGUAGE = "language";
 
     /**
-     * database type
-     */
-    public static final String MYSQL = "MYSQL";
-    public static final String HIVE = "HIVE";
-
-    public static final String ADDRESS = "address";
-    public static final String DATABASE = "database";
-    public static final String OTHER = "other";
-    public static final String USER = "user";
-    public static final String JDBC_URL = "jdbcUrl";
-
-    /**
      * session timeout
      */
     public static final int SESSION_TIME_OUT = 7200;
     public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
     public static final String UDF = "UDF";
     public static final String CLASS = "class";
-
-    /**
-     * dataSource sensitive param
-     */
-    public static final String DATASOURCE_PASSWORD_REGEX =
-            "(?<=((?i)password((\":\")|(=')))).*?(?=((\")|(')))";
 
     /**
      * default worker group
@@ -752,13 +659,6 @@ public final class Constants {
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-    /**
-     * datasource encryption salt
-     */
-    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
-    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
-    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
     /**
      * network interface preferred
@@ -857,5 +757,49 @@ public final class Constants {
     public static final String TYPE_OTHER = "Other";
     public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
 
-    public static final String DATASOUCE = "datasource";
+    /**
+     * spi constants
+     */
+    /** alert plugin param field string **/
+    public static final String STRING_PLUGIN_PARAM_FIELD = "field";
+    /** alert plugin param name string **/
+    public static final String STRING_PLUGIN_PARAM_NAME = "name";
+    /** alert plugin param props string **/
+    public static final String STRING_PLUGIN_PARAM_PROPS = "props";
+    /** alert plugin param type string **/
+    public static final String STRING_PLUGIN_PARAM_TYPE = "type";
+    /** alert plugin param title string **/
+    public static final String STRING_PLUGIN_PARAM_TITLE = "title";
+    /** alert plugin param value string **/
+    public static final String STRING_PLUGIN_PARAM_VALUE = "value";
+    /** alert plugin param validate string **/
+    public static final String STRING_PLUGIN_PARAM_VALIDATE = "validate";
+    /** alert plugin param options string **/
+    public static final String STRING_PLUGIN_PARAM_OPTIONS = "options";
+    /**plugin param emit string **/
+    public static final String STRING_PLUGIN_PARAM_EMIT = "emit";
+
+    /** string true */
+    public static final String STRING_TRUE = "true";
+    /** string false */
+    public static final String STRING_FALSE = "false";
+    /** string yes */
+    public static final String STRING_YES = "YES";
+    /** string no */
+    public static final String STRING_NO = "NO";
+
+    public static final String SMALL = "small";
+
+    public static final String CHANGE = "change";
+
+    /**
+     *  support hive datasource in one session
+     */
+    public static final String SUPPORT_HIVE_ONE_SESSION = "support.hive.oneSession";
+
+    public static final String PRINCIPAL = "principal";
+    public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
+    public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
+    public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
+    public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
 }

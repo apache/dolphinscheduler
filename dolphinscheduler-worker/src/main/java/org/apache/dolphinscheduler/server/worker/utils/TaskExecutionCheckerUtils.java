@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -33,8 +32,13 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,23 +49,24 @@ public class TaskExecutionCheckerUtils {
 
     public static void checkTenantExist(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
         try {
+            String tenantCode = taskExecutionContext.getTenantCode();
             boolean osUserExistFlag;
             // if Using distributed is true and Currently supported systems are linux,Should not let it
             // automatically
             // create tenants,so TenantAutoCreate has no effect
             if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX) {
                 // use the id command to judge in linux
-                osUserExistFlag = OSUtils.existTenantCodeInLinux(taskExecutionContext.getTenantCode());
+                osUserExistFlag = OSUtils.existTenantCodeInLinux(tenantCode);
             } else if (OSUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
                 // if not exists this user, then create
-                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
-                osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
+                OSUtils.createUserIfAbsent(tenantCode);
+                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
             } else {
-                osUserExistFlag = OSUtils.getUserList().contains(taskExecutionContext.getTenantCode());
+                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
             }
             if (!osUserExistFlag) {
                 throw new TaskException(
-                        String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
+                        String.format("TenantCode: %s doesn't exist", tenantCode));
             }
         } catch (TaskException ex) {
             throw ex;
@@ -74,7 +79,8 @@ public class TaskExecutionCheckerUtils {
     public static void createProcessLocalPathIfAbsent(TaskExecutionContext taskExecutionContext) throws TaskException {
         try {
             // local execute path
-            FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
+            createDirectoryWithOwner(Paths.get(taskExecutionContext.getExecutePath()),
+                    taskExecutionContext.getTenantCode());
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }
@@ -122,6 +128,25 @@ public class TaskExecutionCheckerUtils {
                     throw new TaskException(String.format("Download resource file: %s error", fileDownload), e);
                 }
             }
+        }
+    }
+
+    private static void createDirectoryWithOwner(Path filePath, String tenant) {
+        if (Files.exists(filePath)) {
+            return;
+        }
+        try {
+            Files.createDirectories(filePath);
+            if (!OSUtils.isSudoEnable()) {
+                // we need to open sudo, then we can change the owner.
+                return;
+            }
+            UserPrincipalLookupService userPrincipalLookupService =
+                    FileSystems.getDefault().getUserPrincipalLookupService();
+            UserPrincipal tenantPrincipal = userPrincipalLookupService.lookupPrincipalByName(tenant);
+            Files.setOwner(filePath, tenantPrincipal);
+        } catch (IOException e) {
+            throw new TaskException("Set tenant directory permission failed, tenant: " + tenant, e);
         }
     }
 }

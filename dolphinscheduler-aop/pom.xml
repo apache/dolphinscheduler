@@ -53,6 +53,16 @@
             <artifactId>hadoop-yarn-client</artifactId>
             <version>${yarn.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-common</artifactId>
+            <version>${yarn.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${yarn.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
