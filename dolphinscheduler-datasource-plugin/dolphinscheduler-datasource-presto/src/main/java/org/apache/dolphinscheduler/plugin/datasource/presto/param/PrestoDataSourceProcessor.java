@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,11 +27,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -55,8 +56,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
-        PrestoDataSourceParamDTO
-                prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
+        PrestoDataSourceParamDTO prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
         prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
@@ -69,7 +69,8 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PrestoDataSourceParamDTO prestoParam = (PrestoDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
+        String address =
+                String.format("%s%s:%s", DataSourceConstants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
         String jdbcUrl = address + "/" + prestoParam.getDatabase();
 
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
@@ -93,12 +94,12 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_PRESTO_JDBC_DRIVER;
+        return DataSourceConstants.COM_PRESTO_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.PRESTO_VALIDATION_QUERY;
+        return DataSourceConstants.PRESTO_VALIDATION_QUERY;
     }
 
     @Override

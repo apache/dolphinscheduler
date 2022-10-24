@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import static org.apache.dolphinscheduler.plugin.task.http.HttpTaskConstants.APPLICATION_JSON;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -27,12 +29,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.Charsets;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
@@ -95,13 +95,15 @@ public class HttpTask extends AbstractTask {
         String statusCode = null;
         String body = null;
 
-        try (CloseableHttpClient client = createHttpClient();
-             CloseableHttpResponse response = sendRequest(client)) {
+        try (
+                CloseableHttpClient client = createHttpClient();
+                CloseableHttpResponse response = sendRequest(client)) {
             statusCode = String.valueOf(getStatusCode(response));
             body = getResponseBody(response);
             exitStatusCode = validResponse(body, statusCode);
             long costTime = System.currentTimeMillis() - startTime;
-            logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
+            logger.info(
+                    "startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
                     formatTimeStamp, httpParameters.getUrl(),
                     httpParameters.getHttpMethod(), costTime, statusCode, body, output);
         } catch (Exception e) {
@@ -141,7 +143,8 @@ public class HttpTask extends AbstractTask {
             }
         }
         addRequestParams(builder, httpPropertyList);
-        String requestUrl = ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParamUtils.convert(paramsMap));
+        String requestUrl =
+                ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParamUtils.convert(paramsMap));
         HttpUriRequest request = builder.setUri(requestUrl).build();
         setHeaders(request, httpPropertyList);
         return client.execute(request);
@@ -202,7 +205,8 @@ public class HttpTask extends AbstractTask {
                 break;
             case STATUS_CODE_CUSTOM:
                 if (!statusCode.equals(httpParameters.getCondition())) {
-                    appendMessage(httpParameters.getUrl() + " statuscode: " + statusCode + ", Must be: " + httpParameters.getCondition());
+                    appendMessage(httpParameters.getUrl() + " statuscode: " + statusCode + ", Must be: "
+                            + httpParameters.getCondition());
                     exitStatusCode = -1;
                 }
                 break;
@@ -293,7 +297,8 @@ public class HttpTask extends AbstractTask {
      * @return RequestConfig
      */
     private RequestConfig requestConfig() {
-        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout()).setConnectTimeout(httpParameters.getConnectTimeout()).build();
+        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout())
+                .setConnectTimeout(httpParameters.getConnectTimeout()).build();
     }
 
     /**

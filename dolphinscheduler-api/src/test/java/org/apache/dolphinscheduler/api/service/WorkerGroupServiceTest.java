@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -86,7 +86,9 @@ public class WorkerGroupServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         WorkerGroup wg2 = getWorkerGroup(2);
         Mockito.when(workerGroupMapper.selectById(2)).thenReturn(wg2);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg2.getName(), org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES)).thenReturn(getProcessInstanceList());
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg2.getName(),
+                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+                .thenReturn(getProcessInstanceList());
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(user, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_NOT_EXIST.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
@@ -96,7 +98,9 @@ public class WorkerGroupServiceTest {
         // correct
         WorkerGroup wg3 = getWorkerGroup(3);
         Mockito.when(workerGroupMapper.selectById(3)).thenReturn(wg3);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg3.getName(), org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES)).thenReturn(new ArrayList<>());
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg3.getName(),
+                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+                .thenReturn(new ArrayList<>());
         result = workerGroupService.deleteWorkerGroupById(user, 3);
         Assertions.assertEquals(Status.SUCCESS.getMsg(), result.get(Constants.MSG));
     }

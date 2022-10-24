@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_S
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -37,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -125,8 +125,10 @@ public class JavaTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // Step 1: judge if is java or jar run type.
-            // Step 2 case1: the jar run type builds the command directly, adding resource to the java -jar class when building the command
-            // Step 2 case2: the java run type, first replace the custom parameters, then compile the code, and then build the command will add resource
+            // Step 2 case1: the jar run type builds the command directly, adding resource to the java -jar class when
+            // building the command
+            // Step 2 case2: the java run type, first replace the custom parameters, then compile the code, and then
+            // build the command will add resource
             // Step 3: to run the command
             String command = null;
             switch (javaParameters.getRunType()) {
@@ -236,7 +238,6 @@ public class JavaTask extends AbstractTask {
         return javaParameters;
     }
 
-
     /**
      * Replaces placeholders such as local variables in source files
      *
@@ -280,7 +281,7 @@ public class JavaTask extends AbstractTask {
     protected void createJavaSourceFileIfNotExists(String sourceCode, String fileName) throws IOException {
         logger.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
         if (!Files.exists(Paths.get(fileName))) {
-            logger.info("the java source code:{}, will be write to the file: {}", fileName,sourceCode);
+            logger.info("the java source code:{}, will be write to the file: {}", fileName, sourceCode);
             // write data to file
             FileUtils.writeStringToFile(new File(fileName),
                     sourceCode,
@@ -296,7 +297,8 @@ public class JavaTask extends AbstractTask {
      * @return String
      **/
     protected String buildJavaSourceCodeFileFullName(String publicClassName) {
-        return String.format(JavaConstants.JAVA_SOURCE_CODE_NAME_TEMPLATE, taskRequest.getExecutePath(), publicClassName);
+        return String.format(JavaConstants.JAVA_SOURCE_CODE_NAME_TEMPLATE, taskRequest.getExecutePath(),
+                publicClassName);
     }
 
     /**
@@ -331,7 +333,7 @@ public class JavaTask extends AbstractTask {
      **/
     protected String buildJavaCompileCommand(String sourceCode) throws IOException {
         String publicClassName = getPublicClassName(sourceCode);
-        String fileName =  buildJavaSourceCodeFileFullName(publicClassName);
+        String fileName = buildJavaSourceCodeFileFullName(publicClassName);
         createJavaSourceFileIfNotExists(sourceCode, fileName);
 
         StringBuilder compilerCommand = new StringBuilder()

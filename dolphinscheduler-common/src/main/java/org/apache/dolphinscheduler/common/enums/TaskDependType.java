@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * task node depend type
  */
 public enum TaskDependType {
+
     /**
      * 0 run current tasks only
      * 1 run current tasks and previous tasks

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * user type
  */
 public enum UserType {
+
     /**
      * 0 admin user; 1 general user
      */
@@ -46,4 +47,3 @@ public enum UserType {
         return descp;
     }
 }
-

@@ -15,21 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.utils;
+package org.apache.dolphinscheduler.common.utils;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
 
 public class JSONUtilsTest {
-
 
     @Test
     public void createObjectNodeTest() {
@@ -52,7 +58,6 @@ public class JSONUtilsTest {
         Assertions.assertEquals("Jobs", models.get("name"));
 
     }
-
 
     @Test
     public void string2MapTest() {
@@ -89,7 +94,6 @@ public class JSONUtilsTest {
         Assertions.assertNull(JSONUtils.parseObject(""));
         Assertions.assertNull(JSONUtils.parseObject("foo", String.class));
     }
-
 
     @Test
     public void testJsonByteArray() {
@@ -182,7 +186,9 @@ public class JSONUtilsTest {
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        List<LocalDateTime> timeList = JSONUtils.parseObject("[\"2022-02-22 13:38:24\"]", new TypeReference<List<LocalDateTime>>(){});
+        List<LocalDateTime> timeList =
+                JSONUtils.parseObject("[\"2022-02-22 13:38:24\"]", new TypeReference<List<LocalDateTime>>() {
+                });
         Assertions.assertNotNull(timeList);
         Assertions.assertEquals(1, timeList.size());
         Assertions.assertEquals(localDateTime, timeList.get(0));

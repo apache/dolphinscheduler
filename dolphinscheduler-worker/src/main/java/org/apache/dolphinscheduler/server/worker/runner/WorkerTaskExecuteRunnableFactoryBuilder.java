@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
@@ -27,6 +25,9 @@ import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import javax.annotation.Nullable;
+
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class WorkerTaskExecuteRunnableFactoryBuilder {

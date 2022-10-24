@@ -19,22 +19,21 @@ package org.apache.dolphinscheduler.api.dto.queue;
 
 import org.apache.dolphinscheduler.api.dto.PageQueryDto;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * queue query request
  */
-@ApiModel("QUEUE-QUERY")
+@Schema(name = "QUEUE-QUERY")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class QueueQueryRequest extends PageQueryDto {
 
-    @ApiModelProperty(example = "queue11")
+    @Schema(example = "queue11")
     private String searchVal;
 }

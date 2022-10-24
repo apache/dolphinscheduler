@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -37,7 +38,6 @@ public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap>
      */
     ProcessInstanceMap queryByParentId(@Param("parentProcessId") int parentProcessId,
                                        @Param("parentTaskId") int parentTaskId);
-
 
     /**
      * query by sub process id

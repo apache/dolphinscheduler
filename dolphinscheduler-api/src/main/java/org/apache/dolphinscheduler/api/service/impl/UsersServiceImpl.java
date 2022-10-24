@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -56,6 +56,7 @@ import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -339,7 +340,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         if (!isAdmin(loginUser)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -390,7 +392,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -441,7 +444,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (state == 0 && user.getState() != state && Objects.equals(loginUser.getId(), user.getId())) {
-            logger.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(), user.getUserName());
+            logger.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(),
+                    user.getUserName());
             putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
             return result;
         }
@@ -492,7 +496,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
         // only admin can operate
         if (!isAdmin(loginUser)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
             return result;
         }
@@ -508,7 +513,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (CollectionUtils.isNotEmpty(projects)) {
             String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
             putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
-            logger.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id, projectNames);
+            logger.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id,
+                    projectNames);
             return result;
         }
         // delete user
@@ -610,7 +616,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // 3. only project owner can operate
         if (!this.canOperator(loginUser, project.getUserId())) {
-            logger.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.", loginUser.getId(), loginUser.getUserName(), projectCode);
+            logger.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.",
+                    loginUser.getId(), loginUser.getUserName(), projectCode);
             this.putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -777,7 +784,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         }
 
-        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(), needAuthorizeResIds);
+        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(),
+                needAuthorizeResIds);
 
         putMsg(result, Status.SUCCESS);
 

@@ -17,25 +17,24 @@
 
 package org.apache.dolphinscheduler.api.dto.queue;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * queue update request
  */
-@ApiModel("QUEUE-UPDATE")
+@Schema(name = "QUEUE-UPDATE")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class QueueUpdateRequest {
 
-    @ApiModelProperty(example = "queue11", required = true)
+    @Schema(example = "queue11", required = true)
     private String queue;
 
-    @ApiModelProperty(example = "test_queue11", required = true)
+    @Schema(example = "test_queue11", required = true)
     private String queueName;
 }

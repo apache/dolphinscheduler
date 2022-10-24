@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
@@ -131,6 +131,7 @@ public abstract class AbstractCommandExecutor {
                 command.add("sudo");
                 command.add("-u");
                 command.add(taskRequest.getTenantCode());
+                command.add("-E");
             }
         }
         command.add(commandInterpreter());

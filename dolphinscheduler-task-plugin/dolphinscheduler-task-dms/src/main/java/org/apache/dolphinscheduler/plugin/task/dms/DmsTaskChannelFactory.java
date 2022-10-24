@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.plugin.task.dms;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;

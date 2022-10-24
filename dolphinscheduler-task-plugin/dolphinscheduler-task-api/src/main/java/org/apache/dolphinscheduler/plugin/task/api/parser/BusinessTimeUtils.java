@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
+import static org.apache.dolphinscheduler.common.utils.DateUtils.addDays;
+import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_BUSINESS_DATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_CURRENT_DATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_DATETIME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_DATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
-import static org.apache.dolphinscheduler.spi.utils.DateUtils.addDays;
-import static org.apache.dolphinscheduler.spi.utils.DateUtils.format;
 
 import org.apache.dolphinscheduler.spi.enums.CommandType;
 
@@ -35,6 +35,7 @@ import java.util.Map;
  * business time utils
  */
 public class BusinessTimeUtils {
+
     private BusinessTimeUtils() {
         throw new IllegalStateException("BusinessTimeUtils class");
     }

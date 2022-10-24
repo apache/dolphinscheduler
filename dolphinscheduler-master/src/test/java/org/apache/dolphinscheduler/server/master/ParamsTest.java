@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -34,20 +34,20 @@ import org.slf4j.LoggerFactory;
  */
 public class ParamsTest {
 
-    private static  final Logger logger = LoggerFactory.getLogger(ParamsTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(ParamsTest.class);
 
     @Test
     public void systemParamsTest() throws Exception {
         String command = "${system.biz.date}";
 
         // start process
-        Map<String,String> timeParams = BusinessTimeUtils
+        Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(CommandType.START_PROCESS,
                         new Date(), null);
 
         command = ParameterUtils.convertParameterPlaceholders(command, timeParams);
 
-        logger.info("start process : {}",command);
+        logger.info("start process : {}", command);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -59,7 +59,7 @@ public class ParamsTest {
                 .getBusinessTime(CommandType.COMPLEMENT_DATA,
                         calendar.getTime(), null);
         command = ParameterUtils.convertParameterPlaceholders(command, timeParams);
-        logger.info("complement data : {}",command);
+        logger.info("complement data : {}", command);
 
     }
 }

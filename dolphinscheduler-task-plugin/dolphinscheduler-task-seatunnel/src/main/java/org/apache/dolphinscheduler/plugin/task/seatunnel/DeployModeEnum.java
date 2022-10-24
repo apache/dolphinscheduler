@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
 public enum DeployModeEnum {
+
     cluster("cluster"),
     client("client"),
     local("client");

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class ConditionsParameters extends AbstractParameters {
 
-    //depend node list and state, only need task name
+    // depend node list and state, only need task name
     private List<DependentTaskModel> dependTaskList;
     private DependentRelation dependRelation;
 
@@ -80,9 +80,9 @@ public class ConditionsParameters extends AbstractParameters {
 
     public String getConditionResult() {
         return "{"
-            + "\"successNode\": [\"" + successNode.get(0)
-            + "\"],\"failedNode\": [\"" + failedNode.get(0)
-            + "\"]}";
+                + "\"successNode\": [\"" + successNode.get(0)
+                + "\"],\"failedNode\": [\"" + failedNode.get(0)
+                + "\"]}";
     }
 
 }

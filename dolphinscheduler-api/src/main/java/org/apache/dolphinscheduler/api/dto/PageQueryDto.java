@@ -18,19 +18,18 @@
 package org.apache.dolphinscheduler.api.dto;
 
 import lombok.Data;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * page query dto
  */
-@ApiModel("QUERY-PAGE-INFO")
+@Schema(name = "QUERY-PAGE-INFO")
 @Data
 public class PageQueryDto {
 
-    @ApiModelProperty(example = "10", required = true)
+    @Schema(example = "10", required = true)
     private Integer pageSize = 10;
 
-    @ApiModelProperty(example = "1", required = true)
+    @Schema(example = "1", required = true)
     private Integer pageNo = 1;
 }
