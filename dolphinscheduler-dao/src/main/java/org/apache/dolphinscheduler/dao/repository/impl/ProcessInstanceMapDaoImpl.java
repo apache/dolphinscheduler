@@ -39,12 +39,8 @@ public class ProcessInstanceMapDaoImpl implements ProcessInstanceMapDao {
     }
 
     @Override
-    public int createWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap) {
-        int count = 0;
-        if (processInstanceMap != null) {
-            return processInstanceMapMapper.insert(processInstanceMap);
-        }
-        return count;
+    public int createWorkProcessInstanceMap(@NonNull ProcessInstanceMap processInstanceMap) {
+        return processInstanceMapMapper.insert(processInstanceMap);
     }
 
     @Override
