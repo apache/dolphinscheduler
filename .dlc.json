@@ -20,6 +20,7 @@
       "replacement": "https://dolphinscheduler.apache.org/zh-cn/download/download.html"
     }
   ],
+
   "timeout": "10s",
   "retryOn429": true,
   "retryCount": 10,
