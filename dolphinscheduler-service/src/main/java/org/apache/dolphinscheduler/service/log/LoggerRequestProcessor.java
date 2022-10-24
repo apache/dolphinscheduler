@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.service.log;
 
-import static org.apache.dolphinscheduler.common.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ public class LogUtilsTest {
     @Test
     public void getAppIdsFromAppInfoFile() {
         List<String> appIds = LogUtils.getAppIds(APP_ID_FILE, APP_INFO_FILE, "aop");
+        appIds = appIds.stream().filter(a -> a.contains("application")).collect(Collectors.toList());
         Assertions.assertEquals(Lists.newArrayList("application_1548381669007_1234"), appIds);
     }
 }

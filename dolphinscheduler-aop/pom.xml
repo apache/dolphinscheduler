@@ -37,21 +37,39 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
             <version>${aspectj.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjrt -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${aspectj.version}</version>
+            <!--      <version>1.8.13</version>-->
         </dependency>
+
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-yarn-client</artifactId>
             <version>${yarn.version}</version>
+            <!--      <scope>provided</scope>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-common</artifactId>
+            <version>${yarn.version}</version>
+            <!--      <scope>provided</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${yarn.version}</version>
+            <!--      <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
