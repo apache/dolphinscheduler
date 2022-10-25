@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProxyProcessDefinitionController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProxyProcessDefinitionController.class);
-
     @Value("${server.port}")
     private String ServerPort;
 
@@ -45,6 +43,7 @@ public class ProxyProcessDefinitionController {
         requestBodyMap.put("tenantCode", tenantCode);
         requestBodyMap.put("taskRelationJson", taskRelationJson);
         requestBodyMap.put("taskDefinitionJson", taskDefinitionJson);
+        requestBodyMap.put("otherParamsJson", null);
         requestBodyMap.put("executionType", executionType);
 
         try {

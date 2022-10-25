@@ -94,24 +94,9 @@ public class DemoContants {
     public static final String [] DEPENDENT_locations = {"[{\"taskCode\":",
             ",\"x\":100,\"y\":355},{\"taskCode\":",
             ",\"x\":350,\"y\":355}]"};
-    public static final String SHELL_NAME = "demo_shell";
-    public static final String CLEAR_LOG_NAME = "demo_clear_log";
-    public static final String DEPENDENT_NAME = "demo_dependent";
-    public static final String SUB_PROCESS_NAME = "demo_sub_process";
-    public static final String SWITCH_NAME = "demo_switch";
-    public static final String CONDITION_NAME = "demo_condition";
-    public static final String PARAMETER_CONTEXT_NAME = "demo_parameter_context";
-    public static final String CLEAR_LOG_DESCRIPTION = "Clear the DS log files from 30 days ago";
-    public static final String PARAMETER_CONTEXT_DESCRIPTION = "Upstream and downstream task node parameter transfer";
-    public static final String DEPENDENT_DESCRIPTION = "Check the completion of daily tasks";
-    public static final String SWITCH_DESCRIPTION = "Determine which task to perform based on conditions";
-    public static final String SUB_PROCESS_DESCRIPTION = "Start the production line";
-    public static final String CONDITION_DESCRIPTION = "Coin Toss";
-    public static final String SHELL_DESCRIPTION = "Production, processing and sales of a series of processes";
-    public static final String GLOBAL_PARAMS = "[]";
     public static final String PARAMETER_CONTEXT_PARAMS = "[{\"prop\":\"output\",\"value\":\"100\",\"direct\":\"IN\",\"type\":\"VARCHAR\"},{\"prop\":\"value\",\"value\":\"99\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
     public static final String SHELL_GLOBAL_PARAMS = "[{\"prop\":\"resources\",\"value\":\"Processing information\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
     public static final String SWITCH_GLOBAL_PARAMS = "[{\"prop\":\"switchValue\",\"value\":\"A\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
-    public static final int TIMEOUT = 0;
+
 
 }
