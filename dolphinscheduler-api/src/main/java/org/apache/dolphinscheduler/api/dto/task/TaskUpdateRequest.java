@@ -32,7 +32,7 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * task update request
@@ -42,63 +42,63 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 public class TaskUpdateRequest {
 
-    @ApiModelProperty(example = "workflow-code", required = true)
+    @Schema(example = "workflow-code", required = true)
     private long workflowCode;
-    @ApiModelProperty(example = "task-name")
+    @Schema(example = "task-name")
     private String name;
-    @ApiModelProperty(example = "describe what this task actual do")
+    @Schema(example = "describe what this task actual do")
     private String description;
 
-    @ApiModelProperty(example = "SHELL")
+    @Schema(example = "SHELL")
     private String taskType;
 
     // todo
-    @ApiModelProperty(example = "{\"localParams\": [], \"rawScript\": \"echo 1\", \"resourceList\": []}", notes = "task definition params")
+    @Schema(example = "{\"localParams\": [], \"rawScript\": \"echo 1\", \"resourceList\": []}", description = "task definition params")
     private String taskParams;
 
-    @ApiModelProperty(example = "YES", allowableValues = "YES,NO", notes = "default YES is not provided")
+    @Schema(example = "YES", allowableValues = "YES,NO", description = "default YES is not provided")
     private String flag;
 
-    @ApiModelProperty(example = "MEDIUM", allowableValues = "HIGHEST,HIGH,MEDIUM,LOW,LOWEST", notes = "default MEDIUM is not provided")
+    @Schema(example = "MEDIUM", allowableValues = "HIGHEST,HIGH,MEDIUM,LOW,LOWEST", description = "default MEDIUM is not provided")
     private String taskPriority;
 
-    @ApiModelProperty(example = "default", notes = "default 'default' if not provided")
+    @Schema(example = "default", description = "default 'default' if not provided")
     private String workerGroup;
 
-    @ApiModelProperty(example = "6563415109312", dataType = "Long")
+    @Schema(example = "6563415109312", implementation = long.class)
     private long environmentCode;
 
-    @ApiModelProperty(example = "0", dataType = "Integer", notes = "default 0 not provided")
+    @Schema(example = "0", implementation = Integer.class, description = "default 0 not provided")
     private int failRetryTimes;
 
-    @ApiModelProperty(example = "1")
+    @Schema(example = "1")
     private int failRetryInterval;
 
-    @ApiModelProperty(example = "SHELL")
+    @Schema(example = "SHELL")
     private int timeout;
 
-    @ApiModelProperty(example = "CLOSE", allowableValues = "CLOSE,OPEN", notes = "default CLOSE is not provided")
+    @Schema(example = "CLOSE", allowableValues = "CLOSE,OPEN", description = "default CLOSE is not provided")
     private String timeoutFlag;
 
-    @ApiModelProperty(example = "MEDIUM", allowableValues = "WARN,FAILED,WARNFAILED", notes = "default MEDIUM is not provided")
+    @Schema(example = "MEDIUM", allowableValues = "WARN,FAILED,WARNFAILED", description = "default MEDIUM is not provided")
     private String timeoutNotifyStrategy;
 
-    @ApiModelProperty(example = "1,2,3")
+    @Schema(example = "1,2,3")
     private String resourceIds;
 
-    @ApiModelProperty(example = "2")
+    @Schema(example = "2")
     private int taskGroupId;
 
-    @ApiModelProperty(example = "1", dataType = "Integer", notes = "A priority number for execute task, the bigger the high priority, default null if not provided")
+    @Schema(example = "1", implementation = int.class, description = "A priority number for execute task, the bigger the high priority, default null if not provided")
     private int taskGroupPriority;
 
-    @ApiModelProperty(example = "0.1", dataType = "Float", notes = "default unlimited if not provided")
+    @Schema(example = "0.1", implementation = Integer.class, description = "default unlimited if not provided")
     private Integer cpuQuota;
 
-    @ApiModelProperty(example = "0.1", dataType = "Float", notes = "default unlimited if not provided")
+    @Schema(example = "0.1", implementation = Integer.class, description = "default unlimited if not provided")
     private Integer memoryMax;
 
-    @ApiModelProperty(example = "upstream-task-codes1,upstream-task-codes2", notes = "use , to split multiple upstream task codes")
+    @Schema(example = "upstream-task-codes1,upstream-task-codes2", description = "use , to split multiple upstream task codes")
     private String upstreamTasksCodes;
 
     /**

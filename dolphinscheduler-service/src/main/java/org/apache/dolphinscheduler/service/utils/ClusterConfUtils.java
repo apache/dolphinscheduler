@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.utils;
+package org.apache.dolphinscheduler.service.utils;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

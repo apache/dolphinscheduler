@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.slf4j.Logger;

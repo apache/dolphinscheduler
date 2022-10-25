@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.service.command;
 
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.mockito.ArgumentMatchers.anyString;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -116,15 +117,15 @@ class CommandServiceImplTest {
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("COMPLEMENT_DATA,START_FAILURE_TASK_PROCESS");
         Map<String, String> complementMap = new HashMap<>();
-        complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE, startString);
-        complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE, endString);
+        complementMap.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, startString);
+        complementMap.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, endString);
         parentInstance.setCommandParam(JSONUtils.toJsonString(complementMap));
         command = commandService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assertions.assertEquals(CommandType.COMPLEMENT_DATA, command.getCommandType());
 
         JsonNode complementDate = JSONUtils.parseObject(command.getCommandParam());
-        Date start = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE).asText());
-        Date end = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE).asText());
+        Date start = DateUtils.stringToDate(complementDate.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE).asText());
+        Date end = DateUtils.stringToDate(complementDate.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE).asText());
         Assertions.assertEquals(startString, DateUtils.dateToString(start));
         Assertions.assertEquals(endString, DateUtils.dateToString(end));
 
