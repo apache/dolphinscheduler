@@ -25,14 +25,14 @@ The key features for DolphinScheduler are as follows:
   - Creating workflows through Open API
 
 - Highly Reliable,
-DolphinScheduler uses a decentralized multi-master and multi-worker architecture, which naturally supports auto scaling and high availability..
-- High performance, its performance is N times faster than other orchestration platform and it can support tens of millions of tasks per day.
+DolphinScheduler uses a decentralized multi-master and multi-worker architecture, which naturally supports auto scaling and high availability
+- High performance, its performance is N times faster than other orchestration platform and it can support tens of millions of tasks per day
 - Supports multi-tenancy
 - Supports various task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, Hive, Spark SQL), Python, Procedure, Sub_Workflow,
 Http, K8s, Jupyter, MLflow, SageMaker, DVC, Pytorch, Amazon EMR, etc
 - Orchestrating workflows and dependencies, you can pause/stop/recover task any time, failed tasks can be set to automatically retry
 - Visualizing the running state of the task in real-time and seeing the task runtime log
-- WYSIWYG to edit tasks on the UI
+- What you see is what you get when you edit the task on the UI
 - Backfill can be operated on the UI directly
 - Perfect project, resource, data source-level permission control
 - Displaying workflow history in tree/Gantt chart, as well as statistical analysis on the task status & process status in each workflow
