@@ -1576,7 +1576,6 @@ public class ProcessServiceImpl implements ProcessService {
      * @return {@link ResourceInfo}
      */
     protected ResourceInfo updateResourceInfo(int task_id, ResourceInfo res) {
-//        ResourceInfo resourceInfo = new ResourceInfo();
         ResourceInfo resourceInfo = null;
         // only if mainJar is not null and does not contain "resourceName" field
         if (res != null) {
