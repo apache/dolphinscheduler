@@ -66,6 +66,16 @@ export const AuthorizeModal = defineComponent({
     }
 
     let projectIds!: string
+    const onRevokeProject = async () => {
+      await revokeProjectByIdRequest(props.userId, projectIds)
+    }
+    const onGrantReadPerm = async () => {
+      await grantProjectWithReadPermRequest(props.userId, projectIds)
+    }
+    const onGrantAllPerm = async () => {
+      await grantProjectRequest(props.userId, projectIds)
+    }
+
     const { columnsRef } = useColumns()
     const handleCheck = (rowKeys: Array<number>) => {
       projectIds = rowKeys.join()
@@ -82,18 +92,17 @@ export const AuthorizeModal = defineComponent({
     return {
       t,
       columnsRef,
-      projectIds,
       rowKey: (row: any) => row.id,
       ...toRefs(state),
       onCancel,
       onConfirm,
       getProjects,
-      revokeProjectByIdRequest,
       handleCheck,
-      grantProjectRequest,
-      grantProjectWithReadPermRequest,
       requestData, 
-      handleChangePageSize
+      handleChangePageSize,
+      onRevokeProject,
+      onGrantReadPerm,
+      onGrantAllPerm
     }
   },
   render(props: { type: TAuthType, userId: number }) {
@@ -113,13 +122,13 @@ export const AuthorizeModal = defineComponent({
 
           <NSpace vertical>
             <NSpace>
-              <NButton size='small' type='primary' onClick={() => this.revokeProjectByIdRequest(userId, this.projectIds)}>
+              <NButton size='small' type='primary' onClick={this.onRevokeProject}>
                 {t('security.user.revoke_auth')}
               </NButton>
-              <NButton size='small' type='primary' onClick={() => this.grantProjectWithReadPermRequest(userId, this.projectIds)}>
+              <NButton size='small' type='primary' onClick={this.onGrantReadPerm}>
               {t('security.user.grant_read')}
               </NButton>
-              <NButton size='small' type='primary' onClick={() => this.grantProjectRequest(userId, this.projectIds)}>
+              <NButton size='small' type='primary' onClick={this.onGrantAllPerm}>
               {t('security.user.grant_all')}
               </NButton>
               <NInput
