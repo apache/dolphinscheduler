@@ -508,7 +508,7 @@ public enum Status {
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
     DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
             "delete worker group by id fail, for there are {0} enviroments using it",
-            "删除Worker分组失败，有[{0}]个环境正在使用"),;
+            "删除Worker分组失败，有[{0}]个环境正在使用");
     private final int code;
     private final String enMsg;
     private final String zhMsg;
