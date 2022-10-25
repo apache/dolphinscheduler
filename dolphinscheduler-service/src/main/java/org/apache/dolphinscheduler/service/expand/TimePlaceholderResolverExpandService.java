@@ -28,8 +28,8 @@ public interface TimePlaceholderResolverExpandService {
 
     /**
      * time function extension
-     * @param placeholderName
+     * @param functionExpandContent
      * @return
      */
-    String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName);
+    String timeFunctionExtension(FunctionExpandContent functionExpandContent);
 }

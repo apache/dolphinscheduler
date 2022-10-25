@@ -78,7 +78,8 @@ public class CuringGlobalParamsServiceTest {
 
     @Test
     public void testTimeFunctionExtension() {
-        String result = curingGlobalParamsService.timeFunctionExtension(1, "", placeHolderName);
+        FunctionExpandContent functionExpandContent = new FunctionExpandContent(true, null, 1, "", placeHolderName, null);
+        String result = curingGlobalParamsService.timeFunctionExtension(functionExpandContent);
         Assert.assertNull(result);
     }
 

@@ -17,17 +17,17 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import lombok.NonNull;
 
 public interface CuringParamsService {
 
@@ -40,12 +40,10 @@ public interface CuringParamsService {
 
     /**
      * time function extension
-     * @param processInstanceId
-     * @param timezone
-     * @param placeholderName
+     * @param functionExpandContent
      * @return
      */
-    String timeFunctionExtension(Integer processInstanceId, String timezone, String placeholderName);
+    String timeFunctionExtension(FunctionExpandContent functionExpandContent);
 
     /**
      * convert parameter placeholders

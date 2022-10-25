@@ -38,15 +38,17 @@ public class TimePlaceholderResolverExpandServiceTest {
 
     @Test
     public void testTimePlaceholderResolverExpandService() {
+        FunctionExpandContent functionExpandContent = new FunctionExpandContent(true, null, 1, "", placeHolderName, null);
+
         boolean checkResult = timePlaceholderResolverExpandService.timeFunctionNeedExpand(placeHolderName);
         Assert.assertFalse(checkResult);
-        String resultString = timePlaceholderResolverExpandService.timeFunctionExtension(1, "", placeHolderName);
+        String resultString = timePlaceholderResolverExpandService.timeFunctionExtension(functionExpandContent);
         Assert.assertTrue(StringUtils.isEmpty(resultString));
 
         boolean implCheckResult = timePlaceholderResolverExpandServiceImpl.timeFunctionNeedExpand(placeHolderName);
         Assert.assertFalse(implCheckResult);
         String implResultString =
-                timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
+                timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(functionExpandContent);
         Assert.assertTrue(StringUtils.isEmpty(implResultString));
     }
 }
