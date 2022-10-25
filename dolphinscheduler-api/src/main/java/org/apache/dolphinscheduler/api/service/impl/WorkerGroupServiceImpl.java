@@ -372,7 +372,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
         String workerGroup = taskInstance.getWorkerGroup();
 
-        if (!Strings.isNullOrEmpty(workerGroup)) {
+        if (StringUtils.isNotEmpty(workerGroup)) {
             return workerGroup;
         }
         int processInstanceId = taskInstance.getProcessInstanceId();
