@@ -18,7 +18,7 @@ Dolphin Scheduler Official Website
 Apache DolphinScheduler is the modern data workflow orchestration platform with powerful user interface, dedicated to solving complex task dependencies in the data pipeline and providing various types of jobs available `out of the box`
 
 The key features for DolphinScheduler are as follows:
-- Easy to deploy, we provides 4 ways to deploy, such as Standalone deployment,Cluster deployment,Docker / Kubernetes deployment and Rainbond deployment
+- Easy to deploy, we provide 4 ways to deploy, such as Standalone deployment,Cluster deployment,Docker / Kubernetes deployment and Rainbond deployment
 - Easy to use, there are 3 ways to create workflows:
   - Visually, create tasks by dragging and dropping tasks
   - Creating workflows by PyDolphinScheduler(Python way)
