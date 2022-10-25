@@ -1576,13 +1576,14 @@ public class ProcessServiceImpl implements ProcessService {
      * @return {@link ResourceInfo}
      */
     protected ResourceInfo updateResourceInfo(int task_id, ResourceInfo res) {
+//        ResourceInfo resourceInfo = new ResourceInfo();
         ResourceInfo resourceInfo = null;
-        // only if mainJar is not null and does not contains "resourceName" field
+        // only if mainJar is not null and does not contain "resourceName" field
         if (res != null) {
             String resourceFullName = res.getResourceName();
             if (StringUtils.isBlank(resourceFullName)) {
-                logger.error("invalid resourceId, {}", resourceFullName);
-                return null;
+                logger.error("invalid resource full name, {}", resourceFullName);
+                return new ResourceInfo();
             }
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
