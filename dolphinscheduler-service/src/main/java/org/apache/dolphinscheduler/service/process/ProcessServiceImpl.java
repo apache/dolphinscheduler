@@ -126,6 +126,7 @@ import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -3143,7 +3144,7 @@ public class ProcessServiceImpl implements ProcessService {
         QueryWrapper<Cluster> nodeWrapper = new QueryWrapper<>();
         nodeWrapper.eq("name", clusterName);
         Cluster cluster = clusterMapper.selectOne(nodeWrapper);
-        return cluster == null ? null : cluster.getConfig();
+        return cluster == null ? null : ClusterConfUtils.getK8sConfig(cluster.getConfig());
     }
 
     @Override

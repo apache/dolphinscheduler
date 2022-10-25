@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.api.k8s;
 
-import org.apache.dolphinscheduler.api.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 
 import java.util.Hashtable;
 import java.util.Map;
