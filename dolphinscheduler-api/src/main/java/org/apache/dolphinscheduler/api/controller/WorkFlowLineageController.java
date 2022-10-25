@@ -85,7 +85,7 @@ public class WorkFlowLineageController extends BaseController {
         }
     }
 
-    @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODES_NOTES")
+    @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
     @GetMapping(value = "/{workFlowCode}")
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
