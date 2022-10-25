@@ -32,10 +32,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_relation_resources_task")
 public class ResourcesTask {
 
-    private String fullName;
-
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+    
+    private String fullName;
 
     private int taskId;
 
@@ -52,15 +52,5 @@ public class ResourcesTask {
         this.taskId = taskId;
         this.fullName = fullName;
         this.type = type;
-    }
-
-    @Override
-    public String toString() {
-        return "ResourcesTask{" +
-                "id=" + id +
-                "taskId" + taskId +
-                ", fullName='" + fullName + '\'' +
-                ", type=" + type +
-                '}';
     }
 }

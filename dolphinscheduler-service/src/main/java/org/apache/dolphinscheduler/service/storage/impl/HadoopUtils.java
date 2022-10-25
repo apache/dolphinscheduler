@@ -320,13 +320,13 @@ public class HadoopUtils implements Closeable, StorageOperate {
         // with "/" and join all elements except the first two elements because they are
         // tenantCode and "resource" directory.
         String resourceUploadPath =
-                RESOURCE_UPLOAD_PATH.endsWith("/") ? StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
+                RESOURCE_UPLOAD_PATH.endsWith(FOLDER_SEPARATOR) ? StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
         // +1 because we want to skip the "/" after resource upload path as well.
         String pathContainingTenantNResource = fullName.substring(
                 fullName.indexOf(resourceUploadPath)
                         + resourceUploadPath.length() + 1);
-        String[] fileNameArr = pathContainingTenantNResource.split("/");
-        return Joiner.on("/").join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
+        String[] fileNameArr = pathContainingTenantNResource.split(FOLDER_SEPARATOR);
+        return Joiner.on(FOLDER_SEPARATOR).join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
     }
 
     @Override
@@ -352,11 +352,6 @@ public class HadoopUtils implements Closeable, StorageOperate {
      */
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
-        // if(!exists(dstPath))
-        // {
-        // fs.mkdirs(new Path(dstPath));
-        // logger.info("created the destination path: {}", dstPath);
-        // }
         return FileUtil.copy(fs, new Path(srcPath), fs, new Path(dstPath), deleteSource, overwrite, fs.getConf());
     }
 

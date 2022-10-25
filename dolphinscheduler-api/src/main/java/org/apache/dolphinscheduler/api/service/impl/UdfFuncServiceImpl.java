@@ -124,7 +124,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         try {
             existResource = storageOperate.exists(fullName);
         } catch (IOException e) {
-            logger.error("AmazonServiceException when checking resource: " + fullName);
+            logger.error("Check resource error: {}", fullName, e);
         }
 
         if (!existResource) {

@@ -25,7 +25,7 @@
         select
         id
         from t_ds_relation_resources_task
-        where full_name = #{fullName} and task_id = #{taskId} limit 1
+        where full_name = #{fullName} and task_id = #{taskId}
     </select>
 
     <select id="selectBatchFullNames" resultType="org.apache.dolphinscheduler.dao.entity.ResourcesTask">
