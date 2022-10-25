@@ -240,6 +240,7 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
+        // use strict checking here
         if (variables.fullName !== ""){
             queryCurrentResourceByFullName(
               {
@@ -250,6 +251,7 @@ export function useTable() {
             ).then((res: ResourceFile) => {
                 if (res.fileName) {
                   const breadList = res.fileName.split('/')
+                  // pop the alias from the fullname path
                   breadList.pop()
                   variables.breadList = breadList
                 }

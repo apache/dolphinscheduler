@@ -27,6 +27,7 @@ export function useCreate(state: any) {
   const fileStore = useFileStore()
 
   const handleCreateFile = () => {
+    // no more pid, as currentDir acts as the pid or parent path right now.
     const currentDir = fileStore.getCurrentDir || '/'
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {

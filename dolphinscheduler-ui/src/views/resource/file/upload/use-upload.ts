@@ -34,6 +34,7 @@ export function useUpload(state: any) {
     if (state.saving) return
     state.saving = true
     try {
+      // no more pid, as currentDir acts as the pid or parent path right now.
       const currentDir = fileStore.getCurrentDir || '/'
       const formData = new FormData()
       formData.append('file', state.uploadForm.file)
