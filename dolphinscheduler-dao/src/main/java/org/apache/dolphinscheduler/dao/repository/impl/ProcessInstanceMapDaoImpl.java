@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
+
+import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
