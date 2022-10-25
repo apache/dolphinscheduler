@@ -267,7 +267,7 @@ public enum Status {
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
-    RESOURCE_EXIST(20005, "resource already exists", "资源已存在"),
+    RESOURCE_EXIST(20005, "other users have uploaded files with the same name", "其他用户已经上传过同名文件"),
     RESOURCE_SUFFIX_NOT_SUPPORT_VIEW(20006, "resource suffix do not support online viewing", "资源文件后缀不支持查看"),
     RESOURCE_SIZE_EXCEED_LIMIT(20007, "upload resource file size exceeds limit", "上传资源文件大小超过限制"),
     RESOURCE_SUFFIX_FORBID_CHANGE(20008, "resource suffix not allowed to be modified", "资源文件后缀不支持修改"),
