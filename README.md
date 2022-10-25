@@ -22,7 +22,7 @@ The key features for DolphinScheduler are as follows:
 - Easy to use, there are 3 ways to create workflows:
   - Visually, create tasks by dragging and dropping tasks
   - Creating workflows by PyDolphinScheduler(Python way)
-  - Creating through Open API
+  - Creating workflows through Open API
 
 - Highly Reliable,
 DolphinScheduler uses a decentralized multi-master and multi-worker architecture, which naturally supports auto scaling and high availability..
