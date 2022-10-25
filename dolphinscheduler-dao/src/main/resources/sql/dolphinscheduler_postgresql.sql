@@ -379,7 +379,7 @@ CREATE TABLE t_ds_process_definition_log (
   PRIMARY KEY (id)
 ) ;
 
-create UNIQUE index idx_process_definition_log_code_version on t_ds_process_definition_log (code,version);
+create UNIQUE index uniq_idx_code_version on t_ds_process_definition_log (code,version);
 
 --
 -- Table structure for table t_ds_task_definition

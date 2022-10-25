@@ -121,4 +121,4 @@ select uc_dolphin_T_t_ds_task_instance_R_test_flag();
 DROP FUNCTION uc_dolphin_T_t_ds_task_instance_R_test_flag();
 
 
-create UNIQUE index IF NOT EXISTS idx_process_definition_log_code_version on t_ds_process_definition_log (code,version);
+create UNIQUE index IF NOT EXISTS uniq_idx_code_version on t_ds_process_definition_log (code,version);
