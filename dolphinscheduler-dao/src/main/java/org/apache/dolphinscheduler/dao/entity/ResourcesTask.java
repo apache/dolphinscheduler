@@ -34,7 +34,7 @@ public class ResourcesTask {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    
+
     private String fullName;
 
     private int taskId;

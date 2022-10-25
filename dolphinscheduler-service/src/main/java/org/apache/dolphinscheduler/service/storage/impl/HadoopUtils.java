@@ -320,7 +320,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
         // with "/" and join all elements except the first two elements because they are
         // tenantCode and "resource" directory.
         String resourceUploadPath =
-                RESOURCE_UPLOAD_PATH.endsWith(FOLDER_SEPARATOR) ? StringUtils.chop(RESOURCE_UPLOAD_PATH) : RESOURCE_UPLOAD_PATH;
+                RESOURCE_UPLOAD_PATH.endsWith(FOLDER_SEPARATOR) ? StringUtils.chop(RESOURCE_UPLOAD_PATH)
+                        : RESOURCE_UPLOAD_PATH;
         // +1 because we want to skip the "/" after resource upload path as well.
         String pathContainingTenantNResource = fullName.substring(
                 fullName.indexOf(resourceUploadPath)
