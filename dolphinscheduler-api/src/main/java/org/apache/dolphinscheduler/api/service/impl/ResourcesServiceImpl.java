@@ -26,7 +26,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -89,19 +88,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Joiner;
@@ -420,14 +415,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE
-                : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions =
-                canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(type), funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
 
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -453,12 +440,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             logger.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
-        // Check User's permission level on the file
-        boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, result);
-        if (!hasResourceAndWritePerm) {
             return result;
         }
 
@@ -1034,12 +1015,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> delete(User loginUser, String fullName,
                                  String resTenantCode) throws IOException {
         Result<Object> result = new Result<>();
-
-        // Check User's permission level on the file
-        boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, resultCheck);
-        if (!hasResourceAndWritePerm) {
-            return resultCheck;
-        }
 
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1748,21 +1723,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        String funcPermissionKey =
-                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE
-                        : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-                checkResourceType(resource.getType()), funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
-        // Check User's permission level on the file
-        boolean hasResourceAndWritePerm = hasResourceAndWritePerm(loginUser, resource, result);
-        if (!hasResourceAndWritePerm) {
-            return result;
-        }
 
         // check can edit by file suffix
         String nameSuffix = Files.getFileExtension(resource.getAlias());
@@ -2061,13 +2021,18 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
-        Visitor visitor = new ResourceTreeVisitor(authedResources);
-        String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        // Transform into StorageEntity for compatibility
+        List<StorageEntity> transformedResourceList = authedResources.stream()
+            .map(this::createStorageEntityBasedOnResource)
+            .collect(Collectors.toList());
+
+        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
         String jsonTreeStr =
-                JSONUtils.toJsonString(visitor.visit().getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+                JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(jsonTreeStr);
-        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
+        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
     }

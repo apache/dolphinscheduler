@@ -422,11 +422,6 @@ public class ResourcesServiceTest {
         Mockito.when(resourceUserMapper.queryResourceRelation(Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(getResourceUser());
 
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.RESOURCE_FILE_ID, null,
-                0, ApiFuncIdentificationConstant.FILE_DELETE, serviceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.RESOURCE_FILE_ID,
-                new Object[]{1},
-                0, serviceLogger)).thenReturn(true);
         try {
             // HDFS_NOT_STARTUP
             Result result = resourcesService.delete(loginUser, "", "");
