@@ -17,13 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.dinky;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -31,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -45,10 +42,13 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 
 public class DinkyTask extends AbstractRemoteTask {
 
@@ -73,8 +73,8 @@ public class DinkyTask extends AbstractRemoteTask {
     }
 
     @Override
-    public Set<String> getApplicationIds() throws TaskException {
-        return Collections.emptySet();
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
@@ -112,20 +112,23 @@ public class DinkyTask extends AbstractRemoteTask {
                     if (!checkResult(jobInstanceInfoResult)) {
                         break;
                     }
-                    String jobInstanceStatus = jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("status").asText();
+                    String jobInstanceStatus =
+                            jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("status").asText();
                     switch (jobInstanceStatus) {
                         case DinkyTaskConstants.STATUS_FINISHED:
                             final int exitStatusCode = mapStatusToExitCode(status);
                             // Use address-taskId as app id
                             setAppIds(String.format("%s-%s", address, taskId));
                             setExitStatusCode(exitStatusCode);
-                            logger.info("dinky task finished with results: {}", result.get(DinkyTaskConstants.API_RESULT_DATAS));
+                            logger.info("dinky task finished with results: {}",
+                                    result.get(DinkyTaskConstants.API_RESULT_DATAS));
                             finishFlag = true;
                             break;
                         case DinkyTaskConstants.STATUS_FAILED:
                         case DinkyTaskConstants.STATUS_CANCELED:
                         case DinkyTaskConstants.STATUS_UNKNOWN:
-                            errorHandle(jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("error").asText());
+                            errorHandle(jobInstanceInfoResult.get(DinkyTaskConstants.API_RESULT_DATAS).get("error")
+                                    .asText());
                             finishFlag = true;
                             break;
                         default:
@@ -191,14 +194,14 @@ public class DinkyTask extends AbstractRemoteTask {
         String address = this.dinkyParameters.getAddress();
         String taskId = this.dinkyParameters.getTaskId();
         logger.info("trying terminate dinky task, taskId: {}, address: {}, taskId: {}",
-            this.taskExecutionContext.getTaskInstanceId(),
-            address,
-            taskId);
+                this.taskExecutionContext.getTaskInstanceId(),
+                address,
+                taskId);
         cancelTask(address, taskId);
         logger.warn("dinky task terminated, taskId: {}, address: {}, taskId: {}",
-            this.taskExecutionContext.getTaskInstanceId(),
-            address,
-            taskId);
+                this.taskExecutionContext.getTaskInstanceId(),
+                address,
+                taskId);
     }
 
     private JsonNode submitTask(String address, String taskId) {
