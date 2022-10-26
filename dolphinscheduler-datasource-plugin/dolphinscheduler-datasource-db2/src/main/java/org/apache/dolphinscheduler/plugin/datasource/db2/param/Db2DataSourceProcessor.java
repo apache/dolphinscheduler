@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,11 +27,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -50,8 +51,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) createConnectionParams(connectionJson);
 
-        Db2DataSourceParamDTO
-                db2DatasourceParamDTO = new Db2DataSourceParamDTO();
+        Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
         db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
@@ -67,7 +67,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         Db2DataSourceParamDTO db2Param = (Db2DataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_DB2, db2Param.getHost(), db2Param.getPort());
+        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_DB2, db2Param.getHost(), db2Param.getPort());
         String jdbcUrl = String.format("%s/%s", address, db2Param.getDatabase());
 
         Db2ConnectionParam db2ConnectionParam = new Db2ConnectionParam();
@@ -91,7 +91,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_DB2_JDBC_DRIVER;
+        return DataSourceConstants.COM_DB2_JDBC_DRIVER;
     }
 
     @Override
@@ -123,7 +123,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getValidationQuery() {
-        return Constants.DB2_VALIDATION_QUERY;
+        return DataSourceConstants.DB2_VALIDATION_QUERY;
     }
 
     private String transformOther(Map<String, String> otherMap) {

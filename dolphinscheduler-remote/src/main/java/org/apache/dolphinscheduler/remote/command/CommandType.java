@@ -38,7 +38,6 @@ public enum CommandType {
 
     GET_LOG_BYTES_RESPONSE,
 
-
     WORKER_REQUEST,
     MASTER_RESPONSE,
 

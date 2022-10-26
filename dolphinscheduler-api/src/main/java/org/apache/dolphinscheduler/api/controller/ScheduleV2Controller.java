@@ -31,11 +31,9 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import springfox.documentation.annotations.ApiIgnore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,15 +48,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * schedule controller
  */
-@Api(tags = "SCHEDULER_TAG")
+@Tag(name = "SCHEDULER_TAG")
 @RestController
 @RequestMapping("/v2/schedules")
 public class ScheduleV2Controller extends BaseController {
@@ -73,12 +72,12 @@ public class ScheduleV2Controller extends BaseController {
      * @param scheduleCreateRequest the new schedule object will be created
      * @return ResourceResponse object created
      */
-    @ApiOperation(value = "create", notes = "CREATE_SCHEDULE_NOTES")
+    @Operation(summary = "create", description = "CREATE_SCHEDULE_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Schedule> createSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Schedule> createSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody ScheduleCreateRequest scheduleCreateRequest) {
         Schedule schedule = schedulerService.createSchedulesV2(loginUser, scheduleCreateRequest);
         return Result.success(schedule);
@@ -90,15 +89,15 @@ public class ScheduleV2Controller extends BaseController {
      * @param loginUser login user
      * @param id        schedule object id
      */
-    @ApiOperation(value = "delete", notes = "DELETE_SCHEDULE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", dataTypeClass = long.class, example = "123456", required = true)
+    @Operation(summary = "delete", description = "DELETE_SCHEDULE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "SCHEDULE_ID", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result deleteSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @PathVariable("id") Integer id) {
         schedulerService.deleteSchedulesById(loginUser, id);
         return Result.success();
@@ -112,12 +111,12 @@ public class ScheduleV2Controller extends BaseController {
      * @param scheduleUpdateRequest the schedule object will be updated
      * @return result Result
      */
-    @ApiOperation(value = "update", notes = "UPDATE_SCHEDULE_NOTES")
+    @Operation(summary = "update", description = "UPDATE_SCHEDULE_NOTES")
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Schedule> updateSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Schedule> updateSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable("id") Integer id,
                                            @RequestBody ScheduleUpdateRequest scheduleUpdateRequest) {
         Schedule schedule = schedulerService.updateSchedulesV2(loginUser, id, scheduleUpdateRequest);
@@ -131,12 +130,12 @@ public class ScheduleV2Controller extends BaseController {
      * @param id               schedule object id
      * @return result Result
      */
-    @ApiOperation(value = "get", notes = "GET_SCHEDULE_BY_ID_NOTES")
+    @Operation(summary = "get", description = "GET_SCHEDULE_BY_ID_NOTES")
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Schedule> getSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Schedule> getSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable("id") Integer id) {
         Schedule schedule = schedulerService.getSchedule(loginUser, id);
         return Result.success(schedule);
@@ -149,12 +148,12 @@ public class ScheduleV2Controller extends BaseController {
      * @
      * @return result Result
      */
-    @ApiOperation(value = "get", notes = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
-    @GetMapping(consumes = {"application/json"})
+    @Operation(summary = "get", description = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
+    @PostMapping(value = "/filter", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<PageInfo<Schedule>> filterSchedule(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<Schedule>> filterSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @RequestBody ScheduleFilterRequest scheduleFilterRequest) {
         PageInfo<Schedule> schedules = schedulerService.filterSchedules(loginUser, scheduleFilterRequest);
         return Result.success(schedules);

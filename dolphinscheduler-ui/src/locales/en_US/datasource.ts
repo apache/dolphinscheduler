@@ -18,6 +18,7 @@
 export default {
   datasource: 'DataSource',
   create_datasource: 'Create DataSource',
+  choose_datasource_type: 'Choose DataSource Type',
   search_input_tips: 'Please input the keywords',
   datasource_name: 'Datasource Name',
   datasource_name_tips: 'Please enter datasource name',

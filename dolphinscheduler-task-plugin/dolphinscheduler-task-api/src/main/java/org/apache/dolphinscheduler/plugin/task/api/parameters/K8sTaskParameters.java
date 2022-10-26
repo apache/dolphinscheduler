@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,7 @@ import java.util.List;
  * k8s task parameters
  */
 public class K8sTaskParameters extends AbstractParameters {
+
     private String image;
     private String namespace;
     private double minCpuCores;
@@ -67,8 +68,7 @@ public class K8sTaskParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(image) && StringUtils.isNotEmpty(namespace)
-            ;
+        return StringUtils.isNotEmpty(image) && StringUtils.isNotEmpty(namespace);
     }
 
     @Override
@@ -79,10 +79,10 @@ public class K8sTaskParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "K8sTaskParameters{"
-            + "image='" + image + '\''
-            + ", namespace='" + namespace + '\''
-            + ", minCpuCores=" + minCpuCores
-            + ", minMemorySpace=" + minMemorySpace
-            + '}';
+                + "image='" + image + '\''
+                + ", namespace='" + namespace + '\''
+                + ", minCpuCores=" + minCpuCores
+                + ", minMemorySpace=" + minMemorySpace
+                + '}';
     }
 }

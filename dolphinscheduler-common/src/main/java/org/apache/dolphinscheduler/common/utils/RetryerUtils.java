@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +30,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 
 public class RetryerUtils {
+
     private static Retryer<Boolean> defaultRetryerResultCheck;
     private static Retryer<Boolean> defaultRetryerResultNoCheck;
 
@@ -92,7 +93,8 @@ public class RetryerUtils {
      * @throws ExecutionException the execution exception
      * @throws RetryException     the retry exception
      */
-    public static Boolean retryCall(final Callable<Boolean> callable, boolean checkResult) throws ExecutionException, RetryException {
+    public static Boolean retryCall(final Callable<Boolean> callable,
+                                    boolean checkResult) throws ExecutionException, RetryException {
         return getDefaultRetryer(checkResult).call(callable);
     }
 

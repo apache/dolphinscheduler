@@ -33,7 +33,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 
 public class OkHttpUtils {

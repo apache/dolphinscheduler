@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.server.worker.metrics;
 
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import lombok.experimental.UtilityClass;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
-import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class TaskMetrics {
@@ -45,8 +44,7 @@ public class TaskMetrics {
                     Counter.builder("ds.task.execution.count.by.type")
                             .tag("task_type", taskChannelFactory.getName())
                             .description("task execution counter by type")
-                            .register(Metrics.globalRegistry)
-            );
+                            .register(Metrics.globalRegistry));
         }
     }
 

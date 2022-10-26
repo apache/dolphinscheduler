@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 @SpringBootApplication
 public class UpgradeDolphinScheduler {
+
     public static void main(String[] args) {
         SpringApplication.run(UpgradeDolphinScheduler.class, args);
     }
@@ -34,6 +35,7 @@ public class UpgradeDolphinScheduler {
     @Component
     @Profile("upgrade")
     static class UpgradeRunner implements CommandLineRunner {
+
         private static final Logger logger = LoggerFactory.getLogger(UpgradeRunner.class);
 
         private final DolphinSchedulerManager dolphinSchedulerManager;

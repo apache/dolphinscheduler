@@ -17,13 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -37,8 +30,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -61,9 +54,8 @@ public class AccessTokenMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() throws Exception {
         Integer userId = 1;
-
         AccessToken accessToken = createAccessToken(userId);
-        assertThat(accessToken.getId(), greaterThan(0));
+        Assertions.assertTrue(accessToken.getId() > 0);
     }
 
     /**
@@ -84,7 +76,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         }
 
         int deleteCount = accessTokenMapper.deleteAccessTokenByUserId(userId);
-        Assert.assertEquals(insertCount, deleteCount);
+        Assertions.assertEquals(insertCount, deleteCount);
     }
 
     /**
@@ -97,7 +89,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Integer userId = 1;
         AccessToken accessToken = createAccessToken(userId);
         AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
-        assertEquals(accessToken, resultAccessToken);
+        Assertions.assertEquals(accessToken, resultAccessToken);
     }
 
     /**
@@ -111,7 +103,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         AccessToken accessToken = createAccessToken(userId);
         AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
         boolean flag = accessToken.equals(resultAccessToken);
-        assertTrue(flag);
+        Assertions.assertTrue(flag);
     }
 
     /**
@@ -124,7 +116,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         Integer userId = 1;
         AccessToken accessToken = createAccessToken(userId);
         int result = accessToken.hashCode();
-        assertNotNull(result);
+        Assertions.assertNotNull(Integer.valueOf(result));
     }
 
     /**
@@ -145,22 +137,21 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         // general user and create token user
         Page page = new Page(offset, size);
         IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, createTokenUserId);
-        assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()), size);
+        Assertions.assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()), size);
 
         // admin user
         IPage<AccessToken> adminAccessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 0);
-        assertEquals(Integer.valueOf(adminAccessTokenPage.getRecords().size()), size);
+        Assertions.assertEquals(Integer.valueOf(adminAccessTokenPage.getRecords().size()), size);
         for (AccessToken accessToken : adminAccessTokenPage.getRecords()) {
             AccessToken resultAccessToken = accessTokenMap.get(accessToken.getId());
-            assertEquals(accessToken, resultAccessToken);
+            Assertions.assertEquals(accessToken, resultAccessToken);
         }
 
         // general user
         Integer emptySize = 0;
         IPage<AccessToken> generalAccessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 1);
-        assertEquals(Integer.valueOf(generalAccessTokenPage.getRecords().size()), emptySize);
+        Assertions.assertEquals(Integer.valueOf(generalAccessTokenPage.getRecords().size()), emptySize);
     }
-
 
     /**
      * test update
@@ -169,16 +160,16 @@ public class AccessTokenMapperTest extends BaseDaoTest {
     public void testUpdate() throws Exception {
         Integer userId = 1;
         AccessToken accessToken = createAccessToken(userId);
-        //update
+        // update
         accessToken.setToken("56789");
         accessToken.setExpireTime(DateUtils.getCurrentDate());
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
         int status = accessTokenMapper.updateById(accessToken);
         if (status != 1) {
-            Assert.fail("update access token fail");
+            Assertions.fail("update access token fail");
         }
         AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
-        assertEquals(accessToken, resultAccessToken);
+        Assertions.assertEquals(accessToken, resultAccessToken);
     }
 
     /**
@@ -191,12 +182,12 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         AccessToken accessToken = createAccessToken(userId);
         int status = accessTokenMapper.deleteById(accessToken.getId());
         if (status != 1) {
-            Assert.fail("delete access token data fail");
+            Assertions.fail("delete access token data fail");
         }
 
         AccessToken resultAccessToken =
                 accessTokenMapper.selectById(accessToken.getId());
-        assertNull(resultAccessToken);
+        Assertions.assertNull(resultAccessToken);
     }
 
     /**
@@ -208,7 +199,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
      * @throws Exception
      */
     private Map<Integer, AccessToken> createAccessTokens(
-            Integer count, String userName) throws Exception {
+                                                         Integer count, String userName) throws Exception {
 
         User user = createUser(userName);
 
@@ -243,7 +234,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         int status = userMapper.insert(user);
 
         if (status != 1) {
-            Assert.fail("insert user data error");
+            Assertions.fail("insert user data error");
         }
 
         return user;
@@ -257,7 +248,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
      * @return accessToken
      */
     private AccessToken createAccessToken(Integer userId, String userName) {
-        //insertOne
+        // insertOne
         AccessToken accessToken = new AccessToken();
         accessToken.setUserName(userName);
         accessToken.setUserId(userId);
@@ -269,7 +260,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         int status = accessTokenMapper.insert(accessToken);
 
         if (status != 1) {
-            Assert.fail("insert data error");
+            Assertions.fail("insert data error");
         }
         return accessToken;
     }

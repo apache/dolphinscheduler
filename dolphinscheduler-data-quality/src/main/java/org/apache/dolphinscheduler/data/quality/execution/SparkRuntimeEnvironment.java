@@ -53,8 +53,8 @@ public class SparkRuntimeEnvironment {
     private SparkConf createSparkConf() {
         SparkConf conf = new SparkConf();
         this.config.entrySet()
-            .forEach(entry -> conf.set(entry.getKey(), String.valueOf(entry.getValue())));
-        conf.set("spark.sql.crossJoin.enabled","true");
+                .forEach(entry -> conf.set(entry.getKey(), String.valueOf(entry.getValue())));
+        conf.set("spark.sql.crossJoin.enabled", "true");
         return conf;
     }
 

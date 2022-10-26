@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SparkTaskTest {
 
     @Test
@@ -42,7 +42,7 @@ public class SparkTaskTest {
 
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
-        Assert.assertEquals(sparkTask.buildCommand(),
+        Assertions.assertEquals(sparkTask.buildCommand(),
                 "${SPARK_HOME}/bin/spark-sql " +
                         "--master yarn " +
                         "--deploy-mode client " +
@@ -62,7 +62,7 @@ public class SparkTaskTest {
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
-        Assert.assertEquals(sparkTask.buildCommand(),
+        Assertions.assertEquals(sparkTask.buildCommand(),
                 "${SPARK_HOME}/bin/spark-submit " +
                         "--master yarn " +
                         "--deploy-mode client " +

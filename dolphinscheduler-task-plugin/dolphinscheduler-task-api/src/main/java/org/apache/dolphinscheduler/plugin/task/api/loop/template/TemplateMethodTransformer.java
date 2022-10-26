@@ -21,8 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTa
 
 import lombok.NonNull;
 
-public interface TemplateMethodTransformer<YamlMethodT extends LoopTaskYamlDefinition.LoopTaskMethodYamlDefinition,
-    MethodT extends HttpLoopTaskMethodDefinition> {
+public interface TemplateMethodTransformer<YamlMethodT extends LoopTaskYamlDefinition.LoopTaskMethodYamlDefinition, MethodT extends HttpLoopTaskMethodDefinition> {
 
     /**
      * Transform the {@link LoopTaskYamlDefinition.LoopTaskMethodYamlDefinition} to {@link HttpLoopTaskMethodDefinition}.

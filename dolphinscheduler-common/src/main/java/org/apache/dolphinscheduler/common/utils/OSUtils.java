@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import oshi.SystemInfo;
@@ -240,7 +241,7 @@ public class OSUtils {
         int startPos = 0;
         int endPos = lines.length - 2;
         for (int i = 0; i < lines.length; i++) {
-            if (lines[i].isEmpty()) {
+            if (StringUtils.isEmpty(lines[i])) {
                 continue;
             }
 
@@ -417,10 +418,14 @@ public class OSUtils {
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {
-        if (!CommonUtils.isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
+        if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
         return String.format("sudo -u %s %s", tenantCode, command);
+    }
+
+    public static boolean isSudoEnable() {
+        return PropertyUtils.getBoolean(Constants.SUDO_ENABLE, true);
     }
 
     /**

@@ -433,6 +433,27 @@ export function formatParams(data: INodeData): {
     taskParams.hiveSqlScript = data.hiveSqlScript
     taskParams.hiveCliOptions = data.hiveCliOptions
   }
+  if (data.taskType === 'DMS') {
+    taskParams.isRestartTask = data.isRestartTask
+    taskParams.isJsonFormat = data.isJsonFormat
+    taskParams.jsonData = data.jsonData
+    taskParams.migrationType = data.migrationType
+    taskParams.replicationTaskIdentifier = data.replicationTaskIdentifier
+    taskParams.sourceEndpointArn = data.sourceEndpointArn
+    taskParams.targetEndpointArn = data.targetEndpointArn
+    taskParams.replicationInstanceArn = data.replicationInstanceArn
+    taskParams.tableMappings = data.tableMappings
+    taskParams.replicationTaskArn = data.replicationTaskArn
+  }
+
+  if (data.taskType === 'DATASYNC') {
+    taskParams.jsonFormat = data.jsonFormat
+    taskParams.json = data.json
+    taskParams.destinationLocationArn = data.destinationLocationArn
+    taskParams.sourceLocationArn = data.sourceLocationArn
+    taskParams.name = data.name
+    taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
+  }
 
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
