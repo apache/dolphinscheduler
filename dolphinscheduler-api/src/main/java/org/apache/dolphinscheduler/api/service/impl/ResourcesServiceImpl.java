@@ -48,8 +48,8 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -2023,8 +2023,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // Transform into StorageEntity for compatibility
         List<StorageEntity> transformedResourceList = authedResources.stream()
-            .map(this::createStorageEntityBasedOnResource)
-            .collect(Collectors.toList());
+                .map(this::createStorageEntityBasedOnResource)
+                .collect(Collectors.toList());
 
         Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
         String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
