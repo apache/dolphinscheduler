@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
+import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
@@ -221,6 +222,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext, logger);
         logger.info("Resources:{} check success", taskExecutionContext.getResources());
 
+        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate);
+
         TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
         if (null == taskChannel) {
             throw new TaskPluginException(String.format("%s task plugin not found, please check config file.",
@@ -261,6 +264,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setProcessId(task.getProcessId());
         taskExecutionContext.setAppIds(task.getAppIds());
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
+        // upload out files and modify the "OUT FILE" property in VarPool
+        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
 
         logger.info("Send task execute result to master, the current task status: {}",

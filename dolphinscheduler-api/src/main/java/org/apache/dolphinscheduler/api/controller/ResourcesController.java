@@ -271,6 +271,25 @@ public class ResourcesController extends BaseController {
     }
 
     /**
+     * delete DATA_TRANSFER data
+     *
+     * @param loginUser login user
+     * @return delete result code
+     */
+    @Operation(summary = "deleteDataTransferData", description = "Delete the N days ago data of DATA_TRANSFER ")
+    @Parameters({
+            @Parameter(name = "days", description = "N days ago", required = true, schema = @Schema(implementation = Integer.class))
+    })
+    @DeleteMapping(value = "/data-transfer")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_RESOURCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<Object> deleteDataTransferData(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                 @RequestParam(value = "days") Integer days) {
+        return resourceService.deleteDataTransferData(loginUser, days);
+    }
+
+    /**
      * verify resource by alias and type
      *
      * @param loginUser login user
