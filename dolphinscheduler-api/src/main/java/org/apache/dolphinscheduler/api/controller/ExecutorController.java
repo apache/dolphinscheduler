@@ -192,7 +192,7 @@ public class ExecutorController extends BaseController {
      */
     @ApiOperation(value = "batchStartProcessInstance", notes = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataTypeClass = String.class, example = "1,2,3"),
+            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODE_LIST", required = true, dataTypeClass = String.class, example = "1,2,3"),
             @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataTypeClass = String.class, example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataTypeClass = FailureStrategy.class),
             @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataTypeClass = String.class),

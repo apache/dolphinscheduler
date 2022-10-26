@@ -62,7 +62,7 @@ public class FavTaskController extends BaseController {
      * @param loginUser login user
      * @return task type list
      */
-    @ApiOperation(value = "listTaskType", notes = "LIST_TASK_TYPE")
+    @ApiOperation(value = "listTaskType", notes = "QUERY_TASK_TYPE_LIST")
     @GetMapping(value = "/taskTypes")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_TASK_TYPE_ERROR)

@@ -180,7 +180,7 @@ public class TaskInstanceController extends BaseController {
      * @param id task instance id
      * @return the result code and msg
      */
-    @ApiOperation(value = "stop", notes = "TASK_STOP")
+    @ApiOperation(value = "stop", notes = "TASK_INSTANCE_STOP")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "TASK_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "12")
     })

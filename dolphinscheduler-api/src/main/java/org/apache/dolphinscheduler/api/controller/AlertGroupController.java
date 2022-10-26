@@ -181,7 +181,7 @@ public class AlertGroupController extends BaseController {
             @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataTypeClass = int.class, example = "100"),
             @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "description", value = "DESC", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataTypeClass = String.class)
+            @ApiImplicitParam(name = "alertInstanceIds", value = "ALERT_INSTANCE_IDS", required = true, dataTypeClass = String.class)
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
