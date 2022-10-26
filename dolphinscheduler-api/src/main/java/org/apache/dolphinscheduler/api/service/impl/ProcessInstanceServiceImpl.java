@@ -71,6 +71,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -128,6 +129,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     ProcessService processService;
+
+    @Autowired
+    TaskInstanceDao taskInstanceDao;
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
@@ -246,6 +250,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             logger.error("Process definition does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
+            Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
+            if (tenant != null) {
+                processDefinition.setTenantCode(tenant.getTenantCode());
+            }
             processInstance.setLocations(processDefinition.getLocations());
             processInstance.setDagData(processService.genDagData(processDefinition));
             result.put(DATA_LIST, processInstance);
@@ -366,7 +374,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         List<TaskInstance> taskInstanceList =
-                processService.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
+                taskInstanceDao.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
         addDependResultForTaskList(taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
@@ -444,7 +452,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskId);
         if (taskInstance == null) {
             logger.error("Task instance does not exist, projectCode:{}, taskInstanceId{}.", projectCode, taskId);
             putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);

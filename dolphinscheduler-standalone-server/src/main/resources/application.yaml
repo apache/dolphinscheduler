@@ -176,6 +176,7 @@ worker:
   # alert server listen host
   alert-listen-host: localhost
   alert-listen-port: 50052
+  task-execute-threads-full-policy: REJECT
 
 alert:
   port: 50052

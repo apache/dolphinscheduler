@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
 --- rename t_ds_fav_task task_name to task_type
 DO $$
 DECLARE
@@ -27,3 +28,7 @@ BEGIN
    EXECUTE 'ALTER TABLE IF EXISTS ' || quote_ident(v_schema) ||'.t_ds_fav_task RENAME COLUMN task_name TO task_type';
 END IF;
 END $$;
+
+--- add column
+ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
+

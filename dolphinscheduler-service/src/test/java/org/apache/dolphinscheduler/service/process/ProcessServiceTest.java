@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -59,6 +58,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -66,6 +66,9 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
@@ -121,6 +124,16 @@ public class ProcessServiceTest {
     private ProcessInstanceMapper processInstanceMapper;
     @Mock
     private ProcessInstanceDao processInstanceDao;
+
+    @Mock
+    private TaskInstanceDao taskInstanceDao;
+
+    @Mock
+    private TaskDefinitionLogDao taskDefinitionLogDao;
+
+    @Mock
+    private TaskDefinitionDao taskDefinitionDao;
+
     @Mock
     private UserMapper userMapper;
     @Mock
@@ -135,6 +148,8 @@ public class ProcessServiceTest {
     private ProcessDefinitionLogMapper processDefineLogMapper;
     @Mock
     private ResourceMapper resourceMapper;
+    @Mock
+    private ResourceTaskMapper resourceTaskMapper;
     @Mock
     private TaskGroupMapper taskGroupMapper;
     @Mock
@@ -603,6 +618,7 @@ public class ProcessServiceTest {
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
         Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singletonList(taskDefinition.getCode())))
                 .thenReturn(Collections.singletonList(taskDefinition));
+        Mockito.when(taskDefinitionMapper.queryByCode(Mockito.anyLong())).thenReturn(taskDefinition);
         int result = processService.saveTaskDefine(operator, projectCode, taskDefinitionLogs, Boolean.TRUE);
         Assertions.assertEquals(0, result);
     }
@@ -652,7 +668,7 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(taskDefinition);
         taskDefinitionLogs.add(td2);
 
-        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
+        Mockito.when(taskDefinitionLogDao.getTaskDefineLogList(any())).thenReturn(taskDefinitionLogs);
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(list);
 
@@ -680,24 +696,22 @@ public class ProcessServiceTest {
     public void testUpdateResourceInfo() throws Exception {
         // test if input is null
         ResourceInfo resourceInfoNull = null;
-        ResourceInfo updatedResourceInfo1 = processService.updateResourceInfo(resourceInfoNull);
+        ResourceInfo updatedResourceInfo1 = processService.updateResourceInfo(0, resourceInfoNull);
         Assertions.assertNull(updatedResourceInfo1);
 
         // test if resource id less than 1
         ResourceInfo resourceInfoVoid = new ResourceInfo();
-        ResourceInfo updatedResourceInfo2 = processService.updateResourceInfo(resourceInfoVoid);
-        Assertions.assertNull(updatedResourceInfo2);
+        ResourceInfo updatedResourceInfo2 = processService.updateResourceInfo(0, resourceInfoVoid);
+        Assertions.assertNull(updatedResourceInfo2.getResourceName());
 
         // test normal situation
         ResourceInfo resourceInfoNormal = new ResourceInfo();
         resourceInfoNormal.setId(1);
-        Resource resource = new Resource();
-        resource.setId(1);
-        resource.setFileName("test.txt");
-        resource.setFullName("/test.txt");
-        Mockito.when(resourceMapper.selectById(1)).thenReturn(resource);
+        resourceInfoNormal.setRes("test.txt");
+        resourceInfoNormal.setResourceName("/test.txt");
+        Mockito.when(resourceTaskMapper.existResourceByTaskIdNFullName(0, "/test.txt")).thenReturn(1);
 
-        ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(resourceInfoNormal);
+        ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
 
         Assertions.assertEquals(1, updatedResourceInfo3.getId().intValue());
         Assertions.assertEquals("test.txt", updatedResourceInfo3.getRes());
@@ -727,23 +741,6 @@ public class ProcessServiceTest {
 
         processService.releaseTaskGroup(taskInstance);
 
-    }
-
-    @Test
-    public void testFindTaskInstanceByIdList() {
-        List<Integer> emptyList = new ArrayList<>();
-        Mockito.when(taskInstanceMapper.selectBatchIds(emptyList)).thenReturn(new ArrayList<>());
-        Assertions.assertEquals(0, processService.findTaskInstanceByIdList(emptyList).size());
-
-        List<Integer> idList = Collections.singletonList(1);
-        TaskInstance instance = new TaskInstance();
-        instance.setId(1);
-
-        Mockito.when(taskInstanceMapper.selectBatchIds(idList)).thenReturn(Collections.singletonList(instance));
-        List<TaskInstance> taskInstanceByIdList = processService.findTaskInstanceByIdList(idList);
-
-        Assertions.assertEquals(1, taskInstanceByIdList.size());
-        Assertions.assertEquals(instance.getId(), taskInstanceByIdList.get(0).getId());
     }
 
     @Test

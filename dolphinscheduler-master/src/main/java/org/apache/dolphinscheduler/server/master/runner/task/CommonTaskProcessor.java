@@ -146,7 +146,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     public boolean killTask() {
 
         try {
-            taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+            taskInstance = taskInstanceDao.findTaskInstanceById(taskInstance.getId());
             if (taskInstance == null) {
                 return true;
             }
@@ -156,7 +156,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             // we don't wait the kill response
             taskInstance.setState(TaskExecutionStatus.KILL);
             taskInstance.setEndTime(new Date());
-            processService.updateTaskInstance(taskInstance);
+            taskInstanceDao.updateTaskInstance(taskInstance);
             if (StringUtils.isNotEmpty(taskInstance.getHost())) {
                 killRemoteTask();
             }

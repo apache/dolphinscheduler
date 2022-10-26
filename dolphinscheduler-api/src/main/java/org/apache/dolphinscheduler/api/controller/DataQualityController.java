@@ -51,7 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * data quality controller
  */
-@Tag(name = "DATA_QUALITY_SERVICE")
+@Tag(name = "DATA_QUALITY_TAG")
 @RestController
 @RequestMapping("/data-quality")
 public class DataQualityController extends BaseController {

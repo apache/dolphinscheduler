@@ -13,38 +13,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
-package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+-- add unique key to t_ds_process_definition_log
+drop PROCEDURE if EXISTS add_t_ds_process_definition_log_uk_uniq_idx_code_version;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_definition_log_uk_uniq_idx_code_version()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='t_ds_process_definition_log'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND INDEX_NAME='uniq_idx_code_version')
+    THEN
+ALTER TABLE t_ds_process_definition_log ADD UNIQUE KEY uniq_idx_code_version(`code`,`version`);
+END IF;
+END;
 
-import org.apache.commons.lang3.StringUtils;
+d//
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-/**
- * cluster conf will include all env type, but only k8s config now
- */
-public class ClusterConfUtils {
-
-    private static final String K8S_CONFIG = "k8s";
-
-    /**
-     * get k8s
-     *
-     * @param config cluster config in db
-     * @return
-     */
-    public static String getK8sConfig(String config) {
-        if (StringUtils.isEmpty(config)) {
-            return null;
-        }
-        ObjectNode conf = JSONUtils.parseObject(config);
-        if (conf == null) {
-            return null;
-        }
-        return conf.get(K8S_CONFIG).asText();
-    }
-
-}
+delimiter ;
+CALL add_t_ds_process_definition_log_uk_uniq_idx_code_version;
+DROP PROCEDURE add_t_ds_process_definition_log_uk_uniq_idx_code_version;
