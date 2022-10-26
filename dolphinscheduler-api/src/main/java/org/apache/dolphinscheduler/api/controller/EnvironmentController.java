@@ -73,7 +73,7 @@ public class EnvironmentController extends BaseController {
     @Operation(summary = "createEnvironment", description = "CREATE_ENVIRONMENT_NOTES")
     @Parameters({
             @Parameter(name = "name", description = "ENVIRONMENT_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "config", description = "CONFIG", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "config", description = "ENVIRONMENT_CONFIG", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "description", description = "ENVIRONMENT_DESC", schema = @Schema(implementation = String.class)),
             @Parameter(name = "workerGroups", description = "WORKER_GROUP_LIST", schema = @Schema(implementation = String.class))
     })
