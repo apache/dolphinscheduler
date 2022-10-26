@@ -356,13 +356,21 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     }
 
     public void processTimeout() {
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, projectUser);
+        try {
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, projectUser);
+        } catch (Exception ex) {
+            logger.error("Send workflow instance timeout alert error", ex);
+        }
     }
 
     public void taskTimeout(TaskInstance taskInstance) {
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
+        try {
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
+        } catch (Exception ex) {
+            logger.error("Send task instance timeout alert error", ex);
+        }
     }
 
     public void taskFinished(TaskInstance taskInstance) throws StateEventHandleException {
@@ -721,7 +729,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
         if (processAlertManager.isNeedToSendWarning(processInstance)) {
-            processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
+            try {
+                processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
+            } catch (Exception ex) {
+                // the trace id has been set on upstream
+                logger.error("Send workflow instance alert failed");
+            }
         }
         if (processInstance.getState().typeIsSuccess()) {
             processAlertManager.closeAlert(processInstance);
