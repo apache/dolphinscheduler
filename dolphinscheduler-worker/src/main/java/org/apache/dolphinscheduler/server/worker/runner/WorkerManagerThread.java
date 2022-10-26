@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.config.TaskExecuteThreadsFullPolicy;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.slf4j.Logger;
@@ -40,8 +41,8 @@ public class WorkerManagerThread implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(WorkerManagerThread.class);
 
     private final DelayQueue<WorkerDelayTaskExecuteRunnable> waitSubmitQueue;
-
     private final WorkerExecService workerExecService;
+    private final WorkerConfig workerConfig;
 
     private final int workerExecThreads;
 
@@ -51,6 +52,7 @@ public class WorkerManagerThread implements Runnable {
     private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
+        this.workerConfig = workerConfig;
         workerExecThreads = workerConfig.getExecThreads();
         this.waitSubmitQueue = new DelayQueue<>();
         workerExecService = new WorkerExecService(
@@ -92,6 +94,10 @@ public class WorkerManagerThread implements Runnable {
     }
 
     public boolean offer(WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable) {
+        if (workerConfig.getTaskExecuteThreadsFullPolicy() == TaskExecuteThreadsFullPolicy.CONTINUE) {
+            return waitSubmitQueue.offer(workerDelayTaskExecuteRunnable);
+        }
+
         if (waitSubmitQueue.size() > workerExecThreads) {
             logger.warn("Wait submit queue is full, will retry submit task later");
             WorkerServerMetrics.incWorkerSubmitQueueIsFullCount();
