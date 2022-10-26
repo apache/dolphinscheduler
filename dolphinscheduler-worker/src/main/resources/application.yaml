@@ -76,6 +76,7 @@ worker:
     strategy: waiting
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
+  task-execute-threads-full-policy: REJECT
 
 server:
   port: 1235

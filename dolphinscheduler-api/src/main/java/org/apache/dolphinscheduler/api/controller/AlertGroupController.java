@@ -180,7 +180,7 @@ public class AlertGroupController extends BaseController {
             @Parameter(name = "id", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "description", description = "DESC", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "alertInstanceIds", description = "alertInstanceIds", required = true, schema = @Schema(implementation = String.class))
+            @Parameter(name = "alertInstanceIds", description = "ALERT_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
