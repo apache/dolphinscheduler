@@ -28,6 +28,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
@@ -67,6 +68,7 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -148,6 +150,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private ProcessService processService;
+
+    @Mock
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
     private ProcessInstanceService processInstanceService;
@@ -756,8 +761,10 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         result.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(projectMapper.queryByCode(1)).thenReturn(project1);
         Mockito.when(projectService.checkProjectAndAuth(user, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
-
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode))
+                .thenReturn(getProcessTaskRelation());
+        Mockito.when(taskDefinitionLogDao.getTaskDefineLogList(any())).thenReturn(new ArrayList<>());
         Map<String, Object> taskNotNuLLRes =
                 processDefinitionService.viewTree(user, processDefinition.getProjectCode(), 46, 10);
         Assertions.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));

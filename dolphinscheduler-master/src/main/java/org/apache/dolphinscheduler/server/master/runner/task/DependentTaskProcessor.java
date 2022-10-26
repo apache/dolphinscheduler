@@ -114,7 +114,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
             taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
             taskInstance.setStartTime(new Date());
-            processService.updateTaskInstance(taskInstance);
+            taskInstanceDao.updateTaskInstance(taskInstance);
             initDependParameters();
             logger.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
             return true;
@@ -231,7 +231,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean pauseTask() {
         this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -239,7 +239,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -290,7 +290,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         status = (result == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
     }
 
     @Override
