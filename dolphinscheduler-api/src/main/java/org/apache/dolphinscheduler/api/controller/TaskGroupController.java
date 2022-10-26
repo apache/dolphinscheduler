@@ -53,7 +53,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * task group controller
  */
-@Tag(name = "task group")
+@Tag(name = "TASK_GROUP_TAG")
 @RestController
 @RequestMapping("/task-group")
 public class TaskGroupController extends BaseController {
@@ -75,8 +75,8 @@ public class TaskGroupController extends BaseController {
     @Parameters({
             @Parameter(name = "name", description = "NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class)),
-            @Parameter(name = "description", description = "DESCRIPTION", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "groupSize", description = "GROUPSIZE", schema = @Schema(implementation = int.class)),
+            @Parameter(name = "description", description = "TASK_GROUP_DESCRIPTION", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "groupSize", description = "GROUP_SIZE", schema = @Schema(implementation = int.class)),
 
     })
     @PostMapping(value = "/create")
@@ -105,10 +105,10 @@ public class TaskGroupController extends BaseController {
      */
     @Operation(summary = "update", description = "UPDATE_TASK_GROUP_NOTE")
     @Parameters({
-            @Parameter(name = "id", description = "id", schema = @Schema(implementation = int.class)),
-            @Parameter(name = "name", description = "NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "DESCRIPTION", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "groupSize", description = "GROUPSIZE", schema = @Schema(implementation = int.class)),
+            @Parameter(name = "id", description = "TASK_GROUP_ID", schema = @Schema(implementation = int.class)),
+            @Parameter(name = "name", description = "TASK_GROUP_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "TASK_GROUP_DESCRIPTION", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "groupSize", description = "GROUP_SIZE", schema = @Schema(implementation = int.class)),
 
     })
     @PostMapping(value = "/update")
@@ -135,7 +135,7 @@ public class TaskGroupController extends BaseController {
     @Operation(summary = "list-paging", description = "QUERY_ALL_TASK_GROUP_NOTES")
     @Parameters({
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
-            @Parameter(name = "name", description = "NAME", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "name", description = "TASK_GROUP_NAME", required = false, schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping(value = "/list-paging")
@@ -164,7 +164,7 @@ public class TaskGroupController extends BaseController {
     @Parameters({
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20")),
-            @Parameter(name = "status", description = "status", required = true, schema = @Schema(implementation = int.class))
+            @Parameter(name = "status", description = "TASK_GROUP_STATUS", required = true, schema = @Schema(implementation = int.class))
     })
     @GetMapping(value = "/query-list-by-status")
     @ResponseStatus(HttpStatus.OK)
@@ -237,7 +237,7 @@ public class TaskGroupController extends BaseController {
      */
     @Operation(summary = "startTaskGroup", description = "START_TASK_GROUP_NOTES")
     @Parameters({
-            @Parameter(name = "id", description = "ID", required = true, schema = @Schema(implementation = int.class))
+            @Parameter(name = "id", description = "TASK_GROUP_ID", required = true, schema = @Schema(implementation = int.class))
     })
     @PostMapping(value = "/start-task-group")
     @ResponseStatus(HttpStatus.CREATED)
@@ -256,9 +256,9 @@ public class TaskGroupController extends BaseController {
      * @param queueId   task group queue id
      * @return result
      */
-    @Operation(summary = "forceStart", description = "WAKE_TASK_COMPULSIVELY_NOTES")
+    @Operation(summary = "forceStart", description = "FORCE_START_TASK_GROUP")
     @Parameters({
-            @Parameter(name = "queueId", description = "TASK_GROUP_QUEUEID", required = true, schema = @Schema(implementation = int.class))
+            @Parameter(name = "queueId", description = "TASK_GROUP_QUEUE_ID", required = true, schema = @Schema(implementation = int.class))
     })
     @PostMapping(value = "/forceStart")
     @ResponseStatus(HttpStatus.CREATED)
@@ -277,9 +277,9 @@ public class TaskGroupController extends BaseController {
      * @param queueId   task group queue id
      * @return result
      */
-    @Operation(summary = "modifyPriority", description = "WAKE_TASK_COMPULSIVELY_NOTES")
+    @Operation(summary = "modifyPriority", description = "MODIFY_TASK_GROUP_PRIORITY")
     @Parameters({
-            @Parameter(name = "queueId", description = "TASK_GROUP_QUEUEID", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "queueId", description = "TASK_GROUP_QUEUE_ID", required = true, schema = @Schema(implementation = int.class)),
             @Parameter(name = "priority", description = "TASK_GROUP_QUEUE_PRIORITY", required = true, schema = @Schema(implementation = int.class))
     })
     @PostMapping(value = "/modifyPriority")
@@ -308,12 +308,12 @@ public class TaskGroupController extends BaseController {
      * @param pageSize    page size
      * @return queue list
      */
-    @Operation(summary = "queryTasksByGroupId", description = "QUERY_ALL_TASKS_NOTES")
+    @Operation(summary = "queryTasksByGroupId", description = "QUERY_ALL_TASKS_GROUP_NOTES")
     @Parameters({
             @Parameter(name = "groupId", description = "GROUP_ID", required = false, schema = @Schema(implementation = int.class, example = "1", defaultValue = "-1")),
             @Parameter(name = "taskInstanceName", description = "TASK_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "taskName")),
             @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "processName")),
-            @Parameter(name = "status", description = "STATUS", required = false, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "status", description = "TASK_GROUP_STATUS", required = false, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })

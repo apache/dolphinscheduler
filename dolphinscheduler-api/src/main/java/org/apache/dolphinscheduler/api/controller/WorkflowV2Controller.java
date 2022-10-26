@@ -56,7 +56,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * workflow controller
  */
-@Tag(name = "WORKFLOW_TAG")
+@Tag(name = "WORKFLOW_TAG_V2")
 @RestController
 @RequestMapping("/v2/workflows")
 public class WorkflowV2Controller extends BaseController {

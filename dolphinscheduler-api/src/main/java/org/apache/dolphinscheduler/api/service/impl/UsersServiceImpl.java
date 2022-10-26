@@ -1399,7 +1399,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             if (CollectionUtils.isNotEmpty(components)) {
                 for (ResourceComponent component : components) {
                     // verify whether exist
-                    if (!storageOperate.exists(oldTenantCode,
+                    if (!storageOperate.exists(
                             String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
                         logger.error("Resource file: {} does not exist, copy error.", component.getFullName());
                         throw new ServiceException(Status.RESOURCE_NOT_EXIST);
@@ -1414,8 +1414,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
                     if (CollectionUtils.isEmpty(component.getChildren())) {
                         // if not exist,need create it
-                        if (!storageOperate.exists(oldTenantCode,
-                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
+                        if (!storageOperate
+                                .exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
                             storageOperate.mkdir(newTenantCode,
                                     String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
                         }

@@ -15,20 +15,10 @@
  * limitations under the License.
  */
 
-.container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 64px;
-  border-bottom: 1px solid var(--n-border-color);
+package org.apache.dolphinscheduler.server.worker.config;
 
-  .nav {
-    margin-left: 12px;
-  }
-
-  .settings {
-    display: flex;
-    flex: 1;
-    justify-content: flex-end;
-  }
+public enum TaskExecuteThreadsFullPolicy {
+    CONTINUE,
+    REJECT,
+    ;
 }

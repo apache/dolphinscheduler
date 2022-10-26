@@ -28,5 +28,5 @@ public interface Visitor {
      * visit
      * @return resource component
      */
-    ResourceComponent visit();
+    ResourceComponent visit(String rootPath);
 }

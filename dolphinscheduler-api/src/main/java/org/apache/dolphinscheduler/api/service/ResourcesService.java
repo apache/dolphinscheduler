@@ -57,9 +57,8 @@ public interface ResourcesService {
      * @param loginUser login user
      * @param name alias
      * @param desc description
-     * @param file file
      * @param type type
-     * @param pid parent id
+     * @param file file
      * @param currentDir current directory
      * @return create result code
      */
@@ -68,7 +67,6 @@ public interface ResourcesService {
                                   String desc,
                                   ResourceType type,
                                   MultipartFile file,
-                                  int pid,
                                   String currentDir);
 
     boolean hasResourceAndWritePerm(User loginUser, Resource resource, Result<Object> result);
@@ -76,7 +74,6 @@ public interface ResourcesService {
     /**
      * update resource
      * @param loginUser     login user
-     * @param resourceId    resource id
      * @param name          name
      * @param desc          description
      * @param type          resource type
@@ -84,7 +81,8 @@ public interface ResourcesService {
      * @return  update result code
      */
     Result<Object> updateResource(User loginUser,
-                                  int resourceId,
+                                  String fullName,
+                                  String tenantCode,
                                   String name,
                                   String desc,
                                   ResourceType type,
@@ -100,8 +98,8 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo,
-                                   Integer pageSize);
+    Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
+                                   ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query resource list
@@ -110,7 +108,7 @@ public interface ResourcesService {
      * @param type resource type
      * @return resource list
      */
-    Map<String, Object> queryResourceList(User loginUser, ResourceType type);
+    Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName);
 
     /**
      * query resource list by program type
@@ -125,11 +123,10 @@ public interface ResourcesService {
      * delete resource
      *
      * @param loginUser login user
-     * @param resourceId resource id
      * @return delete result code
      * @throws IOException exception
      */
-    Result<Object> delete(User loginUser, int resourceId) throws IOException;
+    Result<Object> delete(User loginUser, String fullName, String tenantCode) throws IOException;
 
     /**
      * verify resource by name and type
@@ -141,23 +138,22 @@ public interface ResourcesService {
     Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser);
 
     /**
-     * verify resource by full name or pid and type
-     * @param fullName  resource full name
-     * @param id        resource id
+     * verify resource by file name
+     * @param fileName  resource file name
      * @param type      resource type
-     * @return true if the resource full name or pid not exists, otherwise return false
+     * @return true if the resource file name, otherwise return false
      */
-    Result<Object> queryResource(User loginUser, String fullName, Integer id, ResourceType type);
+    Result<Object> queryResourceByFileName(User loginUser, String fileName, ResourceType type, String resTenantCode);
 
     /**
      * view resource file online
      *
-     * @param resourceId resource id
      * @param skipLineNum skip line number
      * @param limit limit
+     * @param fullName fullName
      * @return resource content
      */
-    Result<Object> readResource(User loginUser, int resourceId, int skipLineNum, int limit);
+    Result<Object> readResource(User loginUser, String fullName, String tenantCode, int skipLineNum, int limit);
 
     /**
      * create resource file online
@@ -171,7 +167,7 @@ public interface ResourcesService {
      * @return create result code
      */
     Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                        String desc, String content, int pid, String currentDirectory);
+                                        String desc, String content, String currentDirectory);
 
     /**
      * create or update resource.
@@ -205,16 +201,16 @@ public interface ResourcesService {
      * @param content content
      * @return update result cod
      */
-    Result<Object> updateResourceContent(User loginUser, int resourceId, String content);
+    Result<Object> updateResourceContent(User loginUser, String fullName, String tenantCode,
+                                         String content);
 
     /**
      * download file
      *
-     * @param resourceId resource id
      * @return resource content
      * @throws IOException exception
      */
-    org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId) throws IOException;
+    org.springframework.core.io.Resource downloadResource(User loginUser, String fullName) throws IOException;
 
     /**
      * list all file
@@ -281,9 +277,11 @@ public interface ResourcesService {
 
     /**
      * get resource by id
-     * @param resourceId resource id
+     * @param fullName resource full name
+     * @param tenantCode owner's tenant code of resource
      * @return resource
      */
-    Result<Object> queryResourceById(User loginUser, Integer resourceId);
+    Result<Object> queryResourceByFullName(User loginUser, String fullName, String tenantCode,
+                                           ResourceType type) throws IOException;
 
 }
