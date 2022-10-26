@@ -60,6 +60,8 @@ public class WorkerConfig implements Validator {
     private String workerAddress;
     private String workerRegistryPath;
 
+    private TaskExecuteThreadsFullPolicy taskExecuteThreadsFullPolicy = TaskExecuteThreadsFullPolicy.REJECT;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return WorkerConfig.class.isAssignableFrom(clazz);
@@ -97,5 +99,6 @@ public class WorkerConfig implements Validator {
         logger.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
         logger.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
         logger.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
+        logger.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
     }
 }
