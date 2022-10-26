@@ -141,6 +141,20 @@
             </foreach>
         </if>
     </select>
+    <select id="listUdfByResourceFullName" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
+        where 1=1
+        <if test="resourceFullNames != null and resourceFullNames.length > 0">
+            and udf.resource_name in
+            <foreach collection="resourceFullNames" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
     <select id="listAuthorizedUdfByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select
         <include refid="baseSql">

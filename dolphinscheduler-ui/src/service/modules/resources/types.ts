@@ -36,6 +36,10 @@ interface FileNameReq {
   fileName: string
 }
 
+interface TenantCodeReq{
+  tenantCode: string
+}
+
 interface FullNameReq {
   fullName: string
 }
@@ -80,11 +84,7 @@ interface ViewResourceReq {
   skipLineNum: number
 }
 
-interface ResourceIdReq {
-  resourceId: number
-}
-
-interface UdfFuncReq extends UdfTypeReq, DescriptionReq, ResourceIdReq {
+interface UdfFuncReq extends UdfTypeReq, DescriptionReq, FullNameReq {
   className: string
   funcName: string
   argTypes?: string
@@ -126,6 +126,7 @@ export {
   NameReq,
   FileNameReq,
   FullNameReq,
+  TenantCodeReq,
   IdReq,
   ContentReq,
   DescriptionReq,
@@ -135,7 +136,6 @@ export {
   ProgramTypeReq,
   ListReq,
   ViewResourceReq,
-  ResourceIdReq,
   UdfFuncReq,
   ResourceListRes,
   ResourceViewRes,

@@ -572,9 +572,7 @@ public class SqlTask extends AbstractTask {
             String prefixPath = defaultFS.startsWith("file://") ? "file://" : defaultFS;
             String uploadPath = CommonUtils.getHdfsUdfDir(value.getTenantCode());
             String resourceFullName = value.getResourceName();
-            resourceFullName =
-                    resourceFullName.startsWith("/") ? resourceFullName : String.format("/%s", resourceFullName);
-            return String.format("add jar %s%s%s", prefixPath, uploadPath, resourceFullName);
+            return String.format("add jar %s", resourceFullName);
         }).collect(Collectors.toList());
     }
 

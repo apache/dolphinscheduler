@@ -50,7 +50,9 @@ export default defineComponent({
 
     const requestData = () => {
       getTableData({
-        id: variables.id,
+        id: -1,
+        fullName: variables.fullName,
+        tenantCode: variables.tenantCode,
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal
@@ -88,7 +90,7 @@ export default defineComponent({
       let breadName = ''
       variables.breadList.forEach((item, i) => {
         if (i <= index) {
-          breadName = breadName + '/' + item
+          breadName = breadName === "" ? item.toString() : breadName + '/' + item.toString();
         }
       })
       goBread(breadName)

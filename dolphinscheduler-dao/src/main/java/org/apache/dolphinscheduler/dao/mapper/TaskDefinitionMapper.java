@@ -75,7 +75,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     List<DefinitionGroupByUser> countDefinitionGroupByUser(@Param("projectCodes") Long[] projectCodes);
 
     /**
-     * list all resource ids
+     * list all resource ids and task_params containing resourceList
      *
      * @return task ids list
      */

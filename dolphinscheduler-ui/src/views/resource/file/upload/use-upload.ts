@@ -17,14 +17,11 @@
 
 import { useI18n } from 'vue-i18n'
 import { IEmit } from '../types'
-import { useRouter } from 'vue-router'
-import type { Router } from 'vue-router'
 import { useFileStore } from '@/store/file/file'
 import { createResource } from '@/service/modules/resources'
 
 export function useUpload(state: any) {
   const { t } = useI18n()
-  const router: Router = useRouter()
   const fileStore = useFileStore()
 
   const handleUploadFile = async (
@@ -37,13 +34,12 @@ export function useUpload(state: any) {
     if (state.saving) return
     state.saving = true
     try {
-      const pid = router.currentRoute.value.params.id || -1
+      // no more pid, as currentDir acts as the pid or parent path right now.
       const currentDir = fileStore.getCurrentDir || '/'
       const formData = new FormData()
       formData.append('file', state.uploadForm.file)
       formData.append('type', 'FILE')
       formData.append('name', state.uploadForm.name)
-      formData.append('pid', String(pid))
       formData.append('currentDir', currentDir)
       formData.append('description', state.uploadForm.description)
 

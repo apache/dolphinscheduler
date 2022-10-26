@@ -35,18 +35,17 @@ public interface UdfFuncService {
      * @param argTypes argument types
      * @param database database
      * @param desc description
-     * @param resourceId resource id
      * @param className class name
      * @return create result code
      */
     Result<Object> createUdfFunction(User loginUser,
                                      String funcName,
                                      String className,
+                                     String fullName,
                                      String argTypes,
                                      String database,
                                      String desc,
-                                     UdfType type,
-                                     int resourceId);
+                                     UdfType type);
 
     /**
      * query udf function
@@ -66,6 +65,7 @@ public interface UdfFuncService {
      * @param database data base
      * @param desc description
      * @param resourceId resource id
+     * @param fullName resource full name
      * @param className class name
      * @return update result code
      */
@@ -77,7 +77,7 @@ public interface UdfFuncService {
                                  String database,
                                  String desc,
                                  UdfType type,
-                                 int resourceId);
+                                 String fullName);
 
     /**
      * query udf function list paging

@@ -38,7 +38,6 @@ public interface ResourcePermissionCheckService<T> {
      * @param authorizationType
      * @param userId
      * @param logger
-     * @param <T>
      * @return
      */
     Set<T> userOwnedResourceIdsAcquisition(Object authorizationType, Integer userId, Logger logger);

@@ -43,7 +43,9 @@ export function useTable() {
     tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
+    // here is id not prefix because udf function is still stored in db
     id: ref(Number(router.currentRoute.value.params.id) || -1),
+    fullName: ref(String(router.currentRoute.value.query.prefix || "")),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
@@ -129,7 +131,7 @@ export function useTable() {
                 NPopconfirm,
                 {
                   onPositiveClick: () => {
-                    handleDelete(row.id)
+                    handleDelete(row.id, row.fullName)
                   }
                 },
                 {
@@ -188,14 +190,15 @@ export function useTable() {
     variables.row = row
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: number, fullName: string) => {
     /* after deleting data from the current page, you need to jump forward when the page is empty. */
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
 
-    deleteUdfFunc(id).then(() =>
+    deleteUdfFunc(id, {fullName: fullName}).then(() =>
       getTableData({
+        fullName: variables.fullName,
         id: variables.id,
         pageSize: variables.pageSize,
         pageNo: variables.page,

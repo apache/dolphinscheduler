@@ -28,16 +28,14 @@ export function useRename(state: any) {
     resetForm: () => void
   ) => {
     await state.renameFormRef.validate()
-
     if (state.saving) return
     state.saving = true
-
     try {
       await updateResource(
         {
-          ...state.renameForm
-        },
-        state.renameForm.id
+          ...state.renameForm,
+          tenantCode: state.renameForm.user_name,
+        }
       )
       window.$message.success(t('resource.file.success'))
       state.saving = false

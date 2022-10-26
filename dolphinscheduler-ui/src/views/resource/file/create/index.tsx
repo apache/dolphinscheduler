@@ -49,9 +49,7 @@ export default defineComponent({
     }
 
     const handleReturn = () => {
-      const { id } = router.currentRoute.value.params
-      const name = id ? 'resource-file-subdirectory' : 'file'
-      router.push({ name, params: { id } })
+      router.go(-1)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim

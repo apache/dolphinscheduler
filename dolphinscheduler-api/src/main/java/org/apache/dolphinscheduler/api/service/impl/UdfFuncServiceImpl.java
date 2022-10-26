@@ -25,15 +25,16 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -66,6 +67,9 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     @Autowired
     private UDFUserMapper udfUserMapper;
 
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
+
     /**
      * create udf function
      *
@@ -75,7 +79,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param argTypes argument types
      * @param database database
      * @param desc description
-     * @param resourceId resource id
      * @param className class name
      * @return create result code
      */
@@ -84,11 +87,11 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     public Result<Object> createUdfFunction(User loginUser,
                                             String funcName,
                                             String className,
+                                            String fullName,
                                             String argTypes,
                                             String database,
                                             String desc,
-                                            UdfType type,
-                                            int resourceId) {
+                                            UdfType type) {
         Result<Object> result = new Result<>();
 
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
@@ -117,9 +120,15 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             return result;
         }
 
-        Resource resource = resourceMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
+        Boolean existResource = false;
+        try {
+            existResource = storageOperate.exists(fullName);
+        } catch (IOException e) {
+            logger.error("Check resource error: {}", fullName, e);
+        }
+
+        if (!existResource) {
+            logger.error("resource full name {} is not exist", fullName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -137,8 +146,9 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             udf.setDatabase(database);
         }
         udf.setDescription(desc);
-        udf.setResourceId(resourceId);
-        udf.setResourceName(resource.getFullName());
+        // set resourceId to -1 because we do not store resource to db anymore, instead we use fullName
+        udf.setResourceId(-1);
+        udf.setResourceName(fullName);
         udf.setType(type);
 
         udf.setCreateTime(now);
@@ -178,7 +188,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
-            logger.error("Resource does not exist, resourceId:{}.", id);
+            logger.error("Resource does not exist, udf func id:{}.", id);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -196,7 +206,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param argTypes argument types
      * @param database data base
      * @param desc description
-     * @param resourceId resource id
+     * @param fullName resource full name
      * @param className class name
      * @return update result code
      */
@@ -209,7 +219,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
                                         String database,
                                         String desc,
                                         UdfType type,
-                                        int resourceId) {
+                                        String fullName) {
         Result<Object> result = new Result<>();
 
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{udfFuncId},
@@ -251,13 +261,23 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             }
         }
 
-        Resource resource = resourceMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
+        Boolean doesResExist = false;
+        try {
+            doesResExist = storageOperate.exists(fullName);
+        } catch (Exception e) {
+            logger.error("udf resource checking error", fullName);
             result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
             result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
             return result;
         }
+
+        if (!doesResExist) {
+            logger.error("resource full name {} is not exist", fullName);
+            result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
+            result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
+            return result;
+        }
+
         Date now = new Date();
         udf.setFuncName(funcName);
         udf.setClassName(className);
@@ -266,8 +286,9 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             udf.setDatabase(database);
         }
         udf.setDescription(desc);
-        udf.setResourceId(resourceId);
-        udf.setResourceName(resource.getFullName());
+        // set resourceId to -1 because we do not store resource to db anymore, instead we use fullName
+        udf.setResourceId(-1);
+        udf.setResourceName(fullName);
         udf.setType(type);
 
         udf.setUpdateTime(now);

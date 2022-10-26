@@ -168,7 +168,7 @@
     </select>
 
     <select id="listResources" resultType="java.util.HashMap">
-        SELECT distinct pd.code,td.resource_ids
+        SELECT distinct pd.code, td.id as td_id, td.resource_ids
         FROM t_ds_process_task_relation ptr
         join t_ds_process_definition pd
             on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
@@ -180,7 +180,7 @@
     </select>
 
     <select id="listResourcesByUser" resultType="java.util.HashMap">
-        SELECT distinct pd.code,td.resource_ids
+        SELECT distinct pd.code, td.id as td_id, td.resource_ids
         FROM t_ds_process_task_relation ptr
         join t_ds_process_definition pd
             on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version

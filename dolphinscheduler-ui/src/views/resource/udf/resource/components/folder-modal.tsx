@@ -60,7 +60,7 @@ export default defineComponent({
     }
 
     const handleRename = () => {
-      handleRenameResource(props.row.id)
+      handleRenameResource(props.row.fullName)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -72,7 +72,7 @@ export default defineComponent({
         state.folderForm.description = props.row.description
       }
     )
-    const fileEdit = computed(() => props.row.id && !props.row.directory)
+    const fileEdit = computed(() => props.row.fullName && !props.row.directory)
 
     return {
       fileEdit,
@@ -90,10 +90,10 @@ export default defineComponent({
       <Modal
         show={this.$props.show}
         title={
-          this.row.id ? t('resource.udf.edit') : t('resource.udf.create_folder')
+          this.row.fullName ? t('resource.udf.edit') : t('resource.udf.create_folder')
         }
         onCancel={this.hideModal}
-        onConfirm={this.row.id ? this.handleRename : this.handleCreate}
+        onConfirm={this.row.fullName ? this.handleRename : this.handleCreate}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}

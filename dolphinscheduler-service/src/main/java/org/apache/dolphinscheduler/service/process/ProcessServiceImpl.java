@@ -69,6 +69,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -97,6 +98,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -142,9 +144,11 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -228,6 +232,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ResourceMapper resourceMapper;
+
+    @Autowired
+    private ResourceTaskMapper resourceTaskMapper;
 
     @Autowired
     private ResourceUserMapper resourceUserMapper;
@@ -1376,7 +1383,7 @@ public class ProcessServiceImpl implements ProcessService {
                 ResourceInfo mainJar = JSONUtils.parseObject(
                         JSONUtils.toJsonString(mainJarObj),
                         ResourceInfo.class);
-                ResourceInfo resourceInfo = updateResourceInfo(mainJar);
+                ResourceInfo resourceInfo = updateResourceInfo(taskDefinition.getId(), mainJar);
                 if (resourceInfo != null) {
                     taskParameters.put("mainJar", resourceInfo);
                 }
@@ -1387,7 +1394,7 @@ public class ProcessServiceImpl implements ProcessService {
                 List<ResourceInfo> resourceInfos = JSONUtils.toList(resourceListStr, ResourceInfo.class);
                 List<ResourceInfo> updatedResourceInfos = resourceInfos
                         .stream()
-                        .map(this::updateResourceInfo)
+                        .map(resourceInfo -> updateResourceInfo(taskDefinition.getId(), resourceInfo))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList());
                 taskParameters.put("resourceList", updatedResourceInfos);
@@ -1403,21 +1410,23 @@ public class ProcessServiceImpl implements ProcessService {
      * @param res origin resource info
      * @return {@link ResourceInfo}
      */
-    protected ResourceInfo updateResourceInfo(ResourceInfo res) {
+    protected ResourceInfo updateResourceInfo(int task_id, ResourceInfo res) {
         ResourceInfo resourceInfo = null;
-        // only if mainJar is not null and does not contains "resourceName" field
+        // only if mainJar is not null and does not contain "resourceName" field
         if (res != null) {
-            Integer resourceId = res.getId();
-            if (resourceId == null) {
-                logger.error("invalid resourceId, {}", resourceId);
-                return null;
+            String resourceFullName = res.getResourceName();
+            if (StringUtils.isBlank(resourceFullName)) {
+                logger.error("invalid resource full name, {}", resourceFullName);
+                return new ResourceInfo();
             }
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
-            Resource resource = getResourceById(resourceId);
-            resourceInfo.setId(resourceId);
-            resourceInfo.setRes(resource.getFileName());
-            resourceInfo.setResourceName(resource.getFullName());
+            Integer resultList = resourceTaskMapper.existResourceByTaskIdNFullName(task_id, resourceFullName);
+            if (resultList != null) {
+                resourceInfo.setId(resultList);
+                resourceInfo.setRes(res.getRes());
+                resourceInfo.setResourceName(resourceFullName);
+            }
             if (logger.isInfoEnabled()) {
                 logger.info("updated resource info {}",
                         JSONUtils.toJsonString(resourceInfo));
@@ -2033,7 +2042,6 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setUpdateTime(now);
             taskDefinitionLog.setOperateTime(now);
             taskDefinitionLog.setOperator(operator.getId());
-            taskDefinitionLog.setResourceIds(getResourceIds(taskDefinitionLog));
             if (taskDefinitionLog.getCode() == 0) {
                 taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
             }
@@ -2074,6 +2082,8 @@ public class ProcessServiceImpl implements ProcessService {
                 TaskDefinition task = taskDefinitionMap.get(taskDefinitionToUpdate.getCode());
                 if (task == null) {
                     newTaskDefinitionLogs.add(taskDefinitionToUpdate);
+                } else {
+                    taskDefinitionToUpdate.setId(task.getId());
                 }
             }
         }
@@ -2091,9 +2101,42 @@ public class ProcessServiceImpl implements ProcessService {
 
         if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
+
+            for (TaskDefinitionLog newTaskDefinitionLog : newTaskDefinitionLogs) {
+                Set<String> resourceFullNameSet = getResourceFullNames(newTaskDefinitionLog);
+                for (String resourceFullName : resourceFullNameSet) {
+                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
+                            Collections.singletonMap("code", newTaskDefinitionLog.getCode()));
+                    if (taskDefinitionList.size() > 0) {
+                        createRelationTaskResourcesIfNotExist(
+                                taskDefinitionList.get(0).getId(), resourceFullName);
+                    }
+                }
+            }
+
         }
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             for (TaskDefinitionLog taskDefinitionLog : updateTaskDefinitionLogs) {
+                Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionLog);
+
+                // remove resources that user deselected.
+                for (ResourcesTask resourcesTask : resourceTaskMapper.selectByMap(
+                        Collections.singletonMap("task_id",
+                                taskDefinitionMapper.queryByCode(taskDefinitionLog.getCode()).getId()))) {
+                    if (!resourceFullNameSet.contains(resourcesTask.getFullName())) {
+                        resourceTaskMapper.deleteById(resourcesTask.getId());
+                    }
+                }
+
+                for (String resourceFullName : resourceFullNameSet) {
+                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
+                            Collections.singletonMap("code", taskDefinitionLog.getCode()));
+                    if (taskDefinitionList.size() > 0) {
+                        createRelationTaskResourcesIfNotExist(
+                                taskDefinitionList.get(0).getId(), resourceFullName);
+                    }
+                }
+
                 updateResult += taskDefinitionMapper.updateById(taskDefinitionLog);
             }
         }
@@ -2681,5 +2724,37 @@ public class ProcessServiceImpl implements ProcessService {
         if (testDataSourceId != null)
             return testDataSourceId;
         return null;
+    }
+
+    private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
+        Set<String> resourceFullNames = null;
+        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder()
+                .taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
+
+        if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
+            resourceFullNames = params.getResourceFilesList().stream()
+                    .filter(t -> !StringUtils.isBlank(t.getResourceName()))
+                    .map(ResourceInfo::getResourceName)
+                    .collect(toSet());
+        }
+
+        if (CollectionUtils.isEmpty(resourceFullNames)) {
+            return new HashSet<String>();
+        }
+
+        return resourceFullNames;
+    }
+
+    private Integer createRelationTaskResourcesIfNotExist(int taskId, String resourceFullName) {
+
+        Integer resourceId = resourceTaskMapper.existResourceByTaskIdNFullName(taskId, resourceFullName);
+        if (null == resourceId) {
+            // create the relation if not exist
+            ResourcesTask resourcesTask = new ResourcesTask(taskId, resourceFullName, ResourceType.FILE);
+            resourceTaskMapper.insert(resourcesTask);
+            return resourcesTask.getId();
+        }
+
+        return resourceId;
     }
 }

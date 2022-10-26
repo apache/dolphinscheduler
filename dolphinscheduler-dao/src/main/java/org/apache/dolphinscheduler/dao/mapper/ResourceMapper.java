@@ -54,7 +54,6 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     /**
      * resource page
      * @param page page
-     * @param userId userId
      * @param id id
      * @param type type
      * @param searchVal searchVal
