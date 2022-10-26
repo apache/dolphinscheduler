@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;

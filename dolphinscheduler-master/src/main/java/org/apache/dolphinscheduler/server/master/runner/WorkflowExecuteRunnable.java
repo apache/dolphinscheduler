@@ -17,20 +17,22 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_FATHER_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -76,6 +78,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -126,6 +129,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteRunnable.class);
 
     private final ProcessService processService;
+
+    private final CommandService commandService;
 
     private ProcessInstanceDao processInstanceDao;
 
@@ -233,6 +238,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public WorkflowExecuteRunnable(
                                    @NonNull ProcessInstance processInstance,
+                                   @NonNull CommandService commandService,
                                    @NonNull ProcessService processService,
                                    @NonNull ProcessInstanceDao processInstanceDao,
                                    @NonNull NettyExecutorManager nettyExecutorManager,
@@ -241,6 +247,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                                    @NonNull StateWheelExecuteThread stateWheelExecuteThread,
                                    @NonNull CuringParamsService curingParamsService) {
         this.processService = processService;
+        this.commandService = commandService;
         this.processInstanceDao = processInstanceDao;
         this.processInstance = processInstance;
         this.nettyExecutorManager = nettyExecutorManager;
@@ -628,18 +635,18 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setCommandType(CommandType.COMPLEMENT_DATA);
         command.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+        if (cmdParam.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
+            cmdParam.remove(CMD_PARAM_RECOVERY_START_NODE_STRING);
         }
 
-        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,
-                    cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)
-                            .substring(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).indexOf(COMMA) + 1));
+        if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+            cmdParam.replace(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,
+                    cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)
+                            .substring(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).indexOf(COMMA) + 1));
         }
 
-        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE,
+        if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)) {
+            cmdParam.replace(CMD_PARAM_COMPLEMENT_DATA_START_DATE,
                     DateUtils.format(scheduleDate, YYYY_MM_DD_HH_MM_SS, null));
         }
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
@@ -657,7 +664,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         command.setTestFlag(processInstance.getTestFlag());
-        return processService.createCommand(command);
+        return commandService.createCommand(command);
     }
 
     private boolean needComplementProcess() {
@@ -750,7 +757,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessDefinitionCode(processDefinition.getCode());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-        processService.createCommand(command);
+        commandService.createCommand(command);
     }
 
     /**
@@ -875,10 +882,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
                 Date start = null;
                 Date end = null;
-                if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)
-                        && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_END_DATE)) {
-                    start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-                    end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+                if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)
+                        && cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_END_DATE)) {
+                    start = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE));
+                    end = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
                 }
                 if (complementListDate.isEmpty() && needComplementProcess()) {
                     if (start != null && end != null) {
@@ -886,7 +893,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                                 processInstance.getProcessDefinitionCode());
                         complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
                     }
-                    if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+                    if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
                         complementListDate = CronUtils.getSelfScheduleDateList(cmdParam);
                     }
                     logger.info(" process definition code:{} complement data: {}",
@@ -1643,7 +1650,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
 
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        Date endTime = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        Date endTime = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
         return processInstance.getScheduleTime().equals(endTime);
     }
 
@@ -1996,13 +2003,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam) {
         // get start params from command param
         Map<String, String> startParamMap = new HashMap<>();
-        if (cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
-            String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
+        if (cmdParam.containsKey(CMD_PARAM_START_PARAMS)) {
+            String startParamJson = cmdParam.get(CMD_PARAM_START_PARAMS);
             startParamMap = JSONUtils.toMap(startParamJson);
         }
         Map<String, String> fatherParamMap = new HashMap<>();
-        if (cmdParam.containsKey(Constants.CMD_PARAM_FATHER_PARAMS)) {
-            String fatherParamJson = cmdParam.get(Constants.CMD_PARAM_FATHER_PARAMS);
+        if (cmdParam.containsKey(CMD_PARAM_FATHER_PARAMS)) {
+            String fatherParamJson = cmdParam.get(CMD_PARAM_FATHER_PARAMS);
             fatherParamMap = JSONUtils.toMap(fatherParamJson);
         }
         startParamMap.putAll(fatherParamMap);

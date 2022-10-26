@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
