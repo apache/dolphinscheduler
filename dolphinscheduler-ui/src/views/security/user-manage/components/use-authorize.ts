@@ -76,8 +76,6 @@ export function useAuthorize() {
     userId: 0
   })
 
-  const onOperationClick = ( ) => { }
-
   const getProjects = async (userId: number) => {
     if (state.loading) return
     state.loading = true
@@ -278,9 +276,6 @@ export function useAuthorize() {
   const onSave = async (type: TAuthType, userId: number) => {
     if (state.saving) return false
     state.saving = true
-    if (type === 'authorize_project') {
-
-    }
     if (type === 'authorize_datasource') {
       await grantDataSource({
         userId,
@@ -372,5 +367,5 @@ export function useAuthorize() {
     return true
   }
 
-  return { state, onInit, onSave, onOperationClick, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize }
+  return { state, onInit, onSave, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize }
 }
