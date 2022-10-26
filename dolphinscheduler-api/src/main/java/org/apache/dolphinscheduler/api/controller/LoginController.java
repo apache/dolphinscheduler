@@ -39,7 +39,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +64,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("")
 public class LoginController extends BaseController {
+
+    private static Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private SessionService sessionService;
@@ -100,7 +107,7 @@ public class LoginController extends BaseController {
         }
 
         // verify username and password
-        Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip);
+        Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip, null);
         if (result.getCode() != Status.SUCCESS.getCode()) {
             return result;
         }
@@ -115,6 +122,7 @@ public class LoginController extends BaseController {
 
         return result;
     }
+
 
     /**
      * sign out

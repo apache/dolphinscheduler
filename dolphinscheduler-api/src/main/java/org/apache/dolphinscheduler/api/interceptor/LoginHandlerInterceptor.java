@@ -62,11 +62,14 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        logger.info("[debug111] preHandle starts...");
         // get token
+        logger.info("[debug111] request header: {}", request.getHeaderNames());
         String token = request.getHeader("token");
         User user;
         if (StringUtils.isEmpty(token)) {
             user = authenticator.getAuthUser(request);
+            logger.info("[debug111] preHandle, user: {}", user);
             // if user is null
             if (user == null) {
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
@@ -81,6 +84,8 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
                 return false;
             }
         }
+
+        logger.info("[debug111] pre handle debug 1");
 
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {

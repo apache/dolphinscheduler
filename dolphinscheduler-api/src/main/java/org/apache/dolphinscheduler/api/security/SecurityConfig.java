@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
+import org.apache.dolphinscheduler.api.security.impl.oauth2.GoogleOAuth2Authenticator;
 import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,8 +30,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
+// public class SecurityConfig extends WebSecurityConfigurerAdapter {
 public class SecurityConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
@@ -67,11 +73,62 @@ public class SecurityConfig {
             case LDAP:
                 authenticator = new LdapAuthenticator();
                 break;
+            case OAUTH2:
+                logger.info("[debug111] initializing oauth2 authenticator");
+                authenticator = new GoogleOAuth2Authenticator();
+                break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);
         }
         beanFactory.autowireBean(authenticator);
         return authenticator;
+    }
+
+    // @Override
+    // protected void configure(HttpSecurity http) throws Exception {
+//        // @formatter:off
+//        http
+//                .authorizeRequests(a -> a
+//                        .antMatchers("/", "/error", "/webjars/**").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .exceptionHandling(e -> e
+//                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+//                )
+//                .csrf(c -> c
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                )
+//                .logout(l -> l
+//                        .logoutSuccessUrl("/").permitAll()
+//                )
+//                .oauth2Login();
+//        // @formatter:on
+    // }
+
+    // @Bean
+    // public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    // logger.info("[debug111] insdie filterChain...");
+    // http
+    // .authorizeRequests(a -> a
+    // .antMatchers("/**", "/ui/**", "/error", "/webjars/**").permitAll()
+    // .anyRequest().authenticated())
+    // .exceptionHandling(e -> e
+    // .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+    // .csrf(c -> c
+    // .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+    // .logout(l -> l
+    // .logoutSuccessUrl("/").permitAll())
+    // .oauth2Login();
+    // return http.build();
+    // }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .oauth2Login();
+        return http.build();
     }
 
     public String getType() {

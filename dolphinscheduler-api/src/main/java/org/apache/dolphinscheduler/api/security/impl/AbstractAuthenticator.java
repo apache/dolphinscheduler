@@ -58,10 +58,10 @@ public abstract class AbstractAuthenticator implements Authenticator {
      * @param extra extra user login field
      * @return user object in databse
      */
-    public abstract User login(String userId, String password, String extra);
+    public abstract User login(String userId, String password, Object extra);
 
     @Override
-    public Result<Map<String, String>> authenticate(String userId, String password, String extra) {
+    public Result<Map<String, String>> authenticate(String userId, String password, String ip, Object extra) {
         Result<Map<String, String>> result = new Result<>();
         User user = login(userId, password, extra);
         if (user == null) {
@@ -80,7 +80,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
         }
 
         // create session
-        String sessionId = sessionService.createSession(user, extra);
+        String sessionId = sessionService.createSession(user, ip);
         if (sessionId == null) {
             logger.error("Failed to create session, userName:{}.", user.getUserName());
             result.setCode(Status.LOGIN_SESSION_FAILED.getCode());
@@ -92,6 +92,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
 
         Map<String, String> data = new HashMap<>();
         data.put(Constants.SESSION_ID, sessionId);
+        data.put(Constants.SESSION_USER, user.getUserName());
         data.put(Constants.SECURITY_CONFIG_TYPE, securityConfig.getType());
 
         result.setData(data);

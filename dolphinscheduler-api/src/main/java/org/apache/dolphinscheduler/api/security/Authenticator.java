@@ -33,7 +33,7 @@ public interface Authenticator {
      * @param extra extra info
      * @return result object
      */
-    Result<Map<String, String>> authenticate(String username, String password, String extra);
+    Result<Map<String, String>> authenticate(String username, String password, String ip, Object extra);
 
     /**
      * Get authenticated user

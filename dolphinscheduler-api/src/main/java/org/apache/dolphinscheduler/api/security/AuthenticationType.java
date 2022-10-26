@@ -26,6 +26,7 @@ public enum AuthenticationType {
 
     PASSWORD(0, "verify via user name and password"),
     LDAP(1, "verify via LDAP server"),
+    OAUTH2(2, "verify via OAuth2 provider"),
     ;
 
     AuthenticationType(int code, String desc) {

@@ -28,7 +28,7 @@ public class LdapAuthenticator extends AbstractAuthenticator {
     LdapService ldapService;
 
     @Override
-    public User login(String userId, String password, String extra) {
+    public User login(String userId, String password, Object extra) {
         User user = null;
         String ldapEmail = ldapService.ldapLogin(userId, password);
         if (ldapEmail != null) {

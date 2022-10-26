@@ -111,24 +111,24 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
         // test username pwd correct and user not exist, config user not exist action deny, so login denied
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.DENY);
         when(ldapService.createIfUserNotExists()).thenReturn(false);
-        Result<Map<String, String>> result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Result<Map<String, String>> result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip, null);
         Assertions.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
 
         // test username pwd correct and user not exist, config user not exist action create, so login success
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.CREATE);
         when(ldapService.createIfUserNotExists()).thenReturn(true);
-        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip, null);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
         // test username pwd correct and user not exist, config action create but can't create session, so login failed
         when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(null);
-        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip, null);
         Assertions.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
 
         // test username pwd error, login failed
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(null);
-        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip, null);
         Assertions.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
     }
 

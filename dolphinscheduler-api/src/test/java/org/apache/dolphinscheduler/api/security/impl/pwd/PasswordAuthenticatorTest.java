@@ -89,14 +89,14 @@ public class PasswordAuthenticatorTest extends AbstractControllerTest {
     public void testAuthenticate() {
         when(usersService.queryUser("test", "test")).thenReturn(mockUser);
         when(sessionService.createSession(mockUser, "127.0.0.1")).thenReturn(mockSession.getId());
-        Result result = authenticator.authenticate("test", "test", "127.0.0.1");
+        Result result = authenticator.authenticate("test", "test", "127.0.0.1", null);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
         mockUser.setState(0);
         when(usersService.queryUser("test", "test")).thenReturn(mockUser);
         when(sessionService.createSession(mockUser, "127.0.0.1")).thenReturn(mockSession.getId());
-        Result result1 = authenticator.authenticate("test", "test", "127.0.0.1");
+        Result result1 = authenticator.authenticate("test", "test", "127.0.0.1", null);
         Assertions.assertEquals(Status.USER_DISABLED.getCode(), (int) result1.getCode());
         logger.info(result1.toString());
     }
