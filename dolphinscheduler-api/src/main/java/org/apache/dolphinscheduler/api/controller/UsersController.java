@@ -222,16 +222,16 @@ public class UsersController extends BaseController {
      * @param projectIds project id array
      * @return revoke result code
      */
-    @ApiOperation(value = "revokeProjectById", notes = "REVOKE_PROJECT_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS", required = true, type = "String")
+    @Operation(summary = "revokeProjectById", description = "REVOKE_PROJECT_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectIds", description = "PROJECT_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/revoke-project-by-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(REVOKE_PROJECT_ERROR)
     @AccessLogAnnotation
-    public Result revokeProjectById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result revokeProjectById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "userId") int userId,
                                     @RequestParam(value = "projectIds") String projectIds) {
         Map<String, Object> result = usersService.revokeProjectById(loginUser, userId, projectIds);
@@ -246,16 +246,16 @@ public class UsersController extends BaseController {
      * @param projectIds project id array
      * @return grant result code
      */
-    @ApiOperation(value = "grantProjectWithReadPerm", notes = "GRANT_PROJECT_WITH_READ_PERM_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS", required = true, type = "String")
+    @Operation(summary = "grantProjectWithReadPerm", description = "GRANT_PROJECT_WITH_READ_PERM_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectIds", description = "PROJECT_IDS", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/grant-project-with-read-perm")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GRANT_PROJECT_ERROR)
     @AccessLogAnnotation
-    public Result grantProjectWithReadPerm(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result grantProjectWithReadPerm(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "userId") int userId,
                                            @RequestParam(value = "projectIds") String projectIds) {
         Map<String, Object> result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
@@ -343,17 +343,17 @@ public class UsersController extends BaseController {
      * @param allPermResourceIds resource id array with all permission
      * @return grant result code
      */
-    @ApiOperation(value = "grantResourceWithPermLevel", notes = "GRANT_RESOURCE_WITH_PERM_LEVEL_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "readPermResourceIds", value = "READ_PERM_RESOURCE_IDS", required = true, type = "String"),
-            @ApiImplicitParam(name = "allPermResourceIds", value = "ALL_PERM_RESOURCE_IDS", required = true, type = "String")
+    @Operation(summary = "grantResourceWithPermLevel", description = "GRANT_RESOURCE_WITH_PERM_LEVEL_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "readPermResourceIds", description = "READ_PERM_RESOURCE_IDS", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "allPermResourceIds", description = "ALL_PERM_RESOURCE_IDS", schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/grant-file-with-perm-level")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GRANT_RESOURCE_ERROR)
     @AccessLogAnnotation
-    public Result grantResourceWithPermLevel(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result grantResourceWithPermLevel(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam(value = "userId") int userId,
                                              @RequestParam(value = "readPermResourceIds") String readPermResourceIds,
                                              @RequestParam(value = "allPermResourceIds") String allPermResourceIds) {

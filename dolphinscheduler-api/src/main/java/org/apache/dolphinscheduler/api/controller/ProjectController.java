@@ -184,18 +184,18 @@ public class ProjectController extends BaseController {
      * @param pageNo page number
      * @return project list which with the login user's authorized level
      */
-    @ApiOperation(value = "queryProjectWithAuthorizedLevelListPaging", notes = "QUERY_PROJECT_WITH_AUTH_LEVEL_LIST_PAGING_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "10"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
+    @Operation(summary = "queryProjectWithAuthorizedLevelListPaging", description = "QUERY_PROJECT_WITH_AUTH_LEVEL_LIST_PAGING_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1"))
     })
     @GetMapping(value = "/project-with-authorized-level-list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProjectWithAuthorizedLevelListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryProjectWithAuthorizedLevelListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                             @RequestParam("userId") Integer userId,
                                                             @RequestParam(value = "searchVal", required = false) String searchVal,
                                                             @RequestParam("pageSize") Integer pageSize,
@@ -278,15 +278,15 @@ public class ProjectController extends BaseController {
      * @param userId user id
      * @return All projects with users' authorized level for them
      */
-    @ApiOperation(value = "queryProjectWithAuthorizedLevel", notes = "QUERY_PROJECT_AUTHORIZED_LEVEL")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType = "Int", example = "100")
+    @Operation(summary = "queryProjectWithAuthorizedLevel", description = "QUERY_PROJECT_AUTHORIZED_LEVEL")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/project-with-authorized-level")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProjectWithAuthorizedLevel(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryProjectWithAuthorizedLevel(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestParam("userId") Integer userId) {
         return projectService.queryProjectWithAuthorizedLevel(loginUser, userId);
     }

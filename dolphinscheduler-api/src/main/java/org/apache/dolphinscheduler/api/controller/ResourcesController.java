@@ -652,15 +652,15 @@ public class ResourcesController extends BaseController {
      * @param userId user id
      * @return authorized result
      */
-    @ApiOperation(value = "authorizedFileWithReadPerm", notes = "AUTHORIZED_FILE_WITH_READ_PERM_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
+    @Operation(summary = "authorizedFileWithReadPerm", description = "AUTHORIZED_FILE_WITH_READ_PERM_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/authed-file-read-perm")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(AUTHORIZED_FILE_RESOURCE_ERROR)
     @AccessLogAnnotation
-    public Result authorizedFileWithReadPerm(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result authorizedFileWithReadPerm(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizedFileWithReadPerm(loginUser, userId);
         return returnDataList(result);
