@@ -787,7 +787,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private Set<Integer> getNeedAuthorizeResIds(String ResourceIds) {
         Set<Integer> needAuthorizeResIds = new HashSet<>();
         if (StringUtils.isNotBlank(ResourceIds)) {
-            String[] resourceFullIdArr = ResourceIds.split(",");
+            String[] resourceFullIdArr = ResourceIds.split(Constants.COMMA);
             // need authorize resource id set
             for (String resourceFullId : resourceFullIdArr) {
                 String[] resourceIdArr = resourceFullId.split("-");
