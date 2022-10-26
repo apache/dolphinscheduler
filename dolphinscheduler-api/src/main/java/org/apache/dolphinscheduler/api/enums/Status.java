@@ -506,7 +506,8 @@ public enum Status {
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
-    DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,"delete worker group by id fail, for there are {0} enviroments using it","删除Worker分组失败，有[{0}]个环境正在使用");
+    DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
+            "delete worker group by id fail, for there are {0} enviroments using it", "删除Worker分组失败，有[{0}]个环境正在使用");
     private final int code;
     private final String enMsg;
     private final String zhMsg;
