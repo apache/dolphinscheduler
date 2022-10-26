@@ -14,3 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+--- add column
+ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
