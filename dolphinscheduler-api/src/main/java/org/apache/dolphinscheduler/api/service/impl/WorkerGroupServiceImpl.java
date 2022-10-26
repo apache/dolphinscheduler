@@ -341,7 +341,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelationList =
                 environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName());
         if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelationList)) {
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_ENV, environmentWorkerGroupRelationList.size());
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_ENV, environmentWorkerGroupRelationList.size(), workerGroup.getName());
             return result;
         }
         workerGroupMapper.deleteById(id);
