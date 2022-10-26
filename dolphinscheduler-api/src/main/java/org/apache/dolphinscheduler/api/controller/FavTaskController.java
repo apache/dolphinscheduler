@@ -51,7 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * fav controller
  */
-@Tag(name = "FAVOURITE")
+@Tag(name = "FAVOURITE_TAG")
 @RestController
 @RequestMapping("/favourite")
 public class FavTaskController extends BaseController {
@@ -65,7 +65,7 @@ public class FavTaskController extends BaseController {
      * @param loginUser login user
      * @return task type list
      */
-    @Operation(summary = "listTaskType", description = "LIST_TASK_TYPE")
+    @Operation(summary = "listTaskType", description = "QUERY_TASK_TYPE_LIST")
     @GetMapping(value = "/taskTypes")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_TASK_TYPE_ERROR)

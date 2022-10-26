@@ -73,7 +73,7 @@ public class ClusterController extends BaseController {
     @Operation(summary = "createCluster", description = "CREATE_CLUSTER_NOTES")
     @Parameters({
             @Parameter(name = "name", description = "CLUSTER_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "config", description = "CONFIG", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "config", description = "CLUSTER_CONFIG", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "description", description = "CLUSTER_DESC", schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/create")

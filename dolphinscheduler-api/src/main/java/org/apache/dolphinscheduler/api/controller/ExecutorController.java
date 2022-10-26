@@ -194,7 +194,7 @@ public class ExecutorController extends BaseController {
      */
     @Operation(summary = "batchStartProcessInstance", description = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCodes", description = "PROCESS_DEFINITION_CODES", required = true, schema = @Schema(implementation = String.class, example = "1,2,3")),
+            @Parameter(name = "processDefinitionCodes", description = "PROCESS_DEFINITION_CODE_LIST", required = true, schema = @Schema(implementation = String.class, example = "1,2,3")),
             @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", required = true, schema = @Schema(implementation = String.class, example = "2022-04-06 00:00:00,2022-04-06 00:00:00")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema = @Schema(implementation = String.class)),

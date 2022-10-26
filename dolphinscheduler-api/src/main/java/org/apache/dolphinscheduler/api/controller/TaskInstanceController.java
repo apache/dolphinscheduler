@@ -178,7 +178,7 @@ public class TaskInstanceController extends BaseController {
      * @param id task instance id
      * @return the result code and msg
      */
-    @Operation(summary = "stop", description = "TASK_STOP")
+    @Operation(summary = "stop", description = "TASK_INSTANCE_STOP")
     @Parameters({
             @Parameter(name = "id", description = "TASK_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "12"))
     })
