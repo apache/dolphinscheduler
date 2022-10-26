@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -74,6 +75,9 @@ public class FailoverServiceTest {
     private ProcessService processService;
 
     @Mock
+    private TaskInstanceDao taskInstanceDao;
+
+    @Mock
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     @Mock
@@ -108,13 +112,14 @@ public class FailoverServiceTest {
         given(masterConfig.getMasterAddress()).willReturn(testMasterHost);
         MasterFailoverService masterFailoverService =
                 new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager,
-                        processInstanceExecCacheManager, logClient);
+                        processInstanceExecCacheManager, logClient, taskInstanceDao);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
                 masterConfig,
                 processService,
                 workflowExecuteThreadPool,
                 cacheManager,
-                logClient);
+                logClient,
+                taskInstanceDao);
 
         failoverService = new FailoverService(masterFailoverService, workerFailoverService);
 
@@ -150,7 +155,7 @@ public class FailoverServiceTest {
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
-        given(processService.findValidTaskListByProcessId(Mockito.anyInt(), Mockito.anyInt()))
+        given(taskInstanceDao.findValidTaskListByProcessId(Mockito.anyInt(), Mockito.anyInt()))
                 .willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
 
         Thread.sleep(1000);

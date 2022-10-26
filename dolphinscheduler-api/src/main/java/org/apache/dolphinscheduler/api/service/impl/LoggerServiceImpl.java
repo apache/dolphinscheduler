@@ -33,9 +33,9 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,7 +60,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]:  %s%s";
 
     @Autowired
-    private ProcessService processService;
+    private TaskInstanceDao taskInstanceDao;
 
     @Autowired
     private LogClient logClient;
@@ -86,7 +86,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @SuppressWarnings("unchecked")
     public Result<ResponseTaskLog> queryLog(int taskInstId, int skipLineNum, int limit) {
 
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
 
         if (taskInstance == null) {
             logger.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
@@ -111,7 +111,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     public byte[] getLogBytes(int taskInstId) {
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }
@@ -138,7 +138,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             return result;
         }
         // check whether the task instance can be found
-        TaskInstance task = processService.findTaskInstanceById(taskInstId);
+        TaskInstance task = taskInstanceDao.findTaskInstanceById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
@@ -171,7 +171,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             throw new ServiceException("user has no permission");
         }
         // check whether the task instance can be found
-        TaskInstance task = processService.findTaskInstanceById(taskInstId);
+        TaskInstance task = taskInstanceDao.findTaskInstanceById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }

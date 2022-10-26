@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -75,12 +76,15 @@ public class MasterFailoverService {
 
     private final LogClient logClient;
 
+    private final TaskInstanceDao taskInstanceDao;
+
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
                                  @NonNull ProcessService processService,
                                  @NonNull NettyExecutorManager nettyExecutorManager,
                                  @NonNull ProcessInstanceExecCacheManager processInstanceExecCacheManager,
-                                 @NonNull LogClient logClient) {
+                                 @NonNull LogClient logClient,
+                                 @NonNull TaskInstanceDao taskInstanceDao) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
@@ -88,7 +92,7 @@ public class MasterFailoverService {
         this.localAddress = masterConfig.getMasterAddress();
         this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.logClient = logClient;
-
+        this.taskInstanceDao = taskInstanceDao;
     }
 
     /**
@@ -164,7 +168,7 @@ public class MasterFailoverService {
                 processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
                 List<TaskInstance> taskInstanceList =
-                        processService.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
+                        taskInstanceDao.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
                 for (TaskInstance taskInstance : taskInstanceList) {
                     try {
                         LoggerUtils.setTaskInstanceIdMDC(taskInstance.getId());
@@ -249,7 +253,7 @@ public class MasterFailoverService {
         }
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
     }
 
     private void sendKillCommandToWorker(@NonNull TaskInstance taskInstance) {

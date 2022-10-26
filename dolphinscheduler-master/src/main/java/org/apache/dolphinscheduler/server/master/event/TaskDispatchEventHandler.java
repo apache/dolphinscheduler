@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @Autowired
-    private ProcessService processService;
+    private TaskInstanceDao taskInstanceDao;
 
     @Override
     public void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError {
@@ -68,7 +68,7 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
         taskInstance.setState(TaskExecutionStatus.DISPATCH);
         taskInstance.setHost(taskEvent.getWorkerAddress());
         try {
-            if (!processService.updateTaskInstance(taskInstance)) {
+            if (!taskInstanceDao.updateTaskInstance(taskInstance)) {
                 throw new TaskEventHandleError("Handle task dispatch event error, update taskInstance to db failed");
             }
         } catch (Exception ex) {

@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -56,6 +58,10 @@ public class CommonTaskProcessorTest {
 
     private ProcessService processService;
 
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionDao taskDefinitionDao;
+
     private CommonTaskProcessor commonTaskProcessor;
 
     @BeforeEach
@@ -69,6 +75,12 @@ public class CommonTaskProcessorTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(applicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
+        taskDefinitionDao = Mockito.mock(TaskDefinitionDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskDefinitionDao.class)).thenReturn(taskDefinitionDao);
+
         commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         Mockito.when(applicationContext.getBean(CommonTaskProcessor.class)).thenReturn(commonTaskProcessor);
 
@@ -76,7 +88,7 @@ public class CommonTaskProcessorTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
-        Mockito.when(processService.findTaskDefinition(1L, 1))
+        Mockito.when(taskDefinitionDao.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
     }
 
@@ -107,7 +119,7 @@ public class CommonTaskProcessorTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskInstance.setTaskDefine(taskDefinition);
-        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+        Mockito.doReturn(taskInstance).when(taskInstanceDao).findTaskInstanceById(1);
         TaskExecutionContext taskExecutionContext = commonTaskProcessor.getTaskExecutionContext(taskInstance);
         Assertions.assertNull(taskExecutionContext);
     }

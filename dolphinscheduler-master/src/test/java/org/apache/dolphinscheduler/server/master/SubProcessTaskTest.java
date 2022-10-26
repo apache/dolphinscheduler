@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -55,6 +56,8 @@ public class SubProcessTaskTest {
 
     private ProcessService processService;
 
+    private TaskInstanceDao taskInstanceDao;
+
     private ProcessInstance processInstance;
 
     private MockedStatic<ServerLifeCycleManager> mockedStaticServerLifeCycleManager;
@@ -72,11 +75,14 @@ public class SubProcessTaskTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
         mockedStaticServerLifeCycleManager = Mockito.mockStatic(ServerLifeCycleManager.class);
         Mockito.when(ServerLifeCycleManager.isStopped()).thenReturn(false);
 
         processInstance = getProcessInstance();
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .updateTaskInstance(Mockito.any()))
                 .thenReturn(true);
 
