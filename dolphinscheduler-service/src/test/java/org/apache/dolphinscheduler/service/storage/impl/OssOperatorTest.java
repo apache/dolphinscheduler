@@ -169,7 +169,7 @@ public class OssOperatorTest {
         boolean doesExist = false;
         doReturn(true).when(ossClientMock).doesObjectExist(BUCKET_NAME_MOCK, FILE_NAME_MOCK);
         try {
-            doesExist = ossOperator.exists(TENANT_CODE_MOCK, FILE_NAME_MOCK);
+            doesExist = ossOperator.exists(FILE_NAME_MOCK);
         } catch (IOException e) {
             Assertions.fail("unexpected IO exception in unit test");
         }
@@ -183,7 +183,7 @@ public class OssOperatorTest {
         boolean isDeleted = false;
         doReturn(null).when(ossClientMock).deleteObject(anyString(), anyString());
         try {
-            isDeleted = ossOperator.delete(TENANT_CODE_MOCK, FILE_NAME_MOCK, true);
+            isDeleted = ossOperator.delete(FILE_NAME_MOCK, true);
         } catch (IOException e) {
             Assertions.fail("unexpected IO exception in unit test");
         }

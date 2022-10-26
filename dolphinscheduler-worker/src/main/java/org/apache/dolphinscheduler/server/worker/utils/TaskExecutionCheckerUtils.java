@@ -118,18 +118,20 @@ public class TaskExecutionCheckerUtils {
         if (CollectionUtils.isNotEmpty(downloadFiles)) {
             for (Pair<String, String> fileDownload : downloadFiles) {
                 try {
-                    // query the tenant code of the resource according to the name of the resource
                     String fullName = fileDownload.getLeft();
+                    // we do not actually get & need tenantCode with this implementation right now.
                     String tenantCode = fileDownload.getRight();
-                    String resPath = storageOperate.getResourceFileName(tenantCode, fullName);
-                    logger.info("get resource file from path:{}", resPath);
+                    // TODO: Need a better way to get fileName because this implementation is tricky.
+                    String fileName = storageOperate.getResourceFileName(fullName);
+                    logger.info("get resource file from path:{}", fullName);
+
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false,
+                    storageOperate.download(tenantCode, fullName, execLocalPath + File.separator + fileName, false,
                             true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(
-                            Files.size(Paths.get(execLocalPath, fullName)));
+                            Files.size(Paths.get(execLocalPath, fileName)));
                     WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
                 } catch (Exception e) {
                     WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
