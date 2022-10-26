@@ -119,8 +119,6 @@ public interface ProcessService {
 
     List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode);
 
-    Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList);
-
     List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(long processDefinitionCode);
 
     List<ProcessInstance> queryNeedFailoverProcessInstances(String host);
@@ -149,8 +147,6 @@ public interface ProcessService {
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
 
     ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId);
-
-    String getTaskWorkerGroup(TaskInstance taskInstance);
 
     List<Project> getProjectListHavePerm(int userId);
 

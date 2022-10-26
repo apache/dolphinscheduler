@@ -1571,20 +1571,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * query Schedule by processDefinitionCode
-     *
-     * @param processDefinitionCodeList processDefinitionCodeList
-     * @see Schedule
-     */
-    @Override
-    public Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList) {
-        List<Schedule> processDefinitionScheduleList =
-                scheduleMapper.querySchedulesByProcessDefinitionCodes(processDefinitionCodeList);
-        return processDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getProcessDefinitionCode,
-                Schedule::getWorkerGroup));
-    }
-
-    /**
      * query dependent process definition by process definition code
      *
      * @param processDefinitionCode processDefinitionCode
@@ -1795,29 +1781,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId) {
         return projectMapper.queryProjectWithUserByProcessInstanceId(processInstanceId);
-    }
-
-    /**
-     * get task worker group
-     *
-     * @param taskInstance taskInstance
-     * @return workerGroupId
-     */
-    @Override
-    public String getTaskWorkerGroup(TaskInstance taskInstance) {
-        String workerGroup = taskInstance.getWorkerGroup();
-
-        if (!Strings.isNullOrEmpty(workerGroup)) {
-            return workerGroup;
-        }
-        int processInstanceId = taskInstance.getProcessInstanceId();
-        ProcessInstance processInstance = findProcessInstanceById(processInstanceId);
-
-        if (processInstance != null) {
-            return processInstance.getWorkerGroup();
-        }
-        logger.info("task : {} will use default worker group", taskInstance.getId());
-        return Constants.DEFAULT_WORKER_GROUP;
     }
 
     /**
