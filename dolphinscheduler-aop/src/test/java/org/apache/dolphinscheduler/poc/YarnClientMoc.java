@@ -24,13 +24,18 @@ import org.apache.hadoop.yarn.exceptions.YarnException;
 import java.io.IOException;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class YarnClientMoc {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Random random = new Random();
 
     public ApplicationId createAppId() {
         ApplicationId created = ApplicationId.newInstance(System.currentTimeMillis(), random.nextInt());
-        System.out.println("created id " + created.getId());
+        logger.info("created id " + created.getId());
         return created;
     }
 

@@ -221,7 +221,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |sudo.enable | true | 是否开启sudo|
 |alert.rpc.port | 50052 | Alert Server的RPC端口|
 |zeppelin.rest.url | http://localhost:8080 | zeppelin RESTful API 接口地址|
-|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop，注意：如果用户环境覆盖了dolphinscheduler_env.sh收集applicationId相关环境变量配置，aop方法会失效|
+|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop，注意：aop不支持远程主机提交yarn作业的方式比如Beeline客户端提交，且如果用户环境覆盖了dolphinscheduler_env.sh收集applicationId相关环境变量配置，aop方法会失效|
 
 ## Api-server相关配置
 

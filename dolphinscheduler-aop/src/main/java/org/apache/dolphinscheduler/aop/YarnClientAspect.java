@@ -29,6 +29,8 @@ import java.util.Collections;
 
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Aspect
 public class YarnClientAspect {
@@ -40,6 +42,8 @@ public class YarnClientAspect {
 
     private final String appInfoFilePath;
     private boolean debug;
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public YarnClientAspect() {
         appInfoFilePath = String.format("%s/%s", System.getProperty("user.dir"), "appInfo.log");
@@ -64,15 +68,14 @@ public class YarnClientAspect {
                         StandardOpenOption.WRITE,
                         StandardOpenOption.APPEND);
             } catch (IOException ioException) {
-                System.err.println(
-                        "YarnClientAspect[registerAppInfo]: can't output current application information, because "
-                                + ioException.getMessage());
+                logger.error("YarnClientAspect[registerAppInfo]: can't output current application information, because "
+                        + ioException.getMessage());
             }
         }
         if (debug) {
-            System.out.println("YarnClientAspect[submitApplication]: current application context " + appContext);
-            System.out.println("YarnClientAspect[submitApplication]: submitted application id " + submittedAppId);
-            System.out.println(
+            logger.info("YarnClientAspect[submitApplication]: current application context " + appContext);
+            logger.info("YarnClientAspect[submitApplication]: submitted application id " + submittedAppId);
+            logger.info(
                     "YarnClientAspect[submitApplication]: current application report  " + currentApplicationReport);
         }
     }
