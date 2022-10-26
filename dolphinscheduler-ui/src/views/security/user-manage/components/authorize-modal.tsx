@@ -65,20 +65,19 @@ export const AuthorizeModal = defineComponent({
       if (result) onCancel()
     }
 
-    let projectIds!: string
-    const onRevokeProject = async () => {
-      await revokeProjectByIdRequest(props.userId, projectIds)
+    const onRevokeProject = () => {
+      revokeProjectByIdRequest(props.userId, state.projectIds)
     }
-    const onGrantReadPerm = async () => {
-      await grantProjectWithReadPermRequest(props.userId, projectIds)
+    const onGrantReadPerm = () => {
+      grantProjectWithReadPermRequest(props.userId, state.projectIds)
     }
-    const onGrantAllPerm = async () => {
-      await grantProjectRequest(props.userId, projectIds)
+    const onGrantAllPerm = () => {
+      grantProjectRequest(props.userId, state.projectIds)
     }
 
     const { columnsRef } = useColumns()
     const handleCheck = (rowKeys: Array<number>) => {
-      projectIds = rowKeys.join()
+      state.projectIds = rowKeys.join()
     }
     watch(
       () => props.show,

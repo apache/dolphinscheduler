@@ -49,6 +49,7 @@ export function useAuthorize() {
   const state = reactive({
     saving: false,
     loading: false,
+    projectIds: '',
     currentRecord: {} as IRecord | null,
     projectWithAuthorizedLevel: [],
     authorizedProjects: [] as number[],
