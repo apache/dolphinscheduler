@@ -263,7 +263,7 @@ public class S3Utils implements Closeable, StorageOperate {
         try {
             s3Client.deleteObjects(deleteObjectsRequest);
         } catch (AmazonServiceException e) {
-            logger.error(e.getMessage());
+            logger.error("delete objects error", e);
             return false;
         }
 
