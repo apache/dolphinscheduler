@@ -605,7 +605,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
             return result;
         }
-        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+        Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
             ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
             if (projectUserOld != null) {
                 projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
