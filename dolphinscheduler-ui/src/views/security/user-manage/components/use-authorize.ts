@@ -274,6 +274,24 @@ export function useAuthorize() {
     return arrRes
   }
 
+  const getPathIds = (authorizedResources: number[], resources: IResourceOption[]) => {
+    let fullPathId = []
+    const pathId: Array<string> = []
+    authorizedResources.forEach((v: number) => {
+      resources.forEach((v1: any) => {
+        const arr = []
+        arr[0] = v1
+        if (getParent(arr, v).length > 0) {
+          fullPathId = getParent(arr, v).map((v2: any) => {
+            return v2.id
+          })
+          pathId.push(fullPathId.join('-'))
+        }
+      })
+    })
+    return pathId
+  }
+
   const onSave = async (type: TAuthType, userId: number) => {
     if (state.saving) return false
     state.saving = true
@@ -290,65 +308,10 @@ export function useAuthorize() {
       })
     }
     if (type === 'authorize_resource') {
-      let fullPathFileId = []
-      const pathFileId: Array<string> = []
-      state.authorizedFileResources.forEach((v: number) => {
-        state.fileResources.forEach((v1: any) => {
-          const arr = []
-          arr[0] = v1
-          if (getParent(arr, v).length > 0) {
-            fullPathFileId = getParent(arr, v).map((v2: any) => {
-              return v2.id
-            })
-            pathFileId.push(fullPathFileId.join('-'))
-          }
-        })
-      })
-
-      let fullPathUdfId = []
-      const pathUdfId: Array<string> = []
-      state.authorizedUdfResources.forEach((v: number) => {
-        state.udfResources.forEach((v1: any) => {
-          const arr = []
-          arr[0] = v1
-          if (getParent(arr, v).length > 0) {
-            fullPathUdfId = getParent(arr, v).map((v2: any) => {
-              return v2.id
-            })
-            pathUdfId.push(fullPathUdfId.join('-'))
-          }
-        })
-      })
-
-      let fullPathFileIdWithReadPerm = []
-      const pathFileIdWithReadPerm: Array<string> = []
-      state.authorizedFileResourcesWithReadPerm.forEach((v: number) => {
-        state.fileResources.forEach((v1: any) => {
-          const arr = []
-          arr[0] = v1
-          if (getParent(arr, v).length > 0) {
-            fullPathFileIdWithReadPerm = getParent(arr, v).map((v2: any) => {
-              return v2.id
-            })
-            pathFileIdWithReadPerm.push(fullPathFileIdWithReadPerm.join('-'))
-          }
-        })
-      })
-
-      let fullPathUdfIdWithReadPerm = []
-      const pathUdfIdWithReadPerm: Array<string> = []
-      state.authorizedUdfResourcesWithReadPerm.forEach((v: number) => {
-        state.udfResources.forEach((v1: any) => {
-          const arr = []
-          arr[0] = v1
-          if (getParent(arr, v).length > 0) {
-            fullPathUdfIdWithReadPerm = getParent(arr, v).map((v2: any) => {
-              return v2.id
-            })
-            pathUdfIdWithReadPerm.push(fullPathUdfIdWithReadPerm.join('-'))
-          }
-        })
-      })
+      const pathFileId: Array<string> = getPathIds(state.authorizedFileResources,state.fileResources)
+      const pathUdfId: Array<string> = getPathIds(state.authorizedUdfResources,state.udfResources)
+      const pathFileIdWithReadPerm: Array<string> = getPathIds(state.authorizedFileResourcesWithReadPerm,state.fileResources)
+      const pathUdfIdWithReadPerm: Array<string> = getPathIds(state.authorizedUdfResourcesWithReadPerm,state.udfResources)
 
       const allPathId = pathFileId.concat(pathUdfId)
       const allPathIdWithReadPerm = pathFileIdWithReadPerm.concat(pathUdfIdWithReadPerm)
