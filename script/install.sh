@@ -18,6 +18,7 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
+baseDir=`cd ${workDir}/..;pwd`
 
 source ${workDir}/env/install_env.sh
 source ${workDir}/env/dolphinscheduler_env.sh
@@ -27,7 +28,7 @@ echo "1.create directory"
 # If install Path equal to "/" or related path is "/" or is empty, will cause directory "/bin" be overwrite or file adding,
 # so we should check its value. Here use command `realpath` to get the related path, and it will skip if your shell env
 # without command `realpath`.
-if [ `cd ${workDir}/..;pwd` = $installPath ]; then
+if [ ${baseDir} = $installPath ]; then
   echo "Parameter installPath can not be same as the current path (pwd)."
   exit 1
 elif [ ! -d $installPath ];then
