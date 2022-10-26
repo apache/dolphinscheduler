@@ -263,7 +263,7 @@ public class S3Utils implements Closeable, StorageOperate {
         try {
             s3Client.deleteObjects(deleteObjectsRequest);
         } catch (AmazonServiceException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
             return false;
         }
 
@@ -460,7 +460,7 @@ public class S3Utils implements Closeable, StorageOperate {
 
                 storageEntityList.addAll(tempList);
             } catch (AmazonServiceException e) {
-                logger.error(e.getMessage() + "Resource path:" + pathToExplore, e);
+                logger.error("Resource path: {}", pathToExplore, e);
                 // return the resources fetched before error occurs.
                 return storageEntityList;
             }

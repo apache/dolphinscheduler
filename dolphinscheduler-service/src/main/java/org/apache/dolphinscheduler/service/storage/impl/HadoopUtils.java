@@ -926,11 +926,11 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
                 storageEntityList.addAll(tempList);
             } catch (FileNotFoundException e) {
-                logger.error(e.getMessage() + "Resource path:" + pathToExplore, e);
+                logger.error("Resource path: {}", pathToExplore, e);
                 // return the resources fetched before error occurs.
                 return storageEntityList;
             } catch (IOException e) {
-                logger.error(e.getMessage() + "Resource path:" + pathToExplore, e);
+                logger.error("Resource path: {}", pathToExplore, e);
                 // return the resources fetched before error occurs.
                 return storageEntityList;
             }
