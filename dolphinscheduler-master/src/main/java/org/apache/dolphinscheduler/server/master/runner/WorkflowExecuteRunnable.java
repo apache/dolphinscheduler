@@ -386,7 +386,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 if (!processInstance.isBlocked()) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
                 }
-            } else if (taskInstance.taskCanRetry() && processInstance.getState().isReadyStop()) {
+            } else if (taskInstance.taskCanRetry() && !processInstance.getState().isReadyStop()) {
                 // retry task
                 logger.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
                 retryTaskInstance(taskInstance);
@@ -842,6 +842,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     }
                     if (task.taskCanRetry()) {
                         if (task.getState().isNeedFaultTolerance()) {
+                            task.setFlag(Flag.NO);
+                            processService.updateTaskInstance(task);
+
                             // tolerantTaskInstance add to standby list directly
                             TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
                             addTaskToStandByList(tolerantTaskInstance);
@@ -1080,6 +1083,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         // todo relative funtion: TaskInstance.retryTaskIntervalOverTime
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setEndTime(taskInstance.getEndTime());
+
+        if (taskInstance.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE) {
+            newTaskInstance.setAppLink(taskInstance.getAppLink());
+        }
+
         return newTaskInstance;
     }
 
@@ -1100,6 +1108,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         newTaskInstance.setProcessInstance(processInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes());
         newTaskInstance.setState(taskInstance.getState());
+        newTaskInstance.setAppLink(taskInstance.getAppLink());
         return newTaskInstance;
     }
 

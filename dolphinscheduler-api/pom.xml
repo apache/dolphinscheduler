@@ -25,7 +25,6 @@
     <artifactId>dolphinscheduler-api</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -37,7 +36,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -158,6 +156,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-test</artifactId>
             <scope>test</scope>
@@ -196,7 +200,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <testResources>
             <testResource>

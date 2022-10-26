@@ -15,8 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.stream;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-public interface StreamTask {
-    public void savePoint() throws Exception;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ApplicationInfo {
+
+    String appIds;
 }
