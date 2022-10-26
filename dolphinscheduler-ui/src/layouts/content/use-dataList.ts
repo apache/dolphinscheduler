@@ -314,15 +314,7 @@ export function useDataList() {
                   icon: renderIcon(SafetyOutlined)
                 }
               ]
-      },
-      // add UI setting to the banner
-      {
-        label: () =>
-          h(NEllipsis, null, { default: () => t('menu.ui_setting') }),
-        key: 'ui-setting',
-        icon: renderIcon(SettingOutlined),
-        children: []
-      },
+      }
     ]
   }
 

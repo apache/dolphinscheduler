@@ -57,5 +57,5 @@ export default {
   data_quality: 'Data Quality',
   task_result: 'Task Result',
   rule: 'Rule management',
-  ui_setting: 'Setting',
+  ui_setting: 'UI Setting',
 }
