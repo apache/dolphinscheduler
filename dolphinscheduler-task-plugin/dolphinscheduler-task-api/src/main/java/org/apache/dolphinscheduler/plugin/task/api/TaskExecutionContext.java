@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -55,12 +54,12 @@ public class TaskExecutionContext implements Serializable {
     /**
      * task first submit time.
      */
-    private Date firstSubmitTime;
+    private long firstSubmitTime;
 
     /**
      * task start time
      */
-    private Date startTime;
+    private long startTime;
 
     /**
      * task type
@@ -112,29 +111,25 @@ public class TaskExecutionContext implements Serializable {
      */
     private int processInstanceId;
 
-
     /**
      * process instance schedule time
      */
-    private Date scheduleTime;
+    private long scheduleTime;
 
     /**
      * process instance global parameters
      */
     private String globalParams;
 
-
     /**
      * execute user id
      */
     private int executorId;
 
-
     /**
      * command type if complement
      */
     private int cmdTypeIfComplement;
-
 
     /**
      * tenant code
@@ -145,7 +140,6 @@ public class TaskExecutionContext implements Serializable {
      * task queue
      */
     private String queue;
-
 
     /**
      * process define id
@@ -215,7 +209,7 @@ public class TaskExecutionContext implements Serializable {
     /**
      * current execution status
      */
-    private ExecutionStatus currentExecutionStatus;
+    private TaskExecutionStatus currentExecutionStatus;
 
     /**
      * Task Logger name should be like:
@@ -228,7 +222,7 @@ public class TaskExecutionContext implements Serializable {
     /**
      * endTime
      */
-    private Date endTime;
+    private long endTime;
 
     /**
      * sql TaskExecutionContext
@@ -266,4 +260,9 @@ public class TaskExecutionContext implements Serializable {
      * max memory
      */
     private Integer memoryMax;
+
+    /**
+     * test flag
+     */
+    private int testFlag;
 }

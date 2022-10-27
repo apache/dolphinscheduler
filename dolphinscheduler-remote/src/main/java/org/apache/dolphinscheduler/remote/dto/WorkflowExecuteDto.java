@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 
 import java.util.Collection;
 import java.util.Date;
@@ -43,7 +43,7 @@ public class WorkflowExecuteDto {
 
     private int processDefinitionVersion;
 
-    private ExecutionStatus state;
+    private WorkflowExecutionStatus state;
 
     /**
      * recovery flag for failover

@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.CreateTokenRequest;
@@ -26,7 +25,7 @@ import org.apache.dolphinscheduler.api.dto.CreateTokenResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +37,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import springfox.documentation.annotations.ApiIgnore;
-
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * access token controller
  */
-@Api(tags = "ACCESS_TOKEN_TAG")
+@Tag(name = "ACCESS_TOKEN_TAG")
 @RestController
 @RequestMapping("/v2/access-tokens")
 public class AccessTokenV2Controller extends BaseController {
@@ -60,12 +60,13 @@ public class AccessTokenV2Controller extends BaseController {
      * @param createTokenRequest createTokenRequest
      * @return CreateTokenResponse CreateTokenResponse
      */
-    @ApiOperation(value = "createToken", notes = "CREATE_TOKEN_NOTES")
+    @Operation(summary = "createTokenV2", description = "CREATE_TOKEN_V2")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
+    @Parameter(name = "createTokenRequest", description = "createTokenRequest", required = true, schema = @Schema(implementation = CreateTokenRequest.class))
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public CreateTokenResponse createToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public CreateTokenResponse createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody CreateTokenRequest createTokenRequest) {
         Result result = accessTokenService.createToken(loginUser,
                 createTokenRequest.getUserId(),

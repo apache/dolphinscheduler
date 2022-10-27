@@ -54,6 +54,7 @@ import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
 import utils from '@/utils'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -84,11 +85,15 @@ export default defineComponent({
     const route = useRoute()
     const theme = useThemeStore()
 
+    const uiSettingStore = useUISettingStore()
+    const logTimer = uiSettingStore.getLogTimer
+
     // Whether the graph can be operated
     provide('readonly', toRef(props, 'readonly'))
 
     const graph = ref<Graph>()
     provide('graph', graph)
+    context.expose(graph)
 
     // Auto layout modal
     const {
@@ -119,11 +124,11 @@ export default defineComponent({
     })
 
     // start button in the dag node menu
-    const startReadonly = computed(() => {
+    const startDisplay = computed(() => {
       if (props.definition) {
         return (
           route.name === 'workflow-definition-detail' &&
-          props.definition!.processDefinition.releaseState === 'NOT_RELEASE'
+          props.definition!.processDefinition.releaseState === 'ONLINE'
         )
       } else {
         return false
@@ -131,17 +136,17 @@ export default defineComponent({
     })
 
     // other button in the dag node menu
-    const menuReadonly = computed(() => {
+    const menuDisplay = computed(() => {
       if (props.instance) {
         return (
-          props.instance.state !== 'WAITING_THREAD' &&
-          props.instance.state !== 'SUCCESS' &&
-          props.instance.state !== 'PAUSE' &&
-          props.instance.state !== 'FAILURE' &&
-          props.instance.state !== 'STOP'
+          props.instance.state === 'WAITING_THREAD' ||
+          props.instance.state === 'SUCCESS' ||
+          props.instance.state === 'PAUSE' ||
+          props.instance.state === 'FAILURE' ||
+          props.instance.state === 'STOP'
         )
       } else if (props.definition) {
-        return props.definition!.processDefinition.releaseState === 'ONLINE'
+        return props.definition!.processDefinition.releaseState === 'OFFLINE'
       } else {
         return false
       }
@@ -232,23 +237,37 @@ export default defineComponent({
     const handleViewLog = (taskId: number, taskType: string) => {
       taskModalVisible.value = false
       viewLog(taskId, taskType)
-      getLogs()
+
+      getLogs(logTimer)
     }
 
-    const getLogs = () => {
+    var getLogsID: number
+
+    const getLogs = (logTimer: number) => {
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: nodeVariables.logTaskId,
           limit: nodeVariables.limit,
           skipLineNum: nodeVariables.skipLineNum
-        }).then((res: string) => {
-          nodeVariables.logRef += res
-          if (res) {
+        }).then((res: any) => {
+
+          nodeVariables.logRef += res.message || ''
+          if (res && res.message !== '') {
             nodeVariables.limit += 1000
-            nodeVariables.skipLineNum += 1000
-            getLogs()
+            nodeVariables.skipLineNum += res.lineNum
+            getLogs(logTimer)
           } else {
             nodeVariables.logLoadingRef = false
+            if (logTimer !== 0) {
+              if (typeof getLogsID === 'number') {
+                clearTimeout(getLogsID)
+              }
+              getLogsID = setTimeout(() => {
+                nodeVariables.limit += 1000
+                nodeVariables.skipLineNum += 1000
+                getLogs(logTimer)
+              }, logTimer * 1000)
+            }
           }
         }),
         {}
@@ -257,11 +276,11 @@ export default defineComponent({
       return state
     }
 
-    const refreshLogs = () => {
+    const refreshLogs = (logTimer: number) => {
       nodeVariables.logRef = ''
       nodeVariables.limit = 1000
       nodeVariables.skipLineNum = 0
-      getLogs()
+      getLogs(logTimer)
     }
 
     const downloadLogs = () => {
@@ -337,7 +356,7 @@ export default defineComponent({
         />
         {!!props.definition && (
           <VersionModal
-            isInstance={props.instance ? true : false}
+            isInstance={!!props.instance}
             v-model:row={props.definition.processDefinition}
             v-model:show={versionModalShow.value}
             onUpdateList={refreshDetail}
@@ -362,8 +381,8 @@ export default defineComponent({
           onCancel={taskCancel}
         />
         <ContextMenuItem
-          startReadonly={startReadonly.value}
-          menuReadonly={menuReadonly.value}
+          startDisplay={startDisplay.value}
+          menuDisplay={menuDisplay.value}
           taskInstance={taskInstance.value}
           cell={nodeVariables.menuCell as Cell}
           visible={nodeVariables.menuVisible}

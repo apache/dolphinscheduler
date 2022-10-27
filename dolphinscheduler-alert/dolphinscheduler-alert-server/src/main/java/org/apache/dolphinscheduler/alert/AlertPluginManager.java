@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import static java.lang.String.format;
-
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
@@ -31,15 +29,13 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +45,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public final class AlertPluginManager {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
     private final PluginDao pluginDao;
@@ -62,32 +59,31 @@ public final class AlertPluginManager {
     private final PluginParams warningTypeParams = getWarningTypeParams();
 
     public PluginParams getWarningTypeParams() {
-        return
-                RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                        .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                        .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                        .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                        .setValue(WarningType.ALL.getDescp())
-                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                        .build();
+        return RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                .addParamsOptions(
+                        new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
+                .addParamsOptions(
+                        new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
+                .setValue(WarningType.ALL.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
     }
 
     @EventListener
     public void installPlugin(ApplicationReadyEvent readyEvent) {
-        final Set<String> names = new HashSet<>();
 
-        ServiceLoader.load(AlertChannelFactory.class).forEach(factory -> {
-            final String name = factory.name();
+        PrioritySPIFactory<AlertChannelFactory> prioritySPIFactory =
+                new PrioritySPIFactory<>(AlertChannelFactory.class);
+        for (Map.Entry<String, AlertChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
+            String name = entry.getKey();
+            AlertChannelFactory factory = entry.getValue();
 
-            logger.info("Registering alert plugin: {}", name);
-
-            if (!names.add(name)) {
-                throw new IllegalStateException(format("Duplicate alert plugins named '%s'", name));
-            }
+            logger.info("Registering alert plugin: {} - {}", name, factory.getClass());
 
             final AlertChannel alertChannel = factory.create();
 
-            logger.info("Registered alert plugin: {}", name);
+            logger.info("Registered alert plugin: {} - {}", name, factory.getClass());
 
             final List<PluginParams> params = new ArrayList<>(factory.params());
             params.add(0, warningTypeParams);
@@ -98,7 +94,7 @@ public final class AlertPluginManager {
             final int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
 
             channelKeyedById.put(id, alertChannel);
-        });
+        }
     }
 
     public Optional<AlertChannel> getAlertChannel(int id) {

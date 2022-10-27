@@ -65,6 +65,8 @@ public class ClickhouseDataSourceE2ETest {
 
     private static final String jdbcParams = "";
 
+    private static final int testFlag = 1;
+
 
     @BeforeAll
     public static void setup() {
@@ -78,7 +80,7 @@ public class ClickhouseDataSourceE2ETest {
     void testCreateClickhouseDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams);
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams, testFlag);
 
         new WebDriverWait(page.driver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));

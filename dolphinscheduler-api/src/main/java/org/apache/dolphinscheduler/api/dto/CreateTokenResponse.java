@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 
 public class CreateTokenResponse extends Result {
+
     private AccessToken data;
 
     public CreateTokenResponse(Result result) {

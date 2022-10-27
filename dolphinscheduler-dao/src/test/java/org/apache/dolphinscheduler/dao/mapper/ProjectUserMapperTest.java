@@ -17,17 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProjectUserMapperTest extends BaseDaoTest {
@@ -41,7 +38,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
      * @return ProjectUser
      */
     private ProjectUser insertOne() {
-        //insertOne
+        // insertOne
         ProjectUser projectUser = new ProjectUser();
         projectUser.setProjectId(1010);
         projectUser.setUserId(111);
@@ -54,12 +51,12 @@ public class ProjectUserMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         ProjectUser projectUser = insertOne();
         projectUser.setCreateTime(new Date());
-        //update
+        // update
         int update = projectUserMapper.updateById(projectUser);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
@@ -69,7 +66,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
     public void testDelete() {
         ProjectUser projectUserMap = insertOne();
         int delete = projectUserMapper.deleteById(projectUserMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -78,9 +75,9 @@ public class ProjectUserMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         ProjectUser projectUser = insertOne();
-        //query
+        // query
         List<ProjectUser> projectUsers = projectUserMapper.selectList(null);
-        Assert.assertNotEquals(projectUsers.size(), 0);
+        Assertions.assertNotEquals(projectUsers.size(), 0);
     }
 
     /**
@@ -91,7 +88,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
 
         ProjectUser projectUser = insertOne();
         int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        assertThat(delete,greaterThanOrEqualTo(1));
+        Assertions.assertTrue(delete >= 1);
 
     }
 
@@ -101,8 +98,9 @@ public class ProjectUserMapperTest extends BaseDaoTest {
     @Test
     public void testQueryProjectRelation() {
         ProjectUser projectUser = insertOne();
-        ProjectUser projectUser1 = projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        Assert.assertNotEquals(projectUser1, null);
+        ProjectUser projectUser1 =
+                projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
+        Assertions.assertNotEquals(projectUser1, null);
 
     }
 }

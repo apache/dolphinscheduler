@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -27,8 +27,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
@@ -62,13 +60,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     private ServerNodeManager serverNodeManager;
 
     @Autowired
-    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
-
-    @Autowired
     private TaskKillResponseProcessor taskKillResponseProcessor;
-
-    @Autowired
-    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
 
     @Autowired
     private TaskRecallProcessor taskRecallProcessor;
@@ -115,11 +107,12 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 doExecute(host, command);
                 success = true;
                 context.setHost(host);
-                // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be failovered, due to the taskInstance's host
+                // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be
+                // failovered, due to the taskInstance's host
                 // is not belongs to the down worker ISSUE-10842.
                 context.getTaskInstance().setHost(host.getAddress());
             } catch (ExecuteException ex) {
-                logger.error(String.format("execute command : %s error", command), ex);
+                logger.error("Execute command {} error", command, ex);
                 try {
                     failNodeSet.add(host.getAddress());
                     Set<String> tmpAllIps = new HashSet<>(allNodes);
@@ -161,7 +154,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 nettyRemotingClient.send(host, command);
                 success = true;
             } catch (Exception ex) {
-                logger.error(String.format("send command : %s to %s error", command, host), ex);
+                logger.error("Send command to {} error, command: {}", host, command, ex);
                 retryCount--;
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
@@ -197,7 +190,4 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
         return nodes;
     }
 
-    public NettyRemotingClient getNettyRemotingClient() {
-        return nettyRemotingClient;
-    }
 }

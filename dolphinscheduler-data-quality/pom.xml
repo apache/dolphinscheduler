@@ -15,59 +15,60 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-data-quality</artifactId>
-    <name>dolphinscheduler-data-quality</name>
 
     <packaging>jar</packaging>
+    <name>dolphinscheduler-data-quality</name>
 
-    <properties>
-        <scala.binary.version>2.11</scala.binary.version>
-        <spark.version>2.4.0</spark.version>
-        <jackson.version>2.9.10</jackson.version>
-        <jackson.databind.version>2.9.10.8</jackson.databind.version>
-        <scope>provided</scope>
-    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>${scope}</scope>
+            <artifactId>spark-core_2.12</artifactId>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>jackson-module-scala_2.11</artifactId>
                     <groupId>com.fasterxml.jackson.module</groupId>
+                    <artifactId>jackson-module-scala_2.11</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>${scope}</scope>
+            <artifactId>spark-sql_2.12</artifactId>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-hive_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
+            <artifactId>spark-hive_2.12</artifactId>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>commons-httpclient</groupId>
@@ -78,15 +79,14 @@
                     <artifactId>httpclient</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-core-asl</artifactId>
                     <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-core-asl</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-mapper-asl</artifactId>
                     <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
                 </exclusion>
             </exclusions>
-            <scope>${scope}</scope>
         </dependency>
 
         <dependency>
@@ -110,8 +110,8 @@
             <artifactId>clickhouse-jdbc</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -121,8 +121,8 @@
             <artifactId>mssql-jdbc</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>azure-keyvault</artifactId>
                     <groupId>com.microsoft.azure</groupId>
+                    <artifactId>azure-keyvault</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -140,12 +140,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.databind.version}</version>
-            <scope>${scope}</scope>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -153,12 +152,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-scala_2.11</artifactId>
-            <version>${jackson.version}</version>
-            <scope>${scope}</scope>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -166,21 +164,8 @@
         <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
-            <version>3.0.8</version>
-            <scope>${scope}</scope>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>

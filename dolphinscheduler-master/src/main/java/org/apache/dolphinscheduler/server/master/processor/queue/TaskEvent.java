@@ -18,15 +18,16 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
 
 import java.util.Date;
 
-import io.netty.channel.Channel;
 import lombok.Data;
+import io.netty.channel.Channel;
 
 /**
  * task event
@@ -47,7 +48,7 @@ public class TaskEvent {
     /**
      * state
      */
-    private ExecutionStatus state;
+    private TaskExecutionStatus state;
 
     /**
      * start time
@@ -110,9 +111,10 @@ public class TaskEvent {
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
         event.setState(command.getStatus());
-        event.setStartTime(command.getStartTime());
+        event.setStartTime(DateUtils.timeStampToDate(command.getStartTime()));
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());
+        event.setAppIds(command.getAppIds());
         event.setChannel(channel);
         event.setWorkerAddress(workerAddress);
         event.setEvent(TaskEventType.RUNNING);
@@ -123,11 +125,11 @@ public class TaskEvent {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
-        event.setState(ExecutionStatus.of(command.getStatus()));
-        event.setStartTime(command.getStartTime());
+        event.setState(TaskExecutionStatus.of(command.getStatus()));
+        event.setStartTime(DateUtils.timeStampToDate(command.getStartTime()));
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());
-        event.setEndTime(command.getEndTime());
+        event.setEndTime(DateUtils.timeStampToDate(command.getEndTime()));
         event.setProcessId(command.getProcessId());
         event.setAppIds(command.getAppIds());
         event.setVarPool(command.getVarPool());

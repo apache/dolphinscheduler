@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * host test
@@ -28,10 +28,10 @@ public class HostTest {
     @Test
     public void testHost() {
         Host host = Host.of("192.158.2.2:22");
-        Assert.assertEquals(22, host.getPort());
+        Assertions.assertEquals(22, host.getPort());
         host.setAddress("127.0.0.1:8888");
-        Assert.assertEquals("127.0.0.1", host.getIp());
-        Assert.assertEquals(8888, host.getPort());
+        Assertions.assertEquals("127.0.0.1", host.getIp());
+        Assertions.assertEquals(8888, host.getPort());
     }
 
 }

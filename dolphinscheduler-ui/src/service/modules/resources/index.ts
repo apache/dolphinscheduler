@@ -22,6 +22,7 @@ import {
   NameReq,
   FileNameReq,
   FullNameReq,
+  TenantCodeReq,
   IdReq,
   ContentReq,
   DescriptionReq,
@@ -31,12 +32,11 @@ import {
   ProgramTypeReq,
   ListReq,
   ViewResourceReq,
-  ResourceIdReq,
   UdfFuncReq
 } from './types'
 
 export function queryResourceListPaging(
-  params: ListReq & IdReq & ResourceTypeReq
+  params: ListReq & ResourceTypeReq & FullNameReq & TenantCodeReq
 ): any {
   return axios({
     url: '/resources',
@@ -45,21 +45,23 @@ export function queryResourceListPaging(
   })
 }
 
-export function queryResourceById(
-  params: ResourceTypeReq & FullNameReq & IdReq,
-  id: number
+export function queryCurrentResourceByFileName(
+  params: ResourceTypeReq & FileNameReq & TenantCodeReq,
 ): any {
   return axios({
-    url: `/resources/${id}`,
+    url: `/resources/query-file-name`,
     method: 'get',
     params
   })
 }
 
-export function queryCurrentResourceById(id: number): any {
+export function queryCurrentResourceByFullName(
+  params: ResourceTypeReq & FullNameReq & TenantCodeReq,
+): any {
   return axios({
-    url: `/resources/${id}/query`,
-    method: 'get'
+    url: `/resources/query-full-name`,
+    method: 'get',
+    params
   })
 }
 
@@ -107,7 +109,7 @@ export function createDirectory(
   })
 }
 
-export function queryResourceList(params: ResourceTypeReq): any {
+export function queryResourceList(params: ResourceTypeReq & FullNameReq): any {
   return axios({
     url: '/resources/list',
     method: 'get',
@@ -159,10 +161,11 @@ export function verifyUdfFuncName(params: NameReq): any {
   })
 }
 
-export function deleteUdfFunc(id: number): any {
+export function deleteUdfFunc(id: number, params: FullNameReq): any {
   return axios({
     url: `/resources/udf-func/${id}`,
-    method: 'delete'
+    method: 'delete',
+    params
   })
 }
 
@@ -182,37 +185,36 @@ export function verifyResourceName(params: FullNameReq & ResourceTypeReq): any {
   })
 }
 
-export function queryResource(
+export function doesResourceExist(
   params: FullNameReq & ResourceTypeReq,
-  id: IdReq
 ): any {
   return axios({
-    url: `/resources/verify-name/${id}`,
+    url: `/resources/verify-name`,
     method: 'get',
     params
   })
 }
 
 export function updateResource(
-  data: NameReq & ResourceTypeReq & IdReq & DescriptionReq,
-  id: number
+  data: NameReq & ResourceTypeReq & DescriptionReq & FullNameReq & TenantCodeReq,
 ): any {
   return axios({
-    url: `/resources/${id}`,
+    url: `/resources`,
     method: 'put',
     data
   })
 }
 
-export function deleteResource(id: number): any {
+export function deleteResource(params: FullNameReq & TenantCodeReq): any {
   return axios({
-    url: `/resources/${id}`,
-    method: 'delete'
+    url: `/resources`,
+    method: 'delete',
+    params
   })
 }
 
-export function downloadResource(id: number): void {
-  utils.downloadFile(`resources/${id}/download`)
+export function downloadResource(params: FullNameReq): void {
+  utils.downloadFile(`resources/download`, params)
 }
 
 export function viewUIUdfFunction(id: IdReq): any {
@@ -222,28 +224,27 @@ export function viewUIUdfFunction(id: IdReq): any {
   })
 }
 
-export function updateResourceContent(data: ContentReq, id: number): any {
+export function updateResourceContent(data: ContentReq & TenantCodeReq & FullNameReq): any {
   return axios({
-    url: `/resources/${id}/update-content`,
+    url: `/resources/update-content`,
     method: 'put',
     data
   })
 }
 
-export function viewResource(params: ViewResourceReq, id: number): any {
+export function viewResource(params: ViewResourceReq & FullNameReq & TenantCodeReq): any {
   return axios({
-    url: `/resources/${id}/view`,
+    url: `/resources/view`,
     method: 'get',
     params
   })
 }
 
 export function createUdfFunc(
-  data: UdfFuncReq,
-  resourceId: ResourceIdReq
+  data: UdfFuncReq
 ): any {
   return axios({
-    url: `/resources/${resourceId}/udf-func`,
+    url: `/resources/udf-func`,
     method: 'post',
     data
   })
@@ -251,11 +252,10 @@ export function createUdfFunc(
 
 export function updateUdfFunc(
   data: UdfFuncReq,
-  resourceId: ResourceIdReq,
   id: number
 ): any {
   return axios({
-    url: `/resources/${resourceId}/udf-func/${id}`,
+    url: `/resources/udf-func/${id}`,
     method: 'put',
     data
   })

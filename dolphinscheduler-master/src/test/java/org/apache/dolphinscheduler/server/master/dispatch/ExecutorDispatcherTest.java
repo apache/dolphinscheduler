@@ -26,18 +26,19 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * executor dispatch test
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
+@ExtendWith(SpringExtension.class)
+@Disabled
 public class ExecutorDispatcherTest {
 
     @Autowired
@@ -49,10 +50,12 @@ public class ExecutorDispatcherTest {
     @Autowired
     private WorkerConfig workerConfig;
 
-    @Test(expected = ExecuteException.class)
+    @Test
     public void testDispatchWithException() throws ExecuteException {
         ExecutionContext executionContext = ExecutionContextTestUtils.getExecutionContext(10000);
-        executorDispatcher.dispatch(executionContext);
+        Assertions.assertThrows(ExecuteException.class, () -> {
+            executorDispatcher.dispatch(executionContext);
+        });
     }
 
     @Test
@@ -62,15 +65,15 @@ public class ExecutorDispatcherTest {
         serverConfig.setListenPort(port);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
         nettyRemotingServer.registerProcessor(CommandType.TASK_DISPATCH_REQUEST, Mockito.mock(
-            TaskDispatchProcessor.class));
+                TaskDispatchProcessor.class));
         nettyRemotingServer.start();
         //
         workerConfig.setListenPort(port);
-        workerRegistryClient.registry();
+        workerRegistryClient.start();
 
         ExecutionContext executionContext = ExecutionContextTestUtils.getExecutionContext(port);
         executorDispatcher.dispatch(executionContext);
 
-        workerRegistryClient.unRegistry();
+        workerRegistryClient.close();
     }
 }

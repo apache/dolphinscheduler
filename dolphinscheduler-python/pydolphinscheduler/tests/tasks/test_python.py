@@ -16,18 +16,33 @@
 # under the License.
 
 """Test Task python."""
-
-
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from pydolphinscheduler.exceptions import PyDSParamException
+from pydolphinscheduler.resources_plugin import Local
 from pydolphinscheduler.tasks.python import Python
+from pydolphinscheduler.utils import file
+from tests.testing.file import delete_file
 
 
 def foo():  # noqa: D103
     print("hello world.")
+
+
+@pytest.fixture()
+def setup_crt_first(request):
+    """Set up and teardown about create file first and then delete it."""
+    file_content = request.param.get("file_content")
+    file_path = request.param.get("file_path")
+    file.write(
+        content=file_content,
+        to_path=file_path,
+    )
+    yield
+    delete_file(file_path)
 
 
 @pytest.mark.parametrize(
@@ -36,6 +51,7 @@ def foo():  # noqa: D103
         (
             {"definition": "print(1)"},
             {
+                "definition": "print(1)",
                 "rawScript": "print(1)",
                 "localParams": [],
                 "resourceList": [],
@@ -47,6 +63,7 @@ def foo():  # noqa: D103
         (
             {"definition": "def foo():\n    print('I am foo')"},
             {
+                "definition": "def foo():\n    print('I am foo')",
                 "rawScript": "def foo():\n    print('I am foo')\nfoo()",
                 "localParams": [],
                 "resourceList": [],
@@ -58,6 +75,7 @@ def foo():  # noqa: D103
         (
             {"definition": foo},
             {
+                "definition": foo,
                 "rawScript": 'def foo():  # noqa: D103\n    print("hello world.")\nfoo()',
                 "localParams": [],
                 "resourceList": [],
@@ -122,6 +140,7 @@ def test_python_get_define(name, script_code, raw):
         "delayTime": 0,
         "taskType": "PYTHON",
         "taskParams": {
+            "definition": script_code,
             "resourceList": [],
             "localParams": [],
             "rawScript": raw,
@@ -132,6 +151,7 @@ def test_python_get_define(name, script_code, raw):
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
@@ -144,3 +164,38 @@ def test_python_get_define(name, script_code, raw):
     ):
         shell = Python(name, script_code)
         assert shell.get_define() == expect
+
+
+@pytest.mark.parametrize(
+    "setup_crt_first",
+    [
+        {
+            "file_path": Path(__file__).parent.joinpath("local_res.py"),
+            "file_content": "test local resource",
+        }
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "attr, expect",
+    [
+        (
+            {
+                "name": "task_python",
+                "definition": "local_res.py",
+                "resource_plugin": Local(str(Path(__file__).parent)),
+            },
+            "test local resource",
+        ),
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_resources_local_python_command_content(
+    mock_code_version, attr, expect, setup_crt_first
+):
+    """Test task Python definition content through the local resource plug-in."""
+    python = Python(**attr)
+    assert expect == getattr(python, "definition")

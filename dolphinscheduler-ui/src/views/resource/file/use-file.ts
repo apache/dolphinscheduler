@@ -27,14 +27,16 @@ export function useFileState(
   setPagination: ISetPagination = {} as ISetPagination
 ) {
   const getResourceListState: IResourceListState = (
-    id = -1,
+    fullName = '',
+    tenantCode = '',
     searchVal = '',
     pageNo = 1,
     pageSize = 10
   ) => {
     const { state } = useAsyncState(
       queryResourceListPaging({
-        id,
+        fullName,
+        tenantCode,
         type: 'FILE',
         searchVal,
         pageNo,
@@ -66,12 +68,14 @@ export function useFileState(
     return state
   }
 
-  const getResourceView = (id: number) => {
+  const getResourceView = (fullName: string, tenantCode: string) => {
     const params = {
       skipLineNum: 0,
-      limit: 3000
+      limit: 3000,
+      fullName: fullName,
+      tenantCode: tenantCode
     }
-    const { state } = useAsyncState(viewResource(params, id), {})
+    const { state } = useAsyncState(viewResource(params), {})
     return state
   }
 

@@ -20,18 +20,22 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+@Data
 @TableName("t_ds_dq_execute_result")
 public class DqExecuteResult implements Serializable {
+
     /**
      * primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
     /**
      * process defined id
      */
@@ -41,7 +45,7 @@ public class DqExecuteResult implements Serializable {
      * process definition name
      */
     @TableField(exist = false)
-    private String  processDefinitionName;
+    private String processDefinitionName;
     /**
      * process definition code
      */
@@ -152,235 +156,4 @@ public class DqExecuteResult implements Serializable {
      */
     @TableField(value = "update_time")
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public long getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(long processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
-    public long getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(long taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public long getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(long processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public String getProcessInstanceName() {
-        return processInstanceName;
-    }
-
-    public void setProcessInstanceName(String processInstanceName) {
-        this.processInstanceName = processInstanceName;
-    }
-
-    public long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(long projectCode) {
-        this.projectCode = projectCode;
-    }
-
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
-    }
-
-    public double getStatisticsValue() {
-        return statisticsValue;
-    }
-
-    public void setStatisticsValue(double statisticsValue) {
-        this.statisticsValue = statisticsValue;
-    }
-
-    public double getComparisonValue() {
-        return comparisonValue;
-    }
-
-    public void setComparisonValue(double comparisonValue) {
-        this.comparisonValue = comparisonValue;
-    }
-
-    public double getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public int getOperator() {
-        return operator;
-    }
-
-    public void setOperator(int operator) {
-        this.operator = operator;
-    }
-
-    public int getFailureStrategy() {
-        return failureStrategy;
-    }
-
-    public void setFailureStrategy(int failureStrategy) {
-        this.failureStrategy = failureStrategy;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public int getRuleType() {
-        return ruleType;
-    }
-
-    public void setRuleType(int ruleType) {
-        this.ruleType = ruleType;
-    }
-
-    public int getCheckType() {
-        return checkType;
-    }
-
-    public void setCheckType(int checkType) {
-        this.checkType = checkType;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getProcessDefinitionName() {
-        return processDefinitionName;
-    }
-
-    public void setProcessDefinitionName(String processDefinitionName) {
-        this.processDefinitionName = processDefinitionName;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public int getComparisonType() {
-        return comparisonType;
-    }
-
-    public void setComparisonType(int comparisonType) {
-        this.comparisonType = comparisonType;
-    }
-
-    public String getComparisonTypeName() {
-        return comparisonTypeName;
-    }
-
-    public void setComparisonTypeName(String comparisonTypeName) {
-        this.comparisonTypeName = comparisonTypeName;
-    }
-
-    public String getErrorOutputPath() {
-        return errorOutputPath;
-    }
-
-    public void setErrorOutputPath(String errorOutputPath) {
-        this.errorOutputPath = errorOutputPath;
-    }
-
-    @Override
-    public String toString() {
-        return "DqExecuteResult{" 
-                + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
-                + ", processDefinitionName='" + processDefinitionName + '\''
-                + ", processDefinitionCode='" + processDefinitionCode + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", processInstanceName='" + processInstanceName + '\''
-                + ", projectCode='" + projectCode + '\''
-                + ", taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", ruleType=" + ruleType
-                + ", ruleName='" + ruleName + '\''
-                + ", statisticsValue=" + statisticsValue
-                + ", comparisonValue=" + comparisonValue
-                + ", comparisonType=" + comparisonType
-                + ", comparisonTypeName=" + comparisonTypeName
-                + ", checkType=" + checkType
-                + ", threshold=" + threshold
-                + ", operator=" + operator
-                + ", failureStrategy=" + failureStrategy
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", state=" + state
-                + ", errorOutputPath=" + errorOutputPath
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
 }

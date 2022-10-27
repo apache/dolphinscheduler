@@ -32,7 +32,8 @@ import java.util.Map;
 import lombok.NonNull;
 
 public class HttpLoopTaskQueryStatusMethodDefinition extends HttpLoopTaskMethodDefinition
-    implements LoopTaskQueryStatusMethodDefinition {
+        implements
+            LoopTaskQueryStatusMethodDefinition {
 
     private final String taskInstanceFinishedJPath;
     // inject the taskInstanceId into template
@@ -75,7 +76,7 @@ public class HttpLoopTaskQueryStatusMethodDefinition extends HttpLoopTaskMethodD
                 responseBody = OkHttpUtils.post(url, httpHeaders, requestParams, requestBody);
             } else {
                 throw new IllegalArgumentException(String.format("http method type: %s is not supported",
-                                                                 httpMethodType));
+                        httpMethodType));
             }
         } catch (IllegalArgumentException ex) {
             throw ex;

@@ -18,6 +18,8 @@
 import type { Node, Edge } from '@antv/x6'
 import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import utils from '@/utils'
+import { TaskType } from '@/store/project/types'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import { WorkflowDefinition, Coordinate } from './types'
 
 export function useCustomCellBuilder() {
@@ -42,7 +44,8 @@ export function useCustomCellBuilder() {
   function buildEdge(
     sourceId: string,
     targetId: string,
-    label = ''
+    label = '',
+    isStream = false
   ): Edge.Metadata {
     return {
       shape: X6_EDGE_NAME,
@@ -52,7 +55,12 @@ export function useCustomCellBuilder() {
       target: {
         cell: targetId
       },
-      labels: label ? [label] : undefined
+      labels: label ? [label] : undefined,
+      attrs: {
+        line: {
+          strokeDasharray: isStream ? '5 5' : 'none'
+        }
+      }
     }
   }
 
@@ -64,7 +72,7 @@ export function useCustomCellBuilder() {
    */
   function buildNode(
     id: string,
-    type: string,
+    type: TaskType,
     taskName: string,
     flag: string,
     coordinate: Coordinate = { x: 100, y: 100 }
@@ -78,14 +86,18 @@ export function useCustomCellBuilder() {
       data: {
         taskType: type,
         taskName: taskName || id,
-        flag: flag
+        flag: flag,
+        taskExecuteType: TASK_TYPES_MAP[type].taskExecuteType
       },
       attrs: {
         image: {
           // Use href instead of xlink:href, you may lose the icon when downloadPNG
           'xlink:href': `${
             import.meta.env.BASE_URL
-          }images/task-icons/${type.toLocaleLowerCase()}.png`
+          }images/task-icons/${(type !== ('FLINK_STREAM' as TaskType)
+            ? type
+            : 'FLINK'
+          ).toLocaleLowerCase()}.png`
         },
         title: {
           text: truncation
@@ -110,6 +122,7 @@ export function useCustomCellBuilder() {
       parseLocationStr(definition.processDefinition.locations) || []
     const tasks = definition.taskDefinitionList
     const connects = definition.processTaskRelationList
+    const taskTypeMap = {} as { [key in string]: TaskType }
 
     tasks.forEach((task) => {
       const location = locations.find((l) => l.taskCode === task.code) || {}
@@ -124,12 +137,23 @@ export function useCustomCellBuilder() {
         }
       )
       nodes.push(node)
+      taskTypeMap[String(task.code)] = task.taskType
     })
 
     connects
       .filter((r) => !!r.preTaskCode)
       .forEach((c) => {
-        const edge = buildEdge(c.preTaskCode + '', c.postTaskCode + '', c.name)
+        const isStream =
+          TASK_TYPES_MAP[taskTypeMap[c.preTaskCode]].taskExecuteType ===
+            'STREAM' ||
+          TASK_TYPES_MAP[taskTypeMap[c.postTaskCode]].taskExecuteType ===
+            'STREAM'
+        const edge = buildEdge(
+          c.preTaskCode + '',
+          c.postTaskCode + '',
+          c.name,
+          isStream
+        )
         edges.push(edge)
       })
     return {

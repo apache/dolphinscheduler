@@ -16,12 +16,28 @@
 # under the License.
 
 """Test Task DataX."""
-
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+from pydolphinscheduler.resources_plugin import Local
 from pydolphinscheduler.tasks.datax import CustomDataX, DataX
+from pydolphinscheduler.utils import file
+from tests.testing.file import delete_file
+
+
+@pytest.fixture()
+def setup_crt_first(request):
+    """Set up and teardown about create file first and then delete it."""
+    file_content = request.param.get("file_content")
+    file_path = request.param.get("file_path")
+    file.write(
+        content=file_content,
+        to_path=file_path,
+    )
+    yield
+    delete_file(file_path)
 
 
 @patch(
@@ -67,6 +83,7 @@ def test_datax_get_define(mock_datasource):
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
@@ -108,6 +125,7 @@ def test_custom_datax_get_define(json_template):
         "flag": "YES",
         "taskPriority": "MEDIUM",
         "workerGroup": "default",
+        "environmentCode": None,
         "failRetryTimes": 0,
         "failRetryInterval": 1,
         "timeoutFlag": "CLOSE",
@@ -120,3 +138,76 @@ def test_custom_datax_get_define(json_template):
     ):
         task = CustomDataX(name, json_template)
         assert task.get_define() == expect
+
+
+@pytest.mark.parametrize(
+    "setup_crt_first",
+    [
+        {
+            "file_path": Path(__file__).parent.joinpath("local_res.sql"),
+            "file_content": "test local resource",
+        }
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "attr, expect",
+    [
+        (
+            {
+                "name": "task_datax",
+                "datasource_name": "first_mysql",
+                "datatarget_name": "second_mysql",
+                "sql": "local_res.sql",
+                "target_table": "target_table",
+                "resource_plugin": Local(str(Path(__file__).parent)),
+            },
+            "test local resource",
+        ),
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_resources_local_datax_command_content(
+    mock_code_version, attr, expect, setup_crt_first
+):
+    """Test task datax sql content through the local resource plug-in."""
+    datax = DataX(**attr)
+    assert expect == getattr(datax, "sql")
+
+
+@pytest.mark.parametrize(
+    "setup_crt_first",
+    [
+        {
+            "file_path": Path(__file__).parent.joinpath("local_res.json"),
+            "file_content": '{content: "test local resource"}',
+        }
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize(
+    "attr, expect",
+    [
+        (
+            {
+                "name": "task_custom_datax",
+                "json": "local_res.json",
+                "resource_plugin": Local(str(Path(__file__).parent)),
+            },
+            '{content: "test local resource"}',
+        ),
+    ],
+)
+@patch(
+    "pydolphinscheduler.core.task.Task.gen_code_and_version",
+    return_value=(123, 1),
+)
+def test_resources_local_custom_datax_command_content(
+    mock_code_version, attr, expect, setup_crt_first
+):
+    """Test task CustomDataX json content through the local resource plug-in."""
+    custom_datax = CustomDataX(**attr)
+    assert expect == getattr(custom_datax, "json")

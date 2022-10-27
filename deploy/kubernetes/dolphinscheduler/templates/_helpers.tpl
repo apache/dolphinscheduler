@@ -30,19 +30,19 @@ If release name contains chart name it will be used as a full name.
 Create default docker images' fullname.
 */}}
 {{- define "dolphinscheduler.image.fullname.master" -}}
-{{- .Values.image.registry }}/dolphinscheduler-master:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.master }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.worker" -}}
-{{- .Values.image.registry }}/dolphinscheduler-worker:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.worker }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.api" -}}
-{{- .Values.image.registry }}/dolphinscheduler-api:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.api }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.alert" -}}
-{{- .Values.image.registry }}/dolphinscheduler-alert-server:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.alert }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.tools" -}}
-{{- .Values.image.registry }}/dolphinscheduler-tools:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.tools }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
 {{- end -}}
 
 {{/*
@@ -100,7 +100,16 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Create a default fully qualified zookkeeper name.
+Create a default fully qualified mysql name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dolphinscheduler.mysql.fullname" -}}
+{{- $name := default "mysql" .Values.mysql.nameOverride -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified zookeeper name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "dolphinscheduler.zookeeper.fullname" -}}
@@ -123,18 +132,24 @@ Create a database environment variables.
 - name: DATABASE
   {{- if .Values.postgresql.enabled }}
   value: "postgresql"
+  {{- else if .Values.mysql.enabled }}
+  value: "mysql"
   {{- else }}
   value: {{ .Values.externalDatabase.type | quote }}
   {{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
   value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?characterEncoding=utf8
+  {{- else if .Values.mysql.enabled }}
+  value: jdbc:mysql://{{ template "dolphinscheduler.mysql.fullname" . }}:3306/{{ .Values.postgresql.postgresqlDatabase }}?characterEncoding=utf8
   {{- else }}
   value: jdbc:{{ .Values.externalDatabase.type }}://{{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}/{{ .Values.externalDatabase.database }}?{{ .Values.externalDatabase.params }}
   {{- end }}
 - name: SPRING_DATASOURCE_USERNAME
   {{- if .Values.postgresql.enabled }}
   value: {{ .Values.postgresql.postgresqlUsername }}
+  {{- else if .Values.mysql.enabled }}
+  value: {{ .Values.mysql.auth.username }}
   {{- else }}
   value: {{ .Values.externalDatabase.username | quote }}
   {{- end }}
@@ -144,6 +159,9 @@ Create a database environment variables.
       {{- if .Values.postgresql.enabled }}
       name: {{ template "dolphinscheduler.postgresql.fullname" . }}
       key: postgresql-password
+      {{- else if .Values.mysql.enabled }}
+      name: {{ template "dolphinscheduler.mysql.fullname" . }}
+      key: mysql-password
       {{- else }}
       name: {{ include "dolphinscheduler.fullname" . }}-externaldb
       key: database-password
@@ -159,6 +177,8 @@ Wait for database to be ready.
   imagePullPolicy: IfNotPresent
 {{- if .Values.postgresql.enabled }}
   command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.postgresql.fullname" . }} 5432 && exit 0 || sleep 5; done; exit 1']
+{{- else if .Values.mysql.enabled }}
+  command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.mysql.fullname" . }} 3306 && exit 0 || sleep 5; done; exit 1']
 {{- else }}
   command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ .Values.externalDatabase.host }} {{ .Values.externalDatabase.port }} && exit 0 || sleep 5; done; exit 1']
 {{- end }}
@@ -180,19 +200,6 @@ Create a registry environment variables.
   {{- else }}
   value: {{ .Values.externalRegistry.registryServers }}
   {{- end }}
-{{- end -}}
-
-{{/*
-Create a common fs_s3a environment variables.
-*/}}
-{{- define "dolphinscheduler.fs_s3a.env_vars" -}}
-{{- if eq (default "HDFS" .Values.common.configmap.RESOURCE_STORAGE_TYPE) "S3" -}}
-- name: FS_S3A_SECRET_KEY
-  valueFrom:
-    secretKeyRef:
-      key: fs-s3a-secret-key
-      name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
-{{- end -}}
 {{- end -}}
 
 {{/*

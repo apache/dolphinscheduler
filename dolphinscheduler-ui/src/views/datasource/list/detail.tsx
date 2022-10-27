@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
   NSpin,
@@ -30,8 +36,9 @@ import {
 } from 'naive-ui'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
-import { useForm, datasourceType, datasourceTypeList } from './use-form'
+import { useForm, datasourceType } from './use-form'
 import { useDetail } from './use-detail'
+import styles from './index.module.scss'
 
 const props = {
   show: {
@@ -40,13 +47,17 @@ const props = {
   },
   id: {
     type: Number as PropType<number>
+  },
+  selectType: {
+    type: String as PropType<any>,
+    default: 'MYSQL'
   }
 }
 
 const DetailModal = defineComponent({
   name: 'DetailModal',
   props,
-  emits: ['cancel', 'update'],
+  emits: ['cancel', 'update', 'open'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -54,7 +65,9 @@ const DetailModal = defineComponent({
       state,
       changeType,
       changePort,
+      changeTestFlag,
       resetFieldsValue,
+      getSameTypeTestDataSource,
       setFieldsValue,
       getFieldsValue
     } = useForm(props.id)
@@ -83,19 +96,40 @@ const DetailModal = defineComponent({
 
     const onChangeType = changeType
     const onChangePort = changePort
+    const onChangeTestFlag = changeTestFlag
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
+    const handleSourceModalOpen = () => {
+      ctx.emit('open')
+    }
 
     watch(
       () => props.show,
       async () => {
-        props.show && props.id && setFieldsValue(await queryById(props.id))
+        state.detailForm.type = props.selectType
+        state.detailForm.label = props.selectType === 'HIVE' ? 'HIVE/IMPALA' :  props.selectType
         props.show &&
           state.detailForm.type &&
-          changeType(
+          (await changeType(
             state.detailForm.type,
             datasourceType[state.detailForm.type]
-          )
+          ))
+        props.show && props.id && setFieldsValue(await queryById(props.id))
+        props.show && state.detailForm.testFlag == 0 && await getSameTypeTestDataSource()
+      }
+    )
+
+    watch(
+      () => props.selectType,
+      async () => {
+        state.detailForm.type = props.selectType
+        state.detailForm.label = props.selectType === 'HIVE' ? 'HIVE/IMPALA' :  props.selectType
+        state.detailForm.type &&
+        (await changeType(
+          state.detailForm.type,
+          datasourceType[state.detailForm.type]
+        ))
       }
     )
 
@@ -104,11 +138,13 @@ const DetailModal = defineComponent({
       ...toRefs(state),
       ...toRefs(status),
       onChangeType,
+      onChangeTestFlag,
       onChangePort,
       onSubmit,
       onTest,
       onCancel,
-      trim
+      trim,
+      handleSourceModalOpen
     }
   },
   render() {
@@ -119,16 +155,20 @@ const DetailModal = defineComponent({
       detailForm,
       rules,
       requiredDataBase,
+      showHost,
+      showPort,
+      showAwsRegion,
       showConnectType,
       showPrincipal,
       loading,
       saving,
       testing,
-      onChangeType,
+      onChangeTestFlag,
       onChangePort,
       onCancel,
       onTest,
-      onSubmit
+      onSubmit,
+      handleSourceModalOpen
     } = this
     return (
       <Modal
@@ -157,13 +197,10 @@ const DetailModal = defineComponent({
                   path='type'
                   show-require-mark
                 >
-                  <NSelect
-                    class='btn-data-source-type-drop-down'
-                    v-model={[detailForm.type, 'value']}
-                    options={datasourceTypeList}
-                    disabled={!!id}
-                    on-update:value={onChangeType}
-                  />
+                  <div class={[styles.typeBox, !!id && styles.disabledBox]}>
+                    <div v-model={[detailForm.type, 'value']}>{detailForm.label}</div>
+                    <div class={[styles['text-color'], 'btn-data-source-type-drop-down']} onClick={handleSourceModalOpen}>更换</div>
+                  </div>
                 </NFormItem>
                 <NFormItem
                   label={t('datasource.datasource_name')}
@@ -171,7 +208,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-data-source-name'
                     v-model={[detailForm.name, 'value']}
                     maxlength={60}
@@ -180,7 +217,7 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 <NFormItem label={t('datasource.description')} path='note'>
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-data-source-description'
                     v-model={[detailForm.note, 'value']}
                     type='textarea'
@@ -188,12 +225,13 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showHost}
                   label={t('datasource.ip')}
                   path='host'
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-ip'
                     v-model={[detailForm.host, 'value']}
                     type='text'
@@ -202,6 +240,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showPort}
                   label={t('datasource.port')}
                   path='port'
                   show-require-mark
@@ -222,7 +261,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.principal, 'value']}
                     type='text'
                     placeholder={t('datasource.principal_tips')}
@@ -234,7 +273,7 @@ const DetailModal = defineComponent({
                   path='javaSecurityKrb5Conf'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.javaSecurityKrb5Conf, 'value']}
                     type='text'
                     placeholder={t('datasource.krb5_conf_tips')}
@@ -246,7 +285,7 @@ const DetailModal = defineComponent({
                   path='loginUserKeytabUsername'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.loginUserKeytabUsername, 'value']}
                     type='text'
                     placeholder={t('datasource.keytab_username_tips')}
@@ -258,7 +297,7 @@ const DetailModal = defineComponent({
                   path='loginUserKeytabPath'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     v-model={[detailForm.loginUserKeytabPath, 'value']}
                     type='text'
                     placeholder={t('datasource.keytab_path_tips')}
@@ -270,7 +309,7 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-username'
                     v-model={[detailForm.userName, 'value']}
                     type='text'
@@ -283,11 +322,25 @@ const DetailModal = defineComponent({
                   path='password'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-password'
                     v-model={[detailForm.password, 'value']}
                     type='password'
                     placeholder={t('datasource.user_password_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showAwsRegion}
+                    label={t('datasource.aws_region')}
+                    path='awsRegion'
+                    show-require-mark
+                >
+                  <NInput
+                      allowInput={this.trim}
+                      v-model={[detailForm.awsRegion, 'value']}
+                      type='text'
+                      maxlength={60}
+                      placeholder={t('datasource.aws_region_tips')}
                   />
                 </NFormItem>
                 <NFormItem
@@ -296,7 +349,7 @@ const DetailModal = defineComponent({
                   show-require-mark={requiredDataBase}
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-data-base'
                     v-model={[detailForm.database, 'value']}
                     type='text'
@@ -326,7 +379,7 @@ const DetailModal = defineComponent({
                   path='other'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-jdbc-params'
                     v-model={[detailForm.other, 'value']}
                     type='textarea'
@@ -338,6 +391,37 @@ const DetailModal = defineComponent({
                     )} {"key1":"value1","key2":"value2"...} ${t(
                       'datasource.connection_parameter'
                     )}`}
+                  />
+                </NFormItem>
+                <NFormItem
+                  label={t('datasource.datasource_definition')}
+                  path='testFlag'
+                  show-require-mark
+                >
+                  <NRadioGroup
+                    v-model={[detailForm.testFlag, 'value']}
+                    onUpdate:value={onChangeTestFlag}
+                  >
+                    <NSpace>
+                      <NRadio value={1} class='radio-test-datasource'>
+                        {t('datasource.test_datasource')}
+                      </NRadio>
+                      <NRadio value={0} class='radio-online-datasource'>
+                        {t('datasource.online_datasource')}
+                      </NRadio>
+                    </NSpace>
+                  </NRadioGroup>
+                </NFormItem>
+                <NFormItem
+                  v-show={detailForm.testFlag == 0}
+                  label={t('datasource.bind_test_datasource')}
+                  path='bindTestId'
+                  show-require-mark
+                >
+                  <NSelect
+                    class='select-bind-test-data-source-type-drop-down'
+                    v-model={[detailForm.bindTestId, 'value']}
+                    options={this.bindTestDataSourceExample}
                   />
                 </NFormItem>
               </NForm>

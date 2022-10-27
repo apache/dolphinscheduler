@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
@@ -34,12 +34,12 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
     @Autowired
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearTestData();
     }
 
-    @After
+    @AfterEach
     public void after() {
         clearTestData();
     }
@@ -56,7 +56,7 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private EnvironmentWorkerGroupRelation insertOne() {
-        //insertOne
+        // insertOne
         EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
         relation.setEnvironmentCode(1L);
         relation.setWorkerGroup("default");
@@ -73,29 +73,31 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         insertOne();
-        //query
+        // query
         List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
-        Assert.assertEquals(relations.size(), 1);
+        Assertions.assertEquals(relations.size(), 1);
     }
 
     @Test
     public void testQueryByEnvironmentCode() {
         EnvironmentWorkerGroupRelation relation = insertOne();
-        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations = environmentWorkerGroupRelationMapper.queryByEnvironmentCode(1L);
-        Assert.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
+                environmentWorkerGroupRelationMapper.queryByEnvironmentCode(1L);
+        Assertions.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
     }
 
     @Test
     public void testQueryByWorkerGroupName() {
         EnvironmentWorkerGroupRelation relation = insertOne();
-        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations = environmentWorkerGroupRelationMapper.queryByWorkerGroupName("default");
-        Assert.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
+                environmentWorkerGroupRelationMapper.queryByWorkerGroupName("default");
+        Assertions.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
     }
 
     @Test
     public void testDeleteByCode() {
         EnvironmentWorkerGroupRelation relation = insertOne();
         int i = environmentWorkerGroupRelationMapper.deleteByCode(1L, "default");
-        Assert.assertNotEquals(i, 0);
+        Assertions.assertNotEquals(i, 0);
     }
 }

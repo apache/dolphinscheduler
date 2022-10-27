@@ -21,15 +21,18 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_SHECDULE_TIME;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +50,8 @@ public class ParameterUtils {
     private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\$\\]]+)]";
 
     private static final String DATE_START_PATTERN = "^[0-9]";
+
+    private static final char PARAM_REPLACE_CHAR = '?';
 
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
@@ -69,7 +74,7 @@ public class ParameterUtils {
             parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
         }
         if (parameterMap != null && null != parameterMap.get(PARAMETER_DATETIME)) {
-            //Get current time, schedule execute time
+            // Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, PARAMETER_FORMAT_TIME);
         } else {
@@ -94,7 +99,7 @@ public class ParameterUtils {
         if (StringUtils.isEmpty(parameterString)) {
             return parameterString;
         }
-        //Get current time, schedule execute time
+        // Get current time, schedule execute time
         String cronTimeStr = parameterMap.get(PARAMETER_SHECDULE_TIME);
         Date cronTime = null;
 
@@ -126,7 +131,8 @@ public class ParameterUtils {
      * @param value    value
      * @throws Exception errors
      */
-    public static void setInParameter(int index, PreparedStatement stmt, DataType dataType, String value) throws Exception {
+    public static void setInParameter(int index, PreparedStatement stmt, DataType dataType,
+                                      String value) throws Exception {
         if (dataType.equals(DataType.VARCHAR)) {
             stmt.setString(index, value);
         } else if (dataType.equals(DataType.INTEGER)) {
@@ -148,12 +154,70 @@ public class ParameterUtils {
         }
     }
 
+    public static String expandListParameter(Map<Integer, Property> params, String sql) {
+        Map<Integer, Property> expandMap = new HashMap<>();
+        if (params == null || params.isEmpty()) {
+            return sql;
+        }
+        String[] split = sql.split("\\?");
+        if (split.length == 0) {
+            return sql;
+        }
+        StringBuilder ret = new StringBuilder(split[0]);
+        int index = 1;
+        for (int i = 1; i < split.length; i++) {
+            Property property = params.get(i);
+            String value = property.getValue();
+            if (DataType.LIST.equals(property.getType())) {
+                List<Object> valueList = JSONUtils.toList(value, Object.class);
+                if (valueList.isEmpty() && StringUtils.isNotBlank(value)) {
+                    valueList.add(value);
+                }
+                for (int j = 0; j < valueList.size(); j++) {
+                    ret.append(PARAM_REPLACE_CHAR);
+                    if (j != valueList.size() - 1) {
+                        ret.append(",");
+                    }
+                }
+                for (Object v : valueList) {
+                    Property newProperty = new Property();
+                    if (v instanceof Integer) {
+                        newProperty.setType(DataType.INTEGER);
+                    } else if (v instanceof Long) {
+                        newProperty.setType(DataType.LONG);
+                    } else if (v instanceof Float) {
+                        newProperty.setType(DataType.FLOAT);
+                    } else if (v instanceof Double) {
+                        newProperty.setType(DataType.DOUBLE);
+                    } else {
+                        newProperty.setType(DataType.VARCHAR);
+                    }
+                    newProperty.setValue(v.toString());
+                    newProperty.setProp(property.getProp());
+                    newProperty.setDirect(property.getDirect());
+                    expandMap.put(index++, newProperty);
+                }
+            } else {
+                ret.append(PARAM_REPLACE_CHAR);
+                expandMap.put(index++, property);
+            }
+            ret.append(split[i]);
+        }
+        if (PARAM_REPLACE_CHAR == sql.charAt(sql.length() - 1)) {
+            ret.append(PARAM_REPLACE_CHAR);
+            expandMap.put(index, params.get(split.length));
+        }
+        params.clear();
+        params.putAll(expandMap);
+        return ret.toString();
+    }
+
     /**
      * $[yyyyMMdd] replace schedule time
      */
     public static String replaceScheduleTime(String text, Date scheduleTime) {
         Map<String, Property> paramsMap = new HashMap<>();
-        //if getScheduleTime null ,is current date
+        // if getScheduleTime null ,is current date
         if (null == scheduleTime) {
             scheduleTime = new Date();
         }

@@ -15,7 +15,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs, watch, onMounted, ref, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  watch,
+  onMounted,
+  ref,
+  getCurrentInstance
+} from 'vue'
 import { NSelect, NInput } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
@@ -24,7 +31,7 @@ import { useDetail } from './use-detail'
 import Modal from '@/components/modal'
 import Form from '@/components/form'
 import getElementByJson from '@/components/form/get-elements-by-json'
-import type { IRecord, FormRules, IFormItem } from './types'
+import type { IRecord, IFormRules, IFormItem } from './types'
 import type { PropType, Ref } from 'vue'
 
 interface IElements extends Omit<Ref, 'value'> {
@@ -48,7 +55,7 @@ const DetailModal = defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
 
-    const rules = ref<FormRules>({})
+    const rules = ref<IFormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
 
     const {
@@ -168,7 +175,7 @@ const DetailModal = defineComponent({
                     label: t('security.alarm_instance.alarm_instance_name'),
                     widget: (
                       <NInput
-                  allowInput={this.trim}
+                        allowInput={this.trim}
                         v-model={[detailForm.instanceName, 'value']}
                         placeholder={t(
                           'security.alarm_instance.alarm_instance_name_tips'

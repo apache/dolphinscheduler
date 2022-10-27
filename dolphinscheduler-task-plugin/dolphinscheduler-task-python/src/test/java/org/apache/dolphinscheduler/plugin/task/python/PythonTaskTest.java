@@ -17,19 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.python;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.powermock.reflect.Whitebox;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PythonTaskTest {
 
     @Test
     public void buildPythonExecuteCommand() throws Exception {
         PythonTask pythonTask = createPythonTask();
-        String methodName = "buildPythonExecuteCommand";
-        String pythonFile = "test.py";
-        String result1 = Whitebox.invokeMethod(pythonTask, methodName, pythonFile);
-        Assert.assertEquals("${PYTHON_HOME} test.py", result1);
+        Assertions.assertEquals("${PYTHON_HOME} test.py", pythonTask.buildPythonExecuteCommand("test.py"));
     }
 
     private PythonTask createPythonTask() {

@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -36,10 +36,9 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -53,6 +52,7 @@ import org.springframework.util.MultiValueMap;
  * resources controller test
  */
 public class ResourcesControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class);
 
     @MockBean(name = "resourcesServiceImpl")
@@ -65,18 +65,22 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testQuerytResourceList() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(resourcesService.queryResourceList(Mockito.any(), Mockito.any())).thenReturn(mockResult);
+        Mockito.when(resourcesService.queryResourceList(Mockito.any(), Mockito.any(), Mockito.anyString()))
+                .thenReturn(mockResult);
 
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("type", ResourceType.FILE.name());
         MvcResult mvcResult = mockMvc.perform(get("/resources/list")
                 .header(SESSION_ID, sessionId)
-                .param("type", ResourceType.FILE.name()))
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -84,8 +88,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testQueryResourceListPaging() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(resourcesService.queryResourceListPaging(
-                Mockito.any(), Mockito.anyInt(), Mockito.any(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+        Mockito.when(resourcesService.queryResourceListPaging(
+                Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
+                Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -94,6 +99,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "1");
         paramsMap.add("searchVal", "test");
         paramsMap.add("pageSize", "1");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(get("/resources")
                 .header(SESSION_ID, sessionId)
@@ -104,7 +111,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -112,7 +119,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testVerifyResourceName() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(resourcesService.verifyResourceName(Mockito.anyString(), Mockito.any(), Mockito.any())).thenReturn(mockResult);
+        Mockito.when(resourcesService.verifyResourceName(Mockito.anyString(), Mockito.any(), Mockito.any()))
+                .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("fullName", "list_resources_1.sh");
@@ -127,7 +135,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -135,13 +143,17 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testViewResource() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.HDFS_NOT_STARTUP.getCode());
-        PowerMockito.when(resourcesService.readResource(Mockito.any(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(resourcesService.readResource(Mockito.any(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+                .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("skipLineNum", "2");
         paramsMap.add("limit", "100");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
 
-        MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/view", "5")
+        MvcResult mvcResult = mockMvc.perform(get("/resources/view")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -150,7 +162,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.HDFS_NOT_STARTUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -158,8 +170,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testOnlineCreateResource() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(resourcesService
-                .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+        Mockito.when(resourcesService
+                .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -180,7 +193,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -188,13 +201,17 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testUpdateResourceContent() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyInt(), Mockito.anyString())).thenReturn(mockResult);
+        Mockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "1");
         paramsMap.add("content", "echo test_1111");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
 
-        MvcResult mvcResult = mockMvc.perform(put("/resources/1/update-content")
+        MvcResult mvcResult = mockMvc.perform(put("/resources/update-content")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -203,29 +220,35 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testDownloadResource() throws Exception {
 
-        PowerMockito.when(resourcesService.downloadResource(Mockito.any(), Mockito.anyInt())).thenReturn(null);
+        Mockito.when(resourcesService.downloadResource(Mockito.any(), Mockito.anyString()))
+                .thenReturn(null);
 
-        MvcResult mvcResult = mockMvc.perform(get("/resources/{id}/download", 5)
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+
+        MvcResult mvcResult = mockMvc.perform(get("/resources/download")
+                .params(paramsMap)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andReturn();
 
-        Assert.assertNotNull(mvcResult);
+        Assertions.assertNotNull(mvcResult);
     }
 
     @Test
     public void testCreateUdfFunc() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(udfFuncService
-                .createUdfFunction(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
+        Mockito.when(udfFuncService
+                .createUdfFunction(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -236,8 +259,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("database", "database");
         paramsMap.add("description", "description");
         paramsMap.add("resourceId", "1");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
 
-        MvcResult mvcResult = mockMvc.perform(post("/resources/{resourceId}/udf-func", "123")
+        MvcResult mvcResult = mockMvc.perform(post("/resources/udf-func")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -246,7 +270,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -254,7 +278,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testViewUIUdfFunction() throws Exception {
         Result<Object> mockResult = new Result<>();
         putMsg(mockResult, Status.TENANT_NOT_EXIST);
-        PowerMockito.when(udfFuncService
+        Mockito.when(udfFuncService
                 .queryUdfFuncDetail(Mockito.any(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 
@@ -266,7 +290,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -274,8 +298,10 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testUpdateUdfFunc() throws Exception {
         Result<Object> mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        PowerMockito.when(udfFuncService
-                .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
+        Mockito.when(udfFuncService
+                .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
+                        Mockito.anyString()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -287,8 +313,9 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("database", "database");
         paramsMap.add("description", "description");
         paramsMap.add("resourceId", "1");
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
 
-        MvcResult mvcResult = mockMvc.perform(put("/resources/{resourceId}/udf-func/{id}", "123", "456")
+        MvcResult mvcResult = mockMvc.perform(put("/resources/udf-func/{id}", "456")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -297,7 +324,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -305,7 +332,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testQueryUdfFuncList() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(udfFuncService.queryUdfFuncListPaging(Mockito.any(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(udfFuncService.queryUdfFuncListPaging(Mockito.any(), Mockito.anyString(), Mockito.anyInt(),
+                Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pageNo", "1");
@@ -321,7 +349,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -329,7 +357,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testQueryResourceList() throws Exception {
         Result<Object> mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(udfFuncService.queryUdfFuncList(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(udfFuncService.queryUdfFuncList(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("type", String.valueOf(UdfType.HIVE));
@@ -343,7 +371,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -351,7 +379,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testVerifyUdfFuncName() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(udfFuncService.verifyUdfFuncByName(Mockito.any(), Mockito.anyString())).thenReturn(mockResult);
+        Mockito.when(udfFuncService.verifyUdfFuncByName(Mockito.any(), Mockito.anyString())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name", "test");
@@ -365,7 +393,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -373,7 +401,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testAuthorizedFile() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(resourcesService.authorizedFile(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(resourcesService.authorizedFile(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "2");
@@ -387,7 +415,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -395,7 +423,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testAuthorizedUDFFunction() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(resourcesService.authorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(resourcesService.authorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "2");
@@ -409,7 +437,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -417,7 +445,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testUnauthUDFFunc() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        PowerMockito.when(resourcesService.unauthorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(resourcesService.unauthorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "2");
@@ -431,7 +459,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -439,7 +467,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testDeleteUdfFunc() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(udfFuncService.delete(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(udfFuncService.delete(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(delete("/resources/udf-func/{id}", "123")
                 .header(SESSION_ID, sessionId))
@@ -449,7 +477,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -457,17 +485,22 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     public void testDeleteResource() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
-        PowerMockito.when(resourcesService.delete(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
-
-        MvcResult mvcResult = mockMvc.perform(delete("/resources/{id}", "123")
-                .header(SESSION_ID, sessionId))
+        Mockito.when(resourcesService.delete(Mockito.any(), Mockito.anyString(),
+                Mockito.anyString()))
+                .thenReturn(mockResult);
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("fullName", "dolphinscheduler/resourcePath");
+        paramsMap.add("tenantCode", "123");
+        MvcResult mvcResult = mockMvc.perform(delete("/resources")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

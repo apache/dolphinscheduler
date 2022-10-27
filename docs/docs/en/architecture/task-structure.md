@@ -6,28 +6,28 @@ All tasks in DolphinScheduler are saved in the `t_ds_process_definition` table.
 
 The following shows the `t_ds_process_definition` table structure:
 
-No. | field  | type  |  description
--------- | ---------| -------- | ---------
-1|id|int(11)|primary key
-2|name|varchar(255)|process definition name
-3|version|int(11)|process definition version
-4|release_state|tinyint(4)|release status of process definition: 0 not released, 1 released
-5|project_id|int(11)|project id
-6|user_id|int(11)|user id of the process definition
-7|process_definition_json|longtext|process definition JSON
-8|description|text|process definition description
-9|global_params|text|global parameters
-10|flag|tinyint(4)|specify whether the process is available: 0 is not available, 1 is available
-11|locations|text|node location information
-12|connects|text|node connectivity info
-13|receivers|text|receivers
-14|receivers_cc|text|CC receivers
-15|create_time|datetime|create time
-16|timeout|int(11) |timeout
-17|tenant_id|int(11) |tenant id
-18|update_time|datetime|update time
-19|modify_by|varchar(36)|specify the user that made the modification
-20|resource_ids|varchar(255)|resource ids
+| No. |          field          |     type     |                                 description                                  |
+|-----|-------------------------|--------------|------------------------------------------------------------------------------|
+| 1   | id                      | int(11)      | primary key                                                                  |
+| 2   | name                    | varchar(255) | process definition name                                                      |
+| 3   | version                 | int(11)      | process definition version                                                   |
+| 4   | release_state           | tinyint(4)   | release status of process definition: 0 not released, 1 released             |
+| 5   | project_id              | int(11)      | project id                                                                   |
+| 6   | user_id                 | int(11)      | user id of the process definition                                            |
+| 7   | process_definition_json | longtext     | process definition JSON                                                      |
+| 8   | description             | text         | process definition description                                               |
+| 9   | global_params           | text         | global parameters                                                            |
+| 10  | flag                    | tinyint(4)   | specify whether the process is available: 0 is not available, 1 is available |
+| 11  | locations               | text         | node location information                                                    |
+| 12  | connects                | text         | node connectivity info                                                       |
+| 13  | receivers               | text         | receivers                                                                    |
+| 14  | receivers_cc            | text         | CC receivers                                                                 |
+| 15  | create_time             | datetime     | create time                                                                  |
+| 16  | timeout                 | int(11)      | timeout                                                                      |
+| 17  | tenant_id               | int(11)      | tenant id                                                                    |
+| 18  | update_time             | datetime     | update time                                                                  |
+| 19  | modify_by               | varchar(36)  | specify the user that made the modification                                  |
+| 20  | resource_ids            | varchar(255) | resource ids                                                                 |
 
 The `process_definition_json` field is the core field, which defines the task information in the DAG diagram, and it is stored in JSON format.
 
@@ -40,6 +40,7 @@ No. | field  | type  |  description
 4|timeout|int|timeout
 
 Data example:
+
 ```bash
 {
     "globalParams":[
@@ -74,7 +75,7 @@ No.|parameter name||type|description |notes
 9|runFlag | |String |execution flag| |
 10|conditionResult | |Object|condition branch | |
 11| | successNode| Array|jump to node if success| |
-12| | failedNode|Array|jump to node if failure| 
+12| | failedNode|Array|jump to node if failure|
 13| dependence| |Object |task dependency |mutual exclusion with params
 14|maxRetryTimes | |String|max retry times | |
 15|retryInterval | |String |retry interval| |
@@ -159,7 +160,7 @@ No.|parameter name||type|description |note
 19|runFlag | |String |execution flag| |
 20|conditionResult | |Object|condition branch  | |
 21| | successNode| Array|jump to node if success| |
-22| | failedNode|Array|jump to node if failure| 
+22| | failedNode|Array|jump to node if failure|
 23| dependence| |Object |task dependency |mutual exclusion with params
 24|maxRetryTimes | |String|max retry times | |
 25|retryInterval | |String |retry interval| |
@@ -238,38 +239,37 @@ No.|parameter name||type|description |note
 
 **The following shows the node data structure:**
 
-No.|parameter name||type|description |notes
--------- | ---------| ---------| -------- | --------- | ---------
-1|id | |String| task Id|
-2|type ||String |task type |SPARK
-3| name| |String|task name |
-4| params| |Object|customized parameters |JSON format
-5| |mainClass |String | main class
-6| |mainArgs | String| execution arguments
-7| |others | String| other arguments
-8| |mainJar |Object | application jar package
-9| |deployMode |String |deployment mode |local,client,cluster
-10| |driverCores | String| driver cores
-11| |driverMemory | String| driver memory
-12| |numExecutors |String | executor count
-13| |executorMemory |String | executor memory
-14| |executorCores |String | executor cores
-15| |programType | String| program type|JAVA,SCALA,PYTHON
-16| | sparkVersion| String|	Spark version| SPARK1 , SPARK2
-17| | localParams| Array|customized local parameters
-18| | resourceList| Array|resource files
-19|description | |String|description | |
-20|runFlag | |String |execution flag| |
-21|conditionResult | |Object|condition branch| |
-22| | successNode| Array|jump to node if success| |
-23| | failedNode|Array|jump to node if failure| 
-24| dependence| |Object |task dependency |mutual exclusion with params
-25|maxRetryTimes | |String|max retry times | |
-26|retryInterval | |String |retry interval| |
-27|timeout | |Object|timeout | |
-28| taskInstancePriority| |String|task priority | |
-29|workerGroup | |String |Worker group| |
-30|preTasks | |Array|preposition tasks| |
+| No. |            parameter name            ||  type  |         description         |            notes             |
+|-----|----------------------|----------------|--------|-----------------------------|------------------------------|
+| 1   | id                   |                | String | task Id                     |
+| 2   | type                                 || String | task type                   | SPARK                        |
+| 3   | name                 |                | String | task name                   |
+| 4   | params               |                | Object | customized parameters       | JSON format                  |
+| 5   |                      | mainClass      | String | main class                  |
+| 6   |                      | mainArgs       | String | execution arguments         |
+| 7   |                      | others         | String | other arguments             |
+| 8   |                      | mainJar        | Object | application jar package     |
+| 9   |                      | deployMode     | String | deployment mode             | local,client,cluster         |
+| 10  |                      | driverCores    | String | driver cores                |
+| 11  |                      | driverMemory   | String | driver memory               |
+| 12  |                      | numExecutors   | String | executor count              |
+| 13  |                      | executorMemory | String | executor memory             |
+| 14  |                      | executorCores  | String | executor cores              |
+| 15  |                      | programType    | String | program type                | JAVA,SCALA,PYTHON            |
+| 16  |                      | localParams    | Array  | customized local parameters |
+| 17  |                      | resourceList   | Array  | resource files              |
+| 18  | description          |                | String | description                 |                              |
+| 19  | runFlag              |                | String | execution flag              |                              |
+| 20  | conditionResult      |                | Object | condition branch            |                              |
+| 21  |                      | successNode    | Array  | jump to node if success     |                              |
+| 22  |                      | failedNode     | Array  | jump to node if failure     |
+| 23  | dependence           |                | Object | task dependency             | mutual exclusion with params |
+| 24  | maxRetryTimes        |                | String | max retry times             |                              |
+| 25  | retryInterval        |                | String | retry interval              |                              |
+| 26  | timeout              |                | Object | timeout                     |                              |
+| 27  | taskInstancePriority |                | String | task priority               |                              |
+| 28  | workerGroup          |                | String | Worker group                |                              |
+| 29  | preTasks             |                | Array  | preposition tasks           |                              |
 
 **Node data example:**
 
@@ -301,8 +301,7 @@ No.|parameter name||type|description |notes
         "executorCores":2,
         "mainArgs":"10",
         "others":"",
-        "programType":"SCALA",
-        "sparkVersion":"SPARK2"
+        "programType":"SCALA"
     },
     "description":"",
     "runFlag":"NORMAL",
@@ -336,31 +335,31 @@ No.|parameter name||type|description |notes
 
 **The following shows the node data structure:**
 
-No.|parameter name||type|description |notes
--------- | ---------| ---------| -------- | --------- | ---------
-1|id | |String| task Id|
-2|type ||String |task type |MR
-3| name| |String|task name |
-4| params| |Object|customized parameters |JSON format
-5| |mainClass |String | main class
-6| |mainArgs | String|execution arguments
-7| |others | String|other arguments
-8| |mainJar |Object | application jar package
-9| |programType | String|program type|JAVA,PYTHON
-10| | localParams| Array|customized local parameters
-11| | resourceList| Array|resource files
-12|description | |String|description | |
-13|runFlag | |String |execution flag| |
-14|conditionResult | |Object|condition branch| |
-15| | successNode| Array|jump to node if success| |
-16| | failedNode|Array|jump to node if failure| 
-17| dependence| |Object |task dependency |mutual exclusion with params
-18|maxRetryTimes | |String|max retry times | |
-19|retryInterval | |String |retry interval| |
-20|timeout | |Object|timeout | |
-21| taskInstancePriority| |String|task priority| |
-22|workerGroup | |String |Worker group| |
-23|preTasks | |Array|preposition tasks| |
+| No. |           parameter name           ||  type  |         description         |            notes             |
+|-----|----------------------|--------------|--------|-----------------------------|------------------------------|
+| 1   | id                   |              | String | task Id                     |
+| 2   | type                               || String | task type                   | MR                           |
+| 3   | name                 |              | String | task name                   |
+| 4   | params               |              | Object | customized parameters       | JSON format                  |
+| 5   |                      | mainClass    | String | main class                  |
+| 6   |                      | mainArgs     | String | execution arguments         |
+| 7   |                      | others       | String | other arguments             |
+| 8   |                      | mainJar      | Object | application jar package     |
+| 9   |                      | programType  | String | program type                | JAVA,PYTHON                  |
+| 10  |                      | localParams  | Array  | customized local parameters |
+| 11  |                      | resourceList | Array  | resource files              |
+| 12  | description          |              | String | description                 |                              |
+| 13  | runFlag              |              | String | execution flag              |                              |
+| 14  | conditionResult      |              | Object | condition branch            |                              |
+| 15  |                      | successNode  | Array  | jump to node if success     |                              |
+| 16  |                      | failedNode   | Array  | jump to node if failure     |
+| 17  | dependence           |              | Object | task dependency             | mutual exclusion with params |
+| 18  | maxRetryTimes        |              | String | max retry times             |                              |
+| 19  | retryInterval        |              | String | retry interval              |                              |
+| 20  | timeout              |              | Object | timeout                     |                              |
+| 21  | taskInstancePriority |              | String | task priority               |                              |
+| 22  | workerGroup          |              | String | Worker group                |                              |
+| 23  | preTasks             |              | Array  | preposition tasks           |                              |
 
 **Node data example:**
 
@@ -432,7 +431,7 @@ No.|parameter name||type|description |notes
 9|runFlag | |String |execution flag| |
 10|conditionResult | |Object|condition branch| |
 11| | successNode| Array|jump to node if success| |
-12| | failedNode|Array|jump to node if failure | 
+12| | failedNode|Array|jump to node if failure |
 13| dependence| |Object |task dependency |mutual exclusion with params
 14|maxRetryTimes | |String|max retry times | |
 15|retryInterval | |String |retry interval| |
@@ -493,36 +492,36 @@ No.|parameter name||type|description |notes
 
 **The following shows the node data structure:**
 
-No.|parameter name||type|description |notes
--------- | ---------| ---------| -------- | --------- | ---------
-1|id | |String|task Id|
-2|type ||String |task type|FLINK
-3| name| |String|task name|
-4| params| |Object|customized parameters |JSON format
-5| |mainClass |String |main class
-6| |mainArgs | String|execution arguments
-7| |others | String|other arguments
-8| |mainJar |Object |application jar package
-9| |deployMode |String |deployment mode |local,client,cluster
-10| |slot | String| slot count
-11| |taskManager |String | taskManager count
-12| |taskManagerMemory |String |taskManager memory size
-13| |jobManagerMemory |String | jobManager memory size
-14| |programType | String| program type|JAVA,SCALA,PYTHON
-15| | localParams| Array|local parameters
-16| | resourceList| Array|resource files
-17|description | |String|description | |
-18|runFlag | |String |execution flag| |
-19|conditionResult | |Object|condition branch| |
-20| | successNode| Array|jump node if success| |
-21| | failedNode|Array|jump node if failure| 
-22| dependence| |Object |task dependency |mutual exclusion with params
-23|maxRetryTimes | |String|max retry times| |
-24|retryInterval | |String |retry interval| |
-25|timeout | |Object|timeout | |
-26| taskInstancePriority| |String|task priority| |
-27|workerGroup | |String |Worker group| |
-38|preTasks | |Array|preposition tasks| |
+| No. |             parameter name              ||  type  |       description       |            notes             |
+|-----|----------------------|-------------------|--------|-------------------------|------------------------------|
+| 1   | id                   |                   | String | task Id                 |
+| 2   | type                                    || String | task type               | FLINK                        |
+| 3   | name                 |                   | String | task name               |
+| 4   | params               |                   | Object | customized parameters   | JSON format                  |
+| 5   |                      | mainClass         | String | main class              |
+| 6   |                      | mainArgs          | String | execution arguments     |
+| 7   |                      | others            | String | other arguments         |
+| 8   |                      | mainJar           | Object | application jar package |
+| 9   |                      | deployMode        | String | deployment mode         | local,client,cluster         |
+| 10  |                      | slot              | String | slot count              |
+| 11  |                      | taskManager       | String | taskManager count       |
+| 12  |                      | taskManagerMemory | String | taskManager memory size |
+| 13  |                      | jobManagerMemory  | String | jobManager memory size  |
+| 14  |                      | programType       | String | program type            | JAVA,SCALA,PYTHON            |
+| 15  |                      | localParams       | Array  | local parameters        |
+| 16  |                      | resourceList      | Array  | resource files          |
+| 17  | description          |                   | String | description             |                              |
+| 18  | runFlag              |                   | String | execution flag          |                              |
+| 19  | conditionResult      |                   | Object | condition branch        |                              |
+| 20  |                      | successNode       | Array  | jump node if success    |                              |
+| 21  |                      | failedNode        | Array  | jump node if failure    |
+| 22  | dependence           |                   | Object | task dependency         | mutual exclusion with params |
+| 23  | maxRetryTimes        |                   | String | max retry times         |                              |
+| 24  | retryInterval        |                   | String | retry interval          |                              |
+| 25  | timeout              |                   | Object | timeout                 |                              |
+| 26  | taskInstancePriority |                   | String | task priority           |                              |
+| 27  | workerGroup          |                   | String | Worker group            |                              |
+| 38  | preTasks             |                   | Array  | preposition tasks       |                              |
 
 **Node data example:**
 
@@ -588,30 +587,30 @@ No.|parameter name||type|description |notes
 
 **The following shows the node data structure:**
 
-No.|parameter name||type|description |notes
--------- | ---------| ---------| -------- | --------- | ---------
-1|id | |String|task Id|
-2|type ||String |task type|HTTP
-3| name| |String|task name|
-4| params| |Object|customized parameters |JSON format
-5| |url |String |request url
-6| |httpMethod | String|http method|GET,POST,HEAD,PUT,DELETE
-7| | httpParams| Array|http parameters
-8| |httpCheckCondition | String|validation of HTTP code status|default code 200
-9| |condition |String |validation conditions
-10| | localParams| Array|customized local parameters
-11|description | |String|description| |
-12|runFlag | |String |execution flag| |
-13|conditionResult | |Object|condition branch| |
-14| | successNode| Array|jump node if success| |
-15| | failedNode|Array|jump node if failure| 
-16| dependence| |Object |task dependency |mutual exclusion with params
-17|maxRetryTimes | |String|max retry times | |
-18|retryInterval | |String |retry interval| |
-19|timeout | |Object|timeout | |
-20| taskInstancePriority| |String|task priority| |
-21|workerGroup | |String |Worker group| |
-22|preTasks | |Array|preposition tasks| |
+| No. |              parameter name              ||  type  |          description           |            notes             |
+|-----|----------------------|--------------------|--------|--------------------------------|------------------------------|
+| 1   | id                   |                    | String | task Id                        |
+| 2   | type                                     || String | task type                      | HTTP                         |
+| 3   | name                 |                    | String | task name                      |
+| 4   | params               |                    | Object | customized parameters          | JSON format                  |
+| 5   |                      | url                | String | request url                    |
+| 6   |                      | httpMethod         | String | http method                    | GET,POST,HEAD,PUT,DELETE     |
+| 7   |                      | httpParams         | Array  | http parameters                |
+| 8   |                      | httpCheckCondition | String | validation of HTTP code status | default code 200             |
+| 9   |                      | condition          | String | validation conditions          |
+| 10  |                      | localParams        | Array  | customized local parameters    |
+| 11  | description          |                    | String | description                    |                              |
+| 12  | runFlag              |                    | String | execution flag                 |                              |
+| 13  | conditionResult      |                    | Object | condition branch               |                              |
+| 14  |                      | successNode        | Array  | jump node if success           |                              |
+| 15  |                      | failedNode         | Array  | jump node if failure           |
+| 16  | dependence           |                    | Object | task dependency                | mutual exclusion with params |
+| 17  | maxRetryTimes        |                    | String | max retry times                |                              |
+| 18  | retryInterval        |                    | String | retry interval                 |                              |
+| 19  | timeout              |                    | Object | timeout                        |                              |
+| 20  | taskInstancePriority |                    | String | task priority                  |                              |
+| 21  | workerGroup          |                    | String | Worker group                   |                              |
+| 22  | preTasks             |                    | Array  | preposition tasks              |                              |
 
 **Node data example:**
 
@@ -682,7 +681,7 @@ No.|parameter name||type|description |notes
 6| |dsType |String | datasource type
 7| |dataSource |Int | datasource ID
 8| |dtType | String|target database type
-9| |dataTarget | Int|target database ID 
+9| |dataTarget | Int|target database ID
 10| |sql |String | SQL statements
 11| |targetTable |String |target table
 12| |jobSpeedByte |Int |job speed limiting(bytes)
@@ -695,7 +694,7 @@ No.|parameter name||type|description |notes
 19|runFlag | |String |execution flag| |
 20|conditionResult | |Object|condition branch| |
 21| | successNode| Array|jump node if success| |
-22| | failedNode|Array|jump node if failure| 
+22| | failedNode|Array|jump node if failure|
 23| dependence| |Object |task dependency |mutual exclusion with params
 24|maxRetryTimes | |String|max retry times| |
 25|retryInterval | |String |retry interval| |
@@ -776,7 +775,7 @@ No.|parameter name||type|description |notes
 13|runFlag | |String |execution flag| |
 14|conditionResult | |Object|condition branch| |
 15| | successNode| Array|jump node if success| |
-16| | failedNode|Array|jump node if failure| 
+16| | failedNode|Array|jump node if failure|
 17| dependence| |Object |task dependency |mutual exclusion with params
 18|maxRetryTimes | |String|max retry times| |
 19|retryInterval | |String |retry interval| |
@@ -844,7 +843,7 @@ No.|parameter name||type|description |notes
 6|runFlag | |String |execution flag| |
 7|conditionResult | |Object|condition branch | |
 8| | successNode| Array|jump to node if success| |
-9| | failedNode|Array|jump to node if failure| 
+9| | failedNode|Array|jump to node if failure|
 10| dependence| |Object |task dependency |mutual exclusion with params
 11|maxRetryTimes | |String|max retry times | |
 12|retryInterval | |String |retry interval| |
@@ -909,7 +908,7 @@ No.|parameter name||type|description |notes
 7|runFlag | |String |execution flag| |
 8|conditionResult | |Object|condition branch | |
 9| | successNode| Array|jump to node if success| |
-10| | failedNode|Array|jump to node if failure| 
+10| | failedNode|Array|jump to node if failure|
 11| dependence| |Object |task dependency |mutual exclusion with params
 12|maxRetryTimes | |String|max retry times| |
 13|retryInterval | |String |retry interval| |
@@ -970,7 +969,7 @@ No.|parameter name||type|description |notes
 9|runFlag | |String |execution flag| |
 10|conditionResult | |Object|condition branch| |
 11| | successNode| Array|jump to node if success| |
-12| | failedNode|Array|jump to node if failure| 
+12| | failedNode|Array|jump to node if failure|
 13| dependence| |Object |task dependency |mutual exclusion with params
 14| | relation|String |relation|AND,OR
 15| | dependTaskList|Array |dependent task list|
@@ -1112,3 +1111,4 @@ No.|parameter name||type|description |notes
             ]
         }
 ```
+

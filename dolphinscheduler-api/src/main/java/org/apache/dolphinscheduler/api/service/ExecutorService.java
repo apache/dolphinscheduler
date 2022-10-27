@@ -61,11 +61,13 @@ public interface ExecutorService {
     Map<String, Object> execProcessInstance(User loginUser, long projectCode,
                                             long processDefinitionCode, String cronTime, CommandType commandType,
                                             FailureStrategy failureStrategy, String startNodeList,
-                                            TaskDependType taskDependType, WarningType warningType, int warningGroupId,
+                                            TaskDependType taskDependType, WarningType warningType,
+                                            Integer warningGroupId,
                                             RunMode runMode,
-                                            Priority processInstancePriority, String workerGroup, Long environmentCode, Integer timeout,
+                                            Priority processInstancePriority, String workerGroup, Long environmentCode,
+                                            Integer timeout,
                                             Map<String, String> startParams, Integer expectedParallelismNumber,
-                                            int dryRun,
+                                            int dryRun, int testFlag,
                                             ComplementDependentMode complementDependentMode);
 
     /**
@@ -74,10 +76,10 @@ public interface ExecutorService {
      * @param projectCode project code
      * @param processDefinition process definition
      * @param processDefineCode process definition code
-     * @param verison process definition version
-     * @return check result code
+     * @param version process definition version
      */
-    Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode, Integer verison);
+    void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode,
+                                     Integer version);
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
@@ -119,4 +121,22 @@ public interface ExecutorService {
      * @return
      */
     WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId);
+
+    /**
+     * execute stream task instance
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param warningGroupId notify group id
+     * @param workerGroup worker group name
+     * @param environmentCode environment code
+     * @param startParams the global param values which pass to new process instance
+     * @return execute process instance code
+     */
+    Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode,
+                                               long taskDefinitionCode, int taskDefinitionVersion,
+                                               int warningGroupId,
+                                               String workerGroup, Long environmentCode,
+                                               Map<String, String> startParams,
+                                               int dryRun);
 }

@@ -23,6 +23,13 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlertSendRequestCommand implements Serializable {
 
     private int groupId;
@@ -32,49 +39,6 @@ public class AlertSendRequestCommand implements Serializable {
     private String content;
 
     private int warnType;
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public int getWarnType() {
-        return warnType;
-    }
-
-    public void setWarnType(int warnType) {
-        this.warnType = warnType;
-    }
-
-    public AlertSendRequestCommand(){
-
-    }
-
-    public AlertSendRequestCommand(int groupId, String title, String content, int warnType) {
-        this.groupId = groupId;
-        this.title = title;
-        this.content = content;
-        this.warnType = warnType;
-    }
 
     /**
      * package request command
@@ -87,15 +51,5 @@ public class AlertSendRequestCommand implements Serializable {
         byte[] body = JsonSerializer.serialize(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "AlertSendRequestCommand{" +
-                "groupId=" + groupId +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", warnType=" + warnType +
-                '}';
     }
 }

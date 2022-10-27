@@ -23,17 +23,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import lombok.experimental.UtilityClass;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 
-public final class TaskMetrics {
+@UtilityClass
+public class TaskMetrics {
 
-    private TaskMetrics() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
-    private static Map<String, Counter> TASK_TYPE_EXECUTE_COUNTER = new HashMap<>();
-    private static final Counter UNKNOWN_TASK_EXECUTE_COUNTER =
+    private final Map<String, Counter> taskTypeExecutionCounter = new HashMap<>();
+    private final Counter taskUnknownTypeExecutionCounter =
             Counter.builder("ds.task.execution.count.by.type")
                     .tag("task_type", "unknown")
                     .description("task execution counter by type")
@@ -41,18 +39,17 @@ public final class TaskMetrics {
 
     static {
         for (TaskChannelFactory taskChannelFactory : ServiceLoader.load(TaskChannelFactory.class)) {
-            TASK_TYPE_EXECUTE_COUNTER.put(
+            taskTypeExecutionCounter.put(
                     taskChannelFactory.getName(),
                     Counter.builder("ds.task.execution.count.by.type")
                             .tag("task_type", taskChannelFactory.getName())
                             .description("task execution counter by type")
-                            .register(Metrics.globalRegistry)
-            );
+                            .register(Metrics.globalRegistry));
         }
     }
 
-    public static void incrTaskTypeExecuteCount(String taskType) {
-        TASK_TYPE_EXECUTE_COUNTER.getOrDefault(taskType, UNKNOWN_TASK_EXECUTE_COUNTER).increment();
+    public void incrTaskTypeExecuteCount(String taskType) {
+        taskTypeExecutionCounter.getOrDefault(taskType, taskUnknownTypeExecutionCounter).increment();
     }
 
 }

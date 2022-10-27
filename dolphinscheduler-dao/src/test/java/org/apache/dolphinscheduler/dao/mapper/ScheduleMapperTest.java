@@ -29,8 +29,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -55,7 +55,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
      * @return Schedule
      */
     private Schedule insertOne() {
-        //insertOne
+        // insertOne
         Schedule schedule = new Schedule();
         schedule.setStartTime(new Date());
         schedule.setEndTime(new Date());
@@ -74,12 +74,12 @@ public class ScheduleMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Schedule schedule = insertOne();
         schedule.setCreateTime(new Date());
-        //update
+        // update
         int update = scheduleMapper.updateById(schedule);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
     public void testDelete() {
         Schedule schedule = insertOne();
         int delete = scheduleMapper.deleteById(schedule.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -98,9 +98,9 @@ public class ScheduleMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Schedule schedule = insertOne();
-        //query
+        // query
         List<Schedule> schedules = scheduleMapper.selectList(null);
-        Assert.assertNotEquals(schedules.size(), 0);
+        Assertions.assertNotEquals(schedules.size(), 0);
     }
 
     /**
@@ -133,12 +133,12 @@ public class ScheduleMapperTest extends BaseDaoTest {
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
         schedule.setProcessDefinitionCode(processDefinition.getCode());
-        scheduleMapper.insert(schedule);
+        scheduleMapper.updateById(schedule);
 
-        Page<Schedule> page = new Page(1,3);
+        Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
                 processDefinition.getCode(), "");
-        Assert.assertNotEquals(scheduleIPage.getSize(), 0);
+        Assertions.assertNotEquals(scheduleIPage.getSize(), 0);
     }
 
     /**
@@ -171,14 +171,13 @@ public class ScheduleMapperTest extends BaseDaoTest {
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
         schedule.setProcessDefinitionCode(processDefinition.getCode());
-        scheduleMapper.insert(schedule);
+        scheduleMapper.updateById(schedule);
 
-        Page<Schedule> page = new Page(1,3);
+        Page<Schedule> page = new Page(1, 3);
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(
-                project.getName()
-        );
+                project.getName());
 
-        Assert.assertNotEquals(schedules.size(), 0);
+        Assertions.assertNotEquals(schedules.size(), 0);
     }
 
     /**
@@ -192,8 +191,9 @@ public class ScheduleMapperTest extends BaseDaoTest {
         schedule.setReleaseState(ReleaseState.ONLINE);
         scheduleMapper.updateById(schedule);
 
-        List<Schedule> schedules = scheduleMapper.selectAllByProcessDefineArray(new long[] {schedule.getProcessDefinitionCode()});
-        Assert.assertNotEquals(schedules.size(), 0);
+        List<Schedule> schedules =
+                scheduleMapper.selectAllByProcessDefineArray(new long[]{schedule.getProcessDefinitionCode()});
+        Assertions.assertNotEquals(schedules.size(), 0);
     }
 
     /**
@@ -206,6 +206,6 @@ public class ScheduleMapperTest extends BaseDaoTest {
         scheduleMapper.updateById(schedule);
 
         Schedule schedules = scheduleMapper.queryByProcessDefinitionCode(schedule.getProcessDefinitionCode());
-        Assert.assertNotNull(schedules);
+        Assertions.assertNotNull(schedules);
     }
 }

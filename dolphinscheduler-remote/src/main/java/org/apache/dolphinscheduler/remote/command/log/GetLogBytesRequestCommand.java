@@ -23,30 +23,22 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  *  get log bytes request command
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class GetLogBytesRequestCommand implements Serializable {
 
     /**
      *  log path
      */
     private String path;
-
-    public GetLogBytesRequestCommand() {
-    }
-
-    public GetLogBytesRequestCommand(String path) {
-        this.path = path;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 
     /**
      * package request command

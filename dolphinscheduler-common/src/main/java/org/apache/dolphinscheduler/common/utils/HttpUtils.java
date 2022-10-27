@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.AuthSchemes;
@@ -67,6 +67,7 @@ public class HttpUtils {
     }
 
     private static class HttpClientInstance {
+
         private static final CloseableHttpClient httpClient = getHttpClientBuilder().build();
     }
 
@@ -85,6 +86,7 @@ public class HttpUtils {
     private static Registry<ConnectionSocketFactory> socketFactoryRegistry;
 
     private static X509TrustManager xtm = new X509TrustManager() {
+
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
         }
@@ -102,7 +104,7 @@ public class HttpUtils {
     static {
         try {
             ctx = SSLContext.getInstance(SSLConnectionSocketFactory.TLS);
-            ctx.init(null, new TrustManager[] {xtm}, null);
+            ctx.init(null, new TrustManager[]{xtm}, null);
         } catch (NoSuchAlgorithmException e) {
             logger.error("SSLContext init with NoSuchAlgorithmException", e);
         } catch (KeyManagementException e) {
@@ -111,14 +113,14 @@ public class HttpUtils {
         socketFactory = new SSLConnectionSocketFactory(ctx, NoopHostnameVerifier.INSTANCE);
         /** set timeout、request time、socket timeout */
         requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES)
-            .setExpectContinueEnabled(Boolean.TRUE)
-            .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST, AuthSchemes.SPNEGO))
-            .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC, AuthSchemes.SPNEGO))
-            .setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT).setSocketTimeout(Constants.SOCKET_TIMEOUT)
-            .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT).setRedirectsEnabled(true)
-            .build();
+                .setExpectContinueEnabled(Boolean.TRUE)
+                .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST, AuthSchemes.SPNEGO))
+                .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC, AuthSchemes.SPNEGO))
+                .setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT).setSocketTimeout(Constants.SOCKET_TIMEOUT)
+                .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT).setRedirectsEnabled(true)
+                .build();
         socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-            .register("http", PlainConnectionSocketFactory.INSTANCE).register("https", socketFactory).build();
+                .register("http", PlainConnectionSocketFactory.INSTANCE).register("https", socketFactory).build();
         cm = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
         cm.setDefaultMaxPerRoute(60);
         cm.setMaxTotal(100);

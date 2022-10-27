@@ -18,42 +18,20 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * db task final result response command
  */
+@Data
+@AllArgsConstructor
 public class StateEventResponseCommand implements Serializable {
 
     private String key;
-    private ExecutionStatus status;
-
-    public StateEventResponseCommand() {
-        super();
-    }
-
-    public StateEventResponseCommand(ExecutionStatus status, String key) {
-        this.status = status;
-        this.key = key;
-    }
-
-    public ExecutionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ExecutionStatus status) {
-        this.status = status;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
 
     /**
      * package response command
@@ -66,14 +44,6 @@ public class StateEventResponseCommand implements Serializable {
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "StateEventResponseCommand{"
-                + "key=" + key
-                + ", status=" + status
-                + '}';
     }
 
 }

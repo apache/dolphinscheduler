@@ -30,8 +30,8 @@ public class StateEventHandlerManager {
 
     static {
         ServiceLoader.load(StateEventHandler.class)
-            .forEach(stateEventHandler -> stateEventHandlerMap.put(stateEventHandler.getEventType(),
-                stateEventHandler));
+                .forEach(stateEventHandler -> stateEventHandlerMap.put(stateEventHandler.getEventType(),
+                        stateEventHandler));
     }
 
     public static Optional<StateEventHandler> getStateEventHandler(StateEventType stateEventType) {

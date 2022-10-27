@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import lombok.experimental.UtilityClass;
+
 import com.google.common.collect.ImmutableSet;
 
 import io.micrometer.core.instrument.Counter;
@@ -30,62 +32,58 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 
-public final class ProcessInstanceMetrics {
+@UtilityClass
+public class ProcessInstanceMetrics {
 
-    private ProcessInstanceMetrics() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+    private final Map<String, Counter> processInstanceCounters = new HashMap<>();
 
-    private static Map<String, Counter> PROCESS_INSTANCE_COUNTERS = new HashMap<>();
-
-    private static final Set<String> PROCESS_INSTANCE_STATES = ImmutableSet.of(
+    private final Set<String> processInstanceStates = ImmutableSet.of(
             "submit", "timeout", "finish", "failover", "success", "fail", "stop");
 
     static {
-        for (final String state : PROCESS_INSTANCE_STATES) {
-            PROCESS_INSTANCE_COUNTERS.put(
+        for (final String state : processInstanceStates) {
+            processInstanceCounters.put(
                     state,
                     Counter.builder("ds.workflow.instance.count")
                             .tag("state", state)
                             .description(String.format("Process instance %s total count", state))
-                            .register(Metrics.globalRegistry)
-            );
+                            .register(Metrics.globalRegistry));
         }
 
     }
 
-    private static final Timer COMMAND_QUERY_TIMETER =
-        Timer.builder("ds.workflow.command.query.duration")
-            .description("Command query duration")
-            .register(Metrics.globalRegistry);
+    private final Timer commandQueryTimer =
+            Timer.builder("ds.workflow.command.query.duration")
+                    .description("Command query duration")
+                    .register(Metrics.globalRegistry);
 
-    private static final Timer PROCESS_INSTANCE_GENERATE_TIMER =
-        Timer.builder("ds.workflow.instance.generate.duration")
-            .description("Process instance generated duration")
-            .register(Metrics.globalRegistry);
+    private final Timer processInstanceGenerateTimer =
+            Timer.builder("ds.workflow.instance.generate.duration")
+                    .description("Process instance generated duration")
+                    .register(Metrics.globalRegistry);
 
-    public static void recordCommandQueryTime(long milliseconds) {
-        COMMAND_QUERY_TIMETER.record(milliseconds, TimeUnit.MILLISECONDS);
+    public void recordCommandQueryTime(long milliseconds) {
+        commandQueryTimer.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static void recordProcessInstanceGenerateTime(long milliseconds) {
-        PROCESS_INSTANCE_GENERATE_TIMER.record(milliseconds, TimeUnit.MILLISECONDS);
+    public void recordProcessInstanceGenerateTime(long milliseconds) {
+        processInstanceGenerateTimer.record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
+    public synchronized void registerProcessInstanceRunningGauge(Supplier<Number> function) {
         Gauge.builder("ds.workflow.instance.running", function)
-            .description("The current running process instance count")
-            .register(Metrics.globalRegistry);
+                .description("The current running process instance count")
+                .register(Metrics.globalRegistry);
     }
 
-    public static synchronized void registerProcessInstanceResubmitGauge(Supplier<Number> function) {
+    public synchronized void registerProcessInstanceResubmitGauge(Supplier<Number> function) {
         Gauge.builder("ds.workflow.instance.resubmit", function)
-            .description("The current process instance need to resubmit count")
-            .register(Metrics.globalRegistry);
+                .description("The current process instance need to resubmit count")
+                .register(Metrics.globalRegistry);
     }
 
-    public static void incProcessInstanceByState(final String state) {
-        PROCESS_INSTANCE_COUNTERS.get(state).increment();
+    public void incProcessInstanceByState(final String state) {
+        processInstanceCounters.get(state).increment();
     }
 
 }

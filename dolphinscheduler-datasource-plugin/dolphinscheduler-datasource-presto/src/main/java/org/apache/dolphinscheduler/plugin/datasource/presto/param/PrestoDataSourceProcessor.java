@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,11 +27,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -37,14 +38,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
-
-    private static final Pattern PRESTO_DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+/[a-zA-Z0-9\\_\\-\\.]+$");
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -58,11 +56,10 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
-        PrestoDataSourceParamDTO
-                prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
+        PrestoDataSourceParamDTO prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
         prestoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase() + Constants.SLASH + connectionParams.getSchema());
+        prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         prestoDatasourceParamDTO.setUserName(connectionParams.getUser());
         prestoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
@@ -72,8 +69,9 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PrestoDataSourceParamDTO prestoParam = (PrestoDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
-        String jdbcUrl = address + Constants.SLASH + prestoParam.getDatabase();
+        String address =
+                String.format("%s%s:%s", DataSourceConstants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
+        String jdbcUrl = address + "/" + prestoParam.getDatabase();
 
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setUser(prestoParam.getUserName());
@@ -81,8 +79,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         prestoConnectionParam.setOther(transformOther(prestoParam.getOther()));
         prestoConnectionParam.setAddress(address);
         prestoConnectionParam.setJdbcUrl(jdbcUrl);
-        prestoConnectionParam.setDatabase(prestoParam.getDatabase().split(Constants.SLASH)[0]);
-        prestoConnectionParam.setSchema(prestoParam.getDatabase().split(Constants.SLASH)[1]);
+        prestoConnectionParam.setDatabase(prestoParam.getDatabase());
         prestoConnectionParam.setDriverClassName(getDatasourceDriver());
         prestoConnectionParam.setValidationQuery(getValidationQuery());
         prestoConnectionParam.setProps(prestoParam.getOther());
@@ -97,12 +94,12 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_PRESTO_JDBC_DRIVER;
+        return DataSourceConstants.COM_PRESTO_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.PRESTO_VALIDATION_QUERY;
+        return DataSourceConstants.PRESTO_VALIDATION_QUERY;
     }
 
     @Override
@@ -151,12 +148,5 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
             otherMap.put(config.split("=")[0], config.split("=")[1]);
         }
         return otherMap;
-    }
-
-    @Override
-    protected void checkDatasourcePatter(String database) {
-        if (!PRESTO_DATABASE_PATTER.matcher(database).matches()) {
-            throw new IllegalArgumentException("datasource name illegal");
-        }
     }
 }

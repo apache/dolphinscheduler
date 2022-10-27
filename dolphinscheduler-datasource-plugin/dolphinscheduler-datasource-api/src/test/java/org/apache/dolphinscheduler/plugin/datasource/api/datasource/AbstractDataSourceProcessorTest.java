@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AbstractDataSourceProcessorTest {
 
@@ -41,6 +41,14 @@ public class AbstractDataSourceProcessorTest {
         AbstractDataSourceProcessor mockDataSourceProcessor = mock(AbstractDataSourceProcessor.class);
         Map<String, String> other = new HashMap<>();
         other.put("arg0", "%");
+        doThrow(new IllegalArgumentException()).when(mockDataSourceProcessor).checkOther(other);
+    }
+
+    @Test
+    public void shouldNotIncludeMaliciousParams() {
+        AbstractDataSourceProcessor mockDataSourceProcessor = mock(AbstractDataSourceProcessor.class);
+        Map<String, String> other = new HashMap<>();
+        other.put("allowLoadLocalInfile", "whatever");
         doThrow(new IllegalArgumentException()).when(mockDataSourceProcessor).checkOther(other);
     }
 }

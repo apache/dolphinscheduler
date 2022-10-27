@@ -15,19 +15,18 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>dolphinscheduler-datasource-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler-datasource-plugin</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-datasource-hive</artifactId>
-    <name>${project.artifactId}</name>
     <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
 
     <dependencies>
 
@@ -36,10 +35,22 @@
             <artifactId>dolphinscheduler-spi</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase.thirdparty</groupId>
+            <artifactId>hbase-noop-htrace</artifactId>
         </dependency>
 
         <dependency>
@@ -51,8 +62,8 @@
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>servlet-api</artifactId>
                     <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.codehaus.jackson</groupId>
@@ -76,38 +87,31 @@
                     <artifactId>hadoop-mapreduce-client-shuffle</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-client</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-core</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>log4j</artifactId>
                     <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
 
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-jdbc</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty.aggregate</groupId>
@@ -189,124 +193,124 @@
                     <artifactId>json</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-slf4j-impl</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>javax.servlet</artifactId>
                     <groupId>org.eclipse.jetty.orbit</groupId>
+                    <artifactId>javax.servlet</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>servlet-api-2.5</artifactId>
                     <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>servlet-api-2.5</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>tomcat</groupId>
                     <artifactId>jasper-runtime</artifactId>
-                    <groupId>tomcat</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>slider-core</artifactId>
                     <groupId>org.apache.slider</groupId>
+                    <artifactId>slider-core</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-server</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-client</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-core</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-json</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-server</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jersey-guice</artifactId>
                     <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-guice</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-common</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-hadoop2-compat</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-client</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-hadoop-compat</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>co.cask.tephra</groupId>
                     <artifactId>tephra-hbase-compat-1.0</artifactId>
-                    <groupId>co.cask.tephra</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-llap-client</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-llap-common</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-llap-server</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>tephra-core</artifactId>
                     <groupId>co.cask.tephra</groupId>
+                    <artifactId>tephra-core</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>ant</artifactId>
                     <groupId>ant</groupId>
+                    <artifactId>ant</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.antlr</groupId>
                     <artifactId>stringtemplate</artifactId>
-                    <groupId>org.antlr</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.antlr</groupId>
                     <artifactId>antlr-runtime</artifactId>
-                    <groupId>org.antlr</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hive-shims</artifactId>
                     <groupId>org.apache.hive</groupId>
+                    <artifactId>hive-shims</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsp-api</artifactId>
                     <groupId>javax.servlet</groupId>
+                    <artifactId>jsp-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-api</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-core</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-web</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jasper-compiler</artifactId>
                     <groupId>tomcat</groupId>
+                    <artifactId>jasper-compiler</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -317,13 +321,6 @@
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

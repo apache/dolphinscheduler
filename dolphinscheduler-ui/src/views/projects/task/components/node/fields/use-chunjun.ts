@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 import { useChunjunDeployMode } from './'
@@ -26,36 +26,15 @@ export function useChunjun(model: { [field: string]: any }): IJsonItem[] {
   const customParameterSpan = ref(0)
 
   const initConstants = () => {
-    if (model.customConfig) {
-      jsonEditorSpan.value = 24
-      customParameterSpan.value = 24
-    } else {
-      jsonEditorSpan.value = 0
-      customParameterSpan.value = 0
-    }
+    jsonEditorSpan.value = 24
+    customParameterSpan.value = 24
   }
 
   onMounted(() => {
     initConstants()
   })
 
-  watch(
-    () => model.customConfig,
-    () => {
-      initConstants()
-    }
-  )
-
   return [
-    {
-      type: 'switch',
-      field: 'customConfig',
-      value: true,
-      name: t('project.node.chunjun_custom_template'),
-      props: {
-        disabled: true
-      }
-    },
     {
       type: 'editor',
       field: 'json',

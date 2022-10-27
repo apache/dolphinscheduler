@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.flink;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelTask;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,7 +35,8 @@ public class SeatunnelFlinkTask extends SeatunnelTask {
 
     @Override
     public void init() {
-        seatunnelParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SeatunnelFlinkParameters.class);
+        seatunnelParameters =
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SeatunnelFlinkParameters.class);
         setSeatunnelParameters(seatunnelParameters);
         super.init();
     }
@@ -43,7 +44,9 @@ public class SeatunnelFlinkTask extends SeatunnelTask {
     @Override
     public List<String> buildOptions() throws Exception {
         List<String> args = super.buildOptions();
-        args.add(Objects.isNull(seatunnelParameters.getRunMode()) ? SeatunnelFlinkParameters.RunModeEnum.RUN.getCommand() : seatunnelParameters.getRunMode().getCommand());
+        args.add(
+                Objects.isNull(seatunnelParameters.getRunMode()) ? SeatunnelFlinkParameters.RunModeEnum.RUN.getCommand()
+                        : seatunnelParameters.getRunMode().getCommand());
         if (StringUtils.isNotBlank(seatunnelParameters.getOthers())) {
             args.add(seatunnelParameters.getOthers());
         }

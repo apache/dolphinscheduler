@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
-import static org.apache.dolphinscheduler.common.Constants.UTF_8;
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
+import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
 import org.apache.commons.io.IOUtils;
 
@@ -57,7 +57,8 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        String fileName = String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName =
+                String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
 
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
@@ -87,22 +88,29 @@ public class FileUtils {
     /**
      * directory of process execution
      *
-     * @param projectCode project code
-     * @param processDefineCode process definition Code
+     * @param tenant               tenant
+     * @param projectCode          project code
+     * @param processDefineCode    process definition Code
      * @param processDefineVersion process definition version
-     * @param processInstanceId process instance id
-     * @param taskInstanceId task instance id
+     * @param processInstanceId    process instance id
+     * @param taskInstanceId       task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
-        String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
-                projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        return fileName;
+    public static String getProcessExecDir(String tenant,
+                                           long projectCode,
+                                           long processDefineCode,
+                                           int processDefineVersion,
+                                           int processInstanceId,
+                                           int taskInstanceId) {
+        return String.format(
+                "%s/exec/process/%s/%d/%d_%d/%d/%d",
+                DATA_BASEDIR,
+                tenant,
+                projectCode,
+                processDefineCode,
+                processDefineVersion,
+                processInstanceId,
+                taskInstanceId);
     }
 
     /**
@@ -119,7 +127,7 @@ public class FileUtils {
      * @throws IOException errors
      */
     public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        //if work dir exists, first delete
+        // if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
         if (execLocalPathFile.exists()) {
@@ -134,7 +142,7 @@ public class FileUtils {
             }
         }
 
-        //create work dir
+        // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
         logger.info(mkdirLog);
@@ -230,7 +238,7 @@ public class FileUtils {
      * @param filename String type of filename
      * @return whether file path could be traversal or not
      */
-    public static boolean directoryTraversal(String filename){
+    public static boolean directoryTraversal(String filename) {
         if (filename.contains(FOLDER_SEPARATOR)) {
             return true;
         }

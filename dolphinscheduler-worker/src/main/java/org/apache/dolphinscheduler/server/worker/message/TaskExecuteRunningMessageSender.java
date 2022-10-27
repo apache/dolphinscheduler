@@ -25,10 +25,10 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
+import lombok.NonNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import lombok.NonNull;
 
 @Component
 public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecuteRunningCommand> {
@@ -46,10 +46,10 @@ public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecut
 
     public TaskExecuteRunningCommand buildMessage(@NonNull TaskExecutionContext taskExecutionContext,
                                                   @NonNull String messageReceiverAddress) {
-        TaskExecuteRunningCommand taskExecuteRunningMessage
-            = new TaskExecuteRunningCommand(workerConfig.getWorkerAddress(),
-                                            messageReceiverAddress,
-                                            System.currentTimeMillis());
+        TaskExecuteRunningCommand taskExecuteRunningMessage =
+                new TaskExecuteRunningCommand(workerConfig.getWorkerAddress(),
+                        messageReceiverAddress,
+                        System.currentTimeMillis());
         taskExecuteRunningMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecuteRunningMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus());
@@ -57,6 +57,7 @@ public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecut
         taskExecuteRunningMessage.setHost(taskExecutionContext.getHost());
         taskExecuteRunningMessage.setStartTime(taskExecutionContext.getStartTime());
         taskExecuteRunningMessage.setExecutePath(taskExecutionContext.getExecutePath());
+        taskExecuteRunningMessage.setAppIds(taskExecutionContext.getAppIds());
         return taskExecuteRunningMessage;
     }
 

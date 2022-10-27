@@ -23,16 +23,15 @@
 /dolphinscheduler-registry/ @kezhenxu94 @caishunfeng @ruanwenjun
 /dolphinscheduler-api/ @caishunfeng @SbloodyS
 /dolphinscheduler-dao/ @caishunfeng @SbloodyS
+/dolphinscheduler-dao/src/main/resources/sql/ @zhongjiajie
 /dolphinscheduler-common/ @caishunfeng
 /dolphinscheduler-standalone-server/ @kezhenxu94 @caishunfeng
-/dolphinscheduler-log-server/ @caishunfeng
 /dolphinscheduler-datasource-plugin/ @caishunfeng
 /dolphinscheduler-dist/ @kezhenxu94 @caishunfeng
 /dolphinscheduler-meter/ @caishunfeng @kezhenxu94 @ruanwenjun @EricGao888
 /dolphinscheduler-scheduler-plugin/ @caishunfeng
 /dolphinscheduler-master/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-worker/ @caishunfeng @SbloodyS @ruanwenjun
-/dolphinscheduler-server/ @caishunfeng
 /dolphinscheduler-service/ @caishunfeng
 /dolphinscheduler-remote/ @caishunfeng
 /dolphinscheduler-spi/ @caishunfeng

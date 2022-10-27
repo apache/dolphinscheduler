@@ -21,25 +21,12 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 
 import java.util.List;
 
-public class DependentTaskModel {
+import lombok.Data;
 
+@Data
+public class DependentTaskModel {
 
     private List<DependentItem> dependItemList;
     private DependentRelation relation;
 
-    public List<DependentItem> getDependItemList() {
-        return dependItemList;
-    }
-
-    public void setDependItemList(List<DependentItem> dependItemList) {
-        this.dependItemList = dependItemList;
-    }
-
-    public DependentRelation getRelation() {
-        return relation;
-    }
-
-    public void setRelation(DependentRelation relation) {
-        this.relation = relation;
-    }
 }

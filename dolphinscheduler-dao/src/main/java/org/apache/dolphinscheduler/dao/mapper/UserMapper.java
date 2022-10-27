@@ -80,7 +80,6 @@ public interface UserMapper extends BaseMapper<User> {
      */
     User queryUserByNamePassword(@Param("userName") String userName, @Param("password") String password);
 
-
     /**
      * user page
      *
@@ -174,13 +173,8 @@ public interface UserMapper extends BaseMapper<User> {
     List<User> queryAuthedUserListByProjectId(@Param("projectId") int projectId);
 
     /**
-     * list authorized User
-     * @param userId
-     * @param resourcesIds
-     * @param <T>
+     * query enabled users
      * @return
      */
-    <T> List<User> listAuthorizedUsersList (@Param("userId") int userId, @Param("resourcesIds")T[] resourcesIds);
-
-
+    List<User> queryEnabledUsers();
 }

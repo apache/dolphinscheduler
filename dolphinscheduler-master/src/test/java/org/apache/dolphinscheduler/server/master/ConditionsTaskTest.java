@@ -17,21 +17,24 @@
 
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.Duration;
@@ -39,14 +42,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ConditionsTaskTest {
 
     /**
@@ -58,7 +63,11 @@ public class ConditionsTaskTest {
 
     private ProcessInstance processInstance;
 
-    @Before
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionDao taskDefinitionDao;
+
+    @BeforeEach
     public void before() {
         ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -72,6 +81,12 @@ public class ConditionsTaskTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(applicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
+        taskDefinitionDao = Mockito.mock(TaskDefinitionDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskDefinitionDao.class)).thenReturn(taskDefinitionDao);
+
         processInstance = getProcessInstance();
         Mockito.when(processService
                 .findProcessInstanceById(processInstance.getId()))
@@ -81,11 +96,11 @@ public class ConditionsTaskTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
-        Mockito.when(processService.findTaskDefinition(1L, 1))
+        Mockito.when(taskDefinitionDao.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
     }
 
-    private TaskInstance testBasicInit(ExecutionStatus expectResult) {
+    private TaskInstance testBasicInit(TaskExecutionStatus expectResult) {
         TaskInstance taskInstance = getTaskInstance(getTaskNode(), processInstance);
 
         // for MasterBaseTaskExecThread.submit
@@ -93,42 +108,24 @@ public class ConditionsTaskTest {
                 .submitTask(processInstance, taskInstance))
                 .thenReturn(taskInstance);
         // for MasterBaseTaskExecThread.call
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findTaskInstanceById(taskInstance.getId()))
                 .thenReturn(taskInstance);
         // for ConditionsTaskExecThread.initTaskParameters
-        Mockito.when(processService
-                .saveTaskInstance(taskInstance))
+        Mockito.when(taskInstanceDao.upsertTaskInstance(taskInstance))
                 .thenReturn(true);
         // for ConditionsTaskExecThread.updateTaskState
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .updateTaskInstance(taskInstance))
                 .thenReturn(true);
 
         // for ConditionsTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = Stream.of(
-                getTaskInstanceForValidTaskList(expectResult)
-        ).collect(Collectors.toList());
-        Mockito.when(processService
-                .findValidTaskListByProcessId(processInstance.getId()))
+                getTaskInstanceForValidTaskList(expectResult)).collect(Collectors.toList());
+        Mockito.when(taskInstanceDao
+                .findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(conditions);
         return taskInstance;
-    }
-
-    @Test
-    public void testBasicSuccess() {
-        TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
-        //ConditionTaskProcessor taskExecThread = new onditionsTaskExecThread(taskInstance);
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
-    }
-
-    @Test
-    public void testBasicFailure() {
-        TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
-        //ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
-        //taskExecThread.call();
-        //Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
     }
 
     private TaskNode getTaskNode() {
@@ -142,7 +139,7 @@ public class ConditionsTaskTest {
 
         DependentItem dependentItem = new DependentItem();
         dependentItem.setDepTaskCode(11L);
-        dependentItem.setStatus(ExecutionStatus.SUCCESS);
+        dependentItem.setStatus(TaskExecutionStatus.SUCCESS);
 
         DependentTaskModel dependentTaskModel = new DependentTaskModel();
         dependentTaskModel.setDependItemList(Stream.of(dependentItem).collect(Collectors.toList()));
@@ -168,7 +165,7 @@ public class ConditionsTaskTest {
     private ProcessInstance getProcessInstance() {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1000);
-        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
 
         return processInstance;
     }
@@ -185,7 +182,7 @@ public class ConditionsTaskTest {
         return taskInstance;
     }
 
-    private TaskInstance getTaskInstanceForValidTaskList(ExecutionStatus state) {
+    private TaskInstance getTaskInstanceForValidTaskList(TaskExecutionStatus state) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1001);
         taskInstance.setName("1");

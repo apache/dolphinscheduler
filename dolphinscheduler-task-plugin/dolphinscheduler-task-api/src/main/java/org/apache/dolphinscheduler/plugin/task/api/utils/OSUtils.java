@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ShellExecutor;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.StringTokenizer;

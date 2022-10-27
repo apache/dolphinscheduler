@@ -16,7 +16,14 @@
  */
 
 import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, ref, reactive, Ref, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  ref,
+  reactive,
+  Ref,
+  getCurrentInstance
+} from 'vue'
 import {
   NIcon,
   NSpace,
@@ -35,8 +42,8 @@ import { useFileState } from './use-file'
 import { BreadcrumbItem, IRenameFile } from './types'
 import { useFileStore } from '@/store/file/file'
 import {
-  queryCurrentResourceById,
-  queryResourceById
+  queryCurrentResourceByFullName,
+  queryCurrentResourceByFileName
 } from '@/service/modules/resources'
 import Card from '@/components/card'
 import ResourceFolderModal from './folder'
@@ -50,8 +57,8 @@ export default defineComponent({
   name: 'File',
   setup() {
     const router: Router = useRouter()
-    const fileId = ref(Number(router.currentRoute.value.params.id) || -1)
-
+    const fullName = ref(String(router.currentRoute.value.query.prefix || ""))
+    const tenantCode = ref(String(router.currentRoute.value.query.tenantCode || ""))
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
@@ -59,9 +66,10 @@ export default defineComponent({
     const searchRef = ref()
 
     const renameInfo = reactive({
-      id: -1,
       name: '',
-      description: ''
+      description: '',
+      fullName: '',
+      user_name: ''
     })
 
     const paginationReactive = reactive({
@@ -74,7 +82,8 @@ export default defineComponent({
     const handleUpdatePage = (page: number) => {
       paginationReactive.page = page
       resourceListRef.value = getResourceListState(
-        fileId.value,
+        fullName.value,
+        tenantCode.value,
         searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
@@ -85,7 +94,8 @@ export default defineComponent({
       paginationReactive.page = 1
       paginationReactive.pageSize = pageSize
       resourceListRef.value = getResourceListState(
-        fileId.value,
+        fullName.value,
+        tenantCode.value,
         searchRef.value,
         paginationReactive.page,
         paginationReactive.pageSize
@@ -104,7 +114,8 @@ export default defineComponent({
 
     const handleConditions = () => {
       resourceListRef.value = getResourceListState(
-        fileId.value,
+        fullName.value,
+        tenantCode.value,
         searchRef.value
       )
     }
@@ -114,12 +125,12 @@ export default defineComponent({
     }
 
     const handleCreateFile = () => {
-      const name = fileId.value
+      const name = fullName.value
         ? 'resource-subfile-create'
         : 'resource-file-create'
       router.push({
         name,
-        params: { id: fileId.value }
+        params: { id: fullName.value }
       })
     }
 
@@ -127,10 +138,11 @@ export default defineComponent({
       handleShowModal(uploadShowRef)
     }
 
-    const handleRenameFile: IRenameFile = (id, name, description) => {
-      renameInfo.id = id
+    const handleRenameFile: IRenameFile = (name: string, description: string, fullName: string, user_name: string) => {
+      renameInfo.fullName = fullName
       renameInfo.name = name
       renameInfo.description = description
+      renameInfo.user_name = user_name
       handleShowModal(renameShowRef)
     }
 
@@ -142,75 +154,75 @@ export default defineComponent({
 
     const updateList = () => {
       resourceListRef.value = getResourceListState(
-        fileId.value,
+        fullName.value,
+        tenantCode.value,
         searchRef.value
       )
     }
     const fileStore = useFileStore()
 
     onMounted(() => {
-      resourceListRef.value = getResourceListState(fileId.value)
+      resourceListRef.value = getResourceListState(fullName.value, tenantCode.value,searchRef.value)
     })
 
     const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([
       {
         id: 1,
-        fullName: 'l1'
+        fullName: 'l1',
+        userName: 'u1'
       },
       {
         id: 2,
-        fullName: 'l2'
+        fullName: 'l2',
+        userName: 'u2'
       },
       {
         id: 4,
-        fullName: 'l3'
+        fullName: 'l3',
+        userName: 'u3'
       }
     ])
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
-      const currFileId = Number(router.currentRoute.value.params.id) || -1
-      if (currFileId === -1) {
+      const currfullName = String(router.currentRoute.value.query.prefix || "")
+      if (currfullName === "") {
         fileStore.setCurrentDir('/')
       } else {
-        queryCurrentResourceById(currFileId).then((res: ResourceFile) => {
-          if (res.fullName) {
-            fileStore.setCurrentDir(res.fullName)
-          }
-        })
+        fileStore.setCurrentDir(currfullName)
       }
     })
 
     const initBreadcrumb = async (dirs: string[]) => {
-      let index = 0
-      for (const dir of dirs) {
+      for (let index = 0; index < dirs.length; index ++) {
         const newDir = dirs.slice(0, index + 1).join('/')
-        if (newDir) {
-          const id = 0
-          const resource = await queryResourceById(
-            {
-              id,
-              type: 'FILE',
-              fullName: newDir
-            },
-            id
-          )
-          breadcrumbItemsRef.value?.push({ id: resource.id, fullName: dir })
-        } else {
-          breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root' })
+        const resource = await queryCurrentResourceByFileName(
+          {
+            type: 'FILE',
+            fileName: newDir+"/",
+            tenantCode: tenantCode.value
+          }
+        )
+        breadcrumbItemsRef.value?.push({ id: resource.fullName, fullName: resource.alias, userName: resource.userName })
         }
-        index = index + 1
-      }
     }
 
     onMounted(() => {
       breadcrumbItemsRef.value = []
-      if (fileId.value != -1) {
-        queryCurrentResourceById(fileId.value).then((res: ResourceFile) => {
-          if (res.fullName) {
-            const dirs = res.fullName.split('/')
+      if (fullName.value != "") {
+        breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root', userName: '' })
+        queryCurrentResourceByFullName(
+          {
+            type: 'FILE',
+            fullName: fullName.value,
+            tenantCode: tenantCode.value,
+          }
+        ).then((res: ResourceFile) => {
+          if (res.fileName) {
+            const dirs = res.fileName.split('/')
             if (dirs && dirs.length > 1) {
+              dirs.pop()
               initBreadcrumb(dirs)
             }
           }
@@ -219,7 +231,7 @@ export default defineComponent({
     })
 
     return {
-      fileId,
+      fullName,
       searchRef,
       folderShowRef,
       uploadShowRef,
@@ -300,7 +312,7 @@ export default defineComponent({
                     )
                   } else {
                     return (
-                      <NBreadcrumbItem href={item.id.toString()}>
+                      <NBreadcrumbItem href={"0?prefix=" + item.id.toString() + "&tenantCode=" + item.userName}>
                         {item.fullName}
                       </NBreadcrumbItem>
                     )
@@ -346,9 +358,10 @@ export default defineComponent({
         />
         <ResourceRenameModal
           v-model:show={this.renameShowRef}
-          id={this.renameInfo.id}
           name={this.renameInfo.name}
+          fullName={this.renameInfo.fullName}
           description={this.renameInfo.description}
+          userName={this.renameInfo.user_name}
           onUpdateList={this.updateList}
         />
       </NSpace>

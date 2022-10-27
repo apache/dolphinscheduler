@@ -21,16 +21,17 @@ import static java.lang.String.format;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DataSourcePluginManager {
+
     private static final Logger logger = LoggerFactory.getLogger(DataSourcePluginManager.class);
 
     private final Map<String, DataSourceChannel> datasourceClientMap = new ConcurrentHashMap<>();
@@ -41,8 +42,11 @@ public class DataSourcePluginManager {
 
     public void installPlugin() {
 
-        ServiceLoader.load(DataSourceChannelFactory.class).forEach(factory -> {
-            final String name = factory.getName();
+        PrioritySPIFactory<DataSourceChannelFactory> prioritySPIFactory =
+                new PrioritySPIFactory<>(DataSourceChannelFactory.class);
+        for (Map.Entry<String, DataSourceChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
+            final DataSourceChannelFactory factory = entry.getValue();
+            final String name = entry.getKey();
 
             logger.info("Registering datasource plugin: {}", name);
 
@@ -53,7 +57,7 @@ public class DataSourcePluginManager {
             loadDatasourceClient(factory);
 
             logger.info("Registered datasource plugin: {}", name);
-        });
+        }
     }
 
     private void loadDatasourceClient(DataSourceChannelFactory datasourceChannelFactory) {

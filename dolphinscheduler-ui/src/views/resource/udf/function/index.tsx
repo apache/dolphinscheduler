@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, Ref, toRefs, onMounted, toRef, watch, getCurrentInstance } from 'vue'
+import {
+  defineComponent,
+  Ref,
+  toRefs,
+  onMounted,
+  toRef,
+  watch,
+  getCurrentInstance
+} from 'vue'
 import {
   NIcon,
   NSpace,
@@ -39,6 +47,7 @@ export default defineComponent({
     const requestData = () => {
       getTableData({
         id: variables.id,
+        fullName: variables.fullName,
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal
@@ -114,7 +123,7 @@ export default defineComponent({
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>
-                  <SearchOutlined/>
+                  <SearchOutlined />
                 </NIcon>
               </NButton>
             </NSpace>
