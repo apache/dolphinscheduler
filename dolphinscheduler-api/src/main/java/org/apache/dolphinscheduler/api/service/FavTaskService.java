@@ -26,7 +26,7 @@ public interface FavTaskService {
 
     List<FavTaskDto> getFavTaskList(User loginUser);
 
-    boolean deleteFavTask(User loginUser, String taskName);
+    boolean deleteFavTask(User loginUser, String taskType);
 
-    int addFavTask(User loginUser, String taskName);
+    int addFavTask(User loginUser, String taskType);
 }

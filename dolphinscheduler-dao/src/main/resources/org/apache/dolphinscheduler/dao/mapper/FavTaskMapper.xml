@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.FavTaskMapper">
 
     <select id="getUserFavTaskTypes" resultType="string">
-        select task_name
+        select task_type
         from t_ds_fav_task
         where user_id = #{userId}
     </select>
@@ -29,6 +29,6 @@
         delete
         from t_ds_fav_task
         where user_id = #{userId}
-          and task_name = #{taskName}
+          and task_type = #{taskType}
     </delete>
 </mapper>

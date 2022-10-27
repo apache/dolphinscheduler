@@ -32,5 +32,5 @@ public interface FavTaskMapper extends BaseMapper<FavTask> {
 
     Set<String> getUserFavTaskTypes(@Param("userId") int userId);
 
-    boolean deleteUserFavTask(@Param("userId") int userId, @Param("taskName") String taskName);
+    boolean deleteUserFavTask(@Param("userId") int userId, @Param("taskType") String taskType);
 }

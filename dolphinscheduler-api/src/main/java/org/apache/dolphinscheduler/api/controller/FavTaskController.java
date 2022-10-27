@@ -82,13 +82,13 @@ public class FavTaskController extends BaseController {
      * @return
      */
     @Operation(summary = "deleteTaskType", description = "DELETE_TASK_TYPE")
-    @DeleteMapping(value = "/{taskName}")
+    @DeleteMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @PathVariable("taskName") String taskName) {
-        boolean b = favTaskService.deleteFavTask(loginUser, taskName);
+                                @PathVariable("taskType") String taskType) {
+        boolean b = favTaskService.deleteFavTask(loginUser, taskType);
         return success(b);
     }
 
@@ -99,13 +99,13 @@ public class FavTaskController extends BaseController {
      * @return
      */
     @Operation(summary = "addTaskType", description = "ADD_TASK_TYPE")
-    @PostMapping(value = "/{taskName}")
+    @PostMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ADD_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result addFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @PathVariable("taskName") String taskName) {
-        int i = favTaskService.addFavTask(loginUser, taskName);
+                             @PathVariable("taskType") String taskType) {
+        int i = favTaskService.addFavTask(loginUser, taskType);
         return success(i > 0);
     }
 }

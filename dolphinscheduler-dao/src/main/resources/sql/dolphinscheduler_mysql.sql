@@ -2000,8 +2000,8 @@ CREATE TABLE `t_ds_cluster`(
 DROP TABLE IF EXISTS `t_ds_fav_task`;
 CREATE TABLE `t_ds_fav_task`
 (
-    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'favorite task id',
-    `task_name` varchar(64) NOT NULL COMMENT 'favorite task name',
+    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name',
     `user_id`   int         NOT NULL COMMENT 'user id',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB

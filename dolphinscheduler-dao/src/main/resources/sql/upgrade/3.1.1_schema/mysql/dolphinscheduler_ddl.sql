@@ -14,6 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+--- rename t_ds_fav_task task_name to task_type
+drop procedure if exists modify_t_ds_fav_task_task_name;
+delimiter d//
+CREATE PROCEDURE modify_t_ds_fav_task_task_name()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_fav_task'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='task_name')
+    THEN
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+ALTER TABLE `t_ds_fav_task` change `task_name` `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name';
+END IF;
+END;
+d//
+delimiter ;
+CALL modify_t_ds_fav_task_task_name;
+DROP PROCEDURE modify_t_ds_fav_task_task_name;
+
 -- alter table `t_ds_worker_group` add `description` varchar(256);
 drop procedure if exists add_column_safety;
 delimiter d//
