@@ -72,12 +72,10 @@ public class YarnClientAspect {
                         + ioException.getMessage());
             }
         }
-        if (debug) {
             logger.info("YarnClientAspect[submitApplication]: current application context " + appContext);
             logger.info("YarnClientAspect[submitApplication]: submitted application id " + submittedAppId);
             logger.info(
                     "YarnClientAspect[submitApplication]: current application report  " + currentApplicationReport);
-        }
     }
 
     /**
