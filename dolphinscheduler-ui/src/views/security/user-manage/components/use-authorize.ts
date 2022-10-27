@@ -60,7 +60,6 @@ export function useAuthorize() {
     authorizedNamespaces: [] as number[],
     unauthorizedNamespaces: [] as IOption[],
     resourceType: 'file',
-    authorizationType: 'read',
     fileResources: [] as IResourceOption[],
     udfResources: [] as IResourceOption[],
     authorizedFileResources: [] as number[],
