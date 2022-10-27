@@ -16,11 +16,19 @@
  */
 
 import { axios } from '@/service/service'
-import { ListReq, ProjectsReq, UserIdReq, UpdateProjectsReq } from './types'
+import { ListReq, ListIdReq, ProjectsReq, UserIdReq, UpdateProjectsReq } from './types'
 
 export function queryProjectListPaging(params: ListReq): any {
   return axios({
     url: '/projects',
+    method: 'get',
+    params
+  })
+}
+
+export function queryProjectWithAuthorizedLevelListPaging(params: ListIdReq): any {
+  return axios({
+    url: '/projects/project-with-authorized-level-list-paging',
     method: 'get',
     params
   })
@@ -59,6 +67,14 @@ export function queryAllProjectList(): any {
 export function queryUnauthorizedProject(params: UserIdReq): any {
   return axios({
     url: '/projects/unauth-project',
+    method: 'get',
+    params
+  })
+}
+
+export function queryProjectWithAuthorizedLevel(params: UserIdReq): any {
+  return axios({
+    url: '/projects/project-with-authorized-level',
     method: 'get',
     params
   })

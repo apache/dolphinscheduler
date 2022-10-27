@@ -779,6 +779,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_UPDATE))
                 .thenReturn(result);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, result)).thenReturn(true);
 
         try {
             processDefinitionService.updateProcessDefinition(user, projectCode, "test", 1,

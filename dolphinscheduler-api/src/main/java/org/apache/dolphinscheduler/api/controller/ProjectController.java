@@ -175,6 +175,43 @@ public class ProjectController extends BaseController {
     }
 
     /**
+     * query project with authorized level list paging
+     *
+     * @param userId user id
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which with the login user's authorized level
+     */
+    @Operation(summary = "queryProjectWithAuthorizedLevelListPaging", description = "QUERY_PROJECT_WITH_AUTH_LEVEL_LIST_PAGING_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1"))
+    })
+    @GetMapping(value = "/project-with-authorized-level-list-paging")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryProjectWithAuthorizedLevelListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                            @RequestParam("userId") Integer userId,
+                                                            @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                            @RequestParam("pageSize") Integer pageSize,
+                                                            @RequestParam("pageNo") Integer pageNo) {
+
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+        }
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
+                searchVal);
+        return result;
+    }
+
+    /**
      * delete project by code
      *
      * @param loginUser login user
@@ -232,6 +269,26 @@ public class ProjectController extends BaseController {
     public Result queryAuthorizedProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
         return projectService.queryAuthorizedProject(loginUser, userId);
+    }
+
+    /**
+     * query all project with authorized level
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return All projects with users' authorized level for them
+     */
+    @Operation(summary = "queryProjectWithAuthorizedLevel", description = "QUERY_PROJECT_AUTHORIZED_LEVEL")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/project-with-authorized-level")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUTHORIZED_PROJECT)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryProjectWithAuthorizedLevel(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @RequestParam("userId") Integer userId) {
+        return projectService.queryProjectWithAuthorizedLevel(loginUser, userId);
     }
 
     /**

@@ -534,6 +534,97 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
+     * revoke the project permission for specified user by id
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectIds   project id array
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // 1. only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+
+        // 2. check if user is existed
+        User user = this.userMapper.selectById(userId);
+        if (user == null) {
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            // 3. check if project is existed
+            Project project = this.projectMapper.queryDetailById(Integer.parseInt(projectId));
+            if (project == null) {
+                this.putMsg(result, Status.PROJECT_NOT_FOUND, Integer.parseInt(projectId));
+            } else {
+                // 4. delete the relationship between project and user
+                this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+            }
+        });
+
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * grant project with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            return result;
+        }
+        Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
+            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            if (projectUserOld != null) {
+                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+            }
+            Date now = new Date();
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(Integer.parseInt(projectId));
+            projectUser.setPerm(Constants.READ_PERMISSION);
+            projectUser.setCreateTime(now);
+            projectUser.setUpdateTime(now);
+            projectUserMapper.insert(projectUser);
+        });
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
      * grant project
      *
      * @param loginUser  login user
@@ -559,13 +650,15 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        projectUserMapper.deleteProjectRelation(0, userId);
-
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
             logger.warn("Parameter projectIds is empty.");
             return result;
         }
         Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            if (projectUserOld != null) {
+                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+            }
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
             projectUser.setUserId(userId);
