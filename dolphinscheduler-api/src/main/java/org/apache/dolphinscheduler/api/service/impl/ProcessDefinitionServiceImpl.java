@@ -103,6 +103,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -199,6 +200,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
@@ -388,9 +392,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (insertVersion == 0) {
             logger.error("Save process definition error, processCode:{}.", processDefinition.getCode());
             throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
-        } else
+        } else {
             logger.info("Save process definition complete, processCode:{}, processVersion:{}.",
                     processDefinition.getCode(), insertVersion);
+        }
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(),
                 insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
@@ -398,9 +403,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-        } else
+        } else {
             logger.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
+        }
 
         saveOtherRelation(loginUser, processDefinition, result, otherParamsJson);
 
@@ -885,9 +891,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 logger.error("Update process definition error, processCode:{}.", processDefinition.getCode());
                 putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            } else
+            } else {
                 logger.info("Update process definition complete, processCode:{}, processVersion:{}.",
                         processDefinition.getCode(), insertVersion);
+            }
 
             taskUsedInOtherTaskValid(processDefinition, taskRelationList);
             int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
@@ -1136,9 +1143,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                     projectCode, code, schedule.getId());
                             putMsg(result, Status.OFFLINE_SCHEDULE_ERROR);
                             throw new ServiceException(Status.OFFLINE_SCHEDULE_ERROR);
-                        } else
+                        } else {
                             logger.info("Set schedule offline, projectCode:{}, processDefinitionCode:{}, scheduleId:{}",
                                     projectCode, code, schedule.getId());
+                        }
                         schedulerService.deleteSchedule(project.getId(), schedule.getId());
                     }
                 }
@@ -1184,8 +1192,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (CollectionUtils.isNotEmpty(dagDataSchedules)) {
             logger.info("Start download process definition file, processDefinitionCodes:{}.", defineCodeSet);
             downloadProcessDefinitionFile(response, dagDataSchedules);
-        } else
+        } else {
             logger.error("There is no exported process dag data.");
+        }
     }
 
     /**
@@ -1856,7 +1865,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         processDefinitions.get(0).getVersion());
 
         // query task definition log
-        List<TaskDefinitionLog> taskDefinitionLogsList = processService.genTaskDefineList(processTaskRelations);
+        List<TaskDefinitionLog> taskDefinitionLogsList =
+                taskDefinitionLogDao.getTaskDefineLogList(processTaskRelations);
 
         List<DependentSimplifyDefinition> taskDefinitionList = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogsList) {
@@ -1906,7 +1916,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(code, limit);
         processInstanceList.forEach(processInstance -> processInstance
                 .setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
-        List<TaskDefinitionLog> taskDefinitionList = processService.genTaskDefineList(processTaskRelationMapper
+        List<TaskDefinitionLog> taskDefinitionList = taskDefinitionLogDao.getTaskDefineLogList(processTaskRelationMapper
                 .queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode()));
         Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
                 .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
@@ -2144,7 +2154,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             String otherParamsJson = doOtherOperateProcess(loginUser, processDefinition);
             if (isCopy) {
                 logger.info("Copy process definition...");
-                List<TaskDefinitionLog> taskDefinitionLogs = processService.genTaskDefineList(processTaskRelations);
+                List<TaskDefinitionLog> taskDefinitionLogs =
+                        taskDefinitionLogDao.getTaskDefineLogList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                     try {

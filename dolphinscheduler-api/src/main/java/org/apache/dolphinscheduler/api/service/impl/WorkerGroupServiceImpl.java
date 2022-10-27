@@ -30,11 +30,15 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -78,6 +82,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
+    
+    @Autowired
+    private ProcessService processService;
+
+    @Autowired
+    private ScheduleMapper scheduleMapper;
+
 
     /**
      * create or update a worker group
@@ -363,6 +374,35 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public String getTaskWorkerGroup(TaskInstance taskInstance) {
+        if (taskInstance == null) {
+            return null;
+        }
+
+        String workerGroup = taskInstance.getWorkerGroup();
+
+        if (StringUtils.isNotEmpty(workerGroup)) {
+            return workerGroup;
+        }
+        int processInstanceId = taskInstance.getProcessInstanceId();
+        ProcessInstance processInstance = processService.findProcessInstanceById(processInstanceId);
+
+        if (processInstance != null) {
+            return processInstance.getWorkerGroup();
+        }
+        logger.info("task : {} will use default worker group", taskInstance.getId());
+        return Constants.DEFAULT_WORKER_GROUP;
+    }
+
+    @Override
+    public Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList) {
+        List<Schedule> processDefinitionScheduleList =
+                scheduleMapper.querySchedulesByProcessDefinitionCodes(processDefinitionCodeList);
+        return processDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getProcessDefinitionCode,
+                Schedule::getWorkerGroup));
     }
 
 }

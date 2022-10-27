@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.factory.OssClientFactory;
 import org.apache.dolphinscheduler.common.model.OssConnection;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -176,11 +177,21 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
+    public String getResourceFileName(String fullName) {
+        return null;
+    }
+
+    @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
         return getDir(resourceType, tenantCode) + fileName;
+    }
+
+    @Override
+    public boolean delete(String filePath, List<String> childrenPathArray, boolean recursive) throws IOException {
+        return false;
     }
 
     @Override
@@ -210,12 +221,12 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean exists(String tenantCode, String fileName) throws IOException {
+    public boolean exists(String fileName) throws IOException {
         return ossClient.doesObjectExist(bucketName, fileName);
     }
 
     @Override
-    public boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException {
+    public boolean delete(String filePath, boolean recursive) throws IOException {
         try {
             ossClient.deleteObject(bucketName, filePath);
             return true;
@@ -272,6 +283,24 @@ public class OssOperator implements Closeable, StorageOperate {
     @Override
     public ResUploadType returnStorageType() {
         return ResUploadType.OSS;
+    }
+
+    @Override
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type) {
+        return null;
+    }
+
+    @Override
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws Exception {
+        return null;
+    }
+
+    @Override
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
+                                       ResourceType type) throws Exception {
+        return null;
     }
 
     @Override

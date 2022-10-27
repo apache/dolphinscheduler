@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.utils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -47,6 +48,8 @@ public class DependentExecute {
      * process service
      */
     private final ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
+    private final TaskInstanceDao taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
 
     /**
      * depend item list
@@ -154,7 +157,7 @@ public class DependentExecute {
         DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList =
-                processService.findValidTaskListByProcessId(processInstance.getId(), testFlag);
+                taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), testFlag);
 
         for (TaskInstance task : taskInstanceList) {
             if (task.getTaskCode() == taskCode) {

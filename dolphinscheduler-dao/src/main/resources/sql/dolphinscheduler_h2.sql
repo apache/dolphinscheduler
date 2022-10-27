@@ -794,6 +794,24 @@ CREATE TABLE t_ds_resources
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_relation_resources_task
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_relation_resources_task CASCADE;
+CREATE TABLE t_ds_relation_resources_task
+(
+  id                        int(11) NOT NULL AUTO_INCREMENT,
+  task_id                   int(11) DEFAULT NULL,
+  full_name                 varchar(255) DEFAULT NULL,
+  type                      tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY t_ds_relation_resources_task_un (task_id, full_name)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_relation_resources_task
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_schedules
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_schedules CASCADE;
@@ -2010,7 +2028,7 @@ DROP TABLE IF EXISTS t_ds_fav_task CASCADE;
 CREATE TABLE t_ds_fav_task
 (
     id        bigint(20) NOT NULL AUTO_INCREMENT,
-    task_name varchar(64) NOT NULL,
+    task_type varchar(64) NOT NULL,
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );
