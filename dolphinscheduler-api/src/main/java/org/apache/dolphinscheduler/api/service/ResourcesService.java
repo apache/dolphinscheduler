@@ -195,7 +195,9 @@ public interface ResourcesService {
     /**
      * updateProcessInstance resource
      *
-     * @param resourceId resource id
+     * @param loginUser login user
+     * @param fullName full name
+     * @param tenantCode tenantCode
      * @param content content
      * @return update result cod
      */
