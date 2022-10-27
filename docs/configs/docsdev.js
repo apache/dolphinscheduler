@@ -328,6 +328,10 @@ export default {
                                 title: 'Feishu',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/feishu.html',
                             },
+                            {
+                                title: 'Slack',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/slack.html',
+                            },
                         ],
                     },
                     {
@@ -947,6 +951,10 @@ export default {
                             {
                                 title: '飞书告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/feishu.html',
+                            },
+                            {
+                                title: 'Slack告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/slack.html',
                             },
                         ],
                     },
