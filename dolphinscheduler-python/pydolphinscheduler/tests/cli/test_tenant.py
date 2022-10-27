@@ -39,10 +39,15 @@ def show_tenant(a=None, b=None, c=None, d=None, e=None, f=None, g=None):  # noqa
             [
                 "tenant",
                 "--set",
+                "--name",
                 "test-tenant",
+                "--description",
                 "test-queue",
+                "--queue",
                 "test-desc",
+                "--tenant_code",
                 "test-tenant-code",
+                "--user_name",
                 "admin",
             ],
             "Set tenant start.\n"
@@ -64,8 +69,8 @@ def test_tenant_setter(option, output):
     "option, output",
     [
         (
-            ["tenant", "--get", "test-name-1"],
-            "Get tenant ('test-name-1',) from pydolphinscheduler.\n"
+            ["tenant", "--get", "--tenant_code", "test-name-1"],
+            "Get tenant test-name-1 from pydolphinscheduler.\n"
             "Tenant(name=test-tenant, description=test-desc, tenant_id=1, code=test-tenant-code, "
             "queue=test-queue, user_name=admin)",
         )
@@ -83,7 +88,18 @@ def test_tenant_getter(option, output):
     "option, output",
     [
         (
-            ["tenant", "--update", "admin", "test-tenant-code", 1, "test-desc-1"],
+            [
+                "tenant",
+                "--update",
+                "--user_name",
+                "admin",
+                "--tenant_code",
+                "test-tenant-code",
+                "--queue",
+                1,
+                "--description",
+                "test-desc-1",
+            ],
             "Update tenant start.\n"
             "Tenant(name=test-tenant, description=test-desc, tenant_id=1, code=test-tenant-code, "
             "queue=test-queue, user_name=admin)\n"
@@ -114,8 +130,8 @@ def test_tenant_updater(mock_get_tenant, option, output):
     "option, output",
     [
         (
-            ["tenant", "--delete", "admin", "abc"],
-            "Delete tenant (('admin', 'abc'),) from pydolphinscheduler.\n"
+            ["tenant", "--delete", "--user_name", "admin", "--tenant_code", "abc"],
+            "Delete tenant abc from pydolphinscheduler.\n"
             "Tenant(name=test-tenant, description=test-desc, tenant_id=1, code=test-tenant-code, "
             "queue=test-queue, user_name=admin)\n"
             "Delete tenant abc done.",

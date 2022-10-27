@@ -39,12 +39,19 @@ def show_user(a=None, b=None, c=None, d=None, e=None, f=None, g=None):  # noqa: 
             [
                 "user",
                 "--set",
+                "--name",
                 "test-name",
+                "--password",
                 "test-password",
+                "--email",
                 "test-email@abc.com",
+                "--phone",
                 "17366637777",
+                "--tenant",
                 "test-tenant",
+                "--queue",
                 "test-queue",
+                "--status",
                 1,
             ],
             "Set user start.\n"
@@ -66,8 +73,8 @@ def test_user_set(option, output):
     "option, output",
     [
         (
-            ["user", "--get", 1],
-            "Get user (1,) from pydolphinscheduler.\n"
+            ["user", "--get", "--user_id", 1],
+            "Get user 1 from pydolphinscheduler.\n"
             "User(user_id=1 name=test-name, email=test-email@abc.com, phone=17366637777, "
             "tenant=test-tenant, queue=test-queue, status=1)",
         )
@@ -99,12 +106,19 @@ def test_user_getter(mock_get_user, option, output):
             [
                 "user",
                 "--update",
+                "--name",
                 "test-name",
+                "--password",
                 "test-password",
+                "--email",
                 "test-email@abc.com",
+                "--phone",
                 "17366637766",
+                "--tenant",
                 "test-tenant",
+                "--queue",
                 "test-queue",
+                "--status",
                 1,
             ],
             "Update user start.\n"
@@ -126,8 +140,8 @@ def test_user_updater(option, output):
     "option, output",
     [
         (
-            ["user", "--delete", 1],
-            "Delete user (1,) from pydolphinscheduler.\n" "Delete user 1 done.",
+            ["user", "--delete", "--user_id", 1],
+            "Delete user 1 from pydolphinscheduler.\n" "Delete user 1 done.",
         )
     ],
 )

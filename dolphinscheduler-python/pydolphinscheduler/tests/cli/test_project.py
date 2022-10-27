@@ -33,7 +33,16 @@ def show_project(a=None, b=None, c=None, d=None, e=None, f=None, g=None):  # noq
     "option, output",
     [
         (
-            ["project", "--set", "test-project", "test-desc", "admin"],
+            [
+                "project",
+                "--set",
+                "--project_name",
+                "test-project",
+                "--description",
+                "test-desc",
+                "--user_name",
+                "admin",
+            ],
             "Set project start.\n"
             "Project(name=test-name-1, description=test-description, code=1)\n"
             "Set project done.",
@@ -52,8 +61,15 @@ def test_project_setter(option, output):
     "option, output",
     [
         (
-            ["project", "--get", "admin", "test-name-1"],
-            "Get project (('admin', 'test-name-1'),) from pydolphinscheduler.\n"
+            [
+                "project",
+                "--get",
+                "--project_name",
+                "test-name-1",
+                "--user_name",
+                "admin",
+            ],
+            "Get project test-name-1 from pydolphinscheduler.\n"
             "Project(name=test-name-1, description=test-description, code=1)",
         ),
     ],
@@ -75,9 +91,13 @@ def test_project_getter(mock_get_project_by_name, option, output):
             [
                 "project",
                 "--update",
+                "--user_name",
                 "admin",
+                "--project_code",
                 0,
+                "--project_name",
                 "test-name-updated",
+                "--description",
                 "test-description-updated",
             ],
             "Update project start.\n"
@@ -98,8 +118,15 @@ def test_project_updater(option, output):
     "option, output",
     [
         (
-            ["project", "--delete", "admin", "test-name-1"],
-            "Delete project (('admin', 'test-name-1'),) from pydolphinscheduler.\n"
+            [
+                "project",
+                "--delete",
+                "--user_name",
+                "admin",
+                "--project_name",
+                "test-name-1",
+            ],
+            "Delete project test-name-1 from pydolphinscheduler.\n"
             "Project(name=test-name-1, description=test-description, code=1)\n"
             "Delete project test-name-1 done.",
         ),
