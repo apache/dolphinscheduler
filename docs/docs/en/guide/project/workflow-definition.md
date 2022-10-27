@@ -78,7 +78,7 @@ Workflow running parameter description:
 * **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement.
 
   > You could select the time period or fill in it manually in UI. The date range is left closed and right closed time interval (startDate <= N <= endDate)
-  > * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
+  * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
 
   ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
 
