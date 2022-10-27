@@ -31,7 +31,6 @@ const setting = defineComponent({
   name: 'ui-setting',
   setup() {
     const uiSettingStore = useUISettingStore()
-    const defaultLogTimer = uiSettingStore.getLogTimer
 
     const logTimerMap = {
       0: 'Off',
@@ -68,7 +67,7 @@ const setting = defineComponent({
         value: 1800
       }
     ]
-    return { defaultLogTimer, logTimerMap, logTimerOptions }
+    return { uiSettingStore, logTimerMap, logTimerOptions }
   },
   render() {
     const { t } = useI18n()
@@ -80,7 +79,7 @@ const setting = defineComponent({
           <span>{t('ui_setting.refresh_time')}</span>
           <NSelect
             style={{ width: '200px' }}
-            default-value={this.logTimerMap[this.defaultLogTimer]}
+            default-value={this.logTimerMap[this.uiSettingStore.getLogTimer]}
             options={this.logTimerOptions}
             onUpdateValue={handleUpdateValue}
           />
@@ -88,7 +87,7 @@ const setting = defineComponent({
         <h4>{t('ui_setting.experimental_feature')}</h4>
         <NSpace align='center' justify='space-between'>
           <span>{t('ui_setting.dynamic_task_component')}</span>
-          <NSwitch round={false}></NSwitch>
+          <NSwitch round={false} defaultValue={this.uiSettingStore.getDynamicTask} onUpdateValue={() => this.uiSettingStore.setDynamicTask()}></NSwitch>
         </NSpace>
       </Card>
     )

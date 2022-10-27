@@ -22,16 +22,23 @@ export const useUISettingStore = defineStore({
   id: 'ui-setting',
   state: (): UISettingStore => ({
     logTimer: 0,
+    dynamicTask: false
   }),
   persist: true,
   getters: {
     getLogTimer(): number {
       return this.logTimer
+    },
+    getDynamicTask(): boolean {
+      return this.dynamicTask
     }
   },
   actions: {
     setLogTimer(timer: number): void {
       this.logTimer = timer
+    },
+    setDynamicTask(): void {
+      this.dynamicTask = !this.dynamicTask
     }
   }
 })

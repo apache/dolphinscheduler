@@ -16,6 +16,7 @@
  */
 interface UISettingStore {
   logTimer: number
+  dynamicTask: boolean
 }
 
 export { UISettingStore }
