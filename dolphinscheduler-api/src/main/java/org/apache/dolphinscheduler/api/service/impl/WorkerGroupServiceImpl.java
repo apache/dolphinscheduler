@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -40,6 +41,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
@@ -88,6 +90,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
+     @Autowired
+    private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
+
+    @Autowired
     private ProcessService processService;
 
     @Autowired
@@ -360,6 +366,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
                     processInstances.size(), processInstanceIds);
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+            return result;
+        }
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelationList =
+                environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName());
+        if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelationList)) {
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_ENV, environmentWorkerGroupRelationList.size(),
+                    workerGroup.getName());
             return result;
         }
         workerGroupMapper.deleteById(id);

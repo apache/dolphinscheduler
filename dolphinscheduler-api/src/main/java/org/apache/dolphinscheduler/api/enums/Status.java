@@ -510,7 +510,8 @@ public enum Status {
             "failed to delete the work group, there is an workflow associated with this work group",
             "删除Work group失败，存在与此Work group关联的工作流"),
             ;
-
+    DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
+            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}");
     private final int code;
     private final String enMsg;
     private final String zhMsg;
