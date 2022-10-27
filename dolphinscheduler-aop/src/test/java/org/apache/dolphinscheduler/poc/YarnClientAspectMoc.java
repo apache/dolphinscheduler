@@ -34,8 +34,7 @@ public class YarnClientAspectMoc {
 
     @AfterReturning(pointcut = "execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.submitApplication(ApplicationSubmissionContext)) && args(appContext)", returning = "submittedAppId", argNames = "appContext")
     public void submitApplication(ApplicationSubmissionContext appContext, ApplicationId submittedAppId) {
-        logger.info("YarnClientAspectMoc[submitApplication]: app context " + appContext + ", submittedAppId "
-                + submittedAppId + " privateId " + privateId);
+        logger.info("YarnClientAspectMoc[submitApplication]: app context: {}, submittedAppId: {}, privateId: {}", appContext, submittedAppId, privateId);
     }
 
     @AfterReturning(pointcut = "cflow(execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.submitApplication(ApplicationSubmissionContext))) "
