@@ -23,7 +23,7 @@ export const useUISettingStore = defineStore({
   state: (): UISettingStore => ({
     logTimer: 0,
     dynamicTask: false,
-    apiTimer: 1000
+    apiTimer: 10000
   }),
   persist: true,
   getters: {
