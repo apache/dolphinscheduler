@@ -1452,6 +1452,7 @@ public class WorkflowExecuteThread implements Runnable {
     private void submitStandByTask() {
         try {
             int length = readyToSubmitTaskQueue.size();
+            List<TaskInstance> skipSubmitInstance = new ArrayList<>();
             for (int i = 0; i < length; i++) {
                 TaskInstance task = readyToSubmitTaskQueue.peek();
                 if (task == null) {
@@ -1472,6 +1473,8 @@ public class WorkflowExecuteThread implements Runnable {
                         long failedTimeInterval = DateUtils.differSec(new Date(), retryTask.getEndTime());
                         if ((long) retryTask.getRetryInterval() * SEC_2_MINUTES_TIME_UNIT > failedTimeInterval) {
                             logger.info("task name: {} retry waiting has not exceeded the interval time, and skip submission this time, task id:{}", task.getName(), task.getId());
+                            readyToSubmitTaskQueue.remove(task);
+                            skipSubmitInstance.add(task);
                             continue;
                         }
                     }
@@ -1511,6 +1514,9 @@ public class WorkflowExecuteThread implements Runnable {
                     removeTaskFromStandbyList(task);
                     logger.info("remove task {},id:{} , because depend result : {}", task.getName(), task.getId(), dependResult);
                 }
+            }
+            for (TaskInstance task : skipSubmitInstance) {
+                readyToSubmitTaskQueue.put(task);
             }
         } catch (Exception e) {
             logger.error("submit standby task error", e);
