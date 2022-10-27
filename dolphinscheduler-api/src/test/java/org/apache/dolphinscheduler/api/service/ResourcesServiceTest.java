@@ -764,6 +764,30 @@ public class ResourcesServiceTest {
     }
 
     @Test
+    public void testhasResourceAndWritePerm(){
+        User user = getUser();
+        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource(1));
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        Mockito.when(resourceUserMapper.queryResourceRelation(Mockito.anyInt(), Mockito.anyInt()))
+            .thenReturn(getResourceUser());
+        Resource resource = getResource(1);
+        Result result = new Result();
+
+        // case 1: user is admin
+        user.setUserType(UserType.ADMIN_USER);
+        Assertions.assertTrue(resourcesService.hasResourceAndWritePerm(user,resource,result));
+
+        // case 2: user is resource owner
+        user.setUserType(UserType.GENERAL_USER);
+        Assertions.assertTrue(resourcesService.hasResourceAndWritePerm(user,resource,result));
+
+        // case 3: check user permission level
+        user.setId(0);
+        Assertions.assertTrue(resourcesService.hasResourceAndWritePerm(user,resource,result));
+    }
+
+    @Test
     public void testUnauthorizedFile() {
         User user = getUser();
         user.setId(1);
