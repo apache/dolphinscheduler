@@ -1518,6 +1518,7 @@ public class WorkflowExecuteThread implements Runnable {
             for (TaskInstance task : skipSubmitInstance) {
                 readyToSubmitTaskQueue.put(task);
             }
+            skipSubmitInstance.clear();
         } catch (Exception e) {
             logger.error("submit standby task error", e);
         }
