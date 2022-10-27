@@ -75,8 +75,10 @@ Workflow running parameter description:
 * **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker.
 * **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group.
 * **Startup parameters**: Set or override the value of global parameters when starting a new process instance.
-* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement. 
+* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement.
+
   > You could select the time period or fill in it manually in UI. The date range is left closed and right closed time interval (startDate <= N <= endDate)
+
   * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
 
   ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
