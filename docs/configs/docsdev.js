@@ -393,6 +393,10 @@ export default {
                         title: 'Expansion and Reduction',
                         link: '/en-us/docs/dev/user_doc/guide/expansion-reduction.html',
                     },
+                    {
+                        title: 'Demo',
+                        link: '/en-us/docs/dev/user_doc/guide/demo.html',
+                    },
                 ],
             },
             {
@@ -1012,6 +1016,10 @@ export default {
                     {
                         title: '扩/缩容',
                         link: '/zh-cn/docs/dev/user_doc/guide/expansion-reduction.html',
+                    },
+                    {
+                        title: '初始化工作流',
+                        link: '/zh-cn/docs/dev/user_doc/guide/demo.html',
                     },
                 ],
             },

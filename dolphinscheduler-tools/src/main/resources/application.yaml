@@ -34,11 +34,9 @@ spring:
       leak-detection-threshold: 0
       initialization-fail-timeout: 1
 
-create-demo:
+demo:
   tenant-code: default
-
-server:
-  port: 5173
+  api-server-port: 5173
 
 # Override by profile
 

@@ -28,4 +28,4 @@ JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms
 $JAVA_HOME/bin/java $JAVA_OPTS \
   -cp "$DOLPHINSCHEDULER_HOME/tools/conf":"$DOLPHINSCHEDULER_HOME/tools/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
   -Dspring.profiles.active=demo,${DATABASE} \
-  org.apache.dolphinscheduler.tools.datasource.CreateProcessDemo
+  org.apache.dolphinscheduler.tools.demo.CreateProcessDemo

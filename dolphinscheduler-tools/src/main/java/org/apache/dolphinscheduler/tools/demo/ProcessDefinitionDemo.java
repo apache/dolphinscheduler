@@ -30,7 +30,7 @@ public class ProcessDefinitionDemo {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDemo.class);
 
-    @Value("${create-demo.tenant-code}")
+    @Value("${demo.tenant-code}")
     private String tenantCode;
 
     @Autowired
