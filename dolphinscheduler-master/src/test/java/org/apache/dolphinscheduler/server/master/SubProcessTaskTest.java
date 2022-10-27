@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -33,14 +33,15 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.task.SubTaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -54,6 +55,8 @@ public class SubProcessTaskTest {
     public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
 
     private ProcessService processService;
+
+    private TaskInstanceDao taskInstanceDao;
 
     private ProcessInstance processInstance;
 
@@ -72,11 +75,14 @@ public class SubProcessTaskTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
         mockedStaticServerLifeCycleManager = Mockito.mockStatic(ServerLifeCycleManager.class);
         Mockito.when(ServerLifeCycleManager.isStopped()).thenReturn(false);
 
         processInstance = getProcessInstance();
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .updateTaskInstance(Mockito.any()))
                 .thenReturn(true);
 
@@ -124,7 +130,7 @@ public class SubProcessTaskTest {
         subTaskProcessor.init(taskInstance, processInstance);
         subTaskProcessor.action(TaskAction.RUN);
         TaskExecutionStatus status = taskInstance.getState();
-        Assert.assertEquals(TaskExecutionStatus.SUCCESS, status);
+        Assertions.assertEquals(TaskExecutionStatus.SUCCESS, status);
     }
 
     private String getProperty() {

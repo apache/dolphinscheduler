@@ -34,6 +34,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class ConditionsTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public TaskChannel create() {
         return new ConditionsTaskChannel();

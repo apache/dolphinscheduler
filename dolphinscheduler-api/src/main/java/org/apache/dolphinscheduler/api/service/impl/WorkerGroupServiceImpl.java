@@ -24,12 +24,10 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -38,20 +36,27 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -82,6 +87,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    private ProcessService processService;
+
+    @Autowired
+    private ScheduleMapper scheduleMapper;
 
     /**
      * create or update a worker group
@@ -185,10 +195,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
-        Map<String, String> serverMaps = registryClient.getServerMaps(NodeType.WORKER, true);
         if (Strings.isNullOrEmpty(workerGroup.getAddrList())) {
             return null;
         }
+        Map<String, String> serverMaps = registryClient.getServerMaps(NodeType.WORKER);
         for (String addr : workerGroup.getAddrList().split(Constants.COMMA)) {
             if (!serverMaps.containsKey(addr)) {
                 return addr;
@@ -216,11 +226,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         Result result = new Result();
         List<WorkerGroup> workerGroups;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getWorkerGroups(true, null);
+            workerGroups = getWorkerGroups(null);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
-            workerGroups = getWorkerGroups(true, ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
+            workerGroups = getWorkerGroups(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<WorkerGroup> resultDataList = new ArrayList<>();
         int total = 0;
@@ -266,20 +276,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         Map<String, Object> result = new HashMap<>();
         List<WorkerGroup> workerGroups;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getWorkerGroups(false, null);
+            workerGroups = getWorkerGroups(null);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
-            workerGroups = getWorkerGroups(false, ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
+            workerGroups = getWorkerGroups(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<String> availableWorkerGroupList = workerGroups.stream()
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
-        int index = availableWorkerGroupList.indexOf(Constants.DEFAULT_WORKER_GROUP);
-        if (index > -1) {
-            availableWorkerGroupList.remove(index);
-            availableWorkerGroupList.add(0, Constants.DEFAULT_WORKER_GROUP);
-        }
         result.put(Constants.DATA_LIST, availableWorkerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -288,10 +293,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     /**
      * get worker groups
      *
-     * @param isPaging whether paging
      * @return WorkerGroup list
      */
-    private List<WorkerGroup> getWorkerGroups(boolean isPaging, List<Integer> ids) {
+    private List<WorkerGroup> getWorkerGroups(List<Integer> ids) {
         // worker groups from database
         List<WorkerGroup> workerGroups;
         if (ids != null) {
@@ -299,62 +303,21 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         } else {
             workerGroups = workerGroupMapper.queryAllWorkerGroup();
         }
-
-        // worker groups from zookeeper
-        String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-        Collection<String> workerGroupList = null;
-        try {
-            workerGroupList = registryClient.getChildrenKeys(workerPath);
-        } catch (Exception e) {
-            logger.error("Get worker groups exception, workerPath:{}, isPaging:{}", workerPath, isPaging, e);
+        Optional<Boolean> containDefaultWorkerGroups = workerGroups.stream()
+                .map(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName())).findAny();
+        if (!containDefaultWorkerGroups.isPresent() || !containDefaultWorkerGroups.get()) {
+            // there doesn't exist a default WorkerGroup, we will add all worker to the default worker group.
+            Set<String> activeWorkerNodes = registryClient.getServerNodeSet(NodeType.WORKER);
+            WorkerGroup defaultWorkerGroup = new WorkerGroup();
+            defaultWorkerGroup.setName(Constants.DEFAULT_WORKER_GROUP);
+            defaultWorkerGroup.setAddrList(String.join(Constants.COMMA, activeWorkerNodes));
+            defaultWorkerGroup.setCreateTime(new Date());
+            defaultWorkerGroup.setUpdateTime(new Date());
+            defaultWorkerGroup.setSystemDefault(true);
+            workerGroups.add(defaultWorkerGroup);
         }
 
-        if (CollectionUtils.isEmpty(workerGroupList)) {
-            if (CollectionUtils.isEmpty(workerGroups) && !isPaging) {
-                WorkerGroup wg = new WorkerGroup();
-                wg.setName(Constants.DEFAULT_WORKER_GROUP);
-                workerGroups.add(wg);
-            }
-            return workerGroups;
-        }
-        Map<String, WorkerGroup> workerGroupsMap = null;
-        if (workerGroups.size() != 0) {
-            workerGroupsMap = workerGroups.stream().collect(Collectors.toMap(WorkerGroup::getName,
-                    workerGroupItem -> workerGroupItem, (oldWorkerGroup, newWorkerGroup) -> oldWorkerGroup));
-        }
-        for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + Constants.SINGLE_SLASH + workerGroup;
-            Collection<String> childrenNodes = null;
-            try {
-                childrenNodes = registryClient.getChildrenKeys(workerGroupPath);
-            } catch (Exception e) {
-                logger.error("Get children nodes exception, workerGroupPath:{}.", workerGroupPath, e);
-            }
-            if (childrenNodes == null || childrenNodes.isEmpty()) {
-                continue;
-            }
-            WorkerGroup wg = new WorkerGroup();
-            handleAddrList(wg, workerGroup, childrenNodes);
-            wg.setName(workerGroup);
-            if (isPaging) {
-                String registeredValue =
-                        registryClient.get(workerGroupPath + Constants.SINGLE_SLASH + childrenNodes.iterator().next());
-                WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(registeredValue, WorkerHeartBeat.class);
-                wg.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
-                wg.setUpdateTime(new Date(workerHeartBeat.getReportTime()));
-                wg.setSystemDefault(true);
-                if (workerGroupsMap != null && workerGroupsMap.containsKey(workerGroup)) {
-                    wg.setDescription(workerGroupsMap.get(workerGroup).getDescription());
-                    workerGroups.remove(workerGroupsMap.get(workerGroup));
-                }
-            }
-            workerGroups.add(wg);
-        }
         return workerGroups;
-    }
-
-    protected void handleAddrList(WorkerGroup wg, String workerGroup, Collection<String> childrenNodes) {
-        wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
     }
 
     /**
@@ -388,7 +351,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         List<ProcessInstance> processInstances = processInstanceMapper
-                .queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
+                .queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+                        org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             List<Integer> processInstanceIds =
                     processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
@@ -413,10 +377,39 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> getWorkerAddressList() {
         Map<String, Object> result = new HashMap<>();
-        Set<String> serverNodeList = registryClient.getServerNodeSet(NodeType.WORKER, true);
+        Set<String> serverNodeList = registryClient.getServerNodeSet(NodeType.WORKER);
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public String getTaskWorkerGroup(TaskInstance taskInstance) {
+        if (taskInstance == null) {
+            return null;
+        }
+
+        String workerGroup = taskInstance.getWorkerGroup();
+
+        if (StringUtils.isNotEmpty(workerGroup)) {
+            return workerGroup;
+        }
+        int processInstanceId = taskInstance.getProcessInstanceId();
+        ProcessInstance processInstance = processService.findProcessInstanceById(processInstanceId);
+
+        if (processInstance != null) {
+            return processInstance.getWorkerGroup();
+        }
+        logger.info("task : {} will use default worker group", taskInstance.getId());
+        return Constants.DEFAULT_WORKER_GROUP;
+    }
+
+    @Override
+    public Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList) {
+        List<Schedule> processDefinitionScheduleList =
+                scheduleMapper.querySchedulesByProcessDefinitionCodes(processDefinitionCodeList);
+        return processDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getProcessDefinitionCode,
+                Schedule::getWorkerGroup));
     }
 
 }

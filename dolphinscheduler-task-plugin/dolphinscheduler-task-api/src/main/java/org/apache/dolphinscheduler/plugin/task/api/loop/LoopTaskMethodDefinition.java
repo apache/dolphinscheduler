@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.api.loop;
 import lombok.NonNull;
 
 public interface LoopTaskMethodDefinition {
+
     @NonNull
     LoopTaskMethodType getLoopTaskMethodType();
-    
+
 }

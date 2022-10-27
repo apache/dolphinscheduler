@@ -28,7 +28,10 @@ The MLflow plugin currently supports and will support the following:
 
 ## Task Parameters and Example
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |       **Parameter**        |                                                                    **Description**                                                                     |
 |----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -100,6 +103,7 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 ## Environment to Prepare
 
 ### Conda Environment
+
 Please install [anaconda](https://docs.continuum.io/anaconda/install/) or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance.
 
 **Method A:**
@@ -112,7 +116,6 @@ Add the following content to the file:
 # config anaconda environment
 export PATH=/opt/anaconda3/bin:$PATH
 ```
-
 
 **Method B:**
 
@@ -153,3 +156,4 @@ ml.mlflow.preset_repository=https://github.com/apache/dolphinscheduler-mlflow
 # mlflow task plugin preset repository version
 ml.mlflow.preset_repository_version="main"
 ```
+

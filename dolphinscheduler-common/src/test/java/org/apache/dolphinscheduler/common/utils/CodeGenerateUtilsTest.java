@@ -19,16 +19,17 @@ package org.apache.dolphinscheduler.common.utils;
 
 import java.util.HashSet;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class CodeGenerateUtilsTest {
+
     @Test
     public void testNoGenerateDuplicateCode() throws CodeGenerateUtils.CodeGenerateException {
         HashSet<Long> existsCode = new HashSet<>();
         for (int i = 0; i < 100; i++) {
             Long currentCode = CodeGenerateUtils.getInstance().genCode();
-            Assert.assertFalse(existsCode.contains(currentCode));
+            Assertions.assertFalse(existsCode.contains(currentCode));
             existsCode.add(currentCode);
         }
     }

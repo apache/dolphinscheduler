@@ -21,11 +21,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -37,6 +38,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.task.BlockingTaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.Duration;
@@ -46,8 +48,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -61,6 +63,10 @@ public class BlockingTaskTest {
     public static final String FLOW_NODE_RUN_FLAG_NORMAL = "NORMAL";
 
     private ProcessService processService;
+
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionDao taskDefinitionDao;
 
     private ProcessInstance processInstance;
 
@@ -80,8 +86,13 @@ public class BlockingTaskTest {
 
         // mock process service
         processService = Mockito.mock(ProcessService.class);
-
         Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
+        taskDefinitionDao = Mockito.mock(TaskDefinitionDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskDefinitionDao.class)).thenReturn(taskDefinitionDao);
 
         // mock process instance
         processInstance = getProcessInstance();
@@ -93,7 +104,7 @@ public class BlockingTaskTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
-        Mockito.when(processService.findTaskDefinition(1L, 1))
+        Mockito.when(taskDefinitionDao.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
     }
 
@@ -187,24 +198,23 @@ public class BlockingTaskTest {
                 .submitTask(processInstance, taskInstance))
                 .thenReturn(taskInstance);
 
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findTaskInstanceById(taskInstance.getId()))
                 .thenReturn(taskInstance);
 
         // for BlockingTaskExecThread.initTaskParameters
-        Mockito.when(processService
-                .saveTaskInstance(taskInstance))
+        Mockito.when(taskInstanceDao.upsertTaskInstance(taskInstance))
                 .thenReturn(true);
 
         // for BlockingTaskExecThread.updateTaskState
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .updateTaskInstance(taskInstance))
                 .thenReturn(true);
 
         // for BlockingTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = getTaskInstanceForValidTaskList(expectResults);
         Mockito.when(
-                processService.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
+                taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(conditions);
         return taskInstance;
     }
@@ -231,7 +241,7 @@ public class BlockingTaskTest {
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
         blockingTaskProcessor.init(taskInstance, processInstance);
         boolean res = blockingTaskProcessor.action(TaskAction.SUBMIT);
-        Assert.assertEquals(true, res);
+        Assertions.assertTrue(res);
     }
 
     @Test
@@ -243,7 +253,7 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.PAUSE);
         TaskExecutionStatus status = taskInstance.getState();
-        Assert.assertEquals(TaskExecutionStatus.PAUSE, status);
+        Assertions.assertEquals(TaskExecutionStatus.PAUSE, status);
     }
 
     @Test
@@ -255,7 +265,7 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.RUN);
         WorkflowExecutionStatus status = processInstance.getState();
-        Assert.assertEquals(WorkflowExecutionStatus.READY_BLOCK, status);
+        Assertions.assertEquals(WorkflowExecutionStatus.READY_BLOCK, status);
     }
 
     @Test
@@ -267,6 +277,6 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.RUN);
         WorkflowExecutionStatus status = processInstance.getState();
-        Assert.assertEquals(WorkflowExecutionStatus.RUNNING_EXECUTION, status);
+        Assertions.assertEquals(WorkflowExecutionStatus.RUNNING_EXECUTION, status);
     }
 }

@@ -75,9 +75,8 @@
         <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
-        <springfox.version>3.0.0</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
-        <reflections.version>0.9.12</reflections.version>
+        <reflections.version>0.10.2</reflections.version>
         <py4j.version>0.10.9</py4j.version>
         <jsr305.version>3.0.0</jsr305.version>
         <commons-compress.version>1.21</commons-compress.version>
@@ -97,6 +96,8 @@
         <janino.version>3.0.16</janino.version>
         <snakeyaml.version>1.31</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
+        <datasync.version>2.17.282</datasync.version>
+        <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
     </properties>
 
     <dependencyManagement>
@@ -161,6 +162,12 @@
                 <groupId>com.cronutils</groupId>
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -554,11 +561,6 @@
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${javax.servlet-api.version}</version>
             </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.github.rholder</groupId>
@@ -627,6 +629,11 @@
                 <artifactId>aws-java-sdk-sagemaker</artifactId>
                 <version>${aws-sdk.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-dms</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
@@ -652,14 +659,6 @@
                 <version>${spring-cloud-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>3.12.4</version>
-                <!-- TODO: remove this dependency management after removing powermock -->
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -742,6 +741,18 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/datasync -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>datasync</artifactId>
+                <version>${datasync.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi-ui.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

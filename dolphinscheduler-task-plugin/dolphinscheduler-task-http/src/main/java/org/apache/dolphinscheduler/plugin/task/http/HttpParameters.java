@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  * http parameter
  */
 public class HttpParameters extends AbstractParameters {
+
     /**
      * url
      */

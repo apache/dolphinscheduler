@@ -44,5 +44,4 @@ public class WorkerHeartBeat implements HeartBeat {
     private int workerWaitingTaskCount; // worker waiting task count
     private int workerExecThreadCount; // worker thread pool thread count
 
-
 }

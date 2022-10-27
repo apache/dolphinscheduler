@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.workflow;
 
-import static org.apache.dolphinscheduler.common.Constants.VERSION_FIRST;
+import static org.apache.dolphinscheduler.common.constants.Constants.VERSION_FIRST;
 
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import java.util.Date;
 
 import lombok.Data;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * workflow create request
@@ -34,31 +34,31 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 public class WorkflowCreateRequest {
 
-    @ApiModelProperty(example = "workflow name", required = true)
+    @Schema(example = "workflow name", required = true)
     private String name;
 
-    @ApiModelProperty(example = "workflow's description")
+    @Schema(example = "workflow's description")
     private String description;
 
-    @ApiModelProperty(example = "12345", required = true)
+    @Schema(example = "12345", required = true)
     private long projectCode;
 
-    @ApiModelProperty(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", notes = "default OFFLINE if not provide.")
+    @Schema(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", description = "default OFFLINE if not provide.")
     private String releaseState;
 
-    @ApiModelProperty(example = "[{\"prop\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
+    @Schema(example = "[{\"prop\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
     private String globalParams;
 
-    @ApiModelProperty(example = "2")
+    @Schema(example = "2")
     private int warningGroupId;
 
-    @ApiModelProperty(example = "60")
+    @Schema(example = "60")
     private int timeout;
 
-    @ApiModelProperty(example = "tenant1", required = true)
+    @Schema(example = "tenant1", required = true)
     private String tenantCode;
 
-    @ApiModelProperty(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", notes = "default PARALLEL if not provide.")
+    @Schema(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", description = "default PARALLEL if not provide.")
     private String executionType;
 
     public ProcessDefinition convert2ProcessDefinition() {

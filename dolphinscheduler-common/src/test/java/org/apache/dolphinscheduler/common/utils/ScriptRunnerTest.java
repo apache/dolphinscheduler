@@ -18,13 +18,14 @@ package org.apache.dolphinscheduler.common.utils;
 
 import java.io.StringReader;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ScriptRunnerTest {
+
     @Test
     public void testRunScript() {
-        //connection is null
+        // connection is null
         Exception exception = null;
         ScriptRunner s = new ScriptRunner(null, true, true);
         try {
@@ -32,6 +33,6 @@ public class ScriptRunnerTest {
         } catch (Exception e) {
             exception = e;
         }
-        Assert.assertNotNull(exception);
+        Assertions.assertNotNull(exception);
     }
 }

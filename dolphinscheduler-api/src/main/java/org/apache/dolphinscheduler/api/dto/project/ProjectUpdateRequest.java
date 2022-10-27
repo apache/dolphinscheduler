@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.api.dto.project;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * project update request
@@ -31,12 +31,12 @@ import lombok.Data;
 @Data
 public class ProjectUpdateRequest {
 
-    @ApiModelProperty(example = "admin", required = true)
+    @Schema(example = "admin", required = true)
     private String userName;
 
-    @ApiModelProperty(example = "pro123", required = true)
+    @Schema(example = "pro123", required = true)
     private String projectName;
 
-    @ApiModelProperty(example = "this is a project")
+    @Schema(example = "this is a project")
     private String description;
 }
