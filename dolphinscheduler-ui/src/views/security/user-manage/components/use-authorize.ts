@@ -24,7 +24,6 @@ import {
 } from '@/service/modules/data-source'
 import {
   authorizedFile,
-  authorizedFileWithReadPerm,
   authorizeResourceTree,
   authUDFFunc,
   unAuthUDFFunc
@@ -35,12 +34,12 @@ import {
 } from '@/service/modules/k8s-namespace'
 import {
   grantProject,
+  grantResource,
   grantProjectWithReadPerm,
   grantDataSource,
   grantUDFFunc,
   grantNamespaceFunc,
   revokeProjectById,
-  grantResourceWithPermLevel,
 } from '@/service/modules/users'
 import utils from '@/utils'
 import type { TAuthType, IResourceOption, IOption, IRecord } from '../types'
@@ -66,8 +65,6 @@ export function useAuthorize() {
     udfResources: [] as IResourceOption[],
     authorizedFileResources: [] as number[],
     authorizedUdfResources: [] as number[],
-    authorizedFileResourcesWithReadPerm: [] as number[],
-    authorizedUdfResourcesWithReadPerm: [] as number[],
     pagination: {
       pageSize: 5,
       page: 1,
@@ -175,8 +172,7 @@ export function useAuthorize() {
     state.loading = true
     const resources = await Promise.all([
       authorizeResourceTree({ userId }),
-      authorizedFile({ userId }),
-      authorizedFileWithReadPerm({ userId })
+      authorizedFile({ userId })
     ])
     state.loading = false
     utils.removeUselessChildren(resources[0])
@@ -192,19 +188,10 @@ export function useAuthorize() {
         ? fileTargets.push(item.id)
         : udfTargets.push(item.id)
     })
-    const udfTargetsWithReadPerm = [] as number[]
-    const fileTargetsWithReadPerm = [] as number[]
-    resources[2].forEach((item: { type: string; id: number }) => {
-      item.type === 'FILE'
-        ? fileTargetsWithReadPerm.push(item.id)
-        : udfTargetsWithReadPerm.push(item.id)
-    })
     state.fileResources = fileResources
     state.udfResources = udfResources
     state.authorizedFileResources = fileTargets
     state.authorizedUdfResources = udfTargets
-    state.authorizedFileResourcesWithReadPerm = fileTargetsWithReadPerm
-    state.authorizedUdfResourcesWithReadPerm = udfTargetsWithReadPerm
   }
 
   const getNamespaces = async (userId: number) => {
@@ -274,24 +261,6 @@ export function useAuthorize() {
     return arrRes
   }
 
-  const getPathIds = (authorizedResources: number[], resources: IResourceOption[]) => {
-    let fullPathId = []
-    const pathId: Array<string> = []
-    authorizedResources.forEach((v: number) => {
-      resources.forEach((v1: any) => {
-        const arr = []
-        arr[0] = v1
-        if (getParent(arr, v).length > 0) {
-          fullPathId = getParent(arr, v).map((v2: any) => {
-            return v2.id
-          })
-          pathId.push(fullPathId.join('-'))
-        }
-      })
-    })
-    return pathId
-  }
-
   const onSave = async (type: TAuthType, userId: number) => {
     if (state.saving) return false
     state.saving = true
@@ -308,17 +277,40 @@ export function useAuthorize() {
       })
     }
     if (type === 'authorize_resource') {
-      const pathFileId: Array<string> = getPathIds(state.authorizedFileResources,state.fileResources)
-      const pathUdfId: Array<string> = getPathIds(state.authorizedUdfResources,state.udfResources)
-      const pathFileIdWithReadPerm: Array<string> = getPathIds(state.authorizedFileResourcesWithReadPerm,state.fileResources)
-      const pathUdfIdWithReadPerm: Array<string> = getPathIds(state.authorizedUdfResourcesWithReadPerm,state.udfResources)
+      let fullPathFileId = []
+      const pathFileId: Array<string> = []
+      state.authorizedFileResources.forEach((v: number) => {
+        state.fileResources.forEach((v1: any) => {
+          const arr = []
+          arr[0] = v1
+          if (getParent(arr, v).length > 0) {
+            fullPathFileId = getParent(arr, v).map((v2: any) => {
+              return v2.id
+            })
+            pathFileId.push(fullPathFileId.join('-'))
+          }
+        })
+      })
+
+      let fullPathUdfId = []
+      const pathUdfId: Array<string> = []
+      state.authorizedUdfResources.forEach((v: number) => {
+        state.udfResources.forEach((v1: any) => {
+          const arr = []
+          arr[0] = v1
+          if (getParent(arr, v).length > 0) {
+            fullPathUdfId = getParent(arr, v).map((v2: any) => {
+              return v2.id
+            })
+            pathUdfId.push(fullPathUdfId.join('-'))
+          }
+        })
+      })
 
       const allPathId = pathFileId.concat(pathUdfId)
-      const allPathIdWithReadPerm = pathFileIdWithReadPerm.concat(pathUdfIdWithReadPerm)
-      await grantResourceWithPermLevel({
+      await grantResource({
         userId,
-        allPermResourceIds: allPathId.join(','),
-        readPermResourceIds: allPathIdWithReadPerm.join(',')
+        resourceIds: allPathId.join(',')
       })
     }
     if (type === 'authorize_namespace') {
