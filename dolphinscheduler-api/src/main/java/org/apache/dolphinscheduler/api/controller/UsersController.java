@@ -335,34 +335,6 @@ public class UsersController extends BaseController {
     }
 
     /**
-     * grant resource with permission level
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param readPermResourceIds resource id array with read permission
-     * @param allPermResourceIds resource id array with all permission
-     * @return grant result code
-     */
-    @Operation(summary = "grantResourceWithPermLevel", description = "GRANT_RESOURCE_WITH_PERM_LEVEL_NOTES")
-    @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "readPermResourceIds", description = "READ_PERM_RESOURCE_IDS", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "allPermResourceIds", description = "ALL_PERM_RESOURCE_IDS", schema = @Schema(implementation = String.class))
-    })
-    @PostMapping(value = "/grant-file-with-perm-level")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(GRANT_RESOURCE_ERROR)
-    @AccessLogAnnotation
-    public Result grantResourceWithPermLevel(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @RequestParam(value = "userId") int userId,
-                                             @RequestParam(value = "readPermResourceIds") String readPermResourceIds,
-                                             @RequestParam(value = "allPermResourceIds") String allPermResourceIds) {
-        Map<String, Object> result =
-                usersService.grantResourceWithPermLevel(loginUser, userId, readPermResourceIds, allPermResourceIds);
-        return returnDataList(result);
-    }
-
-    /**
      * grant resource
      *
      * @param loginUser login user

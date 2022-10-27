@@ -507,27 +507,6 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testGrantResourceWithPermLevel() {
-        String readPermResourceIds = "100000,120000";
-        String allPermResourceIds = "110000,130000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result =
-                usersService.grantResourceWithPermLevel(loginUser, 2, readPermResourceIds, allPermResourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        // success
-        when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
-        when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
-        result = usersService.grantResourceWithPermLevel(loginUser, 1, readPermResourceIds, allPermResourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-    }
-
-    @Test
     public void testGrantUDFFunction() {
         String udfIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());

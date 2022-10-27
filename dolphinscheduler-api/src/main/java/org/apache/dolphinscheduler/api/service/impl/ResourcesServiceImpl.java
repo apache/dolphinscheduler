@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -49,7 +48,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -82,7 +80,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -363,33 +360,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             logger.error("error occurred when checking resource: " + fullName, e);
         }
         return Boolean.TRUE.equals(existResource);
-    }
-
-    @Override
-    public boolean hasResourceAndWritePerm(User loginUser, Resource resource, Result<Object> result) {
-        boolean checkResult = false;
-        if (resource == null) {
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
-        } else {
-            // case 1: user is admin
-            if (loginUser.getUserType() == UserType.ADMIN_USER) {
-                return true;
-            }
-            // case 2: user is resource owner
-            if (Integer.valueOf(resource.getUserId()).equals(loginUser.getId())) {
-                return true;
-            }
-            // case 3: check user permission level
-            ResourcesUser resourcesUser = resourceUserMapper.queryResourceRelation(resource.getId(), loginUser.getId());
-
-            if (resourcesUser == null || resourcesUser.getPerm() != Constants.AUTHORIZE_WRITABLE_PERM) {
-                putMsg(result, Status.USER_NO_WRITE_RESOURCE_PERM, loginUser.getUserName(), resource.getFileName());
-                checkResult = false;
-            } else {
-                checkResult = true;
-            }
-        }
-        return checkResult;
     }
 
     /**
@@ -1993,46 +1963,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
         result.put(Constants.DATA_LIST, udfFuncs);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * authorized file with read permission
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return authorized result
-     */
-    @Override
-    public Map<String, Object> authorizedFileWithReadPerm(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-
-        List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_READABLE_PERM);
-        Iterator<Resource> iterator = authedResources.iterator();
-        while (iterator.hasNext()) {
-            Resource currentResource = iterator.next();
-            if (currentResource.isDirectory()) {
-                iterator.remove();
-            }
-        }
-
-        // Transform into StorageEntity for compatibility
-        List<StorageEntity> transformedResourceList = authedResources.stream()
-                .map(this::createStorageEntityBasedOnResource)
-                .collect(Collectors.toList());
-
-        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
-        String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-        logger.info(visit);
-        String jsonTreeStr =
-                JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-        logger.info(jsonTreeStr);
-        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
     }

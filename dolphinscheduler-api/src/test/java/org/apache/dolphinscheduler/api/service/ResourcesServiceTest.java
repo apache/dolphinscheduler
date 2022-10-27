@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -417,11 +416,6 @@ public class ResourcesServiceTest {
         loginUser.setId(0);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
-        Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource(1));
-        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourceUserMapper.queryResourceRelation(Mockito.anyInt(), Mockito.anyInt()))
-                .thenReturn(getResourceUser());
-
         try {
             // HDFS_NOT_STARTUP
             Result result = resourcesService.delete(loginUser, "", "");
@@ -764,30 +758,6 @@ public class ResourcesServiceTest {
     }
 
     @Test
-    public void testhasResourceAndWritePerm(){
-        User user = getUser();
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
-        Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource(1));
-        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourceUserMapper.queryResourceRelation(Mockito.anyInt(), Mockito.anyInt()))
-            .thenReturn(getResourceUser());
-        Resource resource = getResource(1);
-        Result result = new Result();
-
-        // case 1: user is admin
-        user.setUserType(UserType.ADMIN_USER);
-        Assertions.assertTrue(resourcesService.hasResourceAndWritePerm(user,resource,result));
-
-        // case 2: user is resource owner
-        user.setUserType(UserType.GENERAL_USER);
-        Assertions.assertTrue(resourcesService.hasResourceAndWritePerm(user,resource,result));
-
-        // case 3: check user permission level
-        user.setId(0);
-        Assertions.assertTrue(resourcesService.hasResourceAndWritePerm(user,resource,result));
-    }
-
-    @Test
     public void testUnauthorizedFile() {
         User user = getUser();
         user.setId(1);
@@ -1054,15 +1024,6 @@ public class ResourcesServiceTest {
         user.setTenantId(1);
         user.setTenantCode("tenantCode");
         return user;
-    }
-
-    private ResourcesUser getResourceUser() {
-        ResourcesUser resourcesUser = new ResourcesUser();
-        resourcesUser.setResourcesId(1);
-        resourcesUser.setUserId(0);
-        resourcesUser.setId(1);
-        resourcesUser.setPerm(7);
-        return resourcesUser;
     }
 
     private List<String> getContent() {

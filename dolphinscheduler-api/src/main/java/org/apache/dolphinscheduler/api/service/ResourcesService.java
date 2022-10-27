@@ -69,8 +69,6 @@ public interface ResourcesService {
                                   MultipartFile file,
                                   String currentDir);
 
-    boolean hasResourceAndWritePerm(User loginUser, Resource resource, Result<Object> result);
-
     /**
      * update resource
      * @param loginUser     login user
@@ -197,7 +195,9 @@ public interface ResourcesService {
     /**
      * updateProcessInstance resource
      *
-     * @param resourceId resource id
+     * @param loginUser login user
+     * @param fullName full name
+     * @param tenantCode tenantCode
      * @param content content
      * @return update result cod
      */
@@ -256,15 +256,6 @@ public interface ResourcesService {
      * @return authorized result code
      */
     Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId);
-
-    /**
-     * authorized file with read permission
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result
-     */
-    Map<String, Object> authorizedFileWithReadPerm(User loginUser, Integer userId);
 
     /**
      * authorized file
