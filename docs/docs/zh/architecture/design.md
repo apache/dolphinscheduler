@@ -195,10 +195,10 @@
 - 详情可参考Master和Worker的logback配置，如下示例：
 
 ```xml
-<conversionRule conversionWord="messsage" converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
+<conversionRule conversionWord="messsage" converterClass="org.apache.dolphinscheduler.service.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
-    <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
+    <filter class="org.apache.dolphinscheduler.service.log.TaskLogFilter"/>
+    <Discriminator class="org.apache.dolphinscheduler.service.log.TaskLogDiscriminator">
         <key>taskAppId</key>
         <logBase>${log.base}</logBase>
     </Discriminator>
