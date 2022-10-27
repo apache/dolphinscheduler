@@ -35,7 +35,7 @@ public class YarnClientMoc {
 
     public ApplicationId createAppId() {
         ApplicationId created = ApplicationId.newInstance(System.currentTimeMillis(), random.nextInt());
-        logger.info("created id " + created.getId());
+        logger.info("created id {}", created.getId());
         return created;
     }
 
