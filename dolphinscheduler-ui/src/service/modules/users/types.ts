@@ -54,11 +54,6 @@ interface GrantResourceReq extends UserIdReq {
   resourceIds: string
 }
 
-interface GrantResourceReqWithPermLevel extends UserIdReq {
-  allPermResourceIds: string
-  readPermResourceIds: string
-}
-
 interface GrantProject extends UserIdReq {
   projectIds: string
 }
@@ -133,7 +128,6 @@ export {
   UserIdReq,
   GrantDataSourceReq,
   GrantResourceReq,
-  GrantResourceReqWithPermLevel,
   GrantProject,
   ProjectCodeReq,
   GrantUDFReq,

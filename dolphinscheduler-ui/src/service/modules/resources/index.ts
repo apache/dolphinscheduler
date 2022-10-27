@@ -83,14 +83,6 @@ export function authorizedFile(params: UserIdReq): any {
   })
 }
 
-export function authorizedFileWithReadPerm(params: UserIdReq): any {
-  return axios({
-    url: '/resources/authed-file-read-perm',
-    method: 'get',
-    params
-  })
-}
-
 export function authorizeResourceTree(params: UserIdReq): any {
   return axios({
     url: '/resources/authed-resource-tree',
