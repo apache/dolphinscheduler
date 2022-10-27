@@ -28,9 +28,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
@@ -73,6 +75,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private RegistryClient registryClient;
+
+    @Autowired
+    private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
 
     /**
      * create or update a worker group
@@ -326,6 +331,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
                     processInstances.size(), processInstanceIds);
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+            return result;
+        }
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelationList =
+                environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName());
+        if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelationList)) {
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_ENV, environmentWorkerGroupRelationList.size(),
+                    workerGroup.getName());
             return result;
         }
         workerGroupMapper.deleteById(id);
