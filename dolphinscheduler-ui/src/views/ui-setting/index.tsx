@@ -73,21 +73,46 @@ const setting = defineComponent({
     const { t } = useI18n()
 
     return (
-      <Card style={{ marginLeft: '25%', width: '50%' }} title={t('menu.ui_setting')}>
+      <Card
+        style={{ marginLeft: '25%', width: '50%' }}
+        title={t('menu.ui_setting')}
+      >
         <h4>{t('ui_setting.request_settings')}</h4>
-        <NSpace align='center' justify='space-between'>
-          <span>{t('ui_setting.refresh_time')}</span>
-          <NSelect
-            style={{ width: '200px' }}
-            default-value={this.logTimerMap[this.uiSettingStore.getLogTimer]}
-            options={this.logTimerOptions}
-            onUpdateValue={handleUpdateValue}
-          />
+        <NSpace vertical>
+          <NSpace align='center' justify='space-between'>
+            <span>{t('ui_setting.api_timeout')}</span>
+            <NSelect
+              style={{ width: '200px' }}
+              default-value={this.uiSettingStore.getApiTimer}
+              options={[
+                { label: '10000 ' + t('ui_setting.millisecond'), value: 10000 },
+                { label: '20000 ' + t('ui_setting.millisecond'), value: 20000 },
+                { label: '30000 ' + t('ui_setting.millisecond'), value: 30000 },
+                { label: '40000 ' + t('ui_setting.millisecond'), value: 40000 },
+                { label: '50000 ' + t('ui_setting.millisecond'), value: 50000 },
+                { label: '60000 ' + t('ui_setting.millisecond'), value: 60000 }
+              ]}
+              onUpdateValue={(t) => this.uiSettingStore.setApiTimer(t)}
+            />
+          </NSpace>
+          <NSpace align='center' justify='space-between'>
+            <span>{t('ui_setting.refresh_time')}</span>
+            <NSelect
+              style={{ width: '200px' }}
+              default-value={this.logTimerMap[this.uiSettingStore.getLogTimer]}
+              options={this.logTimerOptions}
+              onUpdateValue={handleUpdateValue}
+            />
+          </NSpace>
         </NSpace>
         <h4>{t('ui_setting.experimental_feature')}</h4>
         <NSpace align='center' justify='space-between'>
           <span>{t('ui_setting.dynamic_task_component')}</span>
-          <NSwitch round={false} defaultValue={this.uiSettingStore.getDynamicTask} onUpdateValue={() => this.uiSettingStore.setDynamicTask()}></NSwitch>
+          <NSwitch
+            round={false}
+            defaultValue={this.uiSettingStore.getDynamicTask}
+            onUpdateValue={() => this.uiSettingStore.setDynamicTask()}
+          ></NSwitch>
         </NSpace>
       </Card>
     )
