@@ -866,22 +866,30 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
 
-        if (StringUtils.isBlank(fullName)) {
-            if (isAdmin(loginUser)) {
-                List<User> userList = userMapper.selectList(null);
-                Set<String> visitedTenantEntityCode = new HashSet<>();
-                for (User userEntity : userList) {
-                    Tenant tt = tenantMapper.queryById(userEntity.getTenantId());
-                    String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
-                    if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
-                        defaultPath = storageOperate.getResDir(tenantEntityCode);
-                        if (type.equals(ResourceType.UDF)) {
-                            defaultPath = storageOperate.getUdfDir(tenantEntityCode);
+        if (PropertyUtils.getResUploadStartupState()) {
+            if (StringUtils.isBlank(fullName)) {
+                if (isAdmin(loginUser)) {
+                    List<User> userList = userMapper.selectList(null);
+                    Set<String> visitedTenantEntityCode = new HashSet<>();
+                    for (User userEntity : userList) {
+                        String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                        if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
+                            defaultPath = storageOperate.getResDir(tenantEntityCode);
+                            if (type.equals(ResourceType.UDF)) {
+                                defaultPath = storageOperate.getUdfDir(tenantEntityCode);
+                            }
+                            resourcesList.addAll(storageOperate.listFilesStatusRecursively(defaultPath, defaultPath,
+                                    tenantEntityCode, type));
+                            visitedTenantEntityCode.add(tenantEntityCode);
                         }
-                        resourcesList.addAll(storageOperate.listFilesStatusRecursively(defaultPath, defaultPath,
-                                tenantEntityCode, type));
-                        visitedTenantEntityCode.add(tenantEntityCode);
                     }
+                } else {
+                    defaultPath = storageOperate.getResDir(tenantCode);
+                    if (type.equals(ResourceType.UDF)) {
+                        defaultPath = storageOperate.getUdfDir(tenantCode);
+                    }
+
+                    resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
                 }
             } else {
                 defaultPath = storageOperate.getResDir(tenantCode);
@@ -889,15 +897,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     defaultPath = storageOperate.getUdfDir(tenantCode);
                 }
 
-                resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
+                resourcesList = storageOperate.listFilesStatusRecursively(fullName, defaultPath, tenantCode, type);
             }
-        } else {
-            defaultPath = storageOperate.getResDir(tenantCode);
-            if (type.equals(ResourceType.UDF)) {
-                defaultPath = storageOperate.getUdfDir(tenantCode);
-            }
-
-            resourcesList = storageOperate.listFilesStatusRecursively(fullName, defaultPath, tenantCode, type);
         }
 
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resourcesList);
