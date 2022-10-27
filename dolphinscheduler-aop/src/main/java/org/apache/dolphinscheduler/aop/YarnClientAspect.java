@@ -41,13 +41,11 @@ public class YarnClientAspect {
     private ApplicationReport currentApplicationReport = null;
 
     private final String appInfoFilePath;
-    private boolean debug;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public YarnClientAspect() {
         appInfoFilePath = String.format("%s/%s", System.getProperty("user.dir"), "appInfo.log");
-       
     }
 
     /**
@@ -68,14 +66,15 @@ public class YarnClientAspect {
                         StandardOpenOption.WRITE,
                         StandardOpenOption.APPEND);
             } catch (IOException ioException) {
-                logger.error("YarnClientAspect[registerAppInfo]: can't output current application information, because "
-                        + ioException.getMessage());
+                logger.error(
+                        "YarnClientAspect[registerAppInfo]: can't output current application information, because {}",
+                        ioException.getMessage());
             }
         }
-            logger.info("YarnClientAspect[submitApplication]: current application context " + appContext);
-            logger.info("YarnClientAspect[submitApplication]: submitted application id " + submittedAppId);
-            logger.info(
-                    "YarnClientAspect[submitApplication]: current application report  " + currentApplicationReport);
+        logger.info("YarnClientAspect[submitApplication]: current application context {}", appContext);
+        logger.info("YarnClientAspect[submitApplication]: submitted application id {}", submittedAppId);
+        logger.info(
+                "YarnClientAspect[submitApplication]: current application report {}", currentApplicationReport);
     }
 
     /**

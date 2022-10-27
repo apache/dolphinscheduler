@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SEC_2_MINUT
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -124,24 +123,6 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setProcessDefineCode(processDefinition.getCode());
         taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
         taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
-        return this;
-    }
-
-    /**
-     * build execPath related info
-     *
-     * @return TaskExecutionContextBuilder
-     */
-    public TaskExecutionContextBuilder buildExecPathRelatedInfo() {
-        String execPath = FileUtils.getProcessExecDir(
-                taskExecutionContext.getTenantCode(),
-                taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
-        taskExecutionContext.setExecutePath(execPath);
-        taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execPath));
         return this;
     }
 

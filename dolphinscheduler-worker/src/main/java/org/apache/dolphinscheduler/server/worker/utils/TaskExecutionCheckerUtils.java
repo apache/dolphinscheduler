@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -79,6 +80,15 @@ public class TaskExecutionCheckerUtils {
     public static void createProcessLocalPathIfAbsent(TaskExecutionContext taskExecutionContext) throws TaskException {
         try {
             // local execute path
+            String execLocalPath = FileUtils.getProcessExecDir(
+                    taskExecutionContext.getTenantCode(),
+                    taskExecutionContext.getProjectCode(),
+                    taskExecutionContext.getProcessDefineCode(),
+                    taskExecutionContext.getProcessDefineVersion(),
+                    taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            taskExecutionContext.setExecutePath(execLocalPath);
+            taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
             createDirectoryWithOwner(Paths.get(taskExecutionContext.getExecutePath()),
                     taskExecutionContext.getTenantCode());
         } catch (Throwable ex) {

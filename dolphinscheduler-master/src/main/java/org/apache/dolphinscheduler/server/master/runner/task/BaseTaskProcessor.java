@@ -340,7 +340,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
                 .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
-                .buildExecPathRelatedInfo()
                 .buildResourceParametersInfo(resources)
                 .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
                 .buildK8sTaskRelatedInfo(k8sTaskExecutionContext)

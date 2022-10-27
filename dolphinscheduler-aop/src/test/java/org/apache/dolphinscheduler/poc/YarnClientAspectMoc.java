@@ -34,7 +34,8 @@ public class YarnClientAspectMoc {
 
     @AfterReturning(pointcut = "execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.submitApplication(ApplicationSubmissionContext)) && args(appContext)", returning = "submittedAppId", argNames = "appContext")
     public void submitApplication(ApplicationSubmissionContext appContext, ApplicationId submittedAppId) {
-        logger.info("YarnClientAspectMoc[submitApplication]: app context: {}, submittedAppId: {}, privateId: {}", appContext, submittedAppId, privateId);
+        logger.info("YarnClientAspectMoc[submitApplication]: app context: {}, submittedAppId: {}, privateId: {}",
+                appContext, submittedAppId, privateId);
     }
 
     @AfterReturning(pointcut = "cflow(execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.submitApplication(ApplicationSubmissionContext))) "
@@ -42,6 +43,6 @@ public class YarnClientAspectMoc {
             "&& !within(CfowAspect) && execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.createAppId())", returning = "submittedAppId")
     public void createAppId(ApplicationId submittedAppId) {
         privateId = submittedAppId;
-        logger.info("YarnClientAspectMoc[createAppId]: created submittedAppId " + submittedAppId);
+        logger.info("YarnClientAspectMoc[createAppId]: created submittedAppId {}", submittedAppId);
     }
 }

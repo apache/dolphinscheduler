@@ -71,8 +71,7 @@ public class YarnClientAspectMocTest {
             Assertions.assertTrue(stdoutContent.contains("YarnClientAspectMoc[createAppId]:"),
                     "trigger YarnClientAspectMoc.createAppId failed");
         } catch (YarnException | IOException e) {
-            logger.error("test YarnClientAspectMoc failed: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("test YarnClientAspectMoc failed", e);
         }
     }
 }
