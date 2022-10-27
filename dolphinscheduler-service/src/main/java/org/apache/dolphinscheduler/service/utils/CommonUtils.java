@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
@@ -146,14 +147,14 @@ public class CommonUtils {
             return StringUtils.EMPTY;
         }
         // if encryption is not turned on, return directly
-        boolean encryptionEnable = PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE, false);
+        boolean encryptionEnable = PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false);
         if (!encryptionEnable) {
             return password;
         }
 
         // Using Base64 + salt to process password
-        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,
-                Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+        String salt = PropertyUtils.getString(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT,
+                DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = salt + new String(BASE64.encode(password.getBytes(StandardCharsets.UTF_8)));
         return new String(BASE64.encode(passwordWithSalt.getBytes(StandardCharsets.UTF_8)));
     }
@@ -167,14 +168,14 @@ public class CommonUtils {
         }
 
         // if encryption is not turned on, return directly
-        boolean encryptionEnable = PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE, false);
+        boolean encryptionEnable = PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false);
         if (!encryptionEnable) {
             return password;
         }
 
         // Using Base64 + salt to process password
-        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,
-                Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+        String salt = PropertyUtils.getString(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT,
+                DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8);
         if (!passwordWithSalt.startsWith(salt)) {
             logger.warn("There is a password and salt mismatch: {} ", password);

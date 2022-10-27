@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProcessInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -57,6 +57,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -103,6 +104,9 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     ProcessService processService;
+
+    @Mock
+    TaskInstanceDao taskInstanceDao;
 
     @Mock
     ProcessInstanceDao processInstanceDao;
@@ -408,7 +412,7 @@ public class ProcessInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(processInstance.getId()))
                 .thenReturn(Optional.of(processInstance));
-        when(processService.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
+        when(taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(taskInstanceList);
         when(loggerService.queryLog(taskInstance.getId(), 0, 4098)).thenReturn(res);
         Map<String, Object> successRes = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, 1);
@@ -451,7 +455,7 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        when(processService.findTaskInstanceById(1)).thenReturn(null);
+        when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(null);
         Map<String, Object> taskNullRes =
                 processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS, taskNullRes.get(Constants.STATUS));
@@ -461,7 +465,7 @@ public class ProcessInstanceServiceTest {
         taskInstance.setTaskType("HTTP");
         taskInstance.setProcessInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
-        when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
@@ -481,7 +485,7 @@ public class ProcessInstanceServiceTest {
         subTask.setTaskType("SUB_PROCESS");
         subTask.setProcessInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
-        when(processService.findTaskInstanceById(subTask.getId())).thenReturn(subTask);
+        when(taskInstanceDao.findTaskInstanceById(subTask.getId())).thenReturn(subTask);
         when(processService.findSubProcessInstance(subTask.getProcessInstanceId(), subTask.getId())).thenReturn(null);
         Map<String, Object> subprocessNotExistRes =
                 processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, 1);

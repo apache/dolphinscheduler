@@ -70,6 +70,7 @@ spec:
             - name: SPRING_JACKSON_TIME_ZONE
               value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
             {{ range $key, $value :=  .Values.alert.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}

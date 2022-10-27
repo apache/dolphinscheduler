@@ -13,26 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-import { defineStore } from 'pinia'
-import { LogTimerStore } from './types'
-
-export const useLogTimerStore = defineStore({
-  id: 'logTimer',
-  state: (): LogTimerStore => ({
-    logTimer: 0,
-  }),
-  persist: true,
-  getters: {
-    getLogTimer(): number {
-      return this.logTimer
-    }
-  },
-  actions: {
-    setLogTimer(timer: number): void {
-      this.logTimer = timer
-    }
-  }
-})
-
+*/

@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-interface LogTimerStore {
+interface UISettingStore {
   logTimer: number
+  dynamicTask: boolean
 }
 
-export { LogTimerStore }
+export { UISettingStore }

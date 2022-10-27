@@ -30,11 +30,9 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import springfox.documentation.annotations.ApiIgnore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,15 +47,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * workflow controller
  */
-@Api(tags = "WORKFLOW_TAG")
+@Tag(name = "WORKFLOW_TAG_V2")
 @RestController
 @RequestMapping("/v2/workflows")
 public class WorkflowV2Controller extends BaseController {
@@ -72,12 +71,12 @@ public class WorkflowV2Controller extends BaseController {
      * @param workflowCreateRequest the new workflow object will be created
      * @return ResourceResponse object created
      */
-    @ApiOperation(value = "create", notes = "CREATE_WORKFLOWS_NOTES")
+    @Operation(summary = "create", description = "CREATE_WORKFLOWS_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<ProcessDefinition> createWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<ProcessDefinition> createWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @RequestBody WorkflowCreateRequest workflowCreateRequest) {
         ProcessDefinition processDefinition =
                 processDefinitionService.createSingleProcessDefinition(loginUser, workflowCreateRequest);
@@ -91,15 +90,15 @@ public class WorkflowV2Controller extends BaseController {
      * @param code      process definition code
      * @return Result result object delete
      */
-    @ApiOperation(value = "delete", notes = "DELETE_WORKFLOWS_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "WORKFLOW_CODE", dataTypeClass = long.class, example = "123456", required = true)
+    @Operation(summary = "delete", description = "DELETE_WORKFLOWS_NOTES")
+    @Parameters({
+            @Parameter(name = "code", description = "WORKFLOW_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result deleteWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @PathVariable("code") Long code) {
         processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
         return Result.success();
@@ -113,12 +112,12 @@ public class WorkflowV2Controller extends BaseController {
      * @param workflowUpdateRequest workflowUpdateRequest
      * @return ResourceResponse object updated
      */
-    @ApiOperation(value = "update", notes = "UPDATE_WORKFLOWS_NOTES")
+    @Operation(summary = "update", description = "UPDATE_WORKFLOWS_NOTES")
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<ProcessDefinition> updateWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<ProcessDefinition> updateWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @PathVariable("code") Long code,
                                                     @RequestBody WorkflowUpdateRequest workflowUpdateRequest) {
         ProcessDefinition processDefinition =
@@ -133,12 +132,12 @@ public class WorkflowV2Controller extends BaseController {
      * @param code             workflow resource code you want to update
      * @return ResourceResponse object get from condition
      */
-    @ApiOperation(value = "get", notes = "GET_WORKFLOWS_NOTES")
+    @Operation(summary = "get", description = "GET_WORKFLOWS_NOTES")
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<ProcessDefinition> getWorkflow(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<ProcessDefinition> getWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @PathVariable("code") Long code) {
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(loginUser, code);
         return Result.success(processDefinition);
@@ -151,12 +150,12 @@ public class WorkflowV2Controller extends BaseController {
      * @param workflowFilterRequest workflowFilterRequest
      * @return PageResourceResponse from condition
      */
-    @ApiOperation(value = "get", notes = "FILTER_WORKFLOWS_NOTES")
+    @Operation(summary = "get", description = "FILTER_WORKFLOWS_NOTES")
     @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<PageInfo<ProcessDefinition>> filterWorkflows(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<ProcessDefinition>> filterWorkflows(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                @RequestBody WorkflowFilterRequest workflowFilterRequest) {
         PageInfo<ProcessDefinition> processDefinitions =
                 processDefinitionService.filterProcessDefinition(loginUser, workflowFilterRequest);
