@@ -54,7 +54,7 @@
         <if test="userName!=null and userName != ''">
             and u.user_name like concat ('%', #{userName}, '%')
         </if>
-        order by u.update_time desc
+        order by u.update_time desc, u.id desc
     </select>
     <select id="queryDetailsById" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
