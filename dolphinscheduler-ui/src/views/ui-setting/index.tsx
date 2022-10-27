@@ -16,22 +16,22 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { NSelect, NSpace } from 'naive-ui'
+import { NSelect, NSpace, NSwitch } from 'naive-ui'
 import { defineComponent } from 'vue'
-import { useLogTimerStore } from '@/store/logTimer/logTimer'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 
 // Update LogTimer store when select value is updated
 const handleUpdateValue = (logTimer: number) => {
-  const logTimerStore = useLogTimerStore()
-  logTimerStore.setLogTimer(logTimer)
+  const uiSettingStore = useUISettingStore()
+  uiSettingStore.setLogTimer(logTimer)
 }
 
 const setting = defineComponent({
   name: 'ui-setting',
   setup() {
-    const logTimerStore = useLogTimerStore()
-    const defaultLogTimer = logTimerStore.getLogTimer
+    const uiSettingStore = useUISettingStore()
+    const defaultLogTimer = uiSettingStore.getLogTimer
 
     const logTimerMap = {
       0: 'Off',
@@ -75,14 +75,20 @@ const setting = defineComponent({
 
     return (
       <Card style={{ marginLeft: '25%', width: '50%' }} title={t('menu.ui_setting')}>
+        <h4>{t('ui_setting.request_settings')}</h4>
         <NSpace align='center' justify='space-between'>
-          <span>{t('ui_setting.log.refresh_time')}</span>
+          <span>{t('ui_setting.refresh_time')}</span>
           <NSelect
             style={{ width: '200px' }}
             default-value={this.logTimerMap[this.defaultLogTimer]}
             options={this.logTimerOptions}
             onUpdateValue={handleUpdateValue}
           />
+        </NSpace>
+        <h4>{t('ui_setting.experimental_feature')}</h4>
+        <NSpace align='center' justify='space-between'>
+          <span>{t('ui_setting.dynamic_task_component')}</span>
+          <NSwitch round={false}></NSwitch>
         </NSpace>
       </Card>
     )

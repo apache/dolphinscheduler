@@ -14,8 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-interface LogTimerStore {
-  logTimer: number
-}
 
-export { LogTimerStore }
+import { defineStore } from 'pinia'
+import { UISettingStore } from './types'
+
+export const useUISettingStore = defineStore({
+  id: 'ui-setting',
+  state: (): UISettingStore => ({
+    logTimer: 0,
+  }),
+  persist: true,
+  getters: {
+    getLogTimer(): number {
+      return this.logTimer
+    }
+  },
+  actions: {
+    setLogTimer(timer: number): void {
+      this.logTimer = timer
+    }
+  }
+})
+

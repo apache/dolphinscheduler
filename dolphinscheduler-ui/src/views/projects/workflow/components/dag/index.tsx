@@ -54,7 +54,7 @@ import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
 import utils from '@/utils'
-import { useLogTimerStore } from '@/store/logTimer/logTimer'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -85,8 +85,8 @@ export default defineComponent({
     const route = useRoute()
     const theme = useThemeStore()
 
-    const logTimerStore = useLogTimerStore()
-    const logTimer = logTimerStore.getLogTimer
+    const uiSettingStore = useUISettingStore()
+    const logTimer = uiSettingStore.getLogTimer
 
     // Whether the graph can be operated
     provide('readonly', toRef(props, 'readonly'))
