@@ -105,9 +105,12 @@ public abstract class AbstractAuthenticator implements Authenticator {
     public User getAuthUser(HttpServletRequest request) {
         Session session = sessionService.getSession(request);
         if (session == null) {
+            logger.info("[debug111] session is null ...");
             logger.info("session info is null ");
             return null;
         }
+
+        logger.info("[debug111] session is not null, querying user ...");
         // get user object from session
         return userService.queryUser(session.getUserId());
     }

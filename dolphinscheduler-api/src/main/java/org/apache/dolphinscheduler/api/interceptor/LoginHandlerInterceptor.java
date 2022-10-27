@@ -68,31 +68,36 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         String token = request.getHeader("token");
         User user;
         if (StringUtils.isEmpty(token)) {
+            logger.info("[debug111] preHandle token is empty...");
             user = authenticator.getAuthUser(request);
+            logger.info("[debug111] prehandle get user from request...");
             logger.info("[debug111] preHandle, user: {}", user);
             // if user is null
             if (user == null) {
+                logger.info("[debug111] user is null...");
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-                logger.info("user does not exist");
                 return false;
             }
         } else {
+            logger.info("[debug111] prehandle token exists...");
             user = userMapper.queryUserByToken(token, new Date());
+            logger.info("[debug111] prehandle find user by token...");
             if (user == null) {
+                logger.info("[debug111] prehandle token not null but user is null...");
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 logger.info("user token has expired");
                 return false;
             }
         }
 
-        logger.info("[debug111] pre handle debug 1");
-
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {
+            logger.info("[debug111] prehandle user not null but state is no...");
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);
             logger.info(Status.USER_DISABLED.getMsg());
             return false;
         }
+        logger.info("[debug111] prehandle great everything seems good, add user to session...");
         request.setAttribute(Constants.SESSION_USER, user);
         ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());
         return true;
