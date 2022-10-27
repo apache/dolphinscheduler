@@ -47,7 +47,7 @@ public class YarnClientAspect {
 
     public YarnClientAspect() {
         appInfoFilePath = String.format("%s/%s", System.getProperty("user.dir"), "appInfo.log");
-        debug = true;
+       
     }
 
     /**
