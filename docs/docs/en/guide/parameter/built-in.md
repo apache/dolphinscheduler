@@ -40,6 +40,6 @@
      - Before(-)/After(+) The last day of Month(The unit of N is month): `$[month_last_day(yyyy-MM-dd,-N)]`,Such as when N=1, 2022-08-28 => 2022-07-31
      - Before(-)/After(+) The first day of Week(The unit of N is week): `$[week_first_day(yyyy-MM-dd,-N)]`,Such as when N=1, 2022-08-26 => 2022-08-15
      - Before(-)/After(+) The last day of Week(The unit of N is week): `$[week_last_day(yyyy-MM-dd,-N)]`, Such as when N=1, 2022-08-26 => 2022-08-21
-  4.unixtime time  Use timestamp() function, get the unixtime accurate to seconds
+  4. unixtime time  Use timestamp() function, get the unixtime accurate to seconds
      - current time  `$[timestamp(yyyyMMddHHmmss)]`, Such as  2022-08-26 12:01:01 => 1661486461
      - yesterday time  `$[timestamp(yyyyMMddHHmmss-1)]`, Such as 2022-08-26 12:01:01 => 1661400061
