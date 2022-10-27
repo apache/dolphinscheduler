@@ -130,12 +130,15 @@ export default defineComponent({
           <NSpace justify='space-between'>
             <NSpace>
               <NButton
-                type='primary'
+                type={this.uiSettingStore.getDynamicTask ? 'warning' : 'primary'}
                 size='small'
                 onClick={this.createDefinition}
                 class='btn-create-process'
               >
-                {t('project.workflow.create_workflow')}
+                {this.uiSettingStore.getDynamicTask ?
+                  t('project.workflow.create_workflow_dynamic') :
+                  t('project.workflow.create_workflow')
+                }
               </NButton>
               <NButton
                 strong
@@ -145,14 +148,6 @@ export default defineComponent({
               >
                 {t('project.workflow.import_workflow')}
               </NButton>
-              {
-                this.uiSettingStore.getDynamicTask && <NButton
-                  size='small'
-                  type='warning'
-                >
-                  {t('project.workflow.create_workflow_dynamic')}
-                </NButton>
-              }
             </NSpace>
             <NSpace>
               <NInput

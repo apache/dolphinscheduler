@@ -18,7 +18,9 @@
 import { defineComponent } from 'vue'
 import { useMessage } from 'naive-ui'
 import Dag from '../../components/dag'
+import { DynamicDag } from '@/views/projects/workflow/components/dynamic-dag'
 import { useThemeStore } from '@/store/theme/theme'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import { useRoute, useRouter } from 'vue-router'
 import {
   SaveForm,
@@ -41,7 +43,7 @@ export default defineComponent({
   name: 'WorkflowDefinitionCreate',
   setup() {
     const theme = useThemeStore()
-
+    const uiSettingStore = useUISettingStore()
     const message = useMessage()
     const { t } = useI18n()
     const route = useRoute()
@@ -89,7 +91,11 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        <Dag projectCode={projectCode} onSave={onSave} />
+        {
+          uiSettingStore.getDynamicTask ?
+            <DynamicDag /> :
+            <Dag projectCode={projectCode} onSave={onSave} />
+        }
       </div>
     )
   }
