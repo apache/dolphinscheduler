@@ -144,7 +144,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     private void setConditionResult() {
         List<TaskInstance> taskInstances = processService
-                .findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
+                .findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }

@@ -164,7 +164,7 @@ public class MasterFailoverService {
                 processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
                 List<TaskInstance> taskInstanceList =
-                        processService.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
+                        processService.findValidTaskListByProcessId(processInstanceId);
                 for (TaskInstance taskInstance : taskInstanceList) {
                     try {
                         LoggerUtils.setTaskInstanceIdMDC(taskInstance.getId());
