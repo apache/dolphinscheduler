@@ -461,7 +461,8 @@ CREATE TABLE `t_ds_process_definition_log` (
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_idx_code_version` (`code`,`version`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -788,6 +789,23 @@ CREATE TABLE `t_ds_resources` (
 
 -- ----------------------------
 -- Records of t_ds_resources
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_ds_relation_resources_task
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_resources_task`;
+CREATE TABLE `t_ds_relation_resources_task` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `task_id` int(11) DEFAULT NULL COMMENT 'task id',
+  `full_name` varchar(255) DEFAULT NULL,
+  `type` tinyint DEFAULT NULL COMMENT 'resource type,0:FILE,1:UDF',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_relation_resources_task_un` (`task_id`, `full_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_relation_resources_task
 -- ----------------------------
 
 -- ----------------------------
@@ -1982,8 +2000,8 @@ CREATE TABLE `t_ds_cluster`(
 DROP TABLE IF EXISTS `t_ds_fav_task`;
 CREATE TABLE `t_ds_fav_task`
 (
-    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'favorite task id',
-    `task_name` varchar(64) NOT NULL COMMENT 'favorite task name',
+    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name',
     `user_id`   int         NOT NULL COMMENT 'user id',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB

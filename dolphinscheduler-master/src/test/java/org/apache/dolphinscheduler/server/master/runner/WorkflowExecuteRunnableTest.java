@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -31,10 +31,13 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -70,7 +73,12 @@ public class WorkflowExecuteRunnableTest {
 
     private ProcessInstance processInstance;
 
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionLogDao taskDefinitionLogDao;
     private ProcessService processService;
+
+    private CommandService commandService;
 
     private ProcessInstanceDao processInstanceDao;
 
@@ -90,11 +98,14 @@ public class WorkflowExecuteRunnableTest {
 
         config = new MasterConfig();
         processService = Mockito.mock(ProcessService.class);
+        commandService = Mockito.mock(CommandService.class);
         processInstanceDao = Mockito.mock(ProcessInstanceDao.class);
         processInstance = Mockito.mock(ProcessInstance.class);
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
         Map<String, String> cmdParam = new HashMap<>();
-        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
-        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
+        cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
+        cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setGlobalParamMap(Collections.emptyMap());
         processDefinition.setGlobalParamList(Collections.emptyList());
@@ -105,8 +116,10 @@ public class WorkflowExecuteRunnableTest {
         NettyExecutorManager nettyExecutorManager = Mockito.mock(NettyExecutorManager.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
         workflowExecuteThread = Mockito.spy(
-                new WorkflowExecuteRunnable(processInstance, processService, processInstanceDao, nettyExecutorManager,
-                        processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService));
+                new WorkflowExecuteRunnable(processInstance, commandService, processService, processInstanceDao,
+                        nettyExecutorManager,
+                        processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService,
+                        taskInstanceDao, taskDefinitionLogDao));
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
         dag.set(workflowExecuteThread, new DAG());
@@ -141,7 +154,7 @@ public class WorkflowExecuteRunnableTest {
             taskInstance4.setId(4);
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1,2,3,4");
-            Mockito.when(processService.findTaskInstanceByIdList(
+            Mockito.when(taskInstanceDao.findTaskInstanceByIdList(
                     Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(),
                             taskInstance4.getId())))
                     .thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));

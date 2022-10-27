@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.service.expand;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -32,7 +33,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -147,7 +149,7 @@ public class CuringGlobalParams implements CuringParamsService {
         parameters.setVarPool(taskInstance.getVarPool());
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (globalParams.isEmpty() && localParams.isEmpty() && varParams.isEmpty()) {
+        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams) && MapUtils.isEmpty(varParams)) {
             return null;
         }
         // if it is a complement,
@@ -166,10 +168,10 @@ public class CuringGlobalParams implements CuringParamsService {
         }
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
 
-        if (varParams.size() != 0) {
+        if (MapUtils.isNotEmpty(varParams)) {
             globalParams.putAll(varParams);
         }
-        if (localParams.size() != 0) {
+        if (MapUtils.isNotEmpty(localParams)) {
             globalParams.putAll(localParams);
         }
 
@@ -225,11 +227,11 @@ public class CuringGlobalParams implements CuringParamsService {
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
         if (processInstance.getScheduleTime() != null) {
             Date date = processInstance.getScheduleTime();
-            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME, null);
+            String dateTime = DateUtils.format(date, DateConstants.PARAMETER_FORMAT_TIME, null);
             Property p = new Property();
             p.setValue(dateTime);
-            p.setProp(Constants.PARAMETER_DATETIME);
-            paramsMap.put(Constants.PARAMETER_DATETIME, p);
+            p.setProp(DateConstants.PARAMETER_DATETIME);
+            paramsMap.put(DateConstants.PARAMETER_DATETIME, p);
         }
         return paramsMap;
     }

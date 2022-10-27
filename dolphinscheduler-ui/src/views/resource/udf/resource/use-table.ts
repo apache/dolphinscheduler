@@ -30,7 +30,8 @@ import {
   queryResourceListPaging,
   downloadResource,
   deleteResource,
-  queryResourceById
+  queryCurrentResourceByFileName,
+  queryCurrentResourceByFullName
 } from '@/service/modules/resources'
 import ButtonLink from '@/components/button-link'
 import {
@@ -39,14 +40,15 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { IUdfResourceParam } from './types'
+import { ResourceFile } from '@/service/modules/resources/types'
 
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
   fileStore.setFileInfo(`${item.alias}|${item.size}`)
-
   if (item.directory) {
     fileStore.setCurrentDir(`${item.fullName}`)
-    router.push({ name: 'resource-sub-manage', params: { id: item.id } })
+    router.push({ name: 'resource-sub-manage',
+        query: {prefix: item.fullName, tenantCode: item.userName} })
   }
 }
 
@@ -60,8 +62,9 @@ export function useTable() {
     tableWidth: DefaultTableWidth,
     row: {},
     tableData: [],
-    breadList: [],
-    id: ref(Number(router.currentRoute.value.params.id) || -1),
+    breadList: [] as String[],
+    fullName: ref(String(router.currentRoute.value.query.prefix || "")),
+    tenantCode: ref(String(router.currentRoute.value.query.tenantCode || "")),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
@@ -103,7 +106,7 @@ export function useTable() {
         }
       },
       {
-        title: t('resource.udf.user_name'),
+        title: t('resource.udf.tenant_name'),
         ...COLUMN_WIDTH_CONFIG['userName'],
         key: 'userName'
       },
@@ -117,18 +120,13 @@ export function useTable() {
       {
         title: t('resource.udf.file_name'),
         ...COLUMN_WIDTH_CONFIG['name'],
-        key: 'fileName'
+        key: 'fullName'
       },
       {
         title: t('resource.udf.file_size'),
         key: 'size',
         ...COLUMN_WIDTH_CONFIG['size'],
         render: (row) => bytesToSize(row.size)
-      },
-      {
-        title: t('resource.udf.description'),
-        key: 'description',
-        ...COLUMN_WIDTH_CONFIG['note']
       },
       {
         title: t('resource.udf.create_time'),
@@ -185,7 +183,7 @@ export function useTable() {
                         size: 'tiny',
                         class: 'btn-download',
                         disabled: row?.directory ? true : false,
-                        onClick: () => downloadResource(row.id)
+                        onClick: () => downloadResource({fullName: row.fullName})
                       },
                       {
                         icon: () => h(DownloadOutlined)
@@ -198,7 +196,7 @@ export function useTable() {
                 NPopconfirm,
                 {
                   onPositiveClick: () => {
-                    handleDelete(row.id)
+                    handleDelete({fullName: row.fullName, tenantCode: row.userName})
                   }
                 },
                 {
@@ -242,13 +240,25 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
-        const breadList =
-          variables.id === -1
-            ? []
-            : (fileStore.getCurrentDir.split('/') as Array<never>)
-        breadList.shift()
-
-        variables.breadList = breadList
+        // use strict checking here
+        if (variables.fullName !== ""){
+            queryCurrentResourceByFullName(
+              {
+                type: 'UDF',
+                fullName: variables.fullName,
+                tenantCode: variables.tenantCode,
+              }
+            ).then((res: ResourceFile) => {
+                if (res.fileName) {
+                  const breadList = res.fileName.split('/')
+                  // pop the alias from the fullname path
+                  breadList.pop()
+                  variables.breadList = breadList
+                }
+            })
+        } else {
+            variables.breadList = []
+        }
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
@@ -265,15 +275,17 @@ export function useTable() {
     variables.row = row
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (fullNameObj: {fullName: string, tenantCode: string}) => {
     /* after deleting data from the current page, you need to jump forward when the page is empty. */
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
 
-    deleteResource(id).then(() =>
+    deleteResource(fullNameObj).then(() =>
       getTableData({
-        id: variables.id,
+        id: -1,
+        fullName: variables.fullName,
+        tenantCode: variables.tenantCode,
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal
@@ -285,18 +297,16 @@ export function useTable() {
     router.push({ name: 'resource-manage' })
   }
 
-  const goBread = (fullName: string) => {
-    const { id } = variables
-    queryResourceById(
+  const goBread = (fileName: string) => {
+    queryCurrentResourceByFileName(
       {
-        id,
         type: 'UDF',
-        fullName
-      },
-      id
+        fileName: fileName + "/",
+        tenantCode: variables.tenantCode
+      }
     ).then((res: any) => {
       fileStore.setCurrentDir(res.fullName)
-      router.push({ name: 'resource-sub-manage', params: { id: res.id } })
+      router.push({ name: 'resource-sub-manage', query: {prefix: res.fullName, tenantCode: res.userName} })
     })
   }
 

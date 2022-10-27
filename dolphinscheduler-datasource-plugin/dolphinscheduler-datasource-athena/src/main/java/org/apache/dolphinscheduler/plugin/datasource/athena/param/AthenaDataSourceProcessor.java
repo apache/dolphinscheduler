@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.athena.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,11 +27,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -64,7 +65,8 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         AthenaDataSourceParamDTO athenaParam = (AthenaDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s=%s;", Constants.JDBC_ATHENA, "AwsRegion", athenaParam.getAwsRegion());
+        String address =
+                String.format("%s%s=%s;", DataSourceConstants.JDBC_ATHENA, "AwsRegion", athenaParam.getAwsRegion());
 
         AthenaConnectionParam athenaConnectionParam = new AthenaConnectionParam();
         athenaConnectionParam.setUser(athenaParam.getUserName());
@@ -88,12 +90,12 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_ATHENA_JDBC_DRIVER;
+        return DataSourceConstants.COM_ATHENA_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.ATHENA_VALIDATION_QUERY;
+        return DataSourceConstants.ATHENA_VALIDATION_QUERY;
     }
 
     @Override

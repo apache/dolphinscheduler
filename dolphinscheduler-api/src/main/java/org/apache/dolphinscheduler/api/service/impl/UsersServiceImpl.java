@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -1173,7 +1173,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             if (CollectionUtils.isNotEmpty(components)) {
                 for (ResourceComponent component : components) {
                     // verify whether exist
-                    if (!storageOperate.exists(oldTenantCode,
+                    if (!storageOperate.exists(
                             String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
                         logger.error("Resource file: {} does not exist, copy error.", component.getFullName());
                         throw new ServiceException(Status.RESOURCE_NOT_EXIST);
@@ -1188,8 +1188,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
                     if (CollectionUtils.isEmpty(component.getChildren())) {
                         // if not exist,need create it
-                        if (!storageOperate.exists(oldTenantCode,
-                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
+                        if (!storageOperate
+                                .exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
                             storageOperate.mkdir(newTenantCode,
                                     String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
                         }

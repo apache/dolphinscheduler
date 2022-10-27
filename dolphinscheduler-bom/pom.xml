@@ -75,7 +75,6 @@
         <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
-        <springfox.version>3.0.0</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
         <reflections.version>0.10.2</reflections.version>
         <py4j.version>0.10.9</py4j.version>
@@ -98,6 +97,7 @@
         <snakeyaml.version>1.31</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
         <datasync.version>2.17.282</datasync.version>
+        <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
     </properties>
 
     <dependencyManagement>
@@ -561,11 +561,6 @@
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${javax.servlet-api.version}</version>
             </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
-                <version>${springfox.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.github.rholder</groupId>
@@ -752,6 +747,12 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>datasync</artifactId>
                 <version>${datasync.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi-ui.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
@@ -445,7 +445,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         if (isAdmin(loginUser)) {
             k8sNamespaces = k8sNamespaceMapper.selectList(null);
         } else {
-            k8sNamespaces = k8sNamespaceMapper.queryNamespaceAvailable(loginUser.getId());
+            k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(loginUser.getId());
         }
         setClusterName(k8sNamespaces);
         return k8sNamespaces;
