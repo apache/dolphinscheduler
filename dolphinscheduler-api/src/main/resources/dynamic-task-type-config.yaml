@@ -17,7 +17,7 @@
 
 dynamic-task:
   universal:
-    - 'SHELL': {icon: shell-icon.png,hover: shell-hover.png}
+    - 'SHELL': {icon: /static/shell/shell-icon.png,hover: /static/shell/shell-hover.png,json: /static/shell/shell.json}
   cloud:
     - 'EMR': {icon: shell-icon.png,hover: shell-hover.png}
   logic:

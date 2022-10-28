@@ -13,5 +13,6 @@ public class DynamicTaskInfo {
 
     private String hover;
     private String icon;
+    private String json;
 
 }
