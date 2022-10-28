@@ -18,6 +18,7 @@
 import { defineComponent } from 'vue'
 import { useMessage } from 'naive-ui'
 import Dag from '../../components/dag'
+import { DynamicDag } from '@/views/projects/workflow/components/dynamic-dag'
 import { useThemeStore } from '@/store/theme/theme'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -41,7 +42,6 @@ export default defineComponent({
   name: 'WorkflowDefinitionCreate',
   setup() {
     const theme = useThemeStore()
-
     const message = useMessage()
     const { t } = useI18n()
     const route = useRoute()
@@ -89,7 +89,9 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        <Dag projectCode={projectCode} onSave={onSave} />
+        {
+          route.query.dynamic === 'true' ? <DynamicDag /> : <Dag projectCode={projectCode} onSave={onSave} />
+        }
       </div>
     )
   }
