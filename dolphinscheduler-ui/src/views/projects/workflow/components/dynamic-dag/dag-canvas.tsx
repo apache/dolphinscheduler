@@ -17,7 +17,6 @@
 
 import { defineComponent, ref, onMounted } from 'vue'
 import { Graph } from '@antv/x6'
-import { DagNode } from './dag-node'
 import { useDagResize } from './use-dag-resize'
 import { useDagGraph } from './use-dag-graph'
 import { useDagNode } from './use-dag-node'

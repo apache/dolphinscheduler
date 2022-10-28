@@ -24,7 +24,7 @@ const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
     const handelDragend = (e: DragEvent, task: any) => {
-      console.log(e, task)
+      //console.log(e, task)
       //if (readonly.value) {
       //  e.preventDefault()
       //  return

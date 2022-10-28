@@ -18,7 +18,6 @@
 import { defineComponent, onMounted, toRefs } from 'vue'
 import { useSidebar } from './use-sidebar'
 import styles from './dag-sidebar.module.scss'
-import { TaskType } from '@/store/project/types'
 
 const DagSidebar = defineComponent({
   name: 'DagSidebar',
