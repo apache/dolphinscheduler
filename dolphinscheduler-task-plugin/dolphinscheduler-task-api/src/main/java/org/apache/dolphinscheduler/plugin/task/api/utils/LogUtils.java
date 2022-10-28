@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,13 +47,12 @@ public class LogUtils {
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
     public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
-        switch (fetchWay) {
-            case "aop":
-                log.info("Start finding appId in {}, fetch way: {} ", appInfoPath);
-                return getAppIdsFromAppInfoFile(appInfoPath, log);
-            default:
-                log.info("Start finding appId in {}, fetch way: {} ", logPath);
-                return getAppIdsFromLogFile(logPath, log);
+        if (!StringUtils.isEmpty(fetchWay) && fetchWay.equals("aop")) {
+            log.info("Start finding appId in {}, fetch way: {} ", appInfoPath);
+            return getAppIdsFromAppInfoFile(appInfoPath, log);
+        } else {
+            log.info("Start finding appId in {}, fetch way: {} ", logPath);
+            return getAppIdsFromLogFile(logPath, log);
         }
     }
 
