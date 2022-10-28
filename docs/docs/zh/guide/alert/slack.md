@@ -27,6 +27,7 @@
 ### 激活Incoming Webhooks设置
 
 新建APP后，在APP页面左侧，选择`Feature`栏目下的`Incoming Webhooks`，点击激活`Activate Incoming Webhooks`到`ON`。
+![alert-slack-webhook](../../../../img/new_ui/dev/alert/alert_slack_enable.png)
 
 ### 创建一个Incoming Webhook
 

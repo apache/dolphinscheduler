@@ -21,7 +21,7 @@ The following shows the `Slack` configuration example:
 
 ## How to Get Webhook
 
-Please refer to the official article [Slack: Sending messages using Incoming Webhooks](https://api.slack.com/messaging/webhooks) to create new Webhooks.
+Please refer to the official article [Slack: Sending messages using Incoming Webhooks](https://api.slack.com/messaging/webhooks) to create new webhooks.
 
 ### Create a new Slack APP
 
@@ -30,6 +30,7 @@ Visit [Slack Official Website](https://api.slack.com/apps/new) and create a new 
 ### Activate Incoming Webhooks Setting
 
 When finish creating a new APP, select `Incoming Webhooks` of the column `Feature` on the left of the APP page, and switch `Activate Incoming Webhooks` to `ON`.
+![alert-slack-webhook](../../../../img/new_ui/dev/alert/alert_slack_enable.png)
 
 ### Create a New Incoming Webhook
 
