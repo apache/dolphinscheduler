@@ -863,7 +863,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         String tenantCode = tenant.getTenantCode();
 
-        String defaultPath = "";
+        String defaultPath = EMPTY_STRING;
         List<StorageEntity> resourcesList = new ArrayList<>();
 
         if (PropertyUtils.getResUploadStartupState()) {
