@@ -51,6 +51,28 @@ function overwrite_server_env() {
     echo "Start server ${server} using env config path ${server_env_file}, because file ${BIN_ENV_FILE} not exists."
   fi
 }
+function preCheck(){
+  if [ "$command" = "api-server" ]; then
+    pName=org.apache.dolphinscheduler.api.ApiApplicationServer
+  elif [ "$command" = "master-server" ]; then
+    pName=org.apache.dolphinscheduler.server.master.MasterServer
+  elif [ "$command" = "worker-server" ]; then
+    pName=org.apache.dolphinscheduler.server.worker.WorkerServer
+  elif [ "$command" = "alert-server" ]; then
+    pName=org.apache.dolphinscheduler.alert.AlertServer
+  elif [ "$command" = "standalone-server" ]; then
+    pName=org.apache.dolphinscheduler.StandaloneServer
+  else
+    echo "Error: No command named '$command' was found."
+    exit 1
+  fi
+    pnamePID=`ps -ef |grep $pName |grep -v grep | awk '{print $2}'`
+  if [ "${pnamePID}xx" != "xx" ]; then
+    echo "${pName} server appears to be running.  pid is ${pnamePID}"
+    exit 0
+  fi
+}
+
 
 export HOSTNAME=`hostname`
 
@@ -83,6 +105,7 @@ fi
 
 case $startStop in
   (start)
+    preCheck
     echo starting $command, logging to $DOLPHINSCHEDULER_LOG_DIR
     overwrite_server_env "${command}"
     nohup /bin/bash "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
