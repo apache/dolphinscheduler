@@ -28,14 +28,6 @@
     <name>${project.artifactId}</name>
     <description>aop 4 YarnClient to get application id when submitting jars using 'yarn jar mainClass args'</description>
 
-    <!--    <properties>-->
-    <!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
-    <!--        <maven.compiler.source>1.8</maven.compiler.source>-->
-    <!--        <maven.compiler.target>1.8</maven.compiler.target>-->
-    <!--        <aspectj.version>1.9.7</aspectj.version>-->
-    <!--        <hadoop.version>3.2.4</hadoop.version>-->
-    <!--    </properties>-->
-
     <dependencyManagement>
         <dependencies>
             <dependency>

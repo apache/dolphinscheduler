@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class YarnClientAspectMocTest {
+class YarnClientAspectMocTest {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -54,7 +54,7 @@ public class YarnClientAspectMocTest {
     }
 
     @Test
-    public void testMoc() {
+    void testMoc() {
         YarnClientMoc moc = new YarnClientMoc();
         try {
             ApplicationSubmissionContext appContext = ApplicationSubmissionContext.newInstance(
