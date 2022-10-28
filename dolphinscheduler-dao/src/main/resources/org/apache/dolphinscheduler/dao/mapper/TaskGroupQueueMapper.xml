@@ -124,6 +124,13 @@
         where task_id = #{taskId}
     </select>
 
+    <select id="selectCountByTaskIdAndStatus" resultType="java.lang.Integer">
+        select
+        count(1)
+        FROM t_ds_task_group_queue
+        where id = #{queueId} and status = #{queueStatus}
+    </select>
+
     <select id="queryTaskGroupQueueByTaskGroupIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
         queue.id, queue.task_name, queue.group_id, queue.process_id, queue.priority, queue.status
