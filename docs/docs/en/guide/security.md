@@ -104,15 +104,11 @@ public  void doPOSTParam()throws Exception{
 - Note: For projects created by the user, the user has all permissions. The item list and the selected items list are not displayed.
 - The administrator enters the `Security Center -> User Management` page, and clicks the "Authorize" button of the user to be authorized, as shown in the following figure:
 
-<p align="center">
-  <img src="../../../img/auth-en.png" width="80%" />
-</p>
+![project-authroize-step-1](../../../img/new_ui/dev/security/project-authroize-step-1.png)
 
 - Select the project to authorize the project.
 
-<p align="center">
-   <img src="../../../img/auth-project-en.png" width="80%" />
-</p>
+![project-authroize-step-2](../../../img/new_ui/dev/security/project-authroize-step-2.png)
 
 - Resources, data sources, and UDF function authorization are the same as project authorization.
 

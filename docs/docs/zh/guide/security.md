@@ -95,14 +95,14 @@
 
 * 授予权限包括项目权限，资源权限，数据源权限，UDF函数权限，k8s命名空间。
 * 管理员可以对普通用户进行非其创建的项目、资源、数据源、UDF函数、k8s命名空间。因为项目、资源、数据源、UDF函数、k8s命名空间授权方式都是一样的，所以以项目授权为例介绍。
-* 注意：对于用户自己创建的项目，该用户拥有所有的权限。则项目列表和已选项目列表中不会显示。
+* 注意：对于用户自己创建的项目，该用户默认拥有所有的权限。则项目列表和已选项目列表中不会显示。
 - 管理员进入安全中心->用户管理页面，点击需授权用户的“授权”按钮，如下图所示：
 
-![user-authorize](../../../img/new_ui/dev/security/user-authorize.png)
+![project-authroize-step-1](../../../img/new_ui/dev/security/project-authroize-step-1.png)
 
 - 选择项目，进行项目授权。
 
-![project-authorize](../../../img/new_ui/dev/security/project-authorize.png)
+![project-authroize-step-2](../../../img/new_ui/dev/security/project-authroize-step-2.png)
 
 - 资源、数据源、UDF 函数授权同项目授权。
 
