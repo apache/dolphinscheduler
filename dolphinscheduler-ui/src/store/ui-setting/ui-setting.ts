@@ -16,23 +16,36 @@
  */
 
 import { defineStore } from 'pinia'
-import { LogTimerStore } from './types'
+import { UISettingStore } from './types'
 
-export const useLogTimerStore = defineStore({
-  id: 'logTimer',
-  state: (): LogTimerStore => ({
+export const useUISettingStore = defineStore({
+  id: 'ui-setting',
+  state: (): UISettingStore => ({
     logTimer: 0,
+    dynamicTask: false,
+    apiTimer: 10000
   }),
   persist: true,
   getters: {
     getLogTimer(): number {
       return this.logTimer
+    },
+    getDynamicTask(): boolean {
+      return this.dynamicTask
+    },
+    getApiTimer(): number {
+      return this.apiTimer
     }
   },
   actions: {
     setLogTimer(timer: number): void {
       this.logTimer = timer
+    },
+    setDynamicTask(): void {
+      this.dynamicTask = !this.dynamicTask
+    },
+    setApiTimer(timer: number): void {
+      this.apiTimer = timer
     }
   }
 })
-
