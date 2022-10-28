@@ -224,20 +224,15 @@ public class ServerNodeManager implements InitializingBean {
                     final String workerAddress = parts[parts.length - 1];
 
                     if (type == Type.ADD) {
+                        // we don't update the workerGroupToAddressMap, this node will be addded to map aftre 10s
                         logger.info("worker group node : {} added.", path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
-                        logger.info("currentNodes : {}", currentNodes);
-                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
                     } else if (type == Type.REMOVE) {
                         logger.info("worker group node : {} down.", path);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
-                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
+                        // Remove the node from workerNodeInfo, it will not receive task
+                        workerNodeInfo.remove(workerAddress);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         logger.debug("worker group node : {} update, data: {}", path, data);
-                        Collection<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(workerGroupName);
-                        syncWorkerGroupNodes(workerGroupName, new HashSet<>(currentNodes));
-
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
                 } catch (Exception ex) {
