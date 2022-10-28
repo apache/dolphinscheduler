@@ -63,9 +63,6 @@ public class LogUtils {
         List<String> appIds = new ArrayList<>();
         try (Stream<String> stream = Files.lines(Paths.get(appInfoPath))) {
             stream.forEach(appIds::add);
-            stream.forEach(line -> {
-                appIds.add(line);
-            });
             return new ArrayList<>(appIds);
         } catch (IOException e) {
             logger.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
