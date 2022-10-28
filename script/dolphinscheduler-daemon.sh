@@ -51,7 +51,7 @@ function overwrite_server_env() {
     echo "Start server ${server} using env config path ${server_env_file}, because file ${BIN_ENV_FILE} not exists."
   fi
 }
-function preCheck(){
+function preCheck() {
   if [ "$command" = "api-server" ]; then
     pName=org.apache.dolphinscheduler.api.ApiApplicationServer
   elif [ "$command" = "master-server" ]; then
