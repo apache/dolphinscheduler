@@ -74,7 +74,7 @@ public class EnvironmentController extends BaseController {
     @ApiOperation(value = "createEnvironment", notes = "CREATE_ENVIRONMENT_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "ENVIRONMENT_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "config", value = "ENVIRONMENT_CONFIG", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "description", value = "ENVIRONMENT_DESC", dataTypeClass = String.class),
             @ApiImplicitParam(name = "workerGroups", value = "WORKER_GROUP_LIST", dataTypeClass = String.class)
     })

@@ -76,9 +76,8 @@ public class TaskGroupController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "NAME", dataTypeClass = String.class),
             @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class),
-            @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataTypeClass = int.class),
-
+            @ApiImplicitParam(name = "description", value = "TASK_GROUP_DESCRIPTION", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "groupSize", value = "GROUP_SIZE", dataTypeClass = int.class)
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -106,10 +105,10 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "update", notes = "UPDATE_TASK_GROUP_NOTE")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", dataTypeClass = int.class),
-            @ApiImplicitParam(name = "name", value = "NAME", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "description", value = "DESCRIPTION", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "groupSize", value = "GROUPSIZE", dataTypeClass = int.class),
+            @ApiImplicitParam(name = "id", value = "TASK_GROUP_ID", dataTypeClass = int.class),
+            @ApiImplicitParam(name = "name", value = "TASK_GROUP_NAME", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "description", value = "TASK_GROUP_DESCRIPTION", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "groupSize", value = "GROUP_SIZE", dataTypeClass = int.class)
 
     })
     @PostMapping(value = "/update")
@@ -136,7 +135,7 @@ public class TaskGroupController extends BaseController {
     @ApiOperation(value = "list-paging", notes = "QUERY_ALL_TASK_GROUP_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-            @ApiImplicitParam(name = "name", value = "NAME", required = false, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "name", value = "TASK_GROUP_NAME", required = false, dataTypeClass = String.class),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
     })
     @GetMapping(value = "/list-paging")
@@ -165,7 +164,7 @@ public class TaskGroupController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20"),
-            @ApiImplicitParam(name = "status", value = "status", required = true, dataTypeClass = int.class)
+            @ApiImplicitParam(name = "status", value = "TASK_GROUP_STATUS", required = true, dataTypeClass = int.class)
     })
     @GetMapping(value = "/query-list-by-status")
     @ResponseStatus(HttpStatus.OK)
@@ -238,7 +237,7 @@ public class TaskGroupController extends BaseController {
      */
     @ApiOperation(value = "startTaskGroup", notes = "START_TASK_GROUP_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ID", required = true, dataTypeClass = int.class)
+            @ApiImplicitParam(name = "id", value = "TASK_GROUP_ID", required = true, dataTypeClass = int.class)
     })
     @PostMapping(value = "/start-task-group")
     @ResponseStatus(HttpStatus.CREATED)
@@ -257,9 +256,9 @@ public class TaskGroupController extends BaseController {
      * @param queueId   task group queue id
      * @return result
      */
-    @ApiOperation(value = "forceStart", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
+    @ApiOperation(value = "forceStart", notes = "FORCE_START_TASK_GROUP")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataTypeClass = int.class)
+            @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUE_ID", required = true, dataTypeClass = int.class)
     })
     @PostMapping(value = "/forceStart")
     @ResponseStatus(HttpStatus.CREATED)
@@ -278,9 +277,9 @@ public class TaskGroupController extends BaseController {
      * @param queueId   task group queue id
      * @return result
      */
-    @ApiOperation(value = "modifyPriority", notes = "WAKE_TASK_COMPULSIVELY_NOTES")
+    @ApiOperation(value = "modifyPriority", notes = "MODIFY_TASK_GROUP_PRIORITY")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUEID", required = true, dataTypeClass = int.class),
+            @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUE_ID", required = true, dataTypeClass = int.class),
             @ApiImplicitParam(name = "priority", value = "TASK_GROUP_QUEUE_PRIORITY", required = true, dataTypeClass = int.class)
     })
     @PostMapping(value = "/modifyPriority")
@@ -309,12 +308,12 @@ public class TaskGroupController extends BaseController {
      * @param pageSize    page size
      * @return queue list
      */
-    @ApiOperation(value = "queryTasksByGroupId", notes = "QUERY_ALL_TASKS_NOTES")
+    @ApiOperation(value = "queryTasksByGroupId", notes = "QUERY_ALL_TASKS_GROUP_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = false, dataTypeClass = int.class, example = "1", defaultValue = "-1"),
             @ApiImplicitParam(name = "taskInstanceName", value = "TASK_INSTANCE_NAME", required = false, dataTypeClass = String.class, example = "taskName"),
             @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, dataTypeClass = String.class, example = "processName"),
-            @ApiImplicitParam(name = "status", value = "STATUS", required = false, dataTypeClass = int.class, example = "1"),
+            @ApiImplicitParam(name = "status", value = "TASK_GROUP_STATUS", required = false, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
     })

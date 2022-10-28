@@ -74,7 +74,7 @@ public class ClusterController extends BaseController {
     @ApiOperation(value = "createCluster", notes = "CREATE_CLUSTER_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "CLUSTER_NAME", required = true, dataTypeClass = String.class),
-            @ApiImplicitParam(name = "config", value = "CONFIG", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "config", value = "CLUSTER_CONFIG", required = true, dataTypeClass = String.class),
             @ApiImplicitParam(name = "description", value = "CLUSTER_DESC", dataTypeClass = String.class)
     })
     @PostMapping(value = "/create")
