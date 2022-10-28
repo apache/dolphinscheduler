@@ -889,7 +889,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         defaultPath = storageOperate.getUdfDir(tenantCode);
                     }
 
-                    resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
+                    resourcesList =
+                            storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
                 }
             } else {
                 defaultPath = storageOperate.getResDir(tenantCode);
