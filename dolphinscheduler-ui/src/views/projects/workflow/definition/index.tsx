@@ -94,6 +94,16 @@ export default defineComponent({
         path: `/projects/${projectCode}/workflow/definitions/create`
       })
     }
+
+    const createDefinitionDynamic = () => {
+      router.push({
+        path: `/projects/${projectCode}/workflow/definitions/create`,
+        query: {
+          dynamic: 'true'
+        }
+      })
+    }
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     watch(useI18n().locale, () => {
@@ -110,6 +120,7 @@ export default defineComponent({
       handleSearch,
       handleUpdateList,
       createDefinition,
+      createDefinitionDynamic,
       handleChangePageSize,
       batchDeleteWorkflow,
       batchExportWorkflow,
@@ -137,6 +148,15 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
+              {
+                this.uiSettingStore.getDynamicTask && <NButton
+                  type='warning'
+                  size='small'
+                  onClick={this.createDefinitionDynamic}
+                >
+                  {t('project.workflow.create_workflow_dynamic')}
+                </NButton>
+              }
               <NButton
                 strong
                 secondary
@@ -145,14 +165,6 @@ export default defineComponent({
               >
                 {t('project.workflow.import_workflow')}
               </NButton>
-              {
-                this.uiSettingStore.getDynamicTask && <NButton
-                  size='small'
-                  type='warning'
-                >
-                  {t('project.workflow.create_workflow_dynamic')}
-                </NButton>
-              }
             </NSpace>
             <NSpace>
               <NInput
