@@ -204,6 +204,7 @@ public final class Constants {
 
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";
+    public static final String SCHEMA = "schema";
     public static final String OTHER = "other";
     public static final String USER = "user";
     public static final String JDBC_URL = "jdbcUrl";
