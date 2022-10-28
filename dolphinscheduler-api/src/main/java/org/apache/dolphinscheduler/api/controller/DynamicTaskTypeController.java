@@ -65,10 +65,9 @@ public class DynamicTaskTypeController extends BaseController {
     @ApiException(LIST_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listDynamicTaskTypes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @PathVariable("taskCategory") String taskCategory) {{
+                                       @PathVariable("taskCategory") String taskCategory) {
         List<Map<String, DynamicTaskInfo>> taskTypes = dynamicTaskTypeConfiguration.getTaskTypesByCategory(taskCategory);
         return success(Status.SUCCESS.getMsg(), taskTypes);
     }
 
-    }
 }
