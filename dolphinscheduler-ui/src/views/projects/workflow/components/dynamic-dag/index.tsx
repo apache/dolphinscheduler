@@ -23,7 +23,7 @@ import styles from './index.module.scss'
 const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
-    const handelDragend = (e: DragEvent, task: any) => {
+    const handelDragend = () => {
       //console.log(e, task)
       //if (readonly.value) {
       //  e.preventDefault()
