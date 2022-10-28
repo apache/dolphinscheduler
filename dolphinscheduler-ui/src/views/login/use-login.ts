@@ -24,6 +24,7 @@ import type { LoginRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
+import cookies from 'js-cookie'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
@@ -37,6 +38,7 @@ export function useLogin(state: any) {
         const loginRes: LoginRes = await login({ ...state.loginForm })
         await userStore.setSessionId(loginRes.sessionId)
         await userStore.setSecurityConfigType(loginRes.securityConfigType)
+        cookies.set('sessionId', loginRes.sessionId, { path: '/' })
 
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
