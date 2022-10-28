@@ -22,6 +22,16 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class PrestoDataSourceParamDTO extends BaseDataSourceParamDTO {
 
+    private String schema;
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
+
     @Override
     public String toString() {
         return "PrestoDataSourceParamDTO{"
@@ -30,6 +40,7 @@ public class PrestoDataSourceParamDTO extends BaseDataSourceParamDTO {
                 + ", host='" + host + '\''
                 + ", port=" + port
                 + ", database='" + database + '\''
+                + ", schema='" + schema + '\''
                 + ", userName='" + userName + '\''
                 + ", password='" + password + '\''
                 + ", other='" + other + '\''
