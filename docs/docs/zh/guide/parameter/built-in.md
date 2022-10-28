@@ -64,3 +64,4 @@
   使用timestamp()函数，获取精确到秒的unixtime时间
   * 当前时间  $[timestamp(yyyyMMddHHmmss)]，如: 2022-08-26 12:01:01 => 1661486461
   * 昨天时间  $[timestamp(yyyyMMddHHmmss-1)]，如: 2022-08-26 12:01:01 => 1661400061
+

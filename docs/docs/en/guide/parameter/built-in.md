@@ -43,3 +43,4 @@
   4. unixtime time  Use timestamp() function, get the unixtime accurate to seconds
      - current time  `$[timestamp(yyyyMMddHHmmss)]`, Such as  2022-08-26 12:01:01 => 1661486461
      - yesterday time  `$[timestamp(yyyyMMddHHmmss-1)]`, Such as 2022-08-26 12:01:01 => 1661400061
+
