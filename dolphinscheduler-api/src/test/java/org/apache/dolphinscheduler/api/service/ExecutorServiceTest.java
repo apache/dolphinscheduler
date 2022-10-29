@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -105,6 +105,9 @@ public class ExecutorServiceTest {
 
     @Mock
     private CommandService commandService;
+
+    @Mock
+    private WorkerGroupService workerGroupService;
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -289,7 +292,7 @@ public class ExecutorServiceTest {
 
         Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
         processDefinitionWorkerGroupMap.put(1L, Constants.DEFAULT_WORKER_GROUP);
-        Mockito.when(processService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
+        Mockito.when(workerGroupService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
                 .thenReturn(processDefinitionWorkerGroupMap);
 
         Command command = new Command();

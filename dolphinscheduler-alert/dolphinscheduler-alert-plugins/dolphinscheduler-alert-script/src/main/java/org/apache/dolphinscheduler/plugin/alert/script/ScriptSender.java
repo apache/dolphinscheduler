@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.util.Map;
 
@@ -36,9 +38,15 @@ public final class ScriptSender {
     private final String userParams;
 
     ScriptSender(Map<String, String> config) {
-        scriptPath = config.get(ScriptParamsConstants.NAME_SCRIPT_PATH);
-        scriptType = config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE);
-        userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
+        scriptPath = StringUtils.isNotBlank(config.get(ScriptParamsConstants.NAME_SCRIPT_PATH))
+                ? config.get(ScriptParamsConstants.NAME_SCRIPT_PATH)
+                : "";
+        scriptType = StringUtils.isNotBlank(config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE))
+                ? config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE)
+                : "";
+        userParams = StringUtils.isNotBlank(config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS))
+                ? config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS)
+                : "";
     }
 
     AlertResult sendScriptAlert(String title, String content) {
@@ -46,6 +54,11 @@ public final class ScriptSender {
         if (ScriptType.SHELL.getDescp().equals(scriptType)) {
             return executeShellScript(title, content);
         }
+        // If it is another type of alarm script can be added here, such as python
+
+        alertResult.setStatus("false");
+        logger.error("script type error: {}", scriptType);
+        alertResult.setMessage("script type error : " + scriptType);
         return alertResult;
     }
 

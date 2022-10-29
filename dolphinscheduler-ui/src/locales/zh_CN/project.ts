@@ -36,7 +36,11 @@ export default {
     delete: '删除',
     confirm: '确定',
     cancel: '取消',
-    delete_confirm: '确定删除吗?'
+    delete_confirm: '确定删除吗?',
+    authorize_level:'权限等级',
+    no_permission: '无权限',
+    read_permission: '读权限',
+    all_permission: '所有权限',
   },
   workflow: {
     on_line: '线上',
@@ -44,6 +48,7 @@ export default {
     operating_environment: '运行环境',
     workflow_relation: '工作流关系',
     create_workflow: '创建工作流',
+    create_workflow_dynamic: '创建工作流 (动态)',
     import_workflow: '导入工作流',
     workflow_name: '工作流名称',
     workflow_instance_name: '工作流实例名称',
