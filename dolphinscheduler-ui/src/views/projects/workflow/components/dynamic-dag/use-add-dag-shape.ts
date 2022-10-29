@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-import { createVNode } from 'vue'
-import { DagNode } from './dag-node'
-import '@antv/x6-vue-shape'
+import { Graph, Cell } from '@antv/x6'
+import { useDagStore } from '@/store/project/dynamic/dag'
 
-export function useDagNode() {
-  return {
-    inherit: 'vue-shape',
-    component: {
-      render: () => {
-        return createVNode(DagNode)
-      }
+export function useAddDagShape(graph: Graph) {
+  const cells: Array<Cell> = useDagStore().getDagTasks
+
+  cells.forEach(item => {
+    if (item.shape === 'dag-edge') {
+      cells.push((graph as Graph).addEdge(item))
+    } else {
+      cells.push((graph as Graph).addNode(item as any))
     }
-  }
+  })
+
+  ;(graph as Graph).resetCells(cells)
 }

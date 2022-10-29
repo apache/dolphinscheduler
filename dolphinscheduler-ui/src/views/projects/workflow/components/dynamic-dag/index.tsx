@@ -15,36 +15,50 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, reactive } from 'vue'
 import { DagSidebar } from './dag-sidebar'
 import { DagCanvas } from './dag-canvas'
+import { useDagStore } from '@/store/project/dynamic/dag'
 import styles from './index.module.scss'
 
 const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
-    const handelDragend = () => {
-      //console.log(e, task)
-      //if (readonly.value) {
-      //  e.preventDefault()
-      //  return
-      //}
-      //dragged.value = {
-      //  x: e.offsetX,
-      //  y: e.offsetY,
-      //  type: task
-      //}
+    const dragged = reactive({
+      x: 0,
+      y: 0,
+      task: ''
+    })
+
+    const handelDragstart = (e: DragEvent, task: string) => {
+      dragged.x = e.offsetX
+      dragged.y = e.offsetY
+      dragged.task = task
+    }
+
+    const handelDrop = (e: DragEvent) => {
+      if (!dragged.task) return
+
+      dragged.x = e.offsetX
+      dragged.y = e.offsetY
+
+      const shapes = useDagStore().getDagTasks
+      if (shapes) {
+        shapes.push(dragged)
+      }
+      useDagStore().setDagTasks(shapes)
     }
 
     return {
-      handelDragend
+      handelDragstart,
+      handelDrop
     }
   },
   render() {
     return (
       <div class={styles['workflow-dag']}>
-        <DagSidebar onDragend={this.handelDragend} />
-        <DagCanvas />
+        <DagSidebar onDragstart={this.handelDragstart} />
+        <DagCanvas onDrop={this.handelDrop} />
       </div>
     )
   }

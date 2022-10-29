@@ -15,17 +15,8 @@
  * limitations under the License.
  */
 
-import { createVNode } from 'vue'
-import { DagNode } from './dag-node'
-import '@antv/x6-vue-shape'
-
-export function useDagNode() {
-  return {
-    inherit: 'vue-shape',
-    component: {
-      render: () => {
-        return createVNode(DagNode)
-      }
-    }
-  }
+interface DagStore {
+  tasks: Array<any>
 }
+
+export { DagStore }

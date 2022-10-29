@@ -15,17 +15,23 @@
  * limitations under the License.
  */
 
-import { createVNode } from 'vue'
-import { DagNode } from './dag-node'
-import '@antv/x6-vue-shape'
+import { defineStore } from 'pinia'
+import { DagStore } from './types'
 
-export function useDagNode() {
-  return {
-    inherit: 'vue-shape',
-    component: {
-      render: () => {
-        return createVNode(DagNode)
-      }
+export const useDagStore = defineStore({
+  id: 'dag-store',
+  state: (): DagStore => ({
+    tasks: []
+  }),
+  persist: true,
+  getters: {
+    getDagTasks(): Array<any> {
+      return this.tasks
+    }
+  },
+  actions: {
+    setDagTasks(tasks: Array<any>): void {
+      this.tasks = tasks
     }
   }
-}
+})
