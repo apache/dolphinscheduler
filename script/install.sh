@@ -29,7 +29,7 @@ echo "1.create directory"
 # so we should check its value. Here use command `realpath` to get the related path, and it will skip if your shell env
 # without command `realpath`.
 if [ ${baseDir} = $installPath ]; then
-  echo "Parameter installPath can not be same as the current path (pwd)."
+  echo "Fatal: The installPath can not be same as the current path: ${installPath}"
   exit 1
 elif [ ! -d $installPath ];then
   sudo mkdir -p $installPath
