@@ -177,7 +177,7 @@ public class AlertPluginInstanceServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 null, 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = alertPluginInstanceService.create(user, 1, "test", uiParams);
-        Assertions.assertEquals(Status.PLUGIN_INSTANCE_ALREADY_EXIT, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PLUGIN_INSTANCE_ALREADY_EXISTS, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);
         result = alertPluginInstanceService.create(user, 1, "test1", uiParams);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
