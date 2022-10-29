@@ -207,11 +207,12 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         
         when(alertPluginInstanceService.checkExistPluginInstanceName(eq(instanceName)))
                 .thenReturn(true);
-        
-        Result expectResponseContent = JSONUtils.parseObject("{\"code\":110010,\"msg\":\"plugin instance already exit\",\"data\":null,\"failed\":true,\"success\":false}"
-                , Result.class);
-        
-        //When
+
+        Result expectResponseContent = JSONUtils.parseObject(
+                "{\"code\":110010,\"msg\":\"plugin instance already exists\",\"data\":null,\"failed\":true,\"success\":false}",
+                Result.class);
+
+        // When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/verify-name")
                         .header(SESSION_ID, sessionId)
                         .params(paramsMap))
