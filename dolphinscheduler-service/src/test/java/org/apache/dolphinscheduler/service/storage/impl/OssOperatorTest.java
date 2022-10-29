@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.service.storage.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -29,7 +29,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.apache.dolphinscheduler.service.storage.impl.OssOperator;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;

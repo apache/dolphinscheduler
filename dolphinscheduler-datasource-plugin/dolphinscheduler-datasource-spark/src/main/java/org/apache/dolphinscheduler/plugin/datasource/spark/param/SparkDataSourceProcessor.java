@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.spark.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -25,11 +28,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -81,7 +82,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         StringBuilder address = new StringBuilder();
         SparkDataSourceParamDTO sparkDatasourceParam = (SparkDataSourceParamDTO) dataSourceParam;
-        address.append(Constants.JDBC_HIVE_2);
+        address.append(DataSourceConstants.JDBC_HIVE_2);
         for (String zkHost : sparkDatasourceParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, sparkDatasourceParam.getPort()));
         }
@@ -118,12 +119,12 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+        return DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.HIVE_VALIDATION_QUERY;
+        return DataSourceConstants.HIVE_VALIDATION_QUERY;
     }
 
     @Override

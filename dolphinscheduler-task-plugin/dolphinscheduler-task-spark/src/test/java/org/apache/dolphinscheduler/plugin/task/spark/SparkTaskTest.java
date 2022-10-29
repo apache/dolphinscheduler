@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 import java.util.Collections;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.junit.Assert;
 import org.junit.Test;

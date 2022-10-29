@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+=======
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+>>>>>>> dedff70f9 ([Improvement] Merge spi.utils into common.utils (#12502))
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
 import java.util.HashMap;
@@ -73,7 +76,12 @@ public class PrestoDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
+<<<<<<< HEAD
         Assert.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDatasourceProcessor.getDatasourceDriver());
+=======
+        Assertions.assertEquals(DataSourceConstants.COM_PRESTO_JDBC_DRIVER,
+                prestoDatasourceProcessor.getDatasourceDriver());
+>>>>>>> dedff70f9 ([Improvement] Merge spi.utils into common.utils (#12502))
     }
 
     @Test
@@ -93,6 +101,11 @@ public class PrestoDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
+<<<<<<< HEAD
         Assert.assertEquals(Constants.PRESTO_VALIDATION_QUERY, prestoDatasourceProcessor.getValidationQuery());
+=======
+        Assertions.assertEquals(DataSourceConstants.PRESTO_VALIDATION_QUERY,
+                prestoDatasourceProcessor.getValidationQuery());
+>>>>>>> dedff70f9 ([Improvement] Merge spi.utils into common.utils (#12502))
     }
 }

@@ -21,10 +21,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOUR
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT;
 
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 

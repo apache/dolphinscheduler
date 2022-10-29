@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.USER_PASSWORD_MAX_LENGTH;
+import static org.apache.dolphinscheduler.common.constants.Constants.USER_PASSWORD_MIN_LENGTH;
+
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,9 +33,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
-
-import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MAX_LENGTH;
-import static org.apache.dolphinscheduler.common.Constants.USER_PASSWORD_MIN_LENGTH;
 
 /**
  * check utils

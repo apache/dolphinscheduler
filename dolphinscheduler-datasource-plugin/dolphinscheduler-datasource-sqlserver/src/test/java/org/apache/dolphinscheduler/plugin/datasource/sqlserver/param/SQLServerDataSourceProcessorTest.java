@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.plugin.datasource.sqlserver.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.sql.DriverManager;
 import java.util.HashMap;
@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -74,7 +75,8 @@ public class SQLServerDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_SQLSERVER_JDBC_DRIVER, sqlServerDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_SQLSERVER_JDBC_DRIVER,
+                sqlServerDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -93,6 +95,7 @@ public class SQLServerDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.SQLSERVER_VALIDATION_QUERY, sqlServerDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.SQLSERVER_VALIDATION_QUERY,
+                sqlServerDatasourceProcessor.getValidationQuery());
     }
 }

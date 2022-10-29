@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static java.util.Collections.emptyList;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import java.io.IOException;
 import java.net.Inet6Address;

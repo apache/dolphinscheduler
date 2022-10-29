@@ -19,7 +19,10 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import com.google.auto.service.AutoService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -108,7 +111,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(), taskInstance.getTaskGroupPriority(),
-                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+                    Constants.DEFAULT_WORKER_GROUP);
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
             if (taskExecutionContext == null) {

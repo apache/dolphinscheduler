@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.sql.DriverManager;
 import java.util.HashMap;
@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -73,7 +74,8 @@ public class RedshiftDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_REDSHIFT_JDBC_DRIVER, redshiftDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER,
+                redshiftDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -93,6 +95,7 @@ public class RedshiftDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.REDHIFT_VALIDATION_QUERY, redshiftDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.REDHIFT_VALIDATION_QUERY,
+                redshiftDatasourceProcessor.getValidationQuery());
     }
 }

@@ -26,13 +26,16 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT;
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.mockito.ArgumentMatchers.isA;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -758,7 +761,7 @@ public class ProcessDefinitionServiceTest {
                     "", "", "", 0, "root", null, "", null, ProcessExecutionTypeEnum.PARALLEL);
             Assert.fail();
         } catch (ServiceException ex) {
-            Assert.assertEquals(new Integer(Status.DATA_IS_NOT_VALID.getCode()), ex.getCode());
+            Assert.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), ex.getCode());
         }
     }
 

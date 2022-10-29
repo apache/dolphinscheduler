@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;

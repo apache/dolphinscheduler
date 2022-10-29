@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_TASK_TYPE;
+
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +30,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
 
 /**
  * the factory to create task processor
