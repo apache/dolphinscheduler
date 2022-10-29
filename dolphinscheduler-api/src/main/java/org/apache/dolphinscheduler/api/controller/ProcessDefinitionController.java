@@ -27,9 +27,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_TREEVIE
 import static org.apache.dolphinscheduler.api.enums.Status.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_PROCESS_DEFINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_VERSIONS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
@@ -872,4 +874,27 @@ public class ProcessDefinitionController extends BaseController {
         return returnDataList(
                 processDefinitionService.releaseWorkflowAndSchedule(loginUser, projectCode, code, releaseState));
     }
+
+    /**
+     * query process definition global variables and local variables
+     *
+     * @param loginUser login user
+     * @param code process definition code
+     * @return variables data
+     */
+    @Operation(summary = "viewVariables", description = "QUERY_PROCESS_DEFINITION_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
+    @Parameters({
+        @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
+    })
+    @GetMapping(value = "/{code}/view-variables")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR)
+    @AccessLogAnnotation
+    public Result viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+        @PathVariable("code") Long code) {
+        Map<String, Object> result = processDefinitionService.viewVariables(loginUser, projectCode, code);
+        return returnDataList(result);
+    }
+
 }

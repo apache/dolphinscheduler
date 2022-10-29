@@ -1060,6 +1060,27 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(processDefinition, processDefinitionUpdate);
     }
 
+    @Test
+    public void testViewVariables() {
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+
+        Project project = getProject(projectCode);
+
+        ProcessDefinition processDefinition = getProcessDefinition();
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+
+        // project check auth fail
+        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
+            .thenReturn(result);
+
+        Map<String, Object> map =
+            processDefinitionService.viewVariables(user, processDefinition.getProjectCode(), processDefinition.getCode());
+
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+    }
+
     /**
      * get mock processDefinition
      *

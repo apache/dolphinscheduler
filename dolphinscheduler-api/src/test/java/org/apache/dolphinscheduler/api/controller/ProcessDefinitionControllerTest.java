@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -429,6 +430,20 @@ public class ProcessDefinitionControllerTest {
         Result result = processDefinitionController.deleteProcessDefinitionVersion(
                 user, projectCode, 1, 10);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+    }
+
+    @Test
+    public void testViewVariables() {
+        long projectCode = 1L;
+        Map<String, Object> resultMap = new HashMap<>();
+        putMsg(resultMap, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.viewVariables(user, projectCode, 1))
+            .thenReturn(resultMap);
+
+        Result result = processDefinitionController.viewVariables(user, projectCode, 1L);
+
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
 }
