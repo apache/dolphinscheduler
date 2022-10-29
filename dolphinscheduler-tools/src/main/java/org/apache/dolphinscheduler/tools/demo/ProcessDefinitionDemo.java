@@ -1,13 +1,20 @@
 package org.apache.dolphinscheduler.tools.demo;
 
+import static org.apache.dolphinscheduler.common.enums.ConditionType.NONE;
+import static org.apache.dolphinscheduler.common.enums.Flag.YES;
+import static org.apache.dolphinscheduler.common.enums.Priority.MEDIUM;
 import static org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum.PARALLEL;
 
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -23,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 
 @Component
 public class ProcessDefinitionDemo {
@@ -147,21 +153,62 @@ public class ProcessDefinitionDemo {
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String absolutePath = System.getProperty("user.dir");
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName("demo_clear_log");
-        taskDefinition.setDescription("Clear the DS log files from 30 days ago");
-        taskDefinition.setTimeout(0);
-        taskDefinition.setTaskParams("[]");
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setName("demo_clear_log");
+        processDefinitionLog.setDescription("Clear the DS log files from 30 days ago");
+        processDefinitionLog.setGlobalParams("[]");
+        processDefinitionLog.setLocations(DemoContants.CLEAR_LOG_locations[0] + taskCodeFirst + DemoContants.CLEAR_LOG_locations[1]);
+        processDefinitionLog.setTimeout(0);
+
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        for (int i = 0; i < 1; i++) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setName("");
+            processTaskRelationLog.setConditionType(NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogs.add(processTaskRelationLog);
+        }
+        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        processTaskRelationLogFirst.setPreTaskCode(0);
+        processTaskRelationLogFirst.setPreTaskVersion(0);
+        processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
+        processTaskRelationLogFirst.setPostTaskVersion(1);
+
+        String taskRelationJson = JSONUtils.toJsonString(processTaskRelationLogs);
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        for (int i = 0; i < 1; i++) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+            taskDefinitionLog.setFlag(YES);
+            taskDefinitionLog.setDelayTime(0);
+            taskDefinitionLog.setEnvironmentCode(-1);
+            taskDefinitionLog.setFailRetryInterval(1);
+            taskDefinitionLog.setFailRetryTimes(0);
+            taskDefinitionLog.setTaskPriority(MEDIUM);
+            taskDefinitionLog.setTimeout(0);
+            taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
+            taskDefinitionLog.setTimeoutNotifyStrategy(null);
+            taskDefinitionLog.setWorkerGroup("default");
+            taskDefinitionLog.setTaskType("SHELL");
+            taskDefinitionLogs.add(taskDefinitionLog);
+        }
+        TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);
+        taskDefinitionLogFirst.setCode(taskCodes.get(0));
+        taskDefinitionLogFirst.setName("Clear log node");
+        taskDefinitionLogFirst.setDescription("");
+        taskDefinitionLogFirst.setTaskParams("{\"localParams\":[],\"rawScript\":\"cd cd " + absolutePath + "\\r\\nfind ./logs/ -mtime +30 -name \\\"*.log\\\" -exec rm -rf {} \\\\;\",\"resourceList\":[]}");
+
+        String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            taskDefinition.getName(),
-            taskDefinition.getDescription(),
-            taskDefinition.getTaskParams(),
-            DemoContants.CLEAR_LOG_locations[0] + taskCodeFirst + DemoContants.CLEAR_LOG_locations[1],
-            taskDefinition.getTimeout(),
+            processDefinitionLog.getName(),
+            processDefinitionLog.getDescription(),
+            processDefinitionLog.getGlobalParams(),
+            processDefinitionLog.getLocations(),
+            processDefinitionLog.getTimeout(),
             tenantCode,
-            DemoContants.CLEAR_LOG_taskRelationJson[0] + taskCodeFirst + DemoContants.CLEAR_LOG_taskRelationJson[1],
-            DemoContants.CLEAR_LOG_taskDefinitionJson[0] + taskCodeFirst + DemoContants.CLEAR_LOG_taskDefinitionJson[1] + absolutePath + DemoContants.CLEAR_LOG_taskDefinitionJson[2],
+            taskRelationJson,
+            taskDefinitionJson,
             PARALLEL);
         return ProxyResult;
     }
@@ -179,21 +226,74 @@ public class ProcessDefinitionDemo {
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName("demo_dependent");
-        taskDefinition.setDescription("Check the completion of daily tasks");
-        taskDefinition.setTimeout(0);
-        taskDefinition.setTaskParams("[]");
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setName("demo_dependent");
+        processDefinitionLog.setDescription("Check the completion of daily tasks");
+        processDefinitionLog.setGlobalParams("[]");
+        processDefinitionLog.setLocations(DemoContants.DEPENDENT_locations[0] + taskCodeFirst + DemoContants.DEPENDENT_locations[1] + taskCodeSecond + DemoContants.DEPENDENT_locations[2]);
+        processDefinitionLog.setTimeout(0);
+
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setName("");
+            processTaskRelationLog.setConditionType(NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogs.add(processTaskRelationLog);
+        }
+        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        processTaskRelationLogFirst.setPreTaskCode(0);
+        processTaskRelationLogFirst.setPreTaskVersion(0);
+        processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
+        processTaskRelationLogFirst.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogSecond.setPreTaskVersion(1);
+        processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
+        processTaskRelationLogSecond.setPostTaskVersion(1);
+
+        String taskRelationJson = JSONUtils.toJsonString(processTaskRelationLogs);
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+            taskDefinitionLog.setFlag(YES);
+            taskDefinitionLog.setDelayTime(0);
+            taskDefinitionLog.setEnvironmentCode(-1);
+            taskDefinitionLog.setFailRetryInterval(1);
+            taskDefinitionLog.setFailRetryTimes(0);
+            taskDefinitionLog.setTaskPriority(MEDIUM);
+            taskDefinitionLog.setTimeout(0);
+            taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
+            taskDefinitionLog.setTimeoutNotifyStrategy(null);
+            taskDefinitionLog.setWorkerGroup("default");
+            taskDefinitionLogs.add(taskDefinitionLog);
+        }
+        TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);
+        taskDefinitionLogFirst.setCode(taskCodes.get(0));
+        taskDefinitionLogFirst.setName("Weekly report task");
+        taskDefinitionLogFirst.setDescription("The weekly report task requires the demo_shell and demo_switch tasks to be successfully executed every day of the last week");
+        taskDefinitionLogFirst.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"projectCode\":"+projectCode+",\"definitionCode\":"+shellProcessCode+",\"depTaskCode\":0,\"cycle\":\"day\",\"dateValue\":\"last1Days\",\"state\":null},{\"projectCode\":"+projectCode+",\"definitionCode\":"+switchProcessCode+",\"depTaskCode\":0,\"cycle\":\"day\",\"dateValue\":\"last1Days\",\"state\":null}]}]}}");
+        taskDefinitionLogFirst.setTaskType("DEPENDENT");
+
+        TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
+        taskDefinitionLogSecond.setCode(taskCodes.get(1));
+        taskDefinitionLogSecond.setName("Weekly Report Task Result");
+        taskDefinitionLogSecond.setDescription("Result report after the completion of the weekly report task");
+        taskDefinitionLogSecond.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"end of report\\\"\",\"resourceList\":[]}");
+        taskDefinitionLogSecond.setTaskType("SHELL");
+        String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            taskDefinition.getName(),
-            taskDefinition.getDescription(),
-            taskDefinition.getTaskParams(),
-            DemoContants.DEPENDENT_locations[0] + taskCodeFirst + DemoContants.DEPENDENT_locations[1] + taskCodeSecond + DemoContants.DEPENDENT_locations[2],
-            taskDefinition.getTimeout(),
+            processDefinitionLog.getName(),
+            processDefinitionLog.getDescription(),
+            processDefinitionLog.getGlobalParams(),
+            processDefinitionLog.getLocations(),
+            processDefinitionLog.getTimeout(),
             tenantCode,
-            DemoContants.DEPENDENT_taskRelationJson[0] + taskCodeFirst + DemoContants.DEPENDENT_taskRelationJson[1] + taskCodeFirst + DemoContants.DEPENDENT_taskRelationJson[2] + taskCodeSecond + DemoContants.DEPENDENT_taskRelationJson[3],
-            DemoContants.DEPENDENT_taskDefinitionJson[0] + taskCodeFirst + DemoContants.DEPENDENT_taskDefinitionJson[1] + projectCode + DemoContants.DEPENDENT_taskDefinitionJson[2] + shellProcessCode + DemoContants.DEPENDENT_taskDefinitionJson[3] + projectCode + DemoContants.DEPENDENT_taskDefinitionJson[4] + switchProcessCode + DemoContants.DEPENDENT_taskDefinitionJson[5] + taskCodeSecond + DemoContants.DEPENDENT_taskDefinitionJson[6],
+            taskRelationJson,
+            taskDefinitionJson,
             PARALLEL);
         return ProxyResult;
     }
@@ -211,21 +311,73 @@ public class ProcessDefinitionDemo {
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName("demo_parameter_context");
-        taskDefinition.setDescription("Upstream and downstream task node parameter transfer");
-        taskDefinition.setTimeout(0);
-        taskDefinition.setTaskParams(DemoContants.PARAMETER_CONTEXT_PARAMS);
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setName("demo_parameter_context");
+        processDefinitionLog.setDescription("Upstream and downstream task node parameter transfer");
+        processDefinitionLog.setGlobalParams(DemoContants.PARAMETER_CONTEXT_PARAMS);
+        processDefinitionLog.setLocations(DemoContants.PARAMETER_CONTEXT_locations[0] + taskCodeFirst + DemoContants.PARAMETER_CONTEXT_locations[1] + taskCodeSecond + DemoContants.PARAMETER_CONTEXT_locations[2]);
+        processDefinitionLog.setTimeout(0);
+
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setName("");
+            processTaskRelationLog.setConditionType(NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogs.add(processTaskRelationLog);
+        }
+        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        processTaskRelationLogFirst.setPreTaskCode(0);
+        processTaskRelationLogFirst.setPreTaskVersion(0);
+        processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
+        processTaskRelationLogFirst.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogSecond.setPreTaskVersion(1);
+        processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
+        processTaskRelationLogSecond.setPostTaskVersion(1);
+
+        String taskRelationJson = JSONUtils.toJsonString(processTaskRelationLogs);
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+            taskDefinitionLog.setFlag(YES);
+            taskDefinitionLog.setDelayTime(0);
+            taskDefinitionLog.setEnvironmentCode(-1);
+            taskDefinitionLog.setFailRetryInterval(1);
+            taskDefinitionLog.setFailRetryTimes(0);
+            taskDefinitionLog.setTaskPriority(MEDIUM);
+            taskDefinitionLog.setTimeout(0);
+            taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
+            taskDefinitionLog.setTimeoutNotifyStrategy(null);
+            taskDefinitionLog.setWorkerGroup("default");
+            taskDefinitionLog.setTaskType("SHELL");
+            taskDefinitionLogs.add(taskDefinitionLog);
+        }
+        TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);
+        taskDefinitionLogFirst.setCode(taskCodes.get(0));
+        taskDefinitionLogFirst.setName("Upstream task node");
+        taskDefinitionLogFirst.setDescription("Create a local parameter and pass the assignment to the downstream");
+        taskDefinitionLogFirst.setTaskParams("{\"localParams\":[{\"prop\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"0\"},{\"prop\":\"output\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"rawScript\":\"echo \\\"====Node start====\\\"\\r\\necho '${setValue(output=1)}'\\r\\n\\r\\necho ${output}\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
+
+        TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
+        taskDefinitionLogSecond.setCode(taskCodes.get(1));
+        taskDefinitionLogSecond.setName("Downstream task node");
+        taskDefinitionLogSecond.setDescription("Test outputs the parameters passed by the upstream task");
+        taskDefinitionLogSecond.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"====node start====\\\"\\r\\n\\r\\necho ${output}\\r\\n\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
+        String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            taskDefinition.getName(),
-            taskDefinition.getDescription(),
-            taskDefinition.getTaskParams(),
-            DemoContants.PARAMETER_CONTEXT_locations[0] + taskCodeFirst + DemoContants.PARAMETER_CONTEXT_locations[1] + taskCodeSecond + DemoContants.PARAMETER_CONTEXT_locations[2],
-            taskDefinition.getTimeout(),
+            processDefinitionLog.getName(),
+            processDefinitionLog.getDescription(),
+            processDefinitionLog.getGlobalParams(),
+            processDefinitionLog.getLocations(),
+            processDefinitionLog.getTimeout(),
             tenantCode,
-            DemoContants.PARAMETER_CONTEXT_taskRelationJson[0] + taskCodeFirst + DemoContants.PARAMETER_CONTEXT_taskRelationJson[1] + taskCodeFirst + DemoContants.PARAMETER_CONTEXT_taskRelationJson[2] + taskCodeSecond + DemoContants.PARAMETER_CONTEXT_taskRelationJson[3],
-            DemoContants.PARAMETER_CONTEXT_taskDefinitionJson[0] + taskCodeFirst + DemoContants.PARAMETER_CONTEXT_taskDefinitionJson[1] + taskCodeSecond + DemoContants.PARAMETER_CONTEXT_taskDefinitionJson[2],
+            taskRelationJson,
+            taskDefinitionJson,
             PARALLEL);
         return ProxyResult;
     }
@@ -245,23 +397,99 @@ public class ProcessDefinitionDemo {
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
         String taskCodeFourth = String.valueOf(taskCodes.get(3)).replaceAll("\\[|\\]", "");
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName("demo_condition");
-        taskDefinition.setDescription("Coin Toss");
-        taskDefinition.setTimeout(0);
-        taskDefinition.setTaskParams("[]");
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setName("demo_condition");
+        processDefinitionLog.setDescription("Coin Toss");
+        processDefinitionLog.setGlobalParams("[]");
+        processDefinitionLog.setLocations(DemoContants.CONDITION_locations[0] + taskCodeFirst + DemoContants.CONDITION_locations[1] + taskCodeSecond + DemoContants.CONDITION_locations[2] + taskCodeThird + DemoContants.CONDITION_locations[3] + taskCodeFourth + DemoContants.CONDITION_locations[4]);
+        processDefinitionLog.setTimeout(0);
+
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setName("");
+            processTaskRelationLog.setConditionType(NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogs.add(processTaskRelationLog);
+        }
+        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        processTaskRelationLogFirst.setPreTaskCode(0);
+        processTaskRelationLogFirst.setPreTaskVersion(0);
+        processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(1));
+        processTaskRelationLogFirst.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogSecond.setPreTaskVersion(1);
+        processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(2));
+        processTaskRelationLogSecond.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
+        processTaskRelationLogThird.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogThird.setPreTaskVersion(1);
+        processTaskRelationLogThird.setPostTaskCode(taskCodes.get(3));
+        processTaskRelationLogThird.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogFourth = processTaskRelationLogs.get(3);
+        processTaskRelationLogFourth.setPreTaskCode(taskCodes.get(1));
+        processTaskRelationLogFourth.setPreTaskVersion(1);
+        processTaskRelationLogFourth.setPostTaskCode(taskCodes.get(0));
+        processTaskRelationLogFourth.setPostTaskVersion(1);
+        String taskRelationJson = JSONUtils.toJsonString(processTaskRelationLogs);
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+            taskDefinitionLog.setFlag(YES);
+            taskDefinitionLog.setDelayTime(0);
+            taskDefinitionLog.setEnvironmentCode(-1);
+            taskDefinitionLog.setFailRetryInterval(1);
+            taskDefinitionLog.setFailRetryTimes(0);
+            taskDefinitionLog.setTaskPriority(MEDIUM);
+            taskDefinitionLog.setTimeout(0);
+            taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
+            taskDefinitionLog.setTimeoutNotifyStrategy(null);
+            taskDefinitionLog.setWorkerGroup("default");
+            taskDefinitionLogs.add(taskDefinitionLog);
+        }
+        TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);
+        taskDefinitionLogFirst.setCode(taskCodes.get(0));
+        taskDefinitionLogFirst.setName("condition");
+        taskDefinitionLogFirst.setDescription("head is the status of success, tail is the status of failure");
+        taskDefinitionLogFirst.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[]},\"conditionResult\":{\"successNode\":["+taskCodeThird+"],\"failedNode\":["+taskCodeFourth+"]}}");
+        taskDefinitionLogFirst.setTaskType("CONDITIONS");
+
+        TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
+        taskDefinitionLogSecond.setCode(taskCodes.get(1));
+        taskDefinitionLogSecond.setName("coin");
+        taskDefinitionLogSecond.setDescription("Toss a coin");
+        taskDefinitionLogSecond.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"Start\\\"\",\"resourceList\":[]}");
+        taskDefinitionLogSecond.setTaskType("SHELL");
+
+        TaskDefinitionLog taskDefinitionLogThird = taskDefinitionLogs.get(2);
+        taskDefinitionLogThird.setCode(taskCodes.get(2));
+        taskDefinitionLogThird.setName("head");
+        taskDefinitionLogThird.setDescription("Choose to learn if the result is head");
+        taskDefinitionLogThird.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"Start learning\\\"\",\"resourceList\":[]}");
+        taskDefinitionLogThird.setTaskType("SHELL");
+
+        TaskDefinitionLog taskDefinitionLogFourth = taskDefinitionLogs.get(3);
+        taskDefinitionLogFourth.setCode(taskCodes.get(3));
+        taskDefinitionLogFourth.setName("tail");
+        taskDefinitionLogFourth.setDescription("Choose to play if the result is tail");
+        taskDefinitionLogFourth.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"Start playing\\\"\",\"resourceList\":[]}");
+        taskDefinitionLogFourth.setTaskType("SHELL");
+        String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            taskDefinition.getName(),
-            taskDefinition.getDescription(),
-            taskDefinition.getTaskParams(),
-            DemoContants.CONDITION_locations[0] + taskCodeFirst + DemoContants.CONDITION_locations[1] + taskCodeSecond + DemoContants.CONDITION_locations[2] + taskCodeThird + DemoContants.CONDITION_locations[3] + taskCodeFourth + DemoContants.CONDITION_locations[4],
-            taskDefinition.getTimeout(),
+            processDefinitionLog.getName(),
+            processDefinitionLog.getDescription(),
+            processDefinitionLog.getGlobalParams(),
+            processDefinitionLog.getLocations(),
+            processDefinitionLog.getTimeout(),
             tenantCode,
-            DemoContants.CONDITION_taskRelationJson[0] + taskCodeSecond + DemoContants.CONDITION_taskRelationJson[1] + taskCodeFirst + DemoContants.CONDITION_taskRelationJson[2] + taskCodeThird + DemoContants.CONDITION_taskRelationJson[3] + taskCodeFirst + DemoContants.CONDITION_taskRelationJson[4] + taskCodeFourth + DemoContants.CONDITION_taskRelationJson[5] + taskCodeSecond + DemoContants.CONDITION_taskRelationJson[6] +taskCodeFirst+
-                DemoContants.CONDITION_taskRelationJson[7],
-            DemoContants.CONDITION_taskDefinitionJson[0] + taskCodeFirst + DemoContants.CONDITION_taskDefinitionJson[1] + taskCodeThird + DemoContants.CONDITION_taskDefinitionJson[2] + taskCodeFourth + DemoContants.CONDITION_taskDefinitionJson[3] + taskCodeSecond + DemoContants.CONDITION_taskDefinitionJson[4] + taskCodeThird +
-                DemoContants.CONDITION_taskDefinitionJson[5]+taskCodeFourth+ DemoContants.CONDITION_taskDefinitionJson[6],
+            taskRelationJson,
+            taskDefinitionJson,
             PARALLEL);
         return ProxyResult;
     }
@@ -281,23 +509,99 @@ public class ProcessDefinitionDemo {
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
         String taskCodeFourth = String.valueOf(taskCodes.get(3)).replaceAll("\\[|\\]", "");
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName("demo_switch");
-        taskDefinition.setDescription("Determine which task to perform based on conditions");
-        taskDefinition.setTimeout(0);
-        taskDefinition.setTaskParams(DemoContants.SWITCH_GLOBAL_PARAMS);
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setName("demo_switch");
+        processDefinitionLog.setDescription("Determine which task to perform based on conditions");
+        processDefinitionLog.setGlobalParams(DemoContants.SWITCH_GLOBAL_PARAMS);
+        processDefinitionLog.setLocations(DemoContants.SWITCH_locations[0] + taskCodeFirst + DemoContants.SWITCH_locations[1] + taskCodeSecond + DemoContants.SWITCH_locations[2] + taskCodeThird + DemoContants.SWITCH_locations[3] + taskCodeFourth + DemoContants.SWITCH_locations[4]);
+        processDefinitionLog.setTimeout(0);
+
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setName("");
+            processTaskRelationLog.setConditionType(NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogs.add(processTaskRelationLog);
+        }
+        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        processTaskRelationLogFirst.setPreTaskCode(0);
+        processTaskRelationLogFirst.setPreTaskVersion(0);
+        processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
+        processTaskRelationLogFirst.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogSecond.setPreTaskVersion(1);
+        processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
+        processTaskRelationLogSecond.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
+        processTaskRelationLogThird.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogThird.setPreTaskVersion(1);
+        processTaskRelationLogThird.setPostTaskCode(taskCodes.get(2));
+        processTaskRelationLogThird.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogFourth = processTaskRelationLogs.get(3);
+        processTaskRelationLogFourth.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogFourth.setPreTaskVersion(1);
+        processTaskRelationLogFourth.setPostTaskCode(taskCodes.get(3));
+        processTaskRelationLogFourth.setPostTaskVersion(1);
+        String taskRelationJson = JSONUtils.toJsonString(processTaskRelationLogs);
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+            taskDefinitionLog.setFlag(YES);
+            taskDefinitionLog.setDelayTime(0);
+            taskDefinitionLog.setEnvironmentCode(-1);
+            taskDefinitionLog.setFailRetryInterval(1);
+            taskDefinitionLog.setFailRetryTimes(0);
+            taskDefinitionLog.setTaskPriority(MEDIUM);
+            taskDefinitionLog.setTimeout(0);
+            taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
+            taskDefinitionLog.setTimeoutNotifyStrategy(null);
+            taskDefinitionLog.setWorkerGroup("default");
+            taskDefinitionLogs.add(taskDefinitionLog);
+        }
+        TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);
+        taskDefinitionLogFirst.setCode(taskCodes.get(0));
+        taskDefinitionLogFirst.setName("switch node");
+        taskDefinitionLogFirst.setDescription("The global parameter is to execute TaskA for A, and for B to execute TaskB, otherwise the default task is executed");
+        taskDefinitionLogFirst.setTaskParams("{\"localParams\":[],\"rawScript\":\"\",\"resourceList\":[],\"switchResult\":{\"dependTaskList\":[{\"condition\":\"${switchValue} == \\\"A\\\"\",\"nextNode\":" + taskCodeThird + "},{\"condition\":\"${switchValue} == \\\"B\\\"\",\"nextNode\":"+ taskCodeFourth + "}],\"nextNode\":"+taskCodeSecond+"}}");
+        taskDefinitionLogFirst.setTaskType("SWITCH");
+
+        TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
+        taskDefinitionLogSecond.setCode(taskCodes.get(1));
+        taskDefinitionLogSecond.setName("default");
+        taskDefinitionLogSecond.setDescription("executed default task");
+        taskDefinitionLogSecond.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"default\\\"\",\"resourceList\":[]}");
+        taskDefinitionLogSecond.setTaskType("SHELL");
+
+        TaskDefinitionLog taskDefinitionLogThird = taskDefinitionLogs.get(2);
+        taskDefinitionLogThird.setCode(taskCodes.get(2));
+        taskDefinitionLogThird.setName("TaskA");
+        taskDefinitionLogThird.setDescription("execute TaskA");
+        taskDefinitionLogThird.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"TaskA\\\"\",\"resourceList\":[]}");
+        taskDefinitionLogThird.setTaskType("SHELL");
+
+        TaskDefinitionLog taskDefinitionLogFourth = taskDefinitionLogs.get(3);
+        taskDefinitionLogFourth.setCode(taskCodes.get(3));
+        taskDefinitionLogFourth.setName("TaskB");
+        taskDefinitionLogFourth.setDescription("execute TaskB");
+        taskDefinitionLogFourth.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"TaskB\\\"\",\"resourceList\":[]}");
+        taskDefinitionLogFourth.setTaskType("SHELL");
+        String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            taskDefinition.getName(),
-            taskDefinition.getDescription(),
-            taskDefinition.getTaskParams(),
-            DemoContants.SWITCH_locations[0] + taskCodeFirst + DemoContants.SWITCH_locations[1] + taskCodeSecond + DemoContants.SWITCH_locations[2] + taskCodeThird + DemoContants.SWITCH_locations[3] + taskCodeFourth + DemoContants.SWITCH_locations[4],
-            taskDefinition.getTimeout(),
+            processDefinitionLog.getName(),
+            processDefinitionLog.getDescription(),
+            processDefinitionLog.getGlobalParams(),
+            processDefinitionLog.getLocations(),
+            processDefinitionLog.getTimeout(),
             tenantCode,
-            DemoContants.SWITCH_taskRelationJson[0] + taskCodeFirst + DemoContants.SWITCH_taskRelationJson[1] + taskCodeFirst + DemoContants.SWITCH_taskRelationJson[2] + taskCodeSecond + DemoContants.SWITCH_taskRelationJson[3] + taskCodeFirst + DemoContants.SWITCH_taskRelationJson[4] + taskCodeThird + DemoContants.SWITCH_taskRelationJson[5] + taskCodeFirst + DemoContants.SWITCH_taskRelationJson[6] + taskCodeFourth + DemoContants.SWITCH_taskRelationJson[7],
-            DemoContants.SWITCH_taskDefinitionJson[0] + taskCodeFirst + DemoContants.SWITCH_taskDefinitionJson[1] + taskCodeThird + DemoContants.SWITCH_taskDefinitionJson[2] + taskCodeFourth + DemoContants.SWITCH_taskDefinitionJson[3] + taskCodeSecond + DemoContants.SWITCH_taskDefinitionJson[4] + taskCodeSecond +
-                DemoContants.SWITCH_taskDefinitionJson[5]+taskCodeThird+ DemoContants.SWITCH_taskDefinitionJson[6]+taskCodeFourth+
-                DemoContants.SWITCH_taskDefinitionJson[7],
+            taskRelationJson,
+            taskDefinitionJson,
             PARALLEL);
         return ProxyResult;
     }
@@ -316,21 +620,84 @@ public class ProcessDefinitionDemo {
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName("demo_shell");
-        taskDefinition.setDescription("Production, processing and sales of a series of processes");
-        taskDefinition.setTimeout(0);
-        taskDefinition.setTaskParams(DemoContants.SHELL_GLOBAL_PARAMS);
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setName("demo_shell");
+        processDefinitionLog.setDescription("Production, processing and sales of a series of processes");
+        processDefinitionLog.setGlobalParams(DemoContants.SHELL_GLOBAL_PARAMS);
+        processDefinitionLog.setLocations(DemoContants.SHELL_locations[0] + taskCodeFirst + DemoContants.SHELL_locations[1] + taskCodeSecond + DemoContants.SHELL_locations[2] + taskCodeThird + DemoContants.SHELL_locations[3]);
+        processDefinitionLog.setTimeout(0);
+
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setName("");
+            processTaskRelationLog.setConditionType(NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogs.add(processTaskRelationLog);
+        }
+        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        processTaskRelationLogFirst.setPreTaskCode(0);
+        processTaskRelationLogFirst.setPreTaskVersion(0);
+        processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
+        processTaskRelationLogFirst.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
+        processTaskRelationLogSecond.setPreTaskVersion(1);
+        processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
+        processTaskRelationLogSecond.setPostTaskVersion(1);
+
+        ProcessTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
+        processTaskRelationLogThird.setPreTaskCode(taskCodes.get(1));
+        processTaskRelationLogThird.setPreTaskVersion(1);
+        processTaskRelationLogThird.setPostTaskCode(taskCodes.get(2));
+        processTaskRelationLogThird.setPostTaskVersion(1);
+        String taskRelationJson = JSONUtils.toJsonString(processTaskRelationLogs);
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+            taskDefinitionLog.setFlag(YES);
+            taskDefinitionLog.setDelayTime(0);
+            taskDefinitionLog.setEnvironmentCode(-1);
+            taskDefinitionLog.setFailRetryInterval(1);
+            taskDefinitionLog.setFailRetryTimes(0);
+            taskDefinitionLog.setTaskPriority(MEDIUM);
+            taskDefinitionLog.setTimeout(0);
+            taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
+            taskDefinitionLog.setTimeoutNotifyStrategy(null);
+            taskDefinitionLog.setWorkerGroup("default");
+            taskDefinitionLog.setTaskType("SHELL");
+            taskDefinitionLogs.add(taskDefinitionLog);
+        }
+        TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);
+        taskDefinitionLogFirst.setCode(taskCodes.get(0));
+        taskDefinitionLogFirst.setName("001");
+        taskDefinitionLogFirst.setDescription("Make production order");
+        taskDefinitionLogFirst.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"start\\\"\",\"resourceList\":[]}");
+
+        TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
+        taskDefinitionLogSecond.setCode(taskCodes.get(1));
+        taskDefinitionLogSecond.setName("002");
+        taskDefinitionLogSecond.setDescription("Get Information Processing");
+        taskDefinitionLogSecond.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo ${resources}\",\"resourceList\":[]}");
+
+        TaskDefinitionLog taskDefinitionLogThird = taskDefinitionLogs.get(2);
+        taskDefinitionLogThird.setCode(taskCodes.get(2));
+        taskDefinitionLogThird.setName("003");
+        taskDefinitionLogThird.setDescription("Sell after completion");
+        taskDefinitionLogThird.setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"end\\\"\",\"resourceList\":[]}");
+        String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            taskDefinition.getName(),
-            taskDefinition.getDescription(),
-            taskDefinition.getTaskParams(),
-            DemoContants.SHELL_locations[0] + taskCodeFirst + DemoContants.SHELL_locations[1] + taskCodeSecond + DemoContants.SHELL_locations[2] + taskCodeThird + DemoContants.SHELL_locations[3],
-            taskDefinition.getTimeout(),
+            processDefinitionLog.getName(),
+            processDefinitionLog.getDescription(),
+            processDefinitionLog.getGlobalParams(),
+            processDefinitionLog.getLocations(),
+            processDefinitionLog.getTimeout(),
             tenantCode,
-            DemoContants.SHELL_taskRelationJson[0] + taskCodeFirst + DemoContants.SHELL_taskRelationJson[1] + taskCodeFirst + DemoContants.SHELL_taskRelationJson[2] + taskCodeSecond + DemoContants.SHELL_taskRelationJson[3] + taskCodeSecond + DemoContants.SHELL_taskRelationJson[4] + taskCodeThird + DemoContants.SHELL_taskRelationJson[5],
-            DemoContants.SHELL_taskDefinitionJson[0] + taskCodeFirst + DemoContants.SHELL_taskDefinitionJson[1] + taskCodeSecond + DemoContants.SHELL_taskDefinitionJson[2] + taskCodeThird + DemoContants.SHELL_taskDefinitionJson[3],
+            taskRelationJson,
+            taskDefinitionJson,
             PARALLEL);
         return ProxyResult;
     }
@@ -347,21 +714,62 @@ public class ProcessDefinitionDemo {
         }
         String taskCode = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName("demo_sub_process");
-        taskDefinition.setDescription("Start the production line");
-        taskDefinition.setTimeout(0);
-        taskDefinition.setTaskParams("[]");
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setName("demo_sub_process");
+        processDefinitionLog.setDescription("Start the production line");
+        processDefinitionLog.setGlobalParams("[]");
+        processDefinitionLog.setLocations(DemoContants.SUB_PROCESS_locations[0] + taskCode + DemoContants.SUB_PROCESS_locations[1]);
+        processDefinitionLog.setTimeout(0);
+
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        for (int i = 0; i < 1; i++) {
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.setName("");
+            processTaskRelationLog.setConditionType(NONE);
+            processTaskRelationLog.setConditionParams("{}");
+            processTaskRelationLogs.add(processTaskRelationLog);
+        }
+        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        processTaskRelationLogFirst.setPreTaskCode(0);
+        processTaskRelationLogFirst.setPreTaskVersion(0);
+        processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
+        processTaskRelationLogFirst.setPostTaskVersion(1);
+
+        String taskRelationJson = JSONUtils.toJsonString(processTaskRelationLogs);
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        for (int i = 0; i < 1; i++) {
+            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+            taskDefinitionLog.setFlag(YES);
+            taskDefinitionLog.setDelayTime(0);
+            taskDefinitionLog.setEnvironmentCode(-1);
+            taskDefinitionLog.setFailRetryInterval(1);
+            taskDefinitionLog.setFailRetryTimes(0);
+            taskDefinitionLog.setTaskPriority(MEDIUM);
+            taskDefinitionLog.setTimeout(0);
+            taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
+            taskDefinitionLog.setTimeoutNotifyStrategy(null);
+            taskDefinitionLog.setWorkerGroup("default");
+            taskDefinitionLog.setTaskType("SUB_PROCESS");
+            taskDefinitionLogs.add(taskDefinitionLog);
+        }
+        TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);
+        taskDefinitionLogFirst.setCode(taskCodes.get(0));
+        taskDefinitionLogFirst.setName("subprocess node");
+        taskDefinitionLogFirst.setDescription("Enter the demo_shell subnode");
+        taskDefinitionLogFirst.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"processDefinitionCode\":" + subProcessCode + "}");
+
+        String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            taskDefinition.getName(),
-            taskDefinition.getDescription(),
-            taskDefinition.getTaskParams(),
-            DemoContants.SUB_PROCESS_locations[0] + taskCode+ DemoContants.SUB_PROCESS_locations[1],
-            taskDefinition.getTimeout(),
+            processDefinitionLog.getName(),
+            processDefinitionLog.getDescription(),
+            processDefinitionLog.getGlobalParams(),
+            processDefinitionLog.getLocations(),
+            processDefinitionLog.getTimeout(),
             tenantCode,
-            DemoContants.SUB_PROCESS_taskRelationJson[0] + taskCode + DemoContants.SUB_PROCESS_taskRelationJson[1],
-            DemoContants.SUB_PROCESS_taskDefinitionJson[0] + taskCode + DemoContants.SUB_PROCESS_taskDefinitionJson[1] + subProcessCode + DemoContants.SUB_PROCESS_taskDefinitionJson[2],
+            taskRelationJson,
+            taskDefinitionJson,
             PARALLEL);
         return ProxyResult;
     }
