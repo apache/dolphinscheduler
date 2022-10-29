@@ -149,7 +149,7 @@ public class CuringGlobalParams implements CuringParamsService {
         parameters.setVarPool(taskInstance.getVarPool());
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (globalParams.isEmpty() && localParams.isEmpty() && varParams.isEmpty()) {
+        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams) && MapUtils.isEmpty(varParams)) {
             return null;
         }
         // if it is a complement,
@@ -168,10 +168,10 @@ public class CuringGlobalParams implements CuringParamsService {
         }
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
 
-        if (varParams.size() != 0) {
+        if (MapUtils.isNotEmpty(varParams)) {
             globalParams.putAll(varParams);
         }
-        if (localParams.size() != 0) {
+        if (MapUtils.isNotEmpty(localParams)) {
             globalParams.putAll(localParams);
         }
 

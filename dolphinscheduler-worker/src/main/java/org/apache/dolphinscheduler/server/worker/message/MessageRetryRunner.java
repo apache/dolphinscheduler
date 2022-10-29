@@ -25,6 +25,18 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import org.apache.commons.collections.MapUtils;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +111,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
     public void run() {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
-                if (needToRetryMessages.isEmpty()) {
+                if (MapUtils.isEmpty(needToRetryMessages)) {
                     Thread.sleep(MESSAGE_RETRY_WINDOW);
                 }
 

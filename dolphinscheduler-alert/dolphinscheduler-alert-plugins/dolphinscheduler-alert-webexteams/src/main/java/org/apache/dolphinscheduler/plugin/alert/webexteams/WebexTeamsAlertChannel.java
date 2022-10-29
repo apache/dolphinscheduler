@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import org.apache.commons.collections.MapUtils;
+
 import java.util.Map;
 
 public final class WebexTeamsAlertChannel implements AlertChannel {
@@ -29,7 +31,7 @@ public final class WebexTeamsAlertChannel implements AlertChannel {
     public AlertResult process(AlertInfo alertInfo) {
         AlertData alertData = alertInfo.getAlertData();
         Map<String, String> alertParams = alertInfo.getAlertParams();
-        if (alertParams == null || alertParams.size() == 0) {
+        if (MapUtils.isEmpty(alertParams)) {
             return new AlertResult("false", "WebexTeams alert params is empty");
         }
 
