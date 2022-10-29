@@ -534,6 +534,10 @@ public class WorkflowExecuteThread implements Runnable {
             scheduleDate = complementListDate.get(0);
         } else if (processInstance.getState().typeIsFinished()) {
             endProcess();
+            // rerun process instance of complement didn't need create the next process complement
+            if (processInstance.getCommandType() == CommandType.REPEAT_RUNNING) {
+                return true;
+            }
             if (complementListDate.size() <= 0) {
                 logger.info("process complement end. process id:{}", processInstance.getId());
                 return true;
