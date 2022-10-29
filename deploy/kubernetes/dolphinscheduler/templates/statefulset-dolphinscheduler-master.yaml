@@ -36,6 +36,7 @@ spec:
         {{- toYaml .Values.master.annotations | nindent 8 }}
       {{- end }}
     spec:
+      serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
       {{- if .Values.master.affinity }}
       affinity:
         {{- toYaml .Values.master.affinity | nindent 8 }}

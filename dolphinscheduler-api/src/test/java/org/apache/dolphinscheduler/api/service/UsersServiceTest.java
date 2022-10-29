@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -370,6 +370,27 @@ public class UsersServiceTest {
     }
 
     @Test
+    public void testGrantProjectWithReadPerm() {
+        String projectIds = "100000,120000";
+        User loginUser = new User();
+        int userId = 3;
+
+        // user not exist
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        when(userMapper.selectById(userId)).thenReturn(null);
+        Map<String, Object> result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
+        // SUCCESS
+        when(userMapper.selectById(userId)).thenReturn(getUser());
+        result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
     public void testGrantProjectByCode() {
         // Mock Project, User
         final long projectCode = 1L;
@@ -436,6 +457,31 @@ public class UsersServiceTest {
         project.setId(0);
         Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(project);
         result = this.usersService.revokeProject(loginUser, 1, projectCode);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testRevokeProjectById() {
+        Mockito.when(this.userMapper.selectById(1)).thenReturn(this.getUser());
+
+        String projectId = "100000";
+
+        // user no permission
+        User loginUser = new User();
+        Map<String, Object> result = this.usersService.revokeProjectById(loginUser, 1, projectId);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
+        // user not exist
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result = this.usersService.revokeProjectById(loginUser, 2, projectId);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
+        // success
+        Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(new Project());
+        result = this.usersService.revokeProjectById(loginUser, 1, projectId);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }

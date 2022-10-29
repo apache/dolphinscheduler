@@ -36,7 +36,11 @@ export default {
     delete: 'Delete',
     confirm: 'Confirm',
     cancel: 'Cancel',
-    delete_confirm: 'Delete?'
+    delete_confirm: 'Delete?',
+    authorize_level:'Authorize Level',
+    no_permission: 'No Permission',
+    read_permission: 'Read Permission',
+    all_permission: 'All Permission',
   },
   workflow: {
     on_line: 'Online',
@@ -44,6 +48,7 @@ export default {
     operating_environment: 'Operating Environment',
     workflow_relation: 'Workflow Relation',
     create_workflow: 'Create Workflow',
+    create_workflow_dynamic: 'Create Workflow (Dynamic)',
     import_workflow: 'Import Workflow',
     workflow_name: 'Workflow Name',
     workflow_instance_name: 'Workflow Instance Name',

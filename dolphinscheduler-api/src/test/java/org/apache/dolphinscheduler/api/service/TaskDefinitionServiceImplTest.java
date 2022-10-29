@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -141,10 +141,6 @@ public class TaskDefinitionServiceImplTest {
                         + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
                         + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
                         + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
-        List<TaskDefinitionLog> taskDefinitions = JSONUtils.toList(createTaskDefinitionJson, TaskDefinitionLog.class);
-        Mockito.when(processService.saveTaskDefine(user, PROJECT_CODE, taskDefinitions, Boolean.TRUE))
-                .thenReturn(1);
-        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> relation = taskDefinitionService
                 .createTaskDefinition(user, PROJECT_CODE, createTaskDefinitionJson);
         Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
@@ -166,8 +162,7 @@ public class TaskDefinitionServiceImplTest {
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, PROJECT_CODE);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION_UPDATE))
-                .thenReturn(result);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, new HashMap<>())).thenReturn(true);
 
         Mockito.when(processService.isTaskOnline(TASK_CODE)).thenReturn(Boolean.FALSE);
         Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(new TaskDefinition());
@@ -212,6 +207,7 @@ public class TaskDefinitionServiceImplTest {
         // error delete single task definition object
         Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(getTaskDefinition());
         Mockito.when(taskDefinitionMapper.deleteByCode(TASK_CODE)).thenReturn(0);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, new HashMap<>())).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> taskDefinitionService.deleteTaskDefinitionByCode(user, TASK_CODE));
         Assertions.assertEquals(Status.DELETE_TASK_DEFINE_BY_CODE_MSG_ERROR.getCode(),

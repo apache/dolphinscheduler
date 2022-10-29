@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.taskRelation;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 
 import java.util.stream.Stream;
 
@@ -25,7 +25,7 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * task relation want to delete request
@@ -37,7 +37,7 @@ public class TaskRelationDeleteRequest {
 
     private long upstreamCode;
     private long downstreamCode;
-    @ApiModelProperty(example = "12345678,87654321", required = true, notes = "relation pair want to delete relation, separated by comma")
+    @Schema(example = "12345678,87654321", required = true, description = "relation pair want to delete relation, separated by comma")
     private String codePair;
 
     public TaskRelationDeleteRequest(String relationPair) {

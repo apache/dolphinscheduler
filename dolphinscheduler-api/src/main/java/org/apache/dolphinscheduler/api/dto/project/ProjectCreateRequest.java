@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.dto.project;
 
 import lombok.Data;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * project create request
@@ -26,9 +26,9 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 public class ProjectCreateRequest {
 
-    @ApiModelProperty(example = "pro123", required = true)
+    @Schema(example = "pro123", required = true)
     private String projectName;
 
-    @ApiModelProperty(example = "this is a project")
+    @Schema(example = "this is a project")
     private String description;
 }
