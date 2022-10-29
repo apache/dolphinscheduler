@@ -217,7 +217,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 .thenReturn(true);
 
         Result expectResponseContent = JSONUtils.parseObject(
-                "{\"code\":110010,\"msg\":\"plugin instance already exit\",\"data\":null,\"failed\":true,\"success\":false}",
+                "{\"code\":110010,\"msg\":\"plugin instance already exists\",\"data\":null,\"failed\":true,\"success\":false}",
                 Result.class);
 
         // When

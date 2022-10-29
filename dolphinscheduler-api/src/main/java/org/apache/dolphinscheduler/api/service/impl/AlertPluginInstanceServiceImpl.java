@@ -102,7 +102,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()) == Boolean.TRUE) {
             logger.error("Plugin instance with the same name already exists, name:{}.",
                     alertPluginInstance.getInstanceName());
-            putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXIT);
+            putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
             return result;
         }
 
