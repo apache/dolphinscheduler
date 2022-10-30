@@ -190,24 +190,6 @@ public interface ProcessService {
 
     Map<ProcessInstance, TaskInstance> notifyProcessList(int processId);
 
-    DqExecuteResult getDqExecuteResultByTaskInstanceId(int taskInstanceId);
-
-    int updateDqExecuteResultUserId(int taskInstanceId);
-
-    int updateDqExecuteResultState(DqExecuteResult dqExecuteResult);
-
-    int deleteDqExecuteResultByTaskInstanceId(int taskInstanceId);
-
-    int deleteTaskStatisticsValueByTaskInstanceId(int taskInstanceId);
-
-    DqRule getDqRule(int ruleId);
-
-    List<DqRuleInputEntry> getRuleInputEntry(int ruleId);
-
-    List<DqRuleExecuteSql> getDqExecuteSql(int ruleId);
-
-    DqComparisonType getComparisonTypeById(int id);
-
     boolean acquireTaskGroup(int taskId,
                              String taskName, int groupId,
                              int processId, int priority);

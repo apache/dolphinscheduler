@@ -47,8 +47,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.*;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -122,6 +121,14 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected TaskInstanceDao taskInstanceDao;
 
+    protected DqRuleDao dqRuleDao;
+
+    protected DqRuleInputEntryDao dqRuleInputEntryDao;
+
+    protected DqRuleExecuteSqlDao dqRuleExecuteSqlDao;
+
+    protected DqComparisonTypeDao dqComparisonTypeDao;
+
     protected ProcessInstanceDao processInstanceDao;
 
     protected MasterConfig masterConfig;
@@ -140,6 +147,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
         taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
+        dqRuleDao = SpringApplicationContext.getBean(DqRuleDao.class);
+        dqRuleInputEntryDao = SpringApplicationContext.getBean(DqRuleInputEntryDao.class);
+        dqRuleExecuteSqlDao = SpringApplicationContext.getBean(DqRuleExecuteSqlDao.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
@@ -417,7 +427,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         Map<String, String> config = dataQualityParameters.getRuleInputParameter();
 
         int ruleId = dataQualityParameters.getRuleId();
-        DqRule dqRule = processService.getDqRule(ruleId);
+        DqRule dqRule = dqRuleDao.findRuleById(ruleId);
         if (dqRule == null) {
             logger.error("Can not get dataQuality rule by id {}", ruleId);
             return;
@@ -427,12 +437,12 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         dataQualityTaskExecutionContext.setRuleType(dqRule.getType());
         dataQualityTaskExecutionContext.setRuleName(dqRule.getName());
 
-        List<DqRuleInputEntry> ruleInputEntryList = processService.getRuleInputEntry(ruleId);
+        List<DqRuleInputEntry> ruleInputEntryList = dqRuleInputEntryDao.getRuleInputEntry(ruleId);
         if (CollectionUtils.isEmpty(ruleInputEntryList)) {
             logger.error("Rule input entry list is empty, ruleId: {}", ruleId);
             return;
         }
-        List<DqRuleExecuteSql> executeSqlList = processService.getDqExecuteSql(ruleId);
+        List<DqRuleExecuteSql> executeSqlList = dqRuleExecuteSqlDao.getDqExecuteSql(ruleId);
         setComparisonParams(dataQualityTaskExecutionContext, config, ruleInputEntryList, executeSqlList);
         dataQualityTaskExecutionContext.setRuleInputEntryList(JSONUtils.toJsonString(ruleInputEntryList));
         dataQualityTaskExecutionContext.setExecuteSqlList(JSONUtils.toJsonString(executeSqlList));
@@ -467,7 +477,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             int comparisonTypeId = Integer.parseInt(config.get(COMPARISON_TYPE));
             // comparison type id 1 is fixed value ,do not need set param
             if (comparisonTypeId > 1) {
-                DqComparisonType type = processService.getComparisonTypeById(comparisonTypeId);
+                DqComparisonType type = dqComparisonTypeDao.selectById(comparisonTypeId);
                 if (type != null) {
                     DqRuleInputEntry comparisonName = new DqRuleInputEntry();
                     comparisonName.setField(COMPARISON_NAME);

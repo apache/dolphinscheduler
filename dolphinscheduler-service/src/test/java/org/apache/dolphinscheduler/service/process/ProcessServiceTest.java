@@ -65,10 +65,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.*;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
@@ -132,7 +129,13 @@ public class ProcessServiceTest {
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
-    private TaskDefinitionDao taskDefinitionDao;
+    private DqRuleDao dqRuleDao;
+
+    @Mock
+    private DqRuleInputEntryDao dqRuleInputEntryDao;
+
+    @Mock
+    DqRuleExecuteSqlDao dqRuleExecuteSqlDao;
 
     @Mock
     private UserMapper userMapper;
@@ -156,9 +159,6 @@ public class ProcessServiceTest {
     private DataSourceMapper dataSourceMapper;
     @Mock
     private TaskGroupQueueMapper taskGroupQueueMapper;
-
-    @Mock
-    private DqExecuteResultMapper dqExecuteResultMapper;
 
     @Mock
     private DqRuleMapper dqRuleMapper;
@@ -491,19 +491,19 @@ public class ProcessServiceTest {
     @Test
     public void getDqRule() {
         Mockito.when(dqRuleMapper.selectById(1)).thenReturn(new DqRule());
-        Assertions.assertNotNull(processService.getDqRule(1));
+        Assertions.assertNotNull(dqRuleDao.findRuleById(1));
     }
 
     @Test
     public void getRuleInputEntry() {
         Mockito.when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
-        Assertions.assertNotNull(processService.getRuleInputEntry(1));
+        Assertions.assertNotNull(dqRuleInputEntryDao.getRuleInputEntry(1));
     }
 
     @Test
     public void getDqExecuteSql() {
         Mockito.when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
-        Assertions.assertNotNull(processService.getDqExecuteSql(1));
+        Assertions.assertNotNull(dqRuleExecuteSqlDao.getDqExecuteSql(1));
     }
 
     private List<DqRuleInputEntry> getRuleInputEntryList() {

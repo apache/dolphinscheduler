@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
+import org.apache.dolphinscheduler.dao.repository.DqTaskStatisticsValueDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.CheckType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqFailureStrategy;
@@ -50,6 +52,12 @@ public class DataQualityResultOperator {
     private ProcessService processService;
 
     @Autowired
+    private DqExecuteResultDao dqExecuteResultDao;
+
+    @Autowired
+    private DqTaskStatisticsValueDao dqTaskStatisticsValueDao;
+
+    @Autowired
     private ProcessAlertManager alertManager;
 
     /**
@@ -68,15 +76,15 @@ public class DataQualityResultOperator {
             // when the task is failure or cancel, will delete the execute result and statistics value
             if (taskResponseEvent.getState().isFailure()
                     || taskResponseEvent.getState().isKill()) {
-                processService.deleteDqExecuteResultByTaskInstanceId(taskInstance.getId());
-                processService.deleteTaskStatisticsValueByTaskInstanceId(taskInstance.getId());
+                dqExecuteResultDao.deleteDqExecuteResultByTaskInstanceId(taskInstance.getId());
+                dqTaskStatisticsValueDao.deleteTaskStatisticsValueByTaskInstanceId(taskInstance.getId());
                 sendDqTaskErrorAlert(taskInstance, processInstance);
                 return;
             }
 
-            processService.updateDqExecuteResultUserId(taskInstance.getId());
+            dqExecuteResultDao.updateDqExecuteResultUserId(taskInstance.getId());
             DqExecuteResult dqExecuteResult =
-                    processService.getDqExecuteResultByTaskInstanceId(taskInstance.getId());
+                    dqExecuteResultDao.getDqExecuteResultByTaskInstanceId(taskInstance.getId());
             if (dqExecuteResult != null) {
                 // check the result ,if result is failure do some operator by failure strategy
                 checkDqExecuteResult(taskResponseEvent, dqExecuteResult, processInstance);
@@ -115,7 +123,7 @@ public class DataQualityResultOperator {
             dqExecuteResult.setState(DqTaskState.SUCCESS.getCode());
         }
 
-        processService.updateDqExecuteResultState(dqExecuteResult);
+        dqExecuteResultDao.updateById(dqExecuteResult);
     }
 
     /**

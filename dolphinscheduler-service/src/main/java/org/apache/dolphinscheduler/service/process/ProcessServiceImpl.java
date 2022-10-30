@@ -86,7 +86,6 @@ import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
@@ -110,11 +109,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.*;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -247,24 +242,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ProjectMapper projectMapper;
-
-    @Autowired
-    private DqExecuteResultMapper dqExecuteResultMapper;
-
-    @Autowired
-    private DqRuleMapper dqRuleMapper;
-
-    @Autowired
-    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
-
-    @Autowired
-    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
-
-    @Autowired
-    private DqComparisonTypeMapper dqComparisonTypeMapper;
-
-    @Autowired
-    private DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper;
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -2353,76 +2330,6 @@ public class ProcessServiceImpl implements ProcessService {
             processTaskMap.put(fatherProcess, fatherTask);
         }
         return processTaskMap;
-    }
-
-    @Override
-    public DqExecuteResult getDqExecuteResultByTaskInstanceId(int taskInstanceId) {
-        return dqExecuteResultMapper.getExecuteResultById(taskInstanceId);
-    }
-
-    @Override
-    public int updateDqExecuteResultUserId(int taskInstanceId) {
-        DqExecuteResult dqExecuteResult =
-                dqExecuteResultMapper
-                        .selectOne(new QueryWrapper<DqExecuteResult>().eq(TASK_INSTANCE_ID, taskInstanceId));
-        if (dqExecuteResult == null) {
-            return -1;
-        }
-
-        ProcessInstance processInstance = processInstanceMapper.selectById(dqExecuteResult.getProcessInstanceId());
-        if (processInstance == null) {
-            return -1;
-        }
-
-        ProcessDefinition processDefinition =
-                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
-        if (processDefinition == null) {
-            return -1;
-        }
-
-        dqExecuteResult.setProcessDefinitionId(processDefinition.getId());
-        dqExecuteResult.setUserId(processDefinition.getUserId());
-        dqExecuteResult.setState(DqTaskState.DEFAULT.getCode());
-        return dqExecuteResultMapper.updateById(dqExecuteResult);
-    }
-
-    @Override
-    public int updateDqExecuteResultState(DqExecuteResult dqExecuteResult) {
-        return dqExecuteResultMapper.updateById(dqExecuteResult);
-    }
-
-    @Override
-    public int deleteDqExecuteResultByTaskInstanceId(int taskInstanceId) {
-        return dqExecuteResultMapper.delete(
-                new QueryWrapper<DqExecuteResult>()
-                        .eq(TASK_INSTANCE_ID, taskInstanceId));
-    }
-
-    @Override
-    public int deleteTaskStatisticsValueByTaskInstanceId(int taskInstanceId) {
-        return dqTaskStatisticsValueMapper.delete(
-                new QueryWrapper<DqTaskStatisticsValue>()
-                        .eq(TASK_INSTANCE_ID, taskInstanceId));
-    }
-
-    @Override
-    public DqRule getDqRule(int ruleId) {
-        return dqRuleMapper.selectById(ruleId);
-    }
-
-    @Override
-    public List<DqRuleInputEntry> getRuleInputEntry(int ruleId) {
-        return DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(ruleId));
-    }
-
-    @Override
-    public List<DqRuleExecuteSql> getDqExecuteSql(int ruleId) {
-        return dqRuleExecuteSqlMapper.getExecuteSqlList(ruleId);
-    }
-
-    @Override
-    public DqComparisonType getComparisonTypeById(int id) {
-        return dqComparisonTypeMapper.selectById(id);
     }
 
     /**
