@@ -262,39 +262,6 @@ export default defineComponent({
               <NTooltip
                 v-slots={{
                   trigger: () => (
-                    <NPopover
-                      placement='bottom'
-                      trigger='click'
-                      scrollable
-                      style={{ maxWidth: '50vw', maxHeight: '70vh' }}
-                    >
-                      {{
-                        trigger: () => (
-                          <NButton
-                            quaternary
-                            circle
-                            class={Styles['toolbar-btn']}
-                          >
-                            <NIcon>
-                              <FundViewOutlined />
-                            </NIcon>
-                          </NButton>
-                        ),
-                        header: () => (
-                          <NText strong depth={1}>
-                            {t('project.workflow.parameters_variables')}
-                          </NText>
-                        ),
-                        default: () => <VariablesView onCopy={copy} />
-                      }}
-                    </NPopover>
-                  ),
-                  default: () => t('project.dag.view_variables')
-                }}
-              ></NTooltip>
-              <NTooltip
-                v-slots={{
-                  trigger: () => (
                     <NPopover placement='bottom' trigger='click'>
                       {{
                         trigger: () => (

@@ -1,0 +1,14 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND",
+    "err": {
+      "name": "pnpm",
+      "message": "No package.json (or package.yaml, or package.json5) was found in \"/Users/calvin/MyCloud/zhilian/workspace/dolphinscheduler\".",
+      "code": "ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND",
+      "stack": "pnpm: No package.json (or package.yaml, or package.json5) was found in \"/Users/calvin/MyCloud/zhilian/workspace/dolphinscheduler\".\n    at readProjectManifest (/usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:19790:13)\n    at async Object.readProjectManifestOnly (/usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:19794:28)\n    at async readProjectManifestOnly (/usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:43556:24)\n    at async Object.handler (/usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:179434:24)\n    at async /usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:183649:21\n    at async run (/usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:183623:34)\n    at async runPnpm (/usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:183835:5)\n    at async /usr/local/Cellar/nvm/0.33.11/versions/node/v16.13.1/lib/node_modules/pnpm/dist/pnpm.cjs:183827:7"
+    }
+  }
+}
