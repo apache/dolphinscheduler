@@ -143,7 +143,7 @@ public class MasterConfig implements Validator {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() <= 10) {
-            errors.rejectValue("worker-group-refresh-interval", null, "should >= 1s");
+            errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
         }
 
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
