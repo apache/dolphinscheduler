@@ -32,7 +32,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_DEFINE_NOT_EXIST;
-import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.constants.Constants.COPY_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
@@ -45,7 +44,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PA
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
-import java.util.TreeSet;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -81,7 +79,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
@@ -118,7 +115,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
@@ -144,6 +140,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -2921,7 +2918,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // check user access for project
         Map<String, Object> result =
-            projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -2929,7 +2926,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
 
         if (Objects.isNull(processDefinition) || projectCode != processDefinition.getProjectCode()) {
-            logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode, code);
+            logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                    code);
             putMsg(result, PROCESS_DEFINE_NOT_EXIST, code);
             return result;
         }
@@ -2963,32 +2961,31 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Set<Long> taskCodeSet = new TreeSet<>();
 
         processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode())
-            .forEach(processTaskRelation -> {
-                if (processTaskRelation.getPreTaskCode() > 0) {
-                    taskCodeSet.add(processTaskRelation.getPreTaskCode());
-                }
-                if (processTaskRelation.getPostTaskCode() > 0) {
-                    taskCodeSet.add(processTaskRelation.getPostTaskCode());
-                }
-            });
+                .forEach(processTaskRelation -> {
+                    if (processTaskRelation.getPreTaskCode() > 0) {
+                        taskCodeSet.add(processTaskRelation.getPreTaskCode());
+                    }
+                    if (processTaskRelation.getPostTaskCode() > 0) {
+                        taskCodeSet.add(processTaskRelation.getPostTaskCode());
+                    }
+                });
 
         taskDefinitionMapper.queryByCodeList(taskCodeSet)
-            .stream().forEach(taskDefinition -> {
-                Map<String, Object> localParamsMap = new HashMap<>();
-                String localParams = JSONUtils.getNodeString(taskDefinition.getTaskParams(), LOCAL_PARAMS);
-                if (!StringUtils.isEmpty(localParams)) {
-                    List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
-                    localParamsMap.put(TASK_TYPE, taskDefinition.getTaskType());
-                    localParamsMap.put(LOCAL_PARAMS_LIST, localParamsList);
-                    if (CollectionUtils.isNotEmpty(localParamsList)) {
-                        localUserDefParams.put(taskDefinition.getName(), localParamsMap);
+                .stream().forEach(taskDefinition -> {
+                    Map<String, Object> localParamsMap = new HashMap<>();
+                    String localParams = JSONUtils.getNodeString(taskDefinition.getTaskParams(), LOCAL_PARAMS);
+                    if (!StringUtils.isEmpty(localParams)) {
+                        List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+                        localParamsMap.put(TASK_TYPE, taskDefinition.getTaskType());
+                        localParamsMap.put(LOCAL_PARAMS_LIST, localParamsList);
+                        if (CollectionUtils.isNotEmpty(localParamsList)) {
+                            localUserDefParams.put(taskDefinition.getName(), localParamsMap);
+                        }
                     }
-                }
-            });
+                });
 
         return localUserDefParams;
     }
-
 
     /**
      * delete other relation

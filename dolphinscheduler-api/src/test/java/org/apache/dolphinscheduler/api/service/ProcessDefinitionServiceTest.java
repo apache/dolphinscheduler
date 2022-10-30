@@ -1073,10 +1073,11 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project check auth fail
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-            .thenReturn(result);
+                .thenReturn(result);
 
         Map<String, Object> map =
-            processDefinitionService.viewVariables(user, processDefinition.getProjectCode(), processDefinition.getCode());
+                processDefinitionService.viewVariables(user, processDefinition.getProjectCode(),
+                        processDefinition.getCode());
 
         Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
     }

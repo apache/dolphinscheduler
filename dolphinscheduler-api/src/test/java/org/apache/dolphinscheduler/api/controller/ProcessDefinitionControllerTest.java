@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -439,7 +438,7 @@ public class ProcessDefinitionControllerTest {
         putMsg(resultMap, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.viewVariables(user, projectCode, 1))
-            .thenReturn(resultMap);
+                .thenReturn(resultMap);
 
         Result result = processDefinitionController.viewVariables(user, projectCode, 1L);
 
