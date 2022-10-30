@@ -142,7 +142,7 @@ public class MasterConfig implements Validator {
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() <= 10) {
+        if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
             errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
         }
 
