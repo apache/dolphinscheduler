@@ -107,35 +107,35 @@ public class ProcessDefinitionDemo {
         //creat process definition demo
         //shell demo
         ProxyResult shellResult = shellDemo(token, projectCode, tenantCode);
-        logger.info("create shell demo " + shellResult.getMsg());
+        logger.info("create shell demo {}", shellResult.getMsg());
 
         //subprocess demo
         LinkedHashMap<String, Object> subProcess = (LinkedHashMap<String, Object>) shellResult.getData();
         String subProcessCode = String.valueOf(subProcess.get("code")) ;
         ProxyResult subProcessResult = subProcessDemo (token, projectCode, tenantCode, subProcessCode);
-        logger.info("create subprocess demo " + subProcessResult.getMsg());
+        logger.info("create subprocess demo {}", subProcessResult.getMsg());
 
         //switch demo
         ProxyResult switchResult = swicthDemo (token, projectCode, tenantCode);
-        logger.info("create switch demo " + switchResult.getMsg());
+        logger.info("create switch demo {}", switchResult.getMsg());
 
         //condition demo
         ProxyResult conditionResult = conditionDemo (token, projectCode, tenantCode);
-        logger.info("create condition demo " + conditionResult.getMsg());
+        logger.info("create condition demo {}", conditionResult.getMsg());
 
         //dependent demo
         LinkedHashMap<String, Object> switchProcess = (LinkedHashMap<String, Object>) switchResult.getData();
         String switchProcessCode = String.valueOf(switchProcess.get("code")) ;
         ProxyResult dependentResult = dependentProxyResultDemo (token, projectCode, tenantCode, subProcessCode, switchProcessCode);
-        logger.info("create dependent demo " + dependentResult.getMsg());
+        logger.info("create dependent demo {}", dependentResult.getMsg());
 
         //parameter context demo
         ProxyResult parameterContextResult = parameterContextDemo (token, projectCode, tenantCode);
-        logger.info("create parameter context demo " + parameterContextResult.getMsg());
+        logger.info("create parameter context demo {}", parameterContextResult.getMsg());
 
         //clear log demo
         ProxyResult clearLogResult = clearLogDemo (token, projectCode, tenantCode);
-        logger.info("create clear log demo " + clearLogResult.getMsg());
+        logger.info("create clear log demo {}", clearLogResult.getMsg());
 
     }
 
@@ -157,7 +157,7 @@ public class ProcessDefinitionDemo {
         processDefinitionLog.setName("demo_clear_log");
         processDefinitionLog.setDescription("Clear the DS log files from 30 days ago");
         processDefinitionLog.setGlobalParams("[]");
-        processDefinitionLog.setLocations(DemoContants.CLEAR_LOG_locations[0] + taskCodeFirst + DemoContants.CLEAR_LOG_locations[1]);
+        processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
@@ -230,7 +230,7 @@ public class ProcessDefinitionDemo {
         processDefinitionLog.setName("demo_dependent");
         processDefinitionLog.setDescription("Check the completion of daily tasks");
         processDefinitionLog.setGlobalParams("[]");
-        processDefinitionLog.setLocations(DemoContants.DEPENDENT_locations[0] + taskCodeFirst + DemoContants.DEPENDENT_locations[1] + taskCodeSecond + DemoContants.DEPENDENT_locations[2]);
+        processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
@@ -315,7 +315,7 @@ public class ProcessDefinitionDemo {
         processDefinitionLog.setName("demo_parameter_context");
         processDefinitionLog.setDescription("Upstream and downstream task node parameter transfer");
         processDefinitionLog.setGlobalParams(DemoContants.PARAMETER_CONTEXT_PARAMS);
-        processDefinitionLog.setLocations(DemoContants.PARAMETER_CONTEXT_locations[0] + taskCodeFirst + DemoContants.PARAMETER_CONTEXT_locations[1] + taskCodeSecond + DemoContants.PARAMETER_CONTEXT_locations[2]);
+        processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
@@ -401,7 +401,7 @@ public class ProcessDefinitionDemo {
         processDefinitionLog.setName("demo_condition");
         processDefinitionLog.setDescription("Coin Toss");
         processDefinitionLog.setGlobalParams("[]");
-        processDefinitionLog.setLocations(DemoContants.CONDITION_locations[0] + taskCodeFirst + DemoContants.CONDITION_locations[1] + taskCodeSecond + DemoContants.CONDITION_locations[2] + taskCodeThird + DemoContants.CONDITION_locations[3] + taskCodeFourth + DemoContants.CONDITION_locations[4]);
+        processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
@@ -513,7 +513,7 @@ public class ProcessDefinitionDemo {
         processDefinitionLog.setName("demo_switch");
         processDefinitionLog.setDescription("Determine which task to perform based on conditions");
         processDefinitionLog.setGlobalParams(DemoContants.SWITCH_GLOBAL_PARAMS);
-        processDefinitionLog.setLocations(DemoContants.SWITCH_locations[0] + taskCodeFirst + DemoContants.SWITCH_locations[1] + taskCodeSecond + DemoContants.SWITCH_locations[2] + taskCodeThird + DemoContants.SWITCH_locations[3] + taskCodeFourth + DemoContants.SWITCH_locations[4]);
+        processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
@@ -624,7 +624,7 @@ public class ProcessDefinitionDemo {
         processDefinitionLog.setName("demo_shell");
         processDefinitionLog.setDescription("Production, processing and sales of a series of processes");
         processDefinitionLog.setGlobalParams(DemoContants.SHELL_GLOBAL_PARAMS);
-        processDefinitionLog.setLocations(DemoContants.SHELL_locations[0] + taskCodeFirst + DemoContants.SHELL_locations[1] + taskCodeSecond + DemoContants.SHELL_locations[2] + taskCodeThird + DemoContants.SHELL_locations[3]);
+        processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
@@ -718,7 +718,7 @@ public class ProcessDefinitionDemo {
         processDefinitionLog.setName("demo_sub_process");
         processDefinitionLog.setDescription("Start the production line");
         processDefinitionLog.setGlobalParams("[]");
-        processDefinitionLog.setLocations(DemoContants.SUB_PROCESS_locations[0] + taskCode + DemoContants.SUB_PROCESS_locations[1]);
+        processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
         List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();

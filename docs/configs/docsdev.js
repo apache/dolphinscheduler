@@ -1018,7 +1018,7 @@ export default {
                         link: '/zh-cn/docs/dev/user_doc/guide/expansion-reduction.html',
                     },
                     {
-                        title: '初始化工作流',
+                        title: 'Demo',
                         link: '/zh-cn/docs/dev/user_doc/guide/demo.html',
                     },
                 ],

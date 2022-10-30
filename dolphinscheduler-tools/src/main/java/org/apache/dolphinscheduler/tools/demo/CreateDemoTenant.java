@@ -31,7 +31,7 @@ public class CreateDemoTenant {
                 tenantMapper.insert(tenant);
                 logger.info("create tenant success");
             }else {
-                logger.info("os tenant code already exists");
+                logger.warn("os tenant code already exists");
             }
         }
     }
