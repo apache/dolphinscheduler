@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.tools.demo;
 
 public class ProxyResult<T> {
+
     private Integer code;
 
     private String msg;
@@ -47,7 +48,7 @@ public class ProxyResult<T> {
     }
 
     public boolean isSuccess() {
-        if( code == 0){
+        if (code == 0) {
             return true;
         }
         return false;
@@ -84,11 +85,11 @@ public class ProxyResult<T> {
     @Override
     public String toString() {
         return "Status{"
-            + "code='" + code
-            + '\'' + ", msg='"
-            + msg + '\''
-            + ", data=" + data
-            + '}';
+                + "code='" + code
+                + '\'' + ", msg='"
+                + msg + '\''
+                + ", data=" + data
+                + '}';
     }
 
 }

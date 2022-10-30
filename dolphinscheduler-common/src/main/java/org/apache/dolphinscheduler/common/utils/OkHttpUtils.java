@@ -36,10 +36,10 @@ import okhttp3.Response;
 public class OkHttpUtils {
 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
-        .connectTimeout(5, TimeUnit.MINUTES) // connect timeout
-        .writeTimeout(5, TimeUnit.MINUTES) // write timeout
-        .readTimeout(5, TimeUnit.MINUTES) // read timeout
-        .build();
+            .connectTimeout(5, TimeUnit.MINUTES) // connect timeout
+            .writeTimeout(5, TimeUnit.MINUTES) // write timeout
+            .readTimeout(5, TimeUnit.MINUTES) // read timeout
+            .build();
 
     public static @NonNull String get(@NonNull String url,
                                       @Nullable Map<String, String> httpHeaders,
@@ -61,7 +61,7 @@ public class OkHttpUtils {
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
         if (requestBodyMap != null) {
             requestBuilder = requestBuilder.post(RequestBody.create(MediaType.parse("application/json"),
-                JSONUtils.toJsonString(requestBodyMap)));
+                    JSONUtils.toJsonString(requestBodyMap)));
         }
         try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
             return getResponseBody(response);
@@ -69,24 +69,25 @@ public class OkHttpUtils {
     }
 
     public static @NonNull String demoPost(@NonNull String url,
-                                       @Nullable String token,
-                                       @Nullable Map<String, Object> requestBodyMap) throws IOException{
+                                           @Nullable String token,
+                                           @Nullable Map<String, Object> requestBodyMap) throws IOException {
 
         StringBuffer stringBuffer = new StringBuffer();
         if (requestBodyMap != null) {
-            for (String key: requestBodyMap.keySet()) {
+            for (String key : requestBodyMap.keySet()) {
                 stringBuffer.append(key + "=" + requestBodyMap.get(key) + "&");
             }
         }
 
-        RequestBody body = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), stringBuffer.toString());
+        RequestBody body =
+                RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), stringBuffer.toString());
 
         Request request = new Request.Builder()
-            .url(url)
-            .header("token", token)
-            .addHeader("accpect", "application/json")
-            .post(body)
-            .build();
+                .url(url)
+                .header("token", token)
+                .addHeader("accpect", "application/json")
+                .post(body)
+                .build();
 
         try (Response response = CLIENT.newCall(request).execute()) {
             return response.body().string();
@@ -119,8 +120,8 @@ public class OkHttpUtils {
     private static String getResponseBody(@NonNull Response response) throws IOException {
         if (response.code() != HttpStatus.SC_OK || response.body() == null) {
             throw new RuntimeException(String.format("Request execute failed, httpCode: %s, httpBody: %s",
-                response.code(),
-                response.body()));
+                    response.code(),
+                    response.body()));
         }
         return response.body().string();
     }

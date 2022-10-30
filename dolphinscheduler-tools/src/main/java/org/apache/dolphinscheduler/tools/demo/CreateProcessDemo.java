@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
         })
 })
 public class CreateProcessDemo {
+
     public static void main(String[] args) {
         SpringApplication.run(CreateProcessDemo.class, args);
     }
@@ -41,6 +42,7 @@ public class CreateProcessDemo {
     @Component
     @Profile("demo")
     static class DemoRunner implements CommandLineRunner {
+
         private static final Logger logger = LoggerFactory.getLogger(DemoRunner.class);
 
         private final ProcessDefinitionDemo processDefinitionDemo;

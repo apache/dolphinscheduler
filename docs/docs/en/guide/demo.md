@@ -5,6 +5,7 @@
 ### Backup Previous Version's Files and Database
 
 To prevent data loss by some miss-operation, it is recommended to back up data before initializing the workflow demo. The backup way according to your environment.
+
 ### Download the Latest Version Installation Package
 
 Download the latest binary distribute package from [download](/en-us/download/download.html) and then put it in the different

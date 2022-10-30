@@ -34,19 +34,20 @@ public class ProxyProcessDefinitionController {
     @Value("${demo.api-server-port}")
     private String ServerPort;
 
-    public ProxyResult createProcessDefinition (String token,
-                                                long projectCode,
-                                                String name,
-                                                String description,
-                                                String globalParams,
-                                                String locations,
-                                                int timeout,
-                                                String tenantCode,
-                                                String taskRelationJson,
-                                                String taskDefinitionJson,
-                                                ProcessExecutionTypeEnum executionType){
+    public ProxyResult createProcessDefinition(String token,
+                                               long projectCode,
+                                               String name,
+                                               String description,
+                                               String globalParams,
+                                               String locations,
+                                               int timeout,
+                                               String tenantCode,
+                                               String taskRelationJson,
+                                               String taskDefinitionJson,
+                                               ProcessExecutionTypeEnum executionType) {
         ProxyResult proxyResult = new ProxyResult();
-        String url = "http://localhost:" + ServerPort + "/dolphinscheduler/projects/" + projectCode + "/process-definition";
+        String url =
+                "http://localhost:" + ServerPort + "/dolphinscheduler/projects/" + projectCode + "/process-definition";
         String responseBody;
         Map<String, Object> requestBodyMap = new HashMap<>();
 

@@ -32,12 +32,12 @@ public class CreateDemoTenant {
     @Autowired
     private TenantMapper tenantMapper;
 
-    public void createTenantCode(String tenantCode){
+    public void createTenantCode(String tenantCode) {
         Date now = new Date();
 
-        if( !tenantCode.equals("default")){
+        if (!tenantCode.equals("default")) {
             Boolean existTenant = tenantMapper.existTenant(tenantCode);
-            if( !Boolean.TRUE.equals(existTenant) ){
+            if (!Boolean.TRUE.equals(existTenant)) {
                 Tenant tenant = new Tenant();
                 tenant.setTenantCode(tenantCode);
                 tenant.setQueueId(1);
@@ -47,7 +47,7 @@ public class CreateDemoTenant {
                 // save
                 tenantMapper.insert(tenant);
                 logger.info("create tenant success");
-            }else {
+            } else {
                 logger.warn("os tenant code already exists");
             }
         }
