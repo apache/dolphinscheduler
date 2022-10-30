@@ -19,9 +19,10 @@ package org.apache.dolphinscheduler.plugin.alert.feishu;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -81,7 +82,7 @@ public final class FeiShuSender {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
 
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(result)) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(result)) {
             alertResult.setMessage("send fei shu msg error");
             logger.info("send fei shu msg error,fei shu server resp is null");
             return alertResult;
@@ -108,7 +109,7 @@ public final class FeiShuSender {
         if (alertData.getContent() != null) {
 
             List<Map> list = JSONUtils.toList(alertData.getContent(), Map.class);
-            if (list.isEmpty()) {
+            if (CollectionUtils.isEmpty(list)) {
                 return alertData.getTitle() + alertData.getContent();
             }
 

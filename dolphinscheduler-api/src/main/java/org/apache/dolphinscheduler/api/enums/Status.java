@@ -280,6 +280,8 @@ public enum Status {
 
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
     USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),
+    USER_NO_WRITE_PROJECT_PERM(30003, "user [{0}] does not have write permission for project [{1}]",
+            "当前用户[{0}]没有[{1}]项目的写权限"),
 
     PROCESS_INSTANCE_NOT_EXIST(50001, "process instance {0} does not exist", "工作流实例[{0}]不存在"),
     PROCESS_INSTANCE_EXIST(50002, "process instance {0} already exists", "工作流实例[{0}]已存在"),
@@ -409,7 +411,7 @@ public enum Status {
     GET_ALERT_PLUGIN_INSTANCE_ERROR(110007, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
     CREATE_ALERT_PLUGIN_INSTANCE_ERROR(110008, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
     QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(110009, "query all alert plugin instance error", "查询所有告警实例失败"),
-    PLUGIN_INSTANCE_ALREADY_EXIT(110010, "plugin instance already exit", "该告警插件实例已存在"),
+    PLUGIN_INSTANCE_ALREADY_EXISTS(110010, "plugin instance already exists", "该告警插件实例已存在"),
     LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011, "query plugin instance page error", "分页查询告警实例失败"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012,
             "failed to delete the alert instance, there is an alarm group associated with this alert instance",
@@ -502,12 +504,15 @@ public enum Status {
     USER_PASSWORD_LENGTH_ERROR(1300017, "user's password length error", "用户密码长度错误"),
     QUERY_CAN_USE_K8S_NAMESPACE_ERROR(1300018, "login user query can used namespace list error", "查询可用命名空间错误"),
 
+    QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR(1300100, "query process definition all variables error",
+            "查询工作流自定义变量信息错误"),
+
     NO_CURRENT_OPERATING_PERMISSION(1400001, "The current user does not have this permission.", "当前用户无此权限"),
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
-    ;
-
+    DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
+            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}");
     private final int code;
     private final String enMsg;
     private final String zhMsg;

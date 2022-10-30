@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 import static org.mockito.ArgumentMatchers.any;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.IOUtils;
 

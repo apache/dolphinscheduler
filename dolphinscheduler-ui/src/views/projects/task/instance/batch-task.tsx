@@ -39,15 +39,15 @@ import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
 import { stateType } from '@/common/common'
-import { useLogTimerStore } from '@/store/logTimer/logTimer'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
   setup() {
-    const logTimerStore = useLogTimerStore()
-    const logTimer = logTimerStore.getLogTimer
+    const uiSettingStore = useUISettingStore()
+    const logTimer = uiSettingStore.getLogTimer
     const { t, variables, getTableData, createColumns } = useTable()
 
     const requestTableData = () => {

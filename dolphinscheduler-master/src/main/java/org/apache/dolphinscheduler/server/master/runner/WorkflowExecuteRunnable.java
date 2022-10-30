@@ -17,20 +17,22 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_FATHER_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -56,6 +58,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -76,6 +80,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -127,7 +132,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
     private final ProcessService processService;
 
+    private final CommandService commandService;
+
     private ProcessInstanceDao processInstanceDao;
+
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     private final ProcessAlertManager processAlertManager;
 
@@ -233,20 +244,26 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public WorkflowExecuteRunnable(
                                    @NonNull ProcessInstance processInstance,
+                                   @NonNull CommandService commandService,
                                    @NonNull ProcessService processService,
                                    @NonNull ProcessInstanceDao processInstanceDao,
                                    @NonNull NettyExecutorManager nettyExecutorManager,
                                    @NonNull ProcessAlertManager processAlertManager,
                                    @NonNull MasterConfig masterConfig,
                                    @NonNull StateWheelExecuteThread stateWheelExecuteThread,
-                                   @NonNull CuringParamsService curingParamsService) {
+                                   @NonNull CuringParamsService curingParamsService,
+                                   @NonNull TaskInstanceDao taskInstanceDao,
+                                   @NonNull TaskDefinitionLogDao taskDefinitionLogDao) {
         this.processService = processService;
+        this.commandService = commandService;
         this.processInstanceDao = processInstanceDao;
         this.processInstance = processInstance;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
         this.curingParamsService = curingParamsService;
+        this.taskInstanceDao = taskInstanceDao;
+        this.taskDefinitionLogDao = taskDefinitionLogDao;
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
@@ -340,7 +357,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     public boolean checkForceStartAndWakeUp(StateEvent stateEvent) {
         TaskGroupQueue taskGroupQueue = this.processService.loadTaskGroupQueue(stateEvent.getTaskInstanceId());
         if (taskGroupQueue.getForceStart() == Flag.YES.getCode()) {
-            TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+            TaskInstance taskInstance = this.taskInstanceDao.findTaskInstanceById(stateEvent.getTaskInstanceId());
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.DISPATCH);
             this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getTaskId(),
@@ -350,7 +367,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (taskGroupQueue.getInQueue() == Flag.YES.getCode()) {
             boolean acquireTaskGroup = processService.robTaskGroupResource(taskGroupQueue);
             if (acquireTaskGroup) {
-                TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+                TaskInstance taskInstance = this.taskInstanceDao.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
                 taskProcessor.action(TaskAction.DISPATCH);
                 return true;
@@ -495,7 +512,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public void refreshTaskInstance(int taskInstanceId) {
         logger.info("task instance update: {} ", taskInstanceId);
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
         if (taskInstance == null) {
             logger.error("can not find task instance, id:{}", taskInstanceId);
             return;
@@ -628,18 +645,18 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setCommandType(CommandType.COMPLEMENT_DATA);
         command.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+        if (cmdParam.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
+            cmdParam.remove(CMD_PARAM_RECOVERY_START_NODE_STRING);
         }
 
-        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,
-                    cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)
-                            .substring(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).indexOf(COMMA) + 1));
+        if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+            cmdParam.replace(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,
+                    cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)
+                            .substring(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).indexOf(COMMA) + 1));
         }
 
-        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE,
+        if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)) {
+            cmdParam.replace(CMD_PARAM_COMPLEMENT_DATA_START_DATE,
                     DateUtils.format(scheduleDate, YYYY_MM_DD_HH_MM_SS, null));
         }
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
@@ -657,7 +674,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         command.setTestFlag(processInstance.getTestFlag());
-        return processService.createCommand(command);
+        return commandService.createCommand(command);
     }
 
     private boolean needComplementProcess() {
@@ -750,7 +767,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessDefinitionCode(processDefinition.getCode());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-        processService.createCommand(command);
+        commandService.createCommand(command);
     }
 
     /**
@@ -768,7 +785,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         List<ProcessTaskRelation> processTaskRelations =
                 processService.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
         List<TaskDefinitionLog> taskDefinitionLogs =
-                processService.getTaskDefineLogListByRelation(processTaskRelations);
+                taskDefinitionLogDao.getTaskDefineLogListByRelation(processTaskRelations);
         List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
         forbiddenTaskMap.clear();
 
@@ -808,7 +825,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     processInstance.getRunTimes(),
                     processInstance.getRecovery());
             List<TaskInstance> validTaskInstanceList =
-                    processService.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag());
+                    taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
+                            processInstance.getTestFlag());
             for (TaskInstance task : validTaskInstanceList) {
                 try {
                     LoggerUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
@@ -824,7 +842,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
                         if (!oldTaskInstance.getState().isFinished() && task.getState().isFinished()) {
                             task.setFlag(Flag.NO);
-                            processService.updateTaskInstance(task);
+                            taskInstanceDao.updateTaskInstance(task);
                             continue;
                         }
                     }
@@ -845,7 +863,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         if (task.getState().isNeedFaultTolerance()) {
                             logger.info("TaskInstance needs fault tolerance, will be added to standby list.");
                             task.setFlag(Flag.NO);
-                            processService.updateTaskInstance(task);
+                            taskInstanceDao.updateTaskInstance(task);
 
                             // tolerantTaskInstance add to standby list directly
                             TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
@@ -875,10 +893,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
                 Date start = null;
                 Date end = null;
-                if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)
-                        && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_END_DATE)) {
-                    start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-                    end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+                if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)
+                        && cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_END_DATE)) {
+                    start = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE));
+                    end = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
                 }
                 if (complementListDate.isEmpty() && needComplementProcess()) {
                     if (start != null && end != null) {
@@ -886,7 +904,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                                 processInstance.getProcessDefinitionCode());
                         complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
                     }
-                    if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+                    if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
                         complementListDate = CronUtils.getSelfScheduleDateList(cmdParam);
                     }
                     logger.info(" process definition code:{} complement data: {}",
@@ -946,7 +964,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 if (taskInstance.getId() != oldTaskInstanceId) {
                     TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
                     oldTaskInstance.setFlag(Flag.NO);
-                    processService.updateTaskInstance(oldTaskInstance);
+                    taskInstanceDao.updateTaskInstance(oldTaskInstance);
                     validTaskMap.remove(taskInstance.getTaskCode());
                     activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
                 }
@@ -1643,7 +1661,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
 
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        Date endTime = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+        Date endTime = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
         return processInstance.getScheduleTime().equals(endTime);
     }
 
@@ -1773,7 +1791,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             if (taskInstanceId == null || taskInstanceId.equals(0)) {
                 continue;
             }
-            TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
+            TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
             if (taskInstance == null || taskInstance.getState().isFinished()) {
                 continue;
             }
@@ -1806,7 +1824,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
             // stop tasks which is retrying if forced success happens
             if (task.taskCanRetry()) {
-                TaskInstance retryTask = processService.findTaskInstanceById(task.getId());
+                TaskInstance retryTask = taskInstanceDao.findTaskInstanceById(task.getId());
                 if (retryTask != null && retryTask.getState().isForceSuccess()) {
                     task.setState(retryTask.getState());
                     logger.info(
@@ -1881,7 +1899,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     .map(Integer::valueOf)
                     .collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(startTaskInstanceIds)) {
-                return processService.findTaskInstanceByIdList(startTaskInstanceIds);
+                return taskInstanceDao.findTaskInstanceByIdList(startTaskInstanceIds);
             }
         }
         return Collections.emptyList();
@@ -1996,13 +2014,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam) {
         // get start params from command param
         Map<String, String> startParamMap = new HashMap<>();
-        if (cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
-            String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
+        if (cmdParam.containsKey(CMD_PARAM_START_PARAMS)) {
+            String startParamJson = cmdParam.get(CMD_PARAM_START_PARAMS);
             startParamMap = JSONUtils.toMap(startParamJson);
         }
         Map<String, String> fatherParamMap = new HashMap<>();
-        if (cmdParam.containsKey(Constants.CMD_PARAM_FATHER_PARAMS)) {
-            String fatherParamJson = cmdParam.get(Constants.CMD_PARAM_FATHER_PARAMS);
+        if (cmdParam.containsKey(CMD_PARAM_FATHER_PARAMS)) {
+            String fatherParamJson = cmdParam.get(CMD_PARAM_FATHER_PARAMS);
             fatherParamMap = JSONUtils.toMap(fatherParamJson);
         }
         startParamMap.putAll(fatherParamMap);

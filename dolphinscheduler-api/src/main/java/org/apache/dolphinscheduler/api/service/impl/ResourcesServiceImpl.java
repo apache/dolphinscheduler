@@ -17,45 +17,53 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.ALIAS;
-import static org.apache.dolphinscheduler.common.Constants.CONTENT;
-import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_SS;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.JAR;
-import static org.apache.dolphinscheduler.common.Constants.PERIOD;
+import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
+import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_SS;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
+import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
+import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -77,19 +85,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
@@ -106,7 +111,19 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private ResourceMapper resourcesMapper;
 
     @Autowired
+    private ResourceTaskMapper resourceTaskMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
     private UdfFuncMapper udfFunctionMapper;
+
+    @Autowired
+    private ProcessService processService;
+
+    @Autowired
+    private ProcessDefinitionService processDefinitionService;
 
     @Autowired
     private TenantMapper tenantMapper;
@@ -118,7 +135,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private ResourceUserMapper resourceUserMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Autowired
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
@@ -143,14 +163,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                           int pid,
                                           String currentDir) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FOLDER_ONLINE_CREATE
-                : ApiFuncIdentificationConstant.UDF_FOLDER_ONLINE_CREATE;
-        boolean canOperatorPermissions =
-                canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
 
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -162,48 +174,49 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return result;
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
+            logger.error("current user does not have permission");
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         if (checkDescriptionLength(description)) {
             logger.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
-        String fullName = getFullName(currentDir, name);
-        result = verifyResource(loginUser, type, fullName, pid);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-
-        if (checkResourceExists(fullName, type.ordinal())) {
-            logger.warn("Resource directory exists, can not create again, fullName:{}.", fullName);
-            putMsg(result, Status.RESOURCE_EXIST);
-            return result;
-        }
-
-        Date now = new Date();
-
-        Resource resource =
-                new Resource(pid, name, fullName, true, description, name, loginUser.getId(), type, 0, now, now);
+        String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
+                : storageOperate.getResDir(tenantCode);
+        String fullName = !currentDir.contains(userResRootPath) ? userResRootPath + name : currentDir + name;
 
         try {
-            resourcesMapper.insert(resource);
-            putMsg(result, Status.SUCCESS);
-            permissionPostHandle(resource.getType(), loginUser, resource.getId());
-            Map<String, Object> resultMap = new HashMap<>();
-            for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-                if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
-                    resultMap.put(entry.getKey().toString(), entry.getValue());
-                }
+            if (checkResourceExists(fullName)) {
+                logger.error("resource directory {} has exist, can't recreate", fullName);
+                putMsg(result, Status.RESOURCE_EXIST);
+                return result;
             }
-            result.setData(resultMap);
-        } catch (DuplicateKeyException e) {
-            logger.warn("Resource directory exists, can not create again, fullName:{}.", fullName);
-            putMsg(result, Status.RESOURCE_EXIST);
-            return result;
         } catch (Exception e) {
             logger.warn("Resource exists, can not create again, fullName:{}.", fullName, e);
             throw new ServiceException("resource already exists, can't recreate");
         }
+
         // create directory in storage
         createDirectory(loginUser, fullName, type, result);
         return result;
@@ -220,9 +233,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param loginUser  login user
      * @param name       alias
      * @param desc       description
-     * @param file       file
      * @param type       type
-     * @param pid        parent id
+     * @param file       file
      * @param currentDir current directory
      * @return create result code
      */
@@ -233,36 +245,33 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          String desc,
                                          ResourceType type,
                                          MultipartFile file,
-                                         int pid,
                                          String currentDir) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPLOAD
-                : ApiFuncIdentificationConstant.UDF_UPLOAD;
-        boolean canOperatorPermissions =
-                canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
+
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        result = verifyPid(loginUser, pid);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-        if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
-        // make sure login user has tenant
-        String tenantCode = getTenantCode(loginUser.getId(), result);
-        if (StringUtils.isEmpty(tenantCode)) {
-            logger.error("Tenant of current login user does not specified, loginUserName:{}.", loginUser.getUserName());
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
+            logger.error("current user does not have permission");
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -272,45 +281,32 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         // check resource name exists
-        String fullName = getFullName(currentDir, name);
-        if (checkResourceExists(fullName, type.ordinal())) {
-            logger.warn("Resource exists, can not create again, fullName:{}.", RegexUtils.escapeNRT(name));
-            putMsg(result, Status.RESOURCE_EXIST);
-            return result;
+        String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
+                : storageOperate.getResDir(tenantCode);
+        String currDirNFileName = !currentDir.contains(userResRootPath) ? userResRootPath + name : currentDir + name;
+
+        try {
+            if (checkResourceExists(currDirNFileName)) {
+                logger.error("resource {} has exist, can't recreate", RegexUtils.escapeNRT(name));
+                putMsg(result, Status.RESOURCE_EXIST);
+                return result;
+            }
+        } catch (Exception e) {
+            throw new ServiceException("resource already exists, can't recreate");
         }
-        if (fullName.length() > Constants.RESOURCE_FULL_NAME_MAX_LENGTH) {
-            logger.warn(
-                    "Resource file's name is longer than max full name length, fullName:{}, fullNameSize:{}, maxFullNameSize:{}",
-                    RegexUtils.escapeNRT(name), fullName.length(), Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
+        if (currDirNFileName.length() > Constants.RESOURCE_FULL_NAME_MAX_LENGTH) {
+            logger.error(
+                    "Resource file's name is longer than max full name length, fullName:{}, " +
+                            "fullNameSize:{}, maxFullNameSize:{}",
+                    RegexUtils.escapeNRT(name), currDirNFileName.length(), Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
             putMsg(result, Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
             return result;
         }
 
-        Date now = new Date();
-        Resource resource = new Resource(pid, name, fullName, false, desc, file.getOriginalFilename(),
-                loginUser.getId(), type, file.getSize(), now, now);
-
-        try {
-            resourcesMapper.insert(resource);
-            updateParentResourceSize(resource, resource.getSize());
-            putMsg(result, Status.SUCCESS);
-            permissionPostHandle(resource.getType(), loginUser, resource.getId());
-            Map<String, Object> resultMap = new HashMap<>();
-            for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-                if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
-                    resultMap.put(entry.getKey().toString(), entry.getValue());
-                }
-            }
-            result.setData(resultMap);
-        } catch (Exception e) {
-            logger.warn("Resource exists, can not create again, fullName:{}.", fullName, e);
-            throw new ServiceException("resource already exists, can't recreate");
-        }
-
         // fail upload
-        if (!upload(loginUser, fullName, file, type)) {
-            logger.error("Upload resource file failed, resourceName:{}, fileName:{}.",
-                    RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
+        if (!upload(loginUser, currDirNFileName, file, type)) {
+            logger.error("upload resource: {} file: {} failed.", RegexUtils.escapeNRT(name),
+                    RegexUtils.escapeNRT(file.getOriginalFilename()));
             putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
             throw new ServiceException(
                     String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
@@ -354,11 +350,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * check resource is exists
      *
      * @param fullName fullName
-     * @param type     type
      * @return true if resource exists
      */
-    private boolean checkResourceExists(String fullName, int type) {
-        Boolean existResource = resourcesMapper.existResource(fullName, type);
+    private boolean checkResourceExists(String fullName) {
+        Boolean existResource = false;
+        try {
+            existResource = storageOperate.exists(fullName);
+        } catch (IOException e) {
+            logger.error("error occurred when checking resource: " + fullName, e);
+        }
         return Boolean.TRUE.equals(existResource);
     }
 
@@ -366,7 +366,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * update resource
      *
      * @param loginUser  login user
-     * @param resourceId resource id
+     * @param resourceFullName resource full name
+     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                      can be different from the login user in the case of logging in as admin users.
      * @param name       name
      * @param desc       description
      * @param type       resource type
@@ -376,35 +378,50 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     @Transactional
     public Result<Object> updateResource(User loginUser,
-                                         int resourceId,
+                                         String resourceFullName,
+                                         String resTenantCode,
                                          String name,
                                          String desc,
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE
-                : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions =
-                canOperatorPermissions(loginUser, new Object[]{resourceId}, checkResourceType(type), funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
+
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        Resource resource = resourcesMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
-        if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+            logger.error("current user does not have permission");
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
+        String defaultPath = storageOperate.getResDir(tenantCode);
+
+        StorageEntity resource;
+        try {
+            resource = storageOperate.getFileStatus(resourceFullName, defaultPath, resTenantCode, type);
+        } catch (Exception e) {
+            logger.error("Get file status fail, resource path: {}", resourceFullName, e);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            throw new ServiceException((String.format("Get file status fail, resource path: %s", resourceFullName)));
         }
 
         if (!PropertyUtils.getResUploadStartupState()) {
@@ -423,21 +440,33 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         if (file == null && name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
-            logger.info("Resource does not need to be updated due to no change, resourceId:{}.", resourceId);
+            logger.info("Resource does not need to be updated due to no change, resource full name:{}.",
+                    resourceFullName);
             putMsg(result, Status.SUCCESS);
             return result;
         }
 
-        // check resource already exists
+        // check if updated name of the resource already exists
         String originFullName = resource.getFullName();
         String originResourceName = resource.getAlias();
 
+        // the format of hdfs folders in the implementation has a "/" at the very end, we need to remove it.
+        originFullName = originFullName.endsWith("/") ? StringUtils.chop(originFullName) : originFullName;
+        name = name.endsWith("/") ? StringUtils.chop(name) : name;
+        // updated fullName
         String fullName = String.format(FORMAT_SS,
                 originFullName.substring(0, originFullName.lastIndexOf(FOLDER_SEPARATOR) + 1), name);
-        if (!originResourceName.equals(name) && checkResourceExists(fullName, type.ordinal())) {
-            logger.warn("Resource exists, can not create again, fullName:{}.", RegexUtils.escapeNRT(name));
-            putMsg(result, Status.RESOURCE_EXIST);
-            return result;
+        if (!originResourceName.equals(name)) {
+            try {
+                if (checkResourceExists(fullName)) {
+                    logger.error("resource {} already exists, can't recreate", fullName);
+                    putMsg(result, Status.RESOURCE_EXIST);
+                    return result;
+                }
+            } catch (Exception e) {
+                throw new ServiceException(String.format("error occurs while querying resource: %s", fullName));
+            }
+
         }
 
         result = verifyFile(name, type, file);
@@ -445,60 +474,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        // query tenant by user id
-        String tenantCode = getTenantCode(resource.getUserId(), result);
-        if (StringUtils.isEmpty(tenantCode)) {
-            logger.error("Tenant of current login user does not specified, loginUserName:{}.", loginUser.getUserName());
-            return result;
-        }
-        // verify whether the resource exists in storage
-        // get the path of origin file in storage
-        String originFileName = storageOperate.getFileName(resource.getType(), tenantCode, originFullName);
-        try {
-            if (!storageOperate.exists(tenantCode, originFileName)) {
-                logger.error(
-                        "Resource file does not exist in {} storage, tenantCode:{}, resourceId:{}, originFileName:{}.",
-                        resource.getType(), tenantCode, resourceId, originFileName);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-        } catch (IOException e) {
-            logger.error("Storage operation error, storageType:{}, tenantCode:{}, resourceId:{}, originFileName:{}.",
-                    resource.getType(), tenantCode, resourceId, originFileName, e);
-            throw new ServiceException(Status.HDFS_OPERATION_ERROR);
-        }
-
-        if (!resource.isDirectory()) {
-            // get the origin file suffix
-            String originSuffix = Files.getFileExtension(originFullName);
-            String suffix = Files.getFileExtension(fullName);
-            boolean suffixIsChanged = false;
-            if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
-                suffixIsChanged = true;
-            }
-            if (StringUtils.isNotBlank(suffix) && !suffix.equals(originSuffix)) {
-                suffixIsChanged = true;
-            }
-            // verify whether suffix is changed
-            if (suffixIsChanged) {
-                // need verify whether this resource is authorized to other users
-                Map<String, Object> columnMap = new HashMap<>();
-                columnMap.put("resources_id", resourceId);
-
-                List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
-                if (CollectionUtils.isNotEmpty(resourcesUsers)) {
-                    List<Integer> userIds =
-                            resourcesUsers.stream().map(ResourcesUser::getUserId).collect(Collectors.toList());
-                    List<User> users = userMapper.selectBatchIds(userIds);
-                    String userNames = users.stream().map(User::getUserName).collect(Collectors.toList()).toString();
-                    logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
-                    putMsg(result, Status.RESOURCE_IS_AUTHORIZED, userNames);
-                    return result;
-                }
-            }
-        }
-
-        // updateResource data
         Date now = new Date();
         long originFileSize = resource.getSize();
 
@@ -511,97 +486,123 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             resource.setSize(file.getSize());
         }
 
-        try {
-            resourcesMapper.updateById(resource);
-            if (resource.isDirectory()) {
-                List<Integer> childrenResource = listAllChildren(resource, false);
-                if (CollectionUtils.isNotEmpty(childrenResource)) {
-                    String matcherFullName = Matcher.quoteReplacement(fullName);
-                    List<Resource> childResourceList;
-                    Integer[] childResIdArray = childrenResource.toArray(new Integer[childrenResource.size()]);
-                    List<Resource> resourceList = resourcesMapper.listResourceByIds(childResIdArray);
-                    childResourceList = resourceList.stream().map(t -> {
-                        t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
-                        t.setUpdateTime(now);
-                        return t;
-                    }).collect(Collectors.toList());
-                    resourcesMapper.batchUpdateResource(childResourceList);
-
-                    if (ResourceType.UDF.equals(resource.getType())) {
-                        List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(childResIdArray);
-                        if (CollectionUtils.isNotEmpty(udfFuncs)) {
-                            udfFuncs = udfFuncs.stream().map(t -> {
-                                t.setResourceName(t.getResourceName().replaceFirst(originFullName, matcherFullName));
-                                t.setUpdateTime(now);
-                                return t;
-                            }).collect(Collectors.toList());
-                            udfFunctionMapper.batchUpdateUdfFunc(udfFuncs);
-                        }
-                    }
-                }
-            } else if (ResourceType.UDF.equals(resource.getType())) {
-                List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(new Integer[]{resourceId});
-                if (CollectionUtils.isNotEmpty(udfFuncs)) {
-                    udfFuncs = udfFuncs.stream().map(t -> {
-                        t.setResourceName(fullName);
-                        t.setUpdateTime(now);
-                        return t;
-                    }).collect(Collectors.toList());
-                    udfFunctionMapper.batchUpdateUdfFunc(udfFuncs);
-                }
-
-            }
-
-            putMsg(result, Status.SUCCESS);
-            Map<String, Object> resultMap = new HashMap<>();
-            for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-                if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
-                    resultMap.put(entry.getKey().toString(), entry.getValue());
-                }
-            }
-            result.setData(resultMap);
-        } catch (Exception e) {
-            logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
-            throw new ServiceException(Status.UPDATE_RESOURCE_ERROR);
-        }
-
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name) && file == null) {
             return result;
         }
 
+        List<ResourcesTask> existResourcesList;
+        if (resource.isDirectory()) {
+            existResourcesList = resourceTaskMapper.selectSubfoldersFullNames(originFullName + FOLDER_SEPARATOR);
+        } else {
+            existResourcesList = resourceTaskMapper.selectByMap(
+                    Collections.singletonMap("full_name", originFullName));
+        }
+
+        if (existResourcesList.size() > 0 && !fullName.equals(originFullName)) {
+            // check if any related task is online. If it is, it can not be updated.
+            for (ResourcesTask existResource : existResourcesList) {
+                int taskId = existResource.getTaskId();
+                if (processService.isTaskOnline(taskDefinitionMapper.selectById(taskId).getCode())) {
+                    logger.error("can't be updated,because it is used of process definition that's online");
+                    logger.error("resource task relation id:{} is used of task code {}", existResource.getId(),
+                            taskDefinitionMapper.selectById(taskId).getCode());
+                    putMsg(result, Status.RESOURCE_IS_USED);
+                    return result;
+                }
+            }
+
+            for (ResourcesTask existResource : existResourcesList) {
+                int taskId = existResource.getTaskId();
+                long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
+
+                List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
+                        Collections.singletonMap("post_task_code", taskCode));
+                if (processTaskRelation.size() > 0) {
+                    long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
+                    int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
+                    List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
+                            processTaskRelation.get(0).getProjectCode(),
+                            processDefinitionCode);
+
+                    List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
+
+                    if (taskRelationList.size() > 0) {
+                        ProcessDefinitionLog processDefinition =
+                                processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                                        processDefinitionCode, processDefinitionVersion);
+                        for (ProcessTaskRelation taskRelation : taskRelationList) {
+                            long taskCodeInProcess = taskRelation.getPostTaskCode();
+                            TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
+                            if (taskCodeInProcess == taskCode) {
+                                // originFullName is a prefix if isDirectory is true
+                                taskDefinition.setTaskParams(RemoveResourceFromResourceList(originFullName,
+                                        taskDefinition.getTaskParams(),
+                                        resource.isDirectory()));
+                                // if isDirectory is true, fullName is the new prefix. we replace old prefix
+                                // of resource fullname with the new prefix.
+                                // if isDirectory is false, fullName is the new path.
+                                taskDefinition.setTaskParams(AddResourceToResourceList(originFullName,
+                                        fullName,
+                                        existResource.getFullName(),
+                                        taskDefinition.getTaskParams(),
+                                        resource.isDirectory()));
+                            }
+                            taskDefinitionLogList.add(taskDefinition);
+                        }
+
+                        // update workflow & task definition associated to the resource
+                        if (processDefinition != null) {
+                            processDefinitionService.updateProcessDefinition(loginUser,
+                                    processDefinition.getProjectCode(),
+                                    processDefinition.getName(),
+                                    processDefinition.getCode(),
+                                    processDefinition.getDescription(),
+                                    processDefinition.getGlobalParams(),
+                                    processDefinition.getLocations(),
+                                    processDefinition.getTimeout(),
+                                    tenantCode,
+                                    JSONUtils.toJsonString(taskRelationList.toArray()),
+                                    JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
+                                    "",
+                                    processDefinition.getExecutionType());
+                        }
+                    }
+                }
+            }
+        }
+
         if (file != null) {
             // fail upload
             if (!upload(loginUser, fullName, file, type)) {
-                logger.error("Storage operation error, resourceId:{}, resourceName:{}, originFileName:{}.",
-                        resourceId, name, RegexUtils.escapeNRT(file.getOriginalFilename()));
+                logger.error("Storage operation error, resourceName:{}, originFileName:{}.",
+                        name, RegexUtils.escapeNRT(file.getOriginalFilename()));
                 putMsg(result, Status.HDFS_OPERATION_ERROR);
                 throw new ServiceException(
                         String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
             }
             if (!fullName.equals(originFullName)) {
                 try {
-                    storageOperate.delete(tenantCode, originFileName, false);
+                    storageOperate.delete(originFullName, false);
                 } catch (IOException e) {
                     logger.error("Resource delete error, resourceFullName:{}.", originFullName, e);
                     throw new ServiceException(String.format("delete resource: %s failed.", originFullName));
                 }
             }
 
-            updateParentResourceSize(resource, resource.getSize() - originFileSize);
             return result;
         }
 
         // get the path of dest file in hdfs
-        String destHdfsFileName = storageOperate.getFileName(resource.getType(), tenantCode, fullName);
-
+        String destHdfsFileName = fullName;
         try {
-            logger.info("Start copy file {} -> {}.", originFileName, destHdfsFileName);
-            storageOperate.copy(originFileName, destHdfsFileName, true, true);
+            logger.info("start  copy {} -> {}", originFullName, destHdfsFileName);
+            storageOperate.copy(originFullName, destHdfsFileName, true, true);
         } catch (Exception e) {
-            logger.error(MessageFormat.format("Copy file {0} -> {1} fail.", originFileName, destHdfsFileName), e);
+            logger.error(MessageFormat.format(" copy {0} -> {1} fail", originFullName, destHdfsFileName), e);
             putMsg(result, Status.HDFS_COPY_FAIL);
-            throw new ServiceException(Status.HDFS_COPY_FAIL);
+            throw new ServiceException(MessageFormat.format(
+                    Status.HDFS_COPY_FAIL.getMsg(), originFullName, destHdfsFileName));
         }
 
         return result;
@@ -667,6 +668,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * query resources list paging
      *
      * @param loginUser login user
+     * @param fullName resource full name
+     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                      can be different from the login user in the case of logging in as admin users.
      * @param type      resource type
      * @param searchVal search value
      * @param pageNo    page number
@@ -674,30 +678,91 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list page
      */
     @Override
-    public Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal,
-                                          Integer pageNo, Integer pageSize) {
+    public Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
+                                          ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-        Page<Resource> page = new Page<>(pageNo, pageSize);
-        if (directoryId != -1) {
-            Resource directory = resourcesMapper.selectById(directoryId);
-            if (directory == null) {
-                logger.error("Resource does not exist, resourceId:{}.", directoryId);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-        }
-        PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> resourcesIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), logger);
-        if (resourcesIds.isEmpty()) {
-            result.setData(pageInfo);
-            putMsg(result, Status.SUCCESS);
+        PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, directoryId, type.ordinal(),
-                searchVal, new ArrayList<>(resourcesIds));
-        pageInfo.setTotal((int) resourceIPage.getTotal());
-        pageInfo.setTotalList(resourceIPage.getRecords());
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+            logger.error("current user does not have permission");
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
+        String defaultPath = "";
+        List<StorageEntity> resourcesList = new ArrayList<>();
+
+        if (isAdmin(loginUser) && StringUtils.isBlank(fullName)) {
+            // list all tenants' resources to admin users in the root directory
+            List<User> userList = userMapper.selectList(null);
+            Set<String> visitedTenantEntityCode = new HashSet<>();
+            for (User userEntity : userList) {
+                String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
+                    defaultPath = storageOperate.getResDir(tenantEntityCode);
+                    if (type.equals(ResourceType.UDF)) {
+                        defaultPath = storageOperate.getUdfDir(tenantEntityCode);
+                    }
+                    try {
+                        resourcesList.addAll(storageOperate.listFilesStatus(defaultPath, defaultPath,
+                                tenantEntityCode, type));
+
+                        visitedTenantEntityCode.add(tenantEntityCode);
+                    } catch (Exception e) {
+                        logger.error(e.getMessage() + " Resource path: {}", defaultPath, e);
+                        putMsg(result, Status.RESOURCE_NOT_EXIST);
+                        throw new ServiceException(String.format(e.getMessage() +
+                                " make sure resource path: %s exists in hdfs", defaultPath));
+                    }
+                }
+            }
+        } else {
+            defaultPath = storageOperate.getResDir(tenantCode);
+            if (type.equals(ResourceType.UDF)) {
+                defaultPath = storageOperate.getUdfDir(tenantCode);
+            }
+
+            try {
+                if (StringUtils.isBlank(fullName)) {
+                    resourcesList = storageOperate.listFilesStatus(defaultPath, defaultPath, tenantCode, type);
+                } else {
+                    resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage() + " Resource path: {}", fullName, e);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                throw new ServiceException(String.format(e.getMessage() +
+                        " make sure resource path: %s exists in hdfs", defaultPath));
+            }
+        }
+
+        // remove leading and trailing spaces in searchVal
+        String trimmedSearchVal = searchVal != null ? searchVal.trim() : "";
+        // filter based on trimmed searchVal
+        List<StorageEntity> filteredResourceList = resourcesList.stream()
+                .filter(x -> x.getFileName().matches("(.*)" + trimmedSearchVal + "(.*)")).collect(Collectors.toList());
+        // inefficient pagination
+        List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((long) (pageNo - 1) * pageSize)
+                .limit(pageSize).collect(Collectors.toList());
+
+        pageInfo.setTotal(resourcesList.size());
+        pageInfo.setTotalList(slicedResourcesList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -714,22 +779,22 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     private void createDirectory(User loginUser, String fullName, ResourceType type, Result<Object> result) {
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
-        String directoryName = storageOperate.getFileName(type, tenantCode, fullName);
+        // String directoryName = storageOperate.getFileName(type, tenantCode, fullName);
         String resourceRootPath = storageOperate.getDir(type, tenantCode);
         try {
-            if (!storageOperate.exists(tenantCode, resourceRootPath)) {
+            if (!storageOperate.exists(resourceRootPath)) {
                 storageOperate.createTenantDirIfNotExists(tenantCode);
             }
 
-            if (!storageOperate.mkdir(tenantCode, directoryName)) {
-                logger.error("create resource directory {}  failed", directoryName);
+            if (!storageOperate.mkdir(tenantCode, fullName)) {
+                logger.error("create resource directory {} failed", fullName);
                 putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
-                throw new ServiceException(String.format("create resource directory: %s failed.", directoryName));
+                // throw new ServiceException(String.format("create resource directory: %s failed.", fullName));
             }
         } catch (Exception e) {
-            logger.error("create resource directory {}  failed", directoryName);
+            logger.error("create resource directory {} failed", fullName);
             putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
-            throw new ServiceException(String.format("create resource directory: %s failed.", directoryName));
+            throw new ServiceException(String.format("create resource directory: %s failed.", fullName));
         }
     }
 
@@ -755,15 +820,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String localFilename = FileUtils.getUploadFilename(tenantCode, UUID.randomUUID().toString());
 
         // save file to hdfs, and delete original file
-        String fileName = storageOperate.getFileName(type, tenantCode, fullName);
         String resourcePath = storageOperate.getDir(type, tenantCode);
         try {
             // if tenant dir not exists
-            if (!storageOperate.exists(tenantCode, resourcePath)) {
+            if (!storageOperate.exists(resourcePath)) {
                 storageOperate.createTenantDirIfNotExists(tenantCode);
             }
             org.apache.dolphinscheduler.api.utils.FileUtils.copyInputStreamToFile(file, localFilename);
-            storageOperate.upload(tenantCode, localFilename, fileName, true, true);
+            storageOperate.upload(tenantCode, localFilename, fullName, true, true);
         } catch (Exception e) {
             FileUtils.deleteFile(localFilename);
             logger.error(e.getMessage(), e);
@@ -777,15 +841,67 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      *
      * @param loginUser login user
      * @param type      resource type
+     * @param fullName  resource full name
      * @return resource list
      */
     @Override
-    public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
+    public Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName) {
         Map<String, Object> result = new HashMap<>();
 
-        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
-        Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
-        result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return null;
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return null;
+        }
+        String tenantCode = tenant.getTenantCode();
+
+        String defaultPath = "";
+        List<StorageEntity> resourcesList = new ArrayList<>();
+
+        if (StringUtils.isBlank(fullName)) {
+            if (isAdmin(loginUser)) {
+                List<User> userList = userMapper.selectList(null);
+                Set<String> visitedTenantEntityCode = new HashSet<>();
+                for (User userEntity : userList) {
+                    Tenant tt = tenantMapper.queryById(userEntity.getTenantId());
+                    String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                    if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
+                        defaultPath = storageOperate.getResDir(tenantEntityCode);
+                        if (type.equals(ResourceType.UDF)) {
+                            defaultPath = storageOperate.getUdfDir(tenantEntityCode);
+                        }
+                        resourcesList.addAll(storageOperate.listFilesStatusRecursively(defaultPath, defaultPath,
+                                tenantEntityCode, type));
+                        visitedTenantEntityCode.add(tenantEntityCode);
+                    }
+                }
+            } else {
+                defaultPath = storageOperate.getResDir(tenantCode);
+                if (type.equals(ResourceType.UDF)) {
+                    defaultPath = storageOperate.getUdfDir(tenantCode);
+                }
+
+                resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
+            }
+        } else {
+            defaultPath = storageOperate.getResDir(tenantCode);
+            if (type.equals(ResourceType.UDF)) {
+                defaultPath = storageOperate.getUdfDir(tenantCode);
+            }
+
+            resourcesList = storageOperate.listFilesStatusRecursively(fullName, defaultPath, tenantCode, type);
+        }
+
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(resourcesList);
+        result.put(Constants.DATA_LIST, resourceTreeVisitor.visit(defaultPath).getChildren());
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -824,119 +940,262 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
         List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
-        Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
-        result.setData(resourceTreeVisitor.visit().getChildren());
+        // Transform into StorageEntity for compatibility
+        List<StorageEntity> transformedResourceList = resources.stream()
+                .map(this::createStorageEntityBasedOnResource)
+                .collect(Collectors.toList());
+        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        result.setData(visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * transform resource object into StorageEntity object
+     *
+     * @param resource  a resource object
+     * @return a storageEntity object
+     */
+    private StorageEntity createStorageEntityBasedOnResource(Resource resource) {
+        StorageEntity entity = new StorageEntity();
+        entity.setFullName(resource.getFullName());
+        entity.setPfullName(resource.getPid() == -1 ? ""
+                : resourcesMapper.selectById(resource.getPid()).getFullName());
+        entity.setDirectory(resource.isDirectory());
+        entity.setAlias(resource.getAlias());
+        entity.setId(resource.getId());
+        entity.setType(resource.getType());
+        entity.setDescription(resource.getDescription());
+
+        return entity;
     }
 
     /**
      * delete resource
      *
      * @param loginUser  login user
-     * @param resourceId resource id
+     * @param fullName resource full name
+     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                      can be different from the login user in the case of logging in as admin users.
      * @return delete result code
      * @throws IOException exception
      */
     @Override
-    @Transactional
-    public Result<Object> delete(User loginUser, int resourceId) throws IOException {
-        // get resource by id
-        Result<Object> resultCheck = new Result<>();
-        Resource resource = resourcesMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
-            putMsg(resultCheck, Status.RESOURCE_NOT_EXIST);
-            return resultCheck;
-        }
-        String funcPermissionKey =
-                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DELETE
-                        : ApiFuncIdentificationConstant.UDF_DELETE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-                checkResourceType(resource.getType()), funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(resultCheck, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return resultCheck;
-        }
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Object> delete(User loginUser, String fullName,
+                                 String resTenantCode) throws IOException {
+        Result<Object> result = new Result<>();
 
-        Result<Object> result = checkResourceUploadStartupState();
+        result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-        if (!canOperator(loginUser, resource.getUserId())) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
-        String tenantCode = getTenantCode(resource.getUserId(), result);
-        if (StringUtils.isEmpty(tenantCode)) {
-            logger.error("Tenant of current login user does not specified, loginUserName:{}.", loginUser.getUserName());
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             return result;
         }
 
-        // get all resource id of process definitions those are released
-        List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        Map<Integer, Set<Long>> resourceProcessMap =
-                ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
-        Set<Integer> resourceIdSet = resourceProcessMap.keySet();
-        // get all children of the resource
-        List<Integer> allChildren = listAllChildren(resource, true);
+        String tenantCode = tenant.getTenantCode();
 
-        Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
-        if (needDeleteResourceIdArray.length >= 2) {
-            logger.warn("Resource can not be deleted because there are files or folders {} in the current directory.",
-                    resource.getFileName());
-            putMsg(result, Status.RESOURCE_HAS_FOLDER, resource.getFileName());
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+            logger.error("current user does not have permission");
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
+        }
+
+        String defaultPath = storageOperate.getResDir(tenantCode);
+        StorageEntity resource;
+        try {
+            resource = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, null);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " Resource path: {}", fullName, e);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
+        }
+
+        if (resource == null) {
+            logger.error("Resource does not exist, resource full name:{}.", fullName);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+
+        // recursively delete a folder
+        List<String> allChildren = storageOperate.listFilesStatusRecursively(fullName, defaultPath,
+                resTenantCode, resource.getType()).stream().map(storageEntity -> storageEntity.getFullName())
+                .collect(Collectors.toList());
+
+        Set<ResourcesTask> resourcesNeedToDeleteSet = new HashSet<>();
+        String[] allChildrenFullNameArray = allChildren.stream().toArray(String[]::new);
+
+        // check before using allChildrenFullNameArray to query full names.
+        if (allChildrenFullNameArray.length != 0) {
+            resourcesNeedToDeleteSet.addAll(
+                    resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray));
         }
 
         // if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
-            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
-            List<Integer> udfFuncIds = udfFuncs.stream().map(UdfFunc::getId).collect(Collectors.toList());
+            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceFullName(allChildrenFullNameArray);
             if (CollectionUtils.isNotEmpty(udfFuncs)) {
                 logger.warn("Resource can not be deleted because it is bound by UDF functions, udfFuncIds:{}",
-                        udfFuncIds);
+                        udfFuncs);
                 putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
                 return result;
             }
         }
 
-        if (resourceIdSet.contains(resource.getPid())) {
-            logger.warn(
-                    "Resource can not be deleted because it is used by process definition, resourceId:{}, processDefinitionCode:{}.",
-                    resource.getId(), resource.getPid());
-            putMsg(result, Status.RESOURCE_IS_USED);
-            return result;
-        }
-        resourceIdSet.retainAll(allChildren);
-        if (CollectionUtils.isNotEmpty(resourceIdSet)) {
-            for (Integer resId : resourceIdSet) {
-                logger.warn(
-                        "Resource can not be deleted because it is used by process definition, resourceId:{}, processDefinitionCode:{}.",
-                        resId, resourceProcessMap.get(resId));
-            }
-            putMsg(result, Status.RESOURCE_IS_USED);
-            return result;
-        }
-
-        // get hdfs file by type
-        String storageFilename = storageOperate.getFileName(resource.getType(), tenantCode, resource.getFullName());
         // delete data in database
-        resourcesMapper.selectBatchIds(Arrays.asList(needDeleteResourceIdArray)).forEach(item -> {
-            updateParentResourceSize(item, item.getSize() * -1);
-        });
-        resourcesMapper.deleteIds(needDeleteResourceIdArray);
-        resourceUserMapper.deleteResourceUserArray(0, needDeleteResourceIdArray);
+        if (resourcesNeedToDeleteSet.size() > 0) {
+            for (ResourcesTask resourcesTask : resourcesNeedToDeleteSet) {
+                int taskId = resourcesTask.getTaskId();
+                if (processService.isTaskOnline(taskDefinitionMapper.selectById(taskId).getCode())) {
+                    logger.error("can't be deleted,because it is used of process definition that's online");
+                    logger.error("resource task relation id:{} is used of task code {}", resourcesTask.getId(),
+                            taskDefinitionMapper.selectById(taskId).getCode());
+                    putMsg(result, Status.RESOURCE_IS_USED);
+                    return result;
+                }
+            }
 
-        // delete file on hdfs
+            for (ResourcesTask existResource : resourcesNeedToDeleteSet) {
+                int taskId = existResource.getTaskId();
+                long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
 
-        // delete file on storage
-        storageOperate.delete(tenantCode, storageFilename, true);
-        logger.info("Resource delete complete, tenantCode:{}, fileName:{}.", tenantCode, storageFilename);
+                // use taskCode to get processDefinitionCode, then get a list of processDefinitionLog.
+                List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
+                        Collections.singletonMap("post_task_code", taskCode));
+                if (processTaskRelation.size() > 0) {
+                    long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
+                    int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
+                    List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
+                            processTaskRelation.get(0).getProjectCode(),
+                            processDefinitionCode);
+
+                    List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
+
+                    if (taskRelationList.size() > 0) {
+                        ProcessDefinitionLog processDefinition =
+                                processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                                        processDefinitionCode, processDefinitionVersion);
+                        for (ProcessTaskRelation taskRelation : taskRelationList) {
+                            long taskCodeInProcess = taskRelation.getPostTaskCode();
+                            TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
+                            if (taskCodeInProcess == taskCode) {
+                                taskDefinition.setTaskParams(RemoveResourceFromResourceList(existResource.getFullName(),
+                                        taskDefinition.getTaskParams(), false));
+                            }
+                            taskDefinitionLogList.add(taskDefinition);
+                        }
+
+                        // update workflow & task definition associated to the resource
+                        if (processDefinition != null) {
+                            processDefinitionService.updateProcessDefinition(loginUser,
+                                    processDefinition.getProjectCode(),
+                                    processDefinition.getName(),
+                                    processDefinition.getCode(),
+                                    processDefinition.getDescription(),
+                                    processDefinition.getGlobalParams(),
+                                    processDefinition.getLocations(),
+                                    processDefinition.getTimeout(),
+                                    tenantCode,
+                                    JSONUtils.toJsonString(taskRelationList.toArray()),
+                                    JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
+                                    "",
+                                    processDefinition.getExecutionType());
+                        }
+                    }
+                }
+            }
+        }
+
+        // delete file on hdfs,S3
+        storageOperate.delete(fullName, allChildren, true);
+
         putMsg(result, Status.SUCCESS);
 
         return result;
+    }
+
+    private String RemoveResourceFromResourceList(String stringToDelete, String taskParameter, boolean isDir) {
+        Map<String, Object> taskParameters = JSONUtils.parseObject(
+                taskParameter,
+                new TypeReference<Map<String, Object>>() {
+                });
+        if (taskParameters.containsKey("resourceList")) {
+            String resourceListStr = JSONUtils.toJsonString(taskParameters.get("resourceList"));
+            List<ResourceInfo> resourceInfoList = JSONUtils.toList(resourceListStr, ResourceInfo.class);
+            List<ResourceInfo> updatedResourceInfoList;
+            if (isDir) {
+                String stringToDeleteWSeparator = stringToDelete + FOLDER_SEPARATOR;
+                // use start with to identify any prefix matching folder path
+                updatedResourceInfoList = resourceInfoList.stream()
+                        .filter(Objects::nonNull)
+                        .filter(resourceInfo -> !resourceInfo.getResourceName().startsWith(stringToDeleteWSeparator))
+                        .collect(Collectors.toList());
+            } else {
+                updatedResourceInfoList = resourceInfoList.stream()
+                        .filter(Objects::nonNull)
+                        .filter(resourceInfo -> !resourceInfo.getResourceName().equals(stringToDelete))
+                        .collect(Collectors.toList());
+            }
+            taskParameters.put("resourceList", updatedResourceInfoList);
+            return JSONUtils.toJsonString(taskParameters);
+        }
+        return taskParameter;
+    }
+
+    private String AddResourceToResourceList(String oldPrefix, String newPrefix, String resFullName,
+                                             String taskParameter, boolean isDir) {
+        Map<String, Object> taskParameters = JSONUtils.parseObject(
+                taskParameter,
+                new TypeReference<Map<String, Object>>() {
+                });
+
+        if (taskParameters.containsKey("resourceList")) {
+            String resourceListStr = JSONUtils.toJsonString(taskParameters.get("resourceList"));
+            List<ResourceInfo> resourceInfos = JSONUtils.toList(resourceListStr, ResourceInfo.class);
+
+            // add updated resource to replace the original resource.
+            ResourceInfo newResource = new ResourceInfo();
+            if (isDir) {
+                // we add spearator here because we dont want rare cases like
+                // oldFullName: .../folderToDelete and a resource path: .../folderToDeleteAnotherFolder
+                // Therefore, we make sure the oldFullName has a format of .../folderToDelete/ when
+                // modifying resourceFullNames in taskDefinition.
+                String oldFullNameWSeparator = oldPrefix + FOLDER_SEPARATOR;
+                String newFullNameWSpearator = newPrefix + FOLDER_SEPARATOR;
+
+                newResource.setResourceName(resFullName.replace(oldFullNameWSeparator, newFullNameWSpearator));
+            } else {
+                newResource.setResourceName(newPrefix);
+            }
+            resourceInfos.add(newResource);
+
+            taskParameters.put("resourceList", resourceInfos);
+
+            return JSONUtils.toJsonString(taskParameters);
+        }
+        return taskParameter;
+    }
+
+    private String RemoveResourceFromIdsNew(int idToDelete, String idNews) {
+
+        String[] resourceIds = idNews.split(",");
+        Set<Integer> resourceIdSet = Arrays.stream(resourceIds)
+                .map(Integer::parseInt)
+                .filter(integerId -> !integerId.equals(idToDelete))
+                .collect(Collectors.toSet());
+        return Joiner.on(",").join(resourceIdSet);
     }
 
     /**
@@ -950,43 +1209,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_RENAME
-                : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions =
-                canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID, funcPermissionKey);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
         putMsg(result, Status.SUCCESS);
-        if (checkResourceExists(fullName, type.ordinal())) {
-            logger.warn("Resource with same name exists so can not create again, resourceType:{}, resourceName:{}.",
+        if (checkResourceExists(fullName)) {
+            logger.error("Resource with same name exists so can not create again, resourceType:{}, resourceName:{}.",
                     type, RegexUtils.escapeNRT(fullName));
             putMsg(result, Status.RESOURCE_EXIST);
-        } else {
-            // query tenant
-            Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
-            if (tenant != null) {
-                String tenantCode = tenant.getTenantCode();
-                try {
-                    String filename = storageOperate.getFileName(type, tenantCode, fullName);
-                    if (storageOperate.exists(tenantCode, filename)) {
-                        logger.warn(
-                                "Resource file with same name exists so can not create again, tenantCode:{}, resourceName:{}.",
-                                tenantCode, RegexUtils.escapeNRT(filename));
-                        putMsg(result, Status.RESOURCE_FILE_EXIST, filename);
-                    }
-
-                } catch (Exception e) {
-                    logger.error("Verify resource name failed, resourceName:{}.", RegexUtils.escapeNRT(fullName), e);
-                    putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
-                }
-            } else {
-                logger.error(
-                        "Tenant does not exist or tenant of current login user does not specified, loginUserName:{}.",
-                        loginUser.getUserName());
-                putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            }
         }
 
         return result;
@@ -995,157 +1222,188 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * verify resource by full name or pid and type
      *
-     * @param fullName resource full name
-     * @param id       resource id
+     * @param fileName resource file name
      * @param type     resource type
+     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                      can be different from the login user in the case of logging in as admin users.
      * @return true if the resource full name or pid not exists, otherwise return false
      */
     @Override
-    public Result<Object> queryResource(User loginUser, String fullName, Integer id, ResourceType type) {
+    public Result<Object> queryResourceByFileName(User loginUser, String fileName, ResourceType type,
+                                                  String resTenantCode) {
         Result<Object> result = new Result<>();
-        if (StringUtils.isBlank(fullName) && id == null) {
-            logger.warn("Parameter fullName and id is invalid.");
+        if (StringUtils.isBlank(fileName)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
-        Resource resource;
-        if (StringUtils.isNotBlank(fullName)) {
-            List<Resource> resourceList = resourcesMapper.queryResource(fullName, type.ordinal());
-            if (CollectionUtils.isEmpty(resourceList)) {
-                logger.error("Resources do not exist, fullName:{}.",
-                        RegexUtils.escapeNRT(fullName));
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-            resource = resourceList.get(0);
-        } else {
-            resource = resourcesMapper.selectById(id);
-            if (resource == null) {
-                logger.error("Resource does not exist, resourceId:{}.", id);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-            int pid = resource.getPid();
-            resource = resourcesMapper.selectById(pid);
-            if (resource == null) {
-                logger.error("Resource does not exist, resourceId:{}.", pid);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return result;
         }
-        String funcPermissionKey = type.equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW
-                : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resource.getId()},
-                checkResourceType(type), funcPermissionKey);
-        if (!canOperatorPermissions) {
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+            logger.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
+
+        String defaultPath = storageOperate.getResDir(resTenantCode);
+        if (type.equals(ResourceType.UDF)) {
+            defaultPath = storageOperate.getUdfDir(resTenantCode);
+        }
+
+        StorageEntity file;
+        try {
+            file = storageOperate.getFileStatus(defaultPath + fileName, defaultPath, resTenantCode, type);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " Resource path: {}", defaultPath + fileName, e);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+
         putMsg(result, Status.SUCCESS);
-        result.setData(resource);
+        result.setData(file);
         return result;
     }
 
     /**
      * get resource by id
-     * @param id        resource id
+     * @param fullName resource full name
+     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                      can be different from the login user in the case of logging in as admin users.
      * @return resource
      */
     @Override
-    public Result<Object> queryResourceById(User loginUser, Integer id) {
+    public Result<Object> queryResourceByFullName(User loginUser, String fullName, String resTenantCode,
+                                                  ResourceType type) throws IOException {
         Result<Object> result = new Result<>();
-        Resource resource = resourcesMapper.selectById(id);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", id);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
-        String funcPermissionKey =
-                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW
-                        : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id},
-                checkResourceType(resource.getType()), funcPermissionKey);
-        if (!canOperatorPermissions) {
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+            logger.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
+
+        String defaultPath = storageOperate.getResDir(resTenantCode);
+        if (type.equals(ResourceType.UDF)) {
+            defaultPath = storageOperate.getUdfDir(resTenantCode);
+        }
+
+        StorageEntity file;
+        try {
+            file = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, type);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " Resource path: {}", fullName, e);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
+        }
+
         putMsg(result, Status.SUCCESS);
-        result.setData(resource);
+        result.setData(file);
         return result;
     }
 
     /**
      * view resource file online
      *
-     * @param resourceId  resource id
+     * @param fullName  resource fullName
+     * @param resTenantCode  owner's tenant code of the resource
      * @param skipLineNum skip line number
      * @param limit       limit
      * @return resource content
      */
     @Override
-    public Result<Object> readResource(User loginUser, int resourceId, int skipLineNum, int limit) {
+    public Result<Object> readResource(User loginUser, String fullName, String resTenantCode,
+                                       int skipLineNum, int limit) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-        // get resource by id
-        Resource resource = resourcesMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
-        String funcPermissionKey =
-                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_VIEW
-                        : ApiFuncIdentificationConstant.UDF_FILE_VIEW;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-                checkResourceType(resource.getType()), funcPermissionKey);
-        if (!canOperatorPermissions) {
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+            logger.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
+
         // check preview or not by file suffix
-        String nameSuffix = Files.getFileExtension(resource.getAlias());
+        String nameSuffix = Files.getFileExtension(fullName);
         String resourceViewSuffixes = FileUtils.getResourceViewSuffixes();
         if (StringUtils.isNotEmpty(resourceViewSuffixes)) {
             List<String> strList = Arrays.asList(resourceViewSuffixes.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.warn("Resource suffix does not support view, resourceId:{}, suffix:{}.", resourceId, nameSuffix);
+                logger.error("Resource suffix does not support view,resourceFullName:{}, suffix:{}.", fullName,
+                        nameSuffix);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
         }
 
-        String tenantCode = getTenantCode(resource.getUserId(), result);
-        if (StringUtils.isEmpty(tenantCode)) {
-            logger.error("Tenant of resource user does not specified, resourceUserIde:{}.", resource.getUserId());
-            return result;
-        }
-
-        // source path
-        String resourceFileName = storageOperate.getResourceFileName(tenantCode, resource.getFullName());
-        logger.info("Resource file path is {}.", resourceFileName);
+        List<String> content = new ArrayList<>();
         try {
-            if (storageOperate.exists(tenantCode, resourceFileName)) {
-                List<String> content = storageOperate.vimFile(tenantCode, resourceFileName, skipLineNum, limit);
-
-                logger.info(
-                        "Vim file content in path {} success, tenantCode:{}, fileName:{}, skipLineNum:{}, limit:{}.",
-                        resourceFileName, tenantCode, resourceFileName, skipLineNum, limit);
-                putMsg(result, Status.SUCCESS);
-                Map<String, Object> map = new HashMap<>();
-                map.put(ALIAS, resource.getAlias());
-                map.put(CONTENT, String.join("\n", content));
-                result.setData(map);
+            if (storageOperate.exists(fullName)) {
+                content = storageOperate.vimFile(tenantCode, fullName, skipLineNum, limit);
             } else {
-                logger.error("File does not exist in storage, fileName:{}.", resourceFileName);
-                putMsg(result, Status.RESOURCE_FILE_NOT_EXIST, resourceFileName);
+                logger.error("read file {} not exist in storage", fullName);
+                putMsg(result, Status.RESOURCE_FILE_NOT_EXIST, fullName);
+                return result;
             }
 
         } catch (Exception e) {
-            logger.error("Resource file read error, fileName:{}.", resourceFileName, e);
+            logger.error("Resource {} read failed", fullName, e);
             putMsg(result, Status.HDFS_OPERATION_ERROR);
+            return result;
         }
+
+        putMsg(result, Status.SUCCESS);
+        Map<String, Object> map = new HashMap<>();
+        map.put(ALIAS, fullName);
+        map.put(CONTENT, String.join("\n", content));
+        result.setData(map);
 
         return result;
     }
@@ -1159,34 +1417,45 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param fileSuffix file suffix
      * @param desc       description
      * @param content    content
-     * @param pid        pid
      * @param currentDir current directory
      * @return create result code
      */
     @Override
     @Transactional
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                               String desc, String content, int pid, String currentDir) {
+                                               String desc, String content, String currentDir) {
         Result<Object> result = new Result<>();
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.RESOURCE_FILE_ID,
-                ApiFuncIdentificationConstant.FILE_ONLINE_CREATE);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
 
         result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return result;
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
+            logger.error("current user does not have permission");
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         if (FileUtils.directoryTraversal(fileName)) {
             logger.warn("File name verify failed, fileName:{}.", RegexUtils.escapeNRT(fileName));
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
-            return result;
-        }
-        if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -1203,31 +1472,19 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String name = fileName.trim() + "." + nameSuffix;
-        String fullName = getFullName(currentDir, name);
-        result = verifyResource(loginUser, type, fullName, pid);
+
+        String fullName = "";
+        String userResRootPath = storageOperate.getResDir(tenantCode);
+        if (!currentDir.contains(userResRootPath)) {
+            fullName = userResRootPath + name;
+        } else {
+            fullName = currentDir + name;
+        }
+
+        result = verifyResourceName(fullName, type, loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
-
-        // save data
-        Date now = new Date();
-        Resource resource = new Resource(pid, name, fullName, false, desc, name, loginUser.getId(), type,
-                content.getBytes().length, now, now);
-
-        resourcesMapper.insert(resource);
-        updateParentResourceSize(resource, resource.getSize());
-
-        putMsg(result, Status.SUCCESS);
-        permissionPostHandle(resource.getType(), loginUser, resource.getId());
-        Map<String, Object> resultMap = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-            if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
-                resultMap.put(entry.getKey().toString(), entry.getValue());
-            }
-        }
-        result.setData(resultMap);
-
-        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
         result = uploadContentToStorage(loginUser, fullName, tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1250,9 +1507,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional
     public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc,
                                                               String content) {
-        if (checkResourceExists(fileFullName, ResourceType.FILE.ordinal())) {
+        // TODO: need update to third party service
+        if (checkResourceExists(fileFullName)) {
             Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
-            Result<Object> result = this.updateResourceContent(loginUser, resource.getId(), content);
+            Result<Object> result = this.updateResourceContent(loginUser, fileFullName,
+                    resource.getUserName(), content);
             if (result.getCode() == Status.SUCCESS.getCode()) {
                 resource.setDescription(desc);
                 Map<String, Object> resultMap = new HashMap<>();
@@ -1279,7 +1538,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 }
             }
             return this.onlineCreateResource(
-                    loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content, pid,
+                    loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content,
                     currDirPath.toString());
         }
     }
@@ -1311,7 +1570,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {
         String dirFullName = currentDir + FOLDER_SEPARATOR + dirName;
-        if (checkResourceExists(dirFullName, ResourceType.FILE.ordinal())) {
+        if (checkResourceExists(dirFullName)) {
             List<Resource> resourceList = resourcesMapper.queryResource(dirFullName, ResourceType.FILE.ordinal());
             return resourceList.get(0).getId();
         } else {
@@ -1319,8 +1578,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             Result<Object> createDirResult = this.createDirectory(
                     user, dirName, EMPTY_STRING, ResourceType.FILE, pid, currentDir);
             if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
-                Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
-                return resultMap.get("id") == null ? -1 : (Integer) resultMap.get("id");
+                // Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
+                // return resultMap.get("id") == null ? -1 : (Integer) resultMap.get("id");
+
+                // Since resource is kept in third party services, its id will always be -1.
+                return -1;
+
             } else {
                 String msg = String.format("Create dir error,  dirFullName:%s.", dirFullName);
                 logger.error(msg);
@@ -1379,76 +1642,89 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * updateProcessInstance resource
      *
-     * @param resourceId resource id
+     * @param fullName resource full name
+     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                      can be different from the login user in the case of logging in as admin users.
      * @param content    content
      * @return update result cod
      */
     @Override
     @Transactional
-    public Result<Object> updateResourceContent(User loginUser, int resourceId, String content) {
+    public Result<Object> updateResourceContent(User loginUser, String fullName, String resTenantCode,
+                                                String content) {
         Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        Resource resource = resourcesMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
-        String funcPermissionKey =
-                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_UPDATE
-                        : ApiFuncIdentificationConstant.UDF_UPDATE;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-                checkResourceType(resource.getType()), funcPermissionKey);
-        if (!canOperatorPermissions) {
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+            logger.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
+
+        StorageEntity resource;
+        try {
+            resource = storageOperate.getFileStatus(fullName, "", resTenantCode, ResourceType.FILE);
+        } catch (Exception e) {
+            logger.error("error occurred when fetching resource information ,  resource full name {}", fullName);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+
+        if (resource == null) {
+            logger.error("Resource does not exist, resource full name:{}.", fullName);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+
         // check can edit by file suffix
         String nameSuffix = Files.getFileExtension(resource.getAlias());
         String resourceViewSuffixes = FileUtils.getResourceViewSuffixes();
         if (StringUtils.isNotEmpty(resourceViewSuffixes)) {
             List<String> strList = Arrays.asList(resourceViewSuffixes.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.warn("Resource suffix does not support view, resourceId:{}, suffix:{}.", resourceId, nameSuffix);
+                logger.warn("Resource suffix does not support view, resource full name:{}, suffix:{}.",
+                        fullName, nameSuffix);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
         }
 
-        String tenantCode = getTenantCode(resource.getUserId(), result);
-        if (StringUtils.isEmpty(tenantCode)) {
-            logger.error("Tenant of resource user does not specified, resourceUserIde:{}.", resource.getUserId());
-            return result;
-        }
-        long originFileSize = resource.getSize();
-        resource.setSize(content.getBytes().length);
-        resource.setUpdateTime(new Date());
-        resourcesMapper.updateById(resource);
-
-        result = uploadContentToStorage(loginUser, resource.getFullName(), tenantCode, content);
-        updateParentResourceSize(resource, resource.getSize() - originFileSize);
+        result = uploadContentToStorage(loginUser, resource.getFullName(), resTenantCode, content);
 
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         } else
-            logger.info("Update resource content complete, resourceId:{}.", resourceId);
+            logger.info("Update resource content complete, resource full name:{}.", fullName);
         return result;
     }
 
     /**
-     * @param resourceName resource name
+     * @param fullName resource full name
      * @param tenantCode   tenant code
      * @param content      content
      * @return result
      */
-    private Result<Object> uploadContentToStorage(User loginUser, String resourceName, String tenantCode,
-                                                  String content) {
+    private Result<Object> uploadContentToStorage(User loginUser, String fullName, String tenantCode, String content) {
         Result<Object> result = new Result<>();
         String localFilename = "";
-        String storageFileName = "";
         try {
             localFilename = FileUtils.getUploadFilename(tenantCode, UUID.randomUUID().toString());
 
@@ -1461,42 +1737,40 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             // get resource file path
-            storageFileName = storageOperate.getResourceFileName(tenantCode, resourceName);
             String resourcePath = storageOperate.getResDir(tenantCode);
-            logger.info("Resource file name is {}, resource dir is {}.", storageFileName, resourcePath);
+            logger.info("resource  path is {}, resource dir is {}", fullName, resourcePath);
 
-            if (!storageOperate.exists(tenantCode, resourcePath)) {
+            if (!storageOperate.exists(resourcePath)) {
                 // create if tenant dir not exists
                 storageOperate.createTenantDirIfNotExists(tenantCode);
                 logger.info("Create tenant dir because path {} does not exist, tenantCode:{}.", resourcePath,
                         tenantCode);
             }
-            if (storageOperate.exists(tenantCode, storageFileName)) {
-                storageOperate.delete(tenantCode, storageFileName, false);
+            if (storageOperate.exists(fullName)) {
+                storageOperate.delete(fullName, false);
             }
 
-            storageOperate.upload(tenantCode, localFilename, storageFileName, true, true);
+            storageOperate.upload(tenantCode, localFilename, fullName, true, true);
         } catch (Exception e) {
-            logger.error("Upload content to storage error, tenantCode:{}, destFileName:{}.", tenantCode,
-                    storageFileName, e);
+            logger.error("Upload content to storage error, tenantCode:{}, destFileName:{}.", tenantCode, localFilename,
+                    e);
             result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
-            result.setMsg(String.format("copy %s to hdfs %s fail", localFilename, storageFileName));
+            result.setMsg(String.format("copy %s to hdfs %s fail", localFilename, fullName));
             return result;
         }
-        logger.info("Upload content to storage complete, tenantCode:{}, destFileName:{}.", tenantCode, storageFileName);
+        logger.info("Upload content to storage complete, tenantCode:{}, destFileName:{}.", tenantCode, localFilename);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
     /**
      * download file
-     *
-     * @param resourceId resource id
      * @return resource content
      * @throws IOException exception
      */
     @Override
-    public org.springframework.core.io.Resource downloadResource(User loginUser, int resourceId) throws IOException {
+    public org.springframework.core.io.Resource downloadResource(User loginUser,
+                                                                 String fullName) throws IOException {
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
             logger.warn("Storage does not start up, resource upload startup state: {}.",
@@ -1504,59 +1778,42 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException("hdfs not startup");
         }
 
-        Resource resource = resourcesMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("Resource does not exist, resourceId:{}.", resourceId);
-            return null;
-        }
-
-        String funcPermissionKey =
-                resource.getType().equals(ResourceType.FILE) ? ApiFuncIdentificationConstant.FILE_DOWNLOAD
-                        : ApiFuncIdentificationConstant.UDF_DOWNLOAD;
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{resourceId},
-                checkResourceType(resource.getType()), funcPermissionKey);
-        if (!canOperatorPermissions) {
-            logger.error("{}: {}", Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(),
-                    PropertyUtils.getResUploadStartupState());
-            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg());
-        }
-        if (resource.isDirectory()) {
-            logger.warn("Resource is a directory so can not download it, resourceId:{}.", resourceId);
+        if (fullName.endsWith("/")) {
+            logger.error("resource id {} is directory,can't download it", fullName);
             throw new ServiceException("can't download directory");
         }
 
-        int userId = resource.getUserId();
+        int userId = loginUser.getId();
         User user = userMapper.selectById(userId);
         if (user == null) {
             logger.error("User does not exits, userId:{}.", userId);
-            throw new ServiceException(String.format("resource owner id %d does not exist", userId));
+            throw new ServiceException(String.format("Resource owner id %d does not exist", userId));
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            logger.error("Tenant does not exists, tenantId:{}.", user.getTenantId());
-            throw new ServiceException(
-                    String.format("The tenant id %d of resource owner does not exist", user.getTenantId()));
+        String tenantCode = "";
+
+        if (user.getTenantId() != 0) {
+            Tenant tenant = tenantMapper.queryById(user.getTenantId());
+            if (tenant == null) {
+                logger.error("Tenant id {} not exists", user.getTenantId());
+                throw new ServiceException(
+                        String.format("The tenant id %d of resource owner not exist", user.getTenantId()));
+            }
+            tenantCode = tenant.getTenantCode();
         }
 
-        String tenantCode = tenant.getTenantCode();
-
-        String fileName = storageOperate.getFileName(resource.getType(), tenantCode, resource.getFullName());
-
-        String localFileName = FileUtils.getDownloadFilename(resource.getAlias());
-        logger.info("Resource path is {}, download local filename is {}.", fileName, localFileName);
+        String[] aliasArr = fullName.split("/");
+        String alias = aliasArr[aliasArr.length - 1];
+        String localFileName = FileUtils.getDownloadFilename(alias);
+        logger.info("Resource path is {}, download local filename is {}", alias, localFileName);
 
         try {
-            storageOperate.download(tenantCode, fileName, localFileName, false, true);
-            org.springframework.core.io.Resource file2Resource =
-                    org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
-            if (file2Resource != null) {
-                logger.info("Download resource complete, path:{}, localFileName:{}.", fileName, localFileName);
-            }
-            return file2Resource;
+            storageOperate.download(tenantCode, fullName, localFileName, false, true);
+            return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
         } catch (IOException e) {
-            logger.error("Download resource error, path:{}, localFileName:{}.", fileName, localFileName, e);
-            throw new ServerException("download the resource file failed ,it may be related to your storage");
+            logger.error("Download resource error, the path is {}, and local filename is {}, the error message is {}",
+                    fullName, localFileName, e.getMessage());
+            throw new ServerException("Download the resource file failed ,it may be related to your storage");
         }
     }
 
@@ -1585,8 +1842,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         List<ResourceComponent> list;
         if (CollectionUtils.isNotEmpty(resourceList)) {
-            Visitor visitor = new ResourceTreeVisitor(resourceList);
-            list = visitor.visit().getChildren();
+            // Transform into StorageEntity for compatibility
+            List<StorageEntity> transformedResourceList = resourceList.stream()
+                    .map(this::createStorageEntityBasedOnResource)
+                    .collect(Collectors.toList());
+            Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+            list = visitor.visit("").getChildren();
         } else {
             list = new ArrayList<>(0);
         }
@@ -1597,12 +1858,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     @Override
-    public Resource queryResourcesFileInfo(String userName, String fullName) {
+    public Resource queryResourcesFileInfo(String userName, String fileName) {
+        // TODO: It is used in PythonGateway, should be revised
         User user = userMapper.queryByUserNameAccurately(userName);
-        Result<Object> resourceResponse = this.queryResource(user, fullName, null, ResourceType.FILE);
+        Result<Object> resourceResponse = this.queryResourceByFileName(user, fileName, ResourceType.FILE, "");
         if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
             String msg =
-                    String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fullName);
+                    String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fileName);
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
@@ -1637,8 +1899,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } else {
             list = new ArrayList<>(0);
         }
-        Visitor visitor = new ResourceTreeVisitor(list);
-        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
+        // Transform into StorageEntity for compatibility
+        List<StorageEntity> transformedResourceList = list.stream()
+                .map(this::createStorageEntityBasedOnResource)
+                .collect(Collectors.toList());
+        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -1717,13 +1983,17 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
-        Visitor visitor = new ResourceTreeVisitor(authedResources);
-        String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        // Transform into StorageEntity for compatibility
+        List<StorageEntity> transformedResourceList = authedResources.stream()
+                .map(this::createStorageEntityBasedOnResource)
+                .collect(Collectors.toList());
+        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
         String jsonTreeStr =
-                JSONUtils.toJsonString(visitor.visit().getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+                JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(jsonTreeStr);
-        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
+        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -1740,30 +2010,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             authedResourceSet = new HashSet<>(authedResourceList);
             resourceSet.removeAll(authedResourceSet);
         }
-    }
-
-    /**
-     * get tenantCode by UserId
-     *
-     * @param userId user id
-     * @param result return result
-     * @return tenant code
-     */
-    private String getTenantCode(int userId, Result<Object> result) {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            logger.error("user {} not exists", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return null;
-        }
-
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            logger.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return null;
-        }
-        return tenant.getTenantCode();
     }
 
     /**
@@ -1831,5 +2077,28 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private AuthorizationType checkResourceType(ResourceType type) {
         return type.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID : AuthorizationType.UDF_FILE;
+    }
+
+    /**
+     * check permission by comparing login user's tenantCode with tenantCode in the request
+     *
+     * @param isAdmin is the login user admin
+     * @param userTenantCode loginUser's tenantCode
+     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                      can be different from the login user in the case of logging in as admin users.
+     * @return isValid
+     */
+    private boolean isUserTenantValid(boolean isAdmin, String userTenantCode,
+                                      String resTenantCode) throws ServiceException {
+        if (!isAdmin) {
+            resTenantCode = resTenantCode == null ? "" : resTenantCode;
+            if (!StringUtils.isBlank(resTenantCode) && !resTenantCode.equals(userTenantCode)) {
+                // if an ordinary user directly send a query API with a different tenantCode and fullName "",
+                // still he/she does not have read permission.
+                return false;
+            }
+        }
+
+        return true;
     }
 }

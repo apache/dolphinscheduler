@@ -22,12 +22,12 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR;
-import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
-import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
-import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.common.Constants.PROCESS_INSTANCE_STATE;
-import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
+import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_SPLIT;
+import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.Constants.PROCESS_INSTANCE_STATE;
+import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
@@ -43,7 +43,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -71,6 +71,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -128,6 +129,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     ProcessService processService;
+
+    @Autowired
+    TaskInstanceDao taskInstanceDao;
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
@@ -246,6 +250,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             logger.error("Process definition does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
+            Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
+            if (tenant != null) {
+                processDefinition.setTenantCode(tenant.getTenantCode());
+            }
             processInstance.setLocations(processDefinition.getLocations());
             processInstance.setDagData(processService.genDagData(processDefinition));
             result.put(DATA_LIST, processInstance);
@@ -366,7 +374,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         List<TaskInstance> taskInstanceList =
-                processService.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
+                taskInstanceDao.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
         addDependResultForTaskList(taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
@@ -444,7 +452,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskId);
         if (taskInstance == null) {
             logger.error("Task instance does not exist, projectCode:{}, taskInstanceId{}.", projectCode, taskId);
             putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
@@ -889,7 +897,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ganttDto.setTaskNames(nodeList);
 
         List<Task> taskList = new ArrayList<>();
-        if (!nodeList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(nodeList)) {
             List<Long> taskCodes = nodeList.stream().map(Long::parseLong).collect(Collectors.toList());
             List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
                     Collections.singletonList(processInstanceId), taskCodes);

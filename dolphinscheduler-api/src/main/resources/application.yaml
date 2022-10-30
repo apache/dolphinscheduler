@@ -80,12 +80,16 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  packages-to-scan: org.apache.dolphinscheduler.api
 
 management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,metrics,prometheus
   endpoint:
     health:
       enabled: true

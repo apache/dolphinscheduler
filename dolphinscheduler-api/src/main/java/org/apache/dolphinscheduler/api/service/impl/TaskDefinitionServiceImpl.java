@@ -39,7 +39,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -66,6 +66,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -142,15 +143,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                     long projectCode,
                                                     String taskDefinitionJson) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+        // check if user have write perm for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
-        if (taskDefinitionLogs.isEmpty()) {
+        if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
             logger.warn("Parameter taskDefinitionJson is invalid.");
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             return result;
@@ -284,10 +286,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                        String taskDefinitionJsonObj,
                                                        String upstreamCodes) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+        // check if user have write perm for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_CREATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
@@ -336,7 +339,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             // upstreamTaskCodes - queryUpStreamTaskCodes
             Set<Long> diffCode = upstreamTaskCodes.stream().filter(code -> !queryUpStreamTaskCodes.contains(code))
                     .collect(Collectors.toSet());
-            if (!diffCode.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(diffCode)) {
                 String taskCodes = StringUtils.join(diffCode, Constants.COMMA);
                 logger.error("Some task definitions with parameter upstreamCodes do not exist, taskDefinitionCodes:{}.",
                         taskCodes);
@@ -425,10 +428,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * Whether task definition can be deleted or not
      */
-    private void taskCanDeleteValid(User user, TaskDefinition taskDefinition) {
+    private void taskCanDeleteValid(User user, TaskDefinition taskDefinition, User loginUser) {
         // check user access for project
         Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(user, project, TASK_DEFINITION_DELETE);
+        // check if user have write perm for project
+        Map<String, Object> result = new HashMap<>();
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
+            throw new ServiceException(Status.TASK_DEFINE_STATE_ONLINE, taskDefinition.getCode());
+        }
 
         // Whether task relation workflow is online
         if (processService.isTaskOnline(taskDefinition.getCode()) && taskDefinition.getFlag() == Flag.YES) {
@@ -438,7 +447,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // Whether task have downstream tasks
         List<ProcessTaskRelation> processTaskRelationList =
                 processTaskRelationMapper.queryDownstreamByTaskCode(taskDefinition.getCode());
-        if (!processTaskRelationList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
             Set<Long> postTaskCodes = processTaskRelationList
                     .stream()
                     .map(ProcessTaskRelation::getPostTaskCode)
@@ -465,7 +474,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
         }
 
-        this.taskCanDeleteValid(loginUser, taskDefinition);
+        this.taskCanDeleteValid(loginUser, taskDefinition, loginUser);
         int delete = taskDefinitionMapper.deleteByCode(taskCode);
         if (delete <= 0) {
             throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_MSG_ERROR, taskDefinition.getCode());
@@ -474,7 +483,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // Delete task upstream tasks if exists
         List<ProcessTaskRelation> taskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(taskDefinition.getProjectCode(), taskCode);
-        if (!taskRelationList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(taskRelationList)) {
             logger.debug(
                     "Task definition has upstream tasks, start handle them after delete task, taskDefinitionCode:{}.",
                     taskCode);
@@ -540,7 +549,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         List<ProcessTaskRelation> taskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
-        if (!taskRelationList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(taskRelationList)) {
             logger.info(
                     "Task definition has upstream tasks, start handle them after update task, taskDefinitionCode:{}.",
                     taskCode);
@@ -614,7 +623,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         List<ProcessTaskRelation> taskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(taskDefinitionUpdate.getProjectCode(), taskCode);
-        if (!taskRelationList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(taskRelationList)) {
             logger.info(
                     "Task definition has upstream tasks, start handle them after update task, taskDefinitionCode:{}.",
                     taskCode);
@@ -682,11 +691,13 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode, String taskDefinitionJsonObj,
                                          Map<String, Object> result) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_UPDATE));
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+
+        // check if user have write perm for project
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return null;
         }
+
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null) {
             logger.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
@@ -794,13 +805,13 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             }
         }
         Map<Long, TaskDefinition> queryUpStreamTaskCodeMap;
-        if (!upstreamTaskCodes.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
             List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionMapper.queryByCodeList(upstreamTaskCodes);
             queryUpStreamTaskCodeMap = upstreamTaskDefinitionList.stream()
                     .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinition -> taskDefinition));
             // upstreamTaskCodes - queryUpStreamTaskCodeMap.keySet
             upstreamTaskCodes.removeAll(queryUpStreamTaskCodeMap.keySet());
-            if (!upstreamTaskCodes.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
                 String notExistTaskCodes = StringUtils.join(upstreamTaskCodes, Constants.COMMA);
                 logger.error("Some task definitions in parameter upstreamTaskCodes do not exist, notExistTaskCodes:{}.",
                         notExistTaskCodes);
@@ -810,7 +821,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         } else {
             queryUpStreamTaskCodeMap = new HashMap<>();
         }
-        if (!upstreamTaskRelations.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
             ProcessTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<ProcessTaskRelation> processTaskRelations =
                     processTaskRelationMapper.queryByProcessCode(projectCode, taskRelation.getProcessDefinitionCode());
@@ -834,7 +845,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskRelation.setPreTaskVersion(queryUpStreamTask.getValue().getVersion());
                 processTaskRelationList.add(taskRelation);
             }
-            if (queryUpStreamTaskCodeMap.isEmpty() && !processTaskRelationList.isEmpty()) {
+            if (MapUtils.isEmpty(queryUpStreamTaskCodeMap) && CollectionUtils.isNotEmpty(processTaskRelationList)) {
                 processTaskRelationList.add(processTaskRelationList.get(0));
             }
             updateDag(loginUser, taskRelation.getProcessDefinitionCode(), processTaskRelations,
@@ -888,7 +899,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (switchVersion > 0) {
             List<ProcessTaskRelation> taskRelationList =
                     processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
-            if (!taskRelationList.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(taskRelationList)) {
                 logger.info(
                         "Task definition has upstream tasks, start handle them after switch task, taskDefinitionCode:{}.",
                         taskCode);
@@ -942,10 +953,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
+        // check if user have write perm for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION_DELETE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
@@ -1022,7 +1034,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
                         searchTaskName, taskType, taskExecuteType);
         List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
-        if (!records.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(records)) {
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
             for (TaskMainInfo info : records) {
                 taskMainInfoMap.compute(info.getTaskCode(), (k, v) -> {
