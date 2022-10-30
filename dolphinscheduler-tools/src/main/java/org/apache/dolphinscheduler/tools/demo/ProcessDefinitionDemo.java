@@ -101,7 +101,12 @@ public class ProcessDefinitionDemo {
         } else {
             throw new Exception("create project error");
         }
-        Long projectCode = project.getCode();
+        Long projectCode = null;
+        try {
+            projectCode = project.getCode();
+        } catch (NullPointerException e) {
+            logger.error("project code is null", e);
+        }
 
         // generate access token
         String expireTime = "2050-09-30 15:59:23";
