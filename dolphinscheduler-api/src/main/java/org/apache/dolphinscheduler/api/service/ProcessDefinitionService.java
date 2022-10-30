@@ -522,4 +522,13 @@ public interface ProcessDefinitionService {
      * @return Json String
      */
     String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition);
+
+    /**
+     * view process variables
+     * @param loginUser    login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @return variables data
+     */
+    Map<String, Object> viewVariables(User loginUser, long projectCode, long code);
 }

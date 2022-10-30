@@ -431,4 +431,18 @@ public class ProcessDefinitionControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
 
+    @Test
+    public void testViewVariables() {
+        long projectCode = 1L;
+        Map<String, Object> resultMap = new HashMap<>();
+        putMsg(resultMap, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.viewVariables(user, projectCode, 1))
+                .thenReturn(resultMap);
+
+        Result result = processDefinitionController.viewVariables(user, projectCode, 1L);
+
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
 }
