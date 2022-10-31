@@ -110,6 +110,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     @Autowired
     private WorkflowEventLooper workflowEventLooper;
 
+    @Autowired
+    private ServerNodeManager serverNodeManager;
+
     private String masterAddress;
 
     protected MasterSchedulerBootstrap() {
@@ -260,8 +263,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private List<Command> findCommands() throws MasterException {
         try {
             long scheduleStartTime = System.currentTimeMillis();
-            int thisMasterSlot = ServerNodeManager.getSlot();
-            int masterCount = ServerNodeManager.getMasterSize();
+            int thisMasterSlot = serverNodeManager.getSlot();
+            int masterCount = serverNodeManager.getMasterSize();
             if (masterCount <= 0) {
                 logger.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
                 return Collections.emptyList();
@@ -283,8 +286,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     }
 
     private SlotCheckState slotCheck(Command command) {
-        int slot = ServerNodeManager.getSlot();
-        int masterSize = ServerNodeManager.getMasterSize();
+        int slot = serverNodeManager.getSlot();
+        int masterSize = serverNodeManager.getMasterSize();
         SlotCheckState state;
         if (masterSize <= 0) {
             state = SlotCheckState.CHANGE;
