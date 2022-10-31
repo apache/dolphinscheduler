@@ -367,6 +367,8 @@ export default {
     mb: 'MB',
     image: '镜像',
     image_tips: '请输入镜像',
+    command: '容器执行命令',
+    command_tips: '请输入容器执行命令，例如：/bin/echo hello world',
     min_memory_tips: '请输入最小内存',
     state: '状态',
     branch_flow: '分支流转',

@@ -30,6 +30,7 @@ public class K8sParametersTest {
     private final String namespace = "{\"name\":\"default\",\"cluster\":\"lab\"}";
     private final double minCpuCores = 2;
     private final double minMemorySpace = 10;
+    private final String command = "echo 'hello world'";
 
     @BeforeEach
     public void before() {
@@ -38,6 +39,7 @@ public class K8sParametersTest {
         k8sTaskParameters.setNamespace(namespace);
         k8sTaskParameters.setMinCpuCores(minCpuCores);
         k8sTaskParameters.setMinMemorySpace(minMemorySpace);
+        k8sTaskParameters.setCommand(command);
     }
 
     @Test
@@ -57,6 +59,7 @@ public class K8sParametersTest {
         Assertions.assertEquals(namespace, k8sTaskParameters.getNamespace());
         Assertions.assertEquals(0, Double.compare(minCpuCores, k8sTaskParameters.getMinCpuCores()));
         Assertions.assertEquals(0, Double.compare(minMemorySpace, k8sTaskParameters.getMinMemorySpace()));
+        Assertions.assertEquals(command, k8sTaskParameters.getCommand());
     }
 
 }

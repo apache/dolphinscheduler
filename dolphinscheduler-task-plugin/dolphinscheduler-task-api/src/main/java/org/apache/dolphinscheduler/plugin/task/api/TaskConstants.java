@@ -468,6 +468,7 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
+    public static final String COMMAND_SPLIT_REGEX = "[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`";
 
     /**
      * conda config used by jupyter task plugin
