@@ -28,4 +28,5 @@ public class DemoContants {
     public static final String SWITCH_GLOBAL_PARAMS =
             "[{\"prop\":\"switchValue\",\"value\":\"A\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
 
+    public static final String Expire_Time = "2050-09-30 15:59:23";
 }

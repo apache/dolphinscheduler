@@ -25,13 +25,15 @@
 
 #### 修改 `dolphinscheduler-tools/resources/application.yaml` 配置内容
 
-        ```
-        demo:
-          tenant-code: default
-          api-server-port: 5173
-        ```
+```
+demo:
+tenant-code: default
+api-server-port: 5173
+```
 
 其中 tenant-code 是默认租户 default ，用户可以根据自己操作系统用户名修改，从而代替手动创建租户操作。api-server-port 是 dolphinscheduler 服务的端口号
 
 然后执行初始化工作流 demo 服务的启动脚本：`sh ./tools/bin/demo-start.sh` 来启动服务。
+
+创建 demo 可以参考[快速上手](start/quick-start.md)
 

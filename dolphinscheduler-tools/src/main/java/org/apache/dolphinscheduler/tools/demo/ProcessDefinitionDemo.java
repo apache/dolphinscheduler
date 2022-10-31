@@ -109,7 +109,7 @@ public class ProcessDefinitionDemo {
         }
 
         // generate access token
-        String expireTime = "2050-09-30 15:59:23";
+        String expireTime = DemoContants.Expire_Time;
         String token = EncryptionUtils.getMd5(1 + expireTime + System.currentTimeMillis());
         AccessToken accessToken = new AccessToken();
         accessToken.setUserId(1);
