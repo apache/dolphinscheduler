@@ -17,6 +17,15 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class ProxyResult<T> {
 
     private Integer code;
@@ -24,20 +33,6 @@ public class ProxyResult<T> {
     private String msg;
 
     private T data;
-
-    public ProxyResult() {
-    }
-
-    public ProxyResult(Integer code, String msg) {
-        this.code = code;
-        this.msg = msg;
-    }
-
-    public ProxyResult(Integer code, String msg, T data) {
-        this.code = code;
-        this.msg = msg;
-        this.data = data;
-    }
 
     public static <T> ProxyResult<T> success(T data) {
         return new ProxyResult<>(0, "success", data);
@@ -56,40 +51,6 @@ public class ProxyResult<T> {
 
     public boolean isFailed() {
         return !this.isSuccess();
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    @Override
-    public String toString() {
-        return "Status{"
-                + "code='" + code
-                + '\'' + ", msg='"
-                + msg + '\''
-                + ", data=" + data
-                + '}';
     }
 
 }
