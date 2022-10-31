@@ -22,6 +22,7 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 | Min CPU          | Minimum CPU requirement for running k8s task.                                                                    |
 | Min Memory       | Minimum memory requirement for running k8s task.                                                                 |
 | Image            | The registry url for image.                                                                                      |
+| Command          | The container execution command, for example: /bin/echo hello world                                              |
 | Custom parameter | It is a local user-defined parameter for K8S task, these params will pass to container as environment variables. |
 
 ## Task Example

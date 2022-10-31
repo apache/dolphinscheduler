@@ -22,6 +22,7 @@ kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的
 | 最小CPU    | 任务在kubernetes上运行所需的最小CPU                                        |
 | 最小内存     | 任务在kubernetes上运行所需的最小内存                                         |
 | 镜像       | 镜像地址                                                            |
+| 容器执行命令   | 容器执行命令，例如：/bin/echo hello world                                 |
 | 自定义参数    | kubernetes任务局部的用户自定义参数，自定义参数最终会通过环境变量形式存在于容器中，提供给kubernetes任务使用 |
 
 ## 任务样例
