@@ -25,7 +25,6 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class ProxyResult<T> {
 
     private Integer code;
