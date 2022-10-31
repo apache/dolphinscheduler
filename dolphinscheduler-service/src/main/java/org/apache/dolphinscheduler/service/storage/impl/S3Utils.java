@@ -92,6 +92,8 @@ public class S3Utils implements Closeable, StorageOperate {
     public static final String REGION = PropertyUtils.getString(TaskConstants.AWS_REGION);
 
     public static final String BUCKET_NAME = PropertyUtils.getString(Constants.AWS_S3_BUCKET_NAME);
+    
+    public static final String UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH);
 
     private AmazonS3 s3Client = null;
 
@@ -115,7 +117,7 @@ public class S3Utils implements Closeable, StorageOperate {
                         .withRegion(Regions.fromName(REGION))
                         .build();
             }
-            checkBucketNameExists(BUCKET_NAME);
+            checkBucketWithPrefixExists(BUCKET_NAME, UPLOAD_PATH);
         }
     }
 
@@ -400,24 +402,19 @@ public class S3Utils implements Closeable, StorageOperate {
             tm.shutdownNow();
         }
     }
-
-    public void checkBucketNameExists(String bucketName) {
-        if (StringUtils.isBlank(bucketName)) {
-            throw new IllegalArgumentException("resource.aws.s3.bucket.name is blank");
+    
+    public void checkBucketWithPrefixExists(String bucketName, String prefix) {
+        try {
+            s3Client.listObjects(bucketName, prefix);
+        } catch (AmazonS3Exception e) {
+            if (e.getStatusCode() == 404) {
+                logger.info("get status 404, maybe not exists, ignore it");
+            } else {
+                logger.error(
+                        "list bucket: " + bucketName + " failed, please create them by yourself or check permissions.");
+                throw e;
+            }
         }
-
-        Bucket existsBucket = s3Client.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
-                });
-
-        logger.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(),
-                s3Client.getRegionName());
     }
 
     /**
