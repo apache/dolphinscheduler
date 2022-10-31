@@ -148,6 +148,12 @@ public final class Constants {
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
 
     /**
+     * fetch applicationId way
+     */
+    public static final String APPID_COLLECT = "appId.collect";
+    public static final String DEFAULT_COLLECT_WAY = "log";
+
+    /**
      * comma ,
      */
     public static final String COMMA = ",";

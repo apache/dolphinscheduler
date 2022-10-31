@@ -162,6 +162,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         // find log and kill yarn job
         Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
                 taskExecutionContext.getLogPath(),
+                taskExecutionContext.getAppInfoPath(),
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTenantCode());
         return Pair.of(processFlag && yarnResult.getLeft(), yarnResult.getRight());
@@ -226,17 +227,18 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      */
     private Pair<Boolean, List<String>> killYarnJob(@NonNull Host host,
                                                     String logPath,
+                                                    String appInfoPath,
                                                     String executePath,
                                                     String tenantCode) {
-        if (logPath == null || executePath == null || tenantCode == null) {
+        if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {
             logger.error(
-                    "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, executePath: {}, tenantCode: {}",
-                    host, logPath, executePath, tenantCode);
+                    "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
+                    host, logPath, appInfoPath, executePath, tenantCode);
             return Pair.of(false, Collections.emptyList());
         }
         try {
             logger.info("Get appIds from worker {}:{} taskLogPath: {}", host.getIp(), host.getPort(), logPath);
-            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), logPath);
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), logPath, appInfoPath);
             if (CollectionUtils.isEmpty(appIds)) {
                 logger.info("The appId is empty");
                 return Pair.of(true, Collections.emptyList());
