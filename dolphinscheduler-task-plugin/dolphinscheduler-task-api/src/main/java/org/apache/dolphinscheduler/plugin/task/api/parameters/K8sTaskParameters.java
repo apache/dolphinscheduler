@@ -24,47 +24,19 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * k8s task parameters
  */
+@Data
 public class K8sTaskParameters extends AbstractParameters {
 
     private String image;
     private String namespace;
+    private String command;
     private double minCpuCores;
     private double minMemorySpace;
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public double getMinCpuCores() {
-        return minCpuCores;
-    }
-
-    public void setMinCpuCores(double minCpuCores) {
-        this.minCpuCores = minCpuCores;
-    }
-
-    public double getMinMemorySpace() {
-        return minMemorySpace;
-    }
-
-    public void setMinMemorySpace(double minMemorySpace) {
-        this.minMemorySpace = minMemorySpace;
-    }
 
     @Override
     public boolean checkParameters() {
@@ -74,15 +46,5 @@ public class K8sTaskParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public String toString() {
-        return "K8sTaskParameters{"
-                + "image='" + image + '\''
-                + ", namespace='" + namespace + '\''
-                + ", minCpuCores=" + minCpuCores
-                + ", minMemorySpace=" + minMemorySpace
-                + '}';
     }
 }
