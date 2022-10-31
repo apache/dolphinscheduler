@@ -27,8 +27,9 @@
 
 ```
 demo:
-tenant-code: default
-api-server-port: 5173
+  tenant-code: default
+  domain-name: localhost
+  api-server-port: 5173
 ```
 
 其中 tenant-code 是默认租户 default ，用户可以根据自己操作系统用户名修改，从而代替手动创建租户操作。api-server-port 是 dolphinscheduler 服务的端口号

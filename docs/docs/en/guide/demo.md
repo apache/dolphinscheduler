@@ -27,8 +27,9 @@ Initializing the workflow demo needs to store metabase in other database like My
 
 ```
 demo:
-tenant-code: default
-api-server-port: 5173
+  tenant-code: default
+  domain-name: localhost
+  api-server-port: 5173
 ```
 
 Mentioned above, tenant-code is the default tenant, users can modify the user name according to their operating system, this replaces the manual tenant creation action, api-server-port is the port number of the service.

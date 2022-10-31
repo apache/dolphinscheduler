@@ -34,6 +34,9 @@ public class ProxyProcessDefinitionController {
     @Value("${demo.api-server-port}")
     private String ServerPort;
 
+    @Value("${demo.domain-name}")
+    private String DomainName;
+
     public ProxyResult createProcessDefinition(String token,
                                                long projectCode,
                                                String name,
@@ -47,7 +50,8 @@ public class ProxyProcessDefinitionController {
                                                ProcessExecutionTypeEnum executionType) {
         ProxyResult proxyResult = new ProxyResult();
         String url =
-                "http://localhost:" + ServerPort + "/dolphinscheduler/projects/" + projectCode + "/process-definition";
+                "http://" + DomainName + ":" + ServerPort + "/dolphinscheduler/projects/" + projectCode
+                        + "/process-definition";
         String responseBody;
         Map<String, Object> requestBodyMap = new HashMap<>();
 
