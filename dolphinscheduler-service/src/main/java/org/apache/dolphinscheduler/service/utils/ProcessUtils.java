@@ -200,7 +200,8 @@ public class ProcessUtils {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             Host host = Host.of(taskExecutionContext.getHost());
-            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
+                    taskExecutionContext.getAppInfoPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
