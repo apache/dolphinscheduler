@@ -34,7 +34,7 @@ demo:
 
 其中 tenant-code 是默认租户 default ，用户可以根据自己操作系统用户名修改，从而代替手动创建租户操作。api-server-port 是 dolphinscheduler 服务的端口号
 
-然后执行初始化工作流 demo 服务的启动脚本：`sh ./tools/bin/demo-start.sh` 来启动服务。
+然后执行初始化工作流 demo 服务的启动脚本：`sh ./tools/bin/create-demo-processes.sh` 来启动服务。
 
 创建 demo 可以参考[快速上手](start/quick-start.md)
 

@@ -34,6 +34,6 @@ demo:
 
 Mentioned above, tenant-code is the default tenant, users can modify the user name according to their operating system, this replaces the manual tenant creation action, api-server-port is the port number of the service.
 
-Then execute the startup script that initializes the workflow demo service: `sh ./tools/bin/demo-start.sh` to start the service.
+Then execute the startup script that initializes the workflow demo service: `sh ./tools/bin/create-demo-processes.sh` to start the service.
 
 To create a demo, you can refer to [Quick Start](start/quick-start.md)
