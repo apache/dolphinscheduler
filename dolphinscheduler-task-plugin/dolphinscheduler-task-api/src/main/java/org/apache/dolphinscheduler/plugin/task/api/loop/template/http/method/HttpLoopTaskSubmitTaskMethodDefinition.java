@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.method;
 
+import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskSubmitTaskMethodDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskInstanceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskMethodDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JsonPathUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OkHttpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
