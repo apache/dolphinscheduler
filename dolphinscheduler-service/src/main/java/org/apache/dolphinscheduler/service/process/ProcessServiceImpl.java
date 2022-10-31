@@ -2488,8 +2488,8 @@ public class ProcessServiceImpl implements ProcessService {
             this.taskGroupQueueMapper.updateById(taskGroupQueue);
             this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
             return true;
-        }else if (taskGroupQueueMapper.selectCountByTaskIdAndStatus(taskGroupQueue.getId(),
-                TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) == 1) {
+        } else if (taskGroupQueueMapper.selectCountByIdAndStatus(taskGroupQueue.getId(),
+                TaskGroupQueueStatus.WAIT_QUEUE.getCode(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode()) == 1) {
             logger.info("This is a duplicate message,will not rob taskGroup, taskInstanceId: {}, taskGroupId: {}",
                     taskGroupQueue.getTaskId(), taskGroupQueue.getId());
             return true;

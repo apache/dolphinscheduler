@@ -54,7 +54,7 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
      * @param queueStatus queue status
      * @return count(1) for the result
      */
-    int selectCountByTaskIdAndStatus(@Param("queueId") int queueId,@Param("queueStatus") int queueStatus);
+    int selectCountByIdAndStatus(@Param("queueId") int queueId, @Param("queueStatus") int... queueStatus);
 
     /**
      * query by status

@@ -99,4 +99,29 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
         int i = taskGroupQueueMapper.deleteByTaskId(taskGroupQueue.getTaskId());
         Assertions.assertEquals(i, 1);
     }
+
+    @Test
+    public void selectCountByTaskIdAndStatus() {
+        TaskGroupQueue taskGroupQueue = insertOne();
+        int i =
+                taskGroupQueueMapper.selectCountByIdAndStatus(
+                        taskGroupQueue.getId(),
+                        TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode(),
+                        TaskGroupQueueStatus.WAIT_QUEUE.getCode());
+        Assertions.assertEquals(i, 1);
+        int j =
+                taskGroupQueueMapper.selectCountByIdAndStatus(
+                        taskGroupQueue.getId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+        Assertions.assertEquals(j, 1);
+        int k =
+                taskGroupQueueMapper.selectCountByIdAndStatus(
+                        taskGroupQueue.getId(),
+                        TaskGroupQueueStatus.WAIT_QUEUE.getCode());
+        Assertions.assertEquals(k, 0);
+        // no status means "select count by id "
+        int l =
+                taskGroupQueueMapper.selectCountByIdAndStatus(
+                        taskGroupQueue.getId());
+        Assertions.assertEquals(l, 1);
+    }
 }

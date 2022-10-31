@@ -124,11 +124,14 @@
         where task_id = #{taskId}
     </select>
 
-    <select id="selectCountByTaskIdAndStatus" resultType="java.lang.Integer">
+    <select id="selectCountByIdAndStatus" resultType="java.lang.Integer">
         select
         count(1)
         FROM t_ds_task_group_queue
-        where id = #{queueId} and status = #{queueStatus}
+        where id = #{queueId}
+        <foreach collection="queueStatus" open=" and status in(" close=")" item="queueStatus" separator=",">
+            #{queueStatus}
+        </foreach>
     </select>
 
     <select id="queryTaskGroupQueueByTaskGroupIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
