@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.utils;
-
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +35,11 @@ import okhttp3.Response;
 
 public class OkHttpUtils {
 
-    private static final OkHttpClient CLIENT = new OkHttpClient();
+    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.MINUTES) // connect timeout
+            .writeTimeout(5, TimeUnit.MINUTES) // write timeout
+            .readTimeout(5, TimeUnit.MINUTES) // read timeout
+            .build();
 
     public static @NonNull String get(@NonNull String url,
                                       @Nullable Map<String, String> httpHeaders,
@@ -65,6 +68,32 @@ public class OkHttpUtils {
         }
     }
 
+    public static @NonNull String demoPost(@NonNull String url,
+                                           @Nullable String token,
+                                           @Nullable Map<String, Object> requestBodyMap) throws IOException {
+
+        StringBuffer stringBuffer = new StringBuffer();
+        if (requestBodyMap != null) {
+            for (String key : requestBodyMap.keySet()) {
+                stringBuffer.append(key + "=" + requestBodyMap.get(key) + "&");
+            }
+        }
+
+        RequestBody body =
+                RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), stringBuffer.toString());
+
+        Request request = new Request.Builder()
+                .url(url)
+                .header("token", token)
+                .addHeader("accpect", "application/json")
+                .post(body)
+                .build();
+
+        try (Response response = CLIENT.newCall(request).execute()) {
+            return response.body().string();
+        }
+
+    }
     private static String addUrlParams(@Nullable Map<String, Object> requestParams, @NonNull String url) {
         if (requestParams == null) {
             return url;
