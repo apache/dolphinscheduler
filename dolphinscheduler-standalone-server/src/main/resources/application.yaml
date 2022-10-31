@@ -149,6 +149,7 @@ master:
   failover-interval: 10m
   # kill yarn jon when failover taskInstance, default true
   kill-yarn-job-when-task-failover: true
+  worker-group-refresh-interval: 10s
 
 worker:
   # worker listener port
