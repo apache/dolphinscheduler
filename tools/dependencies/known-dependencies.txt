@@ -11,6 +11,7 @@ annotations-13.0.jar
 apache-client-2.17.282.jar
 asm-9.1.jar
 aspectjweaver-1.9.7.jar
+aspectjrt-1.9.7.jar
 auth-2.17.282.jar
 audience-annotations-0.12.0.jar
 automaton-1.11-8.jar

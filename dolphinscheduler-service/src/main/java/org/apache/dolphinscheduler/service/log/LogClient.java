@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.service.log;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -201,15 +205,17 @@ public class LogClient implements AutoCloseable {
         }
     }
 
-    public @Nullable List<String> getAppIds(@NonNull String host, int port,
-                                            @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
-        logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}", host, port, taskLogFilePath);
+    public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath,
+                                            @NonNull String taskAppInfoPath) throws RemotingException, InterruptedException {
+        logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", host, port,
+                taskLogFilePath, taskAppInfoPath);
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
         if (NetUtils.getHost().equals(host)) {
-            appIds = LogUtils.getAppIdsFromLogFile(taskLogFilePath);
+            appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath,
+                    PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
         } else {
-            final Command command = new GetAppIdRequestCommand(taskLogFilePath).convert2Command();
+            final Command command = new GetAppIdRequestCommand(taskLogFilePath, taskAppInfoPath).convert2Command();
             Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetAppIdResponseCommand responseCommand =
@@ -217,7 +223,8 @@ public class LogClient implements AutoCloseable {
                 appIds = responseCommand.getAppIds();
             }
         }
-        logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}", appIds, host, port, taskLogFilePath);
+        logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", appIds, host, port,
+                taskLogFilePath, taskAppInfoPath);
         return appIds;
     }
 

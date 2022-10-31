@@ -141,6 +141,9 @@ conda.path=/opt/anaconda3/etc/profile.d/conda.sh
 
 # Task resource limit state
 task.resource.limit.state=false
+
+# way to collect applicationId: log(original regex match), aop
+appId.collect: log
 ```
 
 > **Note:**

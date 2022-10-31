@@ -98,10 +98,23 @@
         <htrace.version>4.1.1</htrace.version>
         <datasync.version>2.17.282</datasync.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
+        <aspectj.version>1.9.7</aspectj.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- aspectj -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
             <!-- netty -->
             <dependency>
                 <groupId>io.netty</groupId>
@@ -461,7 +474,11 @@
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.htrace</groupId>
                 <artifactId>htrace-core4</artifactId>

@@ -34,6 +34,8 @@ public class GetAppIdRequestCommand implements Serializable {
 
     private String logPath;
 
+    private String appInfoPath;
+
     public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.GET_APP_ID_REQUEST);

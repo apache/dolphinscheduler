@@ -17,7 +17,11 @@
 
 package org.apache.dolphinscheduler.service.log;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -162,11 +166,13 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             case GET_APP_ID_REQUEST:
                 GetAppIdRequestCommand getAppIdRequestCommand =
                         JSONUtils.parseObject(command.getBody(), GetAppIdRequestCommand.class);
+                String appInfoPath = getAppIdRequestCommand.getAppInfoPath();
                 String logPath = getAppIdRequestCommand.getLogPath();
-                if (!checkPathSecurity(logPath)) {
+                if (!checkPathSecurity(appInfoPath) || !checkPathSecurity(logPath)) {
                     throw new IllegalArgumentException("Illegal path");
                 }
-                List<String> appIds = LogUtils.getAppIdsFromLogFile(logPath);
+                List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
+                        PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 channel.writeAndFlush(
                         new GetAppIdResponseCommand(appIds).convert2Command(command.getOpaque()));
                 break;
