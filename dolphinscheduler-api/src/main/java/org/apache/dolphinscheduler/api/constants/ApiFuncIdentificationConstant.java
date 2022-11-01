@@ -157,6 +157,14 @@ public class ApiFuncIdentificationConstant {
 
     public static final String MONITOR_STATISTICS_VIEW = "monitor:statistics:view";
 
+    public static final String TASK_REMOTE_HOST_VIEW = ("security:task-remote-host:view");
+
+    public static final String TASK_REMOTE_HOST_CREATE = ("security:task-remote-host:create");
+
+    public static final String TASK_REMOTE_HOST_EDIT = ("security:task-remote-host:update");
+
+    public static final String TASK_REMOTE_HOST_DELETE = ("security:task-remote-host:delete");
+
     public final static Map<ExecuteType, String> map = new HashMap<ExecuteType, String>();
 
     static {

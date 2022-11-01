@@ -515,7 +515,26 @@ public enum Status {
     SCHEDULE_TIME_NUMBER(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
     DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
-            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}");
+            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}"),
+
+    TASK_REMOTE_HOST_EXIST(1500001, "remote host name [{0}] already exists", "远程主机名称:[{0}] 已存在"),
+    CREATE_TASK_REMOTE_HOST_ERROR(1500002, "create task remote host error", "创建任务远程主机错误"),
+    TASK_REMOTE_HOST_NOT_FOUND(1500003, "task remote host not found, code: [{0}]", "该任务远程主机不存在，code: [{0}]"),
+    UPDATE_TASK_REMOTE_HOST_ERROR(1500004, "update task remote host error", "更新任务远程主机错误"),
+    DELETE_TASK_REMOTE_HOST_ERROR(1500005, "delete task remote host error", "删除任务远程主机错误"),
+    QUERY_TASK_REMOTE_HOST_PAGE_ERROR(1500006, "query task remote host list page error", "分页查询远程任务主机列表错误"),
+    QUERY_TASK_REMOTE_HOST_ERROR(1500006, "query task remote host list error", "查询远程任务主机列表错误"),
+    TEST_CONNECT_ERROR(1500007, "test connect error", "测试连接错误"),
+    VARIFY_TASK_REMOTE_HOST_ERROR(1500008, "verify task remote host error", "验证任务主机错误"),
+    TASK_REMOTE_HOST_IS_NULL(1500009, "task remote host name is null", "远程任务主机名称为空"),
+    TASK_REMOTE_HOST_NAME_EXISTS(1500010, "this remote host name [{0}] already exists", "远程任务主机名称[{0}]已经存在"),
+    TASK_REMOTE_HOST_NAME_IS_NULL(1500011, "host name is null", "主机名称为空"),
+    TASK_REMOTE_HOST_IP_IS_NULL(1500012, "host ip is null", "主机IP为空"),
+    TASK_REMOTE_HOST_ACCOUNT_IS_NULL(1500013, "host account is null", "主机账户为空"),
+    TASK_REMOTE_HOST_PORT_IS_NULL(1500014, "host port is null", "主机SSH端口为空"),
+    TASK_REMOTE_HOST_PASSWORD_IS_NULL(1500015, "host password is null", "主机密码为空"),
+    TASK_REMOTE_HOST_DESC_IS_NULL(1500016, "host description is null", "主机描述为空"),
+    TASK_REMOTE_HOST_IP_ILLEGAL(1500017, "host ip is illegal", "IP非法");
     private final int code;
     private final String enMsg;
     private final String zhMsg;

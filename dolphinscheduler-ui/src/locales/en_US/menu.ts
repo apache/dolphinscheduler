@@ -50,6 +50,7 @@ export default {
   environment_manage: 'Environment Manage',
   cluster_manage: 'Cluster Manage',
   k8s_namespace_manage: 'K8S Namespace Manage',
+  task_remote_host_manage: 'Task Remote Host Manage',
   token_manage: 'Token Manage',
   task_group_manage: 'Task Group Manage',
   task_group_option: 'Task Group Option',

@@ -2007,3 +2007,23 @@ CREATE TABLE `t_ds_fav_task`
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_task_remote_host
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_remote_host`;
+CREATE TABLE `t_ds_task_remote_host`
+(
+    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `code` bigint(20) NOT NULL DEFAULT '0' COMMENT 'encoding',
+    `name` varchar(100) NOT NULL COMMENT 'task remote host name',
+    `ip` varchar(100) NOT NULL COMMENT 'task remote host ip',
+    `port`  int(11) NOT NULL COMMENT 'port',
+    `account` varchar(100) NOT NULL COMMENT 'task remote host account',
+    `password` varchar(64) NOT NULL COMMENT 'account password',
+    `description` text NULL DEFAULT NULL COMMENT 'the details',
+    `operator`    int(11) DEFAULT NULL COMMENT 'operator user id',
+    `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

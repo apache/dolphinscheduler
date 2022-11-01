@@ -47,7 +47,8 @@ import {
   ApartmentOutlined,
   BarsOutlined,
   CloudServerOutlined,
-  ClusterOutlined
+  ClusterOutlined,
+  LaptopOutlined
 } from '@vicons/antd'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
@@ -300,6 +301,11 @@ export function useDataList() {
                   label: t('menu.k8s_namespace_manage'),
                   key: '/security/k8s-namespace-manage',
                   icon: renderIcon(CloudServerOutlined)
+                },
+                {
+                  label: t('menu.task_remote_host_manage'),
+                  key: '/security/task-remote-host-manage',
+                  icon: renderIcon(LaptopOutlined)
                 },
                 {
                   label: t('menu.token_manage'),

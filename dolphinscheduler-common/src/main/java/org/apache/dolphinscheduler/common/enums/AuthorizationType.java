@@ -62,6 +62,8 @@ public enum AuthorizationType {
     TENANT(15, "tenant"),
     DATA_QUALITY(16, "data quality"),
     TASK_GROUP(17, "task group"),
+
+    TASK_REMOTE_TASK(18, "task remote host"),
     ;
 
     AuthorizationType(int code, String descp) {

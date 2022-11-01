@@ -107,6 +107,17 @@ export default {
       }
     },
     {
+      path: '/security/task-remote-host-manage',
+      name: 'task-remote-host-manage',
+      component: components['security-task-remote-host-manage'],
+      meta: {
+        title: '任务远程主机管理',
+        activeMenu: 'security',
+        showSide: true,
+        auth: ['ADMIN_USER']
+      }
+    },
+    {
       path: '/security/token-manage',
       name: 'token-manage',
       component: components['security-token-manage'],

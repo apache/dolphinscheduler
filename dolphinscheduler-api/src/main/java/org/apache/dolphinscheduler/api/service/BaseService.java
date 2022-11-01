@@ -122,4 +122,13 @@ public interface BaseService {
      */
     boolean checkDescriptionLength(String description);
 
+    /**
+     * check operator permissions
+     * @param user operate user
+     * @param ids Object[]
+     * @param type resource type
+     * @param perm permissions string
+     */
+    void checkOperatorPermissions(User user, Object[] ids, AuthorizationType type, String perm);
+
 }

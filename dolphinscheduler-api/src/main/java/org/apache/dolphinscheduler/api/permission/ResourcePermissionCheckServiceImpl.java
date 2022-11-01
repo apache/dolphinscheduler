@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
+import org.apache.dolphinscheduler.dao.entity.TaskRemoteHost;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -61,6 +62,7 @@ import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskRemoteHostMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
@@ -327,6 +329,32 @@ public class ResourcePermissionCheckServiceImpl
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
             return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
+        }
+    }
+
+    @Component
+    public static class TaskRemoteHostResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
+
+        private final TaskRemoteHostMapper taskRemoteHostMapper;
+
+        public TaskRemoteHostResourceList(TaskRemoteHostMapper taskRemoteHostMapper) {
+            this.taskRemoteHostMapper = taskRemoteHostMapper;
+        }
+
+        @Override
+        public List<AuthorizationType> authorizationTypes() {
+            return Collections.singletonList(AuthorizationType.TASK_REMOTE_TASK);
+        }
+
+        @Override
+        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+            List<TaskRemoteHost> taskRemoteHostList = taskRemoteHostMapper.queryAllTaskRemoteHostList();
+            return taskRemoteHostList.stream().map(TaskRemoteHost::getId).collect(Collectors.toSet());
+        }
+
+        @Override
+        public boolean permissionCheck(int userId, String permissionKey, Logger logger) {
+            return false;
         }
     }
 

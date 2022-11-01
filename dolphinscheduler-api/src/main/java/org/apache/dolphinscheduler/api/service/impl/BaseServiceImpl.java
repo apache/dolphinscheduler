@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -223,5 +224,12 @@ public class BaseServiceImpl implements BaseService {
     @Override
     public boolean checkDescriptionLength(String description) {
         return description != null && description.codePointCount(0, description.length()) > 255;
+    }
+
+    @Override
+    public void checkOperatorPermissions(User user, Object[] ids, AuthorizationType type, String perm) {
+        if (!canOperatorPermissions(user, ids, type, perm)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
     }
 }
