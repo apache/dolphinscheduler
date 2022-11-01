@@ -340,10 +340,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryProcessDefinitionByWorkerGroupName(workerGroup.getName());
+        List<ProcessDefinition> processDefinitionList =
+                processDefinitionMapper.queryProcessDefinitionByWorkerGroupName(workerGroup.getName());
         if (CollectionUtils.isNotEmpty(processDefinitionList)) {
-            logger.warn("Delete worker group failed because there are {} processDefinitions are using it.", processDefinitionList.size());
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_WORKFLOW, processDefinitionList.size(), workerGroup.getName());
+            logger.warn("Delete worker group failed because there are {} processDefinitions are using it.",
+                    processDefinitionList.size());
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_WORKFLOW, processDefinitionList.size(),
+                    workerGroup.getName());
             return result;
         }
         List<ProcessInstance> processInstances = processInstanceMapper
