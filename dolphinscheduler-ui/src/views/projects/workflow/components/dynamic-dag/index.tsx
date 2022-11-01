@@ -20,12 +20,14 @@ import { DagSidebar } from './dag-sidebar'
 import { DagCanvas } from './dag-canvas'
 import { useDagStore } from '@/store/project/dynamic/dag'
 import { NodeShape, NodeHeight, NodeWidth } from './dag-setting'
+import { TaskForm } from './task-form'
 import styles from './index.module.scss'
 
 const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
     const draggedTask = ref('')
+    const showModal = ref(false)
 
     const handelDragstart = (task: string) => {
       draggedTask.value = task
@@ -50,20 +52,28 @@ const DynamicDag = defineComponent({
 
       useDagStore().setDagTasks(shapes)
 
-
+      showModal.value = true
     }
 
     return {
       handelDragstart,
-      handelDrop
+      handelDrop,
+      showModal
     }
   },
   render() {
     return (
-      <div class={styles['workflow-dag']}>
-        <DagSidebar onDragstart={this.handelDragstart} />
-        <DagCanvas onDrop={this.handelDrop} />
-      </div>
+      <>
+        <div class={styles['workflow-dag']}>
+          <DagSidebar onDragstart={this.handelDragstart}/>
+          <DagCanvas onDrop={this.handelDrop}/>
+        </div>
+        <TaskForm
+          showModal={this.showModal}
+          onCancelModal={() => this.showModal = false}
+          onConfirmModal={() => this.showModal = false}
+        />
+      </>
     )
   }
 })

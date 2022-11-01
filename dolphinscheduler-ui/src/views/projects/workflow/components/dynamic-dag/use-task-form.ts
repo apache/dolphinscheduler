@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-export const useTaskForm = {
+import { reactive } from 'vue'
+
+const shell = {
   locales: {
     zh_CN: {
       node_name: '节点名称',
@@ -37,4 +39,16 @@ export const useTaskForm = {
       }
     }
   ]
+}
+
+export function useTaskForm() {
+  const variables = reactive({
+    formStructure: {}
+  })
+
+  variables.formStructure = shell
+
+  return {
+    variables
+  }
 }
