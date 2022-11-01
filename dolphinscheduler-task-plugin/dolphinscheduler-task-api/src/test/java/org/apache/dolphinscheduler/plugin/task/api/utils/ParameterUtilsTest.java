@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import static org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils.replacePlaceholders;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 
@@ -60,7 +60,8 @@ public class ParameterUtilsTest {
 
         // replace variable ${} form
         parameterMap.put("testParameter2", "${testParameter}");
-        Assertions.assertEquals(parameterString, PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
+        Assertions.assertEquals(parameterString,
+                PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
 
         // replace time $[...] form, eg. $[yyyyMMdd]
         Date cronTime = new Date();
@@ -78,7 +79,7 @@ public class ParameterUtilsTest {
                         + "'$[yyyyMMdd+7*2]' '$[yyyyMMdd-7*2]'  '$[yyyyMMdd+3]'  '$[0]' '$[yyyyMMdd-3]' '$[HHmmss+2/24]' '$[HHmmss-1/24]' '$[HHmmss+3/24/60]' '$[HHmmss-2/24/60]'  '$[3]'";
         Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put("user", "Kris");
-        parameterMap.put(Constants.PARAMETER_DATETIME, "20201201123000");
+        parameterMap.put(DateConstants.PARAMETER_DATETIME, "20201201123000");
         parameterString = ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap);
         Assertions.assertEquals(
                 "Kris is userName, '$[1]' '20221201' '20181201' '20210301' '20200801' '20201215' '20201117'  '20201204'  '$[0]' '20201128' '143000' '113000' '123300' '122800'  '$[3]'",

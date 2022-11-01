@@ -16,17 +16,19 @@
  */
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.service.model.TaskNode;
+
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class ProcessData {
+
     @EqualsAndHashCode.Include
     private List<TaskNode> tasks;
 

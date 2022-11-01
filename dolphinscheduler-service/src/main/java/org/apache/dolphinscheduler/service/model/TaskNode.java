@@ -21,15 +21,15 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.model.PreviousTaskNode;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -306,7 +306,7 @@ public class TaskNode {
                 && Objects.equals(workerGroup, taskNode.workerGroup)
                 && Objects.equals(environmentCode, taskNode.environmentCode)
                 && Objects.equals(conditionResult, taskNode.conditionResult)
-                && CollectionUtils.equalLists(depList, taskNode.depList)
+                && CollectionUtils.isEqualCollection(depList, taskNode.depList)
                 && Objects.equals(taskExecuteType, taskNode.taskExecuteType);
     }
 

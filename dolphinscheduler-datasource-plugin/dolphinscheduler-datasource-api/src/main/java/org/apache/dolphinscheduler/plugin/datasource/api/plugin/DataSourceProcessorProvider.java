@@ -18,13 +18,14 @@
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataSourceProcessorProvider {
+
     private static final Logger logger = LoggerFactory.getLogger(DataSourceProcessorProvider.class);
 
     private DataSourceProcessorManager dataSourcePluginManager;
@@ -34,6 +35,7 @@ public class DataSourceProcessorProvider {
     }
 
     private static class DataSourceClientProviderHolder {
+
         private static final DataSourceProcessorProvider INSTANCE = new DataSourceProcessorProvider();
     }
 

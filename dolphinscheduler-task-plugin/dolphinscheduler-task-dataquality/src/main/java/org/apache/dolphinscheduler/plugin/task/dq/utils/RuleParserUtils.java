@@ -59,6 +59,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.URL;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.USER;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
@@ -72,10 +73,9 @@ import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.EnvConfig;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.MappingColumn;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,12 +100,12 @@ public class RuleParserUtils {
     private static final String WHERE_TARGET_FILTER = "WHERE (${target_filter})";
 
     public static List<BaseConfig> getReaderConfigList(
-                                            Map<String, String> inputParameterValue,
-                                            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+                                                       Map<String, String> inputParameterValue,
+                                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
 
         List<BaseConfig> readerConfigList = new ArrayList<>();
 
-        //all the rule need the source config
+        // all the rule need the source config
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getSourceConnectorType())) {
             BaseConnectionParam sourceDataSource =
                     (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
@@ -113,17 +113,19 @@ public class RuleParserUtils {
                             dataQualityTaskExecutionContext.getSourceConnectionParams());
             BaseConfig sourceBaseConfig = new BaseConfig();
             sourceBaseConfig.setType(dataQualityTaskExecutionContext.getSourceConnectorType());
-            Map<String,Object> config = new HashMap<>();
+            Map<String, Object> config = new HashMap<>();
             if (sourceDataSource != null) {
-                config.put(DATABASE,sourceDataSource.getDatabase());
-                config.put(TABLE,inputParameterValue.get(SRC_TABLE));
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()),sourceDataSource));
-                config.put(USER,sourceDataSource.getUser());
-                config.put(PASSWORD,sourceDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
+                config.put(DATABASE, sourceDataSource.getDatabase());
+                config.put(TABLE, inputParameterValue.get(SRC_TABLE));
+                config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()),
+                        sourceDataSource));
+                config.put(USER, sourceDataSource.getUser());
+                config.put(PASSWORD, sourceDataSource.getPassword());
+                config.put(DRIVER, DataSourceUtils
+                        .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
                 String outputTable = sourceDataSource.getDatabase() + "_" + inputParameterValue.get(SRC_TABLE);
-                config.put(OUTPUT_TABLE,outputTable);
-                inputParameterValue.put(SRC_TABLE,outputTable);
+                config.put(OUTPUT_TABLE, outputTable);
+                inputParameterValue.put(SRC_TABLE, outputTable);
             }
             sourceBaseConfig.setConfig(config);
 
@@ -138,17 +140,19 @@ public class RuleParserUtils {
                             dataQualityTaskExecutionContext.getTargetConnectionParams());
             BaseConfig targetBaseConfig = new BaseConfig();
             targetBaseConfig.setType(dataQualityTaskExecutionContext.getTargetConnectorType());
-            Map<String,Object> config = new HashMap<>();
+            Map<String, Object> config = new HashMap<>();
             if (targetDataSource != null) {
-                config.put(DATABASE,targetDataSource.getDatabase());
-                config.put(TABLE,inputParameterValue.get(TARGET_TABLE));
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getTargetType()),targetDataSource));
-                config.put(USER,targetDataSource.getUser());
-                config.put(PASSWORD,targetDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
+                config.put(DATABASE, targetDataSource.getDatabase());
+                config.put(TABLE, inputParameterValue.get(TARGET_TABLE));
+                config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getTargetType()),
+                        targetDataSource));
+                config.put(USER, targetDataSource.getUser());
+                config.put(PASSWORD, targetDataSource.getPassword());
+                config.put(DRIVER, DataSourceUtils
+                        .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
                 String outputTable = targetDataSource.getDatabase() + "_" + inputParameterValue.get(TARGET_TABLE);
-                config.put(OUTPUT_TABLE,outputTable);
-                inputParameterValue.put(TARGET_TABLE,outputTable);
+                config.put(OUTPUT_TABLE, outputTable);
+                inputParameterValue.put(TARGET_TABLE, outputTable);
             }
             targetBaseConfig.setConfig(config);
 
@@ -159,26 +163,29 @@ public class RuleParserUtils {
     }
 
     public static int replaceExecuteSqlPlaceholder(List<DqRuleExecuteSql> executeSqlList,
-                                             int index, Map<String, String> inputParameterValueResult,
-                                             List<BaseConfig> transformerConfigList) {
-        List<DqRuleExecuteSql> midExecuteSqlDefinitionList
-                = getExecuteSqlListByType(executeSqlList, ExecuteSqlType.MIDDLE);
+                                                   int index, Map<String, String> inputParameterValueResult,
+                                                   List<BaseConfig> transformerConfigList) {
+        List<DqRuleExecuteSql> midExecuteSqlDefinitionList =
+                getExecuteSqlListByType(executeSqlList, ExecuteSqlType.MIDDLE);
 
-        List<DqRuleExecuteSql> statisticsExecuteSqlDefinitionList
-                = getExecuteSqlListByType(executeSqlList, ExecuteSqlType.STATISTICS);
+        List<DqRuleExecuteSql> statisticsExecuteSqlDefinitionList =
+                getExecuteSqlListByType(executeSqlList, ExecuteSqlType.STATISTICS);
 
-        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),AND_SRC_FILTER);
-        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),WHERE_SRC_FILTER);
-        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),AND_SRC_FILTER);
-        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),WHERE_SRC_FILTER);
+        checkAndReplace(midExecuteSqlDefinitionList, inputParameterValueResult.get(SRC_FILTER), AND_SRC_FILTER);
+        checkAndReplace(midExecuteSqlDefinitionList, inputParameterValueResult.get(SRC_FILTER), WHERE_SRC_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList, inputParameterValueResult.get(SRC_FILTER), AND_SRC_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList, inputParameterValueResult.get(SRC_FILTER),
+                WHERE_SRC_FILTER);
 
-        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),AND_TARGET_FILTER);
-        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),WHERE_TARGET_FILTER);
-        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),AND_TARGET_FILTER);
-        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),WHERE_TARGET_FILTER);
+        checkAndReplace(midExecuteSqlDefinitionList, inputParameterValueResult.get(TARGET_FILTER), AND_TARGET_FILTER);
+        checkAndReplace(midExecuteSqlDefinitionList, inputParameterValueResult.get(TARGET_FILTER), WHERE_TARGET_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList, inputParameterValueResult.get(TARGET_FILTER),
+                AND_TARGET_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList, inputParameterValueResult.get(TARGET_FILTER),
+                WHERE_TARGET_FILTER);
 
         if (CollectionUtils.isNotEmpty(midExecuteSqlDefinitionList)) {
-            for (DqRuleExecuteSql executeSqlDefinition:midExecuteSqlDefinitionList) {
+            for (DqRuleExecuteSql executeSqlDefinition : midExecuteSqlDefinitionList) {
                 index = setTransformerConfig(
                         index,
                         inputParameterValueResult,
@@ -188,7 +195,7 @@ public class RuleParserUtils {
         }
 
         if (CollectionUtils.isNotEmpty(statisticsExecuteSqlDefinitionList)) {
-            for (DqRuleExecuteSql executeSqlDefinition:statisticsExecuteSqlDefinitionList) {
+            for (DqRuleExecuteSql executeSqlDefinition : statisticsExecuteSqlDefinitionList) {
                 index = setTransformerConfig(
                         index,
                         inputParameterValueResult,
@@ -201,59 +208,61 @@ public class RuleParserUtils {
     }
 
     private static int setTransformerConfig(int index,
-                                     Map<String, String> inputParameterValueResult,
-                                     List<BaseConfig> transformerConfigList,
-                                     DqRuleExecuteSql executeSqlDefinition) {
-        Map<String,Object> config = new HashMap<>();
-        config.put(INDEX,index++);
-        config.put(SQL, ParameterUtils.convertParameterPlaceholders(executeSqlDefinition.getSql(),inputParameterValueResult));
-        config.put(OUTPUT_TABLE,executeSqlDefinition.getTableAlias());
+                                            Map<String, String> inputParameterValueResult,
+                                            List<BaseConfig> transformerConfigList,
+                                            DqRuleExecuteSql executeSqlDefinition) {
+        Map<String, Object> config = new HashMap<>();
+        config.put(INDEX, index++);
+        config.put(SQL,
+                ParameterUtils.convertParameterPlaceholders(executeSqlDefinition.getSql(), inputParameterValueResult));
+        config.put(OUTPUT_TABLE, executeSqlDefinition.getTableAlias());
 
-        BaseConfig transformerConfig = new BaseConfig(SQL,config);
+        BaseConfig transformerConfig = new BaseConfig(SQL, config);
         transformerConfigList.add(transformerConfig);
         return index;
     }
 
     public static List<BaseConfig> getSingleTableCustomSqlTransformerConfigList(int index,
-            Map<String, String> inputParameterValueResult) {
+                                                                                Map<String, String> inputParameterValueResult) {
         List<BaseConfig> list = new ArrayList<>();
 
-        Map<String,Object> config = new HashMap<>();
-        config.put(INDEX,index + 1);
-        config.put(SQL,ParameterUtils.convertParameterPlaceholders(inputParameterValueResult.get(STATISTICS_EXECUTE_SQL),inputParameterValueResult));
-        config.put(OUTPUT_TABLE,inputParameterValueResult.get(SRC_TABLE));
-        inputParameterValueResult.put(STATISTICS_TABLE,inputParameterValueResult.get(SRC_TABLE));
-        BaseConfig transformerConfig = new BaseConfig(SQL,config);
+        Map<String, Object> config = new HashMap<>();
+        config.put(INDEX, index + 1);
+        config.put(SQL, ParameterUtils.convertParameterPlaceholders(
+                inputParameterValueResult.get(STATISTICS_EXECUTE_SQL), inputParameterValueResult));
+        config.put(OUTPUT_TABLE, inputParameterValueResult.get(SRC_TABLE));
+        inputParameterValueResult.put(STATISTICS_TABLE, inputParameterValueResult.get(SRC_TABLE));
+        BaseConfig transformerConfig = new BaseConfig(SQL, config);
         list.add(transformerConfig);
-        return  list;
+        return list;
     }
 
     private static String getCoalesceString(String table, String column) {
         return "coalesce(" + table + "." + column + ", '')";
     }
 
-    private static String getSrcColumnIsNullStr(String table,List<String> columns) {
+    private static String getSrcColumnIsNullStr(String table, List<String> columns) {
         String[] columnList = new String[columns.size()];
         for (int i = 0; i < columns.size(); i++) {
             String column = columns.get(i);
             columnList[i] = table + "." + column + " IS NULL";
         }
-        return  String.join(AND, columnList);
+        return String.join(AND, columnList);
     }
 
-    public static Map<String,String> getInputParameterMapFromEntryList(List<DqRuleInputEntry> defaultInputEntryList) {
+    public static Map<String, String> getInputParameterMapFromEntryList(List<DqRuleInputEntry> defaultInputEntryList) {
 
-        Map<String,String> defaultInputParameterValue = new HashMap<>();
-        for (DqRuleInputEntry inputEntry:defaultInputEntryList) {
-            defaultInputParameterValue.put(inputEntry.getField(),inputEntry.getValue());
+        Map<String, String> defaultInputParameterValue = new HashMap<>();
+        for (DqRuleInputEntry inputEntry : defaultInputEntryList) {
+            defaultInputParameterValue.put(inputEntry.getField(), inputEntry.getValue());
         }
 
         return defaultInputParameterValue;
     }
 
     public static List<BaseConfig> getWriterConfigList(
-            String sql,
-            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+                                                       String sql,
+                                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
 
         List<BaseConfig> writerConfigList = new ArrayList<>();
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getWriterConnectorType())) {
@@ -264,15 +273,17 @@ public class RuleParserUtils {
             BaseConfig writerConfig = new BaseConfig();
             writerConfig.setType(dataQualityTaskExecutionContext.getWriterConnectorType());
 
-            Map<String,Object> config = new HashMap<>();
+            Map<String, Object> config = new HashMap<>();
             if (writerDataSource != null) {
-                config.put(DATABASE,writerDataSource.getDatabase());
-                config.put(TABLE,dataQualityTaskExecutionContext.getWriterTable());
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getWriterType()),writerDataSource));
-                config.put(USER,writerDataSource.getUser());
-                config.put(PASSWORD,writerDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
-                config.put(SQL,sql);
+                config.put(DATABASE, writerDataSource.getDatabase());
+                config.put(TABLE, dataQualityTaskExecutionContext.getWriterTable());
+                config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getWriterType()),
+                        writerDataSource));
+                config.put(USER, writerDataSource.getUser());
+                config.put(PASSWORD, writerDataSource.getPassword());
+                config.put(DRIVER, DataSourceUtils
+                        .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
+                config.put(SQL, sql);
             }
             writerConfig.setConfig(config);
             writerConfigList.add(writerConfig);
@@ -281,46 +292,48 @@ public class RuleParserUtils {
         return writerConfigList;
     }
 
-    public static void addStatisticsValueTableReaderConfig (List<BaseConfig> readerConfigList,
-                                                            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+    public static void addStatisticsValueTableReaderConfig(List<BaseConfig> readerConfigList,
+                                                           DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         if (dataQualityTaskExecutionContext.isComparisonNeedStatisticsValueTable()) {
-            List<BaseConfig> statisticsBaseConfigList = RuleParserUtils.getStatisticsValueConfigReaderList(dataQualityTaskExecutionContext);
+            List<BaseConfig> statisticsBaseConfigList =
+                    RuleParserUtils.getStatisticsValueConfigReaderList(dataQualityTaskExecutionContext);
             readerConfigList.addAll(statisticsBaseConfigList);
         }
     }
 
-    public static List<BaseConfig> getStatisticsValueConfigWriterList (
-            String sql,
-            Map<String, String> inputParameterValueResult,
-            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+    public static List<BaseConfig> getStatisticsValueConfigWriterList(
+                                                                      String sql,
+                                                                      Map<String, String> inputParameterValueResult,
+                                                                      DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
 
         List<BaseConfig> writerConfigList = new ArrayList<>();
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getStatisticsValueConnectorType())) {
             BaseConfig writerConfig = getStatisticsValueConfig(dataQualityTaskExecutionContext);
             if (writerConfig != null) {
-                writerConfig.getConfig().put(SQL,ParameterUtils.convertParameterPlaceholders(sql,inputParameterValueResult));
+                writerConfig.getConfig().put(SQL,
+                        ParameterUtils.convertParameterPlaceholders(sql, inputParameterValueResult));
             }
             writerConfigList.add(writerConfig);
         }
         return writerConfigList;
     }
 
-    public static List<BaseConfig> getStatisticsValueConfigReaderList (
-            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+    public static List<BaseConfig> getStatisticsValueConfigReaderList(
+                                                                      DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
 
         List<BaseConfig> readerConfigList = new ArrayList<>();
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getStatisticsValueConnectorType())) {
             BaseConfig readerConfig = getStatisticsValueConfig(dataQualityTaskExecutionContext);
             if (readerConfig != null) {
-                readerConfig.getConfig().put(OUTPUT_TABLE,dataQualityTaskExecutionContext.getStatisticsValueTable());
+                readerConfig.getConfig().put(OUTPUT_TABLE, dataQualityTaskExecutionContext.getStatisticsValueTable());
             }
             readerConfigList.add(readerConfig);
         }
         return readerConfigList;
     }
 
-    public static BaseConfig getStatisticsValueConfig (
-            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+    public static BaseConfig getStatisticsValueConfig(
+                                                      DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
         BaseConfig baseConfig = null;
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getStatisticsValueConnectorType())) {
             BaseConnectionParam writerDataSource =
@@ -330,14 +343,16 @@ public class RuleParserUtils {
             baseConfig = new BaseConfig();
             baseConfig.setType(dataQualityTaskExecutionContext.getStatisticsValueConnectorType());
 
-            Map<String,Object> config = new HashMap<>();
+            Map<String, Object> config = new HashMap<>();
             if (writerDataSource != null) {
-                config.put(DATABASE,writerDataSource.getDatabase());
-                config.put(TABLE,dataQualityTaskExecutionContext.getStatisticsValueTable());
-                config.put(URL,DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getStatisticsValueType()),writerDataSource));
-                config.put(USER,writerDataSource.getUser());
-                config.put(PASSWORD,writerDataSource.getPassword());
-                config.put(DRIVER, DataSourceUtils.getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
+                config.put(DATABASE, writerDataSource.getDatabase());
+                config.put(TABLE, dataQualityTaskExecutionContext.getStatisticsValueTable());
+                config.put(URL, DataSourceUtils.getJdbcUrl(
+                        DbType.of(dataQualityTaskExecutionContext.getStatisticsValueType()), writerDataSource));
+                config.put(USER, writerDataSource.getUser());
+                config.put(PASSWORD, writerDataSource.getPassword());
+                config.put(DRIVER, DataSourceUtils
+                        .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
             }
 
             baseConfig.setConfig(config);
@@ -346,45 +361,53 @@ public class RuleParserUtils {
         return baseConfig;
     }
 
-    public static String getOnClause(List<MappingColumn> mappingColumnList,Map<String,String> inputParameterValueResult) {
-        //get on clause
+    public static String getOnClause(List<MappingColumn> mappingColumnList,
+                                     Map<String, String> inputParameterValueResult) {
+        // get on clause
         String[] columnList = new String[mappingColumnList.size()];
         for (int i = 0; i < mappingColumnList.size(); i++) {
             MappingColumn column = mappingColumnList.get(i);
-            columnList[i] = getCoalesceString(inputParameterValueResult.get(SRC_TABLE),column.getSrcField())
+            columnList[i] = getCoalesceString(inputParameterValueResult.get(SRC_TABLE), column.getSrcField())
                     + column.getOperator()
-                    + getCoalesceString(inputParameterValueResult.get(TARGET_TABLE),column.getTargetField());
+                    + getCoalesceString(inputParameterValueResult.get(TARGET_TABLE), column.getTargetField());
         }
 
-        return String.join(AND,columnList);
+        return String.join(AND, columnList);
     }
 
-    public static String getWhereClause(List<MappingColumn> mappingColumnList,Map<String,String> inputParameterValueResult) {
-        String srcColumnNotNull = "( NOT (" + getSrcColumnIsNullStr(inputParameterValueResult.get(SRC_TABLE),getSrcColumnList(mappingColumnList)) + " ))";
-        String targetColumnIsNull = "( " + getSrcColumnIsNullStr(inputParameterValueResult.get(TARGET_TABLE),getTargetColumnList(mappingColumnList)) + " )";
+    public static String getWhereClause(List<MappingColumn> mappingColumnList,
+                                        Map<String, String> inputParameterValueResult) {
+        String srcColumnNotNull = "( NOT ("
+                + getSrcColumnIsNullStr(inputParameterValueResult.get(SRC_TABLE), getSrcColumnList(mappingColumnList))
+                + " ))";
+        String targetColumnIsNull = "( " + getSrcColumnIsNullStr(inputParameterValueResult.get(TARGET_TABLE),
+                getTargetColumnList(mappingColumnList)) + " )";
 
         return srcColumnNotNull + AND + targetColumnIsNull;
     }
 
     public static List<BaseConfig> getWriterConfigList(
-                                                  int index,
-                                                  Map<String, String> inputParameterValueResult,
-                                                  List<BaseConfig> transformerConfigList,
-                                                  DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
-                                                  String writerSql) throws DataQualityException {
+                                                       int index,
+                                                       Map<String, String> inputParameterValueResult,
+                                                       List<BaseConfig> transformerConfigList,
+                                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
+                                                       String writerSql) throws DataQualityException {
         List<DqRuleExecuteSql> comparisonExecuteSqlList =
-                getExecuteSqlListByType(JSONUtils.toList(dataQualityTaskExecutionContext.getExecuteSqlList(),DqRuleExecuteSql.class), ExecuteSqlType.COMPARISON);
+                getExecuteSqlListByType(
+                        JSONUtils.toList(dataQualityTaskExecutionContext.getExecuteSqlList(), DqRuleExecuteSql.class),
+                        ExecuteSqlType.COMPARISON);
 
         if (CollectionUtils.isNotEmpty(comparisonExecuteSqlList)) {
             DqRuleExecuteSql comparisonSql = comparisonExecuteSqlList.get(0);
-            inputParameterValueResult.put(COMPARISON_TABLE,comparisonSql.getTableAlias());
+            inputParameterValueResult.put(COMPARISON_TABLE, comparisonSql.getTableAlias());
 
-            checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(SRC_FILTER),AND_SRC_FILTER);
-            checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(SRC_FILTER),WHERE_SRC_FILTER);
-            checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(TARGET_FILTER),AND_TARGET_FILTER);
-            checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(TARGET_FILTER),WHERE_TARGET_FILTER);
+            checkAndReplace(comparisonExecuteSqlList, inputParameterValueResult.get(SRC_FILTER), AND_SRC_FILTER);
+            checkAndReplace(comparisonExecuteSqlList, inputParameterValueResult.get(SRC_FILTER), WHERE_SRC_FILTER);
+            checkAndReplace(comparisonExecuteSqlList, inputParameterValueResult.get(TARGET_FILTER), AND_TARGET_FILTER);
+            checkAndReplace(comparisonExecuteSqlList, inputParameterValueResult.get(TARGET_FILTER),
+                    WHERE_TARGET_FILTER);
 
-            for (DqRuleExecuteSql executeSqlDefinition:comparisonExecuteSqlList) {
+            for (DqRuleExecuteSql executeSqlDefinition : comparisonExecuteSqlList) {
                 index = setTransformerConfig(
                         index,
                         inputParameterValueResult,
@@ -394,18 +417,17 @@ public class RuleParserUtils {
         }
 
         return getWriterConfigList(
-                ParameterUtils.convertParameterPlaceholders(writerSql,inputParameterValueResult),
-                dataQualityTaskExecutionContext
-                );
+                ParameterUtils.convertParameterPlaceholders(writerSql, inputParameterValueResult),
+                dataQualityTaskExecutionContext);
     }
 
-    public static List<BaseConfig> getAllWriterConfigList (
-            Map<String, String> inputParameterValue,
-            DataQualityTaskExecutionContext context,
-            int index,
-            List<BaseConfig> transformerConfigList,
-            String writerSql,
-            String statisticsValueWriterSql) {
+    public static List<BaseConfig> getAllWriterConfigList(
+                                                          Map<String, String> inputParameterValue,
+                                                          DataQualityTaskExecutionContext context,
+                                                          int index,
+                                                          List<BaseConfig> transformerConfigList,
+                                                          String writerSql,
+                                                          String statisticsValueWriterSql) {
 
         List<BaseConfig> writerConfigList = RuleParserUtils.getWriterConfigList(
                 index,
@@ -420,7 +442,7 @@ public class RuleParserUtils {
                         inputParameterValue,
                         context));
 
-        BaseConfig errorOutputWriter = RuleParserUtils.getErrorOutputWriter(inputParameterValue,context);
+        BaseConfig errorOutputWriter = RuleParserUtils.getErrorOutputWriter(inputParameterValue, context);
         if (errorOutputWriter != null) {
             writerConfigList.add(errorOutputWriter);
         }
@@ -428,8 +450,9 @@ public class RuleParserUtils {
         return writerConfigList;
     }
 
-    public static List<DqRuleExecuteSql> getExecuteSqlListByType (
-            List<DqRuleExecuteSql> allExecuteSqlList, ExecuteSqlType executeSqlType) {
+    public static List<DqRuleExecuteSql> getExecuteSqlListByType(
+                                                                 List<DqRuleExecuteSql> allExecuteSqlList,
+                                                                 ExecuteSqlType executeSqlType) {
         if (CollectionUtils.isEmpty(allExecuteSqlList)) {
             return allExecuteSqlList;
         }
@@ -442,9 +465,9 @@ public class RuleParserUtils {
 
     private static void checkAndReplace(List<DqRuleExecuteSql> list, String checkValue, String replaceSrc) {
         if (StringUtils.isEmpty(checkValue) && CollectionUtils.isNotEmpty(list)) {
-            for (DqRuleExecuteSql executeSqlDefinition:list) {
+            for (DqRuleExecuteSql executeSqlDefinition : list) {
                 String sql = executeSqlDefinition.getSql();
-                sql = sql.replace(replaceSrc,"");
+                sql = sql.replace(replaceSrc, "");
                 executeSqlDefinition.setSql(sql);
             }
         }
@@ -455,9 +478,9 @@ public class RuleParserUtils {
         List<MappingColumn> list = new ArrayList<>();
         mappingColumnList.forEach(item -> {
             MappingColumn column = new MappingColumn(
-                    String.valueOf(item.get(SRC_FIELD)).replace("\"",""),
-                    String.valueOf(item.get(OPERATOR)).replace("\""," "),
-                    String.valueOf(item.get(TARGET_FIELD)).replace("\"",""));
+                    String.valueOf(item.get(SRC_FIELD)).replace("\"", ""),
+                    String.valueOf(item.get(OPERATOR)).replace("\"", " "),
+                    String.valueOf(item.get(TARGET_FIELD)).replace("\"", ""));
             list.add(column);
         });
 
@@ -466,18 +489,14 @@ public class RuleParserUtils {
 
     public static List<String> getSrcColumnList(List<MappingColumn> mappingColumns) {
         List<String> list = new ArrayList<>();
-        mappingColumns.forEach(item ->
-            list.add(item.getSrcField())
-        );
+        mappingColumns.forEach(item -> list.add(item.getSrcField()));
 
         return list;
     }
 
     public static List<String> getTargetColumnList(List<MappingColumn> mappingColumns) {
         List<String> list = new ArrayList<>();
-        mappingColumns.forEach(item ->
-            list.add(item.getTargetField())
-        );
+        mappingColumns.forEach(item -> list.add(item.getTargetField()));
 
         return list;
     }
@@ -485,13 +504,13 @@ public class RuleParserUtils {
     public static EnvConfig getEnvConfig() {
         EnvConfig envConfig = new EnvConfig();
         envConfig.setType(BATCH);
-        return  envConfig;
+        return envConfig;
     }
 
     public static BaseConfig getErrorOutputWriter(Map<String, String> inputParameterValueResult,
-                                                 DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
-        List<DqRuleExecuteSql> dqRuleExecuteSqlList = JSONUtils.toList(dataQualityTaskExecutionContext.getExecuteSqlList()
-                ,DqRuleExecuteSql.class);
+                                                  DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        List<DqRuleExecuteSql> dqRuleExecuteSqlList =
+                JSONUtils.toList(dataQualityTaskExecutionContext.getExecuteSqlList(), DqRuleExecuteSql.class);
 
         DqRuleExecuteSql errorOutputSql = null;
         if (CollectionUtils.isEmpty(dqRuleExecuteSqlList)) {
@@ -509,9 +528,9 @@ public class RuleParserUtils {
         if (StringUtils.isNotEmpty(inputParameterValueResult.get(ERROR_OUTPUT_PATH))
                 && errorOutputSql != null) {
             baseConfig = new BaseConfig();
-            Map<String,Object> config = new HashMap<>();
-            config.put(PATH,inputParameterValueResult.get(ERROR_OUTPUT_PATH));
-            config.put(INPUT_TABLE,errorOutputSql.getTableAlias());
+            Map<String, Object> config = new HashMap<>();
+            config.put(PATH, inputParameterValueResult.get(ERROR_OUTPUT_PATH));
+            config.put(INPUT_TABLE, errorOutputSql.getTableAlias());
             baseConfig.setConfig(config);
             baseConfig.setType(HDFS_FILE);
         }
@@ -530,7 +549,7 @@ public class RuleParserUtils {
             return "-1";
         }
 
-        Map<String,String> newInputParameterValue = new HashMap<>(inputParameterValue);
+        Map<String, String> newInputParameterValue = new HashMap<>(inputParameterValue);
 
         newInputParameterValue.remove(RULE_TYPE);
         newInputParameterValue.remove(RULE_NAME);
@@ -557,6 +576,6 @@ public class RuleParserUtils {
             sb.append(value);
         }
 
-        return Md5Utils.getMd5(sb.toString(),true);
+        return Md5Utils.getMd5(sb.toString(), true);
     }
 }

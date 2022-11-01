@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.pytorch;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -28,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +46,8 @@ public class PytorchTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext,
-            logger);
+                taskExecutionContext,
+                logger);
     }
 
     @Override
@@ -89,7 +89,6 @@ public class PytorchTask extends AbstractTask {
 
     }
 
-
     public String buildPythonExecuteCommand() throws Exception {
         List<String> args = new ArrayList<>();
 
@@ -112,7 +111,8 @@ public class PytorchTask extends AbstractTask {
 
         String scriptParams = pytorchParameters.getScriptParams();
         if (scriptParams != null && !scriptParams.isEmpty()) {
-            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(), pytorchParameters.getScriptParams()));
+            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(),
+                    pytorchParameters.getScriptParams()));
         } else {
             args.add(String.format("%s %s", getPythonCommand(), pytorchParameters.getScriptPath()));
 
@@ -133,10 +133,8 @@ public class PytorchTask extends AbstractTask {
 
     }
 
-
     @Override
     public AbstractParameters getParameters() {
         return pytorchParameters;
     }
 }
-

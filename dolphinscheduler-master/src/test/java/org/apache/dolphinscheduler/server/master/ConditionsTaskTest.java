@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -34,6 +36,12 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -41,11 +49,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -59,6 +62,10 @@ public class ConditionsTaskTest {
     private ProcessService processService;
 
     private ProcessInstance processInstance;
+
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionDao taskDefinitionDao;
 
     @BeforeEach
     public void before() {
@@ -74,6 +81,12 @@ public class ConditionsTaskTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(applicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
+        taskDefinitionDao = Mockito.mock(TaskDefinitionDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskDefinitionDao.class)).thenReturn(taskDefinitionDao);
+
         processInstance = getProcessInstance();
         Mockito.when(processService
                 .findProcessInstanceById(processInstance.getId()))
@@ -83,7 +96,7 @@ public class ConditionsTaskTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
-        Mockito.when(processService.findTaskDefinition(1L, 1))
+        Mockito.when(taskDefinitionDao.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
     }
 
@@ -95,22 +108,21 @@ public class ConditionsTaskTest {
                 .submitTask(processInstance, taskInstance))
                 .thenReturn(taskInstance);
         // for MasterBaseTaskExecThread.call
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findTaskInstanceById(taskInstance.getId()))
                 .thenReturn(taskInstance);
         // for ConditionsTaskExecThread.initTaskParameters
-        Mockito.when(processService
-                .saveTaskInstance(taskInstance))
+        Mockito.when(taskInstanceDao.upsertTaskInstance(taskInstance))
                 .thenReturn(true);
         // for ConditionsTaskExecThread.updateTaskState
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .updateTaskInstance(taskInstance))
                 .thenReturn(true);
 
         // for ConditionsTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = Stream.of(
                 getTaskInstanceForValidTaskList(expectResult)).collect(Collectors.toList());
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(conditions);
         return taskInstance;

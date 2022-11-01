@@ -16,8 +16,10 @@
  */
 
 export default {
-    log: {
-      refresh_time: 'Log Auto Refresh Time',
-    }
-  }
-  
+  refresh_time: 'Log Auto Refresh Time',
+  experimental_feature: 'Experimental Feature',
+  request_settings: 'Request Settings',
+  dynamic_task_component: 'Dynamic Task Component',
+  api_timeout: 'API Timeout',
+  millisecond: 'Millisecond'
+}

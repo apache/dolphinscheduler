@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.dependent;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -24,8 +25,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class DependentTaskChannel implements TaskChannel {
 
@@ -42,7 +43,8 @@ public class DependentTaskChannel implements TaskChannel {
     @Override
     public AbstractParameters parseParameters(ParametersNode parametersNode) {
         return JSONUtils.parseObject(StringUtils.isEmpty(parametersNode.getDependence())
-                ? parametersNode.getTaskParams() : parametersNode.getDependence(), DependentParameters.class);
+                ? parametersNode.getTaskParams()
+                : parametersNode.getDependence(), DependentParameters.class);
     }
 
     @Override

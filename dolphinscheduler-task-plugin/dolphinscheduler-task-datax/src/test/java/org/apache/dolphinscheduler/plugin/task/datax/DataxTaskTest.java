@@ -17,8 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import org.apache.commons.lang3.SystemUtils;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -32,14 +38,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,19 +54,21 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class DataxTaskTest {
 
     private DataxTask dataxTask;
 
-    private final TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {};
+    private final TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
+    };
 
     @BeforeEach
     public void before() throws Exception {
@@ -109,9 +111,8 @@ public class DataxTaskTest {
         boolean delete = jsonFile.delete();
         Assertions.assertTrue(delete);
 
-        File shellCommandFile = SystemUtils.IS_OS_WINDOWS ?
-                new File("/tmp/execution/app-id_node.bat") :
-                new File("/tmp/execution/app-id_node.sh");
+        File shellCommandFile = SystemUtils.IS_OS_WINDOWS ? new File("/tmp/execution/app-id_node.bat")
+                : new File("/tmp/execution/app-id_node.sh");
         InputStream shellCommandInputStream = Files.newInputStream(shellCommandFile.toPath());
         String shellCommandStr = FileUtils.readFile2Str(shellCommandInputStream);
         Assertions.assertEquals(shellCommandStr, "python2.7 ${DATAX_HOME}/bin/datax.py  --jvm=\"-Xms1G -Xmx1G\" " +
@@ -151,9 +152,8 @@ public class DataxTaskTest {
         boolean delete = jsonFile.delete();
         Assertions.assertTrue(delete);
 
-        File shellCommandFile = SystemUtils.IS_OS_WINDOWS ?
-                new File("/tmp/execution/app-id_node.bat") :
-                new File("/tmp/execution/app-id_node.sh");
+        File shellCommandFile = SystemUtils.IS_OS_WINDOWS ? new File("/tmp/execution/app-id_node.bat")
+                : new File("/tmp/execution/app-id_node.sh");
         InputStream shellCommandInputStream = Files.newInputStream(shellCommandFile.toPath());
         String shellCommandStr = FileUtils.readFile2Str(shellCommandInputStream);
         Assertions.assertEquals(shellCommandStr, "python2.7 ${DATAX_HOME}/bin/datax.py  --jvm=\"-Xms1G -Xmx1G\" " +
@@ -222,12 +222,12 @@ public class DataxTaskTest {
             when(resultSet.getMetaData()).thenReturn(md);
             when(stmt.executeQuery()).thenReturn(resultSet);
 
-            String[] rows = this.dataxTask.tryExecuteSqlResolveColumnNames(DbType.MYSQL,baseConnectionParam, "");
+            String[] rows = this.dataxTask.tryExecuteSqlResolveColumnNames(DbType.MYSQL, baseConnectionParam, "");
             Assertions.assertEquals(rows.length, 1);
             Assertions.assertEquals(rows[0], "something");
 
             when(connection.prepareStatement(anyString())).thenThrow(new SQLException("Connection failed"));
-            String[] nullRows = this.dataxTask.tryExecuteSqlResolveColumnNames(DbType.MYSQL,baseConnectionParam, "");
+            String[] nullRows = this.dataxTask.tryExecuteSqlResolveColumnNames(DbType.MYSQL, baseConnectionParam, "");
             Assertions.assertNull(nullRows);
         }
     }

@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * EdgeInfo: edge description information
  */
 public class DAG<Node, NodeInfo, EdgeInfo> {
+
     private static final Logger logger = LoggerFactory.getLogger(DAG.class);
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -466,8 +467,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         }
 
         /*
-         * After scanning, there is no node with 0 degree of entry,
-         * indicating that there is a ring, and return directly
+         * After scanning, there is no node with 0 degree of entry, indicating that there is a ring, and return directly
          */
         if (zeroIndegreeNodeQueue.isEmpty()) {
             return new AbstractMap.SimpleEntry<>(false, topoResultList);
@@ -501,13 +501,12 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     @Override
     public String toString() {
         return "DAG{"
-            + "nodesMap="
-            + nodesMap
-            + ", edgesMap="
-            + edgesMap
-            + ", reverseEdgesMap="
-            + reverseEdgesMap
-            + '}';
+                + "nodesMap="
+                + nodesMap
+                + ", edgesMap="
+                + edgesMap
+                + ", reverseEdgesMap="
+                + reverseEdgesMap
+                + '}';
     }
 }
-

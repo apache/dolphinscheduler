@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,11 +27,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -55,7 +56,8 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
-    private static final String APPEND_PARAMS = "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
+    private static final String APPEND_PARAMS =
+            "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -64,10 +66,8 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        MySQLConnectionParam
-                connectionParams = (MySQLConnectionParam) createConnectionParams(connectionJson);
-        MySQLDataSourceParamDTO
-                mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
+        MySQLConnectionParam connectionParams = (MySQLConnectionParam) createConnectionParams(connectionJson);
+        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
 
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
@@ -85,11 +85,11 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         MySQLDataSourceParamDTO mysqlDatasourceParam = (MySQLDataSourceParamDTO) dataSourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDatasourceParam.getHost(), mysqlDatasourceParam.getPort());
+        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_MYSQL, mysqlDatasourceParam.getHost(),
+                mysqlDatasourceParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, mysqlDatasourceParam.getDatabase());
 
-        MySQLConnectionParam
-                mysqlConnectionParam = new MySQLConnectionParam();
+        MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl(jdbcUrl);
         mysqlConnectionParam.setDatabase(mysqlDatasourceParam.getDatabase());
         mysqlConnectionParam.setAddress(address);
@@ -110,18 +110,17 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_MYSQL_CJ_JDBC_DRIVER;
+        return DataSourceConstants.COM_MYSQL_CJ_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.MYSQL_VALIDATION_QUERY;
+        return DataSourceConstants.MYSQL_VALIDATION_QUERY;
     }
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        MySQLConnectionParam
-                mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
+        MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
         String jdbcUrl = mysqlConnectionParam.getJdbcUrl();
         if (!StringUtils.isEmpty(mysqlConnectionParam.getOther())) {
             return String.format("%s?%s&%s", jdbcUrl, mysqlConnectionParam.getOther(), APPEND_PARAMS);

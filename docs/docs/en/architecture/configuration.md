@@ -224,6 +224,7 @@ The default configuration is as follows:
 |sudo.enable | true | whether to enable sudo|
 |alert.rpc.port | 50052 | the RPC port of Alert Server|
 |zeppelin.rest.url | http://localhost:8080 | the RESTful API url of zeppelin|
+|appId.collect | log | way to collect applicationId, if use aop, alter the configuration from log to aop, annotation of applicationId auto collection related configuration in `bin/env/dolphinscheduler_env.sh` should be removed. Note: Aop way doesn't support submitting yarn job on remote host by client mode like Beeline, and will failure if override applicationId collection-related environment configuration in dolphinscheduler_env.sh, and .|
 
 ### Api-server related configuration
 
@@ -277,6 +278,7 @@ Location: `master-server/conf/application.yaml`
 |master.kill-yarn-job-when-task-failover|true|whether to kill yarn job when failover taskInstance|
 |master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
 |master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will waitting infinitely|
+|master.worker-group-refresh-interval|10s|The interval to refresh worker group from db to memory|
 
 ### Worker Server related configuration
 
@@ -295,6 +297,7 @@ Location: `worker-server/conf/application.yaml`
 |worker.alert-listen-port|50052|the alert listen port of worker|
 |worker.registry-disconnect-strategy.strategy|stop|Used when the worker disconnect from registry, default value: stop. Optional values include stop, waiting|
 |worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will waitting infinitely |
+|worker.task-execute-threads-full-policy|REJECT|If REJECT, when the task waiting in the worker reaches exec-threads, it will reject the received task and the Master will redispatch it; If CONTINUE, it will put the task into the worker's execution queue and wait for a free thread to start execution|
 
 ### Alert Server related configuration
 
@@ -353,6 +356,13 @@ export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+
+# applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
+export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
+export SPARK_DIST_CLASSPATH=$HADOOP_CLASSPATH:$SPARK_DIST_CLASS_PATH
+export HADOOP_CLIENT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$HADOOP_CLIENT_OPTS
+export SPARK_SUBMIT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$SPARK_SUBMIT_OPTS
+export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$FLINK_ENV_JAVA_OPTS
 ```
 
 ### Log related configuration

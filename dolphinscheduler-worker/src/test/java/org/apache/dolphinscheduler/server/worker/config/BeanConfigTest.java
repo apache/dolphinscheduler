@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.config;
 
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

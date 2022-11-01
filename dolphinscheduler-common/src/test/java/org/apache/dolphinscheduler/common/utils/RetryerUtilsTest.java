@@ -16,12 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.ExecutionException;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
 
 public class RetryerUtilsTest {
 

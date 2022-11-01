@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -37,11 +38,11 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,9 @@ public class TaskPriorityQueueConsumerTest {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private TaskInstanceDao taskInstanceDao;
 
     @Autowired
     private ExecutorDispatcher dispatcher;
@@ -236,7 +240,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
 
-        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+        Mockito.doReturn(taskInstance).when(taskInstanceDao).findTaskInstanceById(1);
 
         Boolean state = taskPriorityQueueConsumer.taskInstanceIsFinalState(1);
         Assertions.assertNotNull(state);
@@ -264,7 +268,7 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
 
-        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+        Mockito.doReturn(taskInstance).when(taskInstanceDao).findTaskInstanceById(1);
 
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "NoWorkGroup");
         taskPriorityQueue.put(taskPriority);
@@ -302,7 +306,7 @@ public class TaskPriorityQueueConsumerTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskInstance.setTaskDefine(taskDefinition);
 
-        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+        Mockito.doReturn(taskInstance).when(taskInstanceDao).findTaskInstanceById(1);
 
         TaskPriority taskPriority = new TaskPriority();
         taskPriority.setTaskId(1);
@@ -333,7 +337,7 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setUserId(2);
         taskInstance.setProcessDefine(processDefinition);
 
-        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+        Mockito.doReturn(taskInstance).when(taskInstanceDao).findTaskInstanceById(1);
 
         TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, 1, "NoWorkGroup");
         taskPriorityQueue.put(taskPriority);

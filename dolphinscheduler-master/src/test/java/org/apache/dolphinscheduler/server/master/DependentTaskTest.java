@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -35,6 +37,11 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.time.Duration;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,10 +50,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
-
-import java.time.Duration;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * DependentTaskTest
@@ -68,6 +71,10 @@ public class DependentTaskTest {
     public static final int TASK_VERSION = 1;
 
     private ProcessService processService;
+
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionDao taskDefinitionDao;
 
     /**
      * the dependent task to be tested
@@ -94,6 +101,12 @@ public class DependentTaskTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(applicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
+        taskDefinitionDao = Mockito.mock(TaskDefinitionDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskDefinitionDao.class)).thenReturn(taskDefinitionDao);
+
         processInstance = getProcessInstance();
         taskInstance = getTaskInstance();
 
@@ -109,20 +122,19 @@ public class DependentTaskTest {
                 .thenAnswer(i -> taskInstance);
 
         // for DependentTaskExecThread.initTaskParameters
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .updateTaskInstance(Mockito.any()))
                 .thenReturn(true);
         // for DependentTaskExecThread.updateTaskState
-        Mockito.when(processService
-                .saveTaskInstance(Mockito.any()))
+        Mockito.when(taskInstanceDao.upsertTaskInstance(Mockito.any()))
                 .thenReturn(true);
 
         // for DependentTaskExecThread.waitTaskQuit
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findTaskInstanceById(1000))
                 .thenAnswer(i -> taskInstance);
 
-        Mockito.when(processService.findTaskDefinition(TASK_CODE, TASK_VERSION))
+        Mockito.when(taskDefinitionDao.findTaskDefinition(TASK_CODE, TASK_VERSION))
                 .thenReturn(getTaskDefinition());
     }
 
@@ -154,7 +166,7 @@ public class DependentTaskTest {
                 .thenReturn(dependentProcessInstance);
 
         // for DependentExecute.getDependTaskResult
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findValidTaskListByProcessId(200, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(2000, TaskExecutionStatus.SUCCESS, DEPEND_TASK_CODE_A,
@@ -176,7 +188,7 @@ public class DependentTaskTest {
                 .thenReturn(dependentProcessInstance);
 
         // for DependentExecute.getDependTaskResult
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findValidTaskListByProcessId(200, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(2000, TaskExecutionStatus.FAILURE, DEPEND_TASK_CODE_A,
@@ -227,13 +239,13 @@ public class DependentTaskTest {
                 .thenReturn(processInstance300);
 
         // for DependentExecute.getDependTaskResult
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findValidTaskListByProcessId(200, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(2000, TaskExecutionStatus.FAILURE, DEPEND_TASK_CODE_A,
                                 processInstance200))
                         .collect(Collectors.toList()));
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findValidTaskListByProcessId(300, 0))
                 .thenReturn(Stream.of(
                         getTaskInstanceForValidTaskList(3000, TaskExecutionStatus.SUCCESS, DEPEND_TASK_CODE_B,
@@ -320,7 +332,7 @@ public class DependentTaskTest {
         // DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
 
         // for DependentExecute.getDependTaskResult
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findValidTaskListByProcessId(200, 0))
                 .thenAnswer(i -> {
                     processInstance.setState(WorkflowExecutionStatus.READY_STOP);

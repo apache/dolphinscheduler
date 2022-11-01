@@ -26,8 +26,9 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT;
-import static org.apache.dolphinscheduler.common.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT;
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
@@ -38,7 +39,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -67,6 +68,7 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -148,6 +150,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private ProcessService processService;
+
+    @Mock
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
     private ProcessInstanceService processInstanceService;
@@ -756,8 +761,10 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         result.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(projectMapper.queryByCode(1)).thenReturn(project1);
         Mockito.when(projectService.checkProjectAndAuth(user, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
-
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode))
+                .thenReturn(getProcessTaskRelation());
+        Mockito.when(taskDefinitionLogDao.getTaskDefineLogList(any())).thenReturn(new ArrayList<>());
         Map<String, Object> taskNotNuLLRes =
                 processDefinitionService.viewTree(user, processDefinition.getProjectCode(), 46, 10);
         Assertions.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
@@ -772,6 +779,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_UPDATE))
                 .thenReturn(result);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, result)).thenReturn(true);
 
         try {
             processDefinitionService.updateProcessDefinition(user, projectCode, "test", 1,
@@ -1050,6 +1058,28 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 processDefinitionService.updateSingleProcessDefinition(user, processDefinitionCode,
                         workflowUpdateRequest);
         Assertions.assertEquals(processDefinition, processDefinitionUpdate);
+    }
+
+    @Test
+    public void testViewVariables() {
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+
+        Project project = getProject(projectCode);
+
+        ProcessDefinition processDefinition = getProcessDefinition();
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+
+        // project check auth fail
+        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
+                .thenReturn(result);
+
+        Map<String, Object> map =
+                processDefinitionService.viewVariables(user, processDefinition.getProjectCode(),
+                        processDefinition.getCode());
+
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
     }
 
     /**

@@ -28,11 +28,9 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import springfox.documentation.annotations.ApiIgnore;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
@@ -49,15 +47,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * access token controller
  */
-@Api(tags = "ACCESS_TOKEN_TAG")
+@Tag(name = "ACCESS_TOKEN_TAG")
 @RestController
 @RequestMapping("/access-tokens")
 public class AccessTokenController extends BaseController {
@@ -74,17 +73,17 @@ public class AccessTokenController extends BaseController {
      * @param token token string (if it is absent, it will be automatically generated)
      * @return create result state code
      */
-    @ApiOperation(value = "createToken", notes = "CREATE_TOKEN_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class),
-            @ApiImplicitParam(name = "expireTime", value = "EXPIRE_TIME", required = true, dataTypeClass = String.class, example = "2021-12-31 00:00:00"),
-            @ApiImplicitParam(name = "token", value = "TOKEN", required = false, dataTypeClass = String.class, example = "xxxx")
+    @Operation(summary = "createToken", description = "CREATE_TOKEN_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class), required = true),
+            @Parameter(name = "expireTime", description = "EXPIRE_TIME", schema = @Schema(implementation = String.class), required = true, example = "2021-12-31 00:00:00"),
+            @Parameter(name = "token", description = "TOKEN", required = false, schema = @Schema(implementation = String.class), example = "xxxx")
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token", required = false) String token) {
@@ -100,7 +99,7 @@ public class AccessTokenController extends BaseController {
      * @param expireTime expire time
      * @return token string
      */
-    @ApiIgnore
+    @Parameter(hidden = true)
     @PostMapping(value = "/generate")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(GENERATE_TOKEN_ERROR)
@@ -121,17 +120,17 @@ public class AccessTokenController extends BaseController {
      * @param pageSize page size
      * @return token list of page number and page size
      */
-    @ApiOperation(value = "queryAccessTokenList", notes = "QUERY_ACCESS_TOKEN_LIST_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
+    @Operation(summary = "queryAccessTokenList", description = "QUERY_ACCESS_TOKEN_LIST_NOTES")
+    @Parameters({
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class), example = "1"),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class), example = "20")
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ACCESSTOKEN_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAccessTokenList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryAccessTokenList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
@@ -152,15 +151,15 @@ public class AccessTokenController extends BaseController {
      * @param userId user id
      * @return token list for specified user
      */
-    @ApiOperation(value = "queryAccessTokenByUser", notes = "QUERY_ACCESS_TOKEN_BY_USER_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", dataTypeClass = int.class)
+    @Operation(summary = "queryAccessTokenByUser", description = "QUERY_ACCESS_TOKEN_BY_USER_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class))
     })
     @GetMapping(value = "/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ACCESSTOKEN_BY_USER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAccessTokenByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryAccessTokenByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @PathVariable("userId") Integer userId) {
         Map<String, Object> result = this.accessTokenService.queryAccessTokenByUser(loginUser, userId);
         return this.returnDataList(result);
@@ -173,12 +172,12 @@ public class AccessTokenController extends BaseController {
      * @param id token id
      * @return delete result code
      */
-    @ApiIgnore
+    @Parameter(hidden = true)
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result delAccessTokenById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result delAccessTokenById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable(value = "id") int id) {
         Map<String, Object> result = accessTokenService.delAccessTokenById(loginUser, id);
         return returnDataList(result);
@@ -194,18 +193,18 @@ public class AccessTokenController extends BaseController {
      * @param token token string (if it is absent, it will be automatically generated)
      * @return updated access token entity
      */
-    @ApiOperation(value = "updateToken", notes = "UPDATE_TOKEN_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "TOKEN_ID", required = true, dataTypeClass = int.class),
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataTypeClass = int.class),
-            @ApiImplicitParam(name = "expireTime", value = "EXPIRE_TIME", required = true, dataTypeClass = String.class, example = "2021-12-31 00:00:00"),
-            @ApiImplicitParam(name = "token", value = "TOKEN", required = false, dataTypeClass = String.class, example = "xxxx")
+    @Operation(summary = "updateToken", description = "UPDATE_TOKEN_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "TOKEN_ID", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "expireTime", description = "EXPIRE_TIME", required = true, schema = @Schema(implementation = String.class), example = "2021-12-31 00:00:00"),
+            @Parameter(name = "token", description = "TOKEN", required = false, schema = @Schema(implementation = String.class), example = "xxxx")
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result updateToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @PathVariable(value = "id") int id,
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,

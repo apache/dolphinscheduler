@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -95,6 +96,9 @@ public class TenantServiceTest {
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Mock
+    private StorageOperate storageOperate;
 
     private static final String tenantCode = "hayden";
     private static final String tenantDesc = "This is the tenant desc";
@@ -205,7 +209,8 @@ public class TenantServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+        Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1,
+                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
                 .thenReturn(getInstanceList());
         Mockito.when(processDefinitionMapper.queryDefinitionListByTenant(2)).thenReturn(getDefinitionsList());
         Mockito.when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());

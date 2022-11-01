@@ -17,16 +17,23 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import static org.apache.dolphinscheduler.api.enums.Status.ADD_TASK_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,19 +43,15 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.annotation.Resource;
-import java.util.List;
-
-import static org.apache.dolphinscheduler.api.enums.Status.ADD_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * fav controller
  */
-@Api(tags = "FAVOURITE")
+@Tag(name = "FAVOURITE_TAG")
 @RestController
 @RequestMapping("/favourite")
 public class FavTaskController extends BaseController {
@@ -62,12 +65,12 @@ public class FavTaskController extends BaseController {
      * @param loginUser login user
      * @return task type list
      */
-    @ApiOperation(value = "listTaskType", notes = "LIST_TASK_TYPE")
+    @Operation(summary = "listTaskType", description = "QUERY_TASK_TYPE_LIST")
     @GetMapping(value = "/taskTypes")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result listTaskType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result listTaskType(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<FavTaskDto> favTaskList = favTaskService.getFavTaskList(loginUser);
         return success(Status.SUCCESS.getMsg(), favTaskList);
     }
@@ -78,14 +81,14 @@ public class FavTaskController extends BaseController {
      * @param loginUser login user
      * @return
      */
-    @ApiOperation(value = "deleteTaskType", notes = "DELETE_TASK_TYPE")
-    @DeleteMapping(value = "/{taskName}")
+    @Operation(summary = "deleteTaskType", description = "DELETE_TASK_TYPE")
+    @DeleteMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteFavTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @PathVariable("taskName") String taskName) {
-        boolean b = favTaskService.deleteFavTask(loginUser, taskName);
+    public Result deleteFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                @PathVariable("taskType") String taskType) {
+        boolean b = favTaskService.deleteFavTask(loginUser, taskType);
         return success(b);
     }
 
@@ -95,14 +98,14 @@ public class FavTaskController extends BaseController {
      * @param loginUser login user
      * @return
      */
-    @ApiOperation(value = "addTaskType", notes = "ADD_TASK_TYPE")
-    @PostMapping(value = "/{taskName}")
+    @Operation(summary = "addTaskType", description = "ADD_TASK_TYPE")
+    @PostMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ADD_TASK_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result addFavTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @PathVariable("taskName") String taskName) {
-        int i = favTaskService.addFavTask(loginUser, taskName);
+    public Result addFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                             @PathVariable("taskType") String taskType) {
+        int i = favTaskService.addFavTask(loginUser, taskType);
         return success(i > 0);
     }
 }

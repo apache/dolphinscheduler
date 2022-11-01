@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * condition type
  */
 public enum ConditionType {
+
     /**
      * 0 none
      * 1 judge

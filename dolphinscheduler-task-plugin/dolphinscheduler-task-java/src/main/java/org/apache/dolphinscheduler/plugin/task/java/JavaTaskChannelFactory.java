@@ -27,6 +27,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class JavaTaskChannelFactory implements TaskChannelFactory {
+
     /**
      * Construct a channel for a Java task
      *

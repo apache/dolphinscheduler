@@ -16,7 +16,7 @@
  */
 
 const removeUselessChildren = (
-  list: { children?: []; dirctory?: boolean; disabled?: boolean }[]
+  list: { children?: []; directory?: boolean; disabled?: boolean; dirctory?: boolean }[]
 ) => {
   if (!list.length) return
   list.forEach((item) => {

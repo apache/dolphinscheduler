@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.taskRelation;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 
 import org.apache.dolphinscheduler.api.dto.PageQueryDto;
 
@@ -29,7 +29,7 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * task relation update request
@@ -39,10 +39,10 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 public class TaskRelationUpdateUpstreamRequest extends PageQueryDto {
 
-    @ApiModelProperty(example = "1234587654321", notes = "workflow code ")
+    @Schema(example = "1234587654321", description = "workflow code ")
     private long workflowCode;
 
-    @ApiModelProperty(example = "12345678,87654321", required = true, notes = "upstream you want to update separated by comma")
+    @Schema(example = "12345678,87654321", required = true, description = "upstream you want to update separated by comma")
     private String upstreams;
 
     public List<Long> getUpstreams() {

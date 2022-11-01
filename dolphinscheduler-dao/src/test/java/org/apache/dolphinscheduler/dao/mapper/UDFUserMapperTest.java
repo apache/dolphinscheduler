@@ -45,7 +45,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * insert
      * @return UDFUser
      */
-    private UDFUser insertOne(){
+    private UDFUser insertOne() {
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(1);
         udfUser.setUserId(1);
@@ -61,7 +61,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * @param udfFunc  udfFunc
      * @return UDFUser
      */
-    private UDFUser insertOne(User user,UdfFunc udfFunc){
+    private UDFUser insertOne(User user, UdfFunc udfFunc) {
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(udfFunc.getId());
         udfUser.setUserId(user.getId());
@@ -71,12 +71,11 @@ public class UDFUserMapperTest extends BaseDaoTest {
         return udfUser;
     }
 
-
     /**
      * insert one user
      * @return User
      */
-    private User insertOneUser(){
+    private User insertOneUser() {
         User user = new User();
         user.setUserName("user1");
         user.setUserPassword("1");
@@ -94,7 +93,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * insert one udf
      * @return UdfFunc
      */
-    private UdfFunc insertOneUdfFunc(){
+    private UdfFunc insertOneUdfFunc() {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setFuncName("dolphin_udf_func");
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
@@ -111,12 +110,12 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOneUser
+    public void testUpdate() {
+        // insertOneUser
         User user = insertOneUser();
-        //insertOneUdfFunc
+        // insertOneUdfFunc
         UdfFunc udfFunc = insertOneUdfFunc();
-        //insertOne
+        // insertOne
         UDFUser udfUser = insertOne(user, udfFunc);
         udfUser.setUserId(2);
         udfUser.setUdfId(2);
@@ -129,12 +128,12 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * test delete
      */
     @Test
-    public void testDelete(){
-        //insertOneUser
+    public void testDelete() {
+        // insertOneUser
         User user = insertOneUser();
-        //insertOneUdfFunc
+        // insertOneUdfFunc
         UdfFunc udfFunc = insertOneUdfFunc();
-        //insertOne
+        // insertOne
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteById(udfUser.getId());
         Assertions.assertEquals(delete, 1);
@@ -144,10 +143,10 @@ public class UDFUserMapperTest extends BaseDaoTest {
      * test query
      */
     @Test
-    public void testQuery(){
-        //insertOne
+    public void testQuery() {
+        // insertOne
         UDFUser udfUser = insertOne();
-        //query
+        // query
         List<UDFUser> udfUserList = udfUserMapper.selectList(null);
         Assertions.assertNotEquals(udfUserList.size(), 0);
     }
@@ -157,11 +156,11 @@ public class UDFUserMapperTest extends BaseDaoTest {
      */
     @Test
     public void testDeleteByUserId() {
-        //insertOneUser
+        // insertOneUser
         User user = insertOneUser();
-        //insertOneUdfFunc
+        // insertOneUdfFunc
         UdfFunc udfFunc = insertOneUdfFunc();
-        //insertOne
+        // insertOne
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUserId(user.getId());
         Assertions.assertEquals(delete, 1);
@@ -173,11 +172,11 @@ public class UDFUserMapperTest extends BaseDaoTest {
      */
     @Test
     public void testDeleteByUdfFuncId() {
-        //insertOneUser
+        // insertOneUser
         User user = insertOneUser();
-        //insertOneUdfFunc
+        // insertOneUdfFunc
         UdfFunc udfFunc = insertOneUdfFunc();
-        //insertOne
+        // insertOne
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUdfFuncId(udfFunc.getId());
         Assertions.assertEquals(delete, 1);

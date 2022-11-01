@@ -17,16 +17,31 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,19 +52,15 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class CommonTaskProcessorTest {
 
     private ProcessService processService;
+
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionDao taskDefinitionDao;
 
     private CommonTaskProcessor commonTaskProcessor;
 
@@ -64,6 +75,12 @@ public class CommonTaskProcessorTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(applicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
+        taskDefinitionDao = Mockito.mock(TaskDefinitionDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskDefinitionDao.class)).thenReturn(taskDefinitionDao);
+
         commonTaskProcessor = Mockito.mock(CommonTaskProcessor.class);
         Mockito.when(applicationContext.getBean(CommonTaskProcessor.class)).thenReturn(commonTaskProcessor);
 
@@ -71,7 +88,7 @@ public class CommonTaskProcessorTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
-        Mockito.when(processService.findTaskDefinition(1L, 1))
+        Mockito.when(taskDefinitionDao.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
     }
 
@@ -102,7 +119,7 @@ public class CommonTaskProcessorTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskInstance.setTaskDefine(taskDefinition);
-        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+        Mockito.doReturn(taskInstance).when(taskInstanceDao).findTaskInstanceById(1);
         TaskExecutionContext taskExecutionContext = commonTaskProcessor.getTaskExecutionContext(taskInstance);
         Assertions.assertNull(taskExecutionContext);
     }
@@ -126,7 +143,8 @@ public class CommonTaskProcessorTest {
         resource.setFileName("fileName");
         resourcesList.add(resource);
         Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
-        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
+        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(),
+                ResourceType.FILE);
         Assertions.assertNotNull(map);
 
     }
@@ -166,17 +184,19 @@ public class CommonTaskProcessorTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTestFlag(1);
         taskInstance.setTaskType("SQL");
-        taskInstance.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
+        taskInstance.setTaskParams(
+                "{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
         TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setTaskParams("{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
+        taskDefinition.setTaskParams(
+                "{\"localParams\":[],\"resourceList\":[],\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from 'order'\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10}");
         taskInstance.setTaskDefine(taskDefinition);
         commonTaskProcessor1.taskInstance = taskInstance;
 
-        //The data source instance has no bound test data source
+        // The data source instance has no bound test data source
         Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
         commonTaskProcessor1.convertExeEnvironmentOnlineToTest();
 
-        //The data source instance has  bound test data source
+        // The data source instance has bound test data source
         Mockito.when(processService.queryTestDataSourceId(any(Integer.class))).thenReturn(2);
         commonTaskProcessor1.convertExeEnvironmentOnlineToTest();
     }

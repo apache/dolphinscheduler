@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MasterHeartBeat implements HeartBeat {
+
     private long startupTime;
     private long reportTime;
     private double cpuUsage;

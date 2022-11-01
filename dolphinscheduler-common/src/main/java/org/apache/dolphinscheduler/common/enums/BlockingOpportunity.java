@@ -24,7 +24,7 @@ public enum BlockingOpportunity {
 
     private final String desc;
 
-    BlockingOpportunity(String desc){
+    BlockingOpportunity(String desc) {
         this.desc = desc;
     }
 

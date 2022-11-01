@@ -16,24 +16,24 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class StringTest {
 
     @Test
-    public void stringCompareTest(){
+    public void stringCompareTest() {
 
-        for(int j = 0; j < 5; j++) {
+        for (int j = 0; j < 5; j++) {
             long start = System.currentTimeMillis();
             int size = 10000;
 
             List<String> taskList = new ArrayList<>(size);
 
-            //init
+            // init
             for (int i = 0; i < size; i++) {
                 taskList.add(String.format("%d_%010d_%010d", 1, i, i + 1));
             }

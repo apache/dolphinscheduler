@@ -23,12 +23,14 @@ import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.dao.entity.FavTask;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.FavTaskMapper;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
 
 @Service
 public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskService {
@@ -48,7 +50,7 @@ public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskServic
         defaultTaskTypes.forEach(e -> {
             try {
                 FavTaskDto clone = (FavTaskDto) e.clone();
-                if (userFavTaskTypes.contains(clone.getTaskName())) {
+                if (userFavTaskTypes.contains(clone.getTaskType())) {
                     clone.setCollection(true);
                 }
                 result.add(clone);
@@ -60,13 +62,13 @@ public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskServic
     }
 
     @Override
-    public boolean deleteFavTask(User loginUser, String taskName) {
-        return favMapper.deleteUserFavTask(loginUser.getId(), taskName);
+    public boolean deleteFavTask(User loginUser, String taskType) {
+        return favMapper.deleteUserFavTask(loginUser.getId(), taskType);
     }
 
     @Override
-    public int addFavTask(User loginUser, String taskName) {
-        favMapper.deleteUserFavTask(loginUser.getId(), taskName);
-        return favMapper.insert(new FavTask(null, taskName, loginUser.getId()));
+    public int addFavTask(User loginUser, String taskType) {
+        favMapper.deleteUserFavTask(loginUser.getId(), taskType);
+        return favMapper.insert(new FavTask(null, taskType, loginUser.getId()));
     }
 }
