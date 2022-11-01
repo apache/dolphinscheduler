@@ -21,6 +21,7 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 ```shell
 # 解压并运行 Standalone Server
 tar -xvzf apache-dolphinscheduler-*-bin.tar.gz
+chmod -R 755 apache-dolphinscheduler-*-bin
 cd apache-dolphinscheduler-*-bin
 bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 ```

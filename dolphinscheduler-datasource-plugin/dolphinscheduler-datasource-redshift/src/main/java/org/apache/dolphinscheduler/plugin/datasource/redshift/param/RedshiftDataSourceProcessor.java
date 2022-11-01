@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,11 +27,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -50,14 +51,12 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        RedshiftConnectionParam
-                connectionParams = (RedshiftConnectionParam) createConnectionParams(connectionJson);
+        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) createConnectionParams(connectionJson);
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
-        RedshiftDataSourceParamDTO
-                redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
+        RedshiftDataSourceParamDTO redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
         redshiftDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         redshiftDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
@@ -70,11 +69,12 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         RedshiftDataSourceParamDTO redshiftParam = (RedshiftDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_REDSHIFT, redshiftParam.getHost(), redshiftParam.getPort());
+        String address =
+                String.format("%s%s:%s", DataSourceConstants.JDBC_REDSHIFT, redshiftParam.getHost(),
+                        redshiftParam.getPort());
         String jdbcUrl = address + Constants.SLASH + redshiftParam.getDatabase();
 
-        RedshiftConnectionParam
-                redshiftConnectionParam = new RedshiftConnectionParam();
+        RedshiftConnectionParam redshiftConnectionParam = new RedshiftConnectionParam();
         redshiftConnectionParam.setUser(redshiftParam.getUserName());
         redshiftConnectionParam.setPassword(PasswordUtils.encodePassword(redshiftParam.getPassword()));
         redshiftConnectionParam.setOther(transformOther(redshiftParam.getOther()));
@@ -95,18 +95,17 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.COM_REDSHIFT_JDBC_DRIVER;
+        return DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.REDHIFT_VALIDATION_QUERY;
+        return DataSourceConstants.REDHIFT_VALIDATION_QUERY;
     }
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        RedshiftConnectionParam
-                redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;
+        RedshiftConnectionParam redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;
         if (!StringUtils.isEmpty(redshiftConnectionParam.getOther())) {
             return String.format("%s?%s", redshiftConnectionParam.getJdbcUrl(), redshiftConnectionParam.getOther());
         }

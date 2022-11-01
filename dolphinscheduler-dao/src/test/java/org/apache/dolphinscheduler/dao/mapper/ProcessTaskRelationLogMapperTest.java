@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProcessTaskRelationLogMapperTest extends BaseDaoTest {
@@ -38,7 +38,7 @@ public class ProcessTaskRelationLogMapperTest extends BaseDaoTest {
      * @return ProcessDefinition
      */
     private ProcessTaskRelationLog insertOne() {
-        //insertOne
+        // insertOne
         ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
         processTaskRelationLog.setName("def 1");
         processTaskRelationLog.setProcessDefinitionVersion(1);
@@ -57,7 +57,7 @@ public class ProcessTaskRelationLogMapperTest extends BaseDaoTest {
         ProcessTaskRelationLog processTaskRelationLog = insertOne();
         List<ProcessTaskRelationLog> processTaskRelationLogs = processTaskRelationLogMapper
                 .queryByProcessCodeAndVersion(1L, 1);
-        Assert.assertNotEquals(processTaskRelationLogs.size(), 0);
+        Assertions.assertNotEquals(processTaskRelationLogs.size(), 0);
     }
 
 }

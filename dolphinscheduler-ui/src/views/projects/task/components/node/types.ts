@@ -90,8 +90,14 @@ interface ISwitchResult {
   nextNode?: number
 }
 
+/*
+ * resourceName: resource full name
+ * res: resource file name
+ */
 interface ISourceItem {
-  id: number
+  id?: number,
+  resourceName: string,
+  res?: string
 }
 
 interface ISqoopTargetData {
@@ -331,6 +337,7 @@ interface ITaskParams {
   minCpuCores?: string
   minMemorySpace?: string
   image?: string
+  command?: string
   algorithm?: string
   params?: string
   searchParams?: string
@@ -373,6 +380,21 @@ interface ITaskParams {
   pythonEnvTool?: string
   requirements?: string
   condaPythonVersion?: string
+  isRestartTask?: boolean
+  isJsonFormat?: boolean
+  jsonData?: string
+  migrationType?: string
+  replicationTaskIdentifier?: string
+  sourceEndpointArn?: string
+  targetEndpointArn?: string
+  replicationInstanceArn?: string
+  tableMappings?: string
+  replicationTaskArn?: string
+  jsonFormat?: boolean
+  destinationLocationArn?: string
+  sourceLocationArn?: string
+  name?: string
+  cloudWatchLogGroupArn?: string
 }
 
 interface INodeData
@@ -414,8 +436,8 @@ interface INodeData
   preTasks?: number[]
   preTaskOptions?: []
   postTaskOptions?: []
-  resourceList?: number[]
-  mainJar?: number
+  resourceList?: string[]
+  mainJar?: string
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string

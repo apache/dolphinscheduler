@@ -23,24 +23,24 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
-import org.apache.dolphinscheduler.service.factory.NettyRemotingClientFactory;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AlertClientServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertClientServiceTest.class);
@@ -51,7 +51,7 @@ public class AlertClientServiceTest {
 
     private MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         client = Mockito.mock(NettyRemotingClient.class);
         mockedNettyRemotingClientFactory = Mockito.mockStatic(NettyRemotingClientFactory.class);
@@ -60,7 +60,7 @@ public class AlertClientServiceTest {
         alertClient = new AlertClientService();
     }
 
-    @After
+    @AfterEach
     public void after() {
         mockedNettyRemotingClientFactory.close();
     }
@@ -76,7 +76,7 @@ public class AlertClientServiceTest {
         // 1.alter server does not exist
         AlertSendResponseCommand alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertNull(alertSendResponseCommand);
+        Assertions.assertNull(alertSendResponseCommand);
 
         AlertSendRequestCommand alertSendRequestCommand =
                 new AlertSendRequestCommand(groupId, title, content, WarningType.FAILURE.getCode());
@@ -98,7 +98,7 @@ public class AlertClientServiceTest {
         Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -113,7 +113,7 @@ public class AlertClientServiceTest {
         Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -127,7 +127,7 @@ public class AlertClientServiceTest {
         Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -140,7 +140,7 @@ public class AlertClientServiceTest {
         Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.isSuccess());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
@@ -154,7 +154,7 @@ public class AlertClientServiceTest {
         Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
         alertSendResponseCommand =
                 alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertTrue(alertSendResponseCommand.isSuccess());
+        Assertions.assertTrue(alertSendResponseCommand.isSuccess());
         alertSendResponseCommand.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 

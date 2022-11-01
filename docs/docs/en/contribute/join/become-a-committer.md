@@ -20,7 +20,7 @@ In Dolphinscheduler, **new committer nomination** could only be officially start
 
 The following steps are recommended (to be initiated only by an existing PMC member):
 1. Send an email titled `[DISCUSS] Promote xxx as new committer` to `private@dolphinscheduler.apache.org`. List the important contributions of the candidate,
-   so you could gather support from other PMC members for your proposal.
+so you could gather support from other PMC members for your proposal.
 2. Keep the discussion open for more than 3 days but no more than 1 week, unless there is any express objection or concern.
 3. If the PMC generally agrees to the proposal, send an email titled `[VOTE] Promote xxx as new committer` to `private@dolphinscheduler.apache.org`.
 4. Keep the voting process open for more than 3 days, but no more than 1 week. Consider the result as `Consensus Approval` if there are `3 + 1` votes with `NO` vetos. Please note that +1 votes > -1 votes.
@@ -31,6 +31,7 @@ The following steps are recommended (to be initiated only by an existing PMC mem
 The PMC member who starts the promotion is responsible for sending an invitation to the new committer and guiding him/her to set up the ASF env.
 
 The PMC member should send an email using the following template to the new committer:
+
 ```
 To: <invitee name>@gmail.com
 Cc: private@dolphinscheduler.apache.org

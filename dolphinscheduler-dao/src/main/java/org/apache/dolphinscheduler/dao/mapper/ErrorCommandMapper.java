@@ -40,7 +40,7 @@ public interface ErrorCommandMapper extends BaseMapper<ErrorCommand> {
      * @return CommandCount list
      */
     List<CommandCount> countCommandState(
-            @Param("startTime") Date startTime,
-            @Param("endTime") Date endTime,
-            @Param("projectCodeArray") Long[] projectCodeArray);
+                                         @Param("startTime") Date startTime,
+                                         @Param("endTime") Date endTime,
+                                         @Param("projectCodeArray") Long[] projectCodeArray);
 }

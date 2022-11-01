@@ -20,20 +20,20 @@ package org.apache.dolphinscheduler.plugin.task.hivecli;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class HiveCliTaskTest {
 
     public static final String EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_SCRIPT_COMMAND =
@@ -50,7 +50,7 @@ public class HiveCliTaskTest {
         String hiveCliTaskParameters = buildHiveCliTaskExecuteSqlFromScriptParameters();
         HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
         hiveCliTask.init();
-        Assert.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_SCRIPT_COMMAND);
+        Assertions.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_SCRIPT_COMMAND);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class HiveCliTaskTest {
         String hiveCliTaskParameters = buildHiveCliTaskExecuteSqlFromFileParameters();
         HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
         hiveCliTask.init();
-        Assert.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_FILE_COMMAND);
+        Assertions.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_FILE_COMMAND);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class HiveCliTaskTest {
         String hiveCliTaskParameters = buildHiveCliTaskExecuteWithOptionsParameters();
         HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
         hiveCliTask.init();
-        Assert.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_WITH_OPTIONS);
+        Assertions.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_WITH_OPTIONS);
     }
 
     private HiveCliTask prepareHiveCliTaskForTest(final String hiveCliTaskParameters) {

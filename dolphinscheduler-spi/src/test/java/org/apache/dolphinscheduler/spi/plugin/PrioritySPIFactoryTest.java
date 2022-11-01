@@ -17,28 +17,29 @@
 
 package org.apache.dolphinscheduler.spi.plugin;
 
-import com.google.auto.service.AutoService;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import com.google.auto.service.AutoService;
 
 public class PrioritySPIFactoryTest {
 
     @Test
     public void loadHighPriority() {
-        PrioritySPIFactory<LoadHighPriorityConflictTestSPI> factory = new PrioritySPIFactory<>(LoadHighPriorityConflictTestSPI.class);
+        PrioritySPIFactory<LoadHighPriorityConflictTestSPI> factory =
+                new PrioritySPIFactory<>(LoadHighPriorityConflictTestSPI.class);
         Map<String, LoadHighPriorityConflictTestSPI> spiMap = factory.getSPIMap();
-        Assert.assertEquals(1, spiMap.get("A").getIdentify().getPriority());
+        Assertions.assertEquals(1, spiMap.get("A").getIdentify().getPriority());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void throwExceptionWhenPriorityIsSame() {
-        PrioritySPIFactory<ThrowExceptionConflictTestSPI> factory = new PrioritySPIFactory<>(ThrowExceptionConflictTestSPI.class);
-        Map<String, ThrowExceptionConflictTestSPI> spiMap = factory.getSPIMap();
-        Assert.assertEquals(0, spiMap.get("B").getIdentify().getPriority());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new PrioritySPIFactory<>(ThrowExceptionConflictTestSPI.class);
+        });
     }
-
 
     public interface LoadHighPriorityConflictTestSPI extends PrioritySPI {
 
@@ -83,6 +84,5 @@ public class PrioritySPIFactoryTest {
             return SPIIdentify.builder().name("B").priority(0).build();
         }
     }
-
 
 }

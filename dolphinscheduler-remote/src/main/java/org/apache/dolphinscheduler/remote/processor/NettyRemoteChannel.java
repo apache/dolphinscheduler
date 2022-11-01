@@ -44,7 +44,6 @@ public class NettyRemoteChannel {
      */
     private final Host host;
 
-
     public NettyRemoteChannel(Channel channel, long opaque) {
         this.channel = channel;
         this.host = ChannelUtils.toAddress(channel);
@@ -69,7 +68,7 @@ public class NettyRemoteChannel {
         return host;
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return this.channel.isActive();
     }
 
@@ -77,7 +76,7 @@ public class NettyRemoteChannel {
         return this.channel.writeAndFlush(command);
     }
 
-    public void close(){
+    public void close() {
         this.channel.close();
     }
 }

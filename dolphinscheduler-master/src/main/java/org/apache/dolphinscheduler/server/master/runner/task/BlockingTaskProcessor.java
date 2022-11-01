@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.BlockingOpportunity;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
+import org.apache.dolphinscheduler.service.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,7 +77,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         this.taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         this.taskInstance.setStartTime(new Date());
-        this.processService.saveTaskInstance(taskInstance);
+        this.taskInstanceDao.upsertTaskInstance(taskInstance);
         this.dependentParameters = taskInstance.getDependency();
         this.blockingParam = JSONUtils.parseObject(taskInstance.getTaskParams(), BlockingParameters.class);
     }
@@ -87,7 +87,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         // todo: task cannot be pause
         taskInstance.setState(TaskExecutionStatus.PAUSE);
         taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         logger.info("blocking task has been paused");
         return true;
     }
@@ -96,7 +96,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         logger.info("blocking task has been killed");
         return true;
     }
@@ -171,7 +171,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
 
     private void setConditionResult() {
 
-        List<TaskInstance> taskInstances = processService
+        List<TaskInstance> taskInstances = taskInstanceDao
                 .findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
@@ -204,7 +204,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         }
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setEndTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
         logger.info("blocking task execute complete, blocking:{}", isBlocked);
     }
 }

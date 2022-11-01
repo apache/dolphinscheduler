@@ -66,7 +66,7 @@ public interface TenantService {
      * @throws Exception exception
      */
     Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
-            String desc) throws Exception;
+                                     String desc) throws Exception;
 
     /**
      * delete tenant

@@ -75,7 +75,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     List<DefinitionGroupByUser> countDefinitionGroupByUser(@Param("projectCodes") Long[] projectCodes);
 
     /**
-     * list all resource ids
+     * list all resource ids and task_params containing resourceList
      *
      * @return task ids list
      */
@@ -122,7 +122,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
                                               @Param("searchWorkflowName") String searchWorkflowName,
                                               @Param("searchTaskName") String searchTaskName,
                                               @Param("taskType") String taskType,
-                                              @Param("taskExecuteType")TaskExecuteType taskExecuteType);
+                                              @Param("taskExecuteType") TaskExecuteType taskExecuteType);
 
     /**
      * query task definition by code list
@@ -131,4 +131,14 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition list
      */
     List<TaskDefinition> queryByCodeList(@Param("codes") Collection<Long> codes);
+
+    /**
+     * Filter task definition
+     *
+     * @param page page
+     * @param taskDefinition process definition object
+     * @return task definition IPage
+     */
+    IPage<TaskDefinition> filterTaskDefinition(IPage<TaskDefinition> page,
+                                               @Param("task") TaskDefinition taskDefinition);
 }

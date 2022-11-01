@@ -27,18 +27,17 @@ export function useCreate(state: any) {
   const fileStore = useFileStore()
 
   const handleCreateFile = () => {
-    const pid = router.currentRoute.value.params.id || -1
+    // no more pid, as currentDir acts as the pid or parent path right now.
     const currentDir = fileStore.getCurrentDir || '/'
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
         await onlineCreateResource({
           ...state.fileForm,
-          ...{ pid, currentDir }
+          ...{ currentDir }
         })
 
         window.$message.success(t('resource.file.success'))
-        const name = pid ? 'resource-file-subdirectory' : 'file'
-        router.push({ name, params: { id: pid } })
+        router.go(-1)
       }
     })
   }

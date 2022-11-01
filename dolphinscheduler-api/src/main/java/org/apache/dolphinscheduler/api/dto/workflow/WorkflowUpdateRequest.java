@@ -28,7 +28,7 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * workflow update request
@@ -38,30 +38,39 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 public class WorkflowUpdateRequest {
 
-    @ApiModelProperty(example = "workflow's name")
+    @Schema(example = "workflow's name")
     private String name;
 
-    @ApiModelProperty(example = "workflow's description")
+    @Schema(example = "workflow's description")
     private String description;
 
-    @ApiModelProperty(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE")
+    @Schema(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE")
     private String releaseState;
 
-    @ApiModelProperty(example = "[{\"prop\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
+    @Schema(example = "[{\"prop\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
     private String globalParams;
 
-    @ApiModelProperty(example = "2")
+    @Schema(example = "2")
     private int warningGroupId;
 
-    @ApiModelProperty(example = "60")
+    @Schema(example = "60")
     private int timeout;
 
-    @ApiModelProperty(example = "tenantCode1")
+    @Schema(example = "tenantCode1")
     private String tenantCode;
 
-    @ApiModelProperty(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", notes = "default PARALLEL if not provide.")
+    @Schema(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", description = "default PARALLEL if not provide.")
     private String executionType;
 
+    @Schema(example = "[{\\\"taskCode\\\":7009653961024,\\\"x\\\":312,\\\"y\\\":196}]")
+    private String location;
+
+    /**
+     * Merge workflowUpdateRequest information into exists processDefinition object
+     *
+     * @param processDefinition exists processDefinition object
+     * @return process definition
+     */
     public ProcessDefinition mergeIntoProcessDefinition(ProcessDefinition processDefinition) {
         ProcessDefinition processDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
@@ -89,6 +98,9 @@ public class WorkflowUpdateRequest {
         }
         if (this.executionType != null) {
             processDefinitionDeepCopy.setExecutionType(ProcessExecutionTypeEnum.valueOf(this.executionType));
+        }
+        if (this.location != null) {
+            processDefinitionDeepCopy.setLocations(this.location);
         }
 
         int version = processDefinitionDeepCopy.getVersion() + 1;

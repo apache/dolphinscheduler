@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.mysql;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.plugin.registry.mysql.task.EphemeralDateManager;
 import org.apache.dolphinscheduler.plugin.registry.mysql.task.RegistryLockManager;
 import org.apache.dolphinscheduler.plugin.registry.mysql.task.SubscribeDataManager;
@@ -27,15 +26,18 @@ import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
+import java.sql.SQLException;
+import java.time.Duration;
+import java.util.Collection;
+
+import javax.annotation.PostConstruct;
+
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.sql.SQLException;
-import java.time.Duration;
-import java.util.Collection;
 
 /**
  * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on mysql database to

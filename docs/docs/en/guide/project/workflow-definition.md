@@ -75,7 +75,10 @@ Workflow running parameter description:
 * **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker.
 * **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group.
 * **Startup parameters**: Set or override the value of global parameters when starting a new process instance.
-* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement. You could select the time period or fill in it manually in UI.
+* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement.
+
+  > You could select the time period or fill in it manually in UI. The date range is left closed and right closed time interval (startDate <= N <= endDate)
+
   * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
 
   ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
@@ -105,11 +108,11 @@ Workflow running parameter description:
 
   * Complement with or without scheduling：
 
-    1. Without scheduling: Run workflow every day from start date to end date according to the time period you set. e.g. Do complement from July 7th to 10th without scheduling:
+    1. `Unconfigured timing` or `Configured timing and timing status offline`: Complement the number according to the selected time range combined with the timing default configuration (0:00 every day). e.g. the workflow scheduling date is from July 7th to July 10th:
 
     ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
 
-    2. With scheduling: Run workflow from start date to end date on schedule according to the time period and schedule you set. e.g. Do complement from July 7th to 10th with the schedule of 5 AM every day:
+    2. `Configured timing and timing status online`: Complement the number according to the selected time range combined with the timing configuration. e.g. the workflow scheduling date is from July 7th to July 10th, and the timing is configured (running at 5 am every day):
 
     ![workflow-configuredTiming](../../../../img/new_ui/dev/project/workflow-configuredTiming.png)
 

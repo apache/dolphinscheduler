@@ -17,19 +17,22 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.config.TaskExecuteThreadsFullPolicy;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.DelayQueue;
+
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nullable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.DelayQueue;
 
 /**
  * Manage tasks
@@ -40,17 +43,19 @@ public class WorkerManagerThread implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(WorkerManagerThread.class);
 
     private final DelayQueue<WorkerDelayTaskExecuteRunnable> waitSubmitQueue;
-
     private final WorkerExecService workerExecService;
+    private final WorkerConfig workerConfig;
 
     private final int workerExecThreads;
 
     /**
      * running task
      */
-    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap =
+            new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
+        this.workerConfig = workerConfig;
         workerExecThreads = workerConfig.getExecThreads();
         this.waitSubmitQueue = new DelayQueue<>();
         workerExecService = new WorkerExecService(
@@ -92,7 +97,12 @@ public class WorkerManagerThread implements Runnable {
     }
 
     public boolean offer(WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable) {
+        if (workerConfig.getTaskExecuteThreadsFullPolicy() == TaskExecuteThreadsFullPolicy.CONTINUE) {
+            return waitSubmitQueue.offer(workerDelayTaskExecuteRunnable);
+        }
+
         if (waitSubmitQueue.size() > workerExecThreads) {
+            logger.warn("Wait submit queue is full, will retry submit task later");
             WorkerServerMetrics.incWorkerSubmitQueueIsFullCount();
             // if waitSubmitQueue is full, it will wait 1s, then try add
             ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);

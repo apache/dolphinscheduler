@@ -130,14 +130,20 @@ public class DependentUtils {
             case "thisMonth":
                 result = DependentDateUtils.getThisMonthInterval(businessDate);
                 break;
+            case "thisMonthBegin":
+                result = DependentDateUtils.getNeededMonthBeginInterval(businessDate, true, 0);
+                break;
+            case "thisMonthEnd":
+                result = DependentDateUtils.getNeededMonthBeginInterval(businessDate, false, 0);
+                break;
             case "lastMonth":
                 result = DependentDateUtils.getLastMonthInterval(businessDate);
                 break;
             case "lastMonthBegin":
-                result = DependentDateUtils.getLastMonthBeginInterval(businessDate, true);
+                result = DependentDateUtils.getNeededMonthBeginInterval(businessDate, true, -1);
                 break;
             case "lastMonthEnd":
-                result = DependentDateUtils.getLastMonthBeginInterval(businessDate, false);
+                result = DependentDateUtils.getNeededMonthBeginInterval(businessDate, false, -1);
                 break;
             default:
                 break;

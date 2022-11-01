@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class StreamGobbler extends Thread {
+
     private static final Logger logger = LoggerFactory.getLogger(StreamGobbler.class);
 
     private final InputStream inputStream;

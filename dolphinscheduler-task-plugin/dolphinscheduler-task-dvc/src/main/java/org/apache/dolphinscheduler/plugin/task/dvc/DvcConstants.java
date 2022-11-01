@@ -18,17 +18,20 @@
 package org.apache.dolphinscheduler.plugin.task.dvc;
 
 public class DvcConstants {
+
     private DvcConstants() {
         throw new IllegalStateException("Utility class");
     }
 
     public static final class DVC_TASK_TYPE {
+
         public static final String UPLOAD = "Upload";
         public static final String DOWNLOAD = "Download";
         public static final String INIT = "Init DVC";
     };
 
-    public static final String CHECK_AND_SET_DVC_REPO = "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=%s";
+    public static final String CHECK_AND_SET_DVC_REPO =
+            "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=%s";
 
     public static final String SET_DATA_PATH = "DVC_DATA_PATH=%s";
 
@@ -38,19 +41,19 @@ public class DvcConstants {
 
     public static final String SET_MESSAGE = "DVC_MESSAGE=\"%s\"";
 
-    public static final String GIT_CLONE_DVC_REPO  = "git clone $DVC_REPO dvc-repository; cd dvc-repository; pwd";
+    public static final String GIT_CLONE_DVC_REPO = "git clone $DVC_REPO dvc-repository; cd dvc-repository; pwd";
 
-    public static final String DVC_AUTOSTAGE  = "dvc config core.autostage true --local || exit 1";
+    public static final String DVC_AUTOSTAGE = "dvc config core.autostage true --local || exit 1";
 
-    public static final String DVC_ADD_DATA  = "dvc add $DVC_DATA_PATH -v -o $DVC_DATA_LOCATION --to-remote || exit 1";
+    public static final String DVC_ADD_DATA = "dvc add $DVC_DATA_PATH -v -o $DVC_DATA_LOCATION --to-remote || exit 1";
 
-    public static final String GIT_UPDATE_FOR_UPDATE_DATA  = "git commit -am \"$DVC_MESSAGE\"\n" +
+    public static final String GIT_UPDATE_FOR_UPDATE_DATA = "git commit -am \"$DVC_MESSAGE\"\n" +
             "git tag \"$DVC_VERSION\" -m \"$DVC_MESSAGE\"\n" +
             "git push --all\n" +
             "git push --tags";
 
-    public static final String DVC_DOWNLOAD  = "dvc get $DVC_REPO $DVC_DATA_LOCATION -o $DVC_DATA_PATH -v --rev $DVC_VERSION";
-
+    public static final String DVC_DOWNLOAD =
+            "dvc get $DVC_REPO $DVC_DATA_LOCATION -o $DVC_DATA_PATH -v --rev $DVC_VERSION";
 
     public static final String DVC_INIT = "dvc init || exit 1";
 
@@ -59,4 +62,3 @@ public class DvcConstants {
     public static final String GIT_UPDATE_FOR_INIT_DVC = "git commit -am \"init dvc project and add remote\"; git push";
 
 }
-

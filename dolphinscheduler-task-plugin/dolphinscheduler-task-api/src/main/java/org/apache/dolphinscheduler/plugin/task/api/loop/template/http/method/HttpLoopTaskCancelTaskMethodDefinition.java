@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.method;
 
+import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskCancelMethodDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskMethodDefinition;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OkHttpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,7 +29,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public class HttpLoopTaskCancelTaskMethodDefinition extends HttpLoopTaskMethodDefinition
-    implements LoopTaskCancelMethodDefinition {
+        implements
+            LoopTaskCancelMethodDefinition {
 
     private final String taskInstanceIdHolder = "${taskInstanceId}";
 
@@ -69,7 +70,7 @@ public class HttpLoopTaskCancelTaskMethodDefinition extends HttpLoopTaskMethodDe
                 OkHttpUtils.post(url, httpHeaders, requestParams, requestBody);
             } else {
                 throw new IllegalArgumentException(String.format("http method type: %s is not supported",
-                                                                 httpMethodType));
+                        httpMethodType));
             }
         } catch (IllegalArgumentException ex) {
             throw ex;

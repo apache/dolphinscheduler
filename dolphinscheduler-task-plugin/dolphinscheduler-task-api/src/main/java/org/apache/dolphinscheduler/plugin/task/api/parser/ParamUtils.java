@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +36,7 @@ public class ParamUtils {
      * @param paramsMap params map
      * @return Map of converted
      */
-    public static Map<String,String> convert(Map<String,Property> paramsMap) {
+    public static Map<String, String> convert(Map<String, Property> paramsMap) {
         if (paramsMap == null) {
             return null;
         }
@@ -63,7 +63,7 @@ public class ParamUtils {
             while (iter.hasNext()) {
                 Map.Entry<String, String> en = iter.next();
                 Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR, en.getValue());
-                userDefParamsMaps.put(property.getProp(),property);
+                userDefParamsMaps.put(property.getProp(), property);
             }
         }
         return userDefParamsMaps;

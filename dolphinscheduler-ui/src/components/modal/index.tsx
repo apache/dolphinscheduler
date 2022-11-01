@@ -38,6 +38,10 @@ const props = {
     type: Boolean as PropType<boolean>,
     default: true
   },
+  confirmShow: {
+    type: Boolean as PropType<boolean>,
+    default: true
+  },
   confirmText: {
     type: String as PropType<string>
   },
@@ -136,16 +140,18 @@ const Modal = defineComponent({
                 )}
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
-                <NButton
-                  class={[this.confirmClassName, 'btn-submit']}
-                  type='info'
-                  size='small'
-                  onClick={onConfirm}
-                  disabled={confirmDisabled}
-                  loading={confirmLoading}
-                >
-                  {this.confirmText || t('modal.confirm')}
-                </NButton>
+                {this.confirmShow && (
+                  <NButton
+                    class={[this.confirmClassName, 'btn-submit']}
+                    type='info'
+                    size='small'
+                    onClick={onConfirm}
+                    disabled={confirmDisabled}
+                    loading={confirmLoading}
+                  >
+                    {this.confirmText || t('modal.confirm')}
+                  </NButton>
+                )}
               </NSpace>
             )
           }}
