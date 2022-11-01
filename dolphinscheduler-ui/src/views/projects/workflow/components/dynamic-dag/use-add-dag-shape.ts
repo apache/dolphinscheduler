@@ -21,13 +21,5 @@ import { useDagStore } from '@/store/project/dynamic/dag'
 export function useAddDagShape(graph: Graph) {
   const cells: Array<Cell> = useDagStore().getDagTasks
 
-  cells.forEach(item => {
-    if (item.shape === 'dag-edge') {
-      cells.push((graph as Graph).addEdge(item))
-    } else {
-      cells.push((graph as Graph).addNode(item as any))
-    }
-  })
-
-  ;(graph as Graph).resetCells(cells)
+  ;(graph as Graph).addNode(cells.at(-1) as any)
 }
