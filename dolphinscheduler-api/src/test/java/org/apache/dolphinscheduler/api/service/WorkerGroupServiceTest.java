@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -89,6 +90,9 @@ public class WorkerGroupServiceTest {
 
     @Mock
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
+
+    @Mock
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     private final String GROUP_NAME = "testWorkerGroup";
 
@@ -247,6 +251,8 @@ public class WorkerGroupServiceTest {
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
                 .thenReturn(processInstances);
 
+        Mockito.when(processDefinitionMapper.queryProcessDefinitionByWorkerGroupName(workerGroup.getName()))
+                .thenReturn(null);
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),
                 ((Status) deleteFailed.get(Constants.STATUS)).getCode());
@@ -267,6 +273,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), ""))
                 .thenReturn(1);
         Mockito.when(environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName()))
+                .thenReturn(null);
+        Mockito.when(processDefinitionMapper.queryProcessDefinitionByWorkerGroupName(workerGroup.getName()))
                 .thenReturn(null);
         Map<String, Object> successResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(),
