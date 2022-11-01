@@ -64,6 +64,12 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.DqRuleDao;
+import org.apache.dolphinscheduler.dao.repository.DqRuleExecuteSqlDao;
+import org.apache.dolphinscheduler.dao.repository.DqRuleInputEntryDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
@@ -133,7 +139,7 @@ public class ProcessServiceTest {
     private DqRuleInputEntryDao dqRuleInputEntryDao;
 
     @Mock
-    DqRuleExecuteSqlDao dqRuleExecuteSqlDao;
+    private DqRuleExecuteSqlDao dqRuleExecuteSqlDao;
 
     @Mock
     private UserMapper userMapper;
