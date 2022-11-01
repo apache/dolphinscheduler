@@ -195,4 +195,17 @@
         SELECT DISTINCT(id) as project_id
         FROM t_ds_project
     </select>
+    <select id="queryProcessDefinitionByWorkerGroupName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        SELECT DISTINCT
+            pd.id, pd.code, pd.name
+        FROM
+            t_ds_process_task_relation ptr
+        JOIN t_ds_process_definition pd ON ptr.process_definition_code = pd.CODE
+        AND ptr.process_definition_version = pd.version
+        AND ptr.project_code = pd.project_code
+        JOIN t_ds_task_definition td ON ( ptr.pre_task_code = td.CODE AND ptr.pre_task_version = td.version )
+        OR ( ptr.post_task_code = td.CODE AND ptr.post_task_version = td.version )
+        WHERE
+            td.worker_group=#{workerGroupName}
+    </select>
 </mapper>

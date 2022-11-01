@@ -190,4 +190,10 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return project ids list
      */
     List<Integer> listProjectIds();
+    /**
+     * query process definition list by worker group
+     * @param workerGroupName
+     * @return processDefinition list
+     */
+    List<ProcessDefinition> queryProcessDefinitionByWorkerGroupName(@Param("workerGroupName") String workerGroupName);
 }

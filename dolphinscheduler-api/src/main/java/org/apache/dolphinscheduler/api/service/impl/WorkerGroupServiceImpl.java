@@ -29,12 +29,14 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
@@ -89,6 +91,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Autowired
     private ScheduleMapper scheduleMapper;
 
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
     /**
      * create or update a worker group
      *
@@ -334,6 +338,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (workerGroup == null) {
             logger.error("Worker group does not exist, workerGroupId:{}.", id);
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
+            return result;
+        }
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryProcessDefinitionByWorkerGroupName(workerGroup.getName());
+        if (CollectionUtils.isNotEmpty(processDefinitionList)) {
+            logger.warn("Delete worker group failed because there are {} processDefinitions are using it.", processDefinitionList.size());
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_WORKFLOW, processDefinitionList.size(), workerGroup.getName());
             return result;
         }
         List<ProcessInstance> processInstances = processInstanceMapper
