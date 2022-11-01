@@ -551,6 +551,16 @@ public final class Constants {
     public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
     /**
+     * single square brackets left
+     */
+    public static final String SINGLE_SQUARE_BRACKETS_LEFT = "[";
+
+    /**
+     * single brackets left
+     */
+    public static final String SINGLE_BRACKETS_LEFT = "{";
+
+    /**
      * double brackets left
      */
     public static final String DOUBLE_BRACKETS_LEFT = "{{";
