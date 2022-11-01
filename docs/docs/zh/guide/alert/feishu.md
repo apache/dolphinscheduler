@@ -4,7 +4,7 @@
 
 ![alert-feishu](../../../../img/new_ui/dev/alert/alert_feishu.png)
 
-参数配置
+## 参数配置
 
 * Webhook
 
