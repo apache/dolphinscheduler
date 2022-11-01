@@ -627,8 +627,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 database = null;
             }
             rs = metaData.getColumns(database,
-                getDbSchemaPattern(dataSource.getType(),schema,connectionParam),
-                tableName, "%");
+                    getDbSchemaPattern(dataSource.getType(), schema, connectionParam),
+                    tableName, "%");
             if (rs == null) {
                 return result;
             }
