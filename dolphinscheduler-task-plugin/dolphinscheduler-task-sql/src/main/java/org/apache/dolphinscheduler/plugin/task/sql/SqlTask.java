@@ -257,6 +257,7 @@ public class SqlTask extends AbstractTaskExecutor {
                 resultJSONArray.add(mapOfColValues);
                 rowCount++;
             }
+
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, rowCount);
             logger.info("display sql result {} rows as follows:", displayRows);
@@ -265,7 +266,10 @@ public class SqlTask extends AbstractTaskExecutor {
                 logger.info("row {} : {}", i + 1, row);
             }
         }
-        String result = JSONUtils.toJsonString(resultJSONArray);
+
+        String result = resultJSONArray.isEmpty() ?
+            JSONUtils.toJsonString(generateEmptyRow(resultSet)) : JSONUtils.toJsonString(resultJSONArray);
+
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
@@ -274,6 +278,27 @@ public class SqlTask extends AbstractTaskExecutor {
         logger.debug("execute sql result : {}", result);
         return result;
     }
+
+    /**
+     * generate empty Results as ArrayNode
+     */
+    private ArrayNode generateEmptyRow(ResultSet resultSet) throws SQLException {
+        ArrayNode resultJSONArray = JSONUtils.createArrayNode();
+        ObjectNode emptyOfColValues = JSONUtils.createObjectNode();
+        if (resultSet != null) {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnsNum = metaData.getColumnCount();
+            logger.info("sql query results is empty");
+            for (int i = 1; i <= columnsNum; i++) {
+                emptyOfColValues.set(metaData.getColumnLabel(i), JSONUtils.toJsonNode(""));
+            }
+        } else {
+            emptyOfColValues.set("error", JSONUtils.toJsonNode("resultSet is null"));
+        }
+        resultJSONArray.add(emptyOfColValues);
+        return resultJSONArray;
+    }
+
 
     /**
      * send alert as an attachment
