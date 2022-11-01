@@ -344,7 +344,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  label={t('datasource.database_name')}
+                  label={t(detailForm.type === 'PRESTO'? 'datasource.catalog_name': 'datasource.database_name')}
                   path='database'
                   show-require-mark={requiredDataBase}
                 >
@@ -354,9 +354,27 @@ const DetailModal = defineComponent({
                     v-model={[detailForm.database, 'value']}
                     type='text'
                     maxlength={60}
-                    placeholder={t('datasource.database_name_tips')}
+                    placeholder={t(detailForm.type === 'PRESTO'? 'datasource.catalog_name_tips': 'datasource.database_name_tips')}
                   />
                 </NFormItem>
+                {
+                  detailForm.type === 'PRESTO'? 
+                  <NFormItem
+                  label={t('datasource.database_schema')}
+                  path='database'
+                  show-require-mark={requiredDataBase}
+                  >
+                    <NInput
+                      allowInput={this.trim}
+                      class='input-data-base'
+                      v-model={[detailForm.schema, 'value']}
+                      type='text'
+                      maxlength={60}
+                      placeholder={t('datasource.database_schema_tips')}
+                    />
+                  </NFormItem>
+                  : null
+                }
                 <NFormItem
                   v-show={showConnectType}
                   label={t('datasource.oracle_connect_type')}

@@ -48,6 +48,7 @@ export function useForm(id?: number) {
     userName: '',
     password: '',
     database: '',
+    schema: '',
     connectType: '',
     other: '',
     testFlag: -1,

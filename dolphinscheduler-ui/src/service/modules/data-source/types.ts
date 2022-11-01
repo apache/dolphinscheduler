@@ -57,6 +57,7 @@ interface IDataSource {
   password?: string
   awsRegion?: string
   database?: string
+  schema?: string
   connectType?: string
   other?: object
   testFlag?: number
