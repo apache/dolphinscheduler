@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -345,6 +346,14 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         insertOne("def 1");
         List<Integer> projectIds = processDefinitionMapper.listProjectIds();
         Assertions.assertNotNull(projectIds);
+    }
+
+    @Test
+    public void testQueryProcessDefinitionByWorkerGroupName() {
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setName("test worker");
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryProcessDefinitionByWorkerGroupName(workerGroup.getName());
+        Assertions.assertNotNull(processDefinitionList);
     }
 
 }
