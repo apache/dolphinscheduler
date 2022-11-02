@@ -41,8 +41,6 @@ export function useFormField(forms: any) {
     }
   })
 
-  console.log(model)
-
   return {
     model
   }
