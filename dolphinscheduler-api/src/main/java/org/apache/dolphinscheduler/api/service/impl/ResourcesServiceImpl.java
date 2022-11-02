@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
+import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -1875,8 +1876,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     @Override
-    public Result<Object> deleteDataTransferData(User loginUser, Integer days) {
-        Result<Object> result = new Result<>();
+    public DeleteDataTransferResponse deleteDataTransferData(User loginUser, Integer days) {
+        DeleteDataTransferResponse result = new DeleteDataTransferResponse();
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
@@ -1891,6 +1892,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             return result;
         }
+
         String tenantCode = tenant.getTenantCode();
 
         String baseFolder = storageOperate.getResourceFileName(tenantCode, "DATA_TRANSFER");
@@ -1925,11 +1927,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("successList", successList);
-        data.put("failList", failList);
+        result.setSuccessList(successList);
+        result.setFailedList(failList);
         putMsg(result, Status.SUCCESS);
-        result.setData(data);
         return result;
     }
 

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -231,12 +232,12 @@ public interface ResourcesService {
     Resource queryResourcesFileInfo(String userName, String fullName);
 
     /**
-     * delete DATA_TRANSFER data in resporce
+     * delete DATA_TRANSFER data in resource center
      *
      * @param loginUser user who query resource
      * @param days number of days
      */
-    Result<Object> deleteDataTransferData(User loginUser, Integer days);
+    DeleteDataTransferResponse deleteDataTransferData(User loginUser, Integer days);
 
     /**
      * unauthorized file

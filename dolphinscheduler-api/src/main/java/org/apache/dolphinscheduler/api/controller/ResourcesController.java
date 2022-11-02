@@ -42,6 +42,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
@@ -284,8 +285,8 @@ public class ResourcesController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> deleteDataTransferData(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @RequestParam(value = "days") Integer days) {
+    public DeleteDataTransferResponse deleteDataTransferData(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @RequestParam(value = "days") Integer days) {
         return resourceService.deleteDataTransferData(loginUser, days);
     }
 
