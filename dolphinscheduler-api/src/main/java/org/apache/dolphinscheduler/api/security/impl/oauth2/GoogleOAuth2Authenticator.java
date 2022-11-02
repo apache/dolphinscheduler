@@ -18,7 +18,7 @@ public class GoogleOAuth2Authenticator extends AbstractAuthenticator {
     LdapService GoogleOAuth2Service;
 
     @Override
-    public User login(String userId, String password, Object extra) {
+    public synchronized User login(String userId, String password, Object extra) {
         logger.info("[debug111] extra: {}", extra.toString());
         OAuth2User principal = (OAuth2User) extra;
         final String rawName = principal.getAttribute("name");

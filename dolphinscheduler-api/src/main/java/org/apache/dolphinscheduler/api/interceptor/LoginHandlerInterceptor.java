@@ -17,9 +17,13 @@
 
 package org.apache.dolphinscheduler.api.interceptor;
 
+import static org.apache.dolphinscheduler.api.controller.BaseController.getClientIpAddress;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -29,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +41,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -52,6 +59,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     @Autowired
     private Authenticator authenticator;
 
+    @Autowired
+    protected UsersService userService;
+
     /**
      * Intercept the execution of a handler. Called after HandlerMapping determined
      *
@@ -67,6 +77,19 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         logger.info("[debug111] request header: {}", request.getHeaderNames());
         String token = request.getHeader("token");
         User user;
+
+        OAuth2User principal = (OAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        logger.info("[debug111] attempt to get principal from spring security context: {}", principal);
+        if (principal != null) {
+            String ip = getClientIpAddress(request);
+            Result<Map<String, String>> result = authenticator.authenticate(null, null, ip, principal);
+            user = userService.getUserByUserName(result.getData().get(Constants.SESSION_USER));
+            logger.info("[debug111] log user info {}", user.toString());
+            request.setAttribute(Constants.SESSION_USER, user);
+            ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());
+            return true;
+        }
+
         if (StringUtils.isEmpty(token)) {
             logger.info("[debug111] preHandle token is empty...");
             user = authenticator.getAuthUser(request);

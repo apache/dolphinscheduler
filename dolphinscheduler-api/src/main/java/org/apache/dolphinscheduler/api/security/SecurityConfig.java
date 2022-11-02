@@ -84,50 +84,14 @@ public class SecurityConfig {
         return authenticator;
     }
 
-    // @Override
-    // protected void configure(HttpSecurity http) throws Exception {
-//        // @formatter:off
-//        http
-//                .authorizeRequests(a -> a
-//                        .antMatchers("/", "/error", "/webjars/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .exceptionHandling(e -> e
-//                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-//                )
-//                .csrf(c -> c
-//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                )
-//                .logout(l -> l
-//                        .logoutSuccessUrl("/").permitAll()
-//                )
-//                .oauth2Login();
-//        // @formatter:on
-    // }
-
-    // @Bean
-    // public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    // logger.info("[debug111] insdie filterChain...");
-    // http
-    // .authorizeRequests(a -> a
-    // .antMatchers("/**", "/ui/**", "/error", "/webjars/**").permitAll()
-    // .anyRequest().authenticated())
-    // .exceptionHandling(e -> e
-    // .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-    // .csrf(c -> c
-    // .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-    // .logout(l -> l
-    // .logoutSuccessUrl("/").permitAll())
-    // .oauth2Login();
-    // return http.build();
-    // }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
-                .oauth2Login();
+                .oauth2Login()
+                .and().logout().logoutUrl("/signOut").logoutSuccessUrl("/").permitAll()
+                .and().csrf().disable();
         return http.build();
     }
 

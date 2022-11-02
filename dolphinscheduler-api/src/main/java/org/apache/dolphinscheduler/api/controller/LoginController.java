@@ -42,9 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -117,7 +114,6 @@ public class LoginController extends BaseController {
         for (Map.Entry<String, String> cookieEntry : cookieMap.entrySet()) {
             Cookie cookie = new Cookie(cookieEntry.getKey(), cookieEntry.getValue());
             cookie.setHttpOnly(true);
-            cookie.setPath("/");
             response.addCookie(cookie);
         }
 
