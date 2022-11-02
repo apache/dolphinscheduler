@@ -62,7 +62,6 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters.setClusterName(clusterName);
         k8sTaskMainParameters.setMinCpuCores(minCpuCores);
         k8sTaskMainParameters.setMinMemorySpace(minMemorySpace);
-        k8sTaskMainParameters.setCommand("echo 'hello world'");
         job = k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
     }
     @Test

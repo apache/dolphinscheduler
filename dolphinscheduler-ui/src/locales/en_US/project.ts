@@ -367,8 +367,6 @@ export default {
     mb: 'MB',
     image: 'Image',
     image_tips: 'Please enter image',
-    command: 'Command',
-    command_tips: 'Please enter the container execution command, for example: /bin/echo hello world',
     min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',
