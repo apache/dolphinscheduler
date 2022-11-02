@@ -15,40 +15,20 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+.container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 64px;
+  border-bottom: 1px solid var(--n-border-color);
 
-const shell = {
-  locales: {
-    zh_CN: {
-      node_name: '节点名称',
-      node_name_tips: '节点名称不能为空'
-    },
-    en_US: {
-      node_name: 'Node Name',
-      node_name_tips: 'Node name cannot be empty'
-    }
-  },
-  items: [
-    {
-      label: 'node_name',
-      type: 'input',
-      field: '',
-      validate: {
-        trigger: ['input', 'blur'],
-        message: 'node_name_tips'
-      }
-    }
-  ]
-}
+  .nav {
+    margin-left: 12px;
+  }
 
-export function useTaskForm() {
-  const variables = reactive({
-    formStructure: {}
-  })
-
-  variables.formStructure = shell
-
-  return {
-    variables
+  .settings {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
   }
 }
