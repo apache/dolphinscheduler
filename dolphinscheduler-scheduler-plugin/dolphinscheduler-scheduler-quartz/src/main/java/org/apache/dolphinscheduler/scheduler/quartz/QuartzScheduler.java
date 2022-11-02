@@ -109,7 +109,7 @@ public class QuartzScheduler implements SchedulerApi {
                     .endAt(endDate)
                     .withSchedule(
                             cronSchedule(cronExpression)
-                                    .withMisfireHandlingInstructionDoNothing()
+                                    .withMisfireHandlingInstructionFireAndProceed()
                                     .inTimeZone(DateUtils.getTimezone(timezoneId)))
                     .forJob(jobDetail).build();
 
