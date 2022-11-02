@@ -16,23 +16,28 @@
  */
 
 import { ref } from 'vue'
+import type { Ref } from 'vue'
 
 export function useFormField(forms: any) {
   const model: any = {}
+
+  const setField = (value: string, type: string): Ref<null | string> => {
+    return ref(value ?
+      value :
+      type === 'select' ?
+        null :
+        ''
+    )
+  }
 
   forms.forEach((f: any) => {
     if (f.field.indexOf('.') >= 0) {
       const hierarchy = f.field.split('.')
       model[hierarchy[0]] = {
-        [hierarchy[1]]: ref(f.defaultValue ? f.defaultValue : '')
+        [hierarchy[1]]: setField(f.defaultValue, f.type)
       }
     } else {
-      model[f.field] = ref(f.defaultValue ?
-        f.defaultValue :
-        f.type === 'select' ?
-          null :
-          ''
-      )
+      model[f.field] = setField(f.defaultValue, f.type)
     }
   })
 
