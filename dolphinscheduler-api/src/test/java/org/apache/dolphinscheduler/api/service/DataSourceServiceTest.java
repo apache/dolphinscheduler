@@ -239,7 +239,7 @@ public class DataSourceServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(1);
         dataSource.setId(22);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE,
                 loginUser.getId(), DATASOURCE_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,
                 new Object[]{dataSource.getId()}, 0, baseServiceLogger)).thenReturn(true);
@@ -254,7 +254,7 @@ public class DataSourceServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         int userId = 3;
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE,
                 loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0,
                 baseServiceLogger)).thenReturn(true);

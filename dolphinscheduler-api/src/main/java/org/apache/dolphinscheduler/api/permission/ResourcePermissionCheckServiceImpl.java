@@ -122,7 +122,7 @@ public class ResourcePermissionCheckServiceImpl
     }
 
     @Override
-    public boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId,
+    public boolean operationPermissionCheck(Object authorizationType, Integer userId,
                                             String permissionKey, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
