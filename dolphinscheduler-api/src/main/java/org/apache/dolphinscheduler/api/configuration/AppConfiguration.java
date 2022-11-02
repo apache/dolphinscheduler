@@ -63,10 +63,10 @@ public class AppConfiguration implements WebMvcConfigurer {
         return new CorsFilter(configSource);
     }
 
-     @Bean
-     public LoginHandlerInterceptor loginInterceptor() {
-     return new LoginHandlerInterceptor();
-     }
+    @Bean
+    public LoginHandlerInterceptor loginInterceptor() {
+        return new LoginHandlerInterceptor();
+    }
 
     /**
      * Cookie

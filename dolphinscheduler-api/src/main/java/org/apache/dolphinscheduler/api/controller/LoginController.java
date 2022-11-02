@@ -120,7 +120,6 @@ public class LoginController extends BaseController {
         return result;
     }
 
-
     /**
      * sign out
      *
