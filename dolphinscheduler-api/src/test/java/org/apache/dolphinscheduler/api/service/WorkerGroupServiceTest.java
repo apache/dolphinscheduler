@@ -103,7 +103,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveNoPermission_whenSaveWorkerGroup_expectNoOperation() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(false);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(false);
@@ -116,7 +116,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveNullName_whenSaveWorkerGroup_expectNAME_NULL() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
@@ -129,7 +129,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveSameUserName_whenSaveWorkerGroup_expectNAME_EXIST() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
@@ -147,7 +147,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveInvalidAddress_whenSaveWorkerGroup_expectADDRESS_INVALID() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
@@ -169,7 +169,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveValidWorkerGroup_whenSaveWorkerGroup_expectSuccess() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
@@ -219,7 +219,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveNotExistsWorkerGroup_whenDeleteWorkerGroupById_expectNotExists() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
@@ -233,7 +233,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveRunningProcess_whenDeleteWorkerGroupById_expectFailed() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
@@ -255,7 +255,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveValidParams_whenDeleteWorkerGroupById_expectSuccess() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
