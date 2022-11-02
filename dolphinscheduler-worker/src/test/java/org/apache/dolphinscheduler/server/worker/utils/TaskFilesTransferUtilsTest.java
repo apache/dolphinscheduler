@@ -39,13 +39,13 @@ import org.zeroturnaround.zip.ZipUtil;
 
 public class TaskFilesTransferUtilsTest {
 
-    final private long processDefineCode = 123;
-    final private int processDefineVersion = 456;
-    final private int processInstanceId = 678;
-    final private int taskInstanceId = 789;
-    final private String taskName = "test";
+    private final long processDefineCode = 123;
+    private final int processDefineVersion = 456;
+    private final int processInstanceId = 678;
+    private final int taskInstanceId = 789;
+    private final String taskName = "test";
 
-    final private String tenantCode = "ubuntu";
+    private final String tenantCode = "ubuntu";
 
     private long endTime;
 
