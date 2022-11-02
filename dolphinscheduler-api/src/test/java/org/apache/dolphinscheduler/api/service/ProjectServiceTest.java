@@ -105,7 +105,7 @@ public class ProjectServiceTest {
 
         User loginUser = getLoginUser();
         loginUser.setId(1);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, 1,
                 PROJECT_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, null, 1,
                 baseServiceLogger)).thenReturn(true);
@@ -149,7 +149,6 @@ public class ProjectServiceTest {
         project.setUserId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
                 project.getUserId(), PROJECT, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
@@ -168,7 +167,6 @@ public class ProjectServiceTest {
         project1.setUserId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
                 loginUser.getId(), PROJECT, baseServiceLogger)).thenReturn(true);
         result2 = projectService.checkProjectAndAuth(loginUser, project1, projectCode, PROJECT);
         Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result2.get(Constants.STATUS));
@@ -191,7 +189,6 @@ public class ProjectServiceTest {
         tempUser.setId(Integer.MAX_VALUE);
         tempUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
                 tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
         boolean checkResult = projectService.hasProjectAndPerm(tempUser, project, result, null);
         logger.info(result.toString());
@@ -202,7 +199,6 @@ public class ProjectServiceTest {
         project.setUserId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
                 loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
@@ -251,7 +247,6 @@ public class ProjectServiceTest {
         tempUser.setId(Integer.MAX_VALUE);
         tempUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
                 tempUser.getId(), null, baseServiceLogger)).thenReturn(true);
         boolean checkResult = projectService.hasProjectAndWritePerm(tempUser, project, result);
         logger.info(result.toString());
@@ -262,7 +257,6 @@ public class ProjectServiceTest {
         project.setUserId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
                 loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
@@ -276,9 +270,10 @@ public class ProjectServiceTest {
     public void testDeleteProject() {
         User loginUser = getLoginUser();
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{1}, loginUser.getId(),
-                PROJECT_DELETE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(
+                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(),
+                        PROJECT_DELETE, baseServiceLogger))
+                .thenReturn(true);
         // PROJECT_NOT_FOUND
         Result result = projectService.deleteProject(loginUser, 11L);
         logger.info(result.toString());
@@ -319,9 +314,10 @@ public class ProjectServiceTest {
         loginUser.setId(1);
         Project project = getProject();
         project.setCode(2L);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{1}, loginUser.getId(),
-                PROJECT_UPDATE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(
+                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(),
+                        PROJECT_UPDATE, baseServiceLogger))
+                .thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
                 loginUser.getId(),
                 baseServiceLogger)).thenReturn(true);
@@ -391,7 +387,7 @@ public class ProjectServiceTest {
         // SUCCESS
         loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(
-                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
+                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                         loginUser.getId(), PROJECT, baseServiceLogger))
                 .thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
@@ -405,7 +401,7 @@ public class ProjectServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(
-                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
+                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                         loginUser.getId(), PROJECT, baseServiceLogger))
                 .thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
