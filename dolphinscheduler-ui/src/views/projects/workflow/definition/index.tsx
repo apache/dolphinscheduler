@@ -82,6 +82,15 @@ export default defineComponent({
       requestData()
     }
 
+    const onClearSearch = () => {
+      variables.page = 1
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: ''
+      })
+    }
+
     const handleChangePageSize = () => {
       variables.page = 1
       requestData()
@@ -106,6 +115,7 @@ export default defineComponent({
     return {
       requestData,
       handleSearch,
+      onClearSearch,
       handleUpdateList,
       createDefinition,
       handleChangePageSize,
@@ -149,6 +159,8 @@ export default defineComponent({
                 size='small'
                 placeholder={t('resource.function.enter_keyword_tips')}
                 v-model={[this.searchVal, 'value']}
+                clearable
+                onClear={this.onClearSearch}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>
