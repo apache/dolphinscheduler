@@ -65,12 +65,12 @@ public class TaskMainInfo {
     /**
      * processDefinitionCode
      */
-    private long processDefinitionCode;
+    private Long processDefinitionCode;
 
     /**
      * processDefinitionVersion
      */
-    private int processDefinitionVersion;
+    private Integer processDefinitionVersion;
 
     /**
      * processDefinitionName
@@ -90,7 +90,7 @@ public class TaskMainInfo {
     /**
      * upstreamTaskCode
      */
-    private long upstreamTaskCode;
+    private Long upstreamTaskCode;
 
     /**
      * upstreamTaskName
