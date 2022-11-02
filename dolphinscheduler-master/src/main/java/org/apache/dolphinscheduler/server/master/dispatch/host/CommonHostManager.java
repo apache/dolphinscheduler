@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -26,13 +24,13 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * common host manager
@@ -79,8 +77,9 @@ public abstract class CommonHostManager implements HostManager {
         Set<String> nodes = serverNodeManager.getWorkerGroupNodes(workerGroup);
         if (CollectionUtils.isNotEmpty(nodes)) {
             for (String node : nodes) {
-                WorkerHeartBeat workerNodeInfo = serverNodeManager.getWorkerNodeInfo(node);
-                hostWorkers.add(HostWorker.of(node, workerNodeInfo.getWorkerHostWeight(), workerGroup));
+                serverNodeManager.getWorkerNodeInfo(node).ifPresent(
+                        workerNodeInfo -> hostWorkers
+                                .add(HostWorker.of(node, workerNodeInfo.getWorkerHostWeight(), workerGroup)));
             }
         }
         return hostWorkers;

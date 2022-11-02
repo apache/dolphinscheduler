@@ -19,7 +19,6 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.common;
 
-import org.junit.rules.ExpectedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

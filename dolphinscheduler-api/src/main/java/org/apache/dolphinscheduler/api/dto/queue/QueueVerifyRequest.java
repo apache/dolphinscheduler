@@ -17,20 +17,19 @@
 
 package org.apache.dolphinscheduler.api.dto.queue;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * queue verify request
  */
-@ApiModel("QUEUE-Verify")
+@Schema(name = "QUEUE-Verify")
 @Data
 public class QueueVerifyRequest {
 
-    @ApiModelProperty(example = "queue11", required = true)
+    @Schema(example = "queue11", required = true)
     private String queue;
 
-    @ApiModelProperty(example = "queue11", required = true)
+    @Schema(example = "queue11", required = true)
     private String queueName;
 }

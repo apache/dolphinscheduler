@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.service.log;
 
 import static org.apache.dolphinscheduler.service.log.SensitiveDataConverter.passwordHandler;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class SensitiveDataConverterTest {
     /**
      * password pattern
      */
-    private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
+    private final Pattern pwdPattern = Pattern.compile(DataSourceConstants.DATASOURCE_PASSWORD_REGEX);
 
     private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
             + "\"database\":\"carbond\","
@@ -51,7 +51,7 @@ public class SensitiveDataConverterTest {
 
     @Test
     public void convert() {
-        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        Assertions.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
     }
 
     /**
@@ -62,8 +62,8 @@ public class SensitiveDataConverterTest {
         logger.info("parameter : {}", logMsg);
         logger.info("parameter : {}", passwordHandler(pwdPattern, logMsg));
 
-        Assert.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
-        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        Assertions.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
+        Assertions.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
 
     }
 

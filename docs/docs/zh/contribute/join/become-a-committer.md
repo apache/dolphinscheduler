@@ -28,6 +28,7 @@ PMC会定期基于活跃贡献者们对Dolphinscheduler的贡献从他们中提�
 发起提名的PMC成员负责向新的committer发出邀请，并指导他/她建立ASF精神思想。
 
 PMC成员应使用以下模板向新的committer发送一封电子邮件:
+
 ```
 To: <invitee name>@gmail.com
 Cc: private@dolphinscheduler.apache.org

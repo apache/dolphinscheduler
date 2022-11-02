@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class FeiShuAlertChannelFactoryTest {
 
@@ -33,13 +33,13 @@ public class FeiShuAlertChannelFactoryTest {
         FeiShuAlertChannelFactory feiShuAlertChannelFactory = new FeiShuAlertChannelFactory();
         List<PluginParams> params = feiShuAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
-        Assert.assertEquals(6, params.size());
+        Assertions.assertEquals(6, params.size());
     }
 
     @Test
     public void testCreate() {
         FeiShuAlertChannelFactory feiShuAlertChannelFactory = new FeiShuAlertChannelFactory();
         AlertChannel alertChannel = feiShuAlertChannelFactory.create();
-        Assert.assertNotNull(alertChannel);
+        Assertions.assertNotNull(alertChannel);
     }
 }

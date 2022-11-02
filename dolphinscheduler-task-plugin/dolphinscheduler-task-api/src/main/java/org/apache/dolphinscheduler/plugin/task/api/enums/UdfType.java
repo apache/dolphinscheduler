@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.plugin.task.api.enums;
  * UDF type
  */
 public enum UdfType {
+
     /**
      * 0 hive; 1 spark
      */

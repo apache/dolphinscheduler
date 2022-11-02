@@ -20,13 +20,13 @@ package org.apache.dolphinscheduler.plugin.datasource.spark;
 import org.apache.dolphinscheduler.plugin.datasource.spark.param.SparkConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SparkDataSourceChannelTest {
 
     @Test
@@ -34,6 +34,6 @@ public class SparkDataSourceChannelTest {
         SparkDataSourceChannel sourceChannel = Mockito.mock(SparkDataSourceChannel.class);
         SparkDataSourceClient dataSourceClient = Mockito.mock(SparkDataSourceClient.class);
         Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new SparkConnectionParam(), DbType.SPARK));
+        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new SparkConnectionParam(), DbType.SPARK));
     }
 }

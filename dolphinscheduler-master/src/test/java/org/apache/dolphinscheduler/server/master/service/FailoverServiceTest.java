@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -45,18 +46,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Lists;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class FailoverServiceTest {
 
     private FailoverService failoverService;
@@ -69,6 +73,9 @@ public class FailoverServiceTest {
 
     @Mock
     private ProcessService processService;
+
+    @Mock
+    private TaskInstanceDao taskInstanceDao;
 
     @Mock
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
@@ -94,7 +101,7 @@ public class FailoverServiceTest {
     private TaskInstance masterTaskInstance;
     private TaskInstance workerTaskInstance;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -105,19 +112,20 @@ public class FailoverServiceTest {
         given(masterConfig.getMasterAddress()).willReturn(testMasterHost);
         MasterFailoverService masterFailoverService =
                 new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager,
-                        processInstanceExecCacheManager, logClient);
+                        processInstanceExecCacheManager, logClient, taskInstanceDao);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
                 masterConfig,
                 processService,
                 workflowExecuteThreadPool,
                 cacheManager,
-                logClient);
+                logClient,
+                taskInstanceDao);
 
         failoverService = new FailoverService(masterFailoverService, workerFailoverService);
 
         String ip = testMasterHost.split(":")[0];
-        int port = Integer.valueOf(testMasterHost.split(":")[1]);
-        Assert.assertEquals(masterPort, port);
+        int port = Integer.parseInt(testMasterHost.split(":")[1]);
+        Assertions.assertEquals(masterPort, port);
 
         testWorkerHost = ip + ":" + workerPort;
 
@@ -147,7 +155,7 @@ public class FailoverServiceTest {
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
-        given(processService.findValidTaskListByProcessId(Mockito.anyInt(), Mockito.anyInt()))
+        given(taskInstanceDao.findValidTaskListByProcessId(Mockito.anyInt(), Mockito.anyInt()))
                 .willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
 
         Thread.sleep(1000);
@@ -172,19 +180,19 @@ public class FailoverServiceTest {
         processInstance.setHost(Constants.NULL);
         masterTaskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         failoverService.failoverServerWhenDown(testMasterHost, NodeType.MASTER);
-        Assert.assertNotEquals(masterTaskInstance.getState(), TaskExecutionStatus.NEED_FAULT_TOLERANCE);
+        Assertions.assertNotEquals(masterTaskInstance.getState(), TaskExecutionStatus.NEED_FAULT_TOLERANCE);
 
         processInstance.setHost(testMasterHost);
         masterTaskInstance.setState(TaskExecutionStatus.SUCCESS);
         failoverService.failoverServerWhenDown(testMasterHost, NodeType.MASTER);
-        Assert.assertNotEquals(masterTaskInstance.getState(), TaskExecutionStatus.NEED_FAULT_TOLERANCE);
-        Assert.assertEquals(Constants.NULL, processInstance.getHost());
+        Assertions.assertNotEquals(masterTaskInstance.getState(), TaskExecutionStatus.NEED_FAULT_TOLERANCE);
+        Assertions.assertEquals(Constants.NULL, processInstance.getHost());
 
         processInstance.setHost(testMasterHost);
         masterTaskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         failoverService.failoverServerWhenDown(testMasterHost, NodeType.MASTER);
-        Assert.assertEquals(masterTaskInstance.getState(), TaskExecutionStatus.NEED_FAULT_TOLERANCE);
-        Assert.assertEquals(Constants.NULL, processInstance.getHost());
+        Assertions.assertEquals(masterTaskInstance.getState(), TaskExecutionStatus.NEED_FAULT_TOLERANCE);
+        Assertions.assertEquals(Constants.NULL, processInstance.getHost());
     }
 
     @Test
@@ -198,6 +206,6 @@ public class FailoverServiceTest {
         Mockito.when(cacheManager.getByProcessInstanceId(Mockito.anyInt())).thenReturn(workflowExecuteRunnable);
 
         failoverService.failoverServerWhenDown(testWorkerHost, NodeType.WORKER);
-        Assert.assertEquals(TaskExecutionStatus.NEED_FAULT_TOLERANCE, workerTaskInstance.getState());
+        Assertions.assertEquals(TaskExecutionStatus.NEED_FAULT_TOLERANCE, workerTaskInstance.getState());
     }
 }

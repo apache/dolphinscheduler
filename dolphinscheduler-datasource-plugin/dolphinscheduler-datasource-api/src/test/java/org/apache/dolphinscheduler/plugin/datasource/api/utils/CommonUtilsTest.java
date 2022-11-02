@@ -17,23 +17,23 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.DATASOURCE_ENCRYPTION_ENABLE;
+import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommonUtilsTest {
 
     @Test
@@ -41,16 +41,18 @@ public class CommonUtilsTest {
         try (
                 MockedStatic<CommonUtils> mockedCommonUtils = Mockito.mockStatic(CommonUtils.class);
                 MockedStatic<PropertyUtils> mockedPropertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
-            Mockito.when(CommonUtils.getKerberosStartupState()).thenAnswer((Answer<Boolean>) invocation -> false);
+            mockedCommonUtils.when(CommonUtils::getKerberosStartupState)
+                    .thenAnswer((Answer<Boolean>) invocation -> false);
             boolean kerberosStartupState = CommonUtils.getKerberosStartupState();
-            Assert.assertFalse(kerberosStartupState);
+            Assertions.assertFalse(kerberosStartupState);
 
-            Mockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE))
+            mockedPropertyUtils.when(() -> PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE))
                     .thenAnswer((Answer<String>) invocation -> "HDFS");
-            Mockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, true))
+            mockedPropertyUtils
+                    .when(() -> PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, true))
                     .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
             kerberosStartupState = CommonUtils.getKerberosStartupState();
-            Assert.assertFalse(kerberosStartupState);
+            Assertions.assertFalse(kerberosStartupState);
         }
     }
 
@@ -61,24 +63,25 @@ public class CommonUtilsTest {
                 MockedStatic<UserGroupInformation> mockedUserGroupInformation =
                         Mockito.mockStatic(UserGroupInformation.class)) {
             try {
-                Mockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE))
+                mockedPropertyUtils.when(() -> PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE))
                         .thenAnswer((Answer<String>) invocation -> "HDFS");
-                Mockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+                mockedPropertyUtils.when(
+                        () -> PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
                         .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
-                Mockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
+                mockedPropertyUtils.when(() -> PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
                         .thenAnswer((Answer<String>) invocation -> "/opt/krb5.conf");
-                Mockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME))
+                mockedPropertyUtils.when(() -> PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME))
                         .thenAnswer((Answer<String>) invocation -> "hdfs-mycluster@ESZ.COM");
-                Mockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH))
+                mockedPropertyUtils.when(() -> PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH))
                         .thenAnswer((Answer<String>) invocation -> "/opt/hdfs.headless.keytab");
                 Configuration configuration = Mockito.mock(Configuration.class);
                 boolean result = CommonUtils.loadKerberosConf(configuration);
-                Assert.assertTrue(result);
+                Assertions.assertTrue(result);
 
                 CommonUtils.loadKerberosConf(null, null, null);
 
             } catch (Exception e) {
-                Assert.fail("load Kerberos Conf failed" + e.getMessage());
+                Assertions.fail("load Kerberos Conf failed" + e.getMessage());
             }
         }
     }
@@ -89,18 +92,18 @@ public class CommonUtilsTest {
             Mockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
                     .thenReturn(Boolean.TRUE);
 
-            Assert.assertEquals("", PasswordUtils.encodePassword(""));
-            Assert.assertEquals("bnVsbE1USXpORFUy", PasswordUtils.encodePassword("123456"));
-            Assert.assertEquals("bnVsbElWRkJXbGhUVjBBPQ==", PasswordUtils.encodePassword("!QAZXSW@"));
-            Assert.assertEquals("bnVsbE5XUm1aMlZ5S0VBPQ==", PasswordUtils.encodePassword("5dfger(@"));
+            Assertions.assertEquals("", PasswordUtils.encodePassword(""));
+            Assertions.assertEquals("bnVsbE1USXpORFUy", PasswordUtils.encodePassword("123456"));
+            Assertions.assertEquals("bnVsbElWRkJXbGhUVjBBPQ==", PasswordUtils.encodePassword("!QAZXSW@"));
+            Assertions.assertEquals("bnVsbE5XUm1aMlZ5S0VBPQ==", PasswordUtils.encodePassword("5dfger(@"));
 
-            Mockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
+            mockedPropertyUtils.when(() -> PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
                     .thenReturn(Boolean.FALSE);
 
-            Assert.assertEquals("", PasswordUtils.encodePassword(""));
-            Assert.assertEquals("123456", PasswordUtils.encodePassword("123456"));
-            Assert.assertEquals("!QAZXSW@", PasswordUtils.encodePassword("!QAZXSW@"));
-            Assert.assertEquals("5dfger(@", PasswordUtils.encodePassword("5dfger(@"));
+            Assertions.assertEquals("", PasswordUtils.encodePassword(""));
+            Assertions.assertEquals("123456", PasswordUtils.encodePassword("123456"));
+            Assertions.assertEquals("!QAZXSW@", PasswordUtils.encodePassword("!QAZXSW@"));
+            Assertions.assertEquals("5dfger(@", PasswordUtils.encodePassword("5dfger(@"));
         }
     }
 
@@ -114,26 +117,28 @@ public class CommonUtilsTest {
 
             PropertyUtils.setValue(DATASOURCE_ENCRYPTION_ENABLE, "true");
 
-            Mockito.when(PasswordUtils.decodePassword("bnVsbE1USXpORFUy")).thenReturn("123456");
-            Mockito.when(PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ==")).thenReturn("!QAZXSW@");
-            Mockito.when(PasswordUtils.decodePassword("bnVsbE5XUm1aMlZ5S0VBPQ==")).thenReturn("5dfger(@");
+            mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("bnVsbE1USXpORFUy")).thenReturn("123456");
+            mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ=="))
+                    .thenReturn("!QAZXSW@");
+            mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("bnVsbE5XUm1aMlZ5S0VBPQ=="))
+                    .thenReturn("5dfger(@");
 
-            Assert.assertEquals(null, PasswordUtils.decodePassword(""));
-            Assert.assertEquals("123456", PasswordUtils.decodePassword("bnVsbE1USXpORFUy"));
-            Assert.assertEquals("!QAZXSW@", PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ=="));
-            Assert.assertEquals("5dfger(@", PasswordUtils.decodePassword("bnVsbE5XUm1aMlZ5S0VBPQ=="));
+            Assertions.assertEquals(null, PasswordUtils.decodePassword(""));
+            Assertions.assertEquals("123456", PasswordUtils.decodePassword("bnVsbE1USXpORFUy"));
+            Assertions.assertEquals("!QAZXSW@", PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ=="));
+            Assertions.assertEquals("5dfger(@", PasswordUtils.decodePassword("bnVsbE5XUm1aMlZ5S0VBPQ=="));
 
             Mockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
                     .thenAnswer((Answer<Boolean>) invocation -> Boolean.FALSE);
 
-            Mockito.when(PasswordUtils.decodePassword("123456")).thenReturn("123456");
-            Mockito.when(PasswordUtils.decodePassword("!QAZXSW@")).thenReturn("!QAZXSW@");
-            Mockito.when(PasswordUtils.decodePassword("5dfger(@")).thenReturn("5dfger(@");
+            mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("123456")).thenReturn("123456");
+            mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("!QAZXSW@")).thenReturn("!QAZXSW@");
+            mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("5dfger(@")).thenReturn("5dfger(@");
 
-            Assert.assertEquals(null, PasswordUtils.decodePassword(""));
-            Assert.assertEquals("123456", PasswordUtils.decodePassword("123456"));
-            Assert.assertEquals("!QAZXSW@", PasswordUtils.decodePassword("!QAZXSW@"));
-            Assert.assertEquals("5dfger(@", PasswordUtils.decodePassword("5dfger(@"));
+            Assertions.assertEquals(null, PasswordUtils.decodePassword(""));
+            Assertions.assertEquals("123456", PasswordUtils.decodePassword("123456"));
+            Assertions.assertEquals("!QAZXSW@", PasswordUtils.decodePassword("!QAZXSW@"));
+            Assertions.assertEquals("5dfger(@", PasswordUtils.decodePassword("5dfger(@"));
         }
     }
 

@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
+import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -181,7 +180,7 @@ public class ProcessUtils {
             }
         }
 
-        if (CommonUtils.isSudoEnable() && !pidList.isEmpty()) {
+        if (OSUtils.isSudoEnable() && !pidList.isEmpty()) {
             pidList = pidList.subList(1, pidList.size());
         }
         return String.join(" ", pidList).trim();
@@ -201,11 +200,14 @@ public class ProcessUtils {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             Host host = Host.of(taskExecutionContext.getHost());
-            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
+                    taskExecutionContext.getAppInfoPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                            .setExecutePath(FileUtils.getProcessExecDir(
+                                    taskExecutionContext.getTenantCode(),
+                                    taskExecutionContext.getProjectCode(),
                                     taskExecutionContext.getProcessDefineCode(),
                                     taskExecutionContext.getProcessDefineVersion(),
                                     taskExecutionContext.getProcessInstanceId(),

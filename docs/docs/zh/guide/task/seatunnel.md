@@ -12,16 +12,19 @@
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
-- 引擎：支持 FLINK 和 SPARK
-  - FLINK
-    - 运行模型：支持 `run` 和 `run-application` 两种模式
-    - 选项参数：用于添加 Flink 引擎本身参数，例如 `-m yarn-cluster -ynm seatunnel`
-  - SPARK
-    - 部署方式：指定部署模式，`cluster` `client` `local`
-    - Master：指定 `Master` 模型，`yarn` `local` `spark` `mesos`，其中 `spark` 和 `mesos` 需要指定 `Master` 服务地址，例如：127.0.0.1:7077
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
-      > 点击 [这里](https://seatunnel.apache.org/docs/2.1.2/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+- 引擎：支持 FLINK 和 SPARK
+- FLINK
+- 运行模型：支持 `run` 和 `run-application` 两种模式
+- 选项参数：用于添加 Flink 引擎本身参数，例如 `-m yarn-cluster -ynm seatunnel`
+- SPARK
+- 部署方式：指定部署模式，`cluster` `client` `local`
+- Master：指定 `Master` 模型，`yarn` `local` `spark` `mesos`，其中 `spark` 和 `mesos` 需要指定 `Master` 服务地址，例如：127.0.0.1:7077
+
+          > 点击 [这里](https://seatunnel.apache.org/docs/2.1.2/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
 
 - 自定义配置：支持自定义配置或从资源中心选择配置文件
 

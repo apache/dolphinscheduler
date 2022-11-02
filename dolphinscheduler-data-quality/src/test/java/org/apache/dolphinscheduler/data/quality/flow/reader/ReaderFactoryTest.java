@@ -34,8 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * ConnectorFactoryTest
@@ -48,23 +48,23 @@ public class ReaderFactoryTest {
         List<ReaderConfig> readerConfigs = new ArrayList<>();
         ReaderConfig readerConfig = new ReaderConfig();
         readerConfig.setType("JDBC");
-        Map<String,Object> config = new HashMap<>();
-        config.put(DATABASE,"test");
-        config.put(TABLE,"test1");
-        config.put(URL,"jdbc:mysql://localhost:3306/test");
-        config.put(USER,"test");
-        config.put(PASSWORD,"123456");
-        config.put(DRIVER,"com.mysql.cj.jdbc.Driver");
+        Map<String, Object> config = new HashMap<>();
+        config.put(DATABASE, "test");
+        config.put(TABLE, "test1");
+        config.put(URL, "jdbc:mysql://localhost:3306/test");
+        config.put(USER, "test");
+        config.put(PASSWORD, "123456");
+        config.put(DRIVER, "com.mysql.cj.jdbc.Driver");
         readerConfig.setConfig(config);
         readerConfigs.add(readerConfig);
 
         int flag = 0;
 
-        List<BatchReader> readers = ReaderFactory.getInstance().getReaders(null,readerConfigs);
+        List<BatchReader> readers = ReaderFactory.getInstance().getReaders(null, readerConfigs);
         if (readers != null && readers.size() >= 1) {
             flag = 1;
         }
 
-        Assert.assertEquals(1,flag);
+        Assertions.assertEquals(1, flag);
     }
 }

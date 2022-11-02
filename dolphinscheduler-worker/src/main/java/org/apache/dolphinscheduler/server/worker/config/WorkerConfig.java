@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
@@ -60,6 +60,8 @@ public class WorkerConfig implements Validator {
     private String workerAddress;
     private String workerRegistryPath;
 
+    private TaskExecuteThreadsFullPolicy taskExecuteThreadsFullPolicy = TaskExecuteThreadsFullPolicy.REJECT;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return WorkerConfig.class.isAssignableFrom(clazz);
@@ -97,5 +99,6 @@ public class WorkerConfig implements Validator {
         logger.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
         logger.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
         logger.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
+        logger.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
     }
 }

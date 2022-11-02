@@ -17,21 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MySQLDataSourceProcessorTest {
 
     private MySQLDataSourceProcessor mysqlDatasourceProcessor = new MySQLDataSourceProcessor();
@@ -51,8 +51,8 @@ public class MySQLDataSourceProcessorTest {
             Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
                     .createConnectionParams(mysqlDatasourceParamDTO);
-            Assert.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
-            Assert.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
+            Assertions.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
         }
     }
 
@@ -62,32 +62,34 @@ public class MySQLDataSourceProcessorTest {
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/default\"}";
         MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
                 .createConnectionParams(connectionJson);
-        Assert.assertNotNull(connectionJson);
-        Assert.assertEquals("root", connectionParams.getUser());
+        Assertions.assertNotNull(connectionJson);
+        Assertions.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_MYSQL_CJ_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_MYSQL_CJ_JDBC_DRIVER,
+                mysqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
                 mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
+        Assertions.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.MYSQL_VALIDATION_QUERY, mysqlDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.MYSQL_VALIDATION_QUERY,
+                mysqlDatasourceProcessor.getValidationQuery());
     }
 
     @Test
@@ -98,7 +100,7 @@ public class MySQLDataSourceProcessorTest {
         mysqlConnectionParam.setPassword("123456");
         try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
             Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
-            Assert.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default",
+            Assertions.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default",
                     mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
         }
     }

@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -51,22 +51,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * data analysis service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class DataAnalysisServiceTest {
 
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
@@ -104,7 +107,7 @@ public class DataAnalysisServiceTest {
 
     private User user;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         user = new User();
@@ -117,7 +120,7 @@ public class DataAnalysisServiceTest {
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(project);
     }
 
-    @After
+    @AfterEach
     public void after() {
         user = null;
         projectMapper = null;
@@ -136,7 +139,7 @@ public class DataAnalysisServiceTest {
 
         // SUCCESS
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -149,7 +152,7 @@ public class DataAnalysisServiceTest {
         putMsg(failResult, Status.PROJECT_NOT_FOUND, 1);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(), any())).thenReturn(failResult);
         failResult = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
     }
 
     @Test
@@ -163,19 +166,19 @@ public class DataAnalysisServiceTest {
         String startDate2 = "illegalDateString";
         String endDate2 = "illegalDateString";
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate2, endDate2);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
         // when one of date in illegal format then return error message
         String startDate3 = "2020-08-28 14:13:40";
         String endDate3 = "illegalDateString";
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate3, endDate3);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
         // when one of date in illegal format then return error message
         String startDate4 = "illegalDateString";
         String endDate4 = "2020-08-28 14:13:40";
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate4, endDate4);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
     }
 
     @Test
@@ -214,7 +217,7 @@ public class DataAnalysisServiceTest {
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(any(), any(), any()))
                 .thenReturn(null);
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, null, null);
-        Assert.assertNull(result.get(Constants.DATA_LIST));
+        Assertions.assertNull(result.get(Constants.DATA_LIST));
     }
 
     @Test
@@ -229,7 +232,7 @@ public class DataAnalysisServiceTest {
         putMsg(failResult, Status.PROJECT_NOT_FOUND, 1);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong(), any())).thenReturn(failResult);
         failResult = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, failResult.get(Constants.STATUS));
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
@@ -237,7 +240,7 @@ public class DataAnalysisServiceTest {
 
         // SUCCESS
         result = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -249,12 +252,12 @@ public class DataAnalysisServiceTest {
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1,
                 serviceLogger)).thenReturn(projectIds());
         result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1,
                 serviceLogger)).thenReturn(Collections.emptySet());
         result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -264,7 +267,7 @@ public class DataAnalysisServiceTest {
         user.setId(1);
 
         Map<String, Object> result = dataAnalysisServiceImpl.countCommandState(user);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         // when no command found then return all count are 0
         Mockito.when(commandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.emptyList());

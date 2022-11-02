@@ -17,23 +17,23 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive.utils;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.common.constants.Constants.JAVA_SECURITY_KRB5_CONF;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
 import java.util.Objects;
 
-public class CommonUtil {
+import lombok.experimental.UtilityClass;
 
-    private CommonUtil() {
-    }
+@UtilityClass
+public class CommonUtil {
 
     public static boolean getKerberosStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);

@@ -63,6 +63,7 @@
         <module>dolphinscheduler-task-pytorch</module>
         <module>dolphinscheduler-task-hivecli</module>
         <module>dolphinscheduler-task-dms</module>
+        <module>dolphinscheduler-task-datasync</module>
     </modules>
 
     <dependencyManagement>
@@ -77,13 +78,4 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>3.12.4</version>
-            <!-- TODO: move this dependency to root pom after removing powermock in the whole project -->
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>

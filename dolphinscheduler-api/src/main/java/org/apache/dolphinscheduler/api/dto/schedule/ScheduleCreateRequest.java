@@ -31,10 +31,7 @@ import lombok.Data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.swagger.annotations.ApiModelProperty;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * schedule create request
@@ -42,40 +39,40 @@ import com.google.gson.GsonBuilder;
 @Data
 public class ScheduleCreateRequest {
 
-    @ApiModelProperty(example = "1234567890123", required = true)
+    @Schema(example = "1234567890123", required = true)
     private long processDefinitionCode;
 
-    @ApiModelProperty(example = "schedule timezone", required = true)
+    @Schema(example = "schedule timezone", required = true)
     private String crontab;
 
-    @ApiModelProperty(example = "2021-01-01 10:00:00", required = true)
+    @Schema(example = "2021-01-01 10:00:00", required = true)
     private String startTime;
 
-    @ApiModelProperty(example = "2022-01-01 12:00:00", required = true)
+    @Schema(example = "2022-01-01 12:00:00", required = true)
     private String endTime;
 
-    @ApiModelProperty(example = "Asia/Shanghai", required = true)
+    @Schema(example = "Asia/Shanghai", required = true)
     private String timezoneId;
 
-    @ApiModelProperty(allowableValues = "CONTINUE / END", example = "CONTINUE", notes = "default CONTINUE if value not provide.")
+    @Schema(allowableValues = "CONTINUE / END", example = "CONTINUE", description = "default CONTINUE if value not provide.")
     private String failureStrategy;
 
-    @ApiModelProperty(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", notes = "default OFFLINE if value not provide.")
+    @Schema(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", description = "default OFFLINE if value not provide.")
     private String releaseState;
 
-    @ApiModelProperty(allowableValues = "NONE / SUCCESS / FAILURE / ALL", example = "SUCCESS", notes = "default NONE if value not provide.")
+    @Schema(allowableValues = "NONE / SUCCESS / FAILURE / ALL", example = "SUCCESS", description = "default NONE if value not provide.")
     private String warningType;
 
-    @ApiModelProperty(example = "2", notes = "default 0 if value not provide.")
+    @Schema(example = "2", description = "default 0 if value not provide.")
     private int warningGroupId;
 
-    @ApiModelProperty(allowableValues = "HIGHEST / HIGH / MEDIUM / LOW / LOWEST", example = "MEDIUM", notes = "default MEDIUM if value not provide.")
+    @Schema(allowableValues = "HIGHEST / HIGH / MEDIUM / LOW / LOWEST", example = "MEDIUM", description = "default MEDIUM if value not provide.")
     private String processInstancePriority;
 
-    @ApiModelProperty(example = "worker-group-name")
+    @Schema(example = "worker-group-name")
     private String workerGroup;
 
-    @ApiModelProperty(example = "environment-code")
+    @Schema(example = "environment-code")
     private long environmentCode;
 
     public String getScheduleParam() {

@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
+import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -42,14 +42,15 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.service.utils.CommonUtils;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -92,11 +93,12 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         this.alertClientService = alertClientService;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
-        String taskLogName = LoggerUtils.buildTaskId(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+        String taskLogName =
+                LoggerUtils.buildTaskId(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                        taskExecutionContext.getProcessDefineCode(),
+                        taskExecutionContext.getProcessDefineVersion(),
+                        taskExecutionContext.getProcessInstanceId(),
+                        taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setTaskLogName(taskLogName);
         logger.info("Set task logger name: {}", taskLogName);
     }
@@ -132,7 +134,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (task != null) {
             try {
                 task.cancel();
-                List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
+                List<String> appIds =
+                        LogUtils.getAppIds(taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(),
+                                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
                             taskExecutionContext.getExecutePath());
@@ -157,7 +161,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             initializeTask();
 
-            if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
+            if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
@@ -264,7 +268,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void clearTaskExecPathIfNeeded() {
-
         String execLocalPath = taskExecutionContext.getExecutePath();
         if (!CommonUtils.isDevelopMode()) {
             logger.info("The current execute mode isn't develop mode, will clear the task execute file: {}",

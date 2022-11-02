@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -38,17 +38,18 @@ import org.springframework.util.MultiValueMap;
 /**
  * logger controller test
  */
-@Ignore
+@Disabled
 public class LoggerControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(LoggerControllerTest.class);
 
     @Test
     public void testQueryLog() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("taskInstId","1501");
-        paramsMap.add("skipLineNum","0");
-        paramsMap.add("limit","1000");
+        paramsMap.add("taskInstId", "1501");
+        paramsMap.add("skipLineNum", "0");
+        paramsMap.add("limit", "1000");
 
         MvcResult mvcResult = mockMvc.perform(get("/log/detail")
                 .header("sessionId", sessionId)
@@ -58,7 +59,7 @@ public class LoggerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -66,16 +67,16 @@ public class LoggerControllerTest extends AbstractControllerTest {
     public void testDownloadTaskLog() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("taskInstId","1501");
+        paramsMap.add("taskInstId", "1501");
 
         MvcResult mvcResult = mockMvc.perform(get("/log/download-log")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                /*.andExpect(content().contentType(MediaType.APPLICATION_JSON))*/
+                /* .andExpect(content().contentType(MediaType.APPLICATION_JSON)) */
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

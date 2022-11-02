@@ -17,20 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.task.openmldb;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class OpenmldbTaskTest {
+
     static class MockOpenmldbTask extends OpenmldbTask {
+
         /**
          * constructor
          *
@@ -55,7 +57,7 @@ public class OpenmldbTaskTest {
         OpenmldbTask openmldbTask = createOpenmldbTask();
         String pythonFile = "test.py";
         String result1 = openmldbTask.buildPythonExecuteCommand(pythonFile);
-        Assert.assertEquals("python3 test.py", result1);
+        Assertions.assertEquals("python3 test.py", result1);
     }
 
     @Test
@@ -74,21 +76,20 @@ public class OpenmldbTaskTest {
         OpenmldbTask openmldbTask = new OpenmldbTask(taskExecutionContext);
         openmldbTask.init();
         OpenmldbParameters internal = (OpenmldbParameters) openmldbTask.getParameters();
-        Assert.assertNotNull(internal);
-        Assert.assertEquals(internal.getExecuteMode(), "offline");
+        Assertions.assertNotNull(internal);
+        Assertions.assertEquals(internal.getExecuteMode(), "offline");
 
         String result1 = openmldbTask.buildPythonScriptContent();
-        Assert.assertEquals("import openmldb\n"
-                        + "import sqlalchemy as db\n"
-                        + "engine = db.create_engine('openmldb:///?zk=localhost:2181&zkPath=dolphinscheduler')\n"
-                        + "con = engine.connect()\n"
-                        + "con.execute(\"set @@execute_mode='offline';\")\n"
-                        + "con.execute(\"set @@sync_job=true\")\n"
-                        + "con.execute(\"set @@job_timeout=1800000\")\n"
-                        + "con.execute(\"select * from users\\n-- some comment\\ninner join order on users.order_id = "
-                        + "order.id\")\n"
-                        + "con.execute(\"select * from users\")\n"
-                , result1);
+        Assertions.assertEquals("import openmldb\n"
+                + "import sqlalchemy as db\n"
+                + "engine = db.create_engine('openmldb:///?zk=localhost:2181&zkPath=dolphinscheduler')\n"
+                + "con = engine.connect()\n"
+                + "con.execute(\"set @@execute_mode='offline';\")\n"
+                + "con.execute(\"set @@sync_job=true\")\n"
+                + "con.execute(\"set @@job_timeout=1800000\")\n"
+                + "con.execute(\"select * from users\\n-- some comment\\ninner join order on users.order_id = "
+                + "order.id\")\n"
+                + "con.execute(\"select * from users\")\n", result1);
     }
 
 }

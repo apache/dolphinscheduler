@@ -17,20 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class Db2DataSourceProcessorTest {
 
     private Db2DataSourceProcessor db2DatasourceProcessor = new Db2DataSourceProcessor();
@@ -46,14 +47,15 @@ public class Db2DataSourceProcessorTest {
         db2DatasourceParamDTO.setPort(5142);
         db2DatasourceParamDTO.setDatabase("default");
         db2DatasourceParamDTO.setOther(props);
-        Mockito.mockStatic(PasswordUtils.class);
-        Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
 
-        Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
-                .createConnectionParams(db2DatasourceParamDTO);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
+            Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
+                    .createConnectionParams(db2DatasourceParamDTO);
+            Assertions.assertNotNull(connectionParams);
+            Assertions.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test
@@ -62,14 +64,14 @@ public class Db2DataSourceProcessorTest {
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:db2://localhost:5142/default\"}";
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
                 .createConnectionParams(connectionJson);
-        Assert.assertNotNull(connectionJson);
-        Assert.assertEquals("root", connectionParams.getUser());
+        Assertions.assertNotNull(connectionJson);
+        Assertions.assertEquals("root", connectionParams.getUser());
 
     }
 
     @Test
     public void testGetDatasourceDriver() {
-        Assert.assertEquals(Constants.COM_DB2_JDBC_DRIVER, db2DatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_DB2_JDBC_DRIVER, db2DatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -78,16 +80,16 @@ public class Db2DataSourceProcessorTest {
         db2ConnectionParam.setJdbcUrl("jdbc:db2://localhost:5142/default");
         db2ConnectionParam.setOther("other=other");
         String jdbcUrl = db2DatasourceProcessor.getJdbcUrl(db2ConnectionParam);
-        Assert.assertEquals("jdbc:db2://localhost:5142/default;other=other", jdbcUrl);
+        Assertions.assertEquals("jdbc:db2://localhost:5142/default;other=other", jdbcUrl);
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.DB2, db2DatasourceProcessor.getDbType());
+        Assertions.assertEquals(DbType.DB2, db2DatasourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assert.assertEquals(Constants.DB2_VALIDATION_QUERY, db2DatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.DB2_VALIDATION_QUERY, db2DatasourceProcessor.getValidationQuery());
     }
 }

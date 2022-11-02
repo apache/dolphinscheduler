@@ -17,12 +17,18 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import lombok.Data;
+import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+
+import java.time.Duration;
+
+import lombok.Data;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -30,10 +36,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.Duration;
-
-import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 
 @Data
 @Validated
@@ -91,6 +93,8 @@ public class MasterConfig implements Validator {
     private boolean killYarnJobWhenTaskFailover = true;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
+    private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
+
     // ip:listenPort
     private String masterAddress;
 
@@ -138,6 +142,10 @@ public class MasterConfig implements Validator {
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
+        if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
+            errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
+        }
+
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         masterConfig.setMasterRegistryPath(REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterConfig.getMasterAddress());
         printConfig();
@@ -161,5 +169,6 @@ public class MasterConfig implements Validator {
         logger.info("Master config: registryDisconnectStrategy -> {} ", registryDisconnectStrategy);
         logger.info("Master config: masterAddress -> {} ", masterAddress);
         logger.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
+        logger.info("Master config: workerGroupRefreshInterval -> {} ", workerGroupRefreshInterval);
     }
 }

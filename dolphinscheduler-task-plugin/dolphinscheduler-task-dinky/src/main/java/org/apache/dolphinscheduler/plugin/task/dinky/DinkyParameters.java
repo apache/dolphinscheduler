@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.dinky;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -72,9 +73,9 @@ public class DinkyParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "DinkyParameters{" +
-            "address='" + address + '\'' +
-            ", taskId='" + taskId + '\'' +
-            ", online='" + online + '\'' +
-            '}';
+                "address='" + address + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", online='" + online + '\'' +
+                '}';
     }
 }

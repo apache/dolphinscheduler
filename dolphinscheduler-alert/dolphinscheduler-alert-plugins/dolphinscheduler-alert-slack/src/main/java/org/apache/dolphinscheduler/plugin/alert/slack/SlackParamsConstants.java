@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.slack;
 
 public final class SlackParamsConstants {
+
     public static final String SLACK_WEB_HOOK_URL = "$t('webhook')";
     public static final String SLACK_WEB_HOOK_URL_NAME = "webHook";
     public static final String SLACK_BOT = "$t('Username')";

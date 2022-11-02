@@ -17,21 +17,25 @@
 
 package org.apache.dolphinscheduler.service.cron;
 
-import com.cronutils.model.Cron;
-import com.cronutils.model.definition.CronDefinitionBuilder;
-import com.cronutils.model.time.ExecutionTime;
-import com.cronutils.parser.CronParser;
-import lombok.NonNull;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.common.Constants;
+import static com.cronutils.model.CronType.QUARTZ;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.day;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.hour;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.min;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.month;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.week;
+import static org.apache.dolphinscheduler.service.cron.CycleFactory.year;
+
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -44,15 +48,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.cronutils.model.CronType.QUARTZ;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.service.cron.CycleFactory.day;
-import static org.apache.dolphinscheduler.service.cron.CycleFactory.hour;
-import static org.apache.dolphinscheduler.service.cron.CycleFactory.min;
-import static org.apache.dolphinscheduler.service.cron.CycleFactory.month;
-import static org.apache.dolphinscheduler.service.cron.CycleFactory.week;
-import static org.apache.dolphinscheduler.service.cron.CycleFactory.year;
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.cronutils.model.Cron;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.model.time.ExecutionTime;
+import com.cronutils.parser.CronParser;
 
 /**
  * // todo: this utils is heavy, it rely on quartz and corn-utils.
@@ -290,7 +294,7 @@ public class CronUtils {
      */
     public static List<Date> getSelfScheduleDateList(Map<String, String> param) {
         List<Date> result = new ArrayList<>();
-        String scheduleDates = param.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
+        String scheduleDates = param.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
         if (StringUtils.isNotEmpty(scheduleDates)) {
             for (String stringDate : scheduleDates.split(COMMA)) {
                 result.add(DateUtils.stringToDate(stringDate.trim()));
