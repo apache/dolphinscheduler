@@ -16,37 +16,48 @@
  */
 
 import { reactive } from 'vue'
+import { useDynamicLocales } from './use-dynamic-locales'
+import type { TaskDynamic } from './types'
 
-const shell = {
-  locales: {
-    zh_CN: {
-      node_name: '节点名称',
-      node_name_tips: '节点名称不能为空'
-    },
-    en_US: {
-      node_name: 'Node Name',
-      node_name_tips: 'Node name cannot be empty'
-    }
-  },
-  items: [
-    {
-      label: 'node_name',
-      type: 'input',
-      field: '',
-      validate: {
-        trigger: ['input', 'blur'],
-        message: 'node_name_tips'
+const data = [
+  {
+    task: 'shell',
+    locales: {
+      zh_CN: {
+        node_name: '节点名称',
+        node_name_tips: '节点名称不能为空'
+      },
+      en_US: {
+        node_name: 'Node Name',
+        node_name_tips: 'Node name cannot be empty'
       }
-    }
-  ]
-}
+    },
+    apis: [
+
+    ],
+    items: [
+      {
+        label: 'task_components.node_name',
+        type: 'input',
+        field: '',
+        validate: {
+          trigger: ['input', 'blur'],
+          message: 'task_components.node_name_tips'
+        }
+      }
+    ]
+  }
+]
 
 export function useTaskForm() {
   const variables = reactive({
     formStructure: {}
   })
 
-  variables.formStructure = shell
+  variables.formStructure = data.map((t: TaskDynamic) => {
+    useDynamicLocales(t.locales)
+    return t
+  })
 
   return {
     variables
