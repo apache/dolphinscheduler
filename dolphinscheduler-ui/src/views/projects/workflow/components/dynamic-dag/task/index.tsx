@@ -15,15 +15,19 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, toRefs } from 'vue'
 import { NForm } from 'naive-ui'
 import { useTaskForm } from './use-task-form'
+import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 
 const props = {
   showModal: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  task: {
+    type: String as PropType<string>
   }
 }
 
@@ -33,6 +37,7 @@ const TaskForm = defineComponent({
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
     const { variables } = useTaskForm()
+    const { t } = useI18n()
 
     const cancelModal = () => {
       ctx.emit('cancelModal')
@@ -42,18 +47,17 @@ const TaskForm = defineComponent({
       ctx.emit('confirmModal')
     }
 
-    return { ...variables, cancelModal, confirmModal }
+    return { ...toRefs(variables), cancelModal, confirmModal, t }
   },
   render() {
     return (
       <Modal
-        title={''}
-        show={this.showModal}
+        title={this.task}
+        show={(this.showModal && this.task) as boolean}
         onCancel={this.cancelModal}
         onConfirm={this.confirmModal}>
         <NForm
           ref={'TaskForm'}>
-
         </NForm>
       </Modal>
     )
