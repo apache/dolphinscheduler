@@ -19,10 +19,8 @@ import { useRoute } from 'vue-router'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { viewVariables } from '@/service/modules/process-instances'
-import { viewProcessDefinitionVariables } from "@/service/modules/process-definition";
 import styles from './variables.module.scss'
 import { NButton } from 'naive-ui'
-
 
 export default defineComponent({
   name: 'variables-view',
@@ -32,29 +30,20 @@ export default defineComponent({
     const route = useRoute()
 
     const projectCode = Number(route.params.projectCode)
-
     const instanceId = Number(route.params.id)
 
-    const processCode = Number(route.params.code)
-
     const globalParams = computed(() => {
-      return paramsRef.value && paramsRef.value.globalParams ? paramsRef.value.globalParams : []
+      return paramsRef.value ? paramsRef.value.globalParams : []
     })
 
     const localParams = computed(() => {
-      return paramsRef.value && paramsRef.value.localParams ? paramsRef.value.localParams : {}
+      return paramsRef.value ? paramsRef.value.localParams : {}
     })
 
     const getViewVariables = () => {
-      if (Number.isNaN(instanceId)) {
-        viewProcessDefinitionVariables(projectCode, processCode).then((res: any) => {
-          paramsRef.value = res
-        })
-      } else {
-        viewVariables(instanceId, projectCode).then((res: any) => {
-          paramsRef.value = res
-        })
-      }
+      viewVariables(instanceId, projectCode).then((res: any) => {
+        paramsRef.value = res
+      })
     }
 
     const handleCopy = (text: string) => {
