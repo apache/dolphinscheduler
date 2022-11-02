@@ -57,6 +57,7 @@ const TaskForm = defineComponent({
         onCancel={this.cancelModal}
         onConfirm={this.confirmModal}>
         <NForm
+          model={this.model}
           ref={'TaskForm'}>
         </NForm>
       </Modal>
