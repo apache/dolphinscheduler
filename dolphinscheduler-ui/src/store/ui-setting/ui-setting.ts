@@ -22,8 +22,7 @@ export const useUISettingStore = defineStore({
   id: 'ui-setting',
   state: (): UISettingStore => ({
     logTimer: 0,
-    dynamicTask: false,
-    apiTimer: 10000
+    dynamicTask: false
   }),
   persist: true,
   getters: {
@@ -32,9 +31,6 @@ export const useUISettingStore = defineStore({
     },
     getDynamicTask(): boolean {
       return this.dynamicTask
-    },
-    getApiTimer(): number {
-      return this.apiTimer
     }
   },
   actions: {
@@ -43,9 +39,7 @@ export const useUISettingStore = defineStore({
     },
     setDynamicTask(): void {
       this.dynamicTask = !this.dynamicTask
-    },
-    setApiTimer(timer: number): void {
-      this.apiTimer = timer
     }
   }
 })
+
