@@ -17,15 +17,12 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
-import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -134,9 +131,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (task != null) {
             try {
                 task.cancel();
-                List<String> appIds =
-                        LogUtils.getAppIds(taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(),
-                                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
+                List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
                             taskExecutionContext.getExecutePath());
@@ -161,7 +156,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             initializeTask();
 
-            if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
+            if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
@@ -268,6 +263,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void clearTaskExecPathIfNeeded() {
+
         String execLocalPath = taskExecutionContext.getExecutePath();
         if (!CommonUtils.isDevelopMode()) {
             logger.info("The current execute mode isn't develop mode, will clear the task execute file: {}",

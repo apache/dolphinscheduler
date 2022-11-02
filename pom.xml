@@ -40,7 +40,6 @@
         <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
-        <module>dolphinscheduler-aop</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
@@ -110,11 +109,6 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-standalone-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-aop</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

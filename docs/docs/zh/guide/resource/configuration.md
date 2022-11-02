@@ -142,9 +142,6 @@ development.state=false
 
 # rpc port
 alert.rpc.port=50052
-
-# way to collect applicationId: log(original regex match), aop
-appId.collect: log
 ```
 
 > **注意**：

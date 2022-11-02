@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
-
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -111,8 +107,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      */
     @Override
     public List<String> getApplicationIds() throws TaskException {
-        return LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(),
-                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
+        return LogUtils.getAppIdsFromLogFile(taskRequest.getLogPath(), logger);
     }
 
     /**

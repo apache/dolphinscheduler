@@ -224,7 +224,6 @@ The default configuration is as follows:
 |sudo.enable | true | whether to enable sudo|
 |alert.rpc.port | 50052 | the RPC port of Alert Server|
 |zeppelin.rest.url | http://localhost:8080 | the RESTful API url of zeppelin|
-|appId.collect | log | way to collect applicationId, if use aop, alter the configuration from log to aop, annotation of applicationId auto collection related configuration in `bin/env/dolphinscheduler_env.sh` should be removed. Note: Aop way doesn't support submitting yarn job on remote host by client mode like Beeline, and will failure if override applicationId collection-related environment configuration in dolphinscheduler_env.sh, and .|
 
 ### Api-server related configuration
 
@@ -356,13 +355,6 @@ export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
-
-# applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
-export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
-export SPARK_DIST_CLASSPATH=$HADOOP_CLASSPATH:$SPARK_DIST_CLASS_PATH
-export HADOOP_CLIENT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$HADOOP_CLIENT_OPTS
-export SPARK_SUBMIT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$SPARK_SUBMIT_OPTS
-export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$FLINK_ENV_JAVA_OPTS
 ```
 
 ### Log related configuration
