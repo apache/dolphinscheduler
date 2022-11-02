@@ -50,7 +50,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -459,23 +458,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * get check result
-     *
-     * @param loginUser login user
-     * @param project project
-     * @return check result
-     */
-    private Map<String, Object> getCheckResult(User loginUser, Project project, String perm) {
-        Map<String, Object> checkResult =
-                checkProjectAndAuth(loginUser, project, project == null ? 0L : project.getCode(), perm);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            return checkResult;
-        }
-        return null;
-    }
-
-    /**
      * updateProcessInstance project
      *
      * @param loginUser login user
@@ -704,44 +686,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         putMsg(result, Status.SUCCESS);
 
         return result;
-    }
-
-    /**
-     * check whether have read permission
-     *
-     * @param user user
-     * @param project project
-     * @return true if the user have permission to see the project, otherwise return false
-     */
-    private boolean checkReadPermission(User user, Project project) {
-        int permissionId = queryPermission(user, project);
-        return (permissionId & Constants.READ_PERMISSION) != 0;
-    }
-
-    /**
-     * query permission id
-     *
-     * @param user user
-     * @param project project
-     * @return permission
-     */
-    private int queryPermission(User user, Project project) {
-        if (user.getUserType() == UserType.ADMIN_USER) {
-            return Constants.READ_PERMISSION;
-        }
-
-        if (Objects.equals(project.getUserId(), user.getId())) {
-            return Constants.ALL_PERMISSIONS;
-        }
-
-        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
-
-        if (projectUser == null) {
-            return 0;
-        }
-
-        return projectUser.getPerm();
-
     }
 
     /**
