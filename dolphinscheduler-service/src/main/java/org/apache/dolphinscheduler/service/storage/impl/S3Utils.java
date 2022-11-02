@@ -92,8 +92,6 @@ public class S3Utils implements Closeable, StorageOperate {
     public static final String REGION = PropertyUtils.getString(TaskConstants.AWS_REGION);
 
     public static final String BUCKET_NAME = PropertyUtils.getString(Constants.AWS_S3_BUCKET_NAME);
-    
-    public static final String UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH);
 
     private AmazonS3 s3Client = null;
 
@@ -117,7 +115,7 @@ public class S3Utils implements Closeable, StorageOperate {
                         .withRegion(Regions.fromName(REGION))
                         .build();
             }
-            checkBucketWithPrefixExists(BUCKET_NAME, UPLOAD_PATH);
+            checkBucketWithPrefixExists(BUCKET_NAME, getS3DataBasePath());
         }
     }
 
@@ -403,6 +401,12 @@ public class S3Utils implements Closeable, StorageOperate {
         }
     }
     
+    /**
+     * check permission by list S3 Directory
+     *
+     * @param bucketName
+     * @param prefix the name of directory
+     */
     public void checkBucketWithPrefixExists(String bucketName, String prefix) {
         try {
             s3Client.listObjects(bucketName, prefix);
