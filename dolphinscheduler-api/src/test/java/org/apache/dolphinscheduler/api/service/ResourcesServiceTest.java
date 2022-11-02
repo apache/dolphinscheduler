@@ -380,6 +380,7 @@ public class ResourcesServiceTest {
         loginUser.setId(0);
         loginUser.setUserType(UserType.ADMIN_USER);
 
+        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         Mockito.when(userMapper.selectList(null)).thenReturn(Arrays.asList(loginUser));
         Mockito.when(userMapper.selectById(loginUser.getId())).thenReturn(loginUser);
         Mockito.when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(getTenant());

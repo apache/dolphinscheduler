@@ -847,7 +847,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName) {
         Map<String, Object> result = new HashMap<>();
-
+        if (!PropertyUtils.getResUploadStartupState()) {
+            logger.error("Storage does not start up, resource upload startup state: {}.",
+                    PropertyUtils.getResUploadStartupState());
+            putMsg(result, Status.STORAGE_NOT_STARTUP);
+            return result;
+        }
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             logger.error("user {} not exists", loginUser.getId());
@@ -863,7 +868,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         String tenantCode = tenant.getTenantCode();
 
-        String defaultPath = "";
+        String defaultPath = EMPTY_STRING;
         List<StorageEntity> resourcesList = new ArrayList<>();
 
         if (StringUtils.isBlank(fullName)) {
@@ -871,7 +876,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 List<User> userList = userMapper.selectList(null);
                 Set<String> visitedTenantEntityCode = new HashSet<>();
                 for (User userEntity : userList) {
-                    Tenant tt = tenantMapper.queryById(userEntity.getTenantId());
                     String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
                     if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
                         defaultPath = storageOperate.getResDir(tenantEntityCode);
