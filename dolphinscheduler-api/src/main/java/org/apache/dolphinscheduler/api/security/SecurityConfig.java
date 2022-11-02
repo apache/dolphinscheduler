@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
-import org.apache.dolphinscheduler.api.security.impl.oauth2.GoogleOAuth2Authenticator;
+import org.apache.dolphinscheduler.api.security.impl.oauth2.OAuth2Authenticator;
 import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
 
 import org.apache.commons.lang3.StringUtils;
@@ -74,8 +74,7 @@ public class SecurityConfig {
                 authenticator = new LdapAuthenticator();
                 break;
             case OAUTH2:
-                logger.info("[debug111] initializing oauth2 authenticator");
-                authenticator = new GoogleOAuth2Authenticator();
+                authenticator = new OAuth2Authenticator();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);
@@ -90,8 +89,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
-                .and().logout().logoutUrl("/signOut").logoutSuccessUrl("/").permitAll()
-                .and().csrf().disable();
+                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/").permitAll();
         return http.build();
     }
 

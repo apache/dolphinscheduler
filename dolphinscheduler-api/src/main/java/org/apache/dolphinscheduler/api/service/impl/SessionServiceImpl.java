@@ -62,22 +62,16 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
     public Session getSession(HttpServletRequest request) {
         String sessionId = request.getHeader(Constants.SESSION_ID);
 
-        logger.info("[debug111] session id is {} ...", sessionId);
-
         if (StringUtils.isBlank(sessionId)) {
             Cookie cookie = WebUtils.getCookie(request, Constants.SESSION_ID);
             if (cookie != null) {
-                logger.info("[debug111] cookie not null, trying getting session id from cookie");
                 sessionId = cookie.getValue();
             }
         }
 
         if (StringUtils.isBlank(sessionId)) {
-            logger.info("[debug111] session id is still null, return null");
             return null;
         }
-
-        logger.info("[debug111] session id is not null, {}", sessionId);
 
         String ip = BaseController.getClientIpAddress(request);
         logger.debug("Get session: {}, ip: {}.", sessionId, ip);

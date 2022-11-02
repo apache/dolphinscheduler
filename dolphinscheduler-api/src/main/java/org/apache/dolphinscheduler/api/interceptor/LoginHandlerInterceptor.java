@@ -72,41 +72,30 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        logger.info("[debug111] preHandle starts...");
         // get token
-        logger.info("[debug111] request header: {}", request.getHeaderNames());
         String token = request.getHeader("token");
         User user;
 
         OAuth2User principal = (OAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        logger.info("[debug111] attempt to get principal from spring security context: {}", principal);
         if (principal != null) {
             String ip = getClientIpAddress(request);
             Result<Map<String, String>> result = authenticator.authenticate(null, null, ip, principal);
             user = userService.getUserByUserName(result.getData().get(Constants.SESSION_USER));
-            logger.info("[debug111] log user info {}", user.toString());
             request.setAttribute(Constants.SESSION_USER, user);
             ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());
             return true;
         }
 
         if (StringUtils.isEmpty(token)) {
-            logger.info("[debug111] preHandle token is empty...");
             user = authenticator.getAuthUser(request);
-            logger.info("[debug111] prehandle get user from request...");
-            logger.info("[debug111] preHandle, user: {}", user);
             // if user is null
             if (user == null) {
-                logger.info("[debug111] user is null...");
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 return false;
             }
         } else {
-            logger.info("[debug111] prehandle token exists...");
             user = userMapper.queryUserByToken(token, new Date());
-            logger.info("[debug111] prehandle find user by token...");
             if (user == null) {
-                logger.info("[debug111] prehandle token not null but user is null...");
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 logger.info("user token has expired");
                 return false;
@@ -115,12 +104,10 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {
-            logger.info("[debug111] prehandle user not null but state is no...");
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);
             logger.info(Status.USER_DISABLED.getMsg());
             return false;
         }
-        logger.info("[debug111] prehandle great everything seems good, add user to session...");
         request.setAttribute(Constants.SESSION_USER, user);
         ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());
         return true;
