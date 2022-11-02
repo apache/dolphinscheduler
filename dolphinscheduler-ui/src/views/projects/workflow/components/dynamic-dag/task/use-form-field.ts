@@ -23,10 +23,8 @@ export function useFormField(forms: any) {
   forms.forEach((f: any) => {
     if (f.field.indexOf('.') >= 0) {
       const hierarchy = f.field.split('.')
-      for (let l = 0; l < hierarchy.length; l++) {
-        model[hierarchy[0]] = {
-          [hierarchy[1]]: ref(f.defaultValue ? f.defaultValue : '')
-        }
+      model[hierarchy[0]] = {
+        [hierarchy[1]]: ref(f.defaultValue ? f.defaultValue : '')
       }
     } else {
       model[f.field] = ref(f.defaultValue ?
@@ -37,6 +35,8 @@ export function useFormField(forms: any) {
       )
     }
   })
+
+  console.log(model)
 
   return {
     model
