@@ -15,42 +15,38 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, reactive } from 'vue'
 import { DagSidebar } from './dag-sidebar'
 import { DagCanvas } from './dag-canvas'
 import { useDagStore } from '@/store/project/dynamic/dag'
-import { NodeShape, NodeHeight, NodeWidth } from './dag-setting'
 import styles from './index.module.scss'
 
 const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
-    const draggedTask = ref('')
+    const dragged = reactive({
+      x: 0,
+      y: 0,
+      task: ''
+    })
 
-    const handelDragstart = (task: string) => {
-      draggedTask.value = task
+    const handelDragstart = (e: DragEvent, task: string) => {
+      dragged.x = e.offsetX
+      dragged.y = e.offsetY
+      dragged.task = task
     }
 
     const handelDrop = (e: DragEvent) => {
-      if (!draggedTask) return
+      if (!dragged.task) return
+
+      dragged.x = e.offsetX
+      dragged.y = e.offsetY
 
       const shapes = useDagStore().getDagTasks
-
-      shapes.push({
-        id: String(shapes.length + 1),
-        x: e.offsetX,
-        y: e.offsetY,
-        width: NodeWidth,
-        height: NodeHeight,
-        shape: NodeShape,
-        label: draggedTask.value + String(shapes.length + 1),
-        zIndex: 1,
-        task: draggedTask.value
-      })
-
+      if (shapes) {
+        shapes.push(dragged)
+      }
       useDagStore().setDagTasks(shapes)
-
-
     }
 
     return {

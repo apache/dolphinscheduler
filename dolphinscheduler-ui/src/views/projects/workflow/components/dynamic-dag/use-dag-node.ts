@@ -15,10 +15,17 @@
  * limitations under the License.
  */
 
-import { NodeShape } from './dag-setting'
+import { createVNode } from 'vue'
+import { DagNode } from './dag-node'
+import '@antv/x6-vue-shape'
 
 export function useDagNode() {
   return {
-    inherit: NodeShape
+    inherit: 'vue-shape',
+    component: {
+      render: () => {
+        return createVNode(DagNode)
+      }
+    }
   }
 }

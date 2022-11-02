@@ -15,7 +15,19 @@
  * limitations under the License.
  */
 
-export const DagNodeName = 'dag-node'
-export const DagEdgeName = 'dag-edge'
-export const NodeWidth = '200'
-export const NodeHeight = '50'
+import { defineComponent } from 'vue'
+import styles from './dag-node.module.scss'
+
+const DagNode = defineComponent({
+  name: 'DagNode',
+  setup() {
+
+  },
+  render() {
+    return (
+      <div class={styles['dag-node']}>1111</div>
+    )
+  }
+})
+
+export { DagNode }
