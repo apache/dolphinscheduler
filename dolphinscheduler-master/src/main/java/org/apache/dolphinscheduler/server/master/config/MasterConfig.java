@@ -93,8 +93,6 @@ public class MasterConfig implements Validator {
     private boolean killYarnJobWhenTaskFailover = true;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
-    private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
-
     // ip:listenPort
     private String masterAddress;
 
@@ -142,10 +140,6 @@ public class MasterConfig implements Validator {
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
             masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
-            errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
-        }
-
         masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         masterConfig.setMasterRegistryPath(REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + masterConfig.getMasterAddress());
         printConfig();
@@ -169,6 +163,5 @@ public class MasterConfig implements Validator {
         logger.info("Master config: registryDisconnectStrategy -> {} ", registryDisconnectStrategy);
         logger.info("Master config: masterAddress -> {} ", masterAddress);
         logger.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
-        logger.info("Master config: workerGroupRefreshInterval -> {} ", workerGroupRefreshInterval);
     }
 }

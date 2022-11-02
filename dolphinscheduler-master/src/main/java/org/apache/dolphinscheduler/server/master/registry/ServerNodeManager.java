@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -67,6 +66,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * server node manager
+ */
 @Service
 public class ServerNodeManager implements InitializingBean {
 
@@ -87,6 +89,9 @@ public class ServerNodeManager implements InitializingBean {
      */
     private final ConcurrentHashMap<String, Set<String>> workerGroupNodes = new ConcurrentHashMap<>();
 
+    /**
+     * master nodes
+     */
     private final Set<String> masterNodes = new HashSet<>();
 
     private final Map<String, WorkerHeartBeat> workerNodeInfo = new HashMap<>();
@@ -110,36 +115,35 @@ public class ServerNodeManager implements InitializingBean {
     @Autowired
     private MasterConfig masterConfig;
 
-    private final List<WorkerInfoChangeListener> workerInfoChangeListeners = new ArrayList<>();
+    private List<WorkerInfoChangeListener> workerInfoChangeListeners = new ArrayList<>();
 
-    private volatile int currentSlot = 0;
+    private static volatile int MASTER_SLOT = 0;
 
-    private volatile int totalSlot = 0;
+    private static volatile int MASTER_SIZE = 0;
 
-    public int getSlot() {
-        return currentSlot;
+    public static int getSlot() {
+        return MASTER_SLOT;
     }
 
-    public int getMasterSize() {
-        return totalSlot;
+    public static int getMasterSize() {
+        return MASTER_SIZE;
     }
 
+    /**
+     * init listener
+     *
+     * @throws Exception if error throws Exception
+     */
     @Override
-    public void afterPropertiesSet() {
+    public void afterPropertiesSet() throws Exception {
 
         // load nodes from zookeeper
-        updateMasterNodes();
-        updateWorkerNodes();
-        updateWorkerGroupMappings();
+        load();
 
         // init executor service
         executorService =
                 Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
-        executorService.scheduleWithFixedDelay(
-                new WorkerNodeInfoAndGroupDbSyncTask(),
-                0,
-                masterConfig.getWorkerGroupRefreshInterval().getSeconds(),
-                TimeUnit.SECONDS);
+        executorService.scheduleWithFixedDelay(new WorkerNodeInfoAndGroupDbSyncTask(), 0, 10, TimeUnit.SECONDS);
 
         // init MasterNodeListener listener
         registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
@@ -148,6 +152,19 @@ public class ServerNodeManager implements InitializingBean {
         registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
     }
 
+    /**
+     * load nodes from zookeeper
+     */
+    public void load() {
+        // master nodes from zookeeper
+        updateMasterNodes();
+        updateWorkerNodes();
+        updateWorkerGroupMappings();
+    }
+
+    /**
+     * worker node info and worker group db sync task
+     */
     class WorkerNodeInfoAndGroupDbSyncTask implements Runnable {
 
         @Override
@@ -234,8 +251,8 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void updateMasterNodes() {
-        currentSlot = 0;
-        totalSlot = 0;
+        MASTER_SLOT = 0;
+        MASTER_SIZE = 0;
         this.masterNodes.clear();
         String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
         try {
@@ -308,12 +325,14 @@ public class ServerNodeManager implements InitializingBean {
             this.masterPriorityQueue.putList(masterNodes);
             int index = masterPriorityQueue.getIndex(masterConfig.getMasterAddress());
             if (index >= 0) {
-                totalSlot = nodes.size();
-                currentSlot = index;
+                MASTER_SIZE = nodes.size();
+                MASTER_SLOT = index;
             } else {
-                logger.warn("Current master is not in active master list");
+                logger.warn("current addr:{} is not in active master list",
+                        masterConfig.getMasterAddress());
             }
-            logger.info("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
+            logger.info("update master nodes, master size: {}, slot: {}, addr: {}", MASTER_SIZE,
+                    MASTER_SLOT, masterConfig.getMasterAddress());
         } finally {
             masterLock.unlock();
         }
@@ -341,10 +360,10 @@ public class ServerNodeManager implements InitializingBean {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
             Set<String> nodes = workerGroupNodes.get(workerGroup);
-            if (CollectionUtils.isEmpty(nodes)) {
-                return Collections.emptySet();
+            if (CollectionUtils.isNotEmpty(nodes)) {
+                return Collections.unmodifiableSet(nodes);
             }
-            return Collections.unmodifiableSet(nodes);
+            return nodes;
         } finally {
             workerGroupReadLock.unlock();
         }
@@ -354,19 +373,45 @@ public class ServerNodeManager implements InitializingBean {
         return Collections.unmodifiableMap(workerNodeInfo);
     }
 
-    public Optional<WorkerHeartBeat> getWorkerNodeInfo(String workerServerAddress) {
+    /**
+     * get worker node info
+     *
+     * @param workerNode worker node
+     * @return worker node info
+     */
+    public WorkerHeartBeat getWorkerNodeInfo(String workerNode) {
         workerNodeInfoReadLock.lock();
         try {
-            return Optional.ofNullable(workerNodeInfo.getOrDefault(workerServerAddress, null));
+            return workerNodeInfo.getOrDefault(workerNode, null);
         } finally {
             workerNodeInfoReadLock.unlock();
         }
     }
 
-    private void syncSingleWorkerNodeInfo(String workerAddress, WorkerHeartBeat info) {
+    /**
+     * sync worker node info
+     *
+     * @param newWorkerNodeInfo new worker node info
+     */
+    private void syncAllWorkerNodeInfo(Map<String, String> newWorkerNodeInfo) {
         workerNodeInfoWriteLock.lock();
         try {
-            workerNodeInfo.put(workerAddress, info);
+            workerNodeInfo.clear();
+            for (Map.Entry<String, String> entry : newWorkerNodeInfo.entrySet()) {
+                workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
+            }
+        } finally {
+            workerNodeInfoWriteLock.unlock();
+        }
+    }
+
+    /**
+     * sync single worker node info
+     */
+    private void syncSingleWorkerNodeInfo(String node, WorkerHeartBeat info) {
+        workerNodeInfoWriteLock.lock();
+        try {
+            workerNodeInfo.put(node, info);
         } finally {
             workerNodeInfoWriteLock.unlock();
         }
@@ -389,6 +434,9 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
+    /**
+     * destroy
+     */
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();
