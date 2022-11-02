@@ -60,6 +60,14 @@ const list = defineComponent({
       requestData()
     }
 
+    const onClearSearch = () => {
+      variables.page = 1
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page
+      })
+    }
+
     const onCancelModal = () => {
       variables.showModalRef = false
     }
@@ -93,6 +101,7 @@ const list = defineComponent({
       handleSearch,
       onCancelModal,
       onConfirmModal,
+      onClearSearch,
       handleChangePageSize,
       trim
     }
@@ -118,6 +127,7 @@ const list = defineComponent({
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('project.list.project_tips')}
                 clearable
+                onClear={this.onClearSearch}
               />
               <NButton size='small' type='primary' onClick={this.handleSearch}>
                 <NIcon>

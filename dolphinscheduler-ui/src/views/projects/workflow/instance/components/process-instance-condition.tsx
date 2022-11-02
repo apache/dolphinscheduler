@@ -56,6 +56,21 @@ export default defineComponent({
       })
     }
 
+    const onClearSearchVal = () => {
+      searchValRef.value = ''
+      handleSearch()
+    }
+
+    const onClearSearchHost = () => {
+      hostRef.value = ''
+      handleSearch()
+    }
+
+    const onClearSearchExecutor = () => {
+      executorNameRef.value = ''
+      handleSearch()
+    }
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
@@ -65,6 +80,9 @@ export default defineComponent({
       stateTypeRef,
       startEndTimeRef,
       handleSearch,
+      onClearSearchVal,
+      onClearSearchExecutor,
+      onClearSearchHost,
       trim
     }
   },
@@ -79,18 +97,24 @@ export default defineComponent({
           size='small'
           v-model:value={this.searchValRef}
           placeholder={t('project.workflow.name')}
+          clearable
+          onClear={this.onClearSearchVal}
         />
         <NInput
           allowInput={this.trim}
           size='small'
           v-model:value={this.executorNameRef}
           placeholder={t('project.workflow.executor')}
+          clearable
+          onClear={this.onClearSearchExecutor}
         />
         <NInput
           allowInput={this.trim}
           size='small'
           v-model:value={this.hostRef}
           placeholder={t('project.workflow.host')}
+          clearable
+          onClear={this.onClearSearchHost}
         />
         <NSelect
           options={options}
