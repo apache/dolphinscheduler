@@ -64,7 +64,6 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     public void disconnect() {
         try {
             ServerLifeCycleManager.toWaiting();
-            // todo: clear the current resource
             clearMasterResource();
             Duration maxWaitingTime = masterConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {
