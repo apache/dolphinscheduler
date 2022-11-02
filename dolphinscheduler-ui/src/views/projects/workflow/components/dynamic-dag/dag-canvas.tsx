@@ -21,7 +21,6 @@ import { useDagResize } from './use-dag-resize'
 import { useDagGraph } from './use-dag-graph'
 import { useDagNode } from './use-dag-node'
 import { useDagEdge } from './use-dag-edge'
-//import { useAddDagShape } from './use-add-dag-shape'
 import { DagNodeName, DagEdgeName } from './dag-setting'
 import styles from './dag-canvas.module.scss'
 
@@ -68,7 +67,6 @@ const DagCanvas = defineComponent({
       initGraph()
       registerNode()
       registerEdge()
-      //useAddDagShape((graph.value as Graph))
     })
 
     return {
