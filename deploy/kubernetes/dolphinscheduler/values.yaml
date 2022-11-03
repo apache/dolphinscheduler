@@ -474,8 +474,10 @@ api:
     type: "ClusterIP"
     ## clusterIP is the IP address of the service and is usually assigned randomly by the master
     clusterIP: ""
-    ## nodePort is the port on each node on which this service is exposed when type=NodePort
+    ## nodePort is the port on each node on which this api service is exposed when type=NodePort
     nodePort: ""
+    ## pythonNodePort is the port on each node on which this python api service is exposed when type=NodePort
+    pythonNodePort: ""
     ## externalIPs is a list of IP addresses for which nodes in the cluster will also accept traffic for this service
     externalIPs: []
     ## externalName is the external reference that kubedns or equivalent will return as a CNAME record for this service, requires Type to be ExternalName
