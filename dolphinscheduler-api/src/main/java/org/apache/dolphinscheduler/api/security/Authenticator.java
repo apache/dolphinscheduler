@@ -28,12 +28,10 @@ public interface Authenticator {
 
     /**
      * Verifying legality via username and password
-     * @param username user name
-     * @param password user password
-     * @param extra extra info
+     * @param credentials user login credentials
      * @return result object
      */
-    Result<Map<String, String>> authenticate(String username, String password, String ip, Object extra);
+    Result<Map<String, String>> authenticate(AbstractLoginCredentials credentials);
 
     /**
      * Get authenticated user

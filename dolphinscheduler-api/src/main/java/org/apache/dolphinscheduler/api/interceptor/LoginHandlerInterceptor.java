@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.interceptor;
 import static org.apache.dolphinscheduler.api.controller.BaseController.getClientIpAddress;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.AbstractLoginCredentials;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -60,6 +61,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     private Authenticator authenticator;
 
     @Autowired
+    private AbstractLoginCredentials credentials;
+
+    @Autowired
     protected UsersService userService;
 
     /**
@@ -79,7 +83,8 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         OAuth2User principal = (OAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal != null) {
             String ip = getClientIpAddress(request);
-            Result<Map<String, String>> result = authenticator.authenticate(null, null, ip, principal);
+            credentials.setIp(ip);
+            Result<Map<String, String>> result = authenticator.authenticate(credentials);
             user = userService.getUserByUserName(result.getData().get(Constants.SESSION_USER));
             request.setAttribute(Constants.SESSION_USER, user);
             ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());

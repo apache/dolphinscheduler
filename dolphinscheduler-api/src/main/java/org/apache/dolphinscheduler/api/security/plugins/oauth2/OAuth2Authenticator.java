@@ -1,6 +1,7 @@
-package org.apache.dolphinscheduler.api.security.impl.oauth2;
+package org.apache.dolphinscheduler.api.security.plugins.oauth2;
 
-import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
+import org.apache.dolphinscheduler.api.security.AbstractAuthenticator;
+import org.apache.dolphinscheduler.api.security.AbstractLoginCredentials;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -13,8 +14,10 @@ public class OAuth2Authenticator extends AbstractAuthenticator {
     private static Logger logger = LoggerFactory.getLogger(AbstractAuthenticator.class);
 
     @Override
-    public synchronized User login(String userId, String password, Object extra) {
-        OAuth2User principal = (OAuth2User) extra;
+    public synchronized User login(AbstractLoginCredentials credentials) {
+        OAuth2LoginCredentials oauth2LoginCredentials = (OAuth2LoginCredentials) credentials;
+
+        OAuth2User principal = oauth2LoginCredentials.getPrincipal();
         final String rawName = principal.getAttribute("name");
         final String userName = rawName.replaceAll(" ", "_");
         User user = null;

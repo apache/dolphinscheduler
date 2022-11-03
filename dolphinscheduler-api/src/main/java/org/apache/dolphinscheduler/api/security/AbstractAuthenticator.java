@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security.impl;
+package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.security.Authenticator;
-import org.apache.dolphinscheduler.api.security.SecurityConfig;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -53,17 +51,16 @@ public abstract class AbstractAuthenticator implements Authenticator {
     /**
      * user login and return user in db
      *
-     * @param userId user identity field
-     * @param password user login password
-     * @param extra extra user login field
-     * @return user object in databse
+     * @param credentials user login credentials
+     * @return user object in database
      */
-    public abstract User login(String userId, String password, Object extra);
+    public abstract User login(AbstractLoginCredentials credentials);
 
     @Override
-    public Result<Map<String, String>> authenticate(String userId, String password, String ip, Object extra) {
+    public Result<Map<String, String>> authenticate(AbstractLoginCredentials credentials) {
+        final String ip = credentials.getIp();
         Result<Map<String, String>> result = new Result<>();
-        User user = login(userId, password, extra);
+        User user = login(credentials);
         if (user == null) {
             logger.error("Username or password entered incorrectly.");
             result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());

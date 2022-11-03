@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.security.AbstractLoginCredentials;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -70,6 +71,9 @@ public class LoginController extends BaseController {
     @Autowired
     private Authenticator authenticator;
 
+    @Autowired
+    private AbstractLoginCredentials credentials;
+
     /**
      * login
      *
@@ -103,8 +107,10 @@ public class LoginController extends BaseController {
             return error(IP_IS_EMPTY.getCode(), IP_IS_EMPTY.getMsg());
         }
 
+        credentials.setIp(ip);
+
         // verify username and password
-        Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip, null);
+        Result<Map<String, String>> result = authenticator.authenticate(credentials);
         if (result.getCode() != Status.SUCCESS.getCode()) {
             return result;
         }

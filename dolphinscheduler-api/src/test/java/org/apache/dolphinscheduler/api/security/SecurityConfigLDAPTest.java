@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
-import org.apache.dolphinscheduler.api.security.impl.ldap.LdapService;
+import org.apache.dolphinscheduler.api.security.plugins.ldap.LdapService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
