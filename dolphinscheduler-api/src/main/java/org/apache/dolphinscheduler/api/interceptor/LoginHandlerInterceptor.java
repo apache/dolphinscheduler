@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.controller.BaseController.getClien
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.security.AbstractLoginCredentials;
 import org.apache.dolphinscheduler.api.security.Authenticator;
+import org.apache.dolphinscheduler.api.security.plugins.oauth2.OAuth2LoginCredentials;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -83,7 +84,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         OAuth2User principal = (OAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal != null) {
             String ip = getClientIpAddress(request);
-            credentials.setIp(ip);
+            OAuth2LoginCredentials oauth2LoginCredentials = (OAuth2LoginCredentials) credentials;
+            oauth2LoginCredentials.setIp(ip);
+            oauth2LoginCredentials.setPrincipal(principal);
             Result<Map<String, String>> result = authenticator.authenticate(credentials);
             user = userService.getUserByUserName(result.getData().get(Constants.SESSION_USER));
             request.setAttribute(Constants.SESSION_USER, user);

@@ -114,7 +114,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/").permitAll();
+                .and().logout().invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .clearAuthentication(true);
         return http.build();
     }
 
