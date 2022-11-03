@@ -1136,6 +1136,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         processTaskRelation.setProjectCode(projectCode);
         processTaskRelation.setProcessDefinitionCode(46L);
         processTaskRelation.setProcessDefinitionVersion(1);
+        processTaskRelation.setPreTaskCode(100);
+        processTaskRelation.setPostTaskCode(200);
         processTaskRelations.add(processTaskRelation);
         return processTaskRelations;
     }
