@@ -64,6 +64,7 @@
         <module>dolphinscheduler-task-hivecli</module>
         <module>dolphinscheduler-task-dms</module>
         <module>dolphinscheduler-task-datasync</module>
+        <module>dolphinscheduler-task-linkis</module>
     </modules>
 
     <dependencyManagement>
