@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.SSHSessionHost;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import java.io.Serializable;
@@ -270,4 +271,9 @@ public class TaskExecutionContext implements Serializable {
      * test flag
      */
     private int testFlag;
+
+    /**
+     * task remote host
+     */
+    private SSHSessionHost sshSessionHost;
 }

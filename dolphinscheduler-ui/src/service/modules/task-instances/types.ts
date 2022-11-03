@@ -59,6 +59,7 @@ interface TotalList {
   taskComplete: boolean
   firstRun: boolean
   environmentCode: number
+  remoteHostCode: number
   processInstance?: any
   pid: number
   appLink: string

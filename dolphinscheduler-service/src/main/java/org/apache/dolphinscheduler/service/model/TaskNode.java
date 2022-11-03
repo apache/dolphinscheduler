@@ -190,6 +190,11 @@ public class TaskNode {
     private Integer memoryMax;
 
     /**
+     * task remote host code
+     */
+    private Long remoteHostCode;
+
+    /**
      * task execute type
      */
     private TaskExecuteType taskExecuteType;
@@ -476,6 +481,7 @@ public class TaskNode {
                 + ", taskInstancePriority=" + taskInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
                 + ", environmentCode=" + environmentCode
+                + ", remoteHostCode=" + remoteHostCode
                 + ", timeout='" + timeout + '\''
                 + ", delayTime=" + delayTime + '\''
                 + ", taskExecuteType=" + taskExecuteType
@@ -544,5 +550,13 @@ public class TaskNode {
 
     public void setTaskExecuteType(TaskExecuteType taskExecuteType) {
         this.taskExecuteType = taskExecuteType;
+    }
+
+    public Long getRemoteHostCode() {
+        return remoteHostCode;
+    }
+
+    public void setRemoteHostCode(Long remoteHostCode) {
+        this.remoteHostCode = remoteHostCode;
     }
 }

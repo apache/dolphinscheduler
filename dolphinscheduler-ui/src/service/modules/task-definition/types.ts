@@ -98,6 +98,7 @@ interface TaskDefinitionVersionItem {
   projectName?: any
   workerGroup: string
   environmentCode: number
+  remoteHostCode: number
   failRetryTimes: number
   failRetryInterval: number
   timeoutFlag: string
@@ -136,6 +137,7 @@ interface TaskDefinitionReq {
   warningGroupId: number
   workerGroup?: string
   environmentCode?: number
+  remoteHostCode?: number
   startParams?: string
   dryRun?: number
 }

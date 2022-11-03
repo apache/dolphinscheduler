@@ -54,6 +54,11 @@ interface IEnvironmentNameOption {
   workerGroups?: string[]
 }
 
+interface ITaskRemoteHostOption {
+  label: string
+  value: string
+}
+
 interface ILocalParam {
   prop: string
   direct?: string
@@ -420,6 +425,7 @@ interface INodeData
   delayTime?: number
   description?: string
   environmentCode?: number | null
+  remoteHostCode?: number | null
   failRetryInterval?: number
   failRetryTimes?: number
   cpuQuota?: number
@@ -486,5 +492,6 @@ export {
   FormRules,
   IJsonItemParams,
   IResponseJsonItem,
-  IDateType
+  IDateType,
+  ITaskRemoteHostOption
 }

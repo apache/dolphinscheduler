@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.SSHSessionHost;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
@@ -294,6 +295,17 @@ public class TaskInstance implements Serializable {
      * max memory
      */
     private Integer memoryMax;
+
+    /**
+     * task remote host code
+     */
+    private long remoteHostCode;
+
+    /**
+     * task remote host
+     */
+    @TableField(exist = false)
+    private SSHSessionHost sshSessionHost;
 
     /**
      * task execute type

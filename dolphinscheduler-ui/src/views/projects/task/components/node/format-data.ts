@@ -478,6 +478,7 @@ export function formatParams(data: INodeData): {
       delayTime: data.delayTime ? String(data.delayTime) : '0',
       description: data.description,
       environmentCode: data.environmentCode || -1,
+      remoteHostCode: data.remoteHostCode || -1,
       failRetryInterval: data.failRetryInterval
         ? String(data.failRetryInterval)
         : '0',
@@ -523,6 +524,7 @@ export function formatParams(data: INodeData): {
 export function formatModel(data: ITaskData) {
   const params = {
     ...omit(data, [
+      'remoteHostCode',
       'environmentCode',
       'timeoutFlag',
       'timeoutNotifyStrategy',
@@ -530,6 +532,7 @@ export function formatModel(data: ITaskData) {
     ]),
     ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
+    remoteHostCode: data.remoteHostCode === -1 ? null : data.remoteHostCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
       ? [data.timeoutNotifyStrategy]

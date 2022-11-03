@@ -2318,6 +2318,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
                 taskNode.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
                 taskNode.setEnvironmentCode(taskDefinitionLog.getEnvironmentCode());
+                taskNode.setRemoteHostCode(taskDefinitionLog.getRemoteHostCode());
                 taskNode.setTimeout(JSONUtils
                         .toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
                                 taskDefinitionLog.getTimeoutNotifyStrategy(),

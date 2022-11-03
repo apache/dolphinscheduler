@@ -351,6 +351,7 @@ export default {
     worker_group_tips:
       'The Worker group no longer exists, please select the correct Worker group!',
     environment_name: 'Environment Name',
+    task_remote_host_name: 'Remote Host Name',
     task_group_name: 'Task group name',
     task_group_queue_priority: 'Priority',
     number_of_failed_retries: 'Number of failed retries',

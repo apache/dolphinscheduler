@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskRemoteHostDao;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -80,6 +81,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     @Autowired
     private TaskDefinitionLogDao taskDefinitionLogDao;
+
+    @Autowired
+    private TaskRemoteHostDao taskRemoteHostDao;
 
     @Autowired
     private MasterConfig masterConfig;
@@ -196,7 +200,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                                 stateWheelExecuteThread,
                                 curingGlobalParamsService,
                                 taskInstanceDao,
-                                taskDefinitionLogDao);
+                                taskDefinitionLogDao,
+                                taskRemoteHostDao);
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
                                 processInstance.getId()));
