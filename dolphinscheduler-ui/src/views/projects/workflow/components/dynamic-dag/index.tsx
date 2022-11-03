@@ -69,12 +69,14 @@ const DynamicDag = defineComponent({
           <DagSidebar onDragstart={this.handelDragstart}/>
           <DagCanvas onDrop={this.handelDrop}/>
         </div>
-        <TaskForm
-          task={this.draggedTask}
-          showModal={this.showModal}
-          onCancelModal={() => this.showModal = false}
-          onConfirmModal={() => this.showModal = false}
-        />
+        {
+          this.draggedTask && <TaskForm
+            task={this.draggedTask}
+            showModal={this.showModal}
+            onCancelModal={() => this.showModal = false}
+            onConfirmModal={() => this.showModal = false}
+          />
+        }
       </>
     )
   }
