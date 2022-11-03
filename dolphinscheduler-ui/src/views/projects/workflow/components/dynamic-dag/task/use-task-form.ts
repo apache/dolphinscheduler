@@ -20,6 +20,7 @@ import { useDynamicLocales } from './use-dynamic-locales'
 import { useFormField } from './use-form-field'
 import { useFormValidate } from './use-form-validate'
 import { useFormStructure } from './use-form-structure'
+import { useFormRequest } from './use-form-request'
 
 const data = {
   task: 'shell',
@@ -49,13 +50,12 @@ const data = {
       script: 'Script'
     }
   },
-  apis: [
-    {
-      name: 'getWorkerGroupList',
-      uri: '/worker-groups/all',
+  apis: {
+    getWorkerGroupList: {
+      url: '/worker-groups/all',
       method: 'get'
     }
-  ],
+  },
   forms: [
     {
       label: 'task_components.node_name',
@@ -121,10 +121,10 @@ export function useTaskForm() {
     rules: {}
   })
 
+  useDynamicLocales(data.locales)
   variables.model = useFormField(data.forms)
   variables.rules = useFormValidate(data.forms)
-  useDynamicLocales(data.locales)
-  variables.formStructure = useFormStructure(data.forms)
+  variables.formStructure = useFormStructure(useFormRequest(data.apis, data.forms))
 
   return {
     variables

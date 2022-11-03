@@ -18,7 +18,7 @@
 import { useI18n } from 'vue-i18n'
 import type { FormItemRule } from 'naive-ui'
 
-export function useFormValidate(forms: any) {
+export function useFormValidate(forms: Array<any>) {
   const { t } = useI18n()
   const validate: any = {}
 
