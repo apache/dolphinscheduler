@@ -65,6 +65,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
@@ -78,6 +79,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -126,6 +128,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     @Mock
     private ProcessDefinitionLogMapper processDefinitionLogMapper;
@@ -499,6 +504,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // delete success
         schedule.setReleaseState(ReleaseState.OFFLINE);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(1, 11))
+                .thenReturn(getProcessTaskRelation());
+        Mockito.when(taskDefinitionMapper.deleteByBatchCodes(Arrays.asList(100L, 200L))).thenReturn(2);
         Mockito.when(processDefinitionMapper.deleteById(46)).thenReturn(1);
         Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
         Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode()))
@@ -507,6 +515,13 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
+
+        // delete fail
+        Mockito.when(taskDefinitionMapper.deleteByBatchCodes(Arrays.asList(100L, 200L))).thenReturn(1);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
+        Assertions.assertEquals(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
     }
 
     @Test
