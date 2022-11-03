@@ -15,40 +15,33 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+import { ref } from 'vue'
+import type { Ref } from 'vue'
 
-const shell = {
-  locales: {
-    zh_CN: {
-      node_name: '节点名称',
-      node_name_tips: '节点名称不能为空'
-    },
-    en_US: {
-      node_name: 'Node Name',
-      node_name_tips: 'Node name cannot be empty'
-    }
-  },
-  items: [
-    {
-      label: 'node_name',
-      type: 'input',
-      field: '',
-      validate: {
-        trigger: ['input', 'blur'],
-        message: 'node_name_tips'
+export function useFormField(forms: any) {
+  const model: any = {}
+
+  const setField = (value: string, type: string): Ref<null | string> => {
+    return ref(value ?
+      value :
+      type === 'select' ?
+        null :
+        ''
+    )
+  }
+
+  forms.forEach((f: any) => {
+    if (f.field.indexOf('.') >= 0) {
+      const hierarchy = f.field.split('.')
+      model[hierarchy[0]] = {
+        [hierarchy[1]]: setField(f.defaultValue, f.type)
       }
+    } else {
+      model[f.field] = setField(f.defaultValue, f.type)
     }
-  ]
-}
-
-export function useTaskForm() {
-  const variables = reactive({
-    formStructure: {}
   })
 
-  variables.formStructure = shell
-
   return {
-    variables
+    model
   }
 }

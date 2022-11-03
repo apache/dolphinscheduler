@@ -15,23 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+import { useI18n } from 'vue-i18n'
+import type { DynamicLocales } from './types'
 
-/**
- * data types in user define parameter
- */
-public enum DataType {
-    /**
-     * 0 string
-     * 1 integer
-     * 2 long
-     * 3 float
-     * 4 double
-     * 5 date, "YYYY-MM-DD"
-     * 6 time, "HH:MM:SS"
-     * 7 time stamp
-     * 8 Boolean
-     * 9 list <String>
-     */
-    VARCHAR, INTEGER, LONG, FLOAT, DOUBLE, DATE, TIME, TIMESTAMP, BOOLEAN, LIST, FILE
+export function useDynamicLocales(locales: DynamicLocales): void {
+  useI18n().mergeLocaleMessage('zh_CN', { task_components: locales.zh_CN })
+  useI18n().mergeLocaleMessage('en_US', { task_components: locales.en_US })
 }

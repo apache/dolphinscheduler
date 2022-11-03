@@ -20,7 +20,7 @@ import { DagSidebar } from './dag-sidebar'
 import { DagCanvas } from './dag-canvas'
 import { useDagStore } from '@/store/project/dynamic/dag'
 import { NodeShape, NodeHeight, NodeWidth } from './dag-setting'
-import { TaskForm } from './task-form'
+import { TaskForm } from './task'
 import styles from './index.module.scss'
 
 const DynamicDag = defineComponent({
@@ -56,6 +56,7 @@ const DynamicDag = defineComponent({
     }
 
     return {
+      draggedTask,
       handelDragstart,
       handelDrop,
       showModal
@@ -68,11 +69,14 @@ const DynamicDag = defineComponent({
           <DagSidebar onDragstart={this.handelDragstart}/>
           <DagCanvas onDrop={this.handelDrop}/>
         </div>
-        <TaskForm
-          showModal={this.showModal}
-          onCancelModal={() => this.showModal = false}
-          onConfirmModal={() => this.showModal = false}
-        />
+        {
+          this.draggedTask && <TaskForm
+            task={this.draggedTask}
+            showModal={this.showModal}
+            onCancelModal={() => this.showModal = false}
+            onConfirmModal={() => this.showModal = false}
+          />
+        }
       </>
     )
   }
