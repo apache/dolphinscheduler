@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
