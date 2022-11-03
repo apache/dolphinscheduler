@@ -1042,8 +1042,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         Map<Long, String> upstreamTaskMap = new HashMap<>();
                         if (info.getUpstreamTaskCode() != 0) {
                             upstreamTaskMap.put(info.getUpstreamTaskCode(), info.getUpstreamTaskName());
-//                            info.setUpstreamTaskCode(0L);
-//                            info.setUpstreamTaskName(StringUtils.EMPTY);
+                            info.setUpstreamTaskCode(0L);
+                            info.setUpstreamTaskName(StringUtils.EMPTY);
                         }
                         info.setUpstreamTaskMap(upstreamTaskMap);
                         v = info;
