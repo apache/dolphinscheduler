@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -64,6 +65,35 @@ public class JDBCDataSourceProvider {
         }
 
         logger.info("Creating HikariDataSource pool success.");
+        return dataSource;
+    }
+
+    /**
+     * Create druid connection pool for DM
+     * @param properties jdbc connection param
+     * @param dbType  database type
+     * @return
+     */
+    public static DruidDataSource createDruidDataSource(BaseConnectionParam properties, DbType dbType) {
+        logger.info("Creating DruidDataSource pool for maxActive:{}", PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        DruidDataSource dataSource = new DruidDataSource();
+
+        loaderJdbcDriver(Thread.currentThread().getContextClassLoader(), properties, dbType);
+
+        dataSource.setDriverClassName(properties.getDriverClassName());
+        dataSource.setUrl(DataSourceUtils.getJdbcUrl(dbType, properties));
+        dataSource.setUsername(properties.getUser());
+        dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
+
+        dataSource.setMinIdle(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 5));
+        dataSource.setMaxActive(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        dataSource.setValidationQuery(properties.getValidationQuery());
+
+        if (properties.getProps() != null) {
+            properties.getProps().forEach(dataSource::addConnectionProperty);
+        }
+
+        logger.info("Creating DruidDataSource pool success.");
         return dataSource;
     }
 
