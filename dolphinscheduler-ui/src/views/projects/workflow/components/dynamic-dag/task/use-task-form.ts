@@ -19,6 +19,7 @@ import { reactive } from 'vue'
 import { useDynamicLocales } from './use-dynamic-locales'
 import { useFormField } from './use-form-field'
 import { useFormValidate } from './use-form-validate'
+import { useFormStructure } from './use-form-structure'
 
 const data = {
   task: 'shell',
@@ -120,10 +121,10 @@ export function useTaskForm() {
     rules: {}
   })
 
-  variables.formStructure = data
   variables.model = useFormField(data.forms)
   variables.rules = useFormValidate(data.forms)
   useDynamicLocales(data.locales)
+  variables.formStructure = useFormStructure(data.forms)
 
   return {
     variables
