@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -42,6 +43,7 @@ import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -56,6 +58,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.ReflectionUtils;
 
 import com.google.common.collect.Lists;
 
@@ -92,6 +95,9 @@ public class FailoverServiceTest {
     @Mock
     private LogClient logClient;
 
+    @Mock
+    private ProcessDefinitionDao processDefinitionDao;
+
     private static int masterPort = 5678;
     private static int workerPort = 1234;
 
@@ -113,6 +119,9 @@ public class FailoverServiceTest {
         MasterFailoverService masterFailoverService =
                 new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager,
                         processInstanceExecCacheManager, logClient, taskInstanceDao);
+        Field processDefinitionDaoField = masterFailoverService.getClass().getDeclaredField("processDefinitionDao");
+        processDefinitionDaoField.setAccessible(true);
+        ReflectionUtils.setField(processDefinitionDaoField, masterFailoverService, processDefinitionDao);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
                 masterConfig,
                 processService,
