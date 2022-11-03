@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -68,6 +67,7 @@ import org.apache.dolphinscheduler.dao.repository.DqRuleDao;
 import org.apache.dolphinscheduler.dao.repository.DqRuleExecuteSqlDao;
 import org.apache.dolphinscheduler.dao.repository.DqRuleInputEntryDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -113,6 +113,8 @@ public class ProcessServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
     @InjectMocks
     private ProcessServiceImpl processService;
+    @Mock
+    private TaskDefinitionDao taskDefinitionDao;
     @Mock
     private CommandMapper commandMapper;
     @Mock
@@ -490,12 +492,6 @@ public class ProcessServiceTest {
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
         Assertions.assertEquals(0, processService.switchVersion(processDefinition, processDefinitionLog));
-    }
-
-    @Test
-    public void getDqRule() {
-        Mockito.when(dqRuleMapper.selectById(1)).thenReturn(new DqRule());
-        Assertions.assertNotNull(dqRuleDao.findRuleById(1));
     }
 
     @Test
