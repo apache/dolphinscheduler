@@ -17,20 +17,18 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResUploadType;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.spi.enums.ResUploadType;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * common utils
@@ -76,6 +74,10 @@ public class CommonUtils {
      */
     public static boolean isSudoEnable() {
         return PropertyUtils.getBoolean(Constants.SUDO_ENABLE, true);
+    }
+
+    public static boolean isSetTenantOwnerEnable() {
+        return PropertyUtils.getBoolean(Constants.SET_TENANT_OWNER_ENABLE, false);
     }
 
     /**

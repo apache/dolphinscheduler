@@ -131,6 +131,8 @@ public final class Constants {
      */
     public static final String SUDO_ENABLE = "sudo.enable";
 
+    public static final String SET_TENANT_OWNER_ENABLE = "setTenantOwner.enable";
+
     /**
      * string true
      */

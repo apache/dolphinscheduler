@@ -144,7 +144,7 @@ public class Checker {
         }
         try {
             Files.createDirectories(filePath);
-            if (!CommonUtils.isSudoEnable()) {
+            if (!CommonUtils.isSetTenantOwnerEnable()) {
                 // we need to open sudo, then we can change the owner.
                 return;
             }
