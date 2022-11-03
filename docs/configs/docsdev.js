@@ -238,6 +238,10 @@ export default {
                                 title: 'Parameter Priority',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/priority.html',
                             },
+                            {
+                                title: 'File Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
+                            },
                         ],
                     },
                     {
@@ -889,6 +893,10 @@ export default {
                             {
                                 title: '参数优先级',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/priority.html',
+                            },
+                            {
+                                title: '文件参数传递',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/file-parameter.html',
                             },
                         ],
                     },

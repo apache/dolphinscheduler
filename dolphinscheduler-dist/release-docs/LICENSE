@@ -498,6 +498,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     sdk-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core/2.17.282, Apache 2.0
     third-party-jackson-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/third-party-jackson-core/2.17.282, Apache 2.0
     utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/utils/2.17.282, Apache 2.0
+    zt-zip 1.15: https://github.com/zeroturnaround/zt-zip/blob/master/LICENSE, Apache 2.0
 
 ========================================================================
 BSD licenses

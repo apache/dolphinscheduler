@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.eq;
 
+import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -46,6 +47,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -874,6 +876,52 @@ public class ResourcesServiceTest {
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         resources = (List<Resource>) result.get(Constants.DATA_LIST);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(resources));
+    }
+
+    @Test
+    public void testDeleteDataTransferData() throws Exception {
+        User user = getUser();
+        Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(user.getTenantId())).thenReturn(getTenant());
+
+        StorageEntity storageEntity1 = Mockito.mock(StorageEntity.class);
+        StorageEntity storageEntity2 = Mockito.mock(StorageEntity.class);
+        StorageEntity storageEntity3 = Mockito.mock(StorageEntity.class);
+        StorageEntity storageEntity4 = Mockito.mock(StorageEntity.class);
+        StorageEntity storageEntity5 = Mockito.mock(StorageEntity.class);
+
+        Mockito.when(storageEntity1.getFullName()).thenReturn("DATA_TRANSFER/20220101");
+        Mockito.when(storageEntity2.getFullName()).thenReturn("DATA_TRANSFER/20220102");
+        Mockito.when(storageEntity3.getFullName()).thenReturn("DATA_TRANSFER/20220103");
+        Mockito.when(storageEntity4.getFullName()).thenReturn("DATA_TRANSFER/20220104");
+        Mockito.when(storageEntity5.getFullName()).thenReturn("DATA_TRANSFER/20220105");
+
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+        storageEntityList.add(storageEntity1);
+        storageEntityList.add(storageEntity2);
+        storageEntityList.add(storageEntity3);
+        storageEntityList.add(storageEntity4);
+        storageEntityList.add(storageEntity5);
+
+        Mockito.when(storageOperate.listFilesStatus(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(storageEntityList);
+
+        LocalDateTime localDateTime = LocalDateTime.of(2022, 1, 5, 0, 0, 0);
+        try (MockedStatic<LocalDateTime> mockHook = Mockito.mockStatic(LocalDateTime.class)) {
+            mockHook.when(LocalDateTime::now).thenReturn(localDateTime);
+            DeleteDataTransferResponse response = resourcesService.deleteDataTransferData(user, 3);
+
+            Assertions.assertEquals(response.getSuccessList().size(), 2);
+            Assertions.assertEquals(response.getSuccessList().get(0), "DATA_TRANSFER/20220101");
+            Assertions.assertEquals(response.getSuccessList().get(1), "DATA_TRANSFER/20220102");
+        }
+
+        try (MockedStatic<LocalDateTime> mockHook = Mockito.mockStatic(LocalDateTime.class)) {
+            mockHook.when(LocalDateTime::now).thenReturn(localDateTime);
+            DeleteDataTransferResponse response = resourcesService.deleteDataTransferData(user, 0);
+            Assertions.assertEquals(response.getSuccessList().size(), 5);
+        }
+
     }
 
     @Test

@@ -99,6 +99,7 @@
         <datasync.version>2.17.282</datasync.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
         <aspectj.version>1.9.7</aspectj.version>
+        <zt-zip.version>1.15</zt-zip.version>
     </properties>
 
     <dependencyManagement>
@@ -771,6 +772,13 @@
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc-openapi-ui.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-zip</artifactId>
+                <version>${zt-zip.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>
