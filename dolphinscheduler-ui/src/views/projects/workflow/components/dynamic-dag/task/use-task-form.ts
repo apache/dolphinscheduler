@@ -18,6 +18,7 @@
 import { reactive } from 'vue'
 import { useDynamicLocales } from './use-dynamic-locales'
 import { useFormField } from './use-form-field'
+import { useFormValidate } from './use-form-validate'
 
 const data = {
   task: 'shell',
@@ -60,7 +61,13 @@ const data = {
       type: 'input',
       field: 'name',
       defaultValue: '',
-      placeholder: 'task_components.node_name_tips'
+      placeholder: 'task_components.node_name_tips',
+      validate: {
+        required: true,
+        trigger: ['input', 'blur'],
+        type: 'non-empty',
+        message: 'task_components.node_name_validate_message'
+      }
     },
     {
       label: 'task_components.task_priority',
@@ -73,7 +80,11 @@ const data = {
         { label: 'task_components.low', value: 'LOW' },
         { label: 'task_components.lowest', value: 'LOWEST' }
       ],
-      defaultValue: 'MEDIUM'
+      defaultValue: 'MEDIUM',
+      validate: {
+        required: true,
+        trigger: ['input', 'blur']
+      }
     },
     {
       label: 'task_components.worker_group',
@@ -81,13 +92,23 @@ const data = {
       field: 'workerGroup',
       options: [],
       defaultValue: 'default',
-      api: 'getWorkerGroupList'
+      api: 'getWorkerGroupList',
+      validate: {
+        required: true,
+        trigger: ['input', 'blur']
+      }
     },
     {
       label: 'task_components.script',
       type: 'studio',
       field: 'taskParams.rawScript',
-      defaultValue: ''
+      defaultValue: '',
+      validate: {
+        required: true,
+        trigger: ['input', 'blur'],
+        type: 'non-empty',
+        message: 'task_components.script_validate_message'
+      }
     }
   ]
 }
@@ -95,11 +116,13 @@ const data = {
 export function useTaskForm() {
   const variables = reactive({
     formStructure: {},
-    model: {}
+    model: {},
+    rules: {}
   })
 
   variables.formStructure = data
   variables.model = useFormField(data.forms)
+  variables.rules = useFormValidate(data.forms)
   useDynamicLocales(data.locales)
 
   return {

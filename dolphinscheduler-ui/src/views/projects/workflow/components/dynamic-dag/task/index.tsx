@@ -58,6 +58,7 @@ const TaskForm = defineComponent({
         onConfirm={this.confirmModal}>
         <NForm
           model={this.model}
+          rules={this.rules}
           ref={'TaskForm'}>
         </NForm>
       </Modal>
