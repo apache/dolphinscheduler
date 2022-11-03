@@ -223,4 +223,12 @@
         </where>
         order by update_time desc, id asc
     </select>
+    <update id="updateProcessTaskRelationTaskVersion">
+            update t_ds_process_task_relation
+            set
+                pre_task_version=#{processTaskRelation.preTaskVersion},
+                post_task_version=#{processTaskRelation.postTaskVersion}
+            where
+                id = #{processTaskRelation.id}
+    </update>
 </mapper>
