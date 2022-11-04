@@ -18,7 +18,7 @@
 import { ref } from 'vue'
 import type { Ref } from 'vue'
 
-export function useFormField(forms: any) {
+export function useFormField(forms: Array<any>) {
   const model: any = {}
 
   const setField = (value: string, type: string): Ref<null | string> => {

@@ -15,11 +15,25 @@
  * limitations under the License.
  */
 
-export function useFormStructure(forms: Array<any>) {
-  return forms.map((f: any) => {
-    delete f.validate
-    delete f.api
+import { axios } from '@/service/service'
 
-    return f
+const reqFunction = (url: string, method: string) => {
+  return axios({
+    url,
+    method
   })
+}
+
+export function useFormRequest(apis: any, forms: Array<any>) {
+  forms.map(f => {
+    if (f.api) {
+      reqFunction(apis[f.api].url, apis[f.api].method).then((res: any) => {
+        f.options = res.map((r: any) => {
+          return { label: r, value: r }
+        })
+      })
+    }
+  })
+
+  return forms
 }
