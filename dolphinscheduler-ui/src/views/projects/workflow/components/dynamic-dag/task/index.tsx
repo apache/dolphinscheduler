@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import { defineComponent, getCurrentInstance, PropType, toRefs } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useTaskForm } from './use-task-form'
 import { useI18n } from 'vue-i18n'
@@ -48,9 +48,9 @@ const TaskForm = defineComponent({
       ctx.emit('confirmModal')
     }
 
-    watch(variables.model, () => {
-      console.log(variables.model)
-    })
+    //watch(variables.model, () => {
+    //  console.log(variables.model)
+    //})
 
     return { ...toRefs(variables), cancelModal, confirmModal, t, trim }
   },
