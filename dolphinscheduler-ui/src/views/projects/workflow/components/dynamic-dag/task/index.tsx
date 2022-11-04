@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs } from 'vue'
-import { NForm } from 'naive-ui'
+import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useTaskForm } from './use-task-form'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -36,6 +36,7 @@ const TaskForm = defineComponent({
   props,
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
     const { variables } = useTaskForm()
     const { t } = useI18n()
 
@@ -47,7 +48,11 @@ const TaskForm = defineComponent({
       ctx.emit('confirmModal')
     }
 
-    return { ...toRefs(variables), cancelModal, confirmModal, t }
+    watch(variables.model, () => {
+      console.log(variables.model)
+    })
+
+    return { ...toRefs(variables), cancelModal, confirmModal, t, trim }
   },
   render() {
     return (
@@ -60,6 +65,22 @@ const TaskForm = defineComponent({
           model={this.model}
           rules={this.rules}
           ref={'TaskForm'}>
+          {
+            (this.formStructure as Array<any>).map(f => {
+              return <NFormItem
+                label={this.t(f.label)}
+                path={f.field}
+              >
+                {
+                  f.type === 'input' && <NInput
+                    allowInput={this.trim}
+                    placeholder={this.t(f.placeholder)}
+                    v-model={[(this.model as any)[f.modelField], 'value']}
+                  />
+                }
+              </NFormItem>
+            })
+          }
         </NForm>
       </Modal>
     )
