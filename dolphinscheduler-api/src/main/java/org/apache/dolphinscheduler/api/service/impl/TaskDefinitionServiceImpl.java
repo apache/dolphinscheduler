@@ -775,8 +775,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 } else if (taskCode == processTaskRelation.getPostTaskCode()) {
                     processTaskRelation.setPostTaskVersion(version);
                 }
-            }
-            for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
                 int count = processTaskRelationMapper.updateProcessTaskRelationTaskVersion(processTaskRelation);
                 if (count != 1) {
                     logger.error("batch update process task relation error, projectCode:{}, taskDefinitionCode:{}.",
