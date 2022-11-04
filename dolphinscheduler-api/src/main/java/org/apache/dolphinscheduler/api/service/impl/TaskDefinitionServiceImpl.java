@@ -1003,6 +1003,13 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             logger.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         } else {
+            List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper
+                    .queryByCode(projectCode, 0, 0, taskCode);
+            if (CollectionUtils.isNotEmpty(taskRelationList)) {
+                taskRelationList = taskRelationList.stream()
+                        .filter(v -> v.getPreTaskCode() != 0).collect(Collectors.toList());
+            }
+            taskDefinition.setProcessTaskRelationList(taskRelationList);
             result.put(Constants.DATA_LIST, taskDefinition);
             putMsg(result, Status.SUCCESS);
         }

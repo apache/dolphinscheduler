@@ -218,6 +218,12 @@ public class TaskDefinition {
      */
     private TaskExecuteType taskExecuteType;
 
+    /**
+     * process task related list
+     */
+    @TableField(exist = false)
+    private List<ProcessTaskRelation> processTaskRelationList;
+
     public TaskDefinition() {
     }
 
