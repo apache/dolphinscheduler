@@ -145,7 +145,7 @@ public class TaskExecutionCheckerUtils {
         }
         try {
             Files.createDirectories(filePath);
-            if (!OSUtils.isSudoEnable()) {
+            if (!CommonUtils.isSetTaskDirToTenantEnable()) {
                 // we need to open sudo, then we can change the owner.
                 return;
             }
