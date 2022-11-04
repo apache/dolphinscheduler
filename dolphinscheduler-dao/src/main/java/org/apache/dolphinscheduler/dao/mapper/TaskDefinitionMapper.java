@@ -131,4 +131,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition list
      */
     List<TaskDefinition> queryByCodeList(@Param("codes") Collection<Long> codes);
+
+    /**
+     * batch delete task by task code
+     *
+     * @param taskCodeList task code list
+     * @return deleted row count
+     */
+    int deleteByBatchCodes(@Param("taskCodeList") List<Long> taskCodeList);
 }

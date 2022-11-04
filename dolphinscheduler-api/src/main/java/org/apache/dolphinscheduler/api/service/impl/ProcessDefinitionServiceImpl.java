@@ -874,6 +874,26 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
         }
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
+                .queryByProcessCode(project.getCode(), processDefinition.getCode());
+        if (CollectionUtils.isNotEmpty(processTaskRelations)) {
+            Set<Long> taskCodeList = new HashSet<>(processTaskRelations.size() * 2);
+            for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+                if (processTaskRelation.getPreTaskCode() != 0) {
+                    taskCodeList.add(processTaskRelation.getPreTaskCode());
+                }
+                if (processTaskRelation.getPostTaskCode() != 0) {
+                    taskCodeList.add(processTaskRelation.getPostTaskCode());
+                }
+            }
+            if (CollectionUtils.isNotEmpty(taskCodeList)) {
+                int i = taskDefinitionMapper.deleteByBatchCodes(new ArrayList<>(taskCodeList));
+                if (i != taskCodeList.size()) {
+                    logger.error("Delete task definition error, processDefinitionCode:{}.", code);
+                    throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+                }
+            }
+        }
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
         if (delete == 0) {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
