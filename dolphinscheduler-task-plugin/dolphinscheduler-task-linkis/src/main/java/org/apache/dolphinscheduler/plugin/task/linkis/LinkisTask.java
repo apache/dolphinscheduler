@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.linkis;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
+import org.apache.dolphinscheduler.plugin.task.api.*;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -104,12 +105,7 @@ public class LinkisTask extends AbstractRemoteTask {
 
     @Override
     public void submitApplication() throws TaskException {
-        try {
-            int exitStatusCode;
-        } catch (Exception e) {
-            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new TaskException("Linkis task error", e);
-        }
+
     }
 
     @Override

@@ -16,7 +16,7 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDeployMode, useResources, useCustomParams } from '.'
+import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
 
 export function useLinkis(model: { [field: string]: any }): IJsonItem[] {
