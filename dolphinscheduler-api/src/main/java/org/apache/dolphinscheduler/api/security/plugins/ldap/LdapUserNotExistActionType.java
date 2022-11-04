@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.plugins.ldap;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
