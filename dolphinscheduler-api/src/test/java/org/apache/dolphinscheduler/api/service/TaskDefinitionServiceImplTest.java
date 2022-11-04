@@ -560,6 +560,7 @@ public class TaskDefinitionServiceImplTest {
         processTaskRelation2.setPreTaskCode(TASK_CODE - 1);
         processTaskRelation2.setPostTaskCode(TASK_CODE);
         processTaskRelationList.add(processTaskRelation2);
+
         return processTaskRelationList;
     }
 }
