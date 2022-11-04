@@ -150,8 +150,9 @@ security:
       base.dn: dc=example,dc=com
       username: cn=read-only-admin,dc=example,dc=com
       password: password
-      user.identity.attribute: uid
-      user.email.attribute: mail
+      user:
+        identity-attribute: uid
+        email-attribute: mail
 
 # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
 # global max request number per second
