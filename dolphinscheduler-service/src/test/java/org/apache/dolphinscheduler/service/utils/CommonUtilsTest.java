@@ -18,9 +18,8 @@
 package org.apache.dolphinscheduler.service.utils;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
-
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.hadoop.security.UserGroupInformation;
 
