@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
-<<<<<<< HEAD
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-=======
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
->>>>>>> dedff70f9 ([Improvement] Merge spi.utils into common.utils (#12502))
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -33,6 +30,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -40,7 +38,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class,
+        DataSourceClientProvider.class, PasswordUtils.class})
 public class PrestoDataSourceProcessorTest {
 
     private PrestoDataSourceProcessor prestoDatasourceProcessor = new PrestoDataSourceProcessor();
@@ -66,8 +65,9 @@ public class PrestoDataSourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
-                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
+        String connectionJson =
+                "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
+                        + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
@@ -76,12 +76,8 @@ public class PrestoDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-<<<<<<< HEAD
-        Assert.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDatasourceProcessor.getDatasourceDriver());
-=======
         Assertions.assertEquals(DataSourceConstants.COM_PRESTO_JDBC_DRIVER,
                 prestoDatasourceProcessor.getDatasourceDriver());
->>>>>>> dedff70f9 ([Improvement] Merge spi.utils into common.utils (#12502))
     }
 
     @Test
@@ -101,11 +97,7 @@ public class PrestoDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-<<<<<<< HEAD
-        Assert.assertEquals(Constants.PRESTO_VALIDATION_QUERY, prestoDatasourceProcessor.getValidationQuery());
-=======
         Assertions.assertEquals(DataSourceConstants.PRESTO_VALIDATION_QUERY,
                 prestoDatasourceProcessor.getValidationQuery());
->>>>>>> dedff70f9 ([Improvement] Merge spi.utils into common.utils (#12502))
     }
 }
