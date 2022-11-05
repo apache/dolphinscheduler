@@ -24,10 +24,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.common.Constants;
-
 import java.net.InetAddress;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.junit.After;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
