@@ -821,7 +821,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         } else {
             queryUpStreamTaskCodeMap = new HashMap<>();
         }
-        if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
+        if (queryUpStreamTaskCodeMap.size() != 0) {
             ProcessTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<ProcessTaskRelation> processTaskRelations =
                     processTaskRelationMapper.queryByProcessCode(projectCode, taskRelation.getProcessDefinitionCode());
