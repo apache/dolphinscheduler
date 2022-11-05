@@ -252,8 +252,8 @@ public enum Status {
     ADD_TASK_TYPE_ERROR(10200, "add task type error", "添加任务类型错误"),
     CREATE_PROCESS_DEFINITION_LOG_ERROR(10201, "Create process definition log error", "创建 process definition log 对象失败"),
     PARSE_SCHEDULE_PARAM_ERROR(10202, "Parse schedule parameter error, {0}", "解析 schedule 参数错误, {0}"),
-    SCHEDULE_NOT_EXISTS(10023, "schedule {0} does not exist", "调度 id {0} 不存在"),
-    SCHEDULE_ALREADY_EXISTS(10024, "workflow {0} schedule {1} already exist, please update or delete it",
+    SCHEDULE_NOT_EXISTS(10203, "schedule {0} does not exist", "调度 id {0} 不存在"),
+    SCHEDULE_ALREADY_EXISTS(10204, "workflow {0} schedule {1} already exist, please update or delete it",
             "工作流 {0} 的定时 {1} 已经存在，请更新或删除"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
