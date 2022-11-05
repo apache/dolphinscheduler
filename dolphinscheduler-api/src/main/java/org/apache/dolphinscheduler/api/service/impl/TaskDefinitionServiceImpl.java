@@ -1009,6 +1009,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskRelationList = taskRelationList.stream()
                         .filter(v -> v.getPreTaskCode() != 0).collect(Collectors.toList());
             }
+
             taskDefinition.setProcessTaskRelationList(taskRelationList);
             result.put(Constants.DATA_LIST, taskDefinition);
             putMsg(result, Status.SUCCESS);
