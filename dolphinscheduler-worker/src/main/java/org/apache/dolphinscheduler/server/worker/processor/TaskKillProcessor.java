@@ -113,11 +113,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
             // if processId > 0, it should call cancelApplication to cancel remote application too.
             this.cancelApplication(taskInstanceId);
-            Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
-
-            taskExecutionContext.setCurrentExecutionStatus(
-                    result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
-            taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
+            if (processId == -1) {
+                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
+            } else {
+                Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
+                taskExecutionContext.setCurrentExecutionStatus(
+                        result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
+                taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
+            }
             sendTaskKillResponseCommand(channel, taskExecutionContext);
 
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());

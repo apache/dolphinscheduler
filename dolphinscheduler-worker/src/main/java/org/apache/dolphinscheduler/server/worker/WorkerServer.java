@@ -24,6 +24,11 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.DSSessionAbandonedConfig;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.DSSessionPoolConfig;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHSessionPool;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SftpConfig;
+import org.apache.dolphinscheduler.server.worker.config.SSHSessionConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -43,6 +48,7 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -102,6 +108,9 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerConfig workerConfig;
 
+    @Autowired
+    private SSHSessionConfig sshSessionConfig;
+
     /**
      * worker server startup, not use web service
      *
@@ -124,6 +133,8 @@ public class WorkerServer implements IStoppable {
         this.workerManagerThread.start();
 
         this.messageRetryRunner.start();
+
+        setSSHConfig();
 
         /*
          * registry hooks, which are called before the process exits
@@ -186,5 +197,19 @@ public class WorkerServer implements IStoppable {
         }
         logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
                 killNumber);
+    }
+
+    public void setSSHConfig() {
+        DSSessionPoolConfig poolConfig = new DSSessionPoolConfig();
+        BeanUtils.copyProperties(sshSessionConfig.getPool(), poolConfig);
+        SSHSessionPool.setPoolConfig(poolConfig);
+
+        DSSessionAbandonedConfig abandonedConfig = new DSSessionAbandonedConfig();
+        BeanUtils.copyProperties(sshSessionConfig.getPool(), abandonedConfig);
+        SSHSessionPool.setAbandonedConfig(abandonedConfig);
+
+        SftpConfig sftpConfig = new SftpConfig();
+        BeanUtils.copyProperties(sshSessionConfig.getSftp(), sftpConfig);
+        SSHSessionPool.setSftpConfig(sftpConfig);
     }
 }

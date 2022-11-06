@@ -15,24 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.plugin.task.api.ssh;
 
 import lombok.Data;
 
 @Data
-public class SSHSessionHost {
+public class SftpConfig {
 
-    private String ip;
+    private boolean enableUploadMonitor;
 
-    private int port;
+    private int maxUploadRate;
 
-    private String account;
-
-    private String password;
-
-    @Override
-    public String toString() {
-        return "[" + account + "@" + ip + ":" + port + "]";
-    }
+    private int maxFileSize;
 
 }

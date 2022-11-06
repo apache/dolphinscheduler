@@ -241,6 +241,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-math3 3.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.1.1, Apache 2.0
     commons-net 3.6: https://github.com/apache/commons-net, Apache 2.0
     commons-pool 1.6: https://github.com/apache/commons-pool, Apache 2.0
+    commons-pool2 2.11.1: https://github.com/apache/commons-pool, Apache 2.0
     commons-text 1.4: https://github.com/apache/commons-text, Apache 2.0
     commons-text 1.8: https://github.com/apache/commons-text, Apache 2.0
     cron-utils 9.1.6: https://mvnrepository.com/artifact/com.cronutils/cron-utils/9.1.6, Apache 2.0

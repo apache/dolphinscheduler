@@ -15,24 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.plugin.task.api.ssh;
+
+import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class SSHSessionHost {
+public class SSHResponse {
 
-    private String ip;
+    private int exitCode;
 
-    private int port;
-
-    private String account;
-
-    private String password;
-
-    @Override
-    public String toString() {
-        return "[" + account + "@" + ip + ":" + port + "]";
-    }
+    private List<String> out;
 
 }

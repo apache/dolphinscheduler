@@ -15,24 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.plugin.task.api.ssh;
 
-import lombok.Data;
+import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 
-@Data
-public class SSHSessionHost {
+/**
+ * DS Configuration settings for abandoned object removal.
+ */
+public class DSSessionPoolConfig extends GenericKeyedObjectPoolConfig<SSHSessionHolder> {
 
-    private String ip;
-
-    private int port;
-
-    private String account;
-
-    private String password;
-
-    @Override
-    public String toString() {
-        return "[" + account + "@" + ip + ":" + port + "]";
+    public DSSessionPoolConfig() {
+        setJmxEnabled(false);
+        setTestOnBorrow(true);
+        setTestOnCreate(true);
+        setTestOnReturn(true);
+        setTestWhileIdle(true);
+        setMinIdlePerKey(0);
+        setNumTestsPerEvictionRun(-1);
     }
 
 }

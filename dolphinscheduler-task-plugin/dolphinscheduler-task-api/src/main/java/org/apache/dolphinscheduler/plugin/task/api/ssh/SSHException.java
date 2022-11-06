@@ -15,24 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.plugin.task.api.ssh;
 
-import lombok.Data;
+/**
+ * Custom SSH exception
+ */
+public class SSHException extends RuntimeException {
 
-@Data
-public class SSHSessionHost {
-
-    private String ip;
-
-    private int port;
-
-    private String account;
-
-    private String password;
-
-    @Override
-    public String toString() {
-        return "[" + account + "@" + ip + ":" + port + "]";
+    public SSHException() {
+        super();
     }
 
+    public SSHException(String message) {
+        super(message);
+    }
+
+    public SSHException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

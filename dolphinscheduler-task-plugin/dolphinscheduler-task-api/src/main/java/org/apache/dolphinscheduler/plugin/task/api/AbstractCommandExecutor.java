@@ -21,10 +21,16 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.SSHSessionHost;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHException;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHResponse;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHSessionHolder;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHSessionPool;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -47,6 +53,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.jcraft.jsch.ChannelExec;
 
 /**
  * abstract command executor
@@ -90,6 +97,21 @@ public abstract class AbstractCommandExecutor {
      * taskRequest
      */
     protected TaskExecutionContext taskRequest;
+
+    /**
+     * running on ssh host flag
+     */
+    protected boolean runningOnSSH = false;
+
+    /**
+     * SSH session channel
+     */
+    protected ChannelExec channelExec;
+
+    /**
+     * SSH session host
+     */
+    protected SSHSessionHost sessionHost;
 
     public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                    TaskExecutionContext taskRequest,
@@ -188,11 +210,105 @@ public abstract class AbstractCommandExecutor {
             return result;
         }
 
+        if (taskRequest.getSshSessionHost() != null) {
+            runningOnSSH = true;
+        }
+
+        if (runningOnSSH && SystemUtils.IS_OS_WINDOWS) {
+            logger.error("SSH does not support Windows systems");
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+            return result;
+        }
+
         String commandFilePath = buildCommandFilePath();
 
         // create command file if not exists
         createCommandFileIfNotExists(execCommand, commandFilePath);
 
+        result = runCommandFile(commandFilePath);
+
+        return result;
+    }
+
+    private TaskResponse runCommandFile(String commandFilePath) throws IOException, InterruptedException {
+        return runningOnSSH ? runOnSSH(commandFilePath) : runOnLocalProcess(commandFilePath);
+    }
+
+    private TaskResponse runOnSSH(String commandFilePath) {
+        TaskResponse result = new TaskResponse();
+        SSHSessionHolder sessionHolder = null;
+        this.sessionHost = taskRequest.getSshSessionHost();
+        try {
+            sessionHolder = SSHSessionPool.getSessionHolder(sessionHost);
+            sessionHolder.setSftpConfig(SSHSessionPool.getSftpConfig());
+            logger.info("borrow session:{} success", sessionHolder);
+
+            boolean uploadRes =
+                    sessionHolder.sftpDir(taskRequest.getExecutePath(), taskRequest.getExecutePath(), logger);
+            if (!uploadRes) {
+                logger.error("upload task {} execute path to remote session {} failed", taskRequest.getExecutePath(),
+                        sessionHost.toString());
+                result.setExitStatusCode(EXIT_CODE_FAILURE);
+                return result;
+            }
+
+            if (taskRequest.getEnvFile() != null) {
+                boolean uploadEnvRes =
+                        sessionHolder.sftpDir(taskRequest.getEnvFile(), taskRequest.getExecutePath(), logger);
+                if (!uploadEnvRes) {
+                    logger.error("upload task {} execute path to remote session {} failed", taskRequest.getEnvFile(),
+                            sessionHost.toString());
+                    result.setExitStatusCode(EXIT_CODE_FAILURE);
+                    return result;
+                }
+            }
+
+            // because JSch .chmod is not stable, so use the 'chmod -R' instead
+            logger.info("update remote path's permission:{} on session:{} to 755", taskRequest.getExecutePath(),
+                    sessionHost.toString());
+            String chmodCommand = "chmod -R 755 " + taskRequest.getExecutePath();
+            sessionHolder.execCommand(chmodCommand, getRemainTime(), logger);
+
+            // all ssh task process id equals -1
+            taskRequest.setProcessId(-1);
+            channelExec = sessionHolder.createChannelExec();
+            String command = "sh " + commandFilePath;
+            SSHResponse response = sessionHolder.execCommand(channelExec, command, getRemainTime(), logger);
+            result.setExitStatusCode(response.getExitCode());
+
+            boolean updateTaskExecutionContextStatus =
+                    TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
+            if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
+                // it will exit process after we disconnect ssh channel, so no need use any kill command
+                channelExec.disconnect();
+                result.setExitStatusCode(EXIT_CODE_KILL);
+                return result;
+            }
+
+            parseSSHResponseOut(response.getOut());
+
+        } catch (SSHException e) {
+            logger.error("Running task command on remote session:{} failed.",
+                    sessionHost.toString(), e);
+            result.setExitStatusCode(EXIT_CODE_FAILURE);
+            return result;
+        } catch (Exception e) {
+            logger.error("Cannot get ssh session {} from SSHSession ACP pool",
+                    sessionHost.toString(), e);
+            result.setExitStatusCode(EXIT_CODE_FAILURE);
+            return result;
+        } finally {
+            SSHSessionPool.returnSSHSessionHolder(sessionHost, sessionHolder);
+            SSHSessionPool.printPoolStatus();
+            if (sessionHolder != null) {
+                sessionHolder.clearPath(taskRequest.getExecutePath());
+            }
+        }
+        return result;
+    }
+
+    private TaskResponse runOnLocalProcess(String commandFilePath) throws InterruptedException, IOException {
+        TaskResponse result = new TaskResponse();
         // build process
         buildProcess(commandFilePath);
 
@@ -238,7 +354,18 @@ public abstract class AbstractCommandExecutor {
                 "process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
                 taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
         return result;
+    }
 
+    private void parseSSHResponseOut(List<String> lines) {
+        if (CollectionUtils.isEmpty(lines)) {
+            return;
+        }
+        for (String line : lines) {
+            if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
+                varPool.append(findVarPool(line));
+                varPool.append("$VarPool$");
+            }
+        }
     }
 
     public String getVarPool() {
@@ -251,6 +378,14 @@ public abstract class AbstractCommandExecutor {
      * @throws Exception exception
      */
     public void cancelApplication() throws Exception {
+        if (runningOnSSH) {
+            killSSHProcess();
+        } else {
+            killLocalProcess();
+        }
+    }
+
+    private void killLocalProcess() {
         if (process == null) {
             return;
         }
@@ -273,6 +408,12 @@ public abstract class AbstractCommandExecutor {
             process.destroy();
 
             process = null;
+        }
+    }
+
+    private void killSSHProcess() {
+        if (channelExec != null && channelExec.isConnected() && !channelExec.isEOF()) {
+            channelExec.disconnect();
         }
     }
 

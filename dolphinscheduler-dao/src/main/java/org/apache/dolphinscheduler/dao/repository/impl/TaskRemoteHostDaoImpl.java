@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 import org.apache.dolphinscheduler.dao.entity.TaskRemoteHost;
 import org.apache.dolphinscheduler.dao.mapper.TaskRemoteHostMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskRemoteHostDao;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

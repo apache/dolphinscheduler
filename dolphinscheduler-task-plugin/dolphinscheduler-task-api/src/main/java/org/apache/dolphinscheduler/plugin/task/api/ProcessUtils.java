@@ -59,6 +59,10 @@ public final class ProcessUtils {
                 logger.error("Task instance kill failed, processId is not exist");
                 return false;
             }
+            // SSH process no need kill, it will be destroyed after session pool destroy
+            if (processId == -1) {
+                return true;
+            }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
             cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);

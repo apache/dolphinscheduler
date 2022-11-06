@@ -15,24 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.plugin.task.api.ssh;
 
-import lombok.Data;
+import org.apache.commons.pool2.impl.AbandonedConfig;
 
-@Data
-public class SSHSessionHost {
+/**
+ * ACP Keyed ObjectPool Config
+ */
+public class DSSessionAbandonedConfig extends AbandonedConfig {
 
-    private String ip;
-
-    private int port;
-
-    private String account;
-
-    private String password;
-
-    @Override
-    public String toString() {
-        return "[" + account + "@" + ip + ":" + port + "]";
+    public DSSessionAbandonedConfig() {
+        setRemoveAbandonedOnMaintenance(true);
     }
 
 }

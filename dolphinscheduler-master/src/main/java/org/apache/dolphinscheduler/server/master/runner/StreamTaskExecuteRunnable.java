@@ -318,8 +318,9 @@ public class StreamTaskExecuteRunnable implements Runnable {
             }
         }
 
-        taskInstance.setRemoteHostCode(taskDefinition.getRemoteHostCode() <= 0 ? -1 : taskDefinition.getRemoteHostCode());
-        if(taskInstance.getRemoteHostCode() > 0) {
+        taskInstance
+                .setRemoteHostCode(taskDefinition.getRemoteHostCode() <= 0 ? -1 : taskDefinition.getRemoteHostCode());
+        if (taskInstance.getRemoteHostCode() > 0) {
             TaskRemoteHost taskRemoteHost = taskRemoteHostDao.getTaskRemoteHostByCode(taskInstance.getRemoteHostCode());
             if (taskRemoteHost != null) {
                 SSHSessionHost sshSessionHost = new SSHSessionHost();

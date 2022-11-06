@@ -190,7 +190,7 @@ public class NetUtils {
                 && !address.isLoopbackAddress());
     }
 
-    public static boolean isValidV4Address(String ip) {
+    public static boolean isValidV4AddressString(String ip) {
         if (StringUtils.isEmpty(ip)) {
             return false;
         }

@@ -220,7 +220,7 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
         if (StringUtils.isEmpty(taskRemoteHostDTO.getIp())) {
             throw new ServiceException(Status.TASK_REMOTE_HOST_IP_IS_NULL);
         }
-        if (!NetUtils.isValidV4Address(taskRemoteHostDTO.getIp())) {
+        if (!NetUtils.isValidV4AddressString(taskRemoteHostDTO.getIp())) {
             throw new ServiceException(Status.TASK_REMOTE_HOST_IP_ILLEGAL);
         }
         if (taskRemoteHostDTO.getPort() == 0) {
