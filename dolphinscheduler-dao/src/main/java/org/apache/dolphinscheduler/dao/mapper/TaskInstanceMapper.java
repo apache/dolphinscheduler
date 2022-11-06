@@ -118,4 +118,13 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,
                                              @Param("status") int status);
+
+    /**
+     * Query task instance list by remote host code and instance status list
+     * @param remoteHostCode task remote host code
+     * @param states task instance state list
+     * @return task instance list
+     */
+    List<TaskInstance> queryByTaskRemoteHostCodeAndStatus(@Param("remoteHostCode") long remoteHostCode,
+                                                          @Param("states") int[] states);
 }

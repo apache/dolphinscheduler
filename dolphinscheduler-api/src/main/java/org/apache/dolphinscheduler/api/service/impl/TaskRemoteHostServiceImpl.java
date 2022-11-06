@@ -32,9 +32,18 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskRemoteHost;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskRemoteHostMapper;
+import org.apache.dolphinscheduler.plugin.task.api.model.SSHSessionHost;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.DSSessionAbandonedConfig;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.DSSessionPoolConfig;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHResponse;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHSessionHolder;
+import org.apache.dolphinscheduler.plugin.task.api.ssh.SSHSessionPool;
+import org.apache.dolphinscheduler.service.utils.Constants;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,6 +72,9 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
 
     @Autowired
     private TaskRemoteHostMapper taskRemoteHostMapper;
+
+    @Autowired
+    private TaskInstanceMapper taskInstanceMapper;
 
     @Override
     @Transactional
@@ -127,7 +139,14 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
         if (taskRemoteHost == null || taskRemoteHost.getCode() != code) {
             throw new ServiceException(Status.TASK_REMOTE_HOST_NOT_FOUND, code);
         }
-        // TODO 需要检查Task是否含有该服务器，否则不能删除
+
+        List<TaskInstance> relatedTaskInstances =
+                taskInstanceMapper.queryByTaskRemoteHostCodeAndStatus(code, Constants.TASK_NOT_TERMINATED_STATES);
+        if (CollectionUtils.isNotEmpty(relatedTaskInstances)) {
+            logger.error("delete task remote code {} failed, because there are {} task instances are using it.", code,
+                    relatedTaskInstances.size());
+            throw new ServiceException(Status.DELETE_TASK_REMOTE_HOST_FAIL, relatedTaskInstances.size());
+        }
 
         return taskRemoteHostMapper.deleteByCode(code);
     }
@@ -188,7 +207,26 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
 
     @Override
     public boolean testConnect(TaskRemoteHostDTO taskRemoteHostDTO) {
-        return true;
+        checkTaskRemoteHostDTO(taskRemoteHostDTO);
+
+        // just use ACP default configuration
+        DSSessionPoolConfig poolConfig = new DSSessionPoolConfig();
+        // if the session pool is full, return directly without any waiting
+        poolConfig.setBlockWhenExhausted(false);
+        DSSessionAbandonedConfig abandonedConfig = new DSSessionAbandonedConfig();
+        SSHSessionPool.setPoolConfig(poolConfig);
+        SSHSessionPool.setAbandonedConfig(abandonedConfig);
+        SSHSessionHost sessionHost = new SSHSessionHost();
+        BeanUtils.copyProperties(taskRemoteHostDTO, sessionHost);
+
+        SSHSessionHolder pooledObject;
+        try {
+            pooledObject = SSHSessionPool.getSessionHolder(sessionHost);
+            SSHResponse response = pooledObject.execCommand("echo 'hello world'");
+            return response.getExitCode() == 0;
+        } catch (Exception e) {
+            throw new ServiceException(Status.TASK_REMOTE_HOST_CANOT_SSH, taskRemoteHostDTO.getIp());
+        }
     }
 
     @Override
@@ -211,6 +249,9 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
     }
 
     private void checkTaskRemoteHostDTO(TaskRemoteHostDTO taskRemoteHostDTO) {
+        if (taskRemoteHostDTO == null) {
+            throw new ServiceException(Status.TASK_REMOTE_HOST_DTO_IS_NULL);
+        }
         if (StringUtils.isEmpty(taskRemoteHostDTO.getName())) {
             throw new ServiceException(Status.TASK_REMOTE_HOST_NAME_IS_NULL);
         }
@@ -223,7 +264,7 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
         if (!NetUtils.isValidV4AddressString(taskRemoteHostDTO.getIp())) {
             throw new ServiceException(Status.TASK_REMOTE_HOST_IP_ILLEGAL);
         }
-        if (taskRemoteHostDTO.getPort() == 0) {
+        if (taskRemoteHostDTO.getPort() == null || taskRemoteHostDTO.getPort() == 0) {
             throw new ServiceException(Status.TASK_REMOTE_HOST_PORT_IS_NULL);
         }
         if (StringUtils.isEmpty(taskRemoteHostDTO.getPassword())) {

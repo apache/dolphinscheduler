@@ -534,7 +534,12 @@ public enum Status {
     TASK_REMOTE_HOST_PORT_IS_NULL(1500014, "host port is null", "主机SSH端口为空"),
     TASK_REMOTE_HOST_PASSWORD_IS_NULL(1500015, "host password is null", "主机密码为空"),
     TASK_REMOTE_HOST_DESC_IS_NULL(1500016, "host description is null", "主机描述为空"),
-    TASK_REMOTE_HOST_IP_ILLEGAL(1500017, "host ip is illegal", "IP非法");
+    TASK_REMOTE_HOST_IP_ILLEGAL(1500017, "host ip is illegal", "IP非法"),
+    TASK_REMOTE_HOST_CANOT_SSH(1500018, "host [{0}] can't ssh", "主机[{0}]无法执行SSH"),
+    DELETE_TASK_REMOTE_HOST_FAIL(1500019,
+            "delete task remote hostfail, for there are {0} task instances in executing using it",
+            "删除任务远程主机失败，有[{0}]个运行中的任务实例正在使用"),
+    TASK_REMOTE_HOST_DTO_IS_NULL(1500020, "task remote host is null", "任务远程主机为空");
     private final int code;
     private final String enMsg;
     private final String zhMsg;

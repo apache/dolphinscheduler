@@ -41,4 +41,13 @@ public final class Constants {
             TaskExecutionStatus.DISPATCH.getCode(),
             WorkflowExecutionStatus.SERIAL_WAIT.getCode()
     };
+
+    public static final int[] TASK_NOT_TERMINATED_STATES = new int[]{
+            TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
+            TaskExecutionStatus.DISPATCH.getCode(),
+            TaskExecutionStatus.PAUSE.getCode(),
+            TaskExecutionStatus.NEED_FAULT_TOLERANCE.getCode(),
+            TaskExecutionStatus.DELAY_EXECUTION.getCode(),
+            TaskExecutionStatus.SUBMITTED_SUCCESS.getCode()
+    };
 }

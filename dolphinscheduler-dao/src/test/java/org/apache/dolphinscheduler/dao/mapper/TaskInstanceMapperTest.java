@@ -386,4 +386,32 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         Assertions.assertEquals(taskInstanceIPage.getTotal(), 0);
 
     }
+
+    @Test
+    public void testQueryByTaskRemoteHostCodeAndStatus() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setFlag(Flag.YES);
+        taskInstance.setName("us task");
+        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setStartTime(new Date());
+        taskInstance.setEndTime(new Date());
+        taskInstance.setProcessInstanceId(1);
+        taskInstance.setTaskType("shel");
+        taskInstance.setRemoteHostCode(1L);
+        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
+        taskInstanceMapper.insert(taskInstance);
+
+        List<TaskInstance> taskInstances =
+                taskInstanceMapper.queryByTaskRemoteHostCodeAndStatus(1L, TASK_NOT_TERMINATED_STATES);
+        Assertions.assertEquals(taskInstances.size(), 1);
+    }
+
+    public static final int[] TASK_NOT_TERMINATED_STATES = new int[]{
+            TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
+            TaskExecutionStatus.DISPATCH.getCode(),
+            TaskExecutionStatus.PAUSE.getCode(),
+            TaskExecutionStatus.NEED_FAULT_TOLERANCE.getCode(),
+            TaskExecutionStatus.DELAY_EXECUTION.getCode(),
+            TaskExecutionStatus.SUBMITTED_SUCCESS.getCode()
+    };
 }

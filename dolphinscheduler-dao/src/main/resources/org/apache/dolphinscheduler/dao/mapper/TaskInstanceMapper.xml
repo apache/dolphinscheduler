@@ -173,6 +173,24 @@
             </foreach>
         </if>
     </select>
+
+    <select id="queryByTaskRemoteHostCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where 1=1
+        <if test="remoteHostCode != ''">
+            and remote_host_code =#{remoteHostCode}
+        </if>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        order by id asc
+    </select>
+
     <select id="queryTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSqlV2">
