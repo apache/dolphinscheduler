@@ -15,10 +15,17 @@
  * limitations under the License.
  */
 
-export function useFormStructure(forms: Array<any>) {
+export function useFormStructure(forms: Array<any>): Array<any> {
   return forms.map((f: any) => {
     delete f.validate
     delete f.api
+
+    f.modelField = f.field
+
+    if (f.field.indexOf('.') >= 0) {
+      const hierarchy = f.field.split('.')
+      f.field = hierarchy[1]
+    }
 
     return f
   })

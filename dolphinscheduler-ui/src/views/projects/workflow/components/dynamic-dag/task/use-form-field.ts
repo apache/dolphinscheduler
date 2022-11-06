@@ -41,7 +41,5 @@ export function useFormField(forms: Array<any>) {
     }
   })
 
-  return {
-    model
-  }
+  return model
 }
