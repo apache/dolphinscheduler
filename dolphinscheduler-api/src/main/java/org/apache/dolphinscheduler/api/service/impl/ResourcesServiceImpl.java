@@ -1831,7 +1831,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1981,7 +1981,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -2019,7 +2019,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -2039,7 +2039,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
