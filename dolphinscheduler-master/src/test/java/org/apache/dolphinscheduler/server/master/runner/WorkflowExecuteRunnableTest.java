@@ -107,6 +107,7 @@ public class WorkflowExecuteRunnableTest {
         taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
         taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
         taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        taskRemoteHostDao = Mockito.mock(TaskRemoteHostDao.class);
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
