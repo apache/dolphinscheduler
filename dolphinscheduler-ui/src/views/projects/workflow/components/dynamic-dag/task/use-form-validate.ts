@@ -52,5 +52,5 @@ export function useFormValidate(forms: Array<any>) {
     }
   })
 
-  return { validate }
+  return validate
 }
