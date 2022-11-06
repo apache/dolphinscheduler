@@ -38,6 +38,9 @@
         <include refid="baseSql"/>
         from t_ds_task_remote_host
         where 1=1
+        <if test="searchName!=null and searchName != ''">
+            and name like concat('%', #{searchName}, '%')
+        </if>
         order by create_time desc
     </select>
     <select id="queryTaskRemoteHostListPagingByIds" resultType="org.apache.dolphinscheduler.dao.entity.TaskRemoteHost">

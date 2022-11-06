@@ -29,7 +29,6 @@ import {
 } from '@/common/column-width-config'
 import {
   deleteTaskRemoteHostByCode,
-  queryTaskRemoteHostByCode,
   queryTaskRemoteHostListPaging
 } from '@/service/modules/task-remote-host'
 import { TaskRemoteTaskRes } from '@/service/modules/task-remote-host/types'

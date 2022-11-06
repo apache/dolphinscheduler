@@ -140,7 +140,7 @@ public class TaskRemoteHostServiceTest {
     public void test_createTaskRemoteHost() {
         User user = createUser();
         TaskRemoteHostDTO taskRemoteHostDTO = createTaskRemoteHostDTO();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_REMOTE_TASK, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_REMOTE_TASK,
                 user.getId(), TASK_REMOTE_HOST_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_REMOTE_TASK, null,
                 user.getId(), baseServiceLogger)).thenReturn(true);
@@ -162,7 +162,7 @@ public class TaskRemoteHostServiceTest {
     public void test_updateTaskRemoteHost() {
         User user = createUser();
         TaskRemoteHostDTO taskRemoteHostDTO = createTaskRemoteHostDTO();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_REMOTE_TASK, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_REMOTE_TASK,
                 user.getId(), TASK_REMOTE_HOST_EDIT, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_REMOTE_TASK, null,
                 user.getId(), baseServiceLogger)).thenReturn(true);
@@ -184,7 +184,7 @@ public class TaskRemoteHostServiceTest {
     @Test
     public void test_deleteByCode() {
         User user = createUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_REMOTE_TASK, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_REMOTE_TASK,
                 user.getId(), TASK_REMOTE_HOST_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_REMOTE_TASK, null,
                 user.getId(), baseServiceLogger)).thenReturn(true);
