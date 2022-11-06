@@ -75,9 +75,9 @@ export function useCanvasInit(options: Options) {
       minimap: {
         enabled: true,
         container: minimap.value,
-        scalable: false,
-        width: 200,
-        height: 120
+        scalable: true,
+        width: 250,
+        height: 150
       },
       interacting: {
         edgeLabelMovable: false,
@@ -108,10 +108,10 @@ export function useCanvasInit(options: Options) {
           const { sourceCell, targetCell } = data
 
           if (
-            sourceCell &&
-            targetCell &&
-            sourceCell.isNode() &&
-            targetCell.isNode()
+              sourceCell &&
+              targetCell &&
+              sourceCell.isNode() &&
+              targetCell.isNode()
           ) {
             const sourceData = sourceCell.getData()
             if (!sourceData) return true
@@ -135,10 +135,10 @@ export function useCanvasInit(options: Options) {
           edge?.setAttrs({
             line: {
               strokeDasharray:
-                sourceData.taskExecuteType === 'STREAM' ||
-                targetData.taskExecuteType === 'STREAM'
-                  ? '5 5'
-                  : 'none'
+                  sourceData.taskExecuteType === 'STREAM' ||
+                  targetData.taskExecuteType === 'STREAM'
+                      ? '5 5'
+                      : 'none'
             }
           })
           return true
