@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 
@@ -197,5 +198,21 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      */
     List<ProcessTaskRelation> queryDownstreamByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
+    /**
+     * Filter process task relation
+     *
+     * @param page page
+     * @param processTaskRelation process definition object
+     * @return process task relation IPage
+     */
+    IPage<ProcessTaskRelation> filterProcessTaskRelation(IPage<ProcessTaskRelation> page,
+                                                         @Param("relation") ProcessTaskRelation processTaskRelation);
 
+    /**
+     * batch update process task relation version
+     *
+     * @param processTaskRelationList process task relation list
+     * @return update num
+     */
+    int updateProcessTaskRelationTaskVersion(@Param("processTaskRelation") ProcessTaskRelation processTaskRelationList);
 }

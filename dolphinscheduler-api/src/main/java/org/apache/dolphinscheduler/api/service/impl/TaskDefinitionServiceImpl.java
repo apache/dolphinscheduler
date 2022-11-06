@@ -534,6 +534,25 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             logger.info(
                     "Update task definition and definitionLog complete, projectCode:{}, taskDefinitionCode:{}, newTaskVersion:{}.",
                     projectCode, taskCode, taskDefinitionToUpdate.getVersion());
+        // update process task relation
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
+                .queryByTaskCode(taskDefinitionToUpdate.getCode());
+        if (CollectionUtils.isNotEmpty(processTaskRelations)) {
+            for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+                if (taskCode == processTaskRelation.getPreTaskCode()) {
+                    processTaskRelation.setPreTaskVersion(version);
+                } else if (taskCode == processTaskRelation.getPostTaskCode()) {
+                    processTaskRelation.setPostTaskVersion(version);
+                }
+                int count = processTaskRelationMapper.updateProcessTaskRelationTaskVersion(processTaskRelation);
+                if (count != 1) {
+                    logger.error("batch update process task relation error, projectCode:{}, taskDefinitionCode:{}.",
+                            projectCode, taskCode);
+                    putMsg(result, Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR);
+                    throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR);
+                }
+            }
+        }
         return taskDefinitionToUpdate;
     }
 
