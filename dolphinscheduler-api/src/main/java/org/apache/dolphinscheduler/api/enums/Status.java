@@ -371,6 +371,8 @@ public enum Status {
             "批量删除工作流任务关系 {0} 错误"),
     PROCESS_TASK_RELATION_BATCH_CREATE_ERROR(50069, "batch create process task relation {0} error",
             "批量创建工作流任务关系 {0} 错误"),
+    PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR(50070, "batch update process task relation error",
+            "批量修改工作流任务关系错误"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),
