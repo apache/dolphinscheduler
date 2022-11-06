@@ -2314,6 +2314,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setConditionResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.CONDITION_RESULT)));
                 taskNode.setSwitchResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.SWITCH_RESULT)));
                 taskNode.setDependence(JSONUtils.toJsonString(taskParamsMap.get(Constants.DEPENDENCE)));
+                taskNode.setLocalOutParamMap(taskDefinitionLog.getTaskOutParamMap());
                 taskParamsMap.remove(Constants.CONDITION_RESULT);
                 taskParamsMap.remove(Constants.DEPENDENCE);
                 taskNode.setParams(JSONUtils.toJsonString(taskParamsMap));

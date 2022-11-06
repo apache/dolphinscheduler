@@ -56,7 +56,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setResourceIds(taskDefinition.getResourceIds());
         this.setTaskParams(taskDefinition.getTaskParams());
         this.setTaskParamList(taskDefinition.getTaskParamList());
-        this.setTaskParamMap(taskDefinition.getTaskParamMap());
+        this.setTaskOutParamMap(taskDefinition.getTaskOutParamMap());
         this.setTaskPriority(taskDefinition.getTaskPriority());
         this.setTimeoutNotifyStrategy(taskDefinition.getTimeoutNotifyStrategy());
         this.setTaskType(taskDefinition.getTaskType());

@@ -134,6 +134,11 @@ public class TaskNode {
     private List<String> depList;
 
     /**
+     * task local parameter map
+     */
+    private Map<String, String> localOutParamMap;
+
+    /**
      * outer dependency information
      */
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
@@ -260,6 +265,14 @@ public class TaskNode {
             this.depList = depList;
             this.preTasks = JSONUtils.toJsonString(depList);
         }
+    }
+
+    public Map<String, String> getLocalOutParamMap() {
+        return localOutParamMap;
+    }
+
+    public void setLocalOutParamMap(Map<String, String> localOutParamMap) {
+        this.localOutParamMap = localOutParamMap;
     }
 
     public String getLoc() {
@@ -471,6 +484,7 @@ public class TaskNode {
                 + ", preTaskNodeList=" + preTaskNodeList
                 + ", extras='" + extras + '\''
                 + ", depList=" + depList
+                + ", localOutParamMap=" + localOutParamMap
                 + ", dependence='" + dependence + '\''
                 + ", conditionResult='" + conditionResult + '\''
                 + ", taskInstancePriority=" + taskInstancePriority

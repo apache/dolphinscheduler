@@ -110,6 +110,8 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -288,8 +290,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     definition.getName(), definition.getCode());
             throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, name);
         }
+        DAG<String, TaskNode, String> graph = new DAG<>();
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
-        List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
+        List<ProcessTaskRelationLog> taskRelationList =
+                generateTaskRelationList(taskRelationJson, taskDefinitionLogs, graph);
         int tenantId = -1;
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
@@ -298,6 +302,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 throw new ServiceException(Status.TENANT_NOT_EXIST);
             }
             tenantId = tenant.getId();
+        }
+        if (!checkValidFileParameter(taskDefinitionLogs, graph)) {
+            logger.error("Exist invalid file parameter.");
+            throw new ServiceException(Status.INVALID_FILE_PARAM);
         }
         long processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
         ProcessDefinition processDefinition =
@@ -328,6 +336,37 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         this.getTenantId(processDefinition);
+    }
+
+    private boolean dfsFindFileOutParam(String code, String upsteamNodeName, String upstreamProp,
+                                        DAG<String, TaskNode, String> graph) {
+        TaskNode nodeInfo = graph.getNode(code);
+        if (Objects.equals(nodeInfo.getName(), upsteamNodeName)) {
+            return nodeInfo.getLocalOutParamMap().containsKey(upstreamProp);
+        }
+        Set<String> previousNodes = graph.getPreviousNodes(code);
+        for (String node : previousNodes) {
+            if (dfsFindFileOutParam(node, upsteamNodeName, upstreamProp, graph)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkValidFileParameter(List<TaskDefinitionLog> taskDefinitionLogs,
+                                            DAG<String, TaskNode, String> graph) {
+        for (TaskDefinitionLog task : taskDefinitionLogs) {
+            List<Property> inFileParams = task.getTaskParamList().stream()
+                    .filter(p -> p.getType() == DataType.FILE && p.getDirect() == Direct.IN)
+                    .collect(Collectors.toList());
+            for (Property param : inFileParams) {
+                String[] split = param.getValue().split("\\.");
+                if (!dfsFindFileOutParam(Long.toString(task.getCode()), split[0], split[1], graph)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private int getTenantId(ProcessDefinition processDefinition) {
@@ -455,7 +494,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     private List<ProcessTaskRelationLog> generateTaskRelationList(String taskRelationJson,
-                                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
+                                                                  List<TaskDefinitionLog> taskDefinitionLogs,
+                                                                  DAG<String, TaskNode, String> graph) {
         try {
             List<ProcessTaskRelationLog> taskRelationList =
                     JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
@@ -480,7 +520,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCodes);
                 }
             }
-            if (graphHasCycle(taskNodeList)) {
+            if (graphHasCycle(taskNodeList, graph)) {
                 logger.error("Process DAG has cycle.");
                 throw new ServiceException(Status.PROCESS_NODE_HAS_CYCLE);
             }
@@ -777,8 +817,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
+        DAG<String, TaskNode, String> graph = new DAG<>();
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
-        List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
+        List<ProcessTaskRelationLog> taskRelationList =
+                generateTaskRelationList(taskRelationJson, taskDefinitionLogs, graph);
 
         int tenantId = -1;
         if (!Constants.DEFAULT.equals(tenantCode)) {
@@ -814,6 +856,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
             }
+        }
+        if (!checkValidFileParameter(taskDefinitionLogs, graph)) {
+            logger.error("Exist invalid file parameter.");
+            throw new ServiceException(Status.INVALID_FILE_PARAM);
         }
         ProcessDefinition processDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
@@ -1075,26 +1121,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
                 throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleObj.getId());
-            }
-        }
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
-                .queryByProcessCode(project.getCode(), processDefinition.getCode());
-        if (CollectionUtils.isNotEmpty(processTaskRelations)) {
-            Set<Long> taskCodeList = new HashSet<>(processTaskRelations.size() * 2);
-            for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-                if (processTaskRelation.getPreTaskCode() != 0) {
-                    taskCodeList.add(processTaskRelation.getPreTaskCode());
-                }
-                if (processTaskRelation.getPostTaskCode() != 0) {
-                    taskCodeList.add(processTaskRelation.getPostTaskCode());
-                }
-            }
-            if (CollectionUtils.isNotEmpty(taskCodeList)) {
-                int i = taskDefinitionMapper.deleteByBatchCodes(new ArrayList<>(taskCodeList));
-                if (i != taskCodeList.size()) {
-                    logger.error("Delete task definition error, processDefinitionCode:{}.", code);
-                    throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
-                }
             }
         }
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
@@ -1719,10 +1745,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
 
+            DAG<String, TaskNode, String> graph = new DAG<>();
             // check has cycle
-            if (graphHasCycle(taskNodes)) {
+            if (graphHasCycle(taskNodes, graph)) {
                 logger.error("Process DAG has cycle.");
                 putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
+                return result;
+            }
+
+            if (!checkValidFileParameter(taskDefinitionLogsList, graph)) {
+                logger.error("Exist invalid file parameter.");
+                putMsg(result, Status.INVALID_FILE_PARAM);
                 return result;
             }
 
@@ -2056,10 +2089,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * whether the graph has a ring
      *
      * @param taskNodeResponseList task node response list
+     * @param graph target process graph
      * @return if graph has cycle flag
      */
-    private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
-        DAG<String, TaskNode, String> graph = new DAG<>();
+    private boolean graphHasCycle(List<TaskNode> taskNodeResponseList, DAG<String, TaskNode, String> graph) {
         // Fill the vertices
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
             graph.addNode(Long.toString(taskNodeResponse.getCode()), taskNodeResponse);

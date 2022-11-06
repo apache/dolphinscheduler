@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
@@ -108,7 +109,7 @@ public class TaskDefinition {
      * user defined parameter map
      */
     @TableField(exist = false)
-    private Map<String, String> taskParamMap;
+    private Map<String, String> taskOutParamMap;
 
     /**
      * task is valid: yes/no
@@ -235,8 +236,8 @@ public class TaskDefinition {
         return taskParamList;
     }
 
-    public Map<String, String> getTaskParamMap() {
-        if (taskParamMap == null && !Strings.isNullOrEmpty(taskParams)) {
+    public Map<String, String> getTaskOutParamMap() {
+        if (taskOutParamMap == null && !Strings.isNullOrEmpty(taskParams)) {
             JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
 
             // If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
@@ -244,14 +245,16 @@ public class TaskDefinition {
                 List<Property> propList = JSONUtils.toList(localParams.toString(), Property.class);
 
                 if (CollectionUtils.isNotEmpty(propList)) {
-                    taskParamMap = new HashMap<>();
+                    taskOutParamMap = new HashMap<>();
                     for (Property property : propList) {
-                        taskParamMap.put(property.getProp(), property.getValue());
+                        if (property.getDirect() == Direct.OUT) {
+                            taskOutParamMap.put(property.getProp(), property.getValue());
+                        }
                     }
                 }
             }
         }
-        return taskParamMap;
+        return taskOutParamMap;
     }
 
     public String getDependence() {
