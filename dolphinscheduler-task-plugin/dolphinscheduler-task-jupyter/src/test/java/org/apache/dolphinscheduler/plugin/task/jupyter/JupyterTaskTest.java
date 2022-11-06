@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
@@ -106,6 +107,7 @@ public class JupyterTaskTest {
     }
 
     @Test
+    @Disabled
     public void jupyterTaskUsePipRequirements() throws Exception {
         String jupyterTaskParameters = buildJupyterTaskUsePipRequirementsCommand();
         JupyterTask jupyterTask = prepareJupyterTaskForTest(jupyterTaskParameters);
