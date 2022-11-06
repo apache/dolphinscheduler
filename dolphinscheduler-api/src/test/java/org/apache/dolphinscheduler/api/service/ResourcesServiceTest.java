@@ -831,7 +831,7 @@ public class ResourcesServiceTest {
         // test admin user
         List<Integer> resIds = new ArrayList<>();
         resIds.add(1);
-        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(false);
         Mockito.when(resourcesMapper.queryResourceExceptUserId(userId)).thenReturn(getResourceList());
         Map<String, Object> result = resourcesService.authorizeResourceTree(user, userId);
         logger.info(result.toString());
@@ -889,7 +889,7 @@ public class ResourcesServiceTest {
         int userId = 3;
 
         // test admin user
-        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(false);
         Mockito.when(udfFunctionMapper.queryUdfFuncExceptUserId(userId)).thenReturn(getUdfFuncList());
         Mockito.when(udfFunctionMapper.queryAuthedUdfFunc(userId)).thenReturn(getSingleUdfFuncList());
         Map<String, Object> result = resourcesService.unauthorizedUDFFunction(user, userId);
@@ -916,7 +916,7 @@ public class ResourcesServiceTest {
         int userId = 3;
 
         // test admin user
-        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(false);
         Mockito.when(udfFunctionMapper.queryAuthedUdfFunc(userId)).thenReturn(getUdfFuncList());
         Map<String, Object> result = resourcesService.authorizedUDFFunction(user, userId);
         logger.info(result.toString());
@@ -945,8 +945,9 @@ public class ResourcesServiceTest {
         // test admin user
         List<Integer> resIds = new ArrayList<>();
         resIds.add(1);
-        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(true);
-        Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(Mockito.anyInt(), Mockito.anyInt())).thenReturn(resIds);
+        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(false);
+        Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(Mockito.anyInt(), Mockito.anyInt()))
+                .thenReturn(resIds);
         Mockito.when(resourcesMapper.queryResourceListById(Mockito.any())).thenReturn(getResourceList());
         Map<String, Object> result = resourcesService.authorizedFile(user, userId);
         logger.info(result.toString());
