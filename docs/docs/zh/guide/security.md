@@ -179,3 +179,15 @@ worker:
 - 创建和授权后，在相关k8s任务选择命名空间时下拉可选，如果k8s集群名字是`ds_null_k8s`是测试模式，不会真正操作集群.
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
+
+## 任务远程主机管理
+
+> 使用任务远程主机
+
+- 在工作流定义中创建任务节点选择远程主机，任务将通过SSH到远程主机上执行任务.
+
+> 创建/更新任务远程主机
+
+- 配置远程主机的相关信息之后，可以通过测试按钮测试当前主机是否能够执行远程SSH。因为能够远程SSH的主机才是有效的.
+
+![create-task-remote-host](../../../img/new_ui/dev/security/create-task-remote-host.png)

@@ -183,3 +183,14 @@ Create a task node in the workflow definition, select the worker group and the e
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
 
+## Task Remote Host Management
+
+> Usage task remote host
+
+- Create a task node in the workflow definition, select the task remote host. When executing the task, the Worker will SSH to the remote host to execute the task.
+
+> Add or update the task remote host
+
+- After configuring the relevant information of the remote host, you can use the Test button to test whether the current host can execute remote SSH. Because the host that can SSH remotely is valid.
+
+![create-task-remote-host](../../../img/new_ui/dev/security/create-task-remote-host.png)

@@ -293,6 +293,24 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |worker.registry-disconnect-strategy.max-waiting-time|100s|当Worker与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Worker与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Worker会丢弃kill正在执行的任务。值为0表示会无限期等待 |
 |worker.task-execute-threads-full-policy|REJECT|如果是 REJECT, 当Worker中等待队列中的任务数达到exec-threads时, Worker将会拒绝接下来新接收的任务，Master将会重新分发该任务; 如果是 CONTINUE, Worker将会接收任务，放入等待队列中等待空闲线程去执行该任务|
 
+## SSH Session相关配置
+位置：`worker-server/conf/application.yaml`
+
+| 参数                                            | 默认值 | 描述                                                                                               |
+| ----------------------------------------------- | ------ |--------------------------------------------------------------------------------------------------|
+| ssh.session.pool.maxTotal                       | 20     | Worker能够同时创建SSH Session的最大数量，当对象池满，新请求将阻塞或直接拒绝                                                   |
+| ssh.session.pool.maxTotalPerKey                 | 10     | Worker能够对单一主机 + 用户创建SSH Session的最大数量。当该主机+用户创建的SSH Session满，则Worker对该主机+用户的SSH ession请求将阻塞或直接拒绝。 |
+| ssh.session.pool.maxIdlePerKey                  | 4      | Worker能够对单一主机 + 用户创建SSH Session的最大空闲数量。当释放的主机+用户创建的SSH Session超过该值，则Worker将直接销毁新收回的SSH Session。  |
+| ssh.session.pool.blockWhenExhausted             | true   | 当对象池满，是否阻塞新请求。true为阻塞，false则为直接异常返回。推荐使用阻塞策略。                                                    |
+| ssh.session.pool.maxWaitDuration                | 500ms  | 该值仅当`blockWhenExhausted`设置为`true`时生效。表示请求最大阻塞时长。建议该值必须设置                                         |
+| ssh.session.pool.minEvictableIdleDuration       | 60s    | 允许空闲SSH Session的最大存活时间。假如空闲SSH Session超过该值未被使用，将被驱逐                                              |
+| ssh.session.pool.durationBetweenEvictionRuns    | 60s    | 检测是否驱逐空闲SSH Session的周期                                                                           |
+| ssh.session.pool.removeAbandonedOnBorrow        | true   | 当每次从池子中借取SSH Session时，去扫描可以被丢弃的SSH Session                                                       |
+| ssh.session.pool.removeAbandonedTimeoutDuration | 30s    | SSH Session借出去最后一次使用后，多长时间未使用和归还就认为是泄漏                                                           |
+| ssh.session.sftp.enableUploadMonitor            | true   | 当通过SFTP上传文件时，是否开启进度监控                                                                            |
+| ssh.session.sftp.maxUploadRate                  | 256    | SFTP的最大速率，单位为KB，若为负数则不限制                                                                         |
+| ssh.session.sftp.maxFileSize                    | 100    | 单任务能够SFTP的最大文件大小，单位为MB，若为负数则不限制                                                                              |
+
 ## Alert Server相关配置
 
 位置：`alert-server/conf/application.yaml`
