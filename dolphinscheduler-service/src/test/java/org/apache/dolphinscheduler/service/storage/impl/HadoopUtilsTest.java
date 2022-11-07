@@ -61,10 +61,4 @@ public class HadoopUtilsTest {
         Assert.assertTrue(true);
     }
 
-    @Test
-    public void getAppAddress() {
-        logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
-        Assert.assertTrue(true);
-    }
-
 }
