@@ -160,7 +160,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public Map<String, Object> execProcessInstance(User loginUser, long projectCode,
                                                    long processDefinitionCode, String cronTime, CommandType commandType,
                                                    FailureStrategy failureStrategy, String startNodeList,
-                                                   TaskDependType taskDependType, WarningType warningType, int warningGroupId,
+                                                   TaskDependType taskDependType, WarningType warningType, Integer warningGroupId,
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Long environmentCode,Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
@@ -613,7 +613,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private int createCommand(CommandType commandType, long processDefineCode,
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
-                              int executorId, int warningGroupId,
+                              int executorId, Integer warningGroupId,
                               RunMode runMode, Priority processInstancePriority, String workerGroup, Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun, ComplementDependentMode complementDependentMode) {
 

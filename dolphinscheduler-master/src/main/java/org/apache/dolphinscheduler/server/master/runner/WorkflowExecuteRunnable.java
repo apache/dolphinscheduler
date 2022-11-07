@@ -697,13 +697,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
             checkSerialProcess(processDefinition);
         }
+
         if (processInstance.getState().typeIsWaitingThread()) {
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
-        if (processAlertManager.isNeedToSendWarning(processInstance)) {
-            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-            processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
-        }
+
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
         if (checkTaskQueue()) {
             //release task group
             processService.releaseAllTaskGroup(processInstance.getId());
