@@ -161,6 +161,7 @@ joda-time-2.10.13.jar
 jpam-1.1.jar
 jsch-0.1.55.jar
 json-1.8.jar
+json-20140107.jar
 json-path-2.7.0.jar
 json-smart-2.4.8.jar
 json-utils-2.17.282.jar
@@ -245,6 +246,7 @@ netty-transport-classes-epoll-4.1.79.Final.jar
 netty-transport-native-epoll-4.1.53.Final.jar
 netty-transport-native-unix-common-4.1.53.Final.jar
 nimbus-jose-jwt-9.8.1.jar
+nimbus-jose-jwt-9.10.jar
 okhttp-2.7.5.jar
 okhttp-3.14.9.jar
 okio-1.17.2.jar
@@ -476,4 +478,8 @@ sshd-core-2.8.0.jar
 jcl-over-slf4j-1.7.36.jar
 databend-jdbc-0.0.7.jar
 kyuubi-hive-jdbc-shaded-1.7.0.jar
+casdoor-java-sdk-1.11.0.jar
+casdoor-spring-boot-starter-1.6.0.jar
+org.apache.oltu.oauth2.client-1.0.2.jar
+org.apache.oltu.oauth2.common-1.0.2.jar
 
