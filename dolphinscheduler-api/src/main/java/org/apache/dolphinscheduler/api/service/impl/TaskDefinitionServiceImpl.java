@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.TaskDefinitionVo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
@@ -1009,9 +1010,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskRelationList = taskRelationList.stream()
                         .filter(v -> v.getPreTaskCode() != 0).collect(Collectors.toList());
             }
-
-            taskDefinition.setProcessTaskRelationList(taskRelationList);
-            result.put(Constants.DATA_LIST, taskDefinition);
+            TaskDefinitionVo taskDefinitionVo = TaskDefinitionVo.fromTaskDefinition(taskDefinition);
+            taskDefinitionVo.setProcessTaskRelationList(taskRelationList);
+            result.put(Constants.DATA_LIST, taskDefinitionVo);
             putMsg(result, Status.SUCCESS);
         }
         return result;
