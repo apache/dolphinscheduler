@@ -27,9 +27,6 @@
         <if test="userId != 0 and perm != 0">
             and rel.user_id=#{userId} and rel.perm=#{perm}
         </if>
-        <if test="userId != 0 and perm == 0">
-            and rel.user_id=#{userId}
-        </if>
     </select>
 
     <delete id="deleteResourceUser">
