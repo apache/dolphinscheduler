@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -42,6 +43,8 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -76,6 +79,27 @@ public class TaskDefinitionServiceImplTest {
 
     @Mock
     private TaskPluginManager taskPluginManager;
+
+    private static final String TASK_PARAMETER =
+            "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";;
+    private static final long PROJECT_CODE = 1L;
+    private static final long PROCESS_DEFINITION_CODE = 2L;
+    private static final long TASK_CODE = 3L;
+    private static final int VERSION = 1;
+    private static final int RESOURCE_RATE = -1;
+    protected User user;
+    protected Exception exception;
+
+    @BeforeEach
+    public void before() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setTenantId(2);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+        user = loginUser;
+    }
+
 
     @Test
     public void createTaskDefinition() {
