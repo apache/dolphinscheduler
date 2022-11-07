@@ -15,31 +15,25 @@
  * limitations under the License.
  */
 
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { axios } from '@/service/service'
 
-export function useFormField(forms: Array<any>) {
-  const model: any = {}
+const reqFunction = (url: string, method: string) => {
+  return axios({
+    url,
+    method
+  })
+}
 
-  const setField = (value: string, type: string): Ref<null | string> => {
-    return ref(value ?
-      value :
-      type === 'select' ?
-        null :
-        ''
-    )
-  }
-
-  forms.forEach((f: any) => {
-    if (f.field.indexOf('.') >= 0) {
-      const hierarchy = f.field.split('.')
-      model[hierarchy[0]] = {
-        [hierarchy[1]]: setField(f.defaultValue, f.type)
-      }
-    } else {
-      model[f.field] = setField(f.defaultValue, f.type)
+export function useFormRequest(apis: any, forms: Array<any>): Array<any> {
+  forms.map(f => {
+    if (f.api) {
+      reqFunction(apis[f.api].url, apis[f.api].method).then((res: any) => {
+        f.options = res.map((r: any) => {
+          return { label: r, value: r }
+        })
+      })
     }
   })
 
-  return model
+  return forms
 }

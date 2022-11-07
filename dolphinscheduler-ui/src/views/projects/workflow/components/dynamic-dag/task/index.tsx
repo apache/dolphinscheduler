@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs } from 'vue'
-import { NForm } from 'naive-ui'
+import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useTaskForm } from './use-task-form'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
+import type { SelectOption } from 'naive-ui'
 
 const props = {
   showModal: {
@@ -36,6 +37,7 @@ const TaskForm = defineComponent({
   props,
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
     const { variables } = useTaskForm()
     const { t } = useI18n()
 
@@ -47,7 +49,11 @@ const TaskForm = defineComponent({
       ctx.emit('confirmModal')
     }
 
-    return { ...toRefs(variables), cancelModal, confirmModal, t }
+    watch(variables.model, () => {
+      //console.log(variables.model)
+    })
+
+    return { ...toRefs(variables), cancelModal, confirmModal, t, trim }
   },
   render() {
     return (
@@ -60,6 +66,39 @@ const TaskForm = defineComponent({
           model={this.model}
           rules={this.rules}
           ref={'TaskForm'}>
+          {
+            (this.formStructure as Array<any>).map(f => {
+              return <NFormItem
+                label={this.t(f.label)}
+                path={f.field}
+              >
+                {
+                  f.type === 'input' && <NInput
+                    allowInput={this.trim}
+                    placeholder={f.placeholder ? this.t(f.placeholder) : ''}
+                    v-model={[(this.model as any)[f.modelField], 'value']}
+                    clearable={f.clearable}
+                  />
+                }
+                {
+                  f.type === 'select' && <NSelect
+                    placeholder={f.placeholder ? this.t(f.placeholder) : ''}
+                    v-model={[(this.model as any)[f.modelField], 'value']}
+                    options={
+                      f.optionsLocale ?
+                        f.options.map((o: SelectOption) => {
+                          return {
+                            label: this.t(o.label as string),
+                            value: o.value
+                          }
+                        }) :
+                        f.options
+                    }
+                  />
+                }
+              </NFormItem>
+            })
+          }
         </NForm>
       </Modal>
     )

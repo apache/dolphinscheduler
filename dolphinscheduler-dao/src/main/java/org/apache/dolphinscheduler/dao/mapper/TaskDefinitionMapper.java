@@ -141,4 +141,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      */
     IPage<TaskDefinition> filterTaskDefinition(IPage<TaskDefinition> page,
                                                @Param("task") TaskDefinition taskDefinition);
+
+    /**
+     * batch delete task by task code
+     *
+     * @param taskCodeList task code list
+     * @return deleted row count
+     */
+    int deleteByBatchCodes(@Param("taskCodeList") List<Long> taskCodeList);
 }

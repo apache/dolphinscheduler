@@ -15,42 +15,18 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
-import type { FormItemRule } from 'naive-ui'
+export function useFormStructure(forms: Array<any>): Array<any> {
+  return forms.map((f: any) => {
+    delete f.validate
+    delete f.api
 
-export function useFormValidate(forms: Array<any>) {
-  const { t } = useI18n()
-  const validate: any = {}
-
-  const setValidate = (v: any): object => {
-    const data: any = {
-      required: v.required,
-      trigger: v.trigger
-    }
-
-    if (v.type) {
-      if (v.type === 'non-empty') {
-        data['validator'] = (rule: FormItemRule, value: string) => {
-          if (!value) {
-            return Error(t(v.message))
-          }
-        }
-      }
-    }
-
-    return data
-  }
-
-  forms.forEach((f: any) => {
-    if (!f.validate && Object.keys(f.validate).length <= 0) return
+    f.modelField = f.field
 
     if (f.field.indexOf('.') >= 0) {
       const hierarchy = f.field.split('.')
-      validate[hierarchy[1]] = setValidate(f.validate)
-    } else {
-      validate[f.field] = setValidate(f.validate)
+      f.field = hierarchy[1]
     }
-  })
 
-  return validate
+    return f
+  })
 }
