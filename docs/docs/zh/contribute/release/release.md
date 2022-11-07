@@ -350,7 +350,7 @@ gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
 cd ../
 ```
 
-> 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令 
+> 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令
 > `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz` 和
 > `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz` 将创建它们
 
@@ -386,8 +386,11 @@ cd ../
 ### 更新版本说明
 
 在 GitHub 中通过 [创建新的 release note](https://github.com/apache/dolphinscheduler/releases/new) 创建一个 release note。 这要在
-投票邮件开始之前完成，因为我们需要在邮件中使用 release note。你可以通过命令 `git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md`
-自动生成 changelog（部分可以不太准确，需要人为过滤一遍），然后将他们分类并粘贴到 GitHub 的 release note 中
+投票邮件开始之前完成，因为我们需要在邮件中使用 release note。你可以在 `tools/release` 目录中运行 `python release.py changelog` 自动创建
+changelog.
+
+> 备注： 如果你更加倾向于手动创建 changelog，你可以通过命令 `git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md`
+> 生成 changelog（部分可以不太准确，需要人为过滤一遍），然后将他们分类并粘贴到 GitHub 的 release note 中
 
 ### 投票阶段
 
