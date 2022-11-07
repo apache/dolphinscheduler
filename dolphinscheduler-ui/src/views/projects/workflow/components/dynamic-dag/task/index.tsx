@@ -20,6 +20,7 @@ import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useTaskForm } from './use-task-form'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
+import MonacoEditor from '@/components/monaco-editor'
 import type { SelectOption } from 'naive-ui'
 
 const props = {
@@ -49,11 +50,31 @@ const TaskForm = defineComponent({
       ctx.emit('confirmModal')
     }
 
+    const onUpdateValue = (v: any, f: any) => {
+      f.modelField.indexOf('.') >= 0 ?
+        (variables.model as any)[f.modelField.split('.')[0]][f.modelField.split('.')[1]] = v :
+        (variables.model as any)[f.modelField] = v
+    }
+
+    const setDefaultValue = (f: any) => {
+      return f.modelField.indexOf('.') >= 0 ?
+        (variables.model as any)[f.modelField.split('.')[0]][f.modelField.split('.')[1]] :
+        (variables.model as any)[f.modelField]
+    }
+
     watch(variables.model, () => {
       //console.log(variables.model)
     })
 
-    return { ...toRefs(variables), cancelModal, confirmModal, t, trim }
+    return {
+      ...toRefs(variables),
+      cancelModal,
+      confirmModal,
+      onUpdateValue,
+      setDefaultValue,
+      t,
+      trim
+    }
   },
   render() {
     return (
@@ -65,7 +86,7 @@ const TaskForm = defineComponent({
         <NForm
           model={this.model}
           rules={this.rules}
-          ref={'TaskForm'}>
+          ref={'taskForm'}>
           {
             (this.formStructure as Array<any>).map(f => {
               return <NFormItem
@@ -76,14 +97,16 @@ const TaskForm = defineComponent({
                   f.type === 'input' && <NInput
                     allowInput={this.trim}
                     placeholder={f.placeholder ? this.t(f.placeholder) : ''}
-                    v-model={[(this.model as any)[f.modelField], 'value']}
+                    defaultValue={this.setDefaultValue(f)}
+                    onUpdateValue={(v) => this.onUpdateValue(v, f)}
                     clearable={f.clearable}
                   />
                 }
                 {
                   f.type === 'select' && <NSelect
                     placeholder={f.placeholder ? this.t(f.placeholder) : ''}
-                    v-model={[(this.model as any)[f.modelField], 'value']}
+                    defaultValue={this.setDefaultValue(f)}
+                    onUpdateValue={(v) => this.onUpdateValue(v, f)}
                     options={
                       f.optionsLocale ?
                         f.options.map((o: SelectOption) => {
@@ -94,6 +117,12 @@ const TaskForm = defineComponent({
                         }) :
                         f.options
                     }
+                  />
+                }
+                {
+                  f.type === 'studio' && <MonacoEditor
+                    defaultValue={this.setDefaultValue(f)}
+                    onUpdateValue={(v) => this.onUpdateValue(v, f)}
                   />
                 }
               </NFormItem>
