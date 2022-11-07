@@ -33,7 +33,7 @@ You could choose between these two based on your needs.
 |------------------------------|------------------------------------------------------------------------------------------------------|
 | Hive Cli Task Execution Type | The type of hive cli task execution, choose either `FROM_SCRIPT` or `FROM_FILE`.                     |
 | Hive SQL Script              | If you choose `FROM_SCRIPT` for `Hive Cli Task Execution Type`, you need to fill in your SQL script. |
-| Hive Cli Options             | Extra options for hive cli, such as `--verbose`                                                      |
+| Hive Cli Options             | Extra options for hive cli, such as `--verbose` to check execution result.                           |
 | Resources                    | If you choose `FROM_FILE` for `Hive Cli Task Execution Type`, you need to select your SQL file.      |
 
 ## Task Example
