@@ -39,6 +39,7 @@ spec:
         {{- toYaml .Values.alert.annotations | nindent 8 }}
       {{- end }}
     spec:
+      serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
       {{- if .Values.alert.affinity }}
       affinity:
         {{- toYaml .Values.alert.affinity | nindent 8 }}
