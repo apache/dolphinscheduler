@@ -19,6 +19,7 @@ export default {
   datasource: '数据源',
   create_datasource: '创建源',
   choose_datasource_type: '选择源类型',
+  select: '更改',
   search_input_tips: '请输入关键字',
   datasource_name: '源名称',
   datasource_name_tips: '请输入数据源名称',

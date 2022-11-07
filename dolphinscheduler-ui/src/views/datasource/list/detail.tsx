@@ -199,7 +199,7 @@ const DetailModal = defineComponent({
                 >
                   <div class={[styles.typeBox, !!id && styles.disabledBox]}>
                     <div v-model={[detailForm.type, 'value']}>{detailForm.label}</div>
-                    <div class={[styles['text-color'], 'btn-data-source-type-drop-down']} onClick={handleSourceModalOpen}>更换</div>
+                    <div class={[styles['text-color'], 'btn-data-source-type-drop-down']} onClick={handleSourceModalOpen}>{t('datasource.select')}</div>
                   </div>
                 </NFormItem>
                 <NFormItem
