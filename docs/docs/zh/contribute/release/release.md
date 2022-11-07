@@ -290,10 +290,6 @@ cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolp
 ```shell
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -a 512 apache-dolphinscheduler-python-"${VERSION}".tar.gz >> apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -b -a 512 apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl >> apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### 提交Apache SVN
@@ -311,10 +307,6 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```shell
 shasum -c apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -c apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -c apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -c apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### 检查gpg签名
@@ -347,10 +339,6 @@ Your decision? 5
 ```shell
 gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
-cd python
-gpg --verify apache-dolphinscheduler-python-"${VERSION}".tar.gz.asc
-gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
-cd ../
 ```
 
 > 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令
@@ -361,7 +349,7 @@ cd ../
 
 #### 检查源码包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`以及Python文件夹下的`apache-dolphinscheduler-python-<VERSION>.tar.gz`，进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`，进行如下检查:
 
 - 检查源码包是否包含由于包含不必要文件，致使tarball过于庞大
 - 存在`LICENSE`和`NOTICE`文件
@@ -373,8 +361,7 @@ cd ../
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`和`apache-dolphinscheduler-python-<VERSION>-bin.tar.gz`
-进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
 - 所有文本文件开头都有ASF许可证

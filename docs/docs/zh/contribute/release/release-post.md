@@ -19,11 +19,6 @@
     -Pdocker,release
 ```
 
-## 发布 pydolphinscheduler 到 PyPI
-
-需要将 Python API 发布到 PyPI，请参考 [Python API release](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-python/pydolphinscheduler/RELEASE.md#to-pypi)
-完成 PyPI 的发版
-
 ## 获取全部的贡献者
 
 当您想要发布新版本的新闻或公告时，您可能需要当前版本的所有贡献者，您可以在 `tools/release` 中使用命令 `python release.py contributor` 自动生成贡献者 Github id。

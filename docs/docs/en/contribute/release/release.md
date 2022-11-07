@@ -287,10 +287,6 @@ cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolp
 ```shell
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -a 512 apache-dolphinscheduler-python-"${VERSION}".tar.gz >> apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -b -a 512 apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl >> apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### Commit to Apache SVN
@@ -308,10 +304,6 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```shell
 shasum -c apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -c apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -c apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -c apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### Check gpg Signature
@@ -345,10 +337,6 @@ Then, check the gpg signature.
 ```shell
 gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
-cd python
-gpg --verify apache-dolphinscheduler-python-"${VERSION}".tar.gz.asc
-gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
-cd ../
 ```
 
 > Note: You have to create gpg signature manually when you can not find your `asc` file, the command
@@ -359,7 +347,7 @@ cd ../
 
 #### Check source package
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dolphinscheduler-python-<VERSION>.tar.gz` then check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` then check the following items:
 
 * Check whether source tarball is oversized for including nonessential files
 * `LICENSE` and `NOTICE` files exist
@@ -372,8 +360,7 @@ Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dol
 
 #### Check binary packages
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dolphinscheduler-python-<VERSION>-bin.tar.gz`
-to check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` to check the following items:
 
 - `LICENSE` and `NOTICE` files exist
 - Correct year in `NOTICE` file

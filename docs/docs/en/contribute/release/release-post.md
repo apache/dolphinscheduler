@@ -20,11 +20,6 @@ We could reuse the main command the CI run and publish our Docker images to Dock
     -Pdocker,release
 ```
 
-## Publish pydolphinscheduler to PyPI
-
-Python API need to release to PyPI for easier download and use, you can see more detail in [Python API release](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-python/pydolphinscheduler/RELEASE.md#to-pypi)
-to finish PyPI release.
-
 ## Get All Contributors
 
 You might need all contributors in current release when you want to publish the release news or announcement, you could
