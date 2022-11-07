@@ -34,6 +34,10 @@
 
 ### 模块介绍
 
+- dolphinscheduler-master master模块，提供工作流管理和编排服务。
+
+- dolphinscheduler-worker worker模块，提供任务执行管理服务。
+
 - dolphinscheduler-alert 告警模块，提供 AlertServer 服务。
 
 - dolphinscheduler-api web应用模块，提供 ApiServer 服务。
