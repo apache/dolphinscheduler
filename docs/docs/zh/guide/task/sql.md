@@ -38,6 +38,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 #### 在hive中创建临时表并写入数据
 
 该样例向hive中创建临时表`tmp_hello_world`并写入一行数据。选择SQL类型为非查询，在创建临时表之前需要确保该表不存在，所以我们使用自定义参数，在每次运行时获取当天时间作为表名后缀，这样这个任务就可以每天运行。创建的表名格式为：`tmp_hello_world_{yyyyMMdd}`。
+**注意**：sql任务组件的hive应用是基于JDBC去调用，SQL statement 不支持多行执行，请注意不要在语句末尾使用';'。如果要执行多行语句请使用Hive-Cli任务。
 
 ![hive-sql](../../../../img/tasks/demo/hive-sql.png)
 
@@ -49,7 +50,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ### 使用前置sql和后置sql示例
 
-在前置sql中执行建表操作，在sql语句中执行操作，在后置sql中执行清理操作
+在前置sql中执行建表操作，在sql语句中执行操作，在后置sql中执行清理操作。
 
 ![pre_post_sql](../../../../img/tasks/demo/pre_post_sql.png)
 

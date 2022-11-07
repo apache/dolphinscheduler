@@ -38,6 +38,7 @@ Refer to [datasource-setting](../howto/datasource-setting.md) `DataSource Center
 #### Create a Temporary Table in Hive and Write Data
 
 This example creates a temporary table `tmp_hello_world` in Hive and writes a row of data. Before creating a temporary table, we need to ensure that the table does not exist. So we use custom parameters to obtain the time of the day as the suffix of the table name every time we run, this task can run every different day. The format of the created table name is: `tmp_hello_world_{yyyyMMdd}`.
+**Note**：the hive datasource in the SQL task based on JDBC to execute SQLs, SQL statement does not support multi-statements, please avoid using ';' at the end of the statement. To process multi-statements please use Hive-Cli task.
 
 ![hive-sql](../../../../img/tasks/demo/hive-sql.png)
 
