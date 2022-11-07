@@ -10,8 +10,6 @@ all conditions are met, if any or them are missing, you should install them and 
 java -version
 # Maven requests
 mvn -version
-# Python 3.6 above is requests, and you have to make keyword `python` work in your terminal and version match
-python --version
 ```
 
 ## GPG Settings
@@ -166,13 +164,10 @@ git push origin "${VERSION}"-release
 ### Pre-Release Check
 
 ```shell
-# make gpg command could be run in maven correct
-export GPG_TTY=$(tty)
-
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
-* `-Prelease,python`: choose release and python profile, which will pack all the source codes, jar files and executable binary packages, and Python distribute package.
+* `-Prelease`: choose release profile, which will pack all the source codes, jar files and executable binary packages.
 * `-DautoVersionSubmodules=true`: it can make the version number is inputted only once and not for each sub-module.
 * `-DdryRun=true`: dry run which means not to generate or submit new version number and new tag.
 
@@ -187,7 +182,7 @@ mvn release:clean
 Then, prepare to execute the release.
 
 ```shell
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 It is basically the same as the previous rehearsal command, but deleting `-DdryRun=true` parameter.
@@ -219,7 +214,7 @@ git push origin --tags
 ### Deploy the Release
 
 ```shell
-mvn release:perform -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 After that command is executed, the version to be released will be uploaded to Apache staging repository automatically.
@@ -267,7 +262,6 @@ Create folder by version number.
 
 ```shell
 mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 cd ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 ```
 
@@ -277,9 +271,6 @@ Add source code packages, binary packages and executable binary packages to SVN 
 # Source and binary tarball for main code
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz.asc ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-
-# Source and binary tarball for Python API
-cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 ```
 
 ### Generate sign files
