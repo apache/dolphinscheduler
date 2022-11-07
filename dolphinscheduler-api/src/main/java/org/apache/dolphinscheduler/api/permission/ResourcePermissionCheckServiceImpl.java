@@ -112,7 +112,7 @@ public class ResourcePermissionCheckServiceImpl
                                            Logger logger) {
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
-            Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
+            Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResourceIds(userId, logger);
             boolean checkResult = ownResSets != null && ownResSets.containsAll(originResSet);
             if (!checkResult) {
                 logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
@@ -153,7 +153,7 @@ public class ResourcePermissionCheckServiceImpl
             logger.error("User does not exist, userId:{}.", userId);
             return Collections.emptySet();
         }
-        return (Set<Object>) RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(
+        return (Set<Object>) RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResourceIds(
                 user.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId, logger);
     }
 
@@ -178,7 +178,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             if (userId != 0) {
                 return Collections.emptySet();
             }
@@ -208,7 +208,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             return projectMapper.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
         }
     }
@@ -231,7 +231,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<Resource> relationResources;
             if (userId == 0) {
                 relationResources = new ArrayList<>();
@@ -267,7 +267,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<UdfFunc> udfFuncList = udfFuncMapper.listAuthorizedUdfByUserId(userId);
             return udfFuncList.stream().map(UdfFunc::getId).collect(toSet());
         }
@@ -293,7 +293,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<TaskGroup> taskGroupList = taskGroupMapper.listAuthorizedResource(userId);
             return taskGroupList.stream().map(TaskGroup::getId).collect(Collectors.toSet());
         }
@@ -324,7 +324,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
             return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
         }
@@ -350,7 +350,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<Environment> environments = environmentMapper.queryAllEnvironmentList();
             return environments.stream().map(Environment::getId).collect(Collectors.toSet());
         }
@@ -376,7 +376,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
             return workerGroups.stream().map(WorkerGroup::getId).collect(Collectors.toSet());
         }
@@ -405,7 +405,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             return Collections.emptySet();
         }
     }
@@ -433,7 +433,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<AlertGroup> alertGroupList = alertGroupMapper.queryAllGroupList();
             return alertGroupList.stream().map(AlertGroup::getId).collect(toSet());
         }
@@ -462,7 +462,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             List<Tenant> tenantList = tenantMapper.queryAll();
             return tenantList.stream().map(Tenant::getId).collect(Collectors.toSet());
         }
@@ -491,7 +491,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             return dataSourceMapper.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId)
                     .collect(toSet());
         }
@@ -520,7 +520,7 @@ public class ResourcePermissionCheckServiceImpl
         }
 
         @Override
-        public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
+        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             return accessTokenMapper.listAuthorizedAccessToken(userId, null).stream().map(AccessToken::getId)
                     .collect(toSet());
         }
@@ -540,7 +540,7 @@ public class ResourcePermissionCheckServiceImpl
          * @param userId
          * @return
          */
-        Set<T> listAuthorizedResource(int userId, Logger logger);
+        Set<T> listAuthorizedResourceIds(int userId, Logger logger);
 
         /**
          * permission check
