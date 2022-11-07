@@ -17,26 +17,24 @@
 
 package org.apache.dolphinscheduler.plugin.task.linkis;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-
-import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.*;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+
 
 /**
  * linkis task
@@ -57,6 +55,12 @@ public class LinkisTask extends AbstractRemoteTask {
      * taskExecutionContext
      */
     protected final TaskExecutionContext taskExecutionContext;
+
+    private String taskId;
+
+    protected static final Pattern LINKIS_TASK_ID_REGEX = Pattern.compile(Constants.LINKIS_TASK_ID_REGEX);
+
+    protected static final Pattern LINKIS_STATUS_REGEX = Pattern.compile(Constants.LINKIS_STATUS_REGEX);
 
     /**
      * constructor
@@ -85,15 +89,14 @@ public class LinkisTask extends AbstractRemoteTask {
         }
     }
 
-    // todo split handle to submit and track
     @Override
-    public void handle(TaskCallBack taskCallBack) throws TaskException {
+    public void submitApplication() throws TaskException {
         try {
             // construct process
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
+            setAppIds(findTaskId(commandExecuteResult.getResultString()));
             setProcessId(commandExecuteResult.getProcessId());
             linkisParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
@@ -109,26 +112,51 @@ public class LinkisTask extends AbstractRemoteTask {
     }
 
     @Override
-    public void submitApplication() throws TaskException {
-
-    }
-
-    @Override
     public void trackApplicationStatus() throws TaskException {
-
+        initTaskId();
+        try {
+            List<String> args = new ArrayList<>();
+            args.add(Constants.SHELL_CLI_OPTIONS);
+            args.add(Constants.STATUS_OPTIONS);
+            args.add(taskId);
+            String command = String.join(Constants.SPACE, args);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            String status = findStatus(commandExecuteResult.getResultString());
+            LinkisJobStatus jobStatus = LinkisJobStatus.convertFromJobStatusString(status);
+            switch (jobStatus) {
+                case FAILED:
+                    setExitStatusCode(EXIT_CODE_FAILURE);
+                    break;
+                case SUCCEED:
+                    setExitStatusCode(EXIT_CODE_SUCCESS);
+                    break;
+                case CANCELLED:
+                    setExitStatusCode(EXIT_CODE_KILL);
+                    break;
+            }
+        } catch (Exception e) {
+            throw new TaskException("track linkis status error", e);
+        }
     }
 
     @Override
     public void cancelApplication() throws TaskException {
         // cancel process
+        initTaskId();
         try {
-            shellCommandExecutor.cancelApplication();
+            List<String> args = new ArrayList<>();
+            args.add(Constants.SHELL_CLI_OPTIONS);
+            args.add(Constants.KILL_OPTIONS);
+            args.add(taskId);
+            String command = String.join(Constants.SPACE, args);
+            shellCommandExecutor.run(command);
+            setExitStatusCode(EXIT_CODE_KILL);
         } catch (Exception e) {
-            throw new TaskException("cancel application error", e);
+            throw new TaskException("cancel linkis task error", e);
         }
     }
 
-    private String buildCommand() throws Exception {
+    private String buildCommand() {
 
         List<String> args = new ArrayList<>();
         args.addAll(buildOptions());
@@ -139,9 +167,10 @@ public class LinkisTask extends AbstractRemoteTask {
         return command;
     }
 
-    protected List<String> buildOptions() throws Exception {
+    protected List<String> buildOptions() {
         List<String> args = new ArrayList<>();
         args.add(Constants.SHELL_CLI_OPTIONS);
+        args.add(Constants.ASYNC_OPTIONS);
         if (BooleanUtils.isTrue(linkisParameters.getUseCustom())) {
             args.add(buildCustomConfigContent());
         } else {
@@ -168,6 +197,35 @@ public class LinkisTask extends AbstractRemoteTask {
         }
         script = parseScript(script);
         return script;
+    }
+
+    private void initTaskId() {
+        if (taskId == null) {
+            if (StringUtils.isNotEmpty(getAppIds())) {
+                taskId = getAppIds();
+            }
+        }
+        if (taskId == null) {
+            throw new TaskException("linkis task id is null");
+        }
+    }
+
+    protected String findTaskId(String line) {
+        Matcher matcher = LINKIS_TASK_ID_REGEX.matcher(line);
+        if (matcher.find()) {
+            String str = matcher.group();
+            return str.substring(11);
+        }
+        return null;
+    }
+
+    protected String findStatus(String line) {
+        Matcher matcher = LINKIS_STATUS_REGEX.matcher(line);
+        if (matcher.find()) {
+            String str = matcher.group();
+            return str.substring(11);
+        }
+        return null;
     }
 
     @Override

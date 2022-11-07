@@ -25,5 +25,15 @@ public class Constants {
 
     public static final String SHELL_CLI_OPTIONS = "${LINKIS_HOME}/bin/linkis-cli";
 
+    public static final String KILL_OPTIONS = "--kill";
+
+    public static final String STATUS_OPTIONS = "--status";
+
+    public static final String ASYNC_OPTIONS = "--async true";
+
     public static final String SPACE = " ";
+
+    public static final String LINKIS_TASK_ID_REGEX = "\"taskID\": \"\\d+";
+
+    public static final String LINKIS_STATUS_REGEX = "\"status\": \"\\w+";
 }
