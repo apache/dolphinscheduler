@@ -107,7 +107,6 @@ const DetailModal = defineComponent({
     watch(
       () => props.show,
       async () => {
-        console.log(1123, props)
         state.detailForm.type = props.selectType
         state.detailForm.label = props.selectType === 'HIVE' ? 'HIVE/IMPALA' :  props.selectType
         props.show &&
