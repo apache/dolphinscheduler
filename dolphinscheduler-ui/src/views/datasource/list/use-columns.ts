@@ -118,7 +118,7 @@ export function useColumns(onCallback: Function) {
                       circle: true,
                       type: 'info',
                       size: 'small',
-                      onClick: () => void onCallback(rowData.id, 'edit')
+                      onClick: () => void onCallback(rowData.id, 'edit', rowData)
                     },
                     {
                       default: () =>
