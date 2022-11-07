@@ -22,6 +22,8 @@ import type { IJsonItem } from '../types'
 export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const hiveSqlScriptSpan = computed(() => (model.hiveCliTaskExecutionType === 'SCRIPT' ? 24 : 0))
+  const resourcesRequired = computed(() => (model.hiveCliTaskExecutionType === 'SCRIPT' ? false : true))
+  const resourcesLimit = computed(() => (model.hiveCliTaskExecutionType === 'SCRIPT' ? -1 : 1))
 
   return [
     {
@@ -56,7 +58,7 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.hive_cli_options_tips')
       }
     },
-    useResources(),
+    useResources(24, resourcesRequired, resourcesLimit),
     ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
 }
