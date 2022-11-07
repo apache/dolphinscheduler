@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.linkis;
 import org.apache.commons.lang3.StringUtils;
 
 public enum LinkisJobStatus {
+
     UNSUBMITTED("Unsubmitted", 0),
     SUBMITTING("Submitting", 1),
     INITED("Inited", 2),
@@ -43,7 +44,8 @@ public enum LinkisJobStatus {
 
     public static LinkisJobStatus convertFromJobStatusString(String status) {
         if (StringUtils.isNotBlank(status)) {
-            if (LinkisJobStatus.INITED.name().equalsIgnoreCase(status)) return LinkisJobStatus.INITED;
+            if (LinkisJobStatus.INITED.name().equalsIgnoreCase(status))
+                return LinkisJobStatus.INITED;
             else if (LinkisJobStatus.WAIT_FOR_RETRY.name().equalsIgnoreCase(status))
                 return LinkisJobStatus.WAIT_FOR_RETRY;
             else if (LinkisJobStatus.SCHEDULED.name().equalsIgnoreCase(status))
@@ -58,7 +60,8 @@ public enum LinkisJobStatus {
                 return LinkisJobStatus.CANCELLED;
             else if (LinkisJobStatus.TIMEOUT.name().equalsIgnoreCase(status))
                 return LinkisJobStatus.TIMEOUT;
-            else return LinkisJobStatus.UNKNOWN;
+            else
+                return LinkisJobStatus.UNKNOWN;
         } else {
             return LinkisJobStatus.UNKNOWN;
         }
