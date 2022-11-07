@@ -31,11 +31,11 @@ import org.slf4j.LoggerFactory;
 /**
  * ACP SSH Session Pool
  */
-public class SSHSessionPool {
+public final class SSHSessionPool {
 
     private static final Logger logger = LoggerFactory.getLogger(SSHSessionPool.class);
 
-    private static volatile GenericKeyedObjectPool<SSHSessionHost, SSHSessionHolder> sessionPool;
+    private static volatile GenericKeyedObjectPool<SSHSessionHost, SSHSessionHolder> sessionPool = null;
 
     private static GenericKeyedObjectPoolConfig<SSHSessionHolder> poolConfig;
 

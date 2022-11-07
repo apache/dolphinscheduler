@@ -61,9 +61,8 @@ public class TaskRemoteHostMapperTest extends BaseDaoTest {
     }
 
     public void clearTestData() {
-        taskRemoteHostMapper.queryAllTaskRemoteHostList().forEach(taskRemoteHost -> {
-            taskRemoteHostMapper.deleteByCode(taskRemoteHost.getCode());
-        });
+        taskRemoteHostMapper.queryAllTaskRemoteHostList()
+                .forEach(taskRemoteHost -> taskRemoteHostMapper.deleteByCode(taskRemoteHost.getCode()));
     }
 
     @Test
@@ -97,7 +96,7 @@ public class TaskRemoteHostMapperTest extends BaseDaoTest {
 
     @Test
     public void testQueryTaskRemoteHostListPaging() {
-        TaskRemoteHost entity = insertOne();
+        insertOne();
         Page<TaskRemoteHost> page = new Page<>(1, 10);
         IPage<TaskRemoteHost> taskRemoteHostIPage = taskRemoteHostMapper.queryTaskRemoteHostListPaging(page, "");
         List<TaskRemoteHost> taskRemoteHostList = taskRemoteHostIPage.getRecords();

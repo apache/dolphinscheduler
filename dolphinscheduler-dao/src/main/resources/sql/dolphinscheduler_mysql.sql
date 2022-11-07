@@ -2028,5 +2028,7 @@ CREATE TABLE `t_ds_task_remote_host`
     `operator`    int(11) DEFAULT NULL COMMENT 'operator user id',
     `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `task_remote_host_name_unique` (`name`),
+    UNIQUE KEY `task_remote_host_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

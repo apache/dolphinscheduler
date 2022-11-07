@@ -2005,5 +2005,7 @@ CREATE TABLE t_ds_task_remote_host
     description          text,
     create_time          timestamp       DEFAULT NULL ,
     update_time          timestamp       DEFAULT NULL ,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT task_remote_host_name_unique UNIQUE (name),
+    CONSTRAINT task_remote_host_code_unique UNIQUE (code)
 );
