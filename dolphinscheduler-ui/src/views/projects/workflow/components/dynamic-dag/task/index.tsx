@@ -50,7 +50,7 @@ const TaskForm = defineComponent({
     }
 
     watch(variables.model, () => {
-      console.log(variables.model)
+      //console.log(variables.model)
     })
 
     return { ...toRefs(variables), cancelModal, confirmModal, t, trim }
