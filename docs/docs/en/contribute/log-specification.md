@@ -1,4 +1,4 @@
-# Log specification
+# Logging specification
 
 ## Preface
 
@@ -8,7 +8,7 @@ Apache DolphinScheduler uses the Logback logging framework to print logs accordi
 
 ## Specifications
 
-### Log level specification
+### Logging level specification
 
 Different levels of logs play different roles in the business process, and failure to use reasonable log levels for printing can cause great difficulties for system operations and maintenance.
 
@@ -17,7 +17,7 @@ Different levels of logs play different roles in the business process, and failu
 - WARN level is used to warn of problems that will occur during operation. For example, the checksum of API module parameters, etc.
 - ERROR level is used to record some unpredictable errors and exceptions that will affect the system process. For example, errors and exceptions that cause workflows and tasks to fail to complete properly.
 
-### Log content specification
+### Logging content specification
 
 The content of the logs determines whether the logs can completely restore the system behavior or state.
 
@@ -33,7 +33,7 @@ The content of the logs determines whether the logs can completely restore the s
   logger.error("description of current error, parameter is {}", parameter, e);
   ```
 
-### Log format specification
+### Logging format specification
 
 The logs of Master module and Worker module are printed using the following format.
 
@@ -42,6 +42,26 @@ The logs of Master module and Worker module are printed using the following form
 ```
 
 That is, the workflow instance ID and task instance ID are injected in the printed logs using MDC, so the developer needs to get the IDs and inject them before printing the logs related to the workflow instance and task instance in these two modules; after the printing is finished, the related IDs need to be removed.
+
+## Logging Configuration
+
+DolphinScheduler uses [LogBack](https://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/html/howto-logging.html) for logging. To change the logging level of a specific package, you need to modify the `logback-spring.xml` file for the corresponding module.
+For example, if you want to enable `DEBUG` logging for `org.springframework.web` package in `standalone` module, you need to add the following configurations in `apache-dolphinscheduler-dev-SNAPSHOT-bin/standalone-server/conf/logback-spring.xml`:
+
+```xml
+<configuration scan="true" scanPeriod="120 seconds">
+
+......
+
+  <logger name="org.springframework.web" level="DEBUG">
+    <appender-ref ref="STANDALONELOGFILE" />
+    <appender-ref ref="TASKLOGFILE"/>
+  </logger>
+
+......
+
+</configuration>
+```
 
 ## Cautions
 
