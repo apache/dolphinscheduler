@@ -329,8 +329,8 @@ public final class DateUtils {
     /**
      * format time to duration
      *
-     * @param d1 d1
-     * @param d2 d2
+     * @param start start
+     * @param end end
      * @return format time
      */
     public static String format2Duration(Date start, Date end) {
