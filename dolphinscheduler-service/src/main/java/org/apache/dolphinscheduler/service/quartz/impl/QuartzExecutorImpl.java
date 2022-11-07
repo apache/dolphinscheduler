@@ -123,7 +123,7 @@ public class QuartzExecutorImpl implements QuartzExecutor {
                     .endAt(endDate)
                     .withSchedule(
                             cronSchedule(cronExpression)
-                                    .withMisfireHandlingInstructionDoNothing()
+                                    .withMisfireHandlingInstructionFireAndProceed()
                                     .inTimeZone(DateUtils.getTimezone(timezoneId))
                     )
                     .forJob(jobDetail).build();
