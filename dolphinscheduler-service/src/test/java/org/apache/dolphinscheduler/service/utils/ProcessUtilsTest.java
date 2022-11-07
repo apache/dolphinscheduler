@@ -34,6 +34,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
@@ -55,6 +56,7 @@ public class ProcessUtilsTest {
     }
 
     @Test
+    @Disabled
     public void getPidsStr() throws Exception {
         int processId = 1;
         PowerMockito.mockStatic(OSUtils.class);

@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -64,6 +65,7 @@ public class HadoopUtilsTest {
     }
 
     @Test
+    @Disabled
     public void getAppAddress() {
         PowerMockito.mockStatic(HttpUtils.class);
         PowerMockito.when(HttpUtils.get("http://ds1:8088/ws/v1/cluster/info")).thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");

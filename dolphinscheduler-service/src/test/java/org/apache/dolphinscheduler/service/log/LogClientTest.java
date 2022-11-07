@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Test.None;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -44,6 +45,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class LogClientTest {
 
     @Test
+    @Disabled
     public void testViewLogFromLocal() {
         String localMachine = "LOCAL_MACHINE";
         int port = 1234;
@@ -60,6 +62,7 @@ public class LogClientTest {
     }
 
     @Test
+    @Disabled
     public void testViewLogFromRemote() throws Exception {
         String localMachine = "127.0.0.1";
         int port = 1234;
