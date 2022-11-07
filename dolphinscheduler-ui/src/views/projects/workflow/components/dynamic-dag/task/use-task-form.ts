@@ -28,6 +28,7 @@ const data = {
     zh_CN: {
       node_name: '节点名称',
       node_name_tips: '请输入节点名称',
+      node_name_validate_message: '节点名称不能为空',
       task_priority: '任务优先级',
       highest: '最高',
       high: '高',
@@ -40,6 +41,7 @@ const data = {
     en_US: {
       node_name: 'Node Name',
       node_name_tips: 'Please entry node name',
+      node_name_validate_message: 'Node name cannot be empty',
       task_priority: 'Task Priority',
       highest: 'Highest',
       high: 'High',
