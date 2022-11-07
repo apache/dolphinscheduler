@@ -17,14 +17,11 @@
 
 package org.apache.dolphinscheduler.service.storage.impl;
 
-import org.apache.dolphinscheduler.common.utils.HttpUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -65,10 +62,7 @@ public class HadoopUtilsTest {
     }
 
     @Test
-    @Disabled
     public void getAppAddress() {
-        PowerMockito.mockStatic(HttpUtils.class);
-        PowerMockito.when(HttpUtils.get("http://ds1:8088/ws/v1/cluster/info")).thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
         logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
         Assert.assertTrue(true);
     }
