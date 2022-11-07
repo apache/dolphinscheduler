@@ -122,7 +122,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,metrics,prometheus
   endpoint:
     health:
       enabled: true
