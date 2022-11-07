@@ -64,6 +64,7 @@ const data = {
       type: 'input',
       field: 'name',
       defaultValue: '',
+      clearable: true,
       placeholder: 'task_components.node_name_tips',
       validate: {
         required: true,
@@ -83,6 +84,7 @@ const data = {
         { label: 'task_components.low', value: 'LOW' },
         { label: 'task_components.lowest', value: 'LOWEST' }
       ],
+      optionsLocale: true,
       defaultValue: 'MEDIUM',
       validate: {
         required: true,
@@ -94,6 +96,7 @@ const data = {
       type: 'select',
       field: 'workerGroup',
       options: [],
+      optionsLocale: false,
       defaultValue: 'default',
       api: 'getWorkerGroupList',
       validate: {
