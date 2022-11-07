@@ -18,7 +18,6 @@
 """Test Task class function."""
 import logging
 import re
-from unittest.mock import patch
 from typing import Set
 from unittest.mock import patch
 
