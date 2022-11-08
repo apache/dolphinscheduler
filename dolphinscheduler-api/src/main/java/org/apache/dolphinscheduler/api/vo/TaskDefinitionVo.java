@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.vo;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 
 import java.util.List;
 
