@@ -25,6 +25,7 @@ import {
 } from '@/service/modules/task-definition'
 import { formatParams as formatData } from '../components/node/format-data'
 import type { ITaskData, INodeData, ISingleSaveReq, IRecord } from './types'
+import { Connect } from '../../workflow/components/dag/types'
 
 export function useTask(projectCode: number) {
   const initalTask = {
@@ -89,7 +90,14 @@ export function useTask(projectCode: number) {
 
   const onEditTask = async (row: IRecord, readonly: boolean) => {
     const result = await queryTaskDefinitionByCode(row.taskCode, projectCode)
-    task.taskData = { ...result, processName: row.processDefinitionCode }
+    task.taskData = {
+      ...result,
+      processName: row.processDefinitionCode,
+      preTasks:
+        result?.processTaskRelationList?.map(
+          (item: Connect) => item.preTaskCode
+        ) || []
+    }
     task.taskShow = true
     task.taskReadonly = readonly
   }
