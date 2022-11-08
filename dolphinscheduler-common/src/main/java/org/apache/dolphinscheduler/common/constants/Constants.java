@@ -137,6 +137,8 @@ public final class Constants {
      */
     public static final String SUDO_ENABLE = "sudo.enable";
 
+    public static final String SET_TASK_DIR_TO_TENANT_ENABLE = "setTaskDirToTenant.enable";
+
     /**
      * resource storage type
      */
