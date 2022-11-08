@@ -1,7 +1,7 @@
 # Release Post
 
 We still have some publish task to do after we send the announcement mail, currently we have to publish Docker images to
-Docker Hub and also publish pydolphinscheduler to PyPI.
+Docker Hub.
 
 ## Publish Docker Image
 

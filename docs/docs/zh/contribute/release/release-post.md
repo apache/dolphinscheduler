@@ -1,6 +1,6 @@
 # 发版后续
 
-发送公告邮件后，我们还有一些发布任务要做，目前我们必须将 Docker 镜像发布到 Docker Hub 和 并且需要将 pydolphinscheduler 发布到 PyPI。
+发送公告邮件后，我们还有一些发布任务要做，目前我们必须将 Docker 镜像发布到 Docker Hub。
 
 ## 发布 Docker 镜像
 
