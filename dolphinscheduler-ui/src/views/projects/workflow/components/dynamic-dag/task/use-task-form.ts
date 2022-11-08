@@ -29,6 +29,7 @@ const data = {
       node_name: '节点名称',
       node_name_tips: '请输入节点名称',
       node_name_validate_message: '节点名称不能为空',
+      script_validate_message: '脚本内容不能为空',
       task_priority: '任务优先级',
       highest: '最高',
       high: '高',
@@ -42,6 +43,7 @@ const data = {
       node_name: 'Node Name',
       node_name_tips: 'Please entry node name',
       node_name_validate_message: 'Node name cannot be empty',
+      script_validate_message: 'Script content cannot be empty',
       task_priority: 'Task Priority',
       highest: 'Highest',
       high: 'High',
@@ -128,7 +130,7 @@ export function useTaskForm() {
 
   useDynamicLocales(data.locales)
   variables.model = useFormField(data.forms)
-  variables.rules = useFormValidate(data.forms)
+  variables.rules = useFormValidate(data.forms, variables.model)
   variables.formStructure = useFormStructure(useFormRequest(data.apis, data.forms))
 
   return {
