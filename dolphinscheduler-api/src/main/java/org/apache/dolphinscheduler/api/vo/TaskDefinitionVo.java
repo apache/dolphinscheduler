@@ -22,11 +22,11 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 
-import org.springframework.beans.BeanUtils;
-
 import java.util.List;
 
 import lombok.Data;
+
+import org.springframework.beans.BeanUtils;
 
 /**
  * @author fanwanlong
@@ -48,10 +48,10 @@ public class TaskDefinitionVo extends TaskDefinition {
 
     public static TaskDefinitionVo fromTaskDefinition(TaskDefinition taskDefinition) {
         TaskDefinitionVo taskDefinitionVo = new TaskDefinitionVo();
-        TaskTimeoutStrategy timeoutStrategy = TimeoutFlag.CLOSE == taskDefinition.getTimeoutFlag()
-                ? null : taskDefinition.getTimeoutNotifyStrategy();
         BeanUtils.copyProperties(taskDefinition, taskDefinitionVo);
-        taskDefinitionVo.setTimeoutNotifyStrategy(timeoutStrategy);
+        if (TimeoutFlag.CLOSE == taskDefinition.getTimeoutFlag()) {
+            taskDefinitionVo.setTimeoutNotifyStrategy(null);
+        }
         return taskDefinitionVo;
     }
 
