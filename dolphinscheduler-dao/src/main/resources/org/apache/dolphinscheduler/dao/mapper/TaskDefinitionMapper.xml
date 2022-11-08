@@ -21,7 +21,10 @@
     <sql id="baseSql">
         id, code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
         worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag,
-        if(timeout_notify_strategy is null, 1000, timeout_notify_strategy) as timeout_notify_strategy, timeout, delay_time,
+        case timeout_notify_strategy is null
+           when true then 1000
+           else timeout_notify_strategy
+        end as timeout_notify_strategy, timeout, delay_time,
         resource_ids, create_time, update_time, task_group_id,task_group_priority, cpu_quota, memory_max, task_execute_type
     </sql>
     <sql id="baseSqlV2">
