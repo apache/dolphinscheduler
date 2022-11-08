@@ -19,6 +19,8 @@ import { reactive } from 'vue'
 import { useDynamicLocales } from './use-dynamic-locales'
 import { useFormField } from './use-form-field'
 import { useFormValidate } from './use-form-validate'
+import { useFormStructure } from './use-form-structure'
+import { useFormRequest } from './use-form-request'
 
 const data = {
   task: 'shell',
@@ -26,6 +28,8 @@ const data = {
     zh_CN: {
       node_name: '节点名称',
       node_name_tips: '请输入节点名称',
+      node_name_validate_message: '节点名称不能为空',
+      script_validate_message: '脚本内容不能为空',
       task_priority: '任务优先级',
       highest: '最高',
       high: '高',
@@ -38,6 +42,8 @@ const data = {
     en_US: {
       node_name: 'Node Name',
       node_name_tips: 'Please entry node name',
+      node_name_validate_message: 'Node name cannot be empty',
+      script_validate_message: 'Script content cannot be empty',
       task_priority: 'Task Priority',
       highest: 'Highest',
       high: 'High',
@@ -48,19 +54,19 @@ const data = {
       script: 'Script'
     }
   },
-  apis: [
-    {
-      name: 'getWorkerGroupList',
-      uri: '/worker-groups/all',
+  apis: {
+    getWorkerGroupList: {
+      url: '/worker-groups/all',
       method: 'get'
     }
-  ],
+  },
   forms: [
     {
       label: 'task_components.node_name',
       type: 'input',
       field: 'name',
       defaultValue: '',
+      clearable: true,
       placeholder: 'task_components.node_name_tips',
       validate: {
         required: true,
@@ -80,6 +86,7 @@ const data = {
         { label: 'task_components.low', value: 'LOW' },
         { label: 'task_components.lowest', value: 'LOWEST' }
       ],
+      optionsLocale: true,
       defaultValue: 'MEDIUM',
       validate: {
         required: true,
@@ -91,6 +98,7 @@ const data = {
       type: 'select',
       field: 'workerGroup',
       options: [],
+      optionsLocale: false,
       defaultValue: 'default',
       api: 'getWorkerGroupList',
       validate: {
@@ -120,10 +128,10 @@ export function useTaskForm() {
     rules: {}
   })
 
-  variables.formStructure = data
-  variables.model = useFormField(data.forms)
-  variables.rules = useFormValidate(data.forms)
   useDynamicLocales(data.locales)
+  variables.model = useFormField(data.forms)
+  variables.rules = useFormValidate(data.forms, variables.model)
+  variables.formStructure = useFormStructure(useFormRequest(data.apis, data.forms))
 
   return {
     variables

@@ -15,31 +15,18 @@
  * limitations under the License.
  */
 
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+export function useFormStructure(forms: Array<any>): Array<any> {
+  return forms.map((f: any) => {
+    delete f.validate
+    delete f.api
 
-export function useFormField(forms: Array<any>) {
-  const model: any = {}
+    f.modelField = f.field
 
-  const setField = (value: string, type: string): Ref<null | string> => {
-    return ref(value ?
-      value :
-      type === 'select' ?
-        null :
-        ''
-    )
-  }
-
-  forms.forEach((f: any) => {
     if (f.field.indexOf('.') >= 0) {
       const hierarchy = f.field.split('.')
-      model[hierarchy[0]] = {
-        [hierarchy[1]]: setField(f.defaultValue, f.type)
-      }
-    } else {
-      model[f.field] = setField(f.defaultValue, f.type)
+      f.field = hierarchy[1]
     }
-  })
 
-  return model
+    return f
+  })
 }
