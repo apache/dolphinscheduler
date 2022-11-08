@@ -808,6 +808,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param loginUser login user
      * @param fullName  full name
      * @param file      file
+     * @param type      resource type
+     * @return upload success return true, otherwise false
      */
     private boolean upload(User loginUser, String fullName, MultipartFile file, ResourceType type) {
         // save to local
