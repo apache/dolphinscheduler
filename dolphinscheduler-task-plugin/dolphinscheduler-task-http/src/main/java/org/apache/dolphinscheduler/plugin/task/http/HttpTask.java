@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import static org.apache.dolphinscheduler.plugin.task.http.HttpTaskConstants.APPLICATION_JSON;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -252,7 +253,7 @@ public class HttpTask extends AbstractTask {
                     if (property.getHttpParametersType().equals(HttpParametersType.PARAMETER)) {
                         builder.addParameter(property.getProp(), property.getValue());
                     } else if (property.getHttpParametersType().equals(HttpParametersType.BODY)) {
-                        jsonParam.put(property.getProp(), property.getValue());
+                        judgeNestedJsonParse(jsonParam, property);
                     }
                 }
             }
@@ -260,6 +261,20 @@ public class HttpTask extends AbstractTask {
             postingString.setContentEncoding(StandardCharsets.UTF_8.name());
             postingString.setContentType(APPLICATION_JSON);
             builder.setEntity(postingString);
+        }
+    }
+
+    /**
+     * judge HttpProperty nested json parse
+     * @param jsonParam ObjectNode
+     * @param property HttpProperty
+     */
+    private void judgeNestedJsonParse(ObjectNode jsonParam, HttpProperty property) {
+        if (property.getValue().contains(Constants.SINGLE_BRACKETS_LEFT)
+                || property.getValue().contains(Constants.SINGLE_SQUARE_BRACKETS_LEFT)) {
+            jsonParam.set(property.getProp(), JSONUtils.parseObject(property.getValue()));
+        } else {
+            jsonParam.put(property.getProp(), property.getValue());
         }
     }
 
