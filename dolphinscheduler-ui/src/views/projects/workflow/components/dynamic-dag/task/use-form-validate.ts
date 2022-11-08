@@ -18,21 +18,28 @@
 import { useI18n } from 'vue-i18n'
 import type { FormItemRule } from 'naive-ui'
 
-export function useFormValidate(forms: Array<any>) {
+export function useFormValidate(forms: Array<any>, model: any) {
   const { t } = useI18n()
   const validate: any = {}
 
-  const setValidate = (v: any): object => {
+  const setValidate = (validate: any, field?: any): object => {
     const data: any = {
-      required: v.required,
-      trigger: v.trigger
+      required: validate.required,
+      trigger: validate.trigger
     }
 
-    if (v.type) {
-      if (v.type === 'non-empty') {
+    if (validate.type) {
+      if (validate.type === 'non-empty') {
         data['validator'] = (rule: FormItemRule, value: string) => {
-          if (!value) {
-            return Error(t(v.message))
+          if (field) {
+            const hierarchy = field.split('.')
+            if (!model[hierarchy[0]][hierarchy[1]]) {
+              return Error(t(validate.message))
+            }
+          } else {
+            if (!value) {
+              return Error(t(validate.message))
+            }
           }
         }
       }
@@ -46,7 +53,7 @@ export function useFormValidate(forms: Array<any>) {
 
     if (f.field.indexOf('.') >= 0) {
       const hierarchy = f.field.split('.')
-      validate[hierarchy[1]] = setValidate(f.validate)
+      validate[hierarchy[1]] = setValidate(f.validate, f.field)
     } else {
       validate[f.field] = setValidate(f.validate)
     }
