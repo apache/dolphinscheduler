@@ -293,6 +293,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'ATHENA',
     label: 'ATHENA',
     defaultPort: 0
+  },
+  DM: {
+    value: 'DM',
+    label: 'DM',
+    defaultPort: 5236
   }
 }
 
