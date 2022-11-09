@@ -499,6 +499,7 @@ public class SqlTask extends AbstractTask {
         // replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
         sql = ParameterUtils.replaceScheduleTime(sql,
                 DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
+        sql = ParameterUtils.convertParameterPlaceholders(sql, ParamUtils.convert(paramsMap));
         // special characters need to be escaped, ${} needs to be escaped
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
         // Replace the original value in sql ！{...} ，Does not participate in precompilation
