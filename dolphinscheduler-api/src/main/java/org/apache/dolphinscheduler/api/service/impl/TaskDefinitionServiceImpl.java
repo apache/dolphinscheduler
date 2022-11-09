@@ -722,6 +722,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         if (taskDefinition.equals(taskDefinitionToUpdate)) {
             logger.warn("Task definition does not need update because no change, taskDefinitionCode:{}.", taskCode);
+            putMsg(result, Status.TASK_DEFINITION_NOT_MODIFY_ERROR, String.valueOf(taskCode));
             return null;
         }
         if (taskDefinitionToUpdate == null) {
