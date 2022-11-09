@@ -1,7 +1,7 @@
 # Release Post
 
 We still have some publish task to do after we send the announcement mail, currently we have to publish Docker images to
-Docker Hub and also publish pydolphinscheduler to PyPI.
+Docker Hub.
 
 ## Publish Docker Image
 
@@ -19,11 +19,6 @@ We could reuse the main command the CI run and publish our Docker images to Dock
     -Ddocker.hub=apache \
     -Pdocker,release
 ```
-
-## Publish pydolphinscheduler to PyPI
-
-Python API need to release to PyPI for easier download and use, you can see more detail in [Python API release](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-python/pydolphinscheduler/RELEASE.md#to-pypi)
-to finish PyPI release.
 
 ## Get All Contributors
 

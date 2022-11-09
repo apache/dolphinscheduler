@@ -23,7 +23,6 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'dolphinscheduler-ui'
-      - 'dolphinscheduler-python/pydolphinscheduler'
     branches:
       - dev
 

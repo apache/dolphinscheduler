@@ -23,7 +23,6 @@ For example, to release `x.y.z`, the following updates are required:
   - `deploy/kubernetes/dolphinscheduler`:
     - `Chart.yaml`: `appVersion` needs to be updated to x.y.z (`version` is helm chart version，incremented and different from x.y.z)
     - `values.yaml`: `image.tag` needs to be updated to x.y.z
-  - `dolphinscheduler-python/pydolphinscheduler/setup.py`: change `version` to x.y.z
 - Version in the docs:
   - Change the placeholder `<version>`(except `pom`)  to the `x.y.z` in directory `docs`
   - Add new history version
