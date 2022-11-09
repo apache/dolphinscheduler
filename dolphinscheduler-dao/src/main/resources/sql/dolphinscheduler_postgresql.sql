@@ -562,6 +562,7 @@ CREATE TABLE t_ds_process_instance (
 create index process_instance_index on t_ds_process_instance (process_definition_code,id);
 create index start_time_index on t_ds_process_instance (start_time,end_time);
 
+
 --
 -- Table structure for table t_ds_project
 --
@@ -796,6 +797,7 @@ CREATE TABLE t_ds_task_instance (
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
+create index idx_task_instance_process_instance_flag on t_ds_task_instance (process_instance_id, flag);
 
 --
 -- Table structure for table t_ds_tenant
