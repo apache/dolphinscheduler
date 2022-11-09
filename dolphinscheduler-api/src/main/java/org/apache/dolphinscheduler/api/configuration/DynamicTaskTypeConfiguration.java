@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.api.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.dto.taskType.DynamicTaskInfo;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -34,7 +32,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @EnableConfigurationProperties
@@ -46,15 +43,14 @@ public class DynamicTaskTypeConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicTaskTypeConfiguration.class);
 
-    private List<Map<String, DynamicTaskInfo>> universal;
-    private List<Map<String, DynamicTaskInfo>> cloud;
-    private List<Map<String, DynamicTaskInfo>> logic;
-    private List<Map<String, DynamicTaskInfo>> dataIntegration;
-    private List<Map<String, DynamicTaskInfo>> dataQuality;
-    private List<Map<String, DynamicTaskInfo>> other;
-    private List<Map<String, DynamicTaskInfo>> machineLearning;
+    private List<DynamicTaskInfo> universal;
+    private List<DynamicTaskInfo> cloud;
+    private List<DynamicTaskInfo> logic;
+    private List<DynamicTaskInfo> dataIntegration;
+    private List<DynamicTaskInfo> dataQuality;
+    private List<DynamicTaskInfo> other;
+    private List<DynamicTaskInfo> machineLearning;
 
-    private static final List<FavTaskDto> defaultTaskTypes = new ArrayList<>();
     private static final List<String> defaultTaskCategories =
             Arrays.asList(Constants.TYPE_UNIVERSAL,Constants.TYPE_DATA_INTEGRATION,Constants.TYPE_CLOUD,
                     Constants.TYPE_LOGIC,Constants.TYPE_DATA_QUALITY,Constants.TYPE_OTHER,Constants.TYPE_MACHINE_LEARNING);
@@ -64,7 +60,7 @@ public class DynamicTaskTypeConfiguration {
         return defaultTaskCategories;
     }
 
-    public List<Map<String, DynamicTaskInfo>> getTaskTypesByCategory(String category) {
+    public List<DynamicTaskInfo> getTaskTypesByCategory(String category) {
         switch (category) {
             case Constants.TYPE_UNIVERSAL:
                 return universal;

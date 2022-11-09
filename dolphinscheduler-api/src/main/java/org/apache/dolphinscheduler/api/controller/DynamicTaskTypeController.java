@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.configuration.DynamicTaskTypeConfiguration;
-import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.dto.taskType.DynamicTaskInfo;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
 
@@ -66,7 +64,7 @@ public class DynamicTaskTypeController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listDynamicTaskTypes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @PathVariable("taskCategory") String taskCategory) {
-        List<Map<String, DynamicTaskInfo>> taskTypes = dynamicTaskTypeConfiguration.getTaskTypesByCategory(taskCategory);
+        List<DynamicTaskInfo> taskTypes = dynamicTaskTypeConfiguration.getTaskTypesByCategory(taskCategory);
         return success(Status.SUCCESS.getMsg(), taskTypes);
     }
 

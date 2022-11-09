@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DynamicTaskInfo {
 
+    private String name;
     private String hover;
     private String icon;
     private String json;

@@ -17,16 +17,16 @@
 
 dynamic-task:
   universal:
-    - 'SHELL': {icon: /static/shell/shell-icon.png,hover: /static/shell/shell-hover.png,json: /static/shell/shell.json}
+    - {name: SHELL,icon: /static/shell/shell-icon.png,hover: /static/shell/shell-hover.png,json: /static/shell/shell.json}
   cloud:
-    - 'EMR': {icon: shell-icon.png,hover: shell-hover.png}
+    - {name: EMR,icon: shell-icon.png,hover: shell-hover.png}
   logic:
-    - 'SUB_PROCESS': {icon: shell-icon.png,hover: shell-hover.png}
+    - {name: SUB_PROCESS,icon: shell-icon.png,hover: shell-hover.png}
   dataIntegration:
-    - 'SEATUNNEL': {icon: shell-icon.png,hover: shell-hover.png}
+    - {name: SEATUNNEL,icon: shell-icon.png,hover: shell-hover.png}
   dataQuality:
-    - 'DATA_QUALITY': {icon: shell-icon.png,hover: shell-hover.png}
+    - {name: DATA_QUALITY,icon: shell-icon.png,hover: shell-hover.png}
   machineLearning:
-    - 'JUPYTER': {icon: shell-icon.png,hover: shell-hover.png}
+    - {name: JUPYTER,icon: shell-icon.png,hover: shell-hover.png}
   other:
-    - 'PIGEON': {icon: shell-icon.png,hover: shell-hover.png}
+    - {name: PIGEON,icon: shell-icon.png,hover: shell-hover.png}
