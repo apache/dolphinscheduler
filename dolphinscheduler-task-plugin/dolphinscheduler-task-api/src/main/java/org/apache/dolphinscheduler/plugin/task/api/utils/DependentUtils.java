@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
+import org.apache.dolphinscheduler.plugin.task.api.parser.dependent.TimeCalculator;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -148,6 +150,22 @@ public class DependentUtils {
             default:
                 break;
         }
+        return result;
+    }
+
+    /**
+     * get date interval list by business date and date expressions.
+     *
+     * @param businessDate business date
+     * @param startDateExpression start date expression of date interval
+     * @param endDateExpression end date expression of date interval
+     * @return date interval list by business date and date expressions.
+     */
+    public static List<DateInterval> getDateIntervalList(Date businessDate, String startDateExpression, String endDateExpression) {
+        List<DateInterval> result = new ArrayList<>();
+        Date beginTime = TimeCalculator.parse(startDateExpression,new DateTime(businessDate),"S").toDate();
+        Date endTime = TimeCalculator.parse(endDateExpression,new DateTime(businessDate)).toDate();
+        result.add(new DateInterval(beginTime, endTime));
         return result;
     }
 

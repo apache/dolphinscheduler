@@ -33,6 +33,8 @@ public class DependentItem {
     private long depTaskCode;
     private String cycle;
     private String dateValue;
+    private String startDateExpression;
+    private String endDateExpression;
     private DependResult dependResult;
     private TaskExecutionStatus status;
 

@@ -95,8 +95,11 @@ public class DependentExecute {
      * @return DependResult
      */
     private DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime, int testFlag) {
-        List<DateInterval> dateIntervals =
-                DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
+        List<DateInterval> dateIntervals = (dependentItem.getCycle().equals("custom"))
+                ? DependentUtils.getDateIntervalList(currentTime,
+                        dependentItem.getStartDateExpression(),
+                        dependentItem.getEndDateExpression())
+                : DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
         return calculateResultForTasks(dependentItem, dateIntervals, testFlag);
     }
 
