@@ -15,44 +15,22 @@
 # limitations under the License.
 #
 
-task:
-  universal:
-    - 'SHELL'
-    - 'JAVA'
-    - 'PYTHON'
-    - 'PROCEDURE'
-    - 'SQL'
-    - 'SPARK'
-    - 'FLINK'
-    - 'HTTP'
-    - 'MR'
-    - 'DINKY'
-    - 'FLINK_STREAM'
-    - 'HIVECLI'
-  cloud:
-    - 'EMR'
-    - 'K8S'
-    - 'DMS'
-  logic:
-    - 'SUB_PROCESS'
-    - 'DEPENDENT'
-    - 'CONDITIONS'
-    - 'SWITCH'
-  dataIntegration:
-    - 'SEATUNNEL'
-    - 'DATAX'
-    - 'SQOOP'
-  dataQuality:
-    - 'DATA_QUALITY'
-  machineLearning:
-    - 'JUPYTER'
-    - 'MLFLOW'
-    - 'OPENMLDB'
-    - 'DVC'
-    - 'SAGEMAKER'
-    - 'PYTORCH'
-    - 'KUBEFLOW'
-  other:
-    - 'PIGEON'
-    - 'ZEPPELIN'
-    - 'CHUNJUN'
+apiVersion: v1
+clusters:
+  - cluster:
+      certificate-authority-data: 123
+      server: https://192.168.2.90:40787
+    name: kind-kubeflow
+contexts:
+  - context:
+      cluster: kind-kubeflow
+      user: kind-kubeflow
+    name: kind-kubeflow
+current-context: kind-kubeflow
+kind: Config
+preferences: {}
+users:
+  - name: kind-kubeflow
+    user:
+      client-certificate-data: 123
+      client-key-data: 123

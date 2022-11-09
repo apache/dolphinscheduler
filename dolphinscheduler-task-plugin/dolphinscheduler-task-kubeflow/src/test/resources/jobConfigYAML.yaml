@@ -15,44 +15,22 @@
 # limitations under the License.
 #
 
-task:
-  universal:
-    - 'SHELL'
-    - 'JAVA'
-    - 'PYTHON'
-    - 'PROCEDURE'
-    - 'SQL'
-    - 'SPARK'
-    - 'FLINK'
-    - 'HTTP'
-    - 'MR'
-    - 'DINKY'
-    - 'FLINK_STREAM'
-    - 'HIVECLI'
-  cloud:
-    - 'EMR'
-    - 'K8S'
-    - 'DMS'
-  logic:
-    - 'SUB_PROCESS'
-    - 'DEPENDENT'
-    - 'CONDITIONS'
-    - 'SWITCH'
-  dataIntegration:
-    - 'SEATUNNEL'
-    - 'DATAX'
-    - 'SQOOP'
-  dataQuality:
-    - 'DATA_QUALITY'
-  machineLearning:
-    - 'JUPYTER'
-    - 'MLFLOW'
-    - 'OPENMLDB'
-    - 'DVC'
-    - 'SAGEMAKER'
-    - 'PYTORCH'
-    - 'KUBEFLOW'
-  other:
-    - 'PIGEON'
-    - 'ZEPPELIN'
-    - 'CHUNJUN'
+
+apiVersion: "kubeflow.org/v1"
+kind: TFJob
+metadata:
+  name: test-tfjob
+  namespace: kubeflow-user-example-com
+spec:
+  tfReplicaSpecs:
+    Worker:
+      replicas: 2
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+            - name: tensorflow
+              image: repo/mnist_with_summaries:v1
+              command:
+                - "python"
+                - "mnist_with_summaries.py"

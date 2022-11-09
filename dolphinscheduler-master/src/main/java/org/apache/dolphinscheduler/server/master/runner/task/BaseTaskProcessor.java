@@ -26,7 +26,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLAS
 import static org.apache.dolphinscheduler.common.constants.Constants.USER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
@@ -325,7 +325,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenant.getTenantCode());
         }
         K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
-        if (TASK_TYPE_K8S.equalsIgnoreCase(taskInstance.getTaskType())) {
+        if (TASK_TYPE_SET_K8S.contains(taskInstance.getTaskType())) {
             setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
         }
 

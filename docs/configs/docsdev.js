@@ -213,6 +213,10 @@ export default {
                                 title: 'AWS Datasync',
                                 link: '/en-us/docs/dev/user_doc/guide/task/datasync.html',
                             },
+                            {
+                                title: 'Kubeflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
                         ],
                     },
                     {
@@ -868,6 +872,10 @@ export default {
                             {
                                 title: 'AWS Datasync',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datasync.html',
+                            },
+                            {
+                                title: 'Kubeflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubeflow.html',
                             },
                         ],
                     },
