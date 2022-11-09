@@ -10,8 +10,6 @@ all conditions are met, if any or them are missing, you should install them and 
 java -version
 # Maven requests
 mvn -version
-# Python 3.6 above is requests, and you have to make keyword `python` work in your terminal and version match
-python --version
 ```
 
 ## GPG Settings
@@ -167,10 +165,10 @@ git push origin "${VERSION}"-release
 
 ```shell
 
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
-* `-Prelease,python`: choose release and python profile, which will pack all the source codes, jar files and executable binary packages, and Python distribute package.
+* `-Prelease`: choose release profile, which will pack all the source codes, jar files and executable binary packages.
 * `-DautoVersionSubmodules=true`: it can make the version number is inputted only once and not for each sub-module.
 * `-DdryRun=true`: dry run which means not to generate or submit new version number and new tag.
 
@@ -186,7 +184,7 @@ Then, prepare to execute the release.
 
 ```shell
 
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 It is basically the same as the previous rehearsal command, but deleting `-DdryRun=true` parameter.
@@ -218,8 +216,7 @@ git push origin --tags
 ### Deploy the Release
 
 ```shell
-<<<<<<< HEAD
-mvn release:perform -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 After that command is executed, the version to be released will be uploaded to Apache staging repository automatically.
@@ -260,7 +257,6 @@ Create folder by version number.
 
 ```shell
 mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 cd ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 ```
 
@@ -270,9 +266,6 @@ Add source code packages, binary packages and executable binary packages to SVN 
 # Source and binary tarball for main code
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz.asc ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-
-# Source and binary tarball for Python API
-cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 ```
 
 ### Generate sign files
@@ -280,10 +273,6 @@ cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolp
 ```shell
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -a 512 apache-dolphinscheduler-python-"${VERSION}".tar.gz >> apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -b -a 512 apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl >> apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### Commit to Apache SVN
@@ -301,10 +290,6 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```shell
 shasum -c apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -c apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -c apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -c apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### Check gpg Signature
@@ -338,10 +323,6 @@ Then, check the gpg signature.
 ```shell
 gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
-cd python
-gpg --verify apache-dolphinscheduler-python-"${VERSION}".tar.gz.asc
-gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
-cd ../
 ```
 
 > Note: You have to create gpg signature manually when you can not find your `asc` file, the command
@@ -352,7 +333,7 @@ cd ../
 
 #### Check source package
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dolphinscheduler-python-<VERSION>.tar.gz` then check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` then check the following items:
 
 * Check whether source tarball is oversized for including nonessential files
 * `LICENSE` and `NOTICE` files exist
@@ -365,8 +346,7 @@ Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dol
 
 #### Check binary packages
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dolphinscheduler-python-<VERSION>-bin.tar.gz`
-to check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` to check the following items:
 
 - `LICENSE` and `NOTICE` files exist
 - Correct year in `NOTICE` file
