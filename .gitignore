@@ -50,18 +50,3 @@ dolphinscheduler-common/test
 dolphinscheduler-worker/logs
 dolphinscheduler-master/logs
 dolphinscheduler-api/logs
-
-# ------------------
-# pydolphinscheduler
-# ------------------
-# Cache
-__pycache__/
-.tox/
-
-# Build
-build/
-*egg-info/
-
-# Test coverage
-.coverage
-htmlcov/
