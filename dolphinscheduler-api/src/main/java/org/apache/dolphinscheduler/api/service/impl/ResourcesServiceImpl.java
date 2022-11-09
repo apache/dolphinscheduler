@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
+import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -71,9 +72,12 @@ import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.rmi.ServerException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -804,6 +808,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param loginUser login user
      * @param fullName  full name
      * @param file      file
+     * @param type      resource type
+     * @return upload success return true, otherwise false
      */
     private boolean upload(User loginUser, String fullName, MultipartFile file, ResourceType type) {
         // save to local
@@ -1827,7 +1833,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1869,6 +1875,64 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new IllegalArgumentException(msg);
         }
         return (Resource) resourceResponse.getData();
+    }
+
+    @Override
+    public DeleteDataTransferResponse deleteDataTransferData(User loginUser, Integer days) {
+        DeleteDataTransferResponse result = new DeleteDataTransferResponse();
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return result;
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        String baseFolder = storageOperate.getResourceFileName(tenantCode, "DATA_TRANSFER");
+
+        LocalDateTime now = LocalDateTime.now();
+        now = now.minus(days, ChronoUnit.DAYS);
+        String deleteDate = now.toLocalDate().toString().replace("-", "");
+        List<StorageEntity> storageEntities;
+        try {
+            storageEntities = new ArrayList<>(
+                    storageOperate.listFilesStatus(baseFolder, baseFolder, tenantCode, ResourceType.FILE));
+        } catch (Exception e) {
+            logger.error("delete data transfer data error", e);
+            putMsg(result, Status.DELETE_RESOURCE_ERROR);
+            return result;
+        }
+
+        List<String> successList = new ArrayList<>();
+        List<String> failList = new ArrayList<>();
+
+        for (StorageEntity storageEntity : storageEntities) {
+            File path = new File(storageEntity.getFullName());
+            String date = path.getName();
+            if (date.compareTo(deleteDate) <= 0) {
+                try {
+                    storageOperate.delete(storageEntity.getFullName(), true);
+                    successList.add(storageEntity.getFullName());
+                } catch (Exception ex) {
+                    logger.error("delete data transfer data {} error, please delete it manually", date, ex);
+                    failList.add(storageEntity.getFullName());
+                }
+            }
+        }
+
+        result.setSuccessList(successList);
+        result.setFailedList(failList);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     /**
@@ -1919,7 +1983,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1957,7 +2021,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1977,7 +2041,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }

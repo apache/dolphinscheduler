@@ -15,40 +15,18 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+export function useFormStructure(forms: Array<any>): Array<any> {
+  return forms.map((f: any) => {
+    delete f.validate
+    delete f.api
 
-const shell = {
-  locales: {
-    zh_CN: {
-      node_name: '节点名称',
-      node_name_tips: '节点名称不能为空'
-    },
-    en_US: {
-      node_name: 'Node Name',
-      node_name_tips: 'Node name cannot be empty'
-    }
-  },
-  items: [
-    {
-      label: 'node_name',
-      type: 'input',
-      field: '',
-      validate: {
-        trigger: ['input', 'blur'],
-        message: 'node_name_tips'
-      }
-    }
-  ]
-}
+    f.modelField = f.field
 
-export function useTaskForm() {
-  const variables = reactive({
-    formStructure: {}
+    if (f.field.indexOf('.') >= 0) {
+      const hierarchy = f.field.split('.')
+      f.field = hierarchy[1]
+    }
+
+    return f
   })
-
-  variables.formStructure = shell
-
-  return {
-    variables
-  }
 }
