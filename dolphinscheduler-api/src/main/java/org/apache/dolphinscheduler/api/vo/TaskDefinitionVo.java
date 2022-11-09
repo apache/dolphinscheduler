@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.api.vo;
 
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import java.util.List;
 
 import lombok.Data;
+
+import org.springframework.beans.BeanUtils;
 
 /**
  * @author fanwanlong
@@ -44,38 +47,10 @@ public class TaskDefinitionVo extends TaskDefinition {
 
     public static TaskDefinitionVo fromTaskDefinition(TaskDefinition taskDefinition) {
         TaskDefinitionVo taskDefinitionVo = new TaskDefinitionVo();
-        taskDefinitionVo.setId(taskDefinition.getId());
-        taskDefinitionVo.setCode(taskDefinition.getCode());
-        taskDefinitionVo.setName(taskDefinition.getName());
-        taskDefinitionVo.setVersion(taskDefinition.getVersion());
-        taskDefinitionVo.setDescription(taskDefinition.getDescription());
-        taskDefinitionVo.setProjectCode(taskDefinition.getProjectCode());
-        taskDefinitionVo.setUserId(taskDefinition.getUserId());
-        taskDefinitionVo.setTaskType(taskDefinition.getTaskType());
-        taskDefinitionVo.setTaskParams(taskDefinition.getTaskParams());
-        taskDefinitionVo.setTaskParamList(taskDefinition.getTaskParamList());
-        taskDefinitionVo.setTaskParamMap(taskDefinition.getTaskParamMap());
-        taskDefinitionVo.setFlag(taskDefinition.getFlag());
-        taskDefinitionVo.setTaskPriority(taskDefinition.getTaskPriority());
-        taskDefinitionVo.setUserName(taskDefinition.getUserName());
-        taskDefinitionVo.setProjectName(taskDefinition.getProjectName());
-        taskDefinitionVo.setWorkerGroup(taskDefinition.getWorkerGroup());
-        taskDefinitionVo.setEnvironmentCode(taskDefinition.getEnvironmentCode());
-        taskDefinitionVo.setFailRetryTimes(taskDefinition.getFailRetryTimes());
-        taskDefinitionVo.setFailRetryInterval(taskDefinition.getFailRetryInterval());
-        taskDefinitionVo.setTimeoutFlag(taskDefinition.getTimeoutFlag());
-        taskDefinitionVo.setTimeoutNotifyStrategy(taskDefinition.getTimeoutNotifyStrategy());
-        taskDefinitionVo.setTimeout(taskDefinition.getTimeout());
-        taskDefinitionVo.setDelayTime(taskDefinition.getDelayTime());
-        taskDefinitionVo.setResourceIds(taskDefinition.getResourceIds());
-        taskDefinitionVo.setCreateTime(taskDefinition.getCreateTime());
-        taskDefinitionVo.setUpdateTime(taskDefinition.getUpdateTime());
-        taskDefinitionVo.setModifyBy(taskDefinition.getModifyBy());
-        taskDefinitionVo.setTaskGroupId(taskDefinition.getTaskGroupId());
-        taskDefinitionVo.setTaskGroupPriority(taskDefinition.getTaskGroupPriority());
-        taskDefinitionVo.setCpuQuota(taskDefinition.getCpuQuota());
-        taskDefinitionVo.setMemoryMax(taskDefinition.getMemoryMax());
-        taskDefinitionVo.setTaskExecuteType(taskDefinition.getTaskExecuteType());
+        BeanUtils.copyProperties(taskDefinition, taskDefinitionVo);
+        if (TimeoutFlag.CLOSE == taskDefinition.getTimeoutFlag()) {
+            taskDefinitionVo.setTimeoutNotifyStrategy(null);
+        }
         return taskDefinitionVo;
     }
 
