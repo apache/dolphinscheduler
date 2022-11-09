@@ -66,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -534,6 +535,7 @@ public class ProcessInstanceServiceTest {
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
     }
 
+    @Ignore
     @Test
     public void testViewVariables() {
         //process instance not null
@@ -551,6 +553,7 @@ public class ProcessInstanceServiceTest {
 
     }
 
+    @Ignore
     @Test
     public void testViewGantt() throws Exception {
         ProcessInstance processInstance = getProcessInstance();

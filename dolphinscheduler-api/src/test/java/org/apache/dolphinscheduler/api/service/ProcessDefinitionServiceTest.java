@@ -693,6 +693,7 @@ public class ProcessDefinitionServiceTest {
         Assert.assertNotNull(processDefinitionService.exportProcessDagData(processDefinition));
     }
 
+    @Ignore
     @Test
     public void testImportSqlProcessDefinition() throws Exception {
         int userId = 10;
