@@ -15,24 +15,25 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
-import { queryDynamicTaskCategories, queryDynamicTaskResourceList } from '@/service/modules/dynamic-dag'
+import { axios } from '@/service/service'
 
-export function useSidebar() {
-  const variables = reactive({
-    taskList: []
+export function queryDynamicTaskCategories(): any {
+  return axios({
+    url: '/dynamic/taskCategories',
+    method: 'get'
   })
+}
 
-  const getTaskList = () => {
-    queryDynamicTaskCategories().then((resC: any) => {
-      queryDynamicTaskResourceList(resC[0]).then((res: any) => {
-        variables.taskList = res
-      })
-    })
-  }
+export function queryDynamicTaskResourceList(categories: string): any {
+  return axios({
+    url: `/dynamic/${categories}/taskTypes`,
+    method: 'get'
+  })
+}
 
-  return {
-    variables,
-    getTaskList
-  }
+export function queryDynamicTaskResource(url: string): any {
+  return axios({
+    url,
+    method: 'get'
+  })
 }

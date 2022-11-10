@@ -42,10 +42,10 @@ const DagSidebar = defineComponent({
     return (
       <div>
         {
-          this.taskList.map(task => {
+          this.taskList.map((task: any) => {
             return (
               <div class={styles['task-item']} draggable='true' onDragstart={() => this.handleDragstart(task)}>
-                {task}
+                {task.name}
               </div>
             )
           })

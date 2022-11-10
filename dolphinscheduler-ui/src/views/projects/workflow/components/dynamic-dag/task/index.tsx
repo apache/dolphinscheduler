@@ -30,6 +30,9 @@ const props = {
   },
   task: {
     type: String as PropType<string>
+  },
+  formData: {
+    type: Object as PropType<object>
   }
 }
 
@@ -39,7 +42,7 @@ const TaskForm = defineComponent({
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-    const { variables } = useTaskForm()
+    const { variables, handleValidate } = useTaskForm(props.formData)
     const { t } = useI18n()
 
     const cancelModal = () => {
@@ -47,6 +50,7 @@ const TaskForm = defineComponent({
     }
 
     const confirmModal = () => {
+      handleValidate()
       ctx.emit('confirmModal')
     }
 
@@ -80,7 +84,7 @@ const TaskForm = defineComponent({
     return (
       <Modal
         title={this.task}
-        show={(this.showModal && this.task) as boolean}
+        show={this.showModal}
         onCancel={this.cancelModal}
         onConfirm={this.confirmModal}>
         <NForm
