@@ -71,7 +71,7 @@ The key configuration in this sample is shown in the following table.
 |-------------------------------------|-------------------------------------------------------------------|
 | Job Name                            | sqoop_mysql_to_hive_test                                          |
 | Data Source - Type                  | MYSQL                                                             |
-| Data Source - Datasource            | MYSQL MyTestMySQL(MyTestMySQL is the name of my test data source) |
+| Data Source - Datasource            | MYSQL MyTestMySQL(You could change MyTestMySQL to the name you like) |
 | Data Source - ModelType             | Form                                                              |
 | Data Source - Table                 | example                                                           |
 | Data Source - ColumnType            | All Columns                                                       |
