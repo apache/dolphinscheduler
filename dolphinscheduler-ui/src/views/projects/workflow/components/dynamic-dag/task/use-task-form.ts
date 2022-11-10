@@ -38,8 +38,6 @@ export function useTaskForm(data: any) {
   const handleValidate = () => {
     variables.taskForm.validate((err: any) => {
       if (err) return
-
-      console.log(variables.model)
     })
   }
 
