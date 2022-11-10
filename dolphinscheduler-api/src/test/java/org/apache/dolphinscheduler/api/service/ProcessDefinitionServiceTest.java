@@ -693,7 +693,6 @@ public class ProcessDefinitionServiceTest {
         Assert.assertNotNull(processDefinitionService.exportProcessDagData(processDefinition));
     }
 
-    @Ignore
     @Test
     public void testImportSqlProcessDefinition() throws Exception {
         int userId = 10;
@@ -723,12 +722,16 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(dataSourceMapper.queryDataSourceByNameAndUserId(userId, "mysql_1")).thenReturn(dataSource);
 
         long projectCode =  1001;
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, getProject(projectCode), projectCode)).thenReturn(result);
         Mockito.when(processService.saveTaskDefine(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(2);
         Mockito.when(processService.saveProcessDefine(Mockito.same(loginUser), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(1);
         Mockito.when(processService.saveTaskRelation(Mockito.same(loginUser), Mockito.eq(projectCode), Mockito.anyLong(),
             Mockito.eq(1), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean())).thenReturn(0);
 
-        Map<String, Object> result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
+        result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, mockMultipartFile);
 
         Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
     }
