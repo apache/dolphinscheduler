@@ -74,7 +74,7 @@ SQOOP 任务类型，用于执行 SQOOP 程序。对于 SQOOP 节点，worker �
 | 任务名称             | sqoop_mysql_to_hive_test                 |
 | 流向               | import                                   |
 | 数据来源 - 类型        | MYSQL                                    |
-| 数据来源 - 数据源       | MYSQL MyTestMySQL（MyTestMySQL是我的测试数据源名称） |
+| 数据来源 - 数据源       | MYSQL MyTestMySQL（您可以将MyTestMySQL改成您自己取的数据源名称） |
 | 数据来源 - 模式        | 表单                                       |
 | 数据来源 - 表名        | example                                  |
 | 数据来源 - 列类型       | 全表导入                                     |
