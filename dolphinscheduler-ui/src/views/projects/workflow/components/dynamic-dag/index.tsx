@@ -32,7 +32,7 @@ const DynamicDag = defineComponent({
     const showModal = ref(false)
 
     const handelDragstart = (task: any) => {
-      draggedTask.value = task
+      draggedTask.value = task.name
 
       queryDynamicTaskResource(task.json).then((res: any) => {
         formData.value = res
