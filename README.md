@@ -21,7 +21,7 @@ The key features for DolphinScheduler are as follows:
 - Easy to deploy, we provide 4 ways to deploy, such as Standalone deployment,Cluster deployment,Docker / Kubernetes deployment and Rainbond deployment
 - Easy to use, there are four ways to create workflows:
   - Visually, create tasks by dragging and dropping tasks
-  - [PyDolphinScheduler](https://dolphinscheduler.apache.org/python/dev/index.html), Creating workflows via Python API, aka workflow-as-code
+  - [PyDolphinScheduler](https://dolphinscheduler.apache.org/python/main/index.html), Creating workflows via Python API, aka workflow-as-code
   - Yaml definition, mapping yaml into workflow(have to install PyDolphinScheduler currently)
   - Open API, Creating workflows
 
