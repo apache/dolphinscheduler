@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.STRING_YES;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
+import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
@@ -52,7 +53,7 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
         InputParam receivesParam = InputParam
                 .newBuilder(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS,
                         MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS)
-                .setPlaceholder("please input receives")
+                .setPlaceholder(AlertInputTips.RECEIVERS.getMsg())
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
@@ -90,12 +91,12 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
                         .build();
 
         InputParam mailUser = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_USER, MailParamsConstants.MAIL_USER)
-                .setPlaceholder("if enable use authentication, you need input user")
+                .setPlaceholder(AlertInputTips.USERNAME.getMsg())
                 .build();
 
         PasswordParam mailPassword =
                 PasswordParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, MailParamsConstants.MAIL_PASSWD)
-                        .setPlaceholder("if enable use authentication, you need input password")
+                        .setPlaceholder(AlertInputTips.PASSWORD.getMsg())
                         .build();
 
         RadioParam enableTls = RadioParam
