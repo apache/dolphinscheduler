@@ -454,7 +454,7 @@ Thanks everyone for taking time to check this release and help us.
 ### Move source packages, binary packages from the `dev` directory to `release` directory
 
 ```shell
-svn mv https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
+svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
 ```
 
 ### Update Document

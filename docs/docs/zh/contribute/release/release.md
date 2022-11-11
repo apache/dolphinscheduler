@@ -454,7 +454,7 @@ Thanks everyone for taking time to check this release and help us.
 ### 将源码和二进制包从svn的dev目录移动到release目录
 
 ```shell
-svn mv https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
+svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
 ```
 
 ### 更新文档
