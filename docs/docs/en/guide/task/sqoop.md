@@ -16,7 +16,7 @@ Sqoop task type for executing Sqoop application. The workers run `sqoop` to exec
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-| **Parameter**                       | **Description**                                                                                                                                                            |
+|            **Parameter**            |                                                                              **Description**                                                                               |
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Job Name                            | map-reduce job name                                                                                                                                                        |
 | Direct                              | (1) import:Imports an individual table from an RDBMS to HDFS or Hve.  (2) export:Exports a set of files from HDFS or Hive back to an RDBMS.                                |
@@ -48,7 +48,6 @@ Sqoop task type for executing Sqoop application. The workers run `sqoop` to exec
 | Data Target - FieldsTerminated      | Sets the field separator character.                                                                                                                                        |
 | Data Target - LinesTerminated       | Sets the end-of-line character.                                                                                                                                            |
 
-
 ## Task Example
 
 This example demonstrates importing data from MySQL into Hive. The MySQL database name is `test` and the table name is `example`. The following figure shows sample data.
@@ -67,24 +66,24 @@ you can configure the node content by following the steps in the diagram below.
 
 The key configuration in this sample is shown in the following table.
 
-| **Parameter**                       | **Value**                                                         |
-|-------------------------------------|-------------------------------------------------------------------|
-| Job Name                            | sqoop_mysql_to_hive_test                                          |
-| Data Source - Type                  | MYSQL                                                             |
+|            **Parameter**            |                              **Value**                               |
+|-------------------------------------|----------------------------------------------------------------------|
+| Job Name                            | sqoop_mysql_to_hive_test                                             |
+| Data Source - Type                  | MYSQL                                                                |
 | Data Source - Datasource            | MYSQL MyTestMySQL(You could change MyTestMySQL to the name you like) |
-| Data Source - ModelType             | Form                                                              |
-| Data Source - Table                 | example                                                           |
-| Data Source - ColumnType            | All Columns                                                       |
-| Data Target - Type                  | HIVE                                                              |
-| Data Target - Database              | tmp                                                               |
-| Data Target - Table                 | example                                                           |
-| Data Target - CreateHiveTable       | true                                                              |
-| Data Target - DropDelimiter         | false                                                             |
-| Data Target - OverWriteSrc          | true                                                              |
-| Data Target - Hive Target Dir       | (No need to fill in)                                              |
-| Data Target - ReplaceDelimiter      | ,                                                                 |
-| Data Target - Hive partition Keys   | (No need to fill in)                                              |
-| Data Target - Hive partition Values | (No need to fill in)                                              |
+| Data Source - ModelType             | Form                                                                 |
+| Data Source - Table                 | example                                                              |
+| Data Source - ColumnType            | All Columns                                                          |
+| Data Target - Type                  | HIVE                                                                 |
+| Data Target - Database              | tmp                                                                  |
+| Data Target - Table                 | example                                                              |
+| Data Target - CreateHiveTable       | true                                                                 |
+| Data Target - DropDelimiter         | false                                                                |
+| Data Target - OverWriteSrc          | true                                                                 |
+| Data Target - Hive Target Dir       | (No need to fill in)                                                 |
+| Data Target - ReplaceDelimiter      | ,                                                                    |
+| Data Target - Hive partition Keys   | (No need to fill in)                                                 |
+| Data Target - Hive partition Values | (No need to fill in)                                                 |
 
 ### View run results
 
