@@ -84,7 +84,7 @@ public class DependentUtils {
                 result = DependentDateUtils.getLastHoursInterval(businessDate, 3);
                 break;
             case "last24Hours":
-                result = DependentDateUtils.getSpecialLastDayInterval(businessDate);
+                result = DependentDateUtils.getLastHoursInterval(businessDate, 24);
                 break;
             case "today":
                 result = DependentDateUtils.getTodayInterval(businessDate);
