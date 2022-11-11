@@ -395,6 +395,7 @@ interface ITaskParams {
   sourceLocationArn?: string
   name?: string
   cloudWatchLogGroupArn?: string
+  yamlContent?: string
 }
 
 interface INodeData
