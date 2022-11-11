@@ -89,7 +89,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -284,7 +283,6 @@ public class ProcessServiceTest {
         processService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance2);
     }
 
-    @Ignore
     @Test
     public void testHandleCommand() {
 
@@ -465,7 +463,6 @@ public class ProcessServiceTest {
         Assert.assertTrue(processInstance10 == null);
     }
 
-    @Ignore
     @Test(expected = ServiceException.class)
     public void testDeleteNotExistCommand() {
         String host = "127.0.0.1";

@@ -191,7 +191,6 @@ public class ExecutorServiceTest {
     /**
      * not complement
      */
-    @Ignore
     @Test
     public void testNoComplement() {
 
@@ -211,7 +210,6 @@ public class ExecutorServiceTest {
     /**
      * not complement
      */
-    @Ignore
     @Test
     public void testComplementWithStartNodeList() {
 
@@ -249,7 +247,6 @@ public class ExecutorServiceTest {
     /**
      * serial
      */
-    @Ignore
     @Test
     public void testSerial() {
 
@@ -268,7 +265,6 @@ public class ExecutorServiceTest {
     /**
      * without schedule
      */
-    @Ignore
     @Test
     public void testParallelWithOutSchedule() {
 
@@ -288,7 +284,6 @@ public class ExecutorServiceTest {
     /**
      * with schedule
      */
-    @Ignore
     @Test
     public void testParallelWithSchedule() {
 
