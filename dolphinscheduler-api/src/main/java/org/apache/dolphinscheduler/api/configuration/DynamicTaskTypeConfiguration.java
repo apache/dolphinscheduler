@@ -17,21 +17,23 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.dolphinscheduler.api.dto.taskType.DynamicTaskInfo;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
 import org.apache.dolphinscheduler.common.constants.Constants;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 @EnableConfigurationProperties
@@ -42,7 +44,10 @@ import java.util.List;
 public class DynamicTaskTypeConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicTaskTypeConfiguration.class);
-
+    private static final List<String> defaultTaskCategories =
+            Arrays.asList(Constants.TYPE_UNIVERSAL, Constants.TYPE_DATA_INTEGRATION, Constants.TYPE_CLOUD,
+                    Constants.TYPE_LOGIC, Constants.TYPE_DATA_QUALITY, Constants.TYPE_OTHER,
+                    Constants.TYPE_MACHINE_LEARNING);
     private List<DynamicTaskInfo> universal;
     private List<DynamicTaskInfo> cloud;
     private List<DynamicTaskInfo> logic;
@@ -51,12 +56,7 @@ public class DynamicTaskTypeConfiguration {
     private List<DynamicTaskInfo> other;
     private List<DynamicTaskInfo> machineLearning;
 
-    private static final List<String> defaultTaskCategories =
-            Arrays.asList(Constants.TYPE_UNIVERSAL,Constants.TYPE_DATA_INTEGRATION,Constants.TYPE_CLOUD,
-                    Constants.TYPE_LOGIC,Constants.TYPE_DATA_QUALITY,Constants.TYPE_OTHER,Constants.TYPE_MACHINE_LEARNING);
-
-
-    public  List<String> getTaskCategories() {
+    public List<String> getTaskCategories() {
         return defaultTaskCategories;
     }
 
