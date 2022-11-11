@@ -261,11 +261,13 @@ public class PythonGateway {
                     ReleaseState.OFFLINE);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name,
                     processDefinitionCode, description, globalParams,
-                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionTypeEnum);
+                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    executionTypeEnum);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
                     description, globalParams,
-                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionTypeEnum);
+                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    executionTypeEnum);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
