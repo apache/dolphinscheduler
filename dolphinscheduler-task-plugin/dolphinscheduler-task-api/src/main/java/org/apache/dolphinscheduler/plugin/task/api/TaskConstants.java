@@ -18,6 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.time.Duration;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 public class TaskConstants {
 
@@ -432,6 +435,8 @@ public class TaskConstants {
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
     public static final String TASK_TYPE_K8S = "K8S";
+
+    public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
 
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 

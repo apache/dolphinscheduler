@@ -456,6 +456,11 @@ export function formatParams(data: INodeData): {
     taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
   }
 
+  if (data.taskType === 'KUBEFLOW') {
+    taskParams.yamlContent = data.yamlContent
+    taskParams.namespace = data.namespace
+  }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {

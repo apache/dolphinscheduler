@@ -48,6 +48,7 @@ export type TaskType =
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
+  | 'KUBEFLOW'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -169,6 +170,10 @@ export const TASK_TYPES_MAP = {
   },
   DATASYNC: {
     alias: 'DATASYNC',
+    helperLinkDisable: true
+  },
+  KUBEFLOW: {
+    alias: 'KUBEFLOW',
     helperLinkDisable: true
   }
 } as {
