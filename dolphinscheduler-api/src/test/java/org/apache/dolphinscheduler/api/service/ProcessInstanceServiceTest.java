@@ -201,7 +201,7 @@ public class ProcessInstanceServiceTest {
         Result successRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
             "2020-01-02 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
             "192.168.xx.xx", 1, 10);
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
         // data parameter empty
         when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1L), eq(""), eq(-1), Mockito.any(),
@@ -209,7 +209,7 @@ public class ProcessInstanceServiceTest {
         successRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "",
             "", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
             "192.168.xx.xx", 1, 10);
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int)successRes.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
         //executor null
         when(usersService.queryUser(loginUser.getId())).thenReturn(null);
@@ -218,7 +218,7 @@ public class ProcessInstanceServiceTest {
             "2020-01-02 00:00:00", "", "admin", ExecutionStatus.SUBMITTED_SUCCESS,
             "192.168.xx.xx", 1, 10);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int)executorExistRes.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorExistRes.getCode());
 
         //executor name empty
         when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1L), eq(""), eq(0), Mockito.any(),
@@ -226,7 +226,7 @@ public class ProcessInstanceServiceTest {
         Result executorEmptyRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
             "2020-01-02 00:00:00", "", "", ExecutionStatus.SUBMITTED_SUCCESS,
             "192.168.xx.xx", 1, 10);
-        Assert.assertEquals(Status.SUCCESS.getCode(), (int)executorEmptyRes.getCode());
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) executorEmptyRes.getCode());
 
     }
 
@@ -299,7 +299,7 @@ public class ProcessInstanceServiceTest {
         Assert.assertEquals(Status.SUCCESS, workerExistRes.get(Constants.STATUS));
 
         when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-            processInstance.getProcessDefinitionVersion())).thenReturn(null);;
+            processInstance.getProcessDefinitionVersion())).thenReturn(null);
         workerExistRes = processInstanceService.queryProcessInstanceById(loginUser, projectCode, 1);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, workerExistRes.get(Constants.STATUS));
     }
@@ -430,7 +430,7 @@ public class ProcessInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
         Map<String, Object> processInstanceNullRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, taskJson,"2020-02-21 00:00:00", true, "", "", 0, "");
+            shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
 
         //process instance not finish
@@ -438,7 +438,7 @@ public class ProcessInstanceServiceTest {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceNotFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, taskJson,"2020-02-21 00:00:00", true, "", "", 0, "");
+            shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstanceNotFinishRes.get(Constants.STATUS));
 
         //process instance finish
@@ -463,7 +463,7 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            taskRelationJson, taskDefinitionJson,"2020-02-21 00:00:00", true, "", "", 0, "root");
+            taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
@@ -472,7 +472,7 @@ public class ProcessInstanceServiceTest {
 
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.FALSE, Boolean.FALSE)).thenReturn(1);
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            taskRelationJson, taskDefinitionJson,"2020-02-21 00:00:00", Boolean.FALSE, "", "", 0, "root");
+            taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
@@ -542,7 +542,7 @@ public class ProcessInstanceServiceTest {
         processInstance.setScheduleTime(new Date());
         processInstance.setGlobalParams("");
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
-        Map<String, Object> successRes = processInstanceService.viewVariables(1L,1);
+        Map<String, Object> successRes = processInstanceService.viewVariables(1L, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
         when(processInstanceMapper.queryDetailById(1)).thenReturn(null);

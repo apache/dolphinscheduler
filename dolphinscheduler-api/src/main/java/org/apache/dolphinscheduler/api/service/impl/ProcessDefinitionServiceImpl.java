@@ -750,7 +750,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         for (ProcessDefinition process : processDefinitionList) {
             try {
-                this.deleteProcessDefinitionByCode(loginUser, process.getCode());
+                this.deleteProcessDefinitionByCode(loginUser, projectCode, process.getCode());
             } catch (Exception e) {
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
             }

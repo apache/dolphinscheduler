@@ -98,11 +98,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * process instance service impl
  */
 @Service
 public class ProcessInstanceServiceImpl extends BaseServiceImpl implements ProcessInstanceService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceServiceImpl.class);
 
     public static final String TASK_TYPE = "taskType";
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
@@ -679,7 +684,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
 
         if (processInstance == null) {
-            throw new RuntimeException("workflow instance is null");
+            logger.error("Process instance does not exist, projectCode:{}, processInstanceId:{}.", projectCode,
+                processInstanceId);
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            return result;
         }
 
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());

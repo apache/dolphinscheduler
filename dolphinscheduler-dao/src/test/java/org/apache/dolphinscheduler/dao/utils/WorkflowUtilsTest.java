@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.dao.utils;
 
 import java.util.Date;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,11 +40,11 @@ class WorkflowUtilsTest {
         System.currentTimeMillis();
         Assertions.assertNotEquals("1d 1h 10m 10s", noStateDuration);
 
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         String notFinishDuration = WorkflowUtils.getWorkflowInstanceDuration(processInstance);
         Assertions.assertNotEquals("1d 1h 10m 10s", notFinishDuration);
 
-        processInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        processInstance.setState(ExecutionStatus.SUCCESS);
         String successDuration = WorkflowUtils.getWorkflowInstanceDuration(processInstance);
         Assertions.assertEquals("1d 1h 10m 10s", successDuration);
     }
