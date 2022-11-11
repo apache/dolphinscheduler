@@ -19,7 +19,7 @@ export const X6_NODE_NAME = 'dag-task'
 export const X6_EDGE_NAME = 'dag-edge'
 export const X6_PORT_OUT_NAME = 'dag-port-out'
 
-const EDGE_COLOR = '#999999'
+const EDGE_COLOR = '#A2B1C3'
 const BG_BLUE = '#DFE9F7'
 const BG_WHITE = '#FFFFFF'
 const NODE_BORDER = '#CCCCCC'
@@ -72,7 +72,7 @@ export const PORT = {
         },
         'circle-outer': {
           stroke: NODE_BORDER,
-          strokeWidth: 1,
+          strokeWidth: 2,
           r: 6,
           fill: BG_WHITE
         },
@@ -164,7 +164,7 @@ export const NODE = {
       pointerEvents: 'visiblePainted',
       fill: BG_WHITE,
       stroke: NODE_BORDER,
-      strokeWidth: 1,
+      strokeWidth: 2,
       strokeDasharray: 'none',
       filter: 'none'
     },
@@ -178,7 +178,7 @@ export const NODE = {
       refX: 45,
       refY: 18,
       fontFamily: 'Microsoft Yahei',
-      fontSize: 12,
+      fontSize: 15,
       fontWeight: 'bold',
       fill: TITLE,
       strokeWidth: 0
@@ -236,12 +236,12 @@ export const EDGE = {
   attrs: {
     line: {
       stroke: EDGE_COLOR,
-      strokeWidth: 1,
+      strokeWidth: 1.5,
       targetMarker: {
         tagName: 'path',
         fill: EDGE_COLOR,
         strokeWidth: 0,
-        d: 'M 6 -3 0 0 6 3 Z'
+        d: 'M 7 -5 0 0 7 5 Z'
       },
       filter: 'none'
     }
@@ -250,9 +250,9 @@ export const EDGE = {
     name: 'rounded'
   },
   router: {
-    name: 'manhattan',
+    name: 'er',
     args: {
-      endDirections: ['top', 'bottom', 'left']
+      offset: 12,
     }
   },
   defaultLabel: {
@@ -269,7 +269,7 @@ export const EDGE = {
     attrs: {
       label: {
         fill: EDGE_COLOR,
-        fontSize: 14,
+        fontSize: 16,
         textAnchor: 'middle',
         textVerticalAnchor: 'middle',
         pointerEvents: 'none'
@@ -278,7 +278,7 @@ export const EDGE = {
         ref: 'label',
         fill: BG_WHITE,
         stroke: EDGE_COLOR,
-        strokeWidth: 1,
+        strokeWidth: 2,
         rx: 4,
         ry: 4,
         refWidth: '140%',
@@ -326,7 +326,7 @@ export const EDGE_SELECTED = {
       targetMarker: {
         fill: STROKE_BLUE
       },
-      strokeWidth: 2,
+      strokeWidth: 3,
       filter: EDGE_SHADOW
     }
   },

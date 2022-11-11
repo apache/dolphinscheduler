@@ -15,18 +15,25 @@
  * limitations under the License.
  */
 
-export function useFormStructure(forms: Array<any>): Array<any> {
-  return forms.map((f: any) => {
-    delete f.validate
-    delete f.api
+import { axios } from '@/service/service'
 
-    f.modelField = f.field
+export function queryDynamicTaskCategories(): any {
+  return axios({
+    url: '/dynamic/taskCategories',
+    method: 'get'
+  })
+}
 
-    if (f.field.indexOf('.') >= 0) {
-      const hierarchy = f.field.split('.')
-      f.field = hierarchy[1]
-    }
+export function queryDynamicTaskResourceList(categories: string): any {
+  return axios({
+    url: `/dynamic/${categories}/taskTypes`,
+    method: 'get'
+  })
+}
 
-    return f
+export function queryDynamicTaskResource(url: string): any {
+  return axios({
+    url,
+    method: 'get'
   })
 }
