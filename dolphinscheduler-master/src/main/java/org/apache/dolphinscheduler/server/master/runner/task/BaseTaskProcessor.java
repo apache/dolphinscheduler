@@ -76,6 +76,7 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+import org.apache.dolphinscheduler.service.task.TaskInstanceHandler;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -132,6 +133,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected String threadLoggerInfoName;
 
+    protected TaskInstanceHandler taskInstanceHandler;
+
     @Override
     public void init(@NonNull TaskInstance taskInstance, @NonNull ProcessInstance processInstance) {
         processService = SpringApplicationContext.getBean(ProcessService.class);
@@ -140,6 +143,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
         taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
+        taskInstanceHandler = SpringApplicationContext.getBean(TaskInstanceHandler.class);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
@@ -267,7 +271,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public String getType() {
-        throw new UnsupportedOperationException("This abstract class doesn's has type");
+        throw new UnsupportedOperationException("This abstract class doesn't has type");
     }
 
     @Override
@@ -343,6 +347,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 .buildResourceParametersInfo(resources)
                 .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
                 .buildK8sTaskRelatedInfo(k8sTaskExecutionContext)
+                .buildBashTaskExecutionContext(taskInstanceHandler.createBashTaskExecutionContext(taskInstance))
                 .buildBusinessParamsMap(businessParamsMap)
                 .buildParamInfo(propertyMap)
                 .create();

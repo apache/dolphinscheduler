@@ -139,8 +139,3 @@ CREATE TABLE `t_ds_task_remote_host`
     `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- Add remote_host_code column
-ALTER TABLE `t_ds_task_definition` ADD COLUMN `remote_host_code` bigint(20) DEFAULT '-1' COMMENT 'task remote host code';
-ALTER TABLE `t_ds_task_definition_log` ADD COLUMN `remote_host_code` bigint(20) DEFAULT '-1' COMMENT 'task remote host code';
-ALTER TABLE `t_ds_task_instance` ADD COLUMN `remote_host_code` bigint(20) DEFAULT '-1' COMMENT 'task remote host code';

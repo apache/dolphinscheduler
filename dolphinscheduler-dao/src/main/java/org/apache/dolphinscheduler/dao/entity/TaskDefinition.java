@@ -214,11 +214,6 @@ public class TaskDefinition {
     private Integer memoryMax;
 
     /**
-     * task remote host code
-     */
-    private long remoteHostCode;
-
-    /**
      * task execute type
      */
     private TaskExecuteType taskExecuteType;

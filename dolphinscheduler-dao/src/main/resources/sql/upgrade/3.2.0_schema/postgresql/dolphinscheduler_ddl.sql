@@ -134,8 +134,3 @@ EXECUTE 'CREATE TABLE IF NOT EXISTS' || quote_ident(v_schema) ||'."t_ds_task_rem
     update_time          timestamp       DEFAULT NULL ,
     PRIMARY KEY (id)
 )';
-
--- Add resource limit column
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition ADD COLUMN IF NOT EXISTS remote_host_code int NOT NULL DEFAULT ''-1''  ';
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_definition_log ADD COLUMN IF NOT EXISTS remote_host_code int NOT NULL DEFAULT ''-1''  ';
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_task_instance ADD COLUMN IF NOT EXISTS remote_host_code remote_host_code bigint DEFAULT ''-1''  ';

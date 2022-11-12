@@ -113,11 +113,17 @@ public abstract class AbstractCommandExecutor {
      */
     protected SSHSessionHost sessionHost;
 
+    /**
+     * bash execution context
+     */
+    protected BashTaskExecutionContext bashTaskExecutionContext;
+
     public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                    TaskExecutionContext taskRequest,
                                    Logger logger) {
         this.logHandler = logHandler;
         this.taskRequest = taskRequest;
+        this.bashTaskExecutionContext = taskRequest.getBashTaskExecutionContext();
         this.logger = logger;
         this.logBuffer = new LinkedBlockingQueue<>();
     }
@@ -210,7 +216,7 @@ public abstract class AbstractCommandExecutor {
             return result;
         }
 
-        if (taskRequest.getSshSessionHost() != null) {
+        if (bashTaskExecutionContext.getSessionHost() != null) {
             runningOnSSH = true;
         }
 
@@ -237,7 +243,7 @@ public abstract class AbstractCommandExecutor {
     private TaskResponse runOnSSH(String commandFilePath) {
         TaskResponse result = new TaskResponse();
         SSHSessionHolder sessionHolder = null;
-        this.sessionHost = taskRequest.getSshSessionHost();
+        this.sessionHost = bashTaskExecutionContext.getSessionHost();
         try {
             sessionHolder = SSHSessionPool.getSessionHolder(sessionHost);
             sessionHolder.setSftpConfig(SSHSessionPool.getSftpConfig());

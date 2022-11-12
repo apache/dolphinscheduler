@@ -200,7 +200,8 @@ public class TaskRemoteHostServiceTest {
                 .thenReturn(taskRemoteHost);
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(createTaskInstance());
-        Mockito.when(taskInstanceMapper.queryByTaskRemoteHostCodeAndStatus(Mockito.any(Long.class),
+
+        Mockito.when(taskInstanceMapper.queryTaskInstanceByTaskParamsAndStatus(Mockito.anyString(),
                 Mockito.eq(Constants.TASK_NOT_TERMINATED_STATES))).thenReturn(taskInstanceList);
         exception = Assertions.assertThrows(ServiceException.class, () -> {
             taskRemoteHostService.deleteByCode(1L, user);
@@ -208,7 +209,7 @@ public class TaskRemoteHostServiceTest {
         Assertions.assertEquals(Status.DELETE_TASK_REMOTE_HOST_FAIL.getCode(),
                 ((ServiceException) exception).getCode());
 
-        Mockito.when(taskInstanceMapper.queryByTaskRemoteHostCodeAndStatus(Mockito.any(Long.class),
+        Mockito.when(taskInstanceMapper.queryTaskInstanceByTaskParamsAndStatus(Mockito.anyString(),
                 Mockito.eq(Constants.TASK_NOT_TERMINATED_STATES))).thenReturn(null);
         Mockito.when(taskRemoteHostMapper.deleteByCode(Mockito.any(Long.class))).thenReturn(1);
         int result = taskRemoteHostService.deleteByCode(1L, user);

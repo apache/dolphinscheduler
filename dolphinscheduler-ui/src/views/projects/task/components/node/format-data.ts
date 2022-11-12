@@ -61,6 +61,10 @@ export function formatParams(data: INodeData): {
     taskParams.others = data.others
   }
 
+  if (data.taskType && ['SHELL', 'PYTHON'].includes(data.taskType)) {
+    taskParams.remoteHostCode = data.remoteHostCode
+  }
+
   if (data.taskType === 'SPARK') {
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
@@ -478,7 +482,6 @@ export function formatParams(data: INodeData): {
       delayTime: data.delayTime ? String(data.delayTime) : '0',
       description: data.description,
       environmentCode: data.environmentCode || -1,
-      remoteHostCode: data.remoteHostCode || -1,
       failRetryInterval: data.failRetryInterval
         ? String(data.failRetryInterval)
         : '0',
@@ -524,7 +527,6 @@ export function formatParams(data: INodeData): {
 export function formatModel(data: ITaskData) {
   const params = {
     ...omit(data, [
-      'remoteHostCode',
       'environmentCode',
       'timeoutFlag',
       'timeoutNotifyStrategy',
@@ -532,7 +534,6 @@ export function formatModel(data: ITaskData) {
     ]),
     ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
-    remoteHostCode: data.remoteHostCode === -1 ? null : data.remoteHostCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
       ? [data.timeoutNotifyStrategy]
@@ -699,6 +700,9 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.jobType) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
+  }
+  if (data.taskParams?.remoteHostCode) {
+    params.remoteHostCode = data.taskParams.remoteHostCode === -1 ? null : data.taskParams.remoteHostCode
   }
 
   return params

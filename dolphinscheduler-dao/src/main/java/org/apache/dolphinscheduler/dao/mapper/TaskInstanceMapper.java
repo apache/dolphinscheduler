@@ -120,11 +120,12 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                              @Param("status") int status);
 
     /**
-     * Query task instance list by remote host code and instance status list
-     * @param remoteHostCode task remote host code
-     * @param states task instance state list
-     * @return task instance list
+     * Query task instances by task params search string
+     * @param searchValue search string
+     * @param states states
+     * @return list of task instances
      */
-    List<TaskInstance> queryByTaskRemoteHostCodeAndStatus(@Param("remoteHostCode") long remoteHostCode,
-                                                          @Param("states") int[] states);
+    List<TaskInstance> queryTaskInstanceByTaskParamsAndStatus(@Param("searchValue") String searchValue,
+                                                              @Param("states") int[] states);
+
 }

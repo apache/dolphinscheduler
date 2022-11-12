@@ -57,16 +57,13 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskRemoteHost;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.TaskRemoteHostDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.SSHSessionHost;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -138,8 +135,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private final CommandService commandService;
 
     private ProcessInstanceDao processInstanceDao;
-
-    private TaskRemoteHostDao taskRemoteHostDao;
 
     private TaskInstanceDao taskInstanceDao;
 
@@ -258,13 +253,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                                    @NonNull StateWheelExecuteThread stateWheelExecuteThread,
                                    @NonNull CuringParamsService curingParamsService,
                                    @NonNull TaskInstanceDao taskInstanceDao,
-                                   @NonNull TaskDefinitionLogDao taskDefinitionLogDao,
-                                   @NonNull TaskRemoteHostDao taskRemoteHostDao) {
+                                   @NonNull TaskDefinitionLogDao taskDefinitionLogDao) {
         this.processService = processService;
         this.commandService = commandService;
         this.processInstanceDao = processInstanceDao;
         this.processInstance = processInstance;
-        this.taskRemoteHostDao = taskRemoteHostDao;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
@@ -1223,18 +1216,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             Environment environment = processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
             if (Objects.nonNull(environment) && StringUtils.isNotEmpty(environment.getConfig())) {
                 taskInstance.setEnvironmentConfig(environment.getConfig());
-            }
-        }
-
-        taskInstance.setRemoteHostCode(taskNode.getRemoteHostCode());
-        if (taskInstance.getRemoteHostCode() > 0) {
-            TaskRemoteHost taskRemoteHost = taskRemoteHostDao.getTaskRemoteHostByCode(taskInstance.getRemoteHostCode());
-            if (taskRemoteHost != null) {
-                SSHSessionHost sshSessionHost = new SSHSessionHost();
-                BeanUtils.copyProperties(taskRemoteHost, sshSessionHost);
-                taskInstance.setSshSessionHost(sshSessionHost);
-            } else {
-                logger.error("cannot find task remote host, code: {}", taskInstance.getRemoteHostCode());
             }
         }
 

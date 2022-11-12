@@ -401,6 +401,7 @@ interface ITaskParams {
   name?: string
   cloudWatchLogGroupArn?: string
   yamlContent?: string
+  remoteHostCode?: number | null
 }
 
 interface INodeData

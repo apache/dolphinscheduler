@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskRemoteHost;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -39,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.model.SSHSessionHost;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -81,7 +79,6 @@ import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 
 /**
  * stream task execute
@@ -315,19 +312,6 @@ public class StreamTaskExecuteRunnable implements Runnable {
             Environment environment = processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
             if (Objects.nonNull(environment) && StringUtils.isNotEmpty(environment.getConfig())) {
                 taskInstance.setEnvironmentConfig(environment.getConfig());
-            }
-        }
-
-        taskInstance
-                .setRemoteHostCode(taskDefinition.getRemoteHostCode() <= 0 ? -1 : taskDefinition.getRemoteHostCode());
-        if (taskInstance.getRemoteHostCode() > 0) {
-            TaskRemoteHost taskRemoteHost = taskRemoteHostDao.getTaskRemoteHostByCode(taskInstance.getRemoteHostCode());
-            if (taskRemoteHost != null) {
-                SSHSessionHost sshSessionHost = new SSHSessionHost();
-                BeanUtils.copyProperties(taskRemoteHost, sshSessionHost);
-                taskInstance.setSshSessionHost(sshSessionHost);
-            } else {
-                logger.error("cannot find task remote host, code: {}", taskInstance.getRemoteHostCode());
             }
         }
 

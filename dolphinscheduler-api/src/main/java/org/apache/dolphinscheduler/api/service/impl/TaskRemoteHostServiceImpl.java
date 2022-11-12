@@ -140,8 +140,9 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
             throw new ServiceException(Status.TASK_REMOTE_HOST_NOT_FOUND, code);
         }
 
-        List<TaskInstance> relatedTaskInstances =
-                taskInstanceMapper.queryByTaskRemoteHostCodeAndStatus(code, Constants.TASK_NOT_TERMINATED_STATES);
+        String searchVal = "\"remoteHostCode\":" + taskRemoteHost.getCode();
+        List<TaskInstance> relatedTaskInstances = taskInstanceMapper.queryTaskInstanceByTaskParamsAndStatus(searchVal,
+                Constants.TASK_NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(relatedTaskInstances)) {
             logger.error("delete task remote code {} failed, because there are {} task instances are using it.", code,
                     relatedTaskInstances.size());

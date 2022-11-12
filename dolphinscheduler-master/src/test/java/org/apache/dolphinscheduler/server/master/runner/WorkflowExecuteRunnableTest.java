@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.TaskRemoteHostDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
@@ -77,8 +76,6 @@ public class WorkflowExecuteRunnableTest {
     private TaskInstanceDao taskInstanceDao;
 
     private TaskDefinitionLogDao taskDefinitionLogDao;
-
-    private TaskRemoteHostDao taskRemoteHostDao;
     private ProcessService processService;
 
     private CommandService commandService;
@@ -107,7 +104,6 @@ public class WorkflowExecuteRunnableTest {
         taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
         taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
         taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
-        taskRemoteHostDao = Mockito.mock(TaskRemoteHostDao.class);
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
@@ -124,7 +120,7 @@ public class WorkflowExecuteRunnableTest {
                 new WorkflowExecuteRunnable(processInstance, commandService, processService, processInstanceDao,
                         nettyExecutorManager,
                         processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService,
-                        taskInstanceDao, taskDefinitionLogDao, taskRemoteHostDao));
+                        taskInstanceDao, taskDefinitionLogDao));
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
         dag.set(workflowExecuteThread, new DAG());

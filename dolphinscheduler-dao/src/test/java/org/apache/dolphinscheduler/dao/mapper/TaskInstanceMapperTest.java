@@ -388,7 +388,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     }
 
     @Test
-    public void testQueryByTaskRemoteHostCodeAndStatus() {
+    public void testQueryTaskInstanceByTaskParamsAndStatus() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setFlag(Flag.YES);
         taskInstance.setName("us task");
@@ -397,13 +397,18 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstance.setEndTime(new Date());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setTaskType("shel");
-        taskInstance.setRemoteHostCode(1L);
+        taskInstance.setTaskParams(
+                "{\"localParams\":[],\"rawScript\":\"echo \\\"hello yann\\\"\",\"resourceList\":[],\"remoteHostCode\":7529232540352,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}");
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
-        taskInstanceMapper.insert(taskInstance);
 
-        List<TaskInstance> taskInstances =
-                taskInstanceMapper.queryByTaskRemoteHostCodeAndStatus(1L, TASK_NOT_TERMINATED_STATES);
-        Assertions.assertEquals(taskInstances.size(), 1);
+        taskInstanceMapper.insert(taskInstance);
+        List<TaskInstance> taskInstances = taskInstanceMapper
+                .queryTaskInstanceByTaskParamsAndStatus("\"remoteHostCode\":7529232540352", TASK_NOT_TERMINATED_STATES);
+        Assertions.assertEquals(1, taskInstances.size());
+
+        List<TaskInstance> nullTaskInstances = taskInstanceMapper
+                .queryTaskInstanceByTaskParamsAndStatus("\"remoteHostCode\":null", TASK_NOT_TERMINATED_STATES);
+        Assertions.assertEquals(0, nullTaskInstances.size());
     }
 
     public static final int[] TASK_NOT_TERMINATED_STATES = new int[]{

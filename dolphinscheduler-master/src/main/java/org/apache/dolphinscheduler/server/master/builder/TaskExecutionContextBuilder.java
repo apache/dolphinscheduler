@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.BashTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -79,7 +80,6 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setCpuQuota(taskInstance.getCpuQuota());
         taskExecutionContext.setMemoryMax(taskInstance.getMemoryMax());
         taskExecutionContext.setAppIds(taskInstance.getAppLink());
-        taskExecutionContext.setSshSessionHost(taskInstance.getSshSessionHost());
         return this;
     }
 
@@ -134,6 +134,11 @@ public class TaskExecutionContextBuilder {
 
     public TaskExecutionContextBuilder buildResourceParametersInfo(ResourceParametersHelper parametersHelper) {
         taskExecutionContext.setResourceParametersHelper(parametersHelper);
+        return this;
+    }
+
+    public TaskExecutionContextBuilder buildBashTaskExecutionContext(BashTaskExecutionContext bashTaskExecutionContext) {
+        taskExecutionContext.setBashTaskExecutionContext(bashTaskExecutionContext);
         return this;
     }
 
