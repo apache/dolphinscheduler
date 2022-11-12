@@ -123,7 +123,9 @@ public abstract class AbstractCommandExecutor {
                                    Logger logger) {
         this.logHandler = logHandler;
         this.taskRequest = taskRequest;
-        this.bashTaskExecutionContext = taskRequest.getBashTaskExecutionContext();
+        if (taskRequest != null) {
+            this.bashTaskExecutionContext = taskRequest.getBashTaskExecutionContext();
+        }
         this.logger = logger;
         this.logBuffer = new LinkedBlockingQueue<>();
     }
