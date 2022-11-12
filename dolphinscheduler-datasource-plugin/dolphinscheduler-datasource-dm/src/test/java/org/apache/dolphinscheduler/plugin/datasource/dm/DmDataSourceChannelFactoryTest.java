@@ -17,13 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.dm;
 
-import org.apache.dolphinscheduler.plugin.datasource.dm.param.DmConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.dm.param.DmDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import java.sql.Connection;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,20 +29,5 @@ public class DmDataSourceChannelFactoryTest {
         DmDataSourceChannelFactory sourceChannelFactory = new DmDataSourceChannelFactory();
         DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
         Assertions.assertNotNull(dataSourceChannel);
-    }
-
-    @Test
-    public void testGetDmConnection() {
-        String connectionParamJson = "{\"address\":\"jdbc:dm://localhost:5236\",\"database\":\"\","
-                + "\"jdbcUrl\":\"jdbc:dm://localhost:5236\",\"user\":\"SYSDBA\",\"password\":\"SYSDBA\"}";
-        DmDataSourceProcessor dmDatasourceProcessor = new DmDataSourceProcessor();
-        DmConnectionParam baseConnectionParam = (DmConnectionParam) dmDatasourceProcessor
-                .createConnectionParams(connectionParamJson);
-
-        DmDataSourceChannelFactory sourceChannelFactory = new DmDataSourceChannelFactory();
-        DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
-        DataSourceClient dataSourceClient = dataSourceChannel.createDataSourceClient(baseConnectionParam, DbType.DM);
-        Connection connection = dataSourceClient.getConnection();
-        System.out.println(connection);
     }
 }
