@@ -272,6 +272,38 @@ public class DataSourceMapperTest extends BaseDaoTest {
                 .containsAll(Arrays.asList(dataSourceIds)));
     }
 
+    @Test
+    public void testSelectPagingByIds() {
+        User user1 = createGeneralUser("user1");
+        User user2 = createGeneralUser("user2");
+        DataSource dataSource1ForUser1 = createDataSource(user1.getId(), "dataSource1ForUser1");
+        DataSource dataSource2ForUser2 = createDataSource(user2.getId(), "dataSource2ForUser2");
+        DataSource dataSource3ForUser1 = createDataSource(user1.getId(), dataSource1ForUser1.getName() + "test");
+
+        // select without conditions
+        Page page = new Page(0, 4);
+        List<DataSource> actualDataSources = dataSourceMapper.selectPagingByIds(page, null, null).getRecords();
+        Assertions.assertEquals(3, actualDataSources.size());
+        Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
+                .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId(),
+                        dataSource3ForUser1.getId())));
+
+        // select with name
+        actualDataSources = dataSourceMapper.selectPagingByIds(page, null, dataSource1ForUser1.getName()).getRecords();
+        Assertions.assertEquals(2, actualDataSources.size());
+        Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
+                .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource3ForUser1.getId())));
+
+        // select with dataSourceIds and name
+        actualDataSources = dataSourceMapper
+                .selectPagingByIds(page, Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId()),
+                        dataSource1ForUser1.getName())
+                .getRecords();
+        Assertions.assertEquals(1, actualDataSources.size());
+        Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
+                .containsAll(Arrays.asList(dataSource1ForUser1.getId())));
+    }
+
     /**
      * create datasource relation
      * @param userId
