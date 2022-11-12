@@ -25,7 +25,6 @@ public class DmConnectionParam extends BaseConnectionParam {
     public String toString() {
         return "DmConnectionParam{"
                 + "user='" + user + '\''
-                + ", password='" + password + '\''
                 + ", address='" + address + '\''
                 + ", database='" + database + '\''
                 + ", jdbcUrl='" + jdbcUrl + '\''
