@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.python;
 
+import org.apache.dolphinscheduler.plugin.task.api.BashTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +31,13 @@ public class PythonTaskTest {
     }
 
     private PythonTask createPythonTask() {
-        return new PythonTask(null);
+        return new PythonTask(createTaskExecutionContext());
+    }
+
+    private TaskExecutionContext createTaskExecutionContext() {
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(1);
+        taskExecutionContext.setBashTaskExecutionContext(new BashTaskExecutionContext());
+        return taskExecutionContext;
     }
 }
