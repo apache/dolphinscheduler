@@ -234,28 +234,34 @@ public class PythonGateway {
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
                                                 String otherParamsJson,
-                                                ProcessExecutionTypeEnum executionType) {
+                                                String executionType) {
         User user = usersService.queryUser(userName);
         Project project = projectMapper.queryByName(projectName);
         long projectCode = project.getCode();
 
         ProcessDefinition processDefinition = getProcessDefinition(user, projectCode, name);
+        ProcessExecutionTypeEnum executionTypeEnum = ProcessExecutionTypeEnum.valueOf(executionType);
         long processDefinitionCode;
         // create or update process definition
         if (processDefinition != null) {
             processDefinitionCode = processDefinition.getCode();
             // make sure process definition offline which could edit
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
-            Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name, processDefinitionCode, description, globalParams,
-                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
+                    ReleaseState.OFFLINE);
+            processDefinitionService.updateProcessDefinition(user, projectCode, name,
+                    processDefinitionCode, description, globalParams,
+                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    executionTypeEnum);
         } else {
-            Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
-                null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+            Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
+                    description, globalParams,
+                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    executionTypeEnum);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
 
-        // Fresh process definition schedule 
+        // Fresh process definition schedule
         if (schedule != null) {
             createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType, warningGroupId);
         }
