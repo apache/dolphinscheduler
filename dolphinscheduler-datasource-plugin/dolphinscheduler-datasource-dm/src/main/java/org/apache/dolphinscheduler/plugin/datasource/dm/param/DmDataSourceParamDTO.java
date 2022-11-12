@@ -31,7 +31,6 @@ public class DmDataSourceParamDTO extends BaseDataSourceParamDTO {
                 + ", port=" + port
                 + ", database='" + database + '\''
                 + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
                 + ", other='" + other + '\''
                 + '}';
     }
