@@ -259,7 +259,7 @@ public class PythonGateway {
             // make sure process definition offline which could edit
             processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
                     ReleaseState.OFFLINE);
-            Map<String, Object> result = processDefinitionService.updateProcessDefinition(user, projectCode, name,
+            processDefinitionService.updateProcessDefinition(user, projectCode, name,
                     processDefinitionCode, description, globalParams,
                     null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
