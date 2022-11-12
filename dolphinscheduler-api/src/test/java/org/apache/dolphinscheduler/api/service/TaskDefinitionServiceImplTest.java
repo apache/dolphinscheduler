@@ -170,8 +170,19 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
+        Mockito.when(processTaskRelationMapper.queryByTaskCode(3)).thenReturn(getProcessTaskRelationList2());
+        Mockito.when(processTaskRelationMapper
+                .updateProcessTaskRelationTaskVersion(Mockito.any(ProcessTaskRelation.class))).thenReturn(1);
         result = taskDefinitionService.updateTaskDefinition(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        // failure
+        Mockito.when(processTaskRelationMapper
+                .updateProcessTaskRelationTaskVersion(Mockito.any(ProcessTaskRelation.class))).thenReturn(2);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> taskDefinitionService.updateTaskDefinition(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson));
+        Assertions.assertEquals(Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+
     }
 
     @Test
@@ -529,6 +540,27 @@ public class TaskDefinitionServiceImplTest {
         processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
 
         processTaskRelationList.add(processTaskRelation);
+        return processTaskRelationList;
+    }
+
+    private List<ProcessTaskRelation> getProcessTaskRelationList2() {
+        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+
+        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        processTaskRelation.setProjectCode(PROJECT_CODE);
+        processTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        processTaskRelation.setPreTaskCode(TASK_CODE);
+        processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
+
+        processTaskRelationList.add(processTaskRelation);
+
+        ProcessTaskRelation processTaskRelation2 = new ProcessTaskRelation();
+        processTaskRelation2.setProjectCode(PROJECT_CODE);
+        processTaskRelation2.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        processTaskRelation2.setPreTaskCode(TASK_CODE - 1);
+        processTaskRelation2.setPostTaskCode(TASK_CODE);
+        processTaskRelationList.add(processTaskRelation2);
+
         return processTaskRelationList;
     }
 }

@@ -31,11 +31,17 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
+import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_DEFINE_NOT_EXIST;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.constants.Constants.COPY_SUFFIX;
+import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.IMPORT_SUFFIX;
+import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
@@ -106,6 +112,7 @@ import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -133,6 +140,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -1067,6 +1075,26 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             if (scheduleObj.getReleaseState() == ReleaseState.ONLINE) {
                 throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleObj.getId());
+            }
+        }
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
+                .queryByProcessCode(project.getCode(), processDefinition.getCode());
+        if (CollectionUtils.isNotEmpty(processTaskRelations)) {
+            Set<Long> taskCodeList = new HashSet<>(processTaskRelations.size() * 2);
+            for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+                if (processTaskRelation.getPreTaskCode() != 0) {
+                    taskCodeList.add(processTaskRelation.getPreTaskCode());
+                }
+                if (processTaskRelation.getPostTaskCode() != 0) {
+                    taskCodeList.add(processTaskRelation.getPostTaskCode());
+                }
+            }
+            if (CollectionUtils.isNotEmpty(taskCodeList)) {
+                int i = taskDefinitionMapper.deleteByBatchCodes(new ArrayList<>(taskCodeList));
+                if (i != taskCodeList.size()) {
+                    logger.error("Delete task definition error, processDefinitionCode:{}.", code);
+                    throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+                }
             }
         }
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
@@ -2894,6 +2922,89 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition) {
         return null;
+    }
+
+    /**
+     * view process variables
+     * @param loginUser    login user
+     * @param projectCode project code
+     * @param code        process definition code
+     * @return variables data
+     */
+    @Override
+    public Map<String, Object> viewVariables(User loginUser, long projectCode, long code) {
+
+        Project project = projectMapper.queryByCode(projectCode);
+
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
+
+        if (Objects.isNull(processDefinition) || projectCode != processDefinition.getProjectCode()) {
+            logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                    code);
+            putMsg(result, PROCESS_DEFINE_NOT_EXIST, code);
+            return result;
+        }
+
+        // global params
+        List<Property> globalParams = processDefinition.getGlobalParamList();
+
+        Map<String, Map<String, Object>> localUserDefParams = getLocalParams(processDefinition);
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        if (Objects.nonNull(globalParams)) {
+            resultMap.put(GLOBAL_PARAMS, globalParams);
+        }
+
+        if (Objects.nonNull(localUserDefParams)) {
+            resultMap.put(LOCAL_PARAMS, localUserDefParams);
+        }
+
+        result.put(DATA_LIST, resultMap);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * get local params
+     */
+    private Map<String, Map<String, Object>> getLocalParams(ProcessDefinition processDefinition) {
+        Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
+
+        Set<Long> taskCodeSet = new TreeSet<>();
+
+        processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode())
+                .forEach(processTaskRelation -> {
+                    if (processTaskRelation.getPreTaskCode() > 0) {
+                        taskCodeSet.add(processTaskRelation.getPreTaskCode());
+                    }
+                    if (processTaskRelation.getPostTaskCode() > 0) {
+                        taskCodeSet.add(processTaskRelation.getPostTaskCode());
+                    }
+                });
+
+        taskDefinitionMapper.queryByCodeList(taskCodeSet)
+                .stream().forEach(taskDefinition -> {
+                    Map<String, Object> localParamsMap = new HashMap<>();
+                    String localParams = JSONUtils.getNodeString(taskDefinition.getTaskParams(), LOCAL_PARAMS);
+                    if (!StringUtils.isEmpty(localParams)) {
+                        List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+                        localParamsMap.put(TASK_TYPE, taskDefinition.getTaskType());
+                        localParamsMap.put(LOCAL_PARAMS_LIST, localParamsList);
+                        if (CollectionUtils.isNotEmpty(localParamsList)) {
+                            localUserDefParams.put(taskDefinition.getName(), localParamsMap);
+                        }
+                    }
+                });
+
+        return localUserDefParams;
     }
 
     /**

@@ -113,16 +113,17 @@ public class ResourcePermissionCheckServiceImpl
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
-            originResSet.removeAll(ownResSets);
-            if (CollectionUtils.isNotEmpty(originResSet))
+            boolean checkResult = ownResSets != null && ownResSets.containsAll(originResSet);
+            if (!checkResult) {
                 logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
-            return CollectionUtils.isEmpty(originResSet);
+            }
+            return checkResult;
         }
         return true;
     }
 
     @Override
-    public boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId,
+    public boolean operationPermissionCheck(Object authorizationType, Integer userId,
                                             String permissionKey, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {

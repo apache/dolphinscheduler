@@ -68,7 +68,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
       label: t('project.node.hour')
     }
   ]
-  const DATE_LSIT = {
+  const DATE_LIST = {
     hour: [
       {
         value: 'currentHour',
@@ -252,7 +252,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             )
           }
           if (dependItem.cycle) {
-            dependItem.dateOptions = DATE_LSIT[dependItem.cycle]
+            dependItem.dateOptions = DATE_LIST[dependItem.cycle]
           }
         })
       })
@@ -354,7 +354,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             props: {
               onUpdateValue: (value: IDateType) => {
                 model.dependTaskList[i].dependItemList[j].dateOptions =
-                  DATE_LSIT[value]
+                  DATE_LIST[value]
                 model.dependTaskList[i].dependItemList[j].dateValue = null
               }
             },
