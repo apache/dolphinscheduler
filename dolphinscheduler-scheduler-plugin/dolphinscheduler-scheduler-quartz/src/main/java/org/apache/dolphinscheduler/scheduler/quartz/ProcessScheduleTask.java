@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -53,6 +54,9 @@ public class ProcessScheduleTask extends QuartzJobBean {
     @Autowired
     private CommandService commandService;
 
+    @Autowired
+    private ScheduleDao scheduleDao;
+
     @Counted(value = "ds.master.quartz.job.executed")
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
@@ -69,7 +73,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
         logger.info("scheduled fire time :{}, fire time :{}, scheduleId :{}", scheduledFireTime, fireTime, scheduleId);
 
         // query schedule
-        Schedule schedule = processService.querySchedule(scheduleId);
+        Schedule schedule = scheduleDao.querySchedule(scheduleId);
         if (schedule == null || ReleaseState.OFFLINE == schedule.getReleaseState()) {
             logger.warn(
                     "process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}",

@@ -57,6 +57,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -102,6 +103,9 @@ public class ExecutorServiceTest {
 
     @Mock
     private ProcessService processService;
+
+    @Mock
+    private ScheduleDao scheduleDao;
 
     @Mock
     private CommandService commandService;
@@ -224,7 +228,7 @@ public class ExecutorServiceTest {
     @Test
     public void testNoComplement() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+        Mockito.when(scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
@@ -247,7 +251,7 @@ public class ExecutorServiceTest {
     @Test
     public void testComplementWithStartNodeList() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+        Mockito.when(scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
@@ -276,7 +280,7 @@ public class ExecutorServiceTest {
         schedule.setCreateTime(new Date());
         schedule.setUpdateTime(new Date());
         List<Schedule> schedules = Lists.newArrayList(schedule);
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(
+        Mockito.when(scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(
                 processDefinitionCode))
                 .thenReturn(schedules);
 
@@ -314,7 +318,7 @@ public class ExecutorServiceTest {
     @Test
     public void testDateError() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+        Mockito.when(scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
@@ -336,7 +340,7 @@ public class ExecutorServiceTest {
     @Test
     public void testSerial() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+        Mockito.when(scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
@@ -358,7 +362,7 @@ public class ExecutorServiceTest {
     @Test
     public void testParallelWithOutSchedule() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+        Mockito.when(scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
@@ -381,7 +385,7 @@ public class ExecutorServiceTest {
     @Test
     public void testParallelWithSchedule() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+        Mockito.when(scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(oneSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,

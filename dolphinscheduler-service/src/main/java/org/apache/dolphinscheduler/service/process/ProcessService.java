@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
@@ -113,10 +112,6 @@ public interface ProcessService {
 
     void changeOutParam(TaskInstance taskInstance);
 
-    Schedule querySchedule(int id);
-
-    List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode);
-
     List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(long processDefinitionCode);
 
     List<ProcessInstance> queryNeedFailoverProcessInstances(String host);
@@ -133,8 +128,6 @@ public interface ProcessService {
     List<UdfFunc> queryUdfFunListByIds(Integer[] ids);
 
     String queryTenantCodeByResName(String resName, ResourceType resourceType);
-
-    List<Schedule> selectAllByProcessDefineCode(long[] codes);
 
     ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 

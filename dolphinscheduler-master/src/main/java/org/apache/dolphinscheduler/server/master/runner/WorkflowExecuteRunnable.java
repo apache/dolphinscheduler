@@ -58,6 +58,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -80,6 +81,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -147,6 +149,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private final ProcessInstance processInstance;
 
     private ProcessDefinition processDefinition;
+
+    private ScheduleDao scheduleDao;
 
     private DAG<String, TaskNode, TaskNodeRelation> dag;
 
@@ -265,6 +269,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         this.taskInstanceDao = taskInstanceDao;
         this.taskDefinitionLogDao = taskDefinitionLogDao;
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
+        this.scheduleDao = SpringApplicationContext.getBean(ScheduleDao.class);
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
 
@@ -900,7 +905,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 }
                 if (complementListDate.isEmpty() && needComplementProcess()) {
                     if (start != null && end != null) {
-                        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                        List<Schedule> schedules = scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(
                                 processInstance.getProcessDefinitionCode());
                         complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
                     }

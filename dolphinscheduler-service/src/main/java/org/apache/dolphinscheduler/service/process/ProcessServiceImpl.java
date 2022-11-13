@@ -100,7 +100,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -112,6 +111,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -225,9 +225,6 @@ public class ProcessServiceImpl implements ProcessService {
     private CommandMapper commandMapper;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
-
-    @Autowired
     private UdfFuncMapper udfFuncMapper;
 
     @Autowired
@@ -307,6 +304,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private CommandService commandService;
+
+    @Autowired
+    private ScheduleDao scheduleDao;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -552,33 +552,6 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             }
         }
-    }
-
-    /**
-     * get schedule time from command
-     *
-     * @param command  command
-     * @param cmdParam cmdParam map
-     * @return date
-     */
-    private Date getScheduleTime(Command command, Map<String, String> cmdParam) throws CronParseException {
-        Date scheduleTime = command.getScheduleTime();
-        if (scheduleTime == null && cmdParam != null && cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)) {
-
-            Date start = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE));
-            Date end = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
-            List<Schedule> schedules =
-                    queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
-            List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
-
-            if (CollectionUtils.isNotEmpty(complementDateList)) {
-                scheduleTime = complementDateList.get(0);
-            } else {
-                logger.error("set scheduler time error: complement date list is empty, command: {}",
-                        command.toString());
-            }
-        }
-        return scheduleTime;
     }
 
     /**
@@ -981,7 +954,8 @@ public class ProcessServiceImpl implements ProcessService {
         List<Date> complementDate = Lists.newLinkedList();
         if (start != null && end != null) {
             List<Schedule> listSchedules =
-                    queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+                    scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(
+                            processInstance.getProcessDefinitionCode());
             complementDate = CronUtils.getSelfFireDateList(start, end, listSchedules);
         }
         if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
@@ -1529,28 +1503,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * query schedule by id
-     *
-     * @param id id
-     * @return schedule
-     */
-    @Override
-    public Schedule querySchedule(int id) {
-        return scheduleMapper.selectById(id);
-    }
-
-    /**
-     * query Schedule by processDefinitionCode
-     *
-     * @param processDefinitionCode processDefinitionCode
-     * @see Schedule
-     */
-    @Override
-    public List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode) {
-        return scheduleMapper.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
-    }
-
-    /**
      * query dependent process definition by process definition code
      *
      * @param processDefinitionCode processDefinitionCode
@@ -1671,17 +1623,6 @@ public class ProcessServiceImpl implements ProcessService {
             return "";
         }
         return tenant.getTenantCode();
-    }
-
-    /**
-     * find schedule list by process define codes.
-     *
-     * @param codes codes
-     * @return schedule list
-     */
-    @Override
-    public List<Schedule> selectAllByProcessDefineCode(long[] codes) {
-        return scheduleMapper.selectAllByProcessDefineArray(codes);
     }
 
     /**

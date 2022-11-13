@@ -71,6 +71,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
@@ -156,6 +157,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private WorkerGroupService workerGroupService;
+
+    @Autowired
+    private ScheduleDao scheduleDao;
 
     /**
      * execute process instance
@@ -878,7 +882,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                 command.getCommandType().getDescp(), command.getProcessDefinitionCode());
                     }
                     // dependent process definition
-                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                    List<Schedule> schedules = scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(
                             command.getProcessDefinitionCode());
 
                     if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
@@ -898,7 +902,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 logger.info("RunMode of {} command is parallel run, processDefinitionCode:{}.",
                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
                 if (startDate != null && endDate != null) {
-                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                    List<Schedule> schedules = scheduleDao.queryReleaseSchedulerListByProcessDefinitionCode(
                             command.getProcessDefinitionCode());
                     List<ZonedDateTime> listDate = CronUtils.getSelfFireDateList(
                             DateUtils.stringToZoneDateTime(startDate),
