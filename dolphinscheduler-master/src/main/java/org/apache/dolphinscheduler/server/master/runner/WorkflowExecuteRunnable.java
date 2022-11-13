@@ -80,6 +80,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -235,36 +236,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
     /**
      * @param processInstance         processInstance
-     * @param processService          processService
-     * @param processInstanceDao      processInstanceDao
-     * @param nettyExecutorManager    nettyExecutorManager
-     * @param processAlertManager     processAlertManager
-     * @param masterConfig            masterConfig
-     * @param stateWheelExecuteThread stateWheelExecuteThread
      */
-    public WorkflowExecuteRunnable(
-                                   @NonNull ProcessInstance processInstance,
-                                   @NonNull CommandService commandService,
-                                   @NonNull ProcessService processService,
-                                   @NonNull ProcessInstanceDao processInstanceDao,
-                                   @NonNull NettyExecutorManager nettyExecutorManager,
-                                   @NonNull ProcessAlertManager processAlertManager,
-                                   @NonNull MasterConfig masterConfig,
-                                   @NonNull StateWheelExecuteThread stateWheelExecuteThread,
-                                   @NonNull CuringParamsService curingParamsService,
-                                   @NonNull TaskInstanceDao taskInstanceDao,
-                                   @NonNull TaskDefinitionLogDao taskDefinitionLogDao) {
-        this.processService = processService;
-        this.commandService = commandService;
-        this.processInstanceDao = processInstanceDao;
+    public WorkflowExecuteRunnable(@NonNull ProcessInstance processInstance) {
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.commandService = SpringApplicationContext.getBean(CommandService.class);
+        this.processInstanceDao = SpringApplicationContext.getBean(ProcessInstanceDao.class);
         this.processInstance = processInstance;
-        this.nettyExecutorManager = nettyExecutorManager;
-        this.processAlertManager = processAlertManager;
-        this.stateWheelExecuteThread = stateWheelExecuteThread;
-        this.curingParamsService = curingParamsService;
-        this.taskInstanceDao = taskInstanceDao;
-        this.taskDefinitionLogDao = taskDefinitionLogDao;
-        this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
+        this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
+        this.processAlertManager = SpringApplicationContext.getBean(ProcessAlertManager.class);
+        this.stateWheelExecuteThread = SpringApplicationContext.getBean(StateWheelExecuteThread.class);
+        this.curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
+        this.taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
+        this.taskDefinitionLogDao = SpringApplicationContext.getBean(TaskDefinitionLogDao.class);
+        this.masterAddress = NetUtils.getAddr(SpringApplicationContext.getBean(MasterConfig.class).getListenPort());
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
 

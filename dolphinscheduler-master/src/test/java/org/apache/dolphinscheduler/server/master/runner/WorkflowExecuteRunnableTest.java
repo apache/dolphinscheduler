@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
@@ -43,13 +42,11 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +56,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -71,38 +69,58 @@ public class WorkflowExecuteRunnableTest {
 
     private WorkflowExecuteRunnable workflowExecuteThread;
 
+    @Mock
     private ProcessInstance processInstance;
 
+    @Mock
     private TaskInstanceDao taskInstanceDao;
 
+    @Mock
     private TaskDefinitionLogDao taskDefinitionLogDao;
+
+    @Mock
     private ProcessService processService;
 
+    @Mock
     private CommandService commandService;
 
+    @Mock
     private ProcessInstanceDao processInstanceDao;
 
+    @Mock
     private MasterConfig config;
 
+    @Mock
     private ApplicationContext applicationContext;
 
+    @Mock
     private StateWheelExecuteThread stateWheelExecuteThread;
 
+    @Mock
     private CuringParamsService curingGlobalParamsService;
+
+    @Mock
+    private NettyExecutorManager nettyExecutorManager;
+
+    @Mock
+    private ProcessAlertManager processAlertManager;
 
     @BeforeEach
     public void init() throws Exception {
-        applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
 
-        config = new MasterConfig();
-        processService = Mockito.mock(ProcessService.class);
-        commandService = Mockito.mock(CommandService.class);
-        processInstanceDao = Mockito.mock(ProcessInstanceDao.class);
-        processInstance = Mockito.mock(ProcessInstance.class);
-        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
-        taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
+        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        Mockito.when(applicationContext.getBean(CommandService.class)).thenReturn(commandService);
+        Mockito.when(applicationContext.getBean(ProcessInstanceDao.class)).thenReturn(processInstanceDao);
+        Mockito.when(applicationContext.getBean(NettyExecutorManager.class)).thenReturn(nettyExecutorManager);
+        Mockito.when(applicationContext.getBean(ProcessAlertManager.class)).thenReturn(processAlertManager);
+        Mockito.when(applicationContext.getBean(StateWheelExecuteThread.class)).thenReturn(stateWheelExecuteThread);
+        Mockito.when(applicationContext.getBean(CuringParamsService.class)).thenReturn(curingGlobalParamsService);
+        Mockito.when(applicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+        Mockito.when(applicationContext.getBean(TaskDefinitionLogDao.class)).thenReturn(taskDefinitionLogDao);
+        Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
+
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
@@ -113,20 +131,14 @@ public class WorkflowExecuteRunnableTest {
 
         stateWheelExecuteThread = Mockito.mock(StateWheelExecuteThread.class);
         curingGlobalParamsService = Mockito.mock(CuringParamsService.class);
-        NettyExecutorManager nettyExecutorManager = Mockito.mock(NettyExecutorManager.class);
-        ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
-        workflowExecuteThread = Mockito.spy(
-                new WorkflowExecuteRunnable(processInstance, commandService, processService, processInstanceDao,
-                        nettyExecutorManager,
-                        processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService,
-                        taskInstanceDao, taskDefinitionLogDao));
+        workflowExecuteThread = Mockito.spy(new WorkflowExecuteRunnable(processInstance));
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
         dag.setAccessible(true);
         dag.set(workflowExecuteThread, new DAG());
     }
 
     @Test
-    public void testParseStartNodeName() throws ParseException {
+    public void testParseStartNodeName() {
         try {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_START_NODES, "1,2,3");
@@ -256,18 +268,6 @@ public class WorkflowExecuteRunnableTest {
         } catch (Exception e) {
             Assertions.fail();
         }
-    }
-
-    private List<Schedule> zeroSchedulerList() {
-        return Collections.emptyList();
-    }
-
-    private List<Schedule> oneSchedulerList() {
-        List<Schedule> schedulerList = new LinkedList<>();
-        Schedule schedule = new Schedule();
-        schedule.setCrontab("0 0 0 1/2 * ?");
-        schedulerList.add(schedule);
-        return schedulerList;
     }
 
 }

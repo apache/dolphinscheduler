@@ -26,12 +26,8 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
@@ -39,9 +35,7 @@ import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
-import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
@@ -73,22 +67,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private CommandService commandService;
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
-
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    private TaskDefinitionLogDao taskDefinitionLogDao;
-
-    @Autowired
     private MasterConfig masterConfig;
-
-    @Autowired
-    private ProcessAlertManager processAlertManager;
-
-    @Autowired
-    private NettyExecutorManager nettyExecutorManager;
 
     /**
      * master prepare exec service
@@ -97,12 +76,6 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
-
-    @Autowired
-    private StateWheelExecuteThread stateWheelExecuteThread;
-
-    @Autowired
-    private CuringParamsService curingGlobalParamsService;
 
     @Autowired
     private WorkflowEventQueue workflowEventQueue;
@@ -186,17 +159,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                             logger.error(
                                     "The workflow instance is already been cached, this case shouldn't be happened");
                         }
-                        WorkflowExecuteRunnable workflowRunnable = new WorkflowExecuteRunnable(processInstance,
-                                commandService,
-                                processService,
-                                processInstanceDao,
-                                nettyExecutorManager,
-                                processAlertManager,
-                                masterConfig,
-                                stateWheelExecuteThread,
-                                curingGlobalParamsService,
-                                taskInstanceDao,
-                                taskDefinitionLogDao);
+                        WorkflowExecuteRunnable workflowRunnable = new WorkflowExecuteRunnable(processInstance);
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
                                 processInstance.getId()));
