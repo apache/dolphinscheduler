@@ -175,10 +175,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 return true;
             }
         }
-        // check registry server
-        String workerGroupPath =
-                Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
-        return registryClient.exists(workerGroupPath);
+        return false;
     }
 
     /**
