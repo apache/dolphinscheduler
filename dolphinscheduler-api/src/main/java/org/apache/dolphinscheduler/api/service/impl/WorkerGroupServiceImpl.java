@@ -169,7 +169,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 return true;
             }
             // update group, the database exists with the same group name except itself
-            Optional<WorkerGroup> sameNameWorkGroupOptional = workerGroupList.stream().filter(group -> !Objects.equals(group.getId(), workerGroup.getId())).findFirst();
+            Optional<WorkerGroup> sameNameWorkGroupOptional = workerGroupList.stream()
+                    .filter(group -> !Objects.equals(group.getId(), workerGroup.getId())).findFirst();
             if (sameNameWorkGroupOptional.isPresent()) {
                 return true;
             }
