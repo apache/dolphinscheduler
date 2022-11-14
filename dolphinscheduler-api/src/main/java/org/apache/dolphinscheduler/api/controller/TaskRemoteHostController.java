@@ -40,6 +40,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,7 +70,7 @@ public class TaskRemoteHostController {
     private TaskRemoteHostService taskRemoteHostService;
 
     @Operation(summary = "createTaskRemoteHost", description = "CREATE_TASK_REMOTE_HOST_NOTES")
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_REMOTE_HOST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -80,7 +81,7 @@ public class TaskRemoteHostController {
     }
 
     @Operation(summary = "updateTaskRemoteHost", description = "UPDATE_TASK_REMOTE_HOST_NOTES")
-    @PutMapping(value = "/update/{code}")
+    @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TASK_REMOTE_HOST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -95,12 +96,12 @@ public class TaskRemoteHostController {
     @Parameters({
             @Parameter(name = "code", description = "TASK_REMOTE_HOST_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
-    @PostMapping(value = "/delete")
+    @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_REMOTE_HOST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteTaskRemoteHost(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam("taskRemoteHostCode") Long code) {
+                                       @RequestParam("code") Long code) {
         int result = taskRemoteHostService.deleteByCode(code, loginUser);
         return result > 0 ? Result.success() : Result.error(DELETE_TASK_REMOTE_HOST_ERROR);
     }

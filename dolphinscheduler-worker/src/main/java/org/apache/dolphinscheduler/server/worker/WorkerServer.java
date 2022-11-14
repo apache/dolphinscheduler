@@ -134,7 +134,7 @@ public class WorkerServer implements IStoppable {
 
         this.messageRetryRunner.start();
 
-        setSSHConfig();
+        initSSHSessionPool();
 
         /*
          * registry hooks, which are called before the process exits
@@ -199,17 +199,16 @@ public class WorkerServer implements IStoppable {
                 killNumber);
     }
 
-    public void setSSHConfig() {
+    public void initSSHSessionPool() {
         DSSessionPoolConfig poolConfig = new DSSessionPoolConfig();
         BeanUtils.copyProperties(sshSessionConfig.getPool(), poolConfig);
-        SSHSessionPool.setPoolConfig(poolConfig);
 
         DSSessionAbandonedConfig abandonedConfig = new DSSessionAbandonedConfig();
         BeanUtils.copyProperties(sshSessionConfig.getPool(), abandonedConfig);
-        SSHSessionPool.setAbandonedConfig(abandonedConfig);
 
         SftpConfig sftpConfig = new SftpConfig();
         BeanUtils.copyProperties(sshSessionConfig.getSftp(), sftpConfig);
-        SSHSessionPool.setSftpConfig(sftpConfig);
+
+        SSHSessionPool.init(poolConfig, abandonedConfig, sftpConfig);
     }
 }

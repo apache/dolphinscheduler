@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -63,7 +64,7 @@ class TaskRemoteHostControllerTest extends AbstractControllerTest {
         Mockito.when(taskRemoteHostService.createTaskRemoteHost(Mockito.any(User.class),
                 Mockito.any(TaskRemoteHostDTO.class))).thenReturn(1);
 
-        MvcResult mvcResult = mockMvc.perform(post("/remote_host/create")
+        MvcResult mvcResult = mockMvc.perform(post("/remote_host")
                 .header("sessionId", sessionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
@@ -87,7 +88,7 @@ class TaskRemoteHostControllerTest extends AbstractControllerTest {
 
         Mockito.when(taskRemoteHostService.updateTaskRemoteHost(Mockito.any(Long.class), Mockito.any(User.class),
                 Mockito.any(TaskRemoteHostDTO.class))).thenReturn(1);
-        MvcResult mvcResult = mockMvc.perform(put("/remote_host/update/1")
+        MvcResult mvcResult = mockMvc.perform(put("/remote_host/1")
                 .header("sessionId", sessionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
@@ -102,10 +103,10 @@ class TaskRemoteHostControllerTest extends AbstractControllerTest {
     @Test
     void deleteTaskRemoteHost() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("taskRemoteHostCode", "1");
+        paramsMap.add("code", "1");
         Mockito.when(taskRemoteHostService.deleteByCode(Mockito.any(Long.class), Mockito.any(User.class)))
                 .thenReturn(1);
-        MvcResult mvcResult = mockMvc.perform(post("/remote_host/delete")
+        MvcResult mvcResult = mockMvc.perform(delete("/remote_host/1")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

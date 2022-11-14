@@ -38,6 +38,7 @@ public class PooledSSHSessionFactory extends BaseKeyedPooledObjectFactory<SSHSes
     public SSHSessionHolder create(SSHSessionHost sshSessionHost) throws Exception {
         SSHSessionHolder pooledObject = new SSHSessionHolder(sshSessionHost);
         pooledObject.connect();
+        logger.info("create session {} for SSH", pooledObject);
         return pooledObject;
     }
 
@@ -48,8 +49,8 @@ public class PooledSSHSessionFactory extends BaseKeyedPooledObjectFactory<SSHSes
 
     @Override
     public void destroyObject(SSHSessionHost key, PooledObject<SSHSessionHolder> p,
-                              DestroyMode destroyMode) throws Exception {
-        logger.info("destroy session {}", p.getObject().toString());
+                              DestroyMode destroyMode) {
+        logger.info("destroy session {}", p.getObject());
         p.getObject().disconnect();
     }
 
@@ -60,7 +61,7 @@ public class PooledSSHSessionFactory extends BaseKeyedPooledObjectFactory<SSHSes
                 p.getObject().keepAlive();
                 return true;
             } catch (Exception e) {
-                logger.error("Cannot send alive msg to session of {}", p.getObject().toString(), e);
+                logger.error("Cannot send alive msg to session of {}", p.getObject(), e);
             }
         }
         return false;

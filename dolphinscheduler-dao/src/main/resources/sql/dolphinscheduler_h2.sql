@@ -2040,16 +2040,16 @@ CREATE TABLE t_ds_fav_task
 DROP TABLE IF EXISTS t_ds_task_remote_host CASCADE;
 CREATE TABLE t_ds_task_remote_host
 (
-    id                   int      NOT NULL   AUTO_INCREMENT,
-    code                 bigint(20)          NOT NULL ,
-    name        varchar(100)    NOT NULL ,
-    ip          varchar(100)    NOT NULL ,
-    port        int             NOT NULL ,
-    account        varchar(100)    NOT NULL ,
-    password    varchar(64)     NOT NULL ,
-    operator             int             DEFAULT NULL ,
-    description          text,
-    create_time          timestamp       DEFAULT NULL ,
-    update_time          timestamp       DEFAULT NULL ,
+    id                   int            NOT NULL   AUTO_INCREMENT,
+    code                 bigint(20)     NOT NULL ,
+    name                varchar(100)    NOT NULL ,
+    ip                  varchar(100)    NOT NULL ,
+    port                int             NOT NULL ,
+    account             varchar(100)    NOT NULL ,
+    password            varchar(64)     NOT NULL ,
+    operator            int             DEFAULT NULL ,
+    description         text,
+    create_time         timestamp       DEFAULT NULL ,
+    update_time         timestamp       DEFAULT NULL ,
     PRIMARY KEY (id)
 );

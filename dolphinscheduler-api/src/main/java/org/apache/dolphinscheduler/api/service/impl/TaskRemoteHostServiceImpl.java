@@ -49,7 +49,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -100,13 +99,7 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
         remoteHost.setCreateTime(new Date());
         remoteHost.setUpdateTime(new Date());
 
-        int result = taskRemoteHostMapper.insert(remoteHost);
-        if (result > 0) {
-            permissionPostHandle(AuthorizationType.TASK_REMOTE_TASK, loginUser.getId(),
-                    Collections.singletonList(remoteHost.getId()), logger);
-            logger.info("Create remote host successes, host name {}.", remoteHost.getName());
-        }
-        return result;
+        return taskRemoteHostMapper.insert(remoteHost);
     }
 
     @Override
@@ -215,8 +208,7 @@ public class TaskRemoteHostServiceImpl extends BaseServiceImpl implements TaskRe
         // if the session pool is full, return directly without any waiting
         poolConfig.setBlockWhenExhausted(false);
         DSSessionAbandonedConfig abandonedConfig = new DSSessionAbandonedConfig();
-        SSHSessionPool.setPoolConfig(poolConfig);
-        SSHSessionPool.setAbandonedConfig(abandonedConfig);
+        SSHSessionPool.init(poolConfig, abandonedConfig);
         SSHSessionHost sessionHost = new SSHSessionHost();
         BeanUtils.copyProperties(taskRemoteHostDTO, sessionHost);
 

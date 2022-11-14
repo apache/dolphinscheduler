@@ -26,7 +26,7 @@ import {
 
 export function createTaskRemoteHost(data: TaskRemoteHostReq): any {
   return axios({
-    url: '/remote_host/create',
+    url: '/remote_host',
     method: 'post',
     data,
     headers: {
@@ -36,11 +36,11 @@ export function createTaskRemoteHost(data: TaskRemoteHostReq): any {
   })
 }
 
-export function deleteTaskRemoteHostByCode(data: TaskRemoteHostCodeReq): any {
+export function deleteTaskRemoteHostByCode(code: number): any {
   return axios({
-    url: '/remote_host/delete',
-    method: 'post',
-    data
+    url: `/remote_host/${code}`,
+    method: 'delete',
+    params: { code }
   })
 }
 
@@ -72,7 +72,7 @@ export function updateTaskRemoteHost(
   code: CodeReq
 ): any {
   return axios({
-    url: `/remote_host/update/${code}`,
+    url: `/remote_host/${code}`,
     method: 'put',
     data,
     headers: {

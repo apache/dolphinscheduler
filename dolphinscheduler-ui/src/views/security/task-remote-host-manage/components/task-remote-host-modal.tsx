@@ -87,13 +87,6 @@ const TaskRemoteHostModal = defineComponent({
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     watch(
-      () => props.showModalRef,
-      () => {
-        props.showModalRef
-      }
-    )
-
-    watch(
       () => props.statusRef,
       () => {
         if (props.statusRef === 0) {

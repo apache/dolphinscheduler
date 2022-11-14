@@ -248,14 +248,13 @@ public abstract class AbstractCommandExecutor {
         this.sessionHost = bashTaskExecutionContext.getSessionHost();
         try {
             sessionHolder = SSHSessionPool.getSessionHolder(sessionHost);
-            sessionHolder.setSftpConfig(SSHSessionPool.getSftpConfig());
             logger.info("borrow session:{} success", sessionHolder);
 
             boolean uploadRes =
                     sessionHolder.sftpDir(taskRequest.getExecutePath(), taskRequest.getExecutePath(), logger);
             if (!uploadRes) {
                 logger.error("upload task {} execute path to remote session {} failed", taskRequest.getExecutePath(),
-                        sessionHost.toString());
+                        sessionHost);
                 result.setExitStatusCode(EXIT_CODE_FAILURE);
                 return result;
             }
@@ -265,7 +264,7 @@ public abstract class AbstractCommandExecutor {
                         sessionHolder.sftpDir(taskRequest.getEnvFile(), taskRequest.getExecutePath(), logger);
                 if (!uploadEnvRes) {
                     logger.error("upload task {} execute path to remote session {} failed", taskRequest.getEnvFile(),
-                            sessionHost.toString());
+                            sessionHost);
                     result.setExitStatusCode(EXIT_CODE_FAILURE);
                     return result;
                 }
@@ -273,7 +272,7 @@ public abstract class AbstractCommandExecutor {
 
             // because JSch .chmod is not stable, so use the 'chmod -R' instead
             logger.info("update remote path's permission:{} on session:{} to 755", taskRequest.getExecutePath(),
-                    sessionHost.toString());
+                    sessionHost);
             String chmodCommand = "chmod -R 755 " + taskRequest.getExecutePath();
             sessionHolder.execCommand(chmodCommand, getRemainTime(), logger);
 
@@ -297,12 +296,12 @@ public abstract class AbstractCommandExecutor {
 
         } catch (SSHException e) {
             logger.error("Running task command on remote session:{} failed.",
-                    sessionHost.toString(), e);
+                    sessionHost, e);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             return result;
         } catch (Exception e) {
             logger.error("Cannot get ssh session {} from SSHSession ACP pool",
-                    sessionHost.toString(), e);
+                    sessionHost, e);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             return result;
         } finally {

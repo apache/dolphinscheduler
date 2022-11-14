@@ -35,34 +35,34 @@ public final class SSHSessionPool {
 
     private static final Logger logger = LoggerFactory.getLogger(SSHSessionPool.class);
 
-    private static volatile GenericKeyedObjectPool<SSHSessionHost, SSHSessionHolder> sessionPool = null;
-
-    private static GenericKeyedObjectPoolConfig<SSHSessionHolder> poolConfig;
-
-    private static AbandonedConfig abandonedConfig;
+    private static GenericKeyedObjectPool<SSHSessionHost, SSHSessionHolder> sessionPool;
 
     private static SftpConfig sftpConfig;
 
-    public static GenericKeyedObjectPool<SSHSessionHost, SSHSessionHolder> getSessionPool() {
-        if (sessionPool == null) {
-            synchronized (SSHSessionPool.class) {
-                if (sessionPool == null) {
-                    sessionPool =
-                            new GenericKeyedObjectPool<>(new PooledSSHSessionFactory(), poolConfig, abandonedConfig);
-                }
-            }
-        }
-        return sessionPool;
+    private SSHSessionPool() {
+    }
+
+    public static void init(GenericKeyedObjectPoolConfig<SSHSessionHolder> poolConfig,
+                            AbandonedConfig abandonedConfig) {
+        init(poolConfig, abandonedConfig, null);
+    }
+
+    public static void init(GenericKeyedObjectPoolConfig<SSHSessionHolder> poolConfig, AbandonedConfig abandonedConfig,
+                            SftpConfig sftpConfig) {
+        sessionPool = new GenericKeyedObjectPool<>(new PooledSSHSessionFactory(), poolConfig, abandonedConfig);
+        SSHSessionPool.sftpConfig = sftpConfig;
     }
 
     public static SSHSessionHolder getSessionHolder(SSHSessionHost sessionHost) throws Exception {
-        logger.info("try to borrow a session:{}", sessionHost.toString());
-        return getSessionPool().borrowObject(sessionHost);
+        logger.info("try to borrow a session:{}", sessionHost);
+        SSHSessionHolder sessionHolder = sessionPool.borrowObject(sessionHost);
+        sessionHolder.setSftpConfig(sftpConfig);
+        return sessionHolder;
     }
 
     public static void returnSSHSessionHolder(SSHSessionHost sessionHost, SSHSessionHolder sessionHolder) {
-        logger.info("return session:{}", sessionHost.toString());
-        getSessionPool().returnObject(sessionHost, sessionHolder);
+        logger.info("return session:{}", sessionHost);
+        sessionPool.returnObject(sessionHost, sessionHolder);
     }
 
     public static void printPoolStatus() {
@@ -75,22 +75,6 @@ public final class SSHSessionPool {
         logger.info("Session Pool Stat: Active session count: {}, Idle session : {}, Wait session: {} , Total: {}",
                 sessionPool.getNumActive(), sessionPool.getNumIdle(), sessionPool.getNumWaiters(),
                 sessionPool.getMaxTotal());
-    }
-
-    public static void setPoolConfig(GenericKeyedObjectPoolConfig<SSHSessionHolder> poolConfig) {
-        SSHSessionPool.poolConfig = poolConfig;
-    }
-
-    public static void setAbandonedConfig(AbandonedConfig abandonedConfig) {
-        SSHSessionPool.abandonedConfig = abandonedConfig;
-    }
-
-    public static SftpConfig getSftpConfig() {
-        return sftpConfig;
-    }
-
-    public static void setSftpConfig(SftpConfig sftpConfig) {
-        SSHSessionPool.sftpConfig = sftpConfig;
     }
 
 }

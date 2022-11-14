@@ -85,7 +85,7 @@ public class SSHSessionHolder {
         // other authorization methods can be considered in the future
         this.session.setPassword(sessionHost.getPassword());
         this.session.connect();
-        logger.info("Connected to ssh session: {}, session id: {}", sessionHost.toString(), id);
+        logger.info("Connected to ssh session: {}, session id: {}", sessionHost, id);
     }
 
     public void disconnect() {
@@ -162,11 +162,15 @@ public class SSHSessionHolder {
             response.setOut(out);
             logger.info("Exec command {} on session {} finished, exit code: {}", command, this, response.getExitCode());
             return response;
+        } catch (InterruptedException e) {
+            logger.error("Exec command {} on session {} interrupted", command, this);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             throw new SSHException("Exec command " + command + " on session " + this + " failed", e);
         } finally {
             close(channelExec);
         }
+        return response;
     }
 
     public boolean sftpDir(String localDirPath, String remoteDirPath) {
@@ -191,7 +195,7 @@ public class SSHSessionHolder {
      */
     public boolean sftpDir(ChannelSftp channelSftp, String localDirPath, String remoteDirPath,
                            boolean enableUploadMonitor, int maxUploadRate, int maxFileSize, Logger customLogger) {
-        customLogger.info("Start to sftp local dir: {} to {}:{}", localDirPath, sessionHost.toString(), remoteDirPath);
+        customLogger.info("Start to sftp local dir: {} to {}:{}", localDirPath, sessionHost, remoteDirPath);
 
         File file = new File(localDirPath);
         if (!file.exists()) {
@@ -206,7 +210,7 @@ public class SSHSessionHolder {
             } catch (SftpException e) {
                 if (!createDirOnRemote(remoteDirPath)) {
                     customLogger.error("Create directory:{} on remote:{} failed, so exit.", remoteDirPath,
-                            sessionHost.toString());
+                            sessionHost);
                     return false;
                 }
             }
@@ -236,13 +240,13 @@ public class SSHSessionHolder {
                         } catch (SftpException e) {
                             if (!createDirOnRemote(mkdirPath)) {
                                 customLogger.error("Could not create directory {} on remote session:{}", mkdirPath,
-                                        sessionHost.toString());
+                                        sessionHost);
                                 return false;
                             }
                         }
                         if (!sftpDir(createChannelSftp(), sf, mkdirPath, enableUploadMonitor, maxUploadRate, -1,
                                 customLogger)) {
-                            customLogger.error("sftp {} to {}:{} failed.", sf, sessionHost.toString(), mkdirPath);
+                            customLogger.error("sftp {} to {}:{} failed.", sf, sessionHost, mkdirPath);
                             return false;
                         }
                     } else {
@@ -266,7 +270,7 @@ public class SSHSessionHolder {
      * @return result
      */
     public boolean createDirOnRemote(String remoteDirPath) {
-        logger.info("create directory:{} on remote:{}", remoteDirPath, sessionHost.toString());
+        logger.info("create directory:{} on remote:{}", remoteDirPath, sessionHost);
         SSHResponse response = execCommand("mkdir -p " + remoteDirPath);
         return response.getExitCode() == 0;
     }

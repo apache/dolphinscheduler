@@ -177,7 +177,7 @@ export function useTable() {
   })
 
   const handleDelete = (row: any) => {
-    deleteTaskRemoteHostByCode({ taskRemoteHostCode: row.code }).then(() => {
+    deleteTaskRemoteHostByCode(row.code).then(() => {
       getTableData({
         pageSize: variables.pageSize,
         pageNo:
