@@ -32,7 +32,7 @@ if sys.version_info[0] < 3:
 
 logger = logging.getLogger(__name__)
 
-version = "3.0.1"
+version = "3.0.2"
 
 # Start package required
 prod = [
@@ -139,7 +139,7 @@ setup(
     ],
     project_urls={
         "Homepage": "https://dolphinscheduler.apache.org",
-        "Documentation": "https://dolphinscheduler.apache.org/python/dev/index.html",
+        "Documentation": "https://dolphinscheduler.apache.org/python/main/index.html",
         "Source": "https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-python/"
         "pydolphinscheduler",
         "Issue Tracker": "https://github.com/apache/dolphinscheduler/issues?"
