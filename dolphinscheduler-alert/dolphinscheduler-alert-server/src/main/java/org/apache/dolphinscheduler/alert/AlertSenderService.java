@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,7 +185,7 @@ public final class AlertSenderService extends Thread {
         Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
         String instanceWarnType = WarningType.ALL.getDescp();
 
-        if (paramsMap != null) {
+        if (MapUtils.isNotEmpty(paramsMap)) {
             instanceWarnType = paramsMap.getOrDefault(AlertConstants.NAME_WARNING_TYPE, WarningType.ALL.getDescp());
         }
 

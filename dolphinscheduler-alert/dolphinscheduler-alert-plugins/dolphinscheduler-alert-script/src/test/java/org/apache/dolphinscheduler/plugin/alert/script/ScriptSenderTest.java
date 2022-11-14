@@ -53,4 +53,31 @@ public class ScriptSenderTest {
         Assert.assertEquals("false", alertResult.getStatus());
     }
 
+    @Test
+    public void testUserParamsNPE() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, null);
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult;
+        alertResult = scriptSender.sendScriptAlert("test user params NPE", "test content");
+        Assert.assertEquals("true", alertResult.getStatus());
+    }
+
+    @Test
+    public void testPathNPE() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, null);
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult;
+        alertResult = scriptSender.sendScriptAlert("test path NPE", "test content");
+        Assert.assertEquals("false", alertResult.getStatus());
+    }
+
+    @Test
+    public void testTypeIsError() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, null);
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult;
+        alertResult = scriptSender.sendScriptAlert("test type is error", "test content");
+        Assert.assertEquals("false", alertResult.getStatus());
+    }
+
 }

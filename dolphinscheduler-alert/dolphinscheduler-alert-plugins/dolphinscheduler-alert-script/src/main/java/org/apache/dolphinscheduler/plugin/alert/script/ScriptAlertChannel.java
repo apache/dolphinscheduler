@@ -29,8 +29,8 @@ public final class ScriptAlertChannel implements AlertChannel {
     public AlertResult process(AlertInfo alertinfo) {
         AlertData alertData = alertinfo.getAlertData();
         Map<String, String> paramsMap = alertinfo.getAlertParams();
-        if (null == paramsMap) {
-            return new AlertResult("false", "script params is null");
+        if (paramsMap == null || paramsMap.isEmpty()) {
+            return new AlertResult("false", "script params is empty");
         }
         return new ScriptSender(paramsMap).sendScriptAlert(alertData.getTitle(), alertData.getContent());
     }
