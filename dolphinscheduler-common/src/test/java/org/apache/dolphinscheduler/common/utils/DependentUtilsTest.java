@@ -360,13 +360,13 @@ public class DependentUtilsTest {
 
     @Test
     public void testGetLast24Hour() {
-        Date curDay = DateUtils.stringToDate("2020-05-15 12:10:00");
+        Date curDay = DateUtils.stringToDate("2020-05-15 02:10:00");
         String dateValue = "last24Hours";
 
         List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
 
         List<DateInterval> expect = Lists.newArrayList();
-        for (int a = 1; a < 24; a++) {
+        for (int a = 2; a < 24; a++) {
             String i = a + "";
             if (a < 10) {
                 i = "0" + i;
@@ -374,8 +374,8 @@ public class DependentUtilsTest {
             DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":59:59")));
             expect.add(dateInterval);
         }
-        DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 00:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 00:59:59")));
-        expect.add(dateInterval);
+        expect.add(new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 00:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 00:59:59"))));
+        expect.add(new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 01:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 01:59:59"))));
 
         Assert.assertEquals(24, dateIntervals.size());
 
