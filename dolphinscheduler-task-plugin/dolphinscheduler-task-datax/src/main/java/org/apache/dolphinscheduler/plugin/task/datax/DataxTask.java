@@ -209,7 +209,7 @@ public class DataxTask extends AbstractTask {
         }
 
         if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()) {
-            json = dataXParameters.getJson().replaceAll("\\r\\n", "\n");
+            json = dataXParameters.getJson().replaceAll("\\r\\n", System.lineSeparator());
         } else {
             ObjectNode job = JSONUtils.createObjectNode();
             job.putArray("content").addAll(buildDataxJobContentJson());
