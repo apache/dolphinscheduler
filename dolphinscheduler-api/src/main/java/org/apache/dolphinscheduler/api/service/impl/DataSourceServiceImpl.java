@@ -182,7 +182,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         // check name can use or not
-        if (!dataSource.getName().trim().equals(dataSource.getName()) && checkName(dataSource.getName())) {
+        if (!dataSourceParam.getName().trim().equals(dataSource.getName()) && checkName(dataSourceParam.getName())) {
             logger.warn("Datasource with the same name already exists, name:{}.", dataSource.getName());
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
