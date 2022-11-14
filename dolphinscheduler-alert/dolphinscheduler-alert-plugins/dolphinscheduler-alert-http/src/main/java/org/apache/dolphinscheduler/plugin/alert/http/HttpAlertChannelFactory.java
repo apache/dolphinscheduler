@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
+import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -40,7 +41,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
 
         InputParam url = InputParam.newBuilder(HttpAlertConstants.NAME_URL, HttpAlertConstants.URL)
-                .setPlaceholder("input request URL")
+                .setPlaceholder(AlertInputTips.URL.getMsg())
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
@@ -48,7 +49,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
 
         InputParam headerParams =
                 InputParam.newBuilder(HttpAlertConstants.NAME_HEADER_PARAMS, HttpAlertConstants.HEADER_PARAMS)
-                        .setPlaceholder("input request headers as JSON format ")
+                        .setPlaceholder(AlertInputTips.HEADER.getMsg())
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
@@ -56,7 +57,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
 
         InputParam bodyParams =
                 InputParam.newBuilder(HttpAlertConstants.NAME_BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
-                        .setPlaceholder("input request body as JSON format ")
+                        .setPlaceholder(AlertInputTips.JSON_BODY.getMsg())
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false)
                                 .build())
@@ -64,7 +65,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
 
         InputParam contentField =
                 InputParam.newBuilder(HttpAlertConstants.NAME_CONTENT_FIELD, HttpAlertConstants.CONTENT_FIELD)
-                        .setPlaceholder("input alert msg field name")
+                        .setPlaceholder(AlertInputTips.FIELD_NAME.getMsg())
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
@@ -72,7 +73,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
 
         InputParam requestType =
                 InputParam.newBuilder(HttpAlertConstants.NAME_REQUEST_TYPE, HttpAlertConstants.REQUEST_TYPE)
-                        .setPlaceholder("input request type POST or GET")
+                        .setPlaceholder(AlertInputTips.HTTP_METHOD.getMsg())
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
