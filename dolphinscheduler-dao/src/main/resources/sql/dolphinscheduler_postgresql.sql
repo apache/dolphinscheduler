@@ -1996,7 +1996,7 @@ CREATE TABLE t_ds_task_remote_host
     name                 varchar(100)    NOT NULL ,
     ip                   varchar(100)    NOT NULL ,
     port                 int NOT NULL ,
-    user                 varchar(100)    NOT NULL ,
+    account              varchar(100)    NOT NULL ,
     password             varchar(64)     NOT NULL ,
     operator             int             DEFAULT NULL ,
     description          text,
