@@ -80,6 +80,7 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+    static-path-pattern: /static/**
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

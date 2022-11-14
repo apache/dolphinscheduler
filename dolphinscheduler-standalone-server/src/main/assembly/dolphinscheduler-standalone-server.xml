@@ -94,6 +94,13 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/../dolphinscheduler-api/src/main/resources</directory>
+            <includes>
+                <include>dynamic-task-type-config.yaml</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
         </fileSet>
