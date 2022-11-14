@@ -62,8 +62,10 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import py4j.GatewayServer;
+import py4j.GatewayServer.GatewayServerBuilder;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -657,28 +659,27 @@ public class PythonGateway {
 
     @PostConstruct
     public void init() {
-        if (pythonGatewayConfiguration.getEnabled()) {
+        if (pythonGatewayConfiguration.isEnabled()) {
             this.start();
         }
     }
 
     private void start() {
-        GatewayServer server;
         try {
             InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfiguration.getGatewayServerAddress());
-            InetAddress pythonHost = InetAddress.getByName(pythonGatewayConfiguration.getPythonAddress());
-            server = new GatewayServer(
-                    this,
-                    pythonGatewayConfiguration.getGatewayServerPort(),
-                    pythonGatewayConfiguration.getPythonPort(),
-                    gatewayHost,
-                    pythonHost,
-                    pythonGatewayConfiguration.getConnectTimeout(),
-                    pythonGatewayConfiguration.getReadTimeout(),
-                    null);
+            GatewayServerBuilder serverBuilder = new GatewayServer.GatewayServerBuilder()
+                    .entryPoint(this)
+                    .javaAddress(gatewayHost)
+                    .javaPort(pythonGatewayConfiguration.getGatewayServerPort())
+                    .connectTimeout(pythonGatewayConfiguration.getConnectTimeout())
+                    .readTimeout(pythonGatewayConfiguration.getReadTimeout());
+            if (!StringUtils.isEmpty(pythonGatewayConfiguration.getAuthToken())) {
+                serverBuilder.authToken(pythonGatewayConfiguration.getAuthToken());
+            }
+
             GatewayServer.turnLoggingOn();
             logger.info("PythonGatewayService started on: " + gatewayHost.toString());
-            server.start();
+            serverBuilder.build().start();
         } catch (UnknownHostException e) {
             logger.error("exception occurred while constructing PythonGatewayService().", e);
         }
