@@ -33,5 +33,9 @@
             <artifactId>dolphinscheduler-spi</artifactId>
             <!-- TODO should get rid off this -->
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
     </dependencies>
 </project>
