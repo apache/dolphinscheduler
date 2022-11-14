@@ -25,8 +25,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 public enum AlertInputTips {
 
-    PASSWORD( "if enable use authentication, you need input password", "如果开启鉴权校验，则需要输入密码"),
-    USERNAME( "if enable use authentication, you need input user", "如果开启鉴权校验，则需要输入账号"),
+    PASSWORD("if enable use authentication, you need input password", "如果开启鉴权校验，则需要输入密码"),
+    USERNAME("if enable use authentication, you need input user", "如果开启鉴权校验，则需要输入账号"),
     RECEIVERS("please input receivers", "请输入收件人"),
     URL("input request URL", "请输入请求的URL"),
     HEADER("input request headers as JSON format", "请输入JSON格式的请求头"),
