@@ -1,8 +1,27 @@
+/*
+ * Licensed to Apache Software Foundation (ASF) under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Apache Software Foundation (ASF) licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.dolphinscheduler.alert.api;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import java.util.Locale;
+
+import org.springframework.context.i18n.LocaleContextHolder;
 
 public enum AlertInputTips {
 
@@ -24,8 +43,9 @@ public enum AlertInputTips {
     ROOM_ID("input the room ID the alert message send to", "请输入告警信息发送的room ID"),
     RECIPIENT_USER_ID("input the person ID of the alert message recipient", "请输入告警信息接收人的person ID"),
     RECIPIENT_EMAIL("input the email address of the alert message recipient", "请输入告警信息接收人的email地址"),
-    WEBEX_MENTION_USERS("use `,`(eng commas) to separate multiple emails, to specify the person you mention in the room",
-            "使用,来分割多个email，来指出在房间中要@的人"),
+    WEBEX_MENTION_USERS(
+            "use `,`(eng commas) to separate multiple emails, to specify the person you mention in the room",
+            "使用 `, `来分割多个email，来指出在房间中要@的人"),
     CORP_ID("please input corp id", "请输入corp id"),
     SECRET("please input secret", "请输入secret"),
     WECHAT_MENTION_USERS("use `|` to separate userIds and `@all` to everyone", "使用`|`来分割userId或使用`@all`来提到所有人"),
