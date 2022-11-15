@@ -15,4 +15,4 @@
  * limitations under the License.
 */
 --- add column
-ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
+ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS description varchar(255) DEFAULT NULL;
