@@ -1069,10 +1069,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
         if (CollectionUtils.isNotEmpty(records)) {
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
-            List<TaskMainInfo> resultRecords = Lists.newArrayList();
-            int index = 0;
             for (TaskMainInfo info : records) {
-                TaskMainInfo taskMainInfo = taskMainInfoMap.compute(info.getTaskCode(), (k, v) -> {
+                taskMainInfoMap.compute(info.getTaskCode(), (k, v) -> {
                     if (v == null) {
                         Map<Long, String> upstreamTaskMap = new HashMap<>();
                         if (info.getUpstreamTaskCode() != 0) {
@@ -1088,9 +1086,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     }
                     return v;
                 });
-                resultRecords.add(index, taskMainInfo);
-                index++;
             }
+            List<TaskMainInfo> resultRecords = Lists.newArrayList(taskMainInfoMap.values());
+            resultRecords.sort((o1, o2) -> o2.getTaskUpdateTime().compareTo(o1.getTaskUpdateTime()));
             taskMainInfoIPage.setRecords(resultRecords);
         }
         PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
