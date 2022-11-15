@@ -1203,13 +1203,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(resource.getType(), loginUser, resource.getId());
-        Map<String, Object> resultMap = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-            if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
-                resultMap.put(entry.getKey().toString(), entry.getValue());
-            }
-        }
-        result.setData(resultMap);
 
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
@@ -1217,6 +1210,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         }
+
+        Map<String, Object> resultMap = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
+            if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
+                resultMap.put(entry.getKey().toString(), entry.getValue());
+            }
+        }
+        result.setData(resultMap);
         return result;
     }
 
