@@ -57,7 +57,7 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(9) > .n-menu-item-content")
     private WebElement menuNamespaceManage;
 
-    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(10) > .n-menu-item-content")
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(11) > .n-menu-item-content")
     private WebElement menuTokenManage;
 
     public SecurityPage(RemoteWebDriver driver) {

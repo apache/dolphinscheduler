@@ -273,7 +273,7 @@ public abstract class AbstractCommandExecutor {
             // because JSch .chmod is not stable, so use the 'chmod -R' instead
             logger.info("update remote path's permission:{} on session:{} to 755", taskRequest.getExecutePath(),
                     sessionHost);
-            String chmodCommand = "chmod -R 755 " + taskRequest.getExecutePath();
+            String chmodCommand = "chmod -R 700 " + taskRequest.getExecutePath();
             sessionHolder.execCommand(chmodCommand, getRemainTime(), logger);
 
             // all ssh task process id equals -1
