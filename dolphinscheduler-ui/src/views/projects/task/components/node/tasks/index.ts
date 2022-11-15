@@ -48,6 +48,7 @@ import { usePytorch } from './use-pytorch'
 import { useHiveCli } from './use-hive-cli'
 import { useDms } from './use-dms'
 import { useDatasync } from './use-datasync'
+import { useKubeflow } from './use-kubeflow'
 import { useLinkis } from './use-linkis'
 
 export default {
@@ -84,5 +85,6 @@ export default {
   HIVECLI: useHiveCli,
   DMS: useDms,
   DATASYNC: useDatasync,
-  LINKIS: useLinkis,
+  KUBEFLOW: useKubeflow,
+  LINKIS: useLinkis
 }

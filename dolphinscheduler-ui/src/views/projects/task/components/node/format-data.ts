@@ -456,6 +456,11 @@ export function formatParams(data: INodeData): {
     taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
   }
 
+  if (data.taskType === 'KUBEFLOW') {
+    taskParams.yamlContent = data.yamlContent
+    taskParams.namespace = data.namespace
+  }
+  
   if (data.taskType === 'LINKIS') {
     taskParams.useCustom = data.useCustom
     taskParams.paramScript = data.paramScript

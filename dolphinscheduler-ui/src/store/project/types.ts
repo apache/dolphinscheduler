@@ -54,6 +54,7 @@ type TaskType =
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
+  | 'KUBEFLOW'
   | 'LINKIS'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'

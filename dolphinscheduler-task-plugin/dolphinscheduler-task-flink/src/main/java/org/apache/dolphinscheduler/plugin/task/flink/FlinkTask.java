@@ -85,10 +85,16 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     protected void setMainJarName() {
+        if (flinkParameters.getProgramType() == ProgramType.SQL) {
+            logger.info("The current flink job type is SQL, will no need to set main jar");
+            return;
+        }
+
         ResourceInfo mainJar = flinkParameters.getMainJar();
         String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);
         flinkParameters.setMainJar(mainJar);
+        logger.info("Success set flink jar: {}", resourceName);
     }
 
     @Override

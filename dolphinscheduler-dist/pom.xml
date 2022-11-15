@@ -73,11 +73,6 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-tools</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-python</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -118,36 +113,6 @@
                                         <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
                                     </descriptors>
                                     <appendAssemblyId>true</appendAssemblyId>
-                                </configuration>
-                            </execution>
-
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>python</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-
-                            <execution>
-                                <id>python</id>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <!-- Make final directory with simple name `python`, and without any addtion information -->
-                                    <finalName>python</finalName>
-                                    <appendAssemblyId>false</appendAssemblyId>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/dolphinscheduler-python-api.xml</descriptor>
-                                    </descriptors>
                                 </configuration>
                             </execution>
 

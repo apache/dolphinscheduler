@@ -394,7 +394,8 @@ interface ITaskParams {
   destinationLocationArn?: string
   sourceLocationArn?: string
   name?: string
-  cloudWatchLogGroupArn?: string,
+  cloudWatchLogGroupArn?: string
+  yamlContent?: string
   paramScript?: ILocalParam[]
 }
 

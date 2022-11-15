@@ -213,6 +213,10 @@ export default {
                                 title: 'AWS Datasync',
                                 link: '/en-us/docs/dev/user_doc/guide/task/datasync.html',
                             },
+                            {
+                                title: 'Kubeflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
                         ],
                     },
                     {
@@ -237,6 +241,10 @@ export default {
                             {
                                 title: 'Parameter Priority',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/priority.html',
+                            },
+                            {
+                                title: 'File Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
                             },
                         ],
                     },
@@ -471,7 +479,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/dev/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: 'Health Check',
@@ -865,6 +873,10 @@ export default {
                                 title: 'AWS Datasync',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datasync.html',
                             },
+                            {
+                                title: 'Kubeflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
                         ],
                     },
                     {
@@ -889,6 +901,10 @@ export default {
                             {
                                 title: '参数优先级',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/priority.html',
+                            },
+                            {
+                                title: '文件参数传递',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/file-parameter.html',
                             },
                         ],
                     },
@@ -1099,7 +1115,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/dev/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: '健康检查',

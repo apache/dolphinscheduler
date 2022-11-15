@@ -201,6 +201,9 @@ $bgLight: #ffffff;
     &.icon-linkis {
       background-image: url('/images/task-icons/linkis.png');
     }
+    &.icon-kubeflow {
+      background-image: url('/images/task-icons/kubeflow_hover.png');
+    }
   }
 
   &:hover {
@@ -304,6 +307,9 @@ $bgLight: #ffffff;
       }
       &.icon-linkis {
         background-image: url('/images/task-icons/linkis_hover.png');
+      }
+      &.icon-kubeflow {
+        background-image: url('/images/task-icons/kubeflow.png');
       }
     }
   }
