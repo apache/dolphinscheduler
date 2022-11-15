@@ -407,6 +407,6 @@ public class TaskInstance implements Serializable {
         Date now = new Date();
         long failedTimeInterval = DateUtils.differSec(now, getEndTime());
         // task retry does not over time, return false
-        return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
+        return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT > failedTimeInterval;
     }
 }
