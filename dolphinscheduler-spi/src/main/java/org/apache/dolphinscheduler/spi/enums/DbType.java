@@ -27,7 +27,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.base.Functions;
 
 public enum DbType {
-
     MYSQL(0, "mysql"),
     POSTGRESQL(1, "postgresql"),
     HIVE(2, "hive"),
