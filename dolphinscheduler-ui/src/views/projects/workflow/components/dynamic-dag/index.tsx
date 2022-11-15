@@ -15,51 +15,77 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { DagSidebar } from './dag-sidebar'
 import { DagCanvas } from './dag-canvas'
 import { useDagStore } from '@/store/project/dynamic/dag'
+import { NodeShape, NodeHeight, NodeWidth } from './dag-setting'
+import { TaskForm } from './task'
+import { queryDynamicTaskResource } from '@/service/modules/dynamic-dag'
 import styles from './index.module.scss'
 
 const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
-    const dragged = reactive({
-      x: 0,
-      y: 0,
-      task: ''
-    })
+    const draggedTask = ref()
+    const formData = ref()
+    const showModal = ref(false)
 
-    const handelDragstart = (e: DragEvent, task: string) => {
-      dragged.x = e.offsetX
-      dragged.y = e.offsetY
-      dragged.task = task
+    const handelDragstart = (task: any) => {
+      draggedTask.value = task.name
+
+      queryDynamicTaskResource(task.json).then((res: any) => {
+        formData.value = res
+      })
     }
 
     const handelDrop = (e: DragEvent) => {
-      if (!dragged.task) return
-
-      dragged.x = e.offsetX
-      dragged.y = e.offsetY
+      if (!draggedTask) return
 
       const shapes = useDagStore().getDagTasks
-      if (shapes) {
-        shapes.push(dragged)
-      }
+
+      shapes.push({
+        id: String(shapes.length + 1),
+        x: e.offsetX,
+        y: e.offsetY,
+        width: NodeWidth,
+        height: NodeHeight,
+        shape: NodeShape,
+        label: draggedTask.value.name + String(shapes.length + 1),
+        zIndex: 1,
+        task: draggedTask.value.name
+      })
+
       useDagStore().setDagTasks(shapes)
+
+      showModal.value = true
     }
 
     return {
+      draggedTask,
+      formData,
       handelDragstart,
-      handelDrop
+      handelDrop,
+      showModal
     }
   },
   render() {
     return (
-      <div class={styles['workflow-dag']}>
-        <DagSidebar onDragstart={this.handelDragstart} />
-        <DagCanvas onDrop={this.handelDrop} />
-      </div>
+      <>
+        <div class={styles['workflow-dag']}>
+          <DagSidebar onDragstart={this.handelDragstart}/>
+          <DagCanvas onDrop={this.handelDrop}/>
+        </div>
+        {
+          this.draggedTask && this.formData && <TaskForm
+            task={this.draggedTask}
+            formData={this.formData}
+            showModal={this.showModal}
+            onCancelModal={() => this.showModal = false}
+            onConfirmModal={() => this.showModal = false}
+          />
+        }
+      </>
     )
   }
 })

@@ -9,8 +9,6 @@
 java -version
 # 需要 Maven 
 mvn -version
-# 需要 Python 3.6 及以上的版本，并且需要 `python` 关键字能在命令行中运行，且版本符合条件。
-python --version
 ```
 
 ## GPG设置
@@ -165,21 +163,18 @@ A_USERNAME=<YOUR-APACHE-USERNAME>
 git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git
 cd ~/dolphinscheduler/
 git pull
-git checkout -b ${RELEASE.VERSION}-release
-git push origin ${RELEASE.VERSION}-release
+git checkout -b "${VERSION}"-release
+git push origin "${VERSION}"-release
 ```
 
 ### 发布预校验
 
 ```shell
-# 保证 python profile 的 gpg 可以正常运行
-export GPG_TTY=$(tty)
-
 # 运行发版校验
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
-* `-Prelease,python`: 选择release和python的profile，这个profile会打包所有源码、jar文件以及可执行二进制包，以及Python的二进制包。
+* `-Prelease`: 选择release的profile，这个profile会打包所有源码、jar文件以及可执行二进制包。
 * `-DautoVersionSubmodules=true`: 作用是发布过程中版本号只需要输入一次，不必为每个子模块都输入一次。
 * `-DdryRun=true`: 演练，即不产生版本号提交，不生成新的tag。
 
@@ -194,7 +189,7 @@ mvn release:clean
 然后准备执行发布。
 
 ```shell
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true  -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 和上一步演练的命令基本相同，去掉了 `-DdryRun=true` 参数。
@@ -223,7 +218,7 @@ git push origin --tags
 ### 部署发布
 
 ```shell
-mvn release:perform -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 执行完该命令后，待发布版本会自动上传到Apache的临时筹备仓库(staging repository)。你可以通过访问 [apache staging repositories](https://repository.apache.org/#stagingRepositories)
@@ -270,7 +265,6 @@ svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 
 ```shell
 mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 cd ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 ```
 
@@ -280,9 +274,6 @@ cd ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 # 主程序源码包和二进制包
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz.asc ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-
-# Python API 源码和二进制包
-cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 ```
 
 ### 生成文件签名
@@ -290,10 +281,6 @@ cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolp
 ```shell
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -a 512 apache-dolphinscheduler-python-"${VERSION}".tar.gz >> apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -b -a 512 apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl >> apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### 提交Apache SVN
@@ -311,10 +298,6 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```shell
 shasum -c apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -c apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -c apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -c apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### 检查gpg签名
@@ -347,10 +330,6 @@ Your decision? 5
 ```shell
 gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
-cd python
-gpg --verify apache-dolphinscheduler-python-"${VERSION}".tar.gz.asc
-gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
-cd ../
 ```
 
 > 注意：当你找不到你的 `asc` 文件时，你必须手动创建 gpg 签名，命令
@@ -361,7 +340,7 @@ cd ../
 
 #### 检查源码包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`以及Python文件夹下的`apache-dolphinscheduler-python-<VERSION>.tar.gz`，进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`，进行如下检查:
 
 - 检查源码包是否包含由于包含不必要文件，致使tarball过于庞大
 - 存在`LICENSE`和`NOTICE`文件
@@ -373,8 +352,7 @@ cd ../
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`和`apache-dolphinscheduler-python-<VERSION>-bin.tar.gz`
-进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
 - 所有文本文件开头都有ASF许可证
@@ -476,7 +454,7 @@ Thanks everyone for taking time to check this release and help us.
 ### 将源码和二进制包从svn的dev目录移动到release目录
 
 ```shell
-svn mv https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
+svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
 ```
 
 ### 更新文档

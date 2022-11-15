@@ -37,11 +37,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(__dirname, 'src')
       // resolve vue-i18n warning: You are running the esm-bundler build of vue-i18n.
-      'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
-      '@antv/x6': '@antv/x6/dist/x6.js',
-      '@antv/x6-vue-shape': '@antv/x6-vue-shape/lib'
     }
   },
   server: {

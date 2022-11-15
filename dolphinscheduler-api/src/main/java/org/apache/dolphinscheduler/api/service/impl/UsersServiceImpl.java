@@ -722,7 +722,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser = new ProjectUser();
             projectUser.setUserId(userId);
             projectUser.setProjectId(project.getId());
-            projectUser.setPerm(7);
+            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(today);
             projectUser.setUpdateTime(today);
             this.projectUserMapper.insert(projectUser);

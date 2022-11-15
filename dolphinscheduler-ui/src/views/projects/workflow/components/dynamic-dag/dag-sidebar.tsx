@@ -25,8 +25,8 @@ const DagSidebar = defineComponent({
   setup(props, context) {
     const { variables, getTaskList } = useSidebar()
 
-    const handleDragstart = (e: DragEvent, task: string) => {
-      context.emit('Dragstart', e, task)
+    const handleDragstart = (task: string) => {
+      context.emit('Dragstart', task)
     }
 
     onMounted(() => {
@@ -42,10 +42,10 @@ const DagSidebar = defineComponent({
     return (
       <div>
         {
-          this.taskList.map(task => {
+          this.taskList.map((task: any) => {
             return (
-              <div class={styles['task-item']} draggable='true' onDragstart={(e: DragEvent) => this.handleDragstart(e, task)}>
-                {task}
+              <div class={styles['task-item']} draggable='true' onDragstart={() => this.handleDragstart(task)}>
+                {task.name}
               </div>
             )
           })
