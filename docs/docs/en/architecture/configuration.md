@@ -303,20 +303,20 @@ Location: `worker-server/conf/application.yaml`
 
 位置：`worker-server/conf/application.yaml`
 
-|                       参数                        |  默认值  |                                                                描述                                                                 |
-|-------------------------------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------------|
-| ssh.session.pool.maxTotal                       | 20    | The maximum number of active ssh session instances in the pool.                                                                   |
-| ssh.session.pool.maxTotalPerKey                 | 10    | The maximum number of active ssh session of per ssh host & account in the pool.                                                   |
-| ssh.session.pool.maxIdlePerKey                  | 4     | The maximum number of sleeping instances of per ssh host in the pool.                                                             |
-| ssh.session.pool.blockWhenExhausted             | true  | When borrow an ssh session, whether to block waiting for a session when the pool is exhausted                                     |
-| ssh.session.pool.maxWaitDuration                | 500ms | The maximum waiting time for the caller when the pool session is exhausted, it will be ignored if `blockWhenExhausted` is `false` |
-| ssh.session.pool.minEvictableIdleDuration       | 60s   | The minimum time to allow idle session to live (or not be evicted)                                                                |
-| ssh.session.pool.durationBetweenEvictionRuns    | 60s   | The interval at which the eviction thread pool scans the pool for free sessions                                                   |
-| ssh.session.pool.removeAbandonedOnBorrow        | true  | Whether borrowObject performs abandoned session removal                                                                           |
-| ssh.session.pool.removeAbandonedTimeoutDuration | 30s   | How long the object has been unused and returned after it was lent out and used for the last time is considered a leak            |
-| ssh.session.sftp.enableUploadMonitor            | true  | enable upload monitor thread when upload files to remote host                                                                     |
-| ssh.session.sftp.maxUploadRate                  | 256   | max upload rate (KB), if negative, will not limit                                                                                 |
-| ssh.session.sftp.maxFileSize                    | 100   | max file size (MB), if negative, will not limit                                                                                   |
+|                    Parameter                    | Default Value |                                                            Description                                                            |
+|-------------------------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| ssh.session.pool.maxTotal                       | 20            | The maximum number of active ssh session instances in the pool.                                                                   |
+| ssh.session.pool.maxTotalPerKey                 | 10            | The maximum number of active ssh session of per ssh host & account in the pool.                                                   |
+| ssh.session.pool.maxIdlePerKey                  | 4             | The maximum number of sleeping instances of per ssh host in the pool.                                                             |
+| ssh.session.pool.blockWhenExhausted             | true          | When borrow an ssh session, whether to block waiting for a session when the pool is exhausted                                     |
+| ssh.session.pool.maxWaitDuration                | 500ms         | The maximum waiting time for the caller when the pool session is exhausted, it will be ignored if `blockWhenExhausted` is `false` |
+| ssh.session.pool.minEvictableIdleDuration       | 60s           | The minimum time to allow idle session to live (or not be evicted)                                                                |
+| ssh.session.pool.durationBetweenEvictionRuns    | 60s           | The interval at which the eviction thread pool scans the pool for free sessions                                                   |
+| ssh.session.pool.removeAbandonedOnBorrow        | true          | Whether borrowObject performs abandoned session removal                                                                           |
+| ssh.session.pool.removeAbandonedTimeoutDuration | 30s           | How long the object has been unused and returned after it was lent out and used for the last time is considered a leak            |
+| ssh.session.sftp.enableUploadMonitor            | true          | enable upload monitor thread when upload files to remote host                                                                     |
+| ssh.session.sftp.maxUploadRate                  | 256           | max upload rate (KB), if negative, will not limit                                                                                 |
+| ssh.session.sftp.maxFileSize                    | 100           | max file size (MB), if negative, will not limit                                                                                   |
 
 ### Alert Server related configuration
 
