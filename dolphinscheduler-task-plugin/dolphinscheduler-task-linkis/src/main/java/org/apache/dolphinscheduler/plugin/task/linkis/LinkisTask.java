@@ -137,6 +137,10 @@ public class LinkisTask extends AbstractRemoteTask {
                     setExitStatusCode(EXIT_CODE_KILL);
                     break;
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Linkis task has been interrupted", e);
+            throw new TaskException("The current Linkis task has been interrupted", e);
         } catch (Exception e) {
             throw new TaskException("track linkis status error", e);
         }
@@ -154,6 +158,10 @@ public class LinkisTask extends AbstractRemoteTask {
             String command = String.join(Constants.SPACE, args);
             shellCommandExecutor.run(command);
             setExitStatusCode(EXIT_CODE_KILL);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current Linkis task has been interrupted", e);
+            throw new TaskException("The current Linkis task has been interrupted", e);
         } catch (Exception e) {
             throw new TaskException("cancel linkis task error", e);
         }
