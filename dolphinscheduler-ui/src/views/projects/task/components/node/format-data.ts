@@ -42,7 +42,7 @@ export function formatParams(data: INodeData): {
     taskParams.jvmArgs = data.jvmArgs
     taskParams.isModulePath = data.isModulePath
     if (data.runType === 'JAR' && data.mainJar) {
-      taskParams.mainJar = { id: data.mainJar }
+      taskParams.mainJar = { resourceName: data.mainJar }
     }
   }
 
@@ -53,7 +53,7 @@ export function formatParams(data: INodeData): {
     taskParams.programType = data.programType
     taskParams.mainClass = data.mainClass
     if (data.mainJar) {
-      taskParams.mainJar = { id: data.mainJar }
+      taskParams.mainJar = { resourceName: data.mainJar }
     }
     taskParams.deployMode = data.deployMode
     taskParams.appName = data.appName
@@ -347,6 +347,7 @@ export function formatParams(data: INodeData): {
     taskParams.minCpuCores = data.minCpuCores
     taskParams.minMemorySpace = data.minMemorySpace
     taskParams.image = data.image
+    taskParams.command = data.command
   }
 
   if (data.taskType === 'JUPYTER') {
@@ -455,6 +456,11 @@ export function formatParams(data: INodeData): {
     taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
   }
 
+  if (data.taskType === 'KUBEFLOW') {
+    taskParams.yamlContent = data.yamlContent
+    taskParams.namespace = data.namespace
+  }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {
@@ -488,7 +494,7 @@ export function formatParams(data: INodeData): {
         initScript: data.initScript,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
-          ? data.resourceList.map((id: number) => ({ id }))
+          ? data.resourceList.map((fullName: string) => ({ resourceName: `${fullName}` }))
           : [],
         ...taskParams
       },
@@ -511,7 +517,6 @@ export function formatParams(data: INodeData): {
     params.taskDefinitionJsonObj.timeout = 0
     params.taskDefinitionJsonObj.timeoutNotifyStrategy = ''
   }
-
   return params
 }
 
@@ -537,11 +542,11 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
-      (item: { id: number }) => item.id
+      (item: { resourceName: string }) => (`${item.resourceName}`)
     )
   }
   if (data.taskParams?.mainJar) {
-    params.mainJar = data.taskParams?.mainJar.id
+    params.mainJar = data.taskParams?.mainJar.resourceName
   }
 
   if (data.taskParams?.method) {

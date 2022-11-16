@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -57,6 +57,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -101,6 +102,12 @@ public class ExecutorServiceTest {
 
     @Mock
     private ProcessService processService;
+
+    @Mock
+    private CommandService commandService;
+
+    @Mock
+    private WorkerGroupService workerGroupService;
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -194,8 +201,8 @@ public class ExecutorServiceTest {
                 .thenReturn(checkProjectAndAuth());
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
-        doReturn(1).when(processService).createCommand(argThat(c -> c.getId() == null));
-        doReturn(0).when(processService).createCommand(argThat(c -> c.getId() != null));
+        doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
+        doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
                 .thenReturn(Optional.ofNullable(processInstance));
@@ -230,7 +237,7 @@ public class ExecutorServiceTest {
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(processService, times(1)).createCommand(any(Command.class));
+        verify(commandService, times(1)).createCommand(any(Command.class));
 
     }
 
@@ -253,7 +260,7 @@ public class ExecutorServiceTest {
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(processService, times(1)).createCommand(any(Command.class));
+        verify(commandService, times(1)).createCommand(any(Command.class));
 
     }
 
@@ -285,7 +292,7 @@ public class ExecutorServiceTest {
 
         Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
         processDefinitionWorkerGroupMap.put(1L, Constants.DEFAULT_WORKER_GROUP);
-        Mockito.when(processService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
+        Mockito.when(workerGroupService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
                 .thenReturn(processDefinitionWorkerGroupMap);
 
         Command command = new Command();
@@ -320,7 +327,7 @@ public class ExecutorServiceTest {
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
-        verify(processService, times(0)).createCommand(any(Command.class));
+        verify(commandService, times(0)).createCommand(any(Command.class));
     }
 
     /**
@@ -342,7 +349,7 @@ public class ExecutorServiceTest {
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(processService, times(1)).createCommand(any(Command.class));
+        verify(commandService, times(1)).createCommand(any(Command.class));
     }
 
     /**
@@ -364,7 +371,7 @@ public class ExecutorServiceTest {
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(processService, times(31)).createCommand(any(Command.class));
+        verify(commandService, times(31)).createCommand(any(Command.class));
 
     }
 
@@ -387,7 +394,7 @@ public class ExecutorServiceTest {
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(processService, times(15)).createCommand(any(Command.class));
+        verify(commandService, times(15)).createCommand(any(Command.class));
 
     }
 
@@ -411,7 +418,7 @@ public class ExecutorServiceTest {
 
     @Test
     public void testExecuteRepeatRunning() {
-        Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
+        Mockito.when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
         Map<String, Object> result =
@@ -421,7 +428,7 @@ public class ExecutorServiceTest {
 
     @Test
     public void testOfTestRun() {
-        Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
+        Mockito.when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,

@@ -25,29 +25,27 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * workflow query response
  */
-@ApiModel("WORKFLOW-QUERY")
+@Schema(name = "WORKFLOW-QUERY")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class WorkflowFilterRequest extends PageQueryDto {
 
-    @ApiModelProperty(example = "project-name")
+    @Schema(example = "project-name")
     private String projectName;
 
-    @ApiModelProperty(example = "workflow-name")
+    @Schema(example = "workflow-name")
     private String workflowName;
 
-    @ApiModelProperty(example = "ONLINE / OFFLINE")
+    @Schema(example = "ONLINE / OFFLINE")
     private String releaseState;
 
-    @ApiModelProperty(example = "ONLINE / OFFLINE")
+    @Schema(example = "ONLINE / OFFLINE")
     private String scheduleReleaseState;
 
     public ProcessDefinition convert2ProcessDefinition() {

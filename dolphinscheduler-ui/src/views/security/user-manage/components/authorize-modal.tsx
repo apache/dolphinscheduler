@@ -15,19 +15,26 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import { defineComponent, PropType, toRefs, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
+  NInput,
+  NButton,
+  NIcon,
   NTransfer,
   NSpace,
   NRadioGroup,
   NRadioButton,
-  NTreeSelect
+  NTreeSelect,
+  NDataTable,
+  NPagination
 } from 'naive-ui'
 import { useAuthorize } from './use-authorize'
 import Modal from '@/components/modal'
 import styles from '../index.module.scss'
 import type { TAuthType } from '../types'
+import { useColumns } from './use-columns'
+import { SearchOutlined } from '@vicons/antd'
 
 const props = {
   show: {
@@ -43,14 +50,13 @@ const props = {
     default: 'auth_project'
   }
 }
-
 export const AuthorizeModal = defineComponent({
   name: 'authorize-project-modal',
   props,
   emits: ['cancel'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, onInit, onSave } = useAuthorize()
+    const { state, onInit, onSave, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize } = useAuthorize()
     const onCancel = () => {
       ctx.emit('cancel')
     }
@@ -59,6 +65,20 @@ export const AuthorizeModal = defineComponent({
       if (result) onCancel()
     }
 
+    const onRevokeProject = () => {
+      revokeProjectByIdRequest(props.userId, state.projectIds)
+    }
+    const onGrantReadPerm = () => {
+      grantProjectWithReadPermRequest(props.userId, state.projectIds)
+    }
+    const onGrantAllPerm = () => {
+      grantProjectRequest(props.userId, state.projectIds)
+    }
+
+    const { columnsRef } = useColumns()
+    const handleCheck = (rowKeys: Array<number>) => {
+      state.projectIds = rowKeys.join()
+    }
     watch(
       () => props.show,
       () => {
@@ -70,14 +90,23 @@ export const AuthorizeModal = defineComponent({
 
     return {
       t,
+      columnsRef,
+      rowKey: (row: any) => row.id,
       ...toRefs(state),
       onCancel,
-      onConfirm
+      onConfirm,
+      getProjects,
+      handleCheck,
+      requestData, 
+      handleChangePageSize,
+      onRevokeProject,
+      onGrantReadPerm,
+      onGrantAllPerm
     }
   },
-  render(props: { type: TAuthType }) {
+  render(props: { type: TAuthType, userId: number }) {
     const { t } = this
-    const { type } = props
+    const { type, userId } = props
     return (
       <Modal
         show={this.show}
@@ -89,13 +118,54 @@ export const AuthorizeModal = defineComponent({
         cancelClassName='btn-cancel'
       >
         {type === 'authorize_project' && (
-          <NTransfer
+
+          <NSpace vertical>
+            <NSpace>
+              <NButton size='small' type='primary' onClick={this.onRevokeProject}>
+                {t('security.user.revoke_auth')}
+              </NButton>
+              <NButton size='small' type='primary' onClick={this.onGrantReadPerm}>
+              {t('security.user.grant_read')}
+              </NButton>
+              <NButton size='small' type='primary' onClick={this.onGrantAllPerm}>
+              {t('security.user.grant_all')}
+              </NButton>
+              <NInput
+                size='small'
+                placeholder={t('project.list.project_tips')}
+                clearable
+                v-model:value={this.searchVal}
+              />
+              {/* <NButton size='small' type='primary' onClick={this.handleSearch}> */}
+              <NButton size='small' type='primary' onClick={() => this.getProjects(userId)}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
+              </NButton>
+            </NSpace>
+          <NDataTable
             virtualScroll
-            options={this.unauthorizedProjects}
-            filterable
-            v-model={[this.authorizedProjects, 'value']}
-            class={styles.transfer}
+            row-class-name='items'
+            columns={this.columnsRef.columns}
+            data={this.projectWithAuthorizedLevel}
+            loading={this.loading}
+            max-height="250"
+            row-key={this.rowKey}
+            on-update:checked-row-keys={this.handleCheck}
           />
+          <div class={styles.pagination}>
+            <NPagination
+              v-model:page={this.pagination.page}
+              v-model:page-size={this.pagination.pageSize}
+              page-count={this.pagination.totalPage}
+              show-size-picker
+              page-sizes={[5, 10]}
+              show-quick-jumper
+              onUpdatePage={this.requestData}
+              onUpdatePageSize={this.handleChangePageSize}
+            />
+          </div>
+          </NSpace>
         )}
         {type === 'authorize_datasource' && (
           <NTransfer

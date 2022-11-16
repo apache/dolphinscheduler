@@ -17,8 +17,10 @@
 
 import { defineComponent, PropType, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { SettingOutlined } from '@vicons/antd'
+import { useI18n } from 'vue-i18n'
+import { NMenu, NButton, NIcon } from 'naive-ui'
 import styles from './index.module.scss'
-import { NMenu } from 'naive-ui'
 import Logo from '../logo'
 import Locales from '../locales'
 import Timezone from '../timezone'
@@ -48,11 +50,15 @@ const Navbar = defineComponent({
   setup() {
     const route = useRoute()
     const router = useRouter()
-
+    const { t } = useI18n()
     const menuKey = ref(route.meta.activeMenu as string)
 
     const handleMenuClick = (key: string) => {
       router.push({ path: `/${key}` })
+    }
+
+    const handleUISettingClick = () => {
+      router.push({ path: '/ui-setting' })
     }
 
     watch(
@@ -62,7 +68,7 @@ const Navbar = defineComponent({
       }
     )
 
-    return { handleMenuClick, menuKey }
+    return { handleMenuClick, handleUISettingClick, menuKey, t }
   },
   render() {
     return (
@@ -77,6 +83,14 @@ const Navbar = defineComponent({
           />
         </div>
         <div class={styles.settings}>
+          <NButton quaternary onClick={this.handleUISettingClick}>
+            {{
+              icon: () => <NIcon size='16'>
+                <SettingOutlined />
+              </NIcon>,
+              default: this.t('menu.ui_setting')
+            }}
+          </NButton>
           <Theme />
           <Locales localesOptions={this.localesOptions} />
           <Timezone timezoneOptions={this.timezoneOptions} />

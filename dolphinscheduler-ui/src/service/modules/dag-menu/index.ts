@@ -24,16 +24,16 @@ export function getDagMenu(): any {
   })
 }
 
-export function Collection(taskName: string): any {
+export function Collection(taskType: string): any {
   return axios({
-    url: `/favourite/${taskName}`,
+    url: `/favourite/${taskType}`,
     method: 'post'
   })
 }
 
-export function CancelCollection(taskName: string): any {
+export function CancelCollection(taskType: string): any {
   return axios({
-    url: `/favourite/${taskName}`,
+    url: `/favourite/${taskType}`,
     method: 'delete'
   })
 }

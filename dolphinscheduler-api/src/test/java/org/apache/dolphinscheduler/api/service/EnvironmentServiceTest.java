@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Environment;
@@ -98,7 +98,7 @@ public class EnvironmentServiceTest {
     @Test
     public void testCreateEnvironment() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
                 loginUser.getId(), ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
@@ -142,7 +142,7 @@ public class EnvironmentServiceTest {
     @Test
     public void testUpdateEnvironmentByCode() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
                 loginUser.getId(), ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
@@ -238,7 +238,7 @@ public class EnvironmentServiceTest {
     @Test
     public void testDeleteEnvironmentByCode() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
                 loginUser.getId(), ENVIRONMENT_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);

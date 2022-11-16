@@ -36,6 +36,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import { useRouter, useRoute } from 'vue-router'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import ImportModal from './components/import-modal'
 import StartModal from './components/start-modal'
@@ -50,6 +51,7 @@ export default defineComponent({
     const router: Router = useRouter()
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
+    const uiSettingStore = useUISettingStore()
 
     const {
       variables,
@@ -82,6 +84,15 @@ export default defineComponent({
       requestData()
     }
 
+    const onClearSearch = () => {
+      variables.page = 1
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: ''
+      })
+    }
+
     const handleChangePageSize = () => {
       variables.page = 1
       requestData()
@@ -92,6 +103,16 @@ export default defineComponent({
         path: `/projects/${projectCode}/workflow/definitions/create`
       })
     }
+
+    const createDefinitionDynamic = () => {
+      router.push({
+        path: `/projects/${projectCode}/workflow/definitions/create`,
+        query: {
+          dynamic: 'true'
+        }
+      })
+    }
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     watch(useI18n().locale, () => {
@@ -106,14 +127,17 @@ export default defineComponent({
     return {
       requestData,
       handleSearch,
+      onClearSearch,
       handleUpdateList,
       createDefinition,
+      createDefinitionDynamic,
       handleChangePageSize,
       batchDeleteWorkflow,
       batchExportWorkflow,
       batchCopyWorkflow,
       handleCopyUpdateList,
       ...toRefs(variables),
+      uiSettingStore,
       trim
     }
   },
@@ -134,6 +158,15 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
+              {
+                this.uiSettingStore.getDynamicTask && <NButton
+                  type='warning'
+                  size='small'
+                  onClick={this.createDefinitionDynamic}
+                >
+                  {t('project.workflow.create_workflow_dynamic')}
+                </NButton>
+              }
               <NButton
                 strong
                 secondary
@@ -149,6 +182,8 @@ export default defineComponent({
                 size='small'
                 placeholder={t('resource.function.enter_keyword_tips')}
                 v-model={[this.searchVal, 'value']}
+                clearable
+                onClear={this.onClearSearch}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>

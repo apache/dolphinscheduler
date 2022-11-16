@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -176,7 +176,7 @@ public class CommandMapperTest extends BaseDaoTest {
         Command command = createCommand();
         Integer id = command.getId();
         boolean hit = id % masterCount == thisMasterSlot;
-        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, 0, masterCount, thisMasterSlot);
+        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, masterCount, thisMasterSlot);
         if (hit) {
             Assertions.assertEquals(id, commandList.get(0).getId());
         } else {

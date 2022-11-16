@@ -40,6 +40,7 @@
         <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
+        <module>dolphinscheduler-aop</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
@@ -48,7 +49,6 @@
         <module>dolphinscheduler-data-quality</module>
         <module>dolphinscheduler-standalone-server</module>
         <module>dolphinscheduler-datasource-plugin</module>
-        <module>dolphinscheduler-python</module>
         <module>dolphinscheduler-meter</module>
         <module>dolphinscheduler-master</module>
         <module>dolphinscheduler-worker</module>
@@ -74,6 +74,7 @@
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
+        <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
         <spotless.version>2.27.2</spotless.version>
         <jacoco.version>0.8.8</jacoco.version>
         <maven.deploy.skip>false</maven.deploy.skip>
@@ -89,8 +90,6 @@
         <docker.tag>${project.version}</docker.tag>
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
-
-        <python.sign.skip>true</python.sign.skip>
         <skipDepCheck>true</skipDepCheck>
     </properties>
 
@@ -109,6 +108,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-standalone-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-aop</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -168,11 +172,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-python</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-alert-api</artifactId>
@@ -381,6 +380,29 @@
                 </plugin>
 
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>aspectj-maven-plugin</artifactId>
+                    <version>${aspectj-maven-plugin.version}</version>
+                    <configuration>
+                        <complianceLevel>${java.version}</complianceLevel>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <showWeaveInfo>true</showWeaveInfo>
+                        <verbose>true</verbose>
+                        <Xlint>ignore</Xlint>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
@@ -567,8 +589,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <skip>false</skip>
-                    <!--not skip compile test classes-->
                 </configuration>
             </plugin>
             <plugin>

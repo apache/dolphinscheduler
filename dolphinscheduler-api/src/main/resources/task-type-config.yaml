@@ -51,6 +51,7 @@ task:
     - 'DVC'
     - 'SAGEMAKER'
     - 'PYTORCH'
+    - 'KUBEFLOW'
   other:
     - 'PIGEON'
     - 'ZEPPELIN'

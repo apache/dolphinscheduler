@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
@@ -36,7 +37,6 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 
@@ -75,11 +75,8 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     @Autowired
     private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
-    /**
-     * processService
-     */
     @Autowired
-    private ProcessService processService;
+    private TaskInstanceDao taskInstanceDao;
 
     /**
      * executor dispatcher
@@ -264,7 +261,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      * @return taskInstance is final state
      */
     public boolean taskInstanceIsFinalState(int taskInstanceId) {
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().isFinished();
     }
 

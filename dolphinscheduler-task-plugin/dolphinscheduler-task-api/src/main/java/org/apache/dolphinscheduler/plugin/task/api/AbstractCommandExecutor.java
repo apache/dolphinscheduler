@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -135,7 +134,6 @@ public abstract class AbstractCommandExecutor {
             }
         }
         command.add(commandInterpreter());
-        command.addAll(Collections.emptyList());
         command.add(commandFile);
 
         // setting commands
