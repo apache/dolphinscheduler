@@ -5,7 +5,7 @@
 ### System Architecture Diagram
 
 <p align="center">
-  <img src="../../../img/architecture-1.3.0.jpg" alt="System architecture diagram"  width="70%" />
+  <img src="../../../img/architecture-lastest.jpg" alt="System architecture diagram"  width="70%" />
   <p align="center">
         <em>System architecture diagram</em>
   </p>
