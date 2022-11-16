@@ -523,7 +523,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * check if task instance exist by state event
      */
     public void checkTaskInstanceByStateEvent(TaskStateEvent stateEvent) throws StateEventHandleError {
-        if (stateEvent.getTaskInstanceId() == 0) {
+        if (stateEvent.getTaskInstanceId() == null || stateEvent.getTaskInstanceId() == 0) {
             throw new StateEventHandleError("The taskInstanceId is 0");
         }
 
@@ -546,10 +546,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * get task instance from memory
      */
     public Optional<TaskInstance> getTaskInstance(int taskInstanceId) {
-        if (taskInstanceMap.containsKey(taskInstanceId)) {
-            return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
-        }
-        return Optional.empty();
+        return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
     }
 
     public Optional<TaskInstance> getTaskInstance(long taskCode) {

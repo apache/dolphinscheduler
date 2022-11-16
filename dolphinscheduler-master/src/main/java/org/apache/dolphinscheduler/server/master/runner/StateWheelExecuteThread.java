@@ -208,8 +208,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             return;
         }
         taskInstanceRetryCheckList.add(taskInstanceKey);
-        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Added task instance into retry check list",
-                processInstance.getId(), taskInstance.getId());
+        logger.info("[WorkflowInstance-{}][TaskInstanceKey-{}:{}] Added task instance into retry check list",
+                processInstance.getId(), taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
     }
 
     public void removeTask4RetryCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
@@ -341,8 +341,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                     // reset taskInstance endTime and state
                     // todo relative funtion: TaskInstance.retryTaskIntervalOverTime,
                     // WorkflowExecuteThread.cloneRetryTaskInstance
-                    logger.info("[TaskInstance-{}]The task instance can retry, will retry this task instance",
-                            taskInstance.getId());
+                    logger.info("[TaskInstanceKey-{}:{}]The task instance can retry, will retry this task instance",
+                            taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
                     taskInstance.setEndTime(null);
                     taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
 

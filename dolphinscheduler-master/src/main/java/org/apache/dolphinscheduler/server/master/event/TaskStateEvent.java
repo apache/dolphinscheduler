@@ -35,7 +35,7 @@ public class TaskStateEvent implements StateEvent {
     // todo: use wrapper type
     private int processInstanceId;
 
-    private int taskInstanceId;
+    private Integer taskInstanceId;
 
     private long taskCode;
 
