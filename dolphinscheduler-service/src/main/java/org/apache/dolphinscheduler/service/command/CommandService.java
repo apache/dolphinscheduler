@@ -47,12 +47,11 @@ public interface CommandService {
     /**
      * Get command page
      * @param pageSize page size
-     * @param pageNumber page number
      * @param masterCount master count
      * @param thisMasterSlot master slot
      * @return command page
      */
-    List<Command> findCommandPageBySlot(int pageSize, int pageNumber, int masterCount, int thisMasterSlot);
+    List<Command> findCommandPageBySlot(int pageSize, int masterCount, int thisMasterSlot);
 
     /**
      * check the input command exists in queue list

@@ -45,6 +45,6 @@
         from t_ds_command
         where id % #{masterCount} = #{thisMasterSlot}
         order by process_instance_priority, id asc
-            limit #{limit} offset #{offset}
+            limit #{limit}
     </select>
 </mapper>

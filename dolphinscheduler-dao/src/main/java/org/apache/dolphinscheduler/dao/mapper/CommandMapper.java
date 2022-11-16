@@ -54,7 +54,7 @@ public interface CommandMapper extends BaseMapper<Command> {
      * query command page by slot
      * @return command list
      */
-    List<Command> queryCommandPageBySlot(@Param("limit") int limit, @Param("offset") int offset,
+    List<Command> queryCommandPageBySlot(@Param("limit") int limit,
                                          @Param("masterCount") int masterCount,
                                          @Param("thisMasterSlot") int thisMasterSlot);
 }

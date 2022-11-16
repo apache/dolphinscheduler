@@ -217,11 +217,10 @@ class CommandServiceImplTest {
     @Test
     public void testFindCommandPageBySlot() {
         int pageSize = 1;
-        int pageNumber = 0;
         int masterCount = 0;
         int thisMasterSlot = 2;
         List<Command> commandList =
-                commandService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+                commandService.findCommandPageBySlot(pageSize, masterCount, thisMasterSlot);
         Assertions.assertEquals(0, commandList.size());
     }
 
