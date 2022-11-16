@@ -36,7 +36,7 @@
 
 ### Config 样例
 
-```Config
+```
 
 sh ./bin/linkis-cli -engineType spark-2.4.3 -codeType sql -code "select count(*) from testdb.test;"  -submitUser hadoop -proxyUser hadoop 
 

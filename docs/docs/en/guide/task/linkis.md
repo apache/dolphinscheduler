@@ -36,7 +36,7 @@ According to the above parameter description, configure the required content.
 
 ### Config example
 
-```Config
+```
 
 sh ./bin/linkis-cli -engineType spark-2.4.3 -codeType sql -code "select count(*) from testdb.test;"  -submitUser hadoop -proxyUser hadoop 
 
@@ -45,5 +45,5 @@ sh ./bin/linkis-cli -engineType spark-2.4.3 -codeType sql -code "select count(*)
 ### Attention
 
 - No need to fill `sh ./bin/linkis-cli` in the configuration column, it has been configured in advance.
-- The default configuration is asynchronous submission. You do not need to configure the `-- async` parameter.
+- The default configuration is asynchronous submission. You do not need to configure the `--async` parameter.
 
