@@ -42,7 +42,6 @@
         <dependency>
             <groupId>io.trino</groupId>
             <artifactId>trino-jdbc</artifactId>
-            <version>402</version>
         </dependency>
     </dependencies>
 </project>

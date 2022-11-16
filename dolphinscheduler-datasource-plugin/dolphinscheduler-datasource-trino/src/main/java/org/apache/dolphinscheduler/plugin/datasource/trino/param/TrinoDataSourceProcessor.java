@@ -105,7 +105,7 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         TrinoConnectionParam TrinoConnectionParam = (TrinoConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(TrinoConnectionParam.getOther())) {
+        if (StringUtils.isNotEmpty(TrinoConnectionParam.getOther())) {
             return String.format("%s?%s", TrinoConnectionParam.getJdbcUrl(), TrinoConnectionParam.getOther());
         }
         return TrinoConnectionParam.getJdbcUrl();

@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.trino;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.trino.param.TrinoConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,9 +31,15 @@ public class TrinoDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        TrinoDataSourceChannel sourceChannel = Mockito.mock(TrinoDataSourceChannel.class);
-        TrinoDataSourceClient dataSourceClient = Mockito.mock(TrinoDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new TrinoConnectionParam(), DbType.TRINO));
+        TrinoDataSourceChannel sourceChannel = new TrinoDataSourceChannel();
+        TrinoConnectionParam trinoConnectionParam = new TrinoConnectionParam();
+        trinoConnectionParam.setValidationQuery(DataSourceConstants.TRINO_VALIDATION_QUERY);
+        trinoConnectionParam.setDriverLocation(DataSourceConstants.COM_TRINO_JDBC_DRIVER);
+        trinoConnectionParam.setDriverClassName(DataSourceConstants.COM_TRINO_JDBC_DRIVER);
+        try {
+            sourceChannel.createDataSourceClient(trinoConnectionParam, DbType.TRINO);
+        } catch (Exception e) {
+            Assertions.assertEquals(RuntimeException.class, e.getClass());
+        }
     }
 }
