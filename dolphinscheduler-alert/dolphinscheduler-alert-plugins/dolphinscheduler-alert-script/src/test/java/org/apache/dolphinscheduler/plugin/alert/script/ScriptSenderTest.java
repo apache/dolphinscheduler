@@ -80,4 +80,12 @@ public class ScriptSenderTest {
         Assert.assertEquals("false", alertResult.getStatus());
     }
 
+    @Test
+    public void testScriptSenderInjectionTest() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "' ; calc.exe ; '");
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
+        Assert.assertEquals("false", alertResult.getStatus());
+    }
+
 }
