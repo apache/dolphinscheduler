@@ -232,22 +232,22 @@ public class PythonGateway {
      * @param otherParamsJson otherParamsJson handle other params
      * @return create result code
      */
-    public Long createOrWorkflow(String userName,
-                                 String projectName,
-                                 String name,
-                                 String description,
-                                 String globalParams,
-                                 String schedule,
-                                 String warningType,
-                                 int warningGroupId,
-                                 int timeout,
-                                 String workerGroup,
-                                 String tenantCode,
-                                 int releaseState,
-                                 String taskRelationJson,
-                                 String taskDefinitionJson,
-                                 String otherParamsJson,
-                                 String executionType) {
+    public Long createOrUpdateWorkflow(String userName,
+                                       String projectName,
+                                       String name,
+                                       String description,
+                                       String globalParams,
+                                       String schedule,
+                                       String warningType,
+                                       int warningGroupId,
+                                       int timeout,
+                                       String workerGroup,
+                                       String tenantCode,
+                                       int releaseState,
+                                       String taskRelationJson,
+                                       String taskDefinitionJson,
+                                       String otherParamsJson,
+                                       String executionType) {
         User user = usersService.queryUser(userName);
         Project project = projectMapper.queryByName(projectName);
         long projectCode = project.getCode();
