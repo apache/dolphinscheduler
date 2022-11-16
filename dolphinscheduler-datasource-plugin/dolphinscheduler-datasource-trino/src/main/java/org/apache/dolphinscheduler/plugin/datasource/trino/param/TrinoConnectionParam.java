@@ -25,7 +25,6 @@ public class TrinoConnectionParam extends BaseConnectionParam {
     public String toString() {
         return "TrinoConnectionParam{"
                 + "user='" + user + '\''
-                + ", password='" + password + '\''
                 + ", address='" + address + '\''
                 + ", database='" + database + '\''
                 + ", jdbcUrl='" + jdbcUrl + '\''

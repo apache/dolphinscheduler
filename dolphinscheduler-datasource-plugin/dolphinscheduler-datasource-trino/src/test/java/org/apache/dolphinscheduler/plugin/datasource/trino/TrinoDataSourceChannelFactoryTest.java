@@ -28,6 +28,7 @@ public class TrinoDataSourceChannelFactoryTest {
     public void testCreate() {
         TrinoDataSourceChannelFactory sourceChannelFactory = new TrinoDataSourceChannelFactory();
         DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
+        sourceChannelFactory.getName();
         Assertions.assertNotNull(dataSourceChannel);
     }
 }

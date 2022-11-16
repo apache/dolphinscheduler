@@ -57,8 +57,10 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
         TrinoDataSourceParamDTO TrinoDatasourceParamDTO = new TrinoDataSourceParamDTO();
-        TrinoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        TrinoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        if (hostPortArray.length != 0 && hostPortArray[0].contains(Constants.COLON)) {
+            TrinoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+            TrinoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        }
         TrinoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         TrinoDatasourceParamDTO.setUserName(connectionParams.getUser());
         TrinoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
