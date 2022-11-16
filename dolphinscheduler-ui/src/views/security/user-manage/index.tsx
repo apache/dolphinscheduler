@@ -18,8 +18,7 @@
 import {
   defineComponent,
   getCurrentInstance,
-  toRefs,
-  withKeys
+  toRefs
 } from 'vue'
 import {
   NButton,
@@ -36,6 +35,7 @@ import { useTable } from './use-table'
 import UserDetailModal from './components/user-detail-modal'
 import AuthorizeModal from './components/authorize-modal'
 import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const UsersManage = defineComponent({
   name: 'user-manage',
@@ -84,12 +84,9 @@ const UsersManage = defineComponent({
               {this.t('security.user.create_user')}
             </NButton>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
+              <Search
                 v-model:value={this.searchVal}
-                size='small'
-                onKeydown={withKeys(this.onUpdatedList, ['enter'])}
-                clearable
+                onSearch={this.onUpdatedList}
               />
               <NButton type='primary' size='small' onClick={this.onUpdatedList}>
                 <NIcon>

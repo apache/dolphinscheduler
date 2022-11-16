@@ -20,7 +20,6 @@ import {
   NButton,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace,
   NTooltip,
@@ -31,8 +30,7 @@ import {
   getCurrentInstance,
   onMounted,
   toRefs,
-  watch,
-  withKeys
+  watch
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
@@ -44,6 +42,7 @@ import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
+import Search from "@/components/input-search";
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -145,12 +144,11 @@ export default defineComponent({
               </NButton>
             </NSpace>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                placeholder={t('resource.function.enter_keyword_tips')}
-                v-model={[this.searchVal, 'value']}
-                onKeydown={withKeys(this.handleSearch, ['enter'])}
+              <Search
+                placeholder = {t('resource.function.enter_keyword_tips')}
+                v-model:value={this.searchVal}
+                onSearch={this.handleSearch}
+
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>
