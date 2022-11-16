@@ -25,49 +25,46 @@ import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * task instance request
  */
-@ApiModel("TASK-INSTANCE-QUERY")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class TaskInstanceQueryRequest extends PageQueryDto {
 
-    @ApiModelProperty(name = "processInstanceId", example = "PROCESS_INSTANCE_ID", value = "0")
+    @Schema(name = "processInstanceId", example = "PROCESS_INSTANCE_ID", defaultValue = "0")
     Integer processInstanceId;
 
-    @ApiModelProperty(name = "processInstanceName", example = "PROCESS-INSTANCE-NAME")
+    @Schema(name = "processInstanceName", example = "PROCESS-INSTANCE-NAME")
     String processInstanceName;
 
-    @ApiModelProperty(name = "processDefinitionName", example = "PROCESS-DEFINITION-NAME")
+    @Schema(name = "processDefinitionName", example = "PROCESS-DEFINITION-NAME")
     String processDefinitionName;
 
-    @ApiModelProperty(name = "searchVal", example = "SEARCH-VAL")
+    @Schema(name = "searchVal", example = "SEARCH-VAL")
     String searchVal;
 
-    @ApiModelProperty(name = "taskName", example = "TASK-NAME")
+    @Schema(name = "taskName", example = "TASK-NAME")
     String taskName;
 
-    @ApiModelProperty(name = "executorName", example = "EXECUTOR-NAME")
+    @Schema(name = "executorName", example = "EXECUTOR-NAME")
     String executorName;
 
-    @ApiModelProperty(name = "stateType", example = "STATE-TYPE")
+    @Schema(name = "stateType", example = "STATE-TYPE")
     TaskExecutionStatus stateType;
 
-    @ApiModelProperty(name = "host", example = "HOST")
+    @Schema(name = "host", example = "HOST")
     String host;
 
-    @ApiModelProperty(name = "startDate", example = "START-TIME")
+    @Schema(name = "startDate", example = "START-TIME")
     String startTime;
 
-    @ApiModelProperty(name = "endDate", example = "END-DATE")
+    @Schema(name = "endDate", example = "END-DATE")
     String endTime;
 
-    @ApiModelProperty(name = "taskExecuteType", example = "EXECUTE-TYPE", value = "BATCH")
+    @Schema(name = "taskExecuteType", example = "EXECUTE-TYPE", defaultValue = "BATCH")
     TaskExecuteType taskExecuteType;
 }
