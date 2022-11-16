@@ -20,8 +20,7 @@ import {
   getCurrentInstance,
   onMounted,
   toRefs,
-  watch,
-  withKeys
+  watch
 } from 'vue'
 import {
   NButton,
@@ -36,6 +35,7 @@ import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import TokenModal from './components/token-modal'
 import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const tokenManage = defineComponent({
   name: 'token-manage',
@@ -123,13 +123,10 @@ const tokenManage = defineComponent({
               {t('security.token.create_token')}
             </NButton>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                clearable
-                v-model={[this.searchVal, 'value']}
+              <Search
+                v-model:vaule={this.searchVal}
                 placeholder={t('security.token.search_tips')}
-                onKeydown={withKeys(onSearch, ['enter'])}
+                onSearch={onSearch}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>

@@ -22,8 +22,7 @@ import {
   onMounted,
   toRef,
   watch,
-  getCurrentInstance,
-  withKeys
+  getCurrentInstance
 } from 'vue'
 import {
   NIcon,
@@ -42,6 +41,7 @@ import Card from '@/components/card'
 import FolderModal from './components/folder-modal'
 import UploadModal from './components/upload-modal'
 import styles from './index.module.scss'
+import Search from "@/components/input-search";
 
 export default defineComponent({
   name: 'resource-manage',
@@ -149,12 +149,10 @@ export default defineComponent({
               </NButton>
             </NSpace>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
+              <Search
                 placeholder={t('resource.udf.enter_keyword_tips')}
-                v-model={[this.searchVal, 'value']}
-                onKeydown={withKeys(this.handleSearch, ['enter'])}
+                v-model:vaule={this.searchVal}
+                onSearch={this.handleSearch}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>

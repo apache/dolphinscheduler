@@ -20,14 +20,12 @@ import {
   getCurrentInstance,
   onMounted,
   toRefs,
-  watch,
-  withKeys
+  watch
 } from 'vue'
 import {
   NButton,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -36,6 +34,7 @@ import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import YarnQueueModal from './components/yarn-queue-modal'
 import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const yarnQueueManage = defineComponent({
   name: 'yarn-queue-manage',
@@ -123,13 +122,10 @@ const yarnQueueManage = defineComponent({
               {t('security.yarn_queue.create_queue')}
             </NButton>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                clearable
-                v-model={[this.searchVal, 'value']}
+              <Search
+                v-model:value={this.searchVal}
                 placeholder={t('security.yarn_queue.search_tips')}
-                onKeydown={withKeys(onSearch, ['enter'])}
+                onSearch={onSearch}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>

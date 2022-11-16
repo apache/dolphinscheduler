@@ -22,8 +22,7 @@ import {
   ref,
   reactive,
   Ref,
-  getCurrentInstance,
-  withKeys
+  getCurrentInstance
 } from 'vue'
 import {
   NIcon,
@@ -53,6 +52,7 @@ import ResourceRenameModal from './rename'
 import styles from './index.module.scss'
 import type { ResourceFile } from '@/service/modules/resources/types'
 import type { Router } from 'vue-router'
+import Search from "@/components/input-search";
 
 export default defineComponent({
   name: 'File',
@@ -286,12 +286,10 @@ export default defineComponent({
               </NButton>
             </NButtonGroup>
             <NSpace>
-              <NInput
-                size='small'
-                allowInput={this.trim}
-                placeholder={t('resource.file.enter_keyword_tips')}
-                v-model={[this.searchRef, 'value']}
-                onKeydown={withKeys(handleConditions,['enter'])}
+              <Search
+                placeholder = {t('resource.file.enter_keyword_tips')}
+                v-model:value={this.searchRef}
+                onSearch={handleConditions}
               />
               <NButton size='small' type='primary' onClick={handleConditions}>
                 <NIcon>
