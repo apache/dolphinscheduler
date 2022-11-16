@@ -79,10 +79,10 @@ public class ResourcePermissionCheckServiceTest {
         User user = new User();
         user.setId(1);
         resourcePermissionCheckServices.setApplicationContext(context);
-        Assertions.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, null,
+        Assertions.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                 user.getId(), null, logger));
         String sourceUrl = "/tmp/";
-        Assertions.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, null,
+        Assertions.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                 user.getId(), sourceUrl, logger));
     }
 

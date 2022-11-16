@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -200,11 +200,14 @@ public class ProcessUtils {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             Host host = Host.of(taskExecutionContext.getHost());
-            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
+                    taskExecutionContext.getAppInfoPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                            .setExecutePath(FileUtils.getProcessExecDir(
+                                    taskExecutionContext.getTenantCode(),
+                                    taskExecutionContext.getProjectCode(),
                                     taskExecutionContext.getProcessDefineCode(),
                                     taskExecutionContext.getProcessDefineVersion(),
                                     taskExecutionContext.getProcessInstanceId(),

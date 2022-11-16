@@ -99,7 +99,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     protected boolean pauseTask() {
         this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -120,7 +120,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -138,13 +138,13 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
-        this.processService.saveTaskInstance(taskInstance);
+        this.taskInstanceDao.upsertTaskInstance(taskInstance);
         this.dependentParameters = taskInstance.getDependency();
     }
 
     private void setConditionResult() {
 
-        List<TaskInstance> taskInstances = processService
+        List<TaskInstance> taskInstances = taskInstanceDao
                 .findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
@@ -194,6 +194,6 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
                 (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
     }
 }

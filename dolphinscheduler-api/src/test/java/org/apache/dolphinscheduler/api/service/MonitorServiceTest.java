@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -132,7 +132,7 @@ public class MonitorServiceTest {
     }
 
     private void mockPermissionCheck(String permissionKey, boolean result) {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, 1,
                 permissionKey, serviceLogger)).thenReturn(result);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0,
                 serviceLogger)).thenReturn(true);

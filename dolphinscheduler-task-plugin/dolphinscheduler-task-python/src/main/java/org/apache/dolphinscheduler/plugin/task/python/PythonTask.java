@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.python;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -28,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -89,7 +89,7 @@ public class PythonTask extends AbstractTask {
 
     @Override
     public String getPreScript() {
-        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         try {
             rawPythonScript = convertPythonScriptPlaceholders(rawPythonScript);
         } catch (StringIndexOutOfBoundsException e) {
@@ -182,9 +182,9 @@ public class PythonTask extends AbstractTask {
             logger.info("generate python script file:{}", pythonScriptFile);
 
             StringBuilder sb = new StringBuilder();
-            sb.append("#-*- encoding=utf8 -*-\n");
+            sb.append("#-*- encoding=utf8 -*-").append(System.lineSeparator());
 
-            sb.append("\n\n");
+            sb.append(System.lineSeparator());
             sb.append(pythonScript);
             logger.info(sb.toString());
 
@@ -212,7 +212,7 @@ public class PythonTask extends AbstractTask {
      */
     protected String buildPythonScriptContent() throws Exception {
         logger.info("raw python script : {}", pythonParameters.getRawScript());
-        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         Map<String, Property> paramsMap = mergeParamsWithContext(pythonParameters);
         return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
     }

@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -141,10 +141,6 @@ public class TaskDefinitionServiceImplTest {
                         + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
                         + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
                         + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}]";
-        List<TaskDefinitionLog> taskDefinitions = JSONUtils.toList(createTaskDefinitionJson, TaskDefinitionLog.class);
-        Mockito.when(processService.saveTaskDefine(user, PROJECT_CODE, taskDefinitions, Boolean.TRUE))
-                .thenReturn(1);
-        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         Map<String, Object> relation = taskDefinitionService
                 .createTaskDefinition(user, PROJECT_CODE, createTaskDefinitionJson);
         Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
@@ -166,8 +162,7 @@ public class TaskDefinitionServiceImplTest {
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, PROJECT_CODE);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION_UPDATE))
-                .thenReturn(result);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, new HashMap<>())).thenReturn(true);
 
         Mockito.when(processService.isTaskOnline(TASK_CODE)).thenReturn(Boolean.FALSE);
         Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(new TaskDefinition());
@@ -175,8 +170,19 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
+        Mockito.when(processTaskRelationMapper.queryByTaskCode(3)).thenReturn(getProcessTaskRelationList2());
+        Mockito.when(processTaskRelationMapper
+                .updateProcessTaskRelationTaskVersion(Mockito.any(ProcessTaskRelation.class))).thenReturn(1);
         result = taskDefinitionService.updateTaskDefinition(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        // failure
+        Mockito.when(processTaskRelationMapper
+                .updateProcessTaskRelationTaskVersion(Mockito.any(ProcessTaskRelation.class))).thenReturn(2);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> taskDefinitionService.updateTaskDefinition(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson));
+        Assertions.assertEquals(Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+
     }
 
     @Test
@@ -212,6 +218,7 @@ public class TaskDefinitionServiceImplTest {
         // error delete single task definition object
         Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(getTaskDefinition());
         Mockito.when(taskDefinitionMapper.deleteByCode(TASK_CODE)).thenReturn(0);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, new HashMap<>())).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> taskDefinitionService.deleteTaskDefinitionByCode(user, TASK_CODE));
         Assertions.assertEquals(Status.DELETE_TASK_DEFINE_BY_CODE_MSG_ERROR.getCode(),
@@ -533,6 +540,27 @@ public class TaskDefinitionServiceImplTest {
         processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
 
         processTaskRelationList.add(processTaskRelation);
+        return processTaskRelationList;
+    }
+
+    private List<ProcessTaskRelation> getProcessTaskRelationList2() {
+        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+
+        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        processTaskRelation.setProjectCode(PROJECT_CODE);
+        processTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        processTaskRelation.setPreTaskCode(TASK_CODE);
+        processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
+
+        processTaskRelationList.add(processTaskRelation);
+
+        ProcessTaskRelation processTaskRelation2 = new ProcessTaskRelation();
+        processTaskRelation2.setProjectCode(PROJECT_CODE);
+        processTaskRelation2.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        processTaskRelation2.setPreTaskCode(TASK_CODE - 1);
+        processTaskRelation2.setPostTaskCode(TASK_CODE);
+        processTaskRelationList.add(processTaskRelation2);
+
         return processTaskRelationList;
     }
 }

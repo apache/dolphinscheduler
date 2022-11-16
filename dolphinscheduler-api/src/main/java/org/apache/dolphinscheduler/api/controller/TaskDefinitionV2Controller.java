@@ -31,11 +31,9 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import springfox.documentation.annotations.ApiIgnore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,15 +48,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * task definition controller
  */
-@Api(tags = "TASK_DEFINITION_TAG")
+@Tag(name = "TASK_DEFINITION_TAG")
 @RestController
 @RequestMapping("v2/tasks")
 public class TaskDefinitionV2Controller extends BaseController {
@@ -73,12 +72,12 @@ public class TaskDefinitionV2Controller extends BaseController {
      * @param taskCreateRequest task definition json
      * @return Result object created
      */
-    @ApiOperation(value = "create", notes = "CREATE_TASK_DEFINITION_NOTES")
+    @Operation(summary = "create", description = "CREATE_TASK_DEFINITION_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<TaskDefinition> createTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<TaskDefinition> createTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestBody TaskCreateRequest taskCreateRequest) {
         TaskDefinition taskDefinition = taskDefinitionService.createTaskDefinitionV2(loginUser, taskCreateRequest);
         return Result.success(taskDefinition);
@@ -90,15 +89,15 @@ public class TaskDefinitionV2Controller extends BaseController {
      * @param loginUser login user
      * @param code      task definition code
      */
-    @ApiOperation(value = "delete", notes = "DELETE_TASK_DEFINITION_VERSION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", dataTypeClass = long.class, example = "123456", required = true)
+    @Operation(summary = "delete", description = "DELETE_TASK_DEFINITION_VERSION_NOTES")
+    @Parameters({
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result deleteTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @PathVariable("code") Long code) {
         taskDefinitionService.deleteTaskDefinitionByCode(loginUser, code);
         return Result.success();
@@ -112,15 +111,15 @@ public class TaskDefinitionV2Controller extends BaseController {
      * @param taskUpdateRequest workflowUpdateRequest
      * @return ResourceResponse object updated
      */
-    @ApiOperation(value = "update", notes = "UPDATE_TASK_DEFINITION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", dataTypeClass = long.class, example = "123456", required = true)
+    @Operation(summary = "update", description = "UPDATE_TASK_DEFINITION_NOTES")
+    @Parameters({
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<TaskDefinition> updateTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<TaskDefinition> updateTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @PathVariable("code") Long code,
                                                        @RequestBody TaskUpdateRequest taskUpdateRequest) {
         TaskDefinition taskDefinition =
@@ -135,15 +134,15 @@ public class TaskDefinitionV2Controller extends BaseController {
      * @param code      task code of resource you want to update
      * @return ResourceResponse object get from condition
      */
-    @ApiOperation(value = "get", notes = "GET_TASK_DEFINITION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", dataTypeClass = long.class, example = "123456", required = true)
+    @Operation(summary = "get", description = "GET_TASK_DEFINITION_NOTES")
+    @Parameters({
+            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DETAIL_OF_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<TaskDefinition> getTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<TaskDefinition> getTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @PathVariable("code") Long code) {
         TaskDefinition taskDefinition = taskDefinitionService.getTaskDefinition(loginUser, code);
         return Result.success(taskDefinition);
@@ -156,12 +155,12 @@ public class TaskDefinitionV2Controller extends BaseController {
      * @param taskFilterRequest workflowFilterRequest
      * @return PageResourceResponse from condition
      */
-    @ApiOperation(value = "get", notes = "FILTER_TASK_DEFINITION_NOTES")
+    @Operation(summary = "get", description = "FILTER_TASK_DEFINITION_NOTES")
     @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<PageInfo<TaskDefinition>> filterTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<TaskDefinition>> filterTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestBody TaskFilterRequest taskFilterRequest) {
         PageInfo<TaskDefinition> taskDefinitions =
                 taskDefinitionService.filterTaskDefinition(loginUser, taskFilterRequest);

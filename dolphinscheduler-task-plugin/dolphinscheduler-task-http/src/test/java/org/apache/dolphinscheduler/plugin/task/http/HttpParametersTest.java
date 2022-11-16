@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

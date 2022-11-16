@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class Db2DataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.COM_DB2_JDBC_DRIVER, db2DatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_DB2_JDBC_DRIVER, db2DatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
@@ -90,6 +90,6 @@ public class Db2DataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.DB2_VALIDATION_QUERY, db2DatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.DB2_VALIDATION_QUERY, db2DatasourceProcessor.getValidationQuery());
     }
 }

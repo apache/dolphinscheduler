@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.service.storage.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.AWS_END_POINT;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_FILE;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_TYPE_UDF;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_S3;
+import static org.apache.dolphinscheduler.common.constants.Constants.AWS_END_POINT;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
+import static org.apache.dolphinscheduler.common.constants.Constants.STORAGE_S3;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -44,7 +45,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,14 +65,22 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.google.common.base.Joiner;
 
+/**
+ * By default, directory path does end with '/'
+ */
 public class S3Utils implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(S3Utils.class);
@@ -172,6 +184,26 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
+    public String getResourceFileName(String fullName) {
+        // here is a quick fix here to get fileName. We get the resource upload path and
+        // get the index of the first appearance of resource upload path. The index is put
+        // in the start index of the substring function and get the result substring containing
+        // tenantcode and "resource" directory and the fileName.
+        // Then we split the result substring
+        // with "/" and join all elements except the first two elements because they are
+        // tenantCode and "resource" directory.
+        String resourceUploadPath =
+                RESOURCE_UPLOAD_PATH.endsWith(FOLDER_SEPARATOR) ? StringUtils.chop(RESOURCE_UPLOAD_PATH)
+                        : RESOURCE_UPLOAD_PATH;
+        // +1 because we want to skip the "/" after resource upload path as well.
+        String pathContainingTenantNResource = fullName.substring(
+                fullName.indexOf(resourceUploadPath)
+                        + resourceUploadPath.length() + 1);
+        String[] fileNameArr = pathContainingTenantNResource.split(FOLDER_SEPARATOR);
+        return Joiner.on(FOLDER_SEPARATOR).join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
+    }
+
+    @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
@@ -206,19 +238,36 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean exists(String tenantCode, String fileName) throws IOException {
-        return s3Client.doesObjectExist(BUCKET_NAME, fileName);
+    public boolean exists(String fullName) throws IOException {
+        return s3Client.doesObjectExist(BUCKET_NAME, fullName);
     }
 
     @Override
-    public boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException {
+    public boolean delete(String fullName, boolean recursive) throws IOException {
         try {
-            s3Client.deleteObject(BUCKET_NAME, filePath);
+            s3Client.deleteObject(BUCKET_NAME, fullName);
             return true;
         } catch (AmazonServiceException e) {
-            logger.error("delete the object error,the resource path is {}", filePath);
+            logger.error("delete the object error,the resource path is {}", fullName);
             return false;
         }
+    }
+
+    @Override
+    public boolean delete(String fullName, List<String> childrenPathList, boolean recursive) throws IOException {
+        // append the resource fullName to the list for deletion.
+        childrenPathList.add(fullName);
+
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(BUCKET_NAME)
+                .withKeys(childrenPathList.stream().toArray(String[]::new));
+        try {
+            s3Client.deleteObjects(deleteObjectsRequest);
+        } catch (AmazonServiceException e) {
+            logger.error("delete objects error", e);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -383,5 +432,198 @@ public class S3Utils implements Closeable, StorageOperate {
     @Override
     public ResUploadType returnStorageType() {
         return ResUploadType.S3;
+    }
+
+    @Override
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type) {
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+
+        LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
+
+        do {
+            String pathToExplore = "";
+            if (foldersToFetch.size() == 0) {
+                pathToExplore = path;
+            } else {
+                pathToExplore = foldersToFetch.pop().getFullName();
+            }
+
+            try {
+                List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
+
+                for (StorageEntity temp : tempList) {
+                    if (temp.isDirectory()) {
+                        foldersToFetch.add(temp);
+                    }
+                }
+
+                storageEntityList.addAll(tempList);
+            } catch (AmazonServiceException e) {
+                logger.error("Resource path: {}", pathToExplore, e);
+                // return the resources fetched before error occurs.
+                return storageEntityList;
+            }
+
+        } while (foldersToFetch.size() != 0);
+
+        return storageEntityList;
+
+    }
+
+    @Override
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws AmazonServiceException {
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+
+        // TODO: optimize pagination
+        ListObjectsV2Request request = new ListObjectsV2Request();
+        request.setBucketName(BUCKET_NAME);
+        request.setPrefix(path);
+        request.setDelimiter("/");
+
+        ListObjectsV2Result v2Result;
+        do {
+            try {
+                v2Result = s3Client.listObjectsV2(request);
+            } catch (AmazonServiceException e) {
+                throw new AmazonServiceException("Get S3 file list exception, error type:" + e.getErrorType(), e);
+            }
+
+            List<S3ObjectSummary> summaries = v2Result.getObjectSummaries();
+
+            for (S3ObjectSummary summary : summaries) {
+                if (!summary.getKey().endsWith("/")) {
+                    // the path is a file
+                    String[] aliasArr = summary.getKey().split("/");
+                    String alias = aliasArr[aliasArr.length - 1];
+                    String fileName = StringUtils.difference(defaultPath, summary.getKey());
+
+                    StorageEntity entity = new StorageEntity();
+                    entity.setAlias(alias);
+                    entity.setFileName(fileName);
+                    entity.setFullName(summary.getKey());
+                    entity.setDirectory(false);
+                    entity.setDescription("");
+                    entity.setUserName(tenantCode);
+                    entity.setType(type);
+                    entity.setSize(summary.getSize());
+                    entity.setCreateTime(summary.getLastModified());
+                    entity.setUpdateTime(summary.getLastModified());
+                    entity.setPfullName(path);
+
+                    storageEntityList.add(entity);
+                }
+            }
+
+            for (String commonPrefix : v2Result.getCommonPrefixes()) {
+                // the paths in commonPrefix are directories
+                String suffix = StringUtils.difference(path, commonPrefix);
+                String fileName = StringUtils.difference(defaultPath, commonPrefix);
+
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(suffix);
+                entity.setFileName(fileName);
+                entity.setFullName(commonPrefix);
+                entity.setDirectory(true);
+                entity.setDescription("");
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(0);
+                entity.setCreateTime(null);
+                entity.setUpdateTime(null);
+                entity.setPfullName(path);
+
+                storageEntityList.add(entity);
+            }
+
+            request.setContinuationToken(v2Result.getContinuationToken());
+
+        } while (v2Result.isTruncated());
+
+        return storageEntityList;
+    }
+
+    @Override
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
+                                       ResourceType type) throws AmazonServiceException, FileNotFoundException {
+        // Notice: we do not use getObject here because intermediate directories
+        // may not exist in S3, which can cause getObject to throw exception.
+        // Since we still want to access it on frontend, this is a workaround using listObjects.
+
+        ListObjectsV2Request request = new ListObjectsV2Request();
+        request.setBucketName(BUCKET_NAME);
+        request.setPrefix(path);
+        request.setDelimiter("/");
+
+        ListObjectsV2Result v2Result;
+        try {
+            v2Result = s3Client.listObjectsV2(request);
+        } catch (AmazonServiceException e) {
+            throw new AmazonServiceException("Get S3 file list exception, error type:" + e.getErrorType(), e);
+        }
+
+        List<S3ObjectSummary> summaries = v2Result.getObjectSummaries();
+
+        if (path.endsWith("/")) {
+            // the path is a directory that may or may not exist in S3
+            String alias = findDirAlias(path);
+            String fileName = StringUtils.difference(defaultPath, path);
+
+            StorageEntity entity = new StorageEntity();
+            entity.setAlias(alias);
+            entity.setFileName(fileName);
+            entity.setFullName(path);
+            entity.setDirectory(true);
+            entity.setDescription("");
+            entity.setUserName(tenantCode);
+            entity.setType(type);
+            entity.setSize(0);
+
+            return entity;
+
+        } else {
+            // the path is a file
+            if (summaries.size() > 0) {
+                S3ObjectSummary summary = summaries.get(0);
+                String[] aliasArr = summary.getKey().split("/");
+                String alias = aliasArr[aliasArr.length - 1];
+                String fileName = StringUtils.difference(defaultPath, summary.getKey());
+
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(alias);
+                entity.setFileName(fileName);
+                entity.setFullName(summary.getKey());
+                entity.setDirectory(false);
+                entity.setDescription("");
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(summary.getSize());
+                entity.setCreateTime(summary.getLastModified());
+                entity.setUpdateTime(summary.getLastModified());
+
+                return entity;
+            }
+        }
+
+        throw new FileNotFoundException("Object is not found in S3 Bucket: " + BUCKET_NAME);
+    }
+
+    /**
+     * find alias for directories, NOT for files
+     * a directory is a path ending with "/"
+     */
+    private String findDirAlias(String myStr) {
+        if (!myStr.endsWith("/")) {
+            // Make sure system won't crush down if someone accidentally misuse the function.
+            return myStr;
+        }
+        int lastIndex = myStr.lastIndexOf("/");
+        String subbedString = myStr.substring(0, lastIndex);
+        int secondLastIndex = subbedString.lastIndexOf("/");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(myStr, secondLastIndex + 1, lastIndex + 1);
+
+        return stringBuilder.toString();
     }
 }

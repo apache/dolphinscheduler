@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
@@ -52,7 +53,7 @@ public class LoggerUtils {
                                      int processInstId,
                                      int taskId) {
         // like TaskAppId=TASK-20211107-798_1-4084-15210
-        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null);
+        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, DateConstants.YYYYMMDD, null);
         return String.format("%s=%s-%s-%s_%s-%s-%s",
                 TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr,
                 processDefineCode, processDefineVersion, processInstId, taskId);
@@ -78,16 +79,16 @@ public class LoggerUtils {
         return "";
     }
 
-    public static void setWorkflowAndTaskInstanceIDMDC(int workflowInstanceId, int taskInstanceId) {
+    public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId, Integer taskInstanceId) {
         setWorkflowInstanceIdMDC(workflowInstanceId);
         setTaskInstanceIdMDC(taskInstanceId);
     }
 
-    public static void setWorkflowInstanceIdMDC(int workflowInstanceId) {
+    public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
         MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
     }
 
-    public static void setTaskInstanceIdMDC(int taskInstanceId) {
+    public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
     }
 

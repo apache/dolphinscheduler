@@ -23,12 +23,10 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import springfox.documentation.annotations.ApiIgnore;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,12 +37,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Api(tags = "AUDIT_LOG_TAG")
+@Tag(name = "AUDIT_LOG_TAG")
 @RestController
 @RequestMapping("projects/audit")
 public class AuditLogController extends BaseController {
@@ -65,21 +64,21 @@ public class AuditLogController extends BaseController {
      * @param pageSize          page size
      * @return      audit log content
      */
-    @ApiOperation(value = "queryAuditLogListPaging", notes = "QUERY_AUDIT_LOG")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "resourceType", value = "RESOURCE_TYPE", dataTypeClass = AuditResourceType.class),
-            @ApiImplicitParam(name = "operationType", value = "OPERATION_TYPE", dataTypeClass = AuditOperationType.class),
-            @ApiImplicitParam(name = "userName", value = "USER_NAME", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
+    @Operation(summary = "queryAuditLogListPaging", description = "QUERY_AUDIT_LOG")
+    @Parameters({
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "resourceType", description = "RESOURCE_TYPE", schema = @Schema(implementation = AuditResourceType.class)),
+            @Parameter(name = "operationType", description = "OPERATION_TYPE", schema = @Schema(implementation = AuditOperationType.class)),
+            @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
     @GetMapping(value = "/audit-log-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAuditLogListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize,
                                           @RequestParam(value = "resourceType", required = false) AuditResourceType resourceType,

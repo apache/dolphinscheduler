@@ -75,7 +75,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     List<DefinitionGroupByUser> countDefinitionGroupByUser(@Param("projectCodes") Long[] projectCodes);
 
     /**
-     * list all resource ids
+     * list all resource ids and task_params containing resourceList
      *
      * @return task ids list
      */
@@ -141,4 +141,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      */
     IPage<TaskDefinition> filterTaskDefinition(IPage<TaskDefinition> page,
                                                @Param("task") TaskDefinition taskDefinition);
+
+    /**
+     * batch delete task by task code
+     *
+     * @param taskCodeList task code list
+     * @return deleted row count
+     */
+    int deleteByBatchCodes(@Param("taskCodeList") List<Long> taskCodeList);
 }
