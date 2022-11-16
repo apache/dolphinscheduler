@@ -47,5 +47,3 @@ sh ./bin/linkis-cli -engineType spark-2.4.3 -codeType sql -code "select count(*)
 - 无需在配置栏里再填写`sh ./bin/linkis-cli`，已提前配置。
 - 配置默认为异步提交，您无需再配置`--async`参数。
 
-
-
