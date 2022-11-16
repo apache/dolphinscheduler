@@ -31,7 +31,6 @@ with ProcessDefinition(
         namespace=str({"name": "default", "cluster": "lab"}),
         min_cpu_cores=2.0,
         min_memory_space=10.0,
-        params_map=str({"day": "20220507"}),
     )
     pd.submit()
 # [end workflow_declare]

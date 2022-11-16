@@ -27,4 +27,3 @@ tasks:
     namespace: '{ "name": "default","cluster": "lab" }'
     minCpuCores: 2.0
     minMemorySpace: 10.0
-    paramsMap: '{ "test": "test" }'

@@ -22,16 +22,15 @@ from unittest.mock import patch
 from pydolphinscheduler.tasks.kubernetes import Kubernetes
 
 
-def test_k8s_get_define():
-    """Test task k8s function get_define."""
+def test_kubernetes_get_define():
+    """Test task kubernetes function get_define."""
     code = 123
     version = 1
-    name = "test_k8s_get_define"
+    name = "test_kubernetes_get_define"
     image = "ds-dev"
     namespace = str({"name": "default", "cluster": "lab"})
     minCpuCores = 2.0
     minMemorySpace = 10.0
-    paramsMap = str({})
 
     expect = {
         "code": code,
@@ -47,7 +46,6 @@ def test_k8s_get_define():
             "namespace": namespace,
             "minCpuCores": minCpuCores,
             "minMemorySpace": minMemorySpace,
-            "paramsMap": paramsMap,
             "dependence": {},
             "conditionResult": {"successNode": [""], "failedNode": [""]},
             "waitStartTimeout": {},
