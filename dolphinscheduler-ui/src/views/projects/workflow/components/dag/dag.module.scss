@@ -199,7 +199,7 @@ $bgLight: #ffffff;
       background-image: url('/images/task-icons/datasync_hover.png');
     }
     &.icon-kubeflow {
-      background-image: url('/images/task-icons/kubeflow_hover.png');
+      background-image: url('/images/task-icons/kubeflow.png');
     }
   }
 
@@ -303,7 +303,7 @@ $bgLight: #ffffff;
         background-image: url('/images/task-icons/datasync.png');
       }
       &.icon-kubeflow {
-        background-image: url('/images/task-icons/kubeflow.png');
+        background-image: url('/images/task-icons/kubeflow_hover.png');
       }
     }
   }
