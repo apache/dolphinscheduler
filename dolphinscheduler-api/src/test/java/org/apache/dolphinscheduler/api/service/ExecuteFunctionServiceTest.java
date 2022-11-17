@@ -381,7 +381,6 @@ public class ExecuteFunctionServiceTest {
         // not enable allLevelDependent
         int count = executorService.createComplementDependentCommand(schedules, command, false);
         Assertions.assertEquals(1, count);
-        Assert.assertEquals(1, count);
 
         // enable allLevelDependent
         DependentProcessDefinition childDependent = new DependentProcessDefinition();
@@ -394,7 +393,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(
             dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent)).thenReturn(Lists.newArrayList());
         int allLevelDependentCount = executorService.createComplementDependentCommand(schedules, command, true);
-        Assert.assertEquals(2, allLevelDependentCount);
+        Assertions.assertEquals(2, allLevelDependentCount);
     }
 
     /**
