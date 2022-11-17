@@ -1,6 +1,6 @@
 # Trino
 
-![Trino Datasource](../../../../img/new_ui/dev/datasource/Trino.png)
+![Trino Datasource](../../../../img/new_ui/dev/datasource/trino.png)
 
 ## Datasource Parameters
 
