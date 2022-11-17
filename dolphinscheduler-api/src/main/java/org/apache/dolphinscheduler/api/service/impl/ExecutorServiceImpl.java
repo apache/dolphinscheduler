@@ -428,8 +428,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * do action to workflow instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
-    
-    
      *
      * @param loginUser         login user
      * @param workflowInstanceId workflow instance id
@@ -750,7 +748,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               Priority processInstancePriority, String workerGroup, String tenantCode,
                               Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
-                              int testFlag, ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
+                              int testFlag, ComplementDependentMode complementDependentMode,
+                              boolean allLevelDependent) {
 
         /**
          * instantiate command schedule instance
@@ -897,7 +896,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         log.info(
                                 "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, processDefinitionCode:{}.",
                                 command.getProcessDefinitionCode());
-                        dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command, allLevelDependent);
+                        dependentProcessDefinitionCreateCount +=
+                                createComplementDependentCommand(schedules, command, allLevelDependent);
                     }
                 }
                 if (createCount > 0) {
@@ -1020,7 +1020,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 getComplementDependentDefinitionList(dependentCommand.getProcessDefinitionCode(),
-                        CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup(), allLevelDependent);
+                        CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup(),
+                        allLevelDependent);
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
             // If the id is Integer, the auto-increment id will be obtained by mybatis-plus

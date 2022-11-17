@@ -389,9 +389,10 @@ public class ExecuteFunctionServiceTest {
         childDependent.setTaskDefinitionCode(4);
         childDependent.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
         childDependent.setTaskParams(
-            "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
         Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(
-            dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent)).thenReturn(Lists.newArrayList());
+                dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent))
+                .thenReturn(Lists.newArrayList());
         int allLevelDependentCount = executorService.createComplementDependentCommand(schedules, command, true);
         Assertions.assertEquals(2, allLevelDependentCount);
     }
