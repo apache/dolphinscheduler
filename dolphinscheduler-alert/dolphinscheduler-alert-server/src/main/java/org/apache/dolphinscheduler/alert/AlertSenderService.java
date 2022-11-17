@@ -233,10 +233,13 @@ public final class AlertSenderService extends Thread {
         }
 
         if (!sendWarning) {
+            String message = String.format(
+                    "Alert Plugin %s send ignore warning type not match: plugin warning type is %s, alert data warning type is %s",
+                    pluginInstanceName, warningType.getCode(), alertData.getWarnType());
             logger.info(
                     "Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}",
                     pluginInstanceName, warningType.getCode(), alertData.getWarnType());
-            return null;
+            return new AlertResult("false", message);
         }
 
         AlertInfo alertInfo = AlertInfo.builder()
