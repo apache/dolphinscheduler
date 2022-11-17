@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.kubeflow;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +77,7 @@ public class KubeflowHelper {
         }
         JsonNode status = data.get("status");
 
+        String lastConditionType = "";
         if (status.has("conditions")) {
             JsonNode conditions = status.get("conditions");
             for (int x = messageIndex; x < conditions.size(); x = x + 1) {
@@ -83,10 +86,14 @@ public class KubeflowHelper {
                 logger.info(stepMessage);
             }
             messageIndex = conditions.size();
+            JsonNode lastCondition = conditions.get(conditions.size() - 1);
+            lastConditionType = lastCondition.has("type") ? lastCondition.get("type").asText() : "";
         }
         String phase;
         if (status.has("phase")) {
             phase = status.get("phase").asText();
+        } else if (StringUtils.isNotEmpty(lastConditionType)) {
+            phase = lastConditionType;
         } else {
             phase = "";
         }

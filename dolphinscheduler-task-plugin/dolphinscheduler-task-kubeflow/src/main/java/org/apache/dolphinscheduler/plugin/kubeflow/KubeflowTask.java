@@ -109,6 +109,7 @@ public class KubeflowTask extends AbstractRemoteTask {
         logger.info("Kubeflow task delete command: \n{}", command);
         String message = runCommand(command);
         logger.info("Kubeflow task delete result: \n{}", message);
+        exitStatusCode = TaskConstants.EXIT_CODE_KILL;
     }
 
     protected String runCommand(String command) {

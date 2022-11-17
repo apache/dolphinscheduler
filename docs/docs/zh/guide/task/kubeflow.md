@@ -24,7 +24,31 @@
 ### Kubeflow组件独有的参数
 
 - **Namespace**：集群命名空间参数
-- **yamlContent**：CRD YAML文件内容
+- **yamlContent**：CRD YAML文件内容, 如：
+
+```yaml
+apiVersion: "kubeflow.org/v1"
+kind: TFJob
+metadata:
+  name: tfjob-simple
+  namespace: kubeflow-user-example-com
+spec:
+   tfReplicaSpecs:
+     Worker:
+       replicas: 2
+       restartPolicy: OnFailure
+       template:
+         metadata:
+           annotations:
+             sidecar.istio.io/inject: "false"
+         spec:
+           containers:
+             - name: tensorflow
+               image: gcr.io/kubeflow-ci/tf-mnist-with-summaries:1.0
+               command:
+                 - "python"
+                 - "/var/tf_mnist/mnist_with_summaries.py"
+```
 
 ## 环境配置
 
