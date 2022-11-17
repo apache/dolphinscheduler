@@ -128,19 +128,12 @@ public class DataSourceServiceTest {
         try (
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
-            // DATASOURCE_CONNECT_FAILED
             DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
             mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(null);
-            Result connectFailedResult = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
-            Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED.getCode(),
-                    connectFailedResult.getCode().intValue());
 
             // SUCCESS
-            Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
             Result success = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
             Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
         }
@@ -204,15 +197,9 @@ public class DataSourceServiceTest {
             DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
             mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(null);
             Mockito.when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
-            Result connectFailed =
-                    dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
-            Assertions.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), connectFailed.getCode().intValue());
 
             // SUCCESS
-            Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
             Result success = dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
             Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
         }
