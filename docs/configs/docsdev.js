@@ -217,6 +217,10 @@ export default {
                                 title: 'Kubeflow',
                                 link: '/en-us/docs/dev/user_doc/guide/task/kubeflow.html',
                             },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
+                            },
                         ],
                     },
                     {
@@ -876,6 +880,10 @@ export default {
                             {
                                 title: 'Kubeflow',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
                             },
                         ],
                     },

@@ -145,6 +145,10 @@ export const TASK_TYPES_MAP = {
   KUBEFLOW: {
     alias: 'KUBEFLOW',
     helperLinkDisable: true
+  },
+  LINKIS: {
+    alias: 'LINKIS',
+    helperLinkDisable: true
   }
 } as {
   [key in TaskType]: {

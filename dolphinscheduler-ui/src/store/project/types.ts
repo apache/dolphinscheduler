@@ -55,6 +55,7 @@ type TaskType =
   | 'DMS'
   | 'DATASYNC'
   | 'KUBEFLOW'
+  | 'LINKIS'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 type DependentResultType = {

@@ -31,6 +31,7 @@ export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 export SEATUNNEL_HOME=${SEATUNNEL_HOME:-/opt/soft/seatunnel}
 export CHUNJUN_HOME=${CHUNJUN_HOME:-/opt/soft/chunjun}
+export LINKIS_HOME=${LINKIS_HOME:-/opt/soft/linkis}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$SEATUNNEL_HOME/bin:$CHUNJUN_HOME/bin:$PATH
 
