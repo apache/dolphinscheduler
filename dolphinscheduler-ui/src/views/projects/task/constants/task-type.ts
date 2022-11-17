@@ -38,6 +38,7 @@ export type TaskType =
   | 'JUPYTER'
   | 'MLFLOW'
   | 'OPENMLDB'
+  | 'BLOCKING'
   | 'DVC'
   | 'JAVA'
   | 'DINKY'
@@ -134,6 +135,10 @@ export const TASK_TYPES_MAP = {
   },
   OPENMLDB: {
     alias: 'OPENMLDB',
+    helperLinkDisable: true
+  },
+  BLOCKING: {
+    alias: 'BLOCKING',
     helperLinkDisable: true
   },
   DVC: {

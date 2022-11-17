@@ -38,6 +38,7 @@ task:
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'
+    - 'BLOCKING'
   dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'

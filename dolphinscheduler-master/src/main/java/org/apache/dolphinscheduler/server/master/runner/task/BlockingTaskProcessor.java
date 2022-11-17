@@ -139,7 +139,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean dispatchTask() {
-        return false;
+        return true;
     }
 
     @Override

@@ -54,6 +54,7 @@ type TaskType =
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
+  | 'BLOCKING'
   | 'KUBEFLOW'
   | 'LINKIS'
 

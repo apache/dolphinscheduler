@@ -246,6 +246,15 @@ export function formatParams(data: INodeData): {
     }
   }
 
+  if (data.taskType == 'BLOCKING') {
+    taskParams.dependence = {
+      relation: data.relation,
+      dependTaskList: data.dependTaskList
+    }
+    taskParams.blockingOpportunity = data.blockingOpportunity
+    taskParams.isAlertWhenBlocking = data.isAlertWhenBlocking
+  }
+
   if (data.taskType === 'DATAX') {
     taskParams.customConfig = data.customConfig ? 1 : 0
     if (taskParams.customConfig === 0) {

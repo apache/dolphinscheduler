@@ -182,7 +182,7 @@ public class BlockingTaskTest {
 
         // set blocking node params
         BlockingParameters blockingParameters = new BlockingParameters();
-        blockingParameters.setAlertWhenBlocking(false);
+        blockingParameters.setIsAlertWhenBlocking(false);
         blockingParameters.setBlockingCondition(blockingCondition);
 
         taskNode.setParams(JSONUtils.toJsonString(blockingParameters));

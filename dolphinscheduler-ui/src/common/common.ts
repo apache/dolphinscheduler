@@ -121,6 +121,10 @@ export const runningType = (t: any) => [
   {
     desc: `${t('project.workflow.recover_serial_wait')}`,
     code: 'RECOVER_SERIAL_WAIT'
+  },
+  {
+    desc: `${t('project.workflow.block')}`,
+    code: 'BLOCK'
   }
 ]
 
@@ -310,6 +314,22 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     icon: HistoryOutlined,
     isSpin: false,
     classNames: 'pending'
+  },
+  READY_BLOCK: {
+    id: 19,
+    desc: `${t('project.workflow.ready_block')}`,
+    color: '#e22f2c',
+    icon: SettingOutlined,
+    isSpin: false,
+    classNames: 'blocked'
+  },
+  BLOCK: {
+    id: 20,
+    desc: `${t('project.workflow.block')}`,
+    color: '#e22f2c',
+    icon: PauseCircleOutlined,
+    isSpin: false,
+    classNames: 'blocked'
   }
 })
 

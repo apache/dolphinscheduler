@@ -149,7 +149,8 @@ export default defineComponent({
                     (state !== 'SUCCESS' &&
                       state !== 'PAUSE' &&
                       state !== 'FAILURE' &&
-                      state !== 'STOP') ||
+                      state !== 'STOP' &&
+                      state !== 'BLOCK') ||
                     this.row?.disabled
                   }
                 >
@@ -175,7 +176,7 @@ export default defineComponent({
                 type='primary'
                 circle
                 onClick={this.handleReStore}
-                disabled={state !== 'FAILURE' || this.row?.disabled}
+                disabled={state !== 'FAILURE'|| this.row?.disabled}
               >
                 {this.row?.buttonType === 'store' ? (
                   <span>{this.row?.count}</span>
@@ -220,7 +221,7 @@ export default defineComponent({
         <NTooltip trigger={'hover'}>
           {{
             default: () =>
-              state === 'PAUSE'
+                (state === 'PAUSE' || state === 'BLOCK')
                 ? t('project.workflow.recovery_suspend')
                 : t('project.workflow.pause'),
             trigger: () => (
@@ -230,13 +231,13 @@ export default defineComponent({
                 type='warning'
                 circle
                 disabled={
-                  (state !== 'RUNNING_EXECUTION' && state !== 'PAUSE') ||
+                  (state !== 'RUNNING_EXECUTION' && state !== 'PAUSE' && state !== 'BLOCK') ||
                   this.row?.disabled
                 }
                 onClick={this.handleSuspend}
               >
                 <NIcon>
-                  {state === 'PAUSE' ? (
+                  {(state === 'PAUSE' || state == 'BLOCK') ? (
                     <PlayCircleOutlined />
                   ) : (
                     <PauseCircleOutlined />
@@ -259,7 +260,8 @@ export default defineComponent({
                   (state !== 'SUCCESS' &&
                     state !== 'FAILURE' &&
                     state !== 'STOP' &&
-                    state !== 'PAUSE') ||
+                    state !== 'PAUSE'&&
+                    state !== 'BLOCK') ||
                   this.row?.disabled
                 }
               >

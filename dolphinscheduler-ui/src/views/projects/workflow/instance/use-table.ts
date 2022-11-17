@@ -220,7 +220,7 @@ export function useTable() {
               }
             },
             onSuspend: () => {
-              if (_row.state === 'PAUSE') {
+              if (_row.state === 'PAUSE' || _row.state === 'BLOCK') {
                 _countDownFn({
                   index,
                   processInstanceId: _row.id,

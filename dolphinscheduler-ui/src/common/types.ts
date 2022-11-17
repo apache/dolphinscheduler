@@ -34,6 +34,8 @@ export type ITaskState =
   | 'SERIAL_WAIT'
   | 'DISPATCH'
   | 'PENDING'
+  | 'READY_BLOCK'
+  | 'BLOCK'
 
 export type ITaskStateConfig = {
   [key in ITaskState]: {

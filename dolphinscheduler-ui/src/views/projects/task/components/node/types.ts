@@ -359,6 +359,8 @@ interface ITaskParams {
   zk?: string
   zkPath?: string
   executeMode?: string
+  blockingOpportunity?: string
+  isAlertWhenBlocking?: boolean
   useCustom?: boolean
   runMode?: string
   dvcTaskType?: string
@@ -451,7 +453,11 @@ interface INodeData
   udfs?: string[]
   customConfig?: boolean
   mapping_columns?: object[]
+  blockingOpportunity?: 'BlockingOnSuccess' | 'BlockingOnFailed'
+  isAlertWhenBlocking?: boolean
   taskExecuteType?: TaskExecuteType
+  successNode?: string
+  failedNode?: string
 }
 
 interface ITaskData

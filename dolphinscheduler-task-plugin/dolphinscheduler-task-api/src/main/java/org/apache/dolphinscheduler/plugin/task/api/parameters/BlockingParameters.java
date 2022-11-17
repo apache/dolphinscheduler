@@ -45,7 +45,7 @@ public class BlockingParameters extends AbstractParameters {
         return isAlertWhenBlocking;
     }
 
-    public void setAlertWhenBlocking(boolean alertWhenBlocking) {
+    public void setIsAlertWhenBlocking(boolean alertWhenBlocking) {
         isAlertWhenBlocking = alertWhenBlocking;
     }
 }

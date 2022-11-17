@@ -39,6 +39,7 @@ import { useK8s } from './use-k8s'
 import { useJupyter } from './use-jupyter'
 import { useMlflow } from './use-mlflow'
 import { useOpenmldb } from './use-openmldb'
+import { useBlocking } from './use-blocking'
 import { useDvc } from './use-dvc'
 import { useJava } from './use-java'
 import { useDinky } from './use-dinky'
@@ -75,6 +76,7 @@ export default {
   JUPYTER: useJupyter,
   MLFLOW: useMlflow,
   OPENMLDB: useOpenmldb,
+  BLOCKING: useBlocking,
   DVC: useDvc,
   DINKY: useDinky,
   SAGEMAKER: userSagemaker,

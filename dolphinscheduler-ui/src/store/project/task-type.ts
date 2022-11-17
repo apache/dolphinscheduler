@@ -142,6 +142,10 @@ export const TASK_TYPES_MAP = {
     alias: 'DATASYNC',
     helperLinkDisable: true
   },
+  BLOCKING: {
+    alias: 'BLOCKING',
+    helperLinkDisable: true
+  },
   KUBEFLOW: {
     alias: 'KUBEFLOW',
     helperLinkDisable: true
