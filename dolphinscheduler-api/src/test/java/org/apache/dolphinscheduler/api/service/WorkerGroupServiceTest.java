@@ -153,9 +153,6 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(null);
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
-        String workerGroupPath =
-                Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + GROUP_NAME;
-        Mockito.when(registryClient.exists(workerGroupPath)).thenReturn(false);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost1:0000", "");
         Mockito.when(registryClient.getServerMaps(NodeType.WORKER)).thenReturn(serverMaps);
@@ -176,9 +173,6 @@ public class WorkerGroupServiceTest {
 
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(null);
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
-        String workerGroupPath =
-                Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + GROUP_NAME;
-        Mockito.when(registryClient.exists(workerGroupPath)).thenReturn(false);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost:0000", "");
         Mockito.when(registryClient.getServerMaps(NodeType.WORKER)).thenReturn(serverMaps);

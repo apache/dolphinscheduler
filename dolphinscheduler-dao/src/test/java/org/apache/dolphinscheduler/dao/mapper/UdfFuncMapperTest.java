@@ -93,16 +93,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
      * @return User
      */
     private User insertOneUser() {
-        User user = new User();
-        user.setUserName("user1");
-        user.setUserPassword("1");
-        user.setEmail("xx@123.com");
-        user.setUserType(UserType.GENERAL_USER);
-        user.setCreateTime(new Date());
-        user.setTenantId(1);
-        user.setUpdateTime(new Date());
-        userMapper.insert(user);
-        return user;
+        return insertOneUser("user1");
     }
 
     /**
@@ -111,6 +102,15 @@ public class UdfFuncMapperTest extends BaseDaoTest {
      * @return User
      */
     private User insertOneUser(String userName) {
+        return createGeneralUser(userName);
+    }
+
+    /**
+     * create general user
+     *
+     * @return User
+     */
+    private User createGeneralUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("1");
@@ -138,24 +138,6 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         udfUser.setUpdateTime(new Date());
         udfUserMapper.insert(udfUser);
         return udfUser;
-    }
-
-    /**
-     * create general user
-     *
-     * @return User
-     */
-    private User createGeneralUser(String userName) {
-        User user = new User();
-        user.setUserName(userName);
-        user.setUserPassword("1");
-        user.setEmail("xx@123.com");
-        user.setUserType(UserType.GENERAL_USER);
-        user.setCreateTime(new Date());
-        user.setTenantId(1);
-        user.setUpdateTime(new Date());
-        userMapper.insert(user);
-        return user;
     }
 
     /**
