@@ -106,7 +106,7 @@ Method: PATCH
 
 ### ⑥ Others
 
-In addition to creating, deleting, modifying and quering, we also locate the corresponding resource through url, and then append operations to it after the path, such as:
+In addition to creating, deleting, modifying and querying, we also locate the corresponding resource through url, and then append operations to it after the path, such as:
 
 ```
 /dolphinscheduler/alert-groups/verify-name
