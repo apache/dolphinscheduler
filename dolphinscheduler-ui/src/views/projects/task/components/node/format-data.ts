@@ -464,6 +464,12 @@ export function formatParams(data: INodeData): {
     taskParams.yamlContent = data.yamlContent
     taskParams.namespace = data.namespace
   }
+  
+  if (data.taskType === 'LINKIS') {
+    taskParams.useCustom = data.useCustom
+    taskParams.paramScript = data.paramScript
+    taskParams.rawScript = data.rawScript
+  }
 
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {

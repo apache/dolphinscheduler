@@ -49,6 +49,7 @@ export type TaskType =
   | 'DMS'
   | 'DATASYNC'
   | 'KUBEFLOW'
+  | 'LINKIS'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -174,6 +175,10 @@ export const TASK_TYPES_MAP = {
   },
   KUBEFLOW: {
     alias: 'KUBEFLOW',
+    helperLinkDisable: true
+  },
+  LINKIS: {
+    alias: 'LINKIS',
     helperLinkDisable: true
   }
 } as {
