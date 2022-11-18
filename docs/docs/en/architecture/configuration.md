@@ -17,7 +17,7 @@ The directory structure of DolphinScheduler is as follows:
 │
 ├── licenses                                    directory of licenses
 │
-├── bin                                         directory of DolphinScheduler application commands, configrations scripts
+├── bin                                         directory of DolphinScheduler application commands, configurations scripts
 │   ├── dolphinscheduler-daemon.sh              script to start or shut down DolphinScheduler application
 │   ├── env                                     directory of scripts to load environment variables
 │   │   ├── dolphinscheduler_env.sh             script to export environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] when you start or stop service using script `dolphinscheduler-daemon.sh`
@@ -29,7 +29,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── status-all.sh                           script to check the status of all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │   └── stop-all.sh                             script to shut down all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │
-├── alert-server                                directory of DolphinScheduler alert-server commands, configrations scripts and libs
+├── alert-server                                directory of DolphinScheduler alert-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler alert-server
 │   ├── conf
@@ -40,7 +40,7 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── logback-spring.xml                  configurations of alert-service log
 │   └── libs                                    directory of alert-server libs
 │
-├── api-server                                  directory of DolphinScheduler api-server commands, configrations scripts and libs
+├── api-server                                  directory of DolphinScheduler api-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler api-server
 │   ├── conf
@@ -52,7 +52,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── libs                                    directory of api-server libs
 │   └── ui                                      directory of api-server related front-end web resources
 │
-├── master-server                               directory of DolphinScheduler master-server commands, configrations scripts and libs
+├── master-server                               directory of DolphinScheduler master-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler master-server
 │   ├── conf
@@ -63,7 +63,7 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── logback-spring.xml                  configurations of master-service log
 │   └── libs                                    directory of master-server libs
 │
-├── standalone-server                           directory of DolphinScheduler standalone-server commands, configrations scripts and libs
+├── standalone-server                           directory of DolphinScheduler standalone-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler standalone-server
 │   ├── conf
@@ -76,7 +76,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── libs                                    directory of standalone-server libs
 │   └── ui                                      directory of standalone-server related front-end web resources
 │  
-├── tools                                       directory of DolphinScheduler metadata tools commands, configrations scripts and libs
+├── tools                                       directory of DolphinScheduler metadata tools commands, configurations scripts and libs
 │   ├── bin
 │   │   └── upgrade-schema.sh                   script to initialize or upgrade DolphinScheduler metadata
 │   ├── conf
@@ -85,7 +85,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── libs                                    directory of tool libs
 │   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
 │  
-├── worker-server                               directory of DolphinScheduler worker-server commands, configrations scripts and libs
+├── worker-server                               directory of DolphinScheduler worker-server commands, configurations scripts and libs
 │       ├── bin
 │       │   └── start.sh                        script to start DolphinScheduler worker-server
 │       ├── conf
