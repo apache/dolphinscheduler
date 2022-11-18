@@ -67,7 +67,7 @@ The architecture of worker group is different between version before version 1.3
 
 * Modify worker related configuration in `bin/env/install_config.conf`.
 
-Assume bellow are the machine worker service to be deployed:
+Assume below are the machine worker service to be deployed:
 
 | hostname |      ip       |
 |:---------|:-------------:|

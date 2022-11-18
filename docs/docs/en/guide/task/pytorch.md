@@ -48,7 +48,7 @@ The preceding two parameters are used to minimize the running of the configurati
 - **Python Environment Manager Tool** ：You can choose `virtualenv` or `conda`.
   - if choose `virtualenv`，that may use `virtualenv` to create a new environment. Use command `virtualenv -p ${PYTHON_HOME} venv`.
   - if choose `conda`, ，that may use `conda` to create a new environment，And you need to specify the Python version.
-- **Requirement File** ：The defualt is requirements.txt。
+- **Requirement File** ：The default is requirements.txt。
 
 We can use relative paths of `Python Script` and `Requirement File` if we set `Project Path` which contains the python script or required requirement file.
 
