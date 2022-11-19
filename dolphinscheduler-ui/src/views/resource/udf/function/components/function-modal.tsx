@@ -106,7 +106,7 @@ export default defineComponent({
         state.functionForm.funcName = props.row.funcName
         state.functionForm.className = props.row.className
         state.functionForm.resourceId = props.row.resourceId || -1
-        state.functionForm.fullName = props.row.resourceName || ""
+        state.functionForm.fullName = props.row.resourceName || ''
         state.functionForm.description = props.row.description
       }
     )

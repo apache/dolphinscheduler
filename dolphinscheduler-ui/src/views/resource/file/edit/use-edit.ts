@@ -44,13 +44,11 @@ export function useEdit(state: any) {
   const handleUpdateContent = (fullName: string, tenantCode: string) => {
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
-        await updateResourceContent(
-          {
-            ...state.fileForm,
-            tenantCode: tenantCode,
-            fullName: fullName,
-          },
-        )
+        await updateResourceContent({
+          ...state.fileForm,
+          tenantCode: tenantCode,
+          fullName: fullName
+        })
 
         window.$message.success(t('resource.file.success'))
         router.go(-1)

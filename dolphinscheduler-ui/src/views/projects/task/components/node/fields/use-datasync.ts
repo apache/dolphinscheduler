@@ -20,67 +20,66 @@ import { watch, ref } from 'vue'
 import { useCustomParams } from '.'
 
 export function useDatasync(model: { [field: string]: any }): IJsonItem[] {
+  const jsonSpan = ref(0)
+  const destinationLocationArnSpan = ref(0)
+  const sourceLocationArnSpan = ref(0)
+  const nameSpan = ref(0)
+  const cloudWatchLogGroupArnSpan = ref(0)
 
-    const jsonSpan = ref(0)
-    const destinationLocationArnSpan = ref(0)
-    const sourceLocationArnSpan = ref(0)
-    const nameSpan = ref(0)
-    const cloudWatchLogGroupArnSpan = ref(0)
+  const resetSpan = () => {
+    jsonSpan.value = model.jsonFormat ? 24 : 0
+    destinationLocationArnSpan.value = model.jsonFormat ? 0 : 24
+    sourceLocationArnSpan.value = model.jsonFormat ? 0 : 24
+    nameSpan.value = model.jsonFormat ? 0 : 24
+    cloudWatchLogGroupArnSpan.value = model.jsonFormat ? 0 : 24
+  }
 
-    const resetSpan = () => {
-        jsonSpan.value = model.jsonFormat ? 24 : 0
-        destinationLocationArnSpan.value = model.jsonFormat ? 0 : 24
-        sourceLocationArnSpan.value = model.jsonFormat ? 0 : 24
-        nameSpan.value = model.jsonFormat ? 0 : 24
-        cloudWatchLogGroupArnSpan.value = model.jsonFormat ? 0 : 24
+  watch(
+    () => [model.jsonFormat],
+    () => {
+      resetSpan()
     }
+  )
 
-    watch(
-        () => [model.jsonFormat],
-        () => {
-            resetSpan()
-        }
-    )
+  resetSpan()
 
-    resetSpan()
-
-    return [
-        {
-            type: 'switch',
-            field: 'jsonFormat',
-            name: 'jsonFormat',
-            span: 12
-        },
-        {
-            type: 'editor',
-            field: 'json',
-            name: 'json',
-            span: jsonSpan
-        },
-        {
-            type: 'input',
-            field: 'destinationLocationArn',
-            name: 'destinationLocationArn',
-            span: destinationLocationArnSpan
-        },
-        {
-            type: 'input',
-            field: 'sourceLocationArn',
-            name: 'sourceLocationArn',
-            span: sourceLocationArnSpan
-        },
-        {
-            type: 'input',
-            field: 'name',
-            name: 'name',
-            span: nameSpan
-        },
-        {
-            type: 'input',
-            field: 'cloudWatchLogGroupArn',
-            name: 'cloudWatchLogGroupArn',
-            span: cloudWatchLogGroupArnSpan
-        },
-        ...useCustomParams({ model, field: 'localParams', isSimple: false })
-    ]
+  return [
+    {
+      type: 'switch',
+      field: 'jsonFormat',
+      name: 'jsonFormat',
+      span: 12
+    },
+    {
+      type: 'editor',
+      field: 'json',
+      name: 'json',
+      span: jsonSpan
+    },
+    {
+      type: 'input',
+      field: 'destinationLocationArn',
+      name: 'destinationLocationArn',
+      span: destinationLocationArnSpan
+    },
+    {
+      type: 'input',
+      field: 'sourceLocationArn',
+      name: 'sourceLocationArn',
+      span: sourceLocationArnSpan
+    },
+    {
+      type: 'input',
+      field: 'name',
+      name: 'name',
+      span: nameSpan
+    },
+    {
+      type: 'input',
+      field: 'cloudWatchLogGroupArn',
+      name: 'cloudWatchLogGroupArn',
+      span: cloudWatchLogGroupArnSpan
+    },
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+  ]
 }

@@ -47,8 +47,10 @@ const goSubFolder = (router: Router, item: any) => {
   fileStore.setFileInfo(`${item.alias}|${item.size}`)
   if (item.directory) {
     fileStore.setCurrentDir(`${item.fullName}`)
-    router.push({ name: 'resource-sub-manage',
-        query: {prefix: item.fullName, tenantCode: item.userName} })
+    router.push({
+      name: 'resource-sub-manage',
+      query: { prefix: item.fullName, tenantCode: item.userName }
+    })
   }
 }
 
@@ -63,8 +65,8 @@ export function useTable() {
     row: {},
     tableData: [],
     breadList: [] as String[],
-    fullName: ref(String(router.currentRoute.value.query.prefix || "")),
-    tenantCode: ref(String(router.currentRoute.value.query.tenantCode || "")),
+    fullName: ref(String(router.currentRoute.value.query.prefix || '')),
+    tenantCode: ref(String(router.currentRoute.value.query.tenantCode || '')),
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
@@ -183,7 +185,8 @@ export function useTable() {
                         size: 'tiny',
                         class: 'btn-download',
                         disabled: row?.directory ? true : false,
-                        onClick: () => downloadResource({fullName: row.fullName})
+                        onClick: () =>
+                          downloadResource({ fullName: row.fullName })
                       },
                       {
                         icon: () => h(DownloadOutlined)
@@ -196,7 +199,10 @@ export function useTable() {
                 NPopconfirm,
                 {
                   onPositiveClick: () => {
-                    handleDelete({fullName: row.fullName, tenantCode: row.userName})
+                    handleDelete({
+                      fullName: row.fullName,
+                      tenantCode: row.userName
+                    })
                   }
                 },
                 {
@@ -241,23 +247,21 @@ export function useTable() {
     const { state } = useAsyncState(
       queryResourceListPaging({ ...params, type: 'UDF' }).then((res: any) => {
         // use strict checking here
-        if (variables.fullName !== ""){
-            queryCurrentResourceByFullName(
-              {
-                type: 'UDF',
-                fullName: variables.fullName,
-                tenantCode: variables.tenantCode,
-              }
-            ).then((res: ResourceFile) => {
-                if (res.fileName) {
-                  const breadList = res.fileName.split('/')
-                  // pop the alias from the fullname path
-                  breadList.pop()
-                  variables.breadList = breadList
-                }
-            })
+        if (variables.fullName !== '') {
+          queryCurrentResourceByFullName({
+            type: 'UDF',
+            fullName: variables.fullName,
+            tenantCode: variables.tenantCode
+          }).then((res: ResourceFile) => {
+            if (res.fileName) {
+              const breadList = res.fileName.split('/')
+              // pop the alias from the fullname path
+              breadList.pop()
+              variables.breadList = breadList
+            }
+          })
         } else {
-            variables.breadList = []
+          variables.breadList = []
         }
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
@@ -275,7 +279,10 @@ export function useTable() {
     variables.row = row
   }
 
-  const handleDelete = (fullNameObj: {fullName: string, tenantCode: string}) => {
+  const handleDelete = (fullNameObj: {
+    fullName: string
+    tenantCode: string
+  }) => {
     /* after deleting data from the current page, you need to jump forward when the page is empty. */
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
@@ -298,15 +305,16 @@ export function useTable() {
   }
 
   const goBread = (fileName: string) => {
-    queryCurrentResourceByFileName(
-      {
-        type: 'UDF',
-        fileName: fileName + "/",
-        tenantCode: variables.tenantCode
-      }
-    ).then((res: any) => {
+    queryCurrentResourceByFileName({
+      type: 'UDF',
+      fileName: fileName + '/',
+      tenantCode: variables.tenantCode
+    }).then((res: any) => {
       fileStore.setCurrentDir(res.fullName)
-      router.push({ name: 'resource-sub-manage', query: {prefix: res.fullName, tenantCode: res.userName} })
+      router.push({
+        name: 'resource-sub-manage',
+        query: { prefix: res.fullName, tenantCode: res.userName }
+      })
     })
   }
 

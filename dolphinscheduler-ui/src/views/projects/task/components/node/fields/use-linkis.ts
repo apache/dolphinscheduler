@@ -24,7 +24,7 @@ export function useLinkis(model: { [field: string]: any }): IJsonItem[] {
 
   const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
   const parmaEditorSpan = computed(() => (model.useCustom ? 0 : 24))
-  computed(() => (model.useCustom ? 0 : 24));
+  computed(() => (model.useCustom ? 0 : 24))
   return [
     {
       type: 'switch',
@@ -54,7 +54,7 @@ export function useLinkis(model: { [field: string]: any }): IJsonItem[] {
               }
 
               const sameItems = model.localParams.filter(
-                  (item: { prop: string }) => item.prop === value
+                (item: { prop: string }) => item.prop === value
               )
 
               if (sameItems.length > 1) {

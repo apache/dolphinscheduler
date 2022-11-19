@@ -37,10 +37,10 @@ export default {
     confirm: 'Confirm',
     cancel: 'Cancel',
     delete_confirm: 'Delete?',
-    authorize_level:'Authorize Level',
+    authorize_level: 'Authorize Level',
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
-    all_permission: 'All Permission',
+    all_permission: 'All Permission'
   },
   workflow: {
     on_line: 'Online',
@@ -368,7 +368,8 @@ export default {
     image: 'Image',
     image_tips: 'Please enter image',
     command: 'Command',
-    command_tips: 'Please enter the container execution command, for example: /bin/echo hello world',
+    command_tips:
+      'Please enter the container execution command, for example: /bin/echo hello world',
     min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',
@@ -799,6 +800,6 @@ export default {
     di: 'Data Integration',
     dq: 'Data Quality',
     ml: 'Machine Learning',
-    other: 'Other',
+    other: 'Other'
   }
 }

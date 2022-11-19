@@ -460,7 +460,7 @@ export function formatParams(data: INodeData): {
     taskParams.yamlContent = data.yamlContent
     taskParams.namespace = data.namespace
   }
-  
+
   if (data.taskType === 'LINKIS') {
     taskParams.useCustom = data.useCustom
     taskParams.paramScript = data.paramScript
@@ -500,7 +500,9 @@ export function formatParams(data: INodeData): {
         initScript: data.initScript,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
-          ? data.resourceList.map((fullName: string) => ({ resourceName: `${fullName}` }))
+          ? data.resourceList.map((fullName: string) => ({
+              resourceName: `${fullName}`
+            }))
           : [],
         ...taskParams
       },
@@ -548,7 +550,7 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
-      (item: { resourceName: string }) => (`${item.resourceName}`)
+      (item: { resourceName: string }) => `${item.resourceName}`
     )
   }
   if (data.taskParams?.mainJar) {

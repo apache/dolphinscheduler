@@ -23,14 +23,7 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import {
-  NButton,
-  NIcon,
-  NSpace,
-  NTooltip,
-  NSpin,
-  NEllipsis
-} from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
@@ -39,19 +32,14 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  parseTime,
-  renderTableTime,
-  tasksState
-} from '@/common/common'
+import { parseTime, renderTableTime, tasksState } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
-import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
-
+import { renderEnvironmentalDistinctionCell } from '@/utils/environmental-distinction'
 
 export function useTable() {
   const { t } = useI18n()

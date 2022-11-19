@@ -29,17 +29,17 @@ type IDataBase =
   | 'ATHENA'
 
 type IDataBaseLabel =
-| 'MYSQL'
-| 'POSTGRESQL'
-| 'HIVE'
-| 'SPARK'
-| 'CLICKHOUSE'
-| 'ORACLE'
-| 'SQLSERVER'
-| 'DB2'
-| 'PRESTO'
-| 'REDSHIFT'
-| 'ATHENA'
+  | 'MYSQL'
+  | 'POSTGRESQL'
+  | 'HIVE'
+  | 'SPARK'
+  | 'CLICKHOUSE'
+  | 'ORACLE'
+  | 'SQLSERVER'
+  | 'DB2'
+  | 'PRESTO'
+  | 'REDSHIFT'
+  | 'ATHENA'
 
 interface IDataSource {
   id?: number

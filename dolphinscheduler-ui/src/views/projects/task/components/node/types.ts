@@ -95,8 +95,8 @@ interface ISwitchResult {
  * res: resource file name
  */
 interface ISourceItem {
-  id?: number,
-  resourceName: string,
+  id?: number
+  resourceName: string
   res?: string
 }
 

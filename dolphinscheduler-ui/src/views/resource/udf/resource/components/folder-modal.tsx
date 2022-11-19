@@ -90,7 +90,9 @@ export default defineComponent({
       <Modal
         show={this.$props.show}
         title={
-          this.row.fullName ? t('resource.udf.edit') : t('resource.udf.create_folder')
+          this.row.fullName
+            ? t('resource.udf.edit')
+            : t('resource.udf.create_folder')
         }
         onCancel={this.hideModal}
         onConfirm={this.row.fullName ? this.handleRename : this.handleCreate}

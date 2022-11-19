@@ -37,10 +37,10 @@ export default {
     confirm: '确定',
     cancel: '取消',
     delete_confirm: '确定删除吗?',
-    authorize_level:'权限等级',
+    authorize_level: '权限等级',
     no_permission: '无权限',
     read_permission: '读权限',
-    all_permission: '所有权限',
+    all_permission: '所有权限'
   },
   workflow: {
     on_line: '线上',
@@ -779,6 +779,6 @@ export default {
     di: '数据集成',
     dq: '数据质量',
     ml: '机器学习',
-    other: '其他',
+    other: '其他'
   }
 }

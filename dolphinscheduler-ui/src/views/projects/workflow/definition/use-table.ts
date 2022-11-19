@@ -90,75 +90,75 @@ export function useTable() {
         minWidth: 300,
         maxWidth: 600,
         render: (row) =>
-            h(
-                NSpace,
-                {
-                  justify: 'space-between',
-                  wrap: false,
-                  class: styles['workflow-name']
-                },
-                {
-                  default: () =>
+          h(
+            NSpace,
+            {
+              justify: 'space-between',
+              wrap: false,
+              class: styles['workflow-name']
+            },
+            {
+              default: () =>
+                h(
+                  ButtonLink,
+                  {
+                    onClick: () =>
+                      void router.push({
+                        name: 'workflow-definition-detail',
+                        params: { code: row.code }
+                      })
+                  },
+                  {
+                    default: () =>
                       h(
-                          ButtonLink,
-                          {
-                            onClick: () =>
-                                void router.push({
-                                  name: 'workflow-definition-detail',
-                                  params: { code: row.code }
-                                })
-                          },
-                          {
-                            default: () =>
-                                h(
-                                    NEllipsis,
-                                    {
-                                      style: 'max-width: 580px;line-height: 1.5'
-                                    },
-                                    () => row.name
-                                )
-                          }
+                        NEllipsis,
+                        {
+                          style: 'max-width: 580px;line-height: 1.5'
+                        },
+                        () => row.name
                       )
-                }
-            )
+                  }
+                )
+            }
+          )
       },
       {
         title: 'Copy',
         key: 'copy',
         ...COLUMN_WIDTH_CONFIG['copy'],
         render: (row) =>
-            h(
-                NButton,
-                {
-                  quaternary: true,
-                  circle: true,
-                  type: 'info',
-                  size: 'tiny',
-                  onClick: () => void copy(row.name)
-                },
-                { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
-            )
+          h(
+            NButton,
+            {
+              quaternary: true,
+              circle: true,
+              type: 'info',
+              size: 'tiny',
+              onClick: () => void copy(row.name)
+            },
+            { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
+          )
       },
       {
         title: t('project.workflow.status'),
         key: 'releaseState',
         ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) =>
-            row.releaseState === 'ONLINE'
-                ? h(
-                    NTag,
-                    { type: 'success', size: 'small' },
-                    {
-                      default: () => t('project.workflow.up_line')
-                    }
-                )
-                : h(
-                    NTag,
-                    { type: 'warning', size: 'small' },
-                    {
-                      default: () => t('project.workflow.down_line')
-                    }
-                )
+          row.releaseState === 'ONLINE'
+            ? h(
+                NTag,
+                { type: 'success', size: 'small' },
+                {
+                  default: () => t('project.workflow.up_line')
+                }
+              )
+            : h(
+                NTag,
+                { type: 'warning', size: 'small' },
+                {
+                  default: () => t('project.workflow.down_line')
+                }
+              )
       },
       {
         title: t('project.workflow.schedule_publish_status'),
@@ -167,19 +167,19 @@ export function useTable() {
         render: (row) => {
           if (row.scheduleReleaseState === 'ONLINE') {
             return h(
-                NTag,
-                { type: 'success', size: 'small' },
-                {
-                  default: () => t('project.workflow.up_line')
-                }
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('project.workflow.up_line')
+              }
             )
           } else if (row.scheduleReleaseState === 'OFFLINE') {
             return h(
-                NTag,
-                { type: 'warning', size: 'small' },
-                {
-                  default: () => t('project.workflow.down_line')
-                }
+              NTag,
+              { type: 'warning', size: 'small' },
+              {
+                default: () => t('project.workflow.down_line')
+              }
             )
           } else {
             return '-'
@@ -216,19 +216,19 @@ export function useTable() {
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](10),
         render: (row) =>
-            h(TableAction, {
-              row,
-              onEditWorkflow: () => editWorkflow(row),
-              onStartWorkflow: () => startWorkflow(row),
-              onTimingWorkflow: () => timingWorkflow(row),
-              onVersionWorkflow: () => versionWorkflow(row),
-              onDeleteWorkflow: () => deleteWorkflow(row),
-              onReleaseWorkflow: () => releaseWorkflow(row),
-              onCopyWorkflow: () => copyWorkflow(row),
-              onExportWorkflow: () => exportWorkflow(row),
-              onGotoTimingManage: () => gotoTimingManage(row),
-              onGotoWorkflowTree: () => gotoWorkflowTree(row)
-            })
+          h(TableAction, {
+            row,
+            onEditWorkflow: () => editWorkflow(row),
+            onStartWorkflow: () => startWorkflow(row),
+            onTimingWorkflow: () => timingWorkflow(row),
+            onVersionWorkflow: () => versionWorkflow(row),
+            onDeleteWorkflow: () => deleteWorkflow(row),
+            onReleaseWorkflow: () => releaseWorkflow(row),
+            onCopyWorkflow: () => copyWorkflow(row),
+            onExportWorkflow: () => exportWorkflow(row),
+            onGotoTimingManage: () => gotoTimingManage(row),
+            onGotoWorkflowTree: () => gotoWorkflowTree(row)
+          })
       }
     ] as TableColumns<any>
     if (variables.tableWidth) {
@@ -279,8 +279,8 @@ export function useTable() {
       window.$message.success(t('project.workflow.success'))
 
       if (
-          variables.tableData.length === variables.checkedRowKeys.length &&
-          variables.page > 1
+        variables.tableData.length === variables.checkedRowKeys.length &&
+        variables.page > 1
       ) {
         variables.page -= 1
       }
@@ -307,14 +307,14 @@ export function useTable() {
     })
   }
 
-  const batchCopyWorkflow = () => { }
+  const batchCopyWorkflow = () => {}
 
   const releaseWorkflow = (row: any) => {
     const data = {
       name: row.name,
       releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
-          | 'OFFLINE'
-          | 'ONLINE'
+        | 'OFFLINE'
+        | 'ONLINE'
     }
     release(data, variables.projectCode, row.code).then(() => {
       window.$message.success(t('project.workflow.success'))
@@ -395,14 +395,14 @@ export function useTable() {
     if (variables.loadingRef) return
     variables.loadingRef = true
     const { state } = useAsyncState(
-        queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
-          variables.totalPage = res.totalPage
-          variables.tableData = res.totalList.map((item: any) => {
-            return { ...item }
-          })
-          variables.loadingRef = false
-        }),
-        { total: 0, table: [] }
+      queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
+        variables.totalPage = res.totalPage
+        variables.tableData = res.totalList.map((item: any) => {
+          return { ...item }
+        })
+        variables.loadingRef = false
+      }),
+      { total: 0, table: [] }
     )
     return state
   }

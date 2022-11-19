@@ -42,7 +42,7 @@ const props = {
     default: {
       name: '',
       description: '',
-      user_name: '',
+      user_name: ''
     }
   }
 }
@@ -62,15 +62,26 @@ export default defineComponent({
       return !(flag && size < 1000000)
     }
 
-    const handleEditFile = (item: {fullName: string, user_name: string }) => {
-      router.push({ name: 'resource-file-edit', query: {prefix: item.fullName, tenantCode: item.user_name} })
+    const handleEditFile = (item: { fullName: string; user_name: string }) => {
+      router.push({
+        name: 'resource-file-edit',
+        query: { prefix: item.fullName, tenantCode: item.user_name }
+      })
     }
 
-    const handleDeleteFile = (fullNameObj: {fullName: string, tenantCode: string}) => {
+    const handleDeleteFile = (fullNameObj: {
+      fullName: string
+      tenantCode: string
+    }) => {
       deleteResource(fullNameObj).then(() => emit('updateList'))
     }
 
-    const handleRenameFile: IRenameFile = (name: string, description: string, fullName: string, user_name: string) => {
+    const handleRenameFile: IRenameFile = (
+      name: string,
+      description: string,
+      fullName: string,
+      user_name: string
+    ) => {
       emit('renameResource', name, description, fullName, user_name)
     }
 
@@ -97,7 +108,10 @@ export default defineComponent({
                 disabled={this.rtDisb(this.row.name, this.row.size)}
                 tag='div'
                 onClick={() => {
-                  this.handleEditFile({fullName:this.row.fullName, user_name:this.row.user_name})
+                  this.handleEditFile({
+                    fullName: this.row.fullName,
+                    user_name: this.row.user_name
+                  })
                 }}
                 style={{ marginRight: '-5px' }}
                 circle
@@ -124,9 +138,7 @@ export default defineComponent({
                     this.row.fullName,
                     this.row.user_name
                   )
-                }
-
-                }
+                }}
                 style={{ marginRight: '-5px' }}
                 circle
                 class='btn-rename'
@@ -149,7 +161,9 @@ export default defineComponent({
                 tag='div'
                 circle
                 style={{ marginRight: '-5px' }}
-                onClick={() => downloadResource({fullName: this.row.fullName})}
+                onClick={() =>
+                  downloadResource({ fullName: this.row.fullName })
+                }
                 class='btn-download'
               >
                 <NIcon>
@@ -168,7 +182,10 @@ export default defineComponent({
                   positive-text={t('resource.file.confirm')}
                   negative-text={t('resource.file.cancel')}
                   onPositiveClick={() => {
-                    this.handleDeleteFile({fullName: this.row.fullName, tenantCode: this.row.user_name})
+                    this.handleDeleteFile({
+                      fullName: this.row.fullName,
+                      tenantCode: this.row.user_name
+                    })
                   }}
                 >
                   {{

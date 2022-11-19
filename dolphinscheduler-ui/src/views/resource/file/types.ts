@@ -38,7 +38,13 @@ export interface IRtDisb {
 }
 
 export interface IResourceListState {
-  (searchVal?: string, fullName?: string, tenantCode?: string, pageNo?: number, pageSize?: number): any
+  (
+    searchVal?: string,
+    fullName?: string,
+    tenantCode?: string,
+    pageNo?: number,
+    pageSize?: number
+  ): any
 }
 
 export interface BasicTableProps {

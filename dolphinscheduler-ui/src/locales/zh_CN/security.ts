@@ -150,7 +150,7 @@ export default {
     namespace: '命名空间',
     revoke_auth: '撤销权限',
     grant_read: '授予读权限',
-    grant_all:'授予所有权限',
+    grant_all: '授予所有权限',
     authorize_project: '项目授权',
     authorize_resource: '资源授权',
     authorize_namespace: '命名空间授权',

@@ -57,8 +57,10 @@ export default defineComponent({
   name: 'File',
   setup() {
     const router: Router = useRouter()
-    const fullName = ref(String(router.currentRoute.value.query.prefix || ""))
-    const tenantCode = ref(String(router.currentRoute.value.query.tenantCode || ""))
+    const fullName = ref(String(router.currentRoute.value.query.prefix || ''))
+    const tenantCode = ref(
+      String(router.currentRoute.value.query.tenantCode || '')
+    )
     const resourceListRef = ref()
     const folderShowRef = ref(false)
     const uploadShowRef = ref(false)
@@ -138,7 +140,12 @@ export default defineComponent({
       handleShowModal(uploadShowRef)
     }
 
-    const handleRenameFile: IRenameFile = (name: string, description: string, fullName: string, user_name: string) => {
+    const handleRenameFile: IRenameFile = (
+      name: string,
+      description: string,
+      fullName: string,
+      user_name: string
+    ) => {
       renameInfo.fullName = fullName
       renameInfo.name = name
       renameInfo.description = description
@@ -162,7 +169,11 @@ export default defineComponent({
     const fileStore = useFileStore()
 
     onMounted(() => {
-      resourceListRef.value = getResourceListState(fullName.value, tenantCode.value,searchRef.value)
+      resourceListRef.value = getResourceListState(
+        fullName.value,
+        tenantCode.value,
+        searchRef.value
+      )
     })
 
     const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([
@@ -186,8 +197,8 @@ export default defineComponent({
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
-      const currfullName = String(router.currentRoute.value.query.prefix || "")
-      if (currfullName === "") {
+      const currfullName = String(router.currentRoute.value.query.prefix || '')
+      if (currfullName === '') {
         fileStore.setCurrentDir('/')
       } else {
         fileStore.setCurrentDir(currfullName)
@@ -195,30 +206,34 @@ export default defineComponent({
     })
 
     const initBreadcrumb = async (dirs: string[]) => {
-      for (let index = 0; index < dirs.length; index ++) {
+      for (let index = 0; index < dirs.length; index++) {
         const newDir = dirs.slice(0, index + 1).join('/')
-        const resource = await queryCurrentResourceByFileName(
-          {
-            type: 'FILE',
-            fileName: newDir+"/",
-            tenantCode: tenantCode.value
-          }
-        )
-        breadcrumbItemsRef.value?.push({ id: resource.fullName, fullName: resource.alias, userName: resource.userName })
-        }
+        const resource = await queryCurrentResourceByFileName({
+          type: 'FILE',
+          fileName: newDir + '/',
+          tenantCode: tenantCode.value
+        })
+        breadcrumbItemsRef.value?.push({
+          id: resource.fullName,
+          fullName: resource.alias,
+          userName: resource.userName
+        })
+      }
     }
 
     onMounted(() => {
       breadcrumbItemsRef.value = []
-      if (fullName.value != "") {
-        breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root', userName: '' })
-        queryCurrentResourceByFullName(
-          {
-            type: 'FILE',
-            fullName: fullName.value,
-            tenantCode: tenantCode.value,
-          }
-        ).then((res: ResourceFile) => {
+      if (fullName.value != '') {
+        breadcrumbItemsRef.value?.push({
+          id: 0,
+          fullName: 'Root',
+          userName: ''
+        })
+        queryCurrentResourceByFullName({
+          type: 'FILE',
+          fullName: fullName.value,
+          tenantCode: tenantCode.value
+        }).then((res: ResourceFile) => {
           if (res.fileName) {
             const dirs = res.fileName.split('/')
             if (dirs && dirs.length > 1) {
@@ -312,7 +327,14 @@ export default defineComponent({
                     )
                   } else {
                     return (
-                      <NBreadcrumbItem href={"0?prefix=" + item.id.toString() + "&tenantCode=" + item.userName}>
+                      <NBreadcrumbItem
+                        href={
+                          '0?prefix=' +
+                          item.id.toString() +
+                          '&tenantCode=' +
+                          item.userName
+                        }
+                      >
                         {item.fullName}
                       </NBreadcrumbItem>
                     )

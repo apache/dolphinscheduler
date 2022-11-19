@@ -158,15 +158,15 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
-              {
-                this.uiSettingStore.getDynamicTask && <NButton
+              {this.uiSettingStore.getDynamicTask && (
+                <NButton
                   type='warning'
                   size='small'
                   onClick={this.createDefinitionDynamic}
                 >
                   {t('project.workflow.create_workflow_dynamic')}
                 </NButton>
-              }
+              )}
               <NButton
                 strong
                 secondary
@@ -200,8 +200,8 @@ export default defineComponent({
               rowKey={(row) => row.code}
               columns={this.columns}
               data={this.tableData}
-              // v-model:checked-row-keys={this.checkedRowKeys}
-              // row-class-name='items'
+              v-model:checked-row-keys={this.checkedRowKeys}
+              row-class-name='items'
               scrollX={this.tableWidth}
             />
             <NSpace justify='space-between'>

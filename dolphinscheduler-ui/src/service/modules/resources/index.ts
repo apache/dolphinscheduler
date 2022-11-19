@@ -46,7 +46,7 @@ export function queryResourceListPaging(
 }
 
 export function queryCurrentResourceByFileName(
-  params: ResourceTypeReq & FileNameReq & TenantCodeReq,
+  params: ResourceTypeReq & FileNameReq & TenantCodeReq
 ): any {
   return axios({
     url: `/resources/query-file-name`,
@@ -56,7 +56,7 @@ export function queryCurrentResourceByFileName(
 }
 
 export function queryCurrentResourceByFullName(
-  params: ResourceTypeReq & FullNameReq & TenantCodeReq,
+  params: ResourceTypeReq & FullNameReq & TenantCodeReq
 ): any {
   return axios({
     url: `/resources/query-full-name`,
@@ -185,9 +185,7 @@ export function verifyResourceName(params: FullNameReq & ResourceTypeReq): any {
   })
 }
 
-export function doesResourceExist(
-  params: FullNameReq & ResourceTypeReq,
-): any {
+export function doesResourceExist(params: FullNameReq & ResourceTypeReq): any {
   return axios({
     url: `/resources/verify-name`,
     method: 'get',
@@ -196,7 +194,7 @@ export function doesResourceExist(
 }
 
 export function updateResource(
-  data: NameReq & ResourceTypeReq & DescriptionReq & FullNameReq & TenantCodeReq,
+  data: NameReq & ResourceTypeReq & DescriptionReq & FullNameReq & TenantCodeReq
 ): any {
   return axios({
     url: `/resources`,
@@ -224,7 +222,9 @@ export function viewUIUdfFunction(id: IdReq): any {
   })
 }
 
-export function updateResourceContent(data: ContentReq & TenantCodeReq & FullNameReq): any {
+export function updateResourceContent(
+  data: ContentReq & TenantCodeReq & FullNameReq
+): any {
   return axios({
     url: `/resources/update-content`,
     method: 'put',
@@ -232,7 +232,9 @@ export function updateResourceContent(data: ContentReq & TenantCodeReq & FullNam
   })
 }
 
-export function viewResource(params: ViewResourceReq & FullNameReq & TenantCodeReq): any {
+export function viewResource(
+  params: ViewResourceReq & FullNameReq & TenantCodeReq
+): any {
   return axios({
     url: `/resources/view`,
     method: 'get',
@@ -240,9 +242,7 @@ export function viewResource(params: ViewResourceReq & FullNameReq & TenantCodeR
   })
 }
 
-export function createUdfFunc(
-  data: UdfFuncReq
-): any {
+export function createUdfFunc(data: UdfFuncReq): any {
   return axios({
     url: `/resources/udf-func`,
     method: 'post',
@@ -250,10 +250,7 @@ export function createUdfFunc(
   })
 }
 
-export function updateUdfFunc(
-  data: UdfFuncReq,
-  id: number
-): any {
+export function updateUdfFunc(data: UdfFuncReq, id: number): any {
   return axios({
     url: `/resources/udf-func/${id}`,
     method: 'put',

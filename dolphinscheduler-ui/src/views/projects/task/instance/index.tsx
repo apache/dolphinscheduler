@@ -21,7 +21,6 @@ import { NTabPane, NTabs } from 'naive-ui'
 import BatchTaskInstance from './batch-task'
 import StreamTaskInstance from './stream-task'
 
-
 const TaskDefinition = defineComponent({
   name: 'task-instance',
   setup() {

@@ -160,7 +160,7 @@ export function useForm(id?: number) {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
 
-    state.requiredDataBase = (type !== 'POSTGRESQL' && type !== 'ATHENA')
+    state.requiredDataBase = type !== 'POSTGRESQL' && type !== 'ATHENA'
 
     state.showHost = type !== 'ATHENA'
     state.showPort = type !== 'ATHENA'
@@ -200,13 +200,13 @@ export function useForm(id?: number) {
     const params = { type: state.detailForm.type, testFlag: 1 } as TypeReq
     const result = await queryDataSourceList(params)
     state.bindTestDataSourceExample = result
-        .filter((value: { label: string; value: string }) => {
-          // @ts-ignore
-          if (state.detailForm.id && state.detailForm.id === value.id)
-            return false
-          return true
-        })
-        .map((TestDataSourceExample: { name: string; id: number }) => ({
+      .filter((value: { label: string; value: string }) => {
+        // @ts-ignore
+        if (state.detailForm.id && state.detailForm.id === value.id)
+          return false
+        return true
+      })
+      .map((TestDataSourceExample: { name: string; id: number }) => ({
         label: TestDataSourceExample.name,
         value: TestDataSourceExample.id
       }))

@@ -73,18 +73,18 @@ const DynamicDag = defineComponent({
     return (
       <>
         <div class={styles['workflow-dag']}>
-          <DagSidebar onDragstart={this.handelDragstart}/>
-          <DagCanvas onDrop={this.handelDrop}/>
+          <DagSidebar onDragstart={this.handelDragstart} />
+          <DagCanvas onDrop={this.handelDrop} />
         </div>
-        {
-          this.draggedTask && this.formData && <TaskForm
+        {this.draggedTask && this.formData && (
+          <TaskForm
             task={this.draggedTask}
             formData={this.formData}
             showModal={this.showModal}
-            onCancelModal={() => this.showModal = false}
-            onConfirmModal={() => this.showModal = false}
+            onCancelModal={() => (this.showModal = false)}
+            onConfirmModal={() => (this.showModal = false)}
           />
-        }
+        )}
       </>
     )
   }

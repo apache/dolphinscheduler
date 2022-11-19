@@ -90,7 +90,10 @@ export default defineComponent({
       let breadName = ''
       variables.breadList.forEach((item, i) => {
         if (i <= index) {
-          breadName = breadName === "" ? item.toString() : breadName + '/' + item.toString();
+          breadName =
+            breadName === ''
+              ? item.toString()
+              : breadName + '/' + item.toString()
         }
       })
       goBread(breadName)

@@ -44,7 +44,7 @@ export function useDms({
     delayTime: 0,
     timeout: 30,
     timeoutNotifyStrategy: ['WARN'],
-    isRestartTask: false,
+    isRestartTask: false
   } as INodeData)
 
   let extra: IJsonItem[] = []

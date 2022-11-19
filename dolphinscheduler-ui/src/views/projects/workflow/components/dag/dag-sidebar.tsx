@@ -96,7 +96,7 @@ export default defineComponent({
       handleDagMenu()
     })
 
-    return () =>
+    return () => (
       <div class={styles.sidebar}>
         <NCollapse default-expanded-names='1' accordion>
           {variables.fav.length > 0 && (
@@ -139,11 +139,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -192,11 +188,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -245,11 +237,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -298,11 +286,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -351,11 +335,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -404,11 +384,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -457,11 +433,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -510,11 +482,7 @@ export default defineComponent({
                               : '#ccc'
                           }
                         >
-                          {task.collection ? (
-                            <StarFilled />
-                          ) : (
-                            <StarOutlined />
-                          )}
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
                         </NIcon>
                       </div>
                     </div>
@@ -525,5 +493,6 @@ export default defineComponent({
           )}
         </NCollapse>
       </div>
+    )
   }
 })

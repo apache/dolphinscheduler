@@ -15,14 +15,8 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  toRefs
-} from 'vue'
-import {
-  NSpace
-} from 'naive-ui'
+import { defineComponent, PropType, toRefs } from 'vue'
+import { NSpace } from 'naive-ui'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import { useForm, datasourceTypeList } from './use-form'
@@ -58,11 +52,7 @@ const SourceModal = defineComponent({
     }
   },
   render() {
-    const {
-      show,
-      t,
-      handleTypeSelect
-    } = this
+    const { show, t, handleTypeSelect } = this
 
     return (
       <Modal
@@ -77,7 +67,10 @@ const SourceModal = defineComponent({
             <div class={styles.content}>
               <NSpace>
                 {datasourceTypeList.map((item) => (
-                  <div class={[styles.itemBox, `${item.label}-box`]} onClick={() => handleTypeSelect(item.value)}>
+                  <div
+                    class={[styles.itemBox, `${item.label}-box`]}
+                    onClick={() => handleTypeSelect(item.value)}
+                  >
                     {item.label}
                   </div>
                 ))}

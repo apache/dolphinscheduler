@@ -37,9 +37,15 @@ const goSubFolder = (router: Router, item: any) => {
   fileStore.setFileInfo(`${item.alias}|${item.size}`)
   if (item.directory) {
     fileStore.setCurrentDir(`${item.fullName}`)
-    router.push({ name: 'resource-file-subdirectory', query: { prefix: item.fullName, tenantCode: item.user_name}})
+    router.push({
+      name: 'resource-file-subdirectory',
+      query: { prefix: item.fullName, tenantCode: item.user_name }
+    })
   } else {
-    router.push({ name: 'resource-file-list', query: {prefix: item.fullName, tenantCode: item.user_name} })
+    router.push({
+      name: 'resource-file-list',
+      query: { prefix: item.fullName, tenantCode: item.user_name }
+    })
   }
 }
 
@@ -104,7 +110,7 @@ export function useTable(renameResource: IRenameFile, updateList: () => void) {
       render: (row) =>
         h(TableAction, {
           row,
-          onRenameResource: ( name, description, fullName, user_name ) => {
+          onRenameResource: (name, description, fullName, user_name) => {
             renameResource(name, description, fullName, user_name)
           },
           onUpdateList: () => updateList()

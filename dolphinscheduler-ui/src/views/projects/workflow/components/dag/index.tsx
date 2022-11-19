@@ -250,7 +250,6 @@ export default defineComponent({
           limit: nodeVariables.limit,
           skipLineNum: nodeVariables.skipLineNum
         }).then((res: any) => {
-
           nodeVariables.logRef += res.message || ''
           if (res && res.message !== '') {
             nodeVariables.limit += 1000
