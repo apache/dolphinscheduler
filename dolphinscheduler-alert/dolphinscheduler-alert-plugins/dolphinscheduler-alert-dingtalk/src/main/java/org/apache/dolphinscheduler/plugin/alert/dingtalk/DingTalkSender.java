@@ -172,7 +172,7 @@ public final class DingTalkSender {
         String msg = generateMsgJson(title, content);
 
         HttpPost httpPost = constructHttpPost(
-            org.apache.commons.lang3.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
+                org.apache.commons.lang3.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
@@ -291,11 +291,11 @@ public final class DingTalkSender {
         Map<String, Object> at = new HashMap<>();
 
         String[] atMobileArray =
-            org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
-                : new String[0];
+                org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
+                        : new String[0];
         String[] atUserArray =
-            org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
-                : new String[0];
+                org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
+                        : new String[0];
         boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
 
         at.put("atMobiles", atMobileArray);
@@ -385,7 +385,7 @@ public final class DingTalkSender {
         @Override
         public String toString() {
             return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg="
-                + this.getErrmsg() + ")";
+                    + this.getErrmsg() + ")";
         }
     }
 }
