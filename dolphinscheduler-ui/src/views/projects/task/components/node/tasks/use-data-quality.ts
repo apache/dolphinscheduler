@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { Ref, reactive } from 'vue'
+import {Ref, reactive, ref} from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
@@ -36,6 +36,7 @@ export function useDataQuality({
   updateElements: () => void
 }) {
   const { t } = useI18n()
+  const useResourcesSpan = ref(24)
   const model = reactive({
     taskType: 'DATA_QUALITY',
     name: '',
@@ -97,6 +98,7 @@ export function useDataQuality({
         field: 'localParams',
         isSimple: true
       }),
+      Fields.useResources(useResourcesSpan),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model
