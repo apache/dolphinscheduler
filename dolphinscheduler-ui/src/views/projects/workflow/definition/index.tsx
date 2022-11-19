@@ -200,9 +200,8 @@ export default defineComponent({
               rowKey={(row) => row.code}
               columns={this.columns}
               data={this.tableData}
-              striped
-              v-model:checked-row-keys={this.checkedRowKeys}
-              row-class-name='items'
+              // v-model:checked-row-keys={this.checkedRowKeys}
+              // row-class-name='items'
               scrollX={this.tableWidth}
             />
             <NSpace justify='space-between'>
