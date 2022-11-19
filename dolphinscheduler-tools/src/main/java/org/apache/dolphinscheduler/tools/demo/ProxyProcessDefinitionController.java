@@ -48,7 +48,6 @@ public class ProxyProcessDefinitionController {
                                                String taskRelationJson,
                                                String taskDefinitionJson,
                                                ProcessExecutionTypeEnum executionType) {
-        ProxyResult proxyResult = new ProxyResult();
         String url =
                 "http://" + DomainName + ":" + ServerPort + "/dolphinscheduler/projects/" + projectCode
                         + "/process-definition";
@@ -71,7 +70,7 @@ public class ProxyProcessDefinitionController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        proxyResult = JSONUtils.parseObject(responseBody, ProxyResult.class);
+        ProxyResult proxyResult = JSONUtils.parseObject(responseBody, ProxyResult.class);
 
         return proxyResult;
 

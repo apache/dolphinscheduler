@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
-public class DemoContants {
+public class DemoConstants {
 
     public static final String PARAMETER_CONTEXT_PARAMS =
             "[{\"prop\":\"output\",\"value\":\"100\",\"direct\":\"IN\",\"type\":\"VARCHAR\"},{\"prop\":\"value\",\"value\":\"99\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
@@ -28,5 +28,5 @@ public class DemoContants {
     public static final String SWITCH_GLOBAL_PARAMS =
             "[{\"prop\":\"switchValue\",\"value\":\"A\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
 
-    public static final String Expire_Time = "2050-09-30 15:59:23";
+    public static final String EXPIRE_TIME = "2050-09-30 15:59:23";
 }

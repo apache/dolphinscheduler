@@ -109,7 +109,7 @@ public class ProcessDefinitionDemo {
         }
 
         // generate access token
-        String expireTime = DemoContants.Expire_Time;
+        String expireTime = DemoConstants.EXPIRE_TIME;
         String token = EncryptionUtils.getMd5(1 + expireTime + System.currentTimeMillis());
         AccessToken accessToken = new AccessToken();
         accessToken.setUserId(1);
@@ -346,7 +346,7 @@ public class ProcessDefinitionDemo {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setName("demo_parameter_context");
         processDefinitionLog.setDescription("Upstream and downstream task node parameter transfer");
-        processDefinitionLog.setGlobalParams(DemoContants.PARAMETER_CONTEXT_PARAMS);
+        processDefinitionLog.setGlobalParams(DemoConstants.PARAMETER_CONTEXT_PARAMS);
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
@@ -551,7 +551,7 @@ public class ProcessDefinitionDemo {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setName("demo_switch");
         processDefinitionLog.setDescription("Determine which task to perform based on conditions");
-        processDefinitionLog.setGlobalParams(DemoContants.SWITCH_GLOBAL_PARAMS);
+        processDefinitionLog.setGlobalParams(DemoConstants.SWITCH_GLOBAL_PARAMS);
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
@@ -669,7 +669,7 @@ public class ProcessDefinitionDemo {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setName("demo_shell");
         processDefinitionLog.setDescription("Production, processing and sales of a series of processes");
-        processDefinitionLog.setGlobalParams(DemoContants.SHELL_GLOBAL_PARAMS);
+        processDefinitionLog.setGlobalParams(DemoConstants.SHELL_GLOBAL_PARAMS);
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 

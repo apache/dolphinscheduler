@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.tools.datasource;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.tools.datasource.dao.UpgradeDao;
@@ -81,7 +82,7 @@ public class DolphinSchedulerManager {
     public void upgradeDolphinScheduler() throws IOException {
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
-        if (schemaList == null || schemaList.size() == 0) {
+        if (CollectionUtils.isEmpty(schemaList)) {
             logger.info("There is no schema to upgrade!");
         } else {
             String version;

@@ -41,10 +41,7 @@ public class ProxyResult<T> {
     }
 
     public boolean isSuccess() {
-        if (code == 0) {
-            return true;
-        }
-        return false;
+        return code == 0;
     }
 
     public boolean isFailed() {
