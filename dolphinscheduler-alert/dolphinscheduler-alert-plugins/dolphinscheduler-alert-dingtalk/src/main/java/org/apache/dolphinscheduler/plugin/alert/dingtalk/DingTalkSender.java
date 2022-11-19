@@ -172,7 +172,7 @@ public final class DingTalkSender {
         String msg = generateMsgJson(title, content);
 
         HttpPost httpPost = constructHttpPost(
-                org.apache.commons.lang3.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
+            org.apache.commons.lang3.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
@@ -283,44 +283,6 @@ public final class DingTalkSender {
     }
 
     /**
-     * generate markdown msg
-     *
-     * @param title title
-     * @param content content
-     * @param text text
-     */
-    private void generateMarkdownMsgByTemplate(String title, String content, Map<String, Object> text) {
-
-        String textTemplate = "#### ${TITLE} @150XXXXXXXX \\n > 9度，西北风1级，空气良89，相对温度73%\\n > ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png)\\n > ###### 10点20分发布 [天气](https://www.dingtalk.com) \\n";
-
-        StringBuilder builder = new StringBuilder(content);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {
-            builder.append(" ");
-            builder.append(keyword);
-        }
-        builder.append("\n\n");
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles)) {
-            Arrays.stream(atMobiles.split(",")).forEach(value -> {
-                builder.append("@");
-                builder.append(value);
-                builder.append(" ");
-            });
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds)) {
-            Arrays.stream(atUserIds.split(",")).forEach(value -> {
-                builder.append("@");
-                builder.append(value);
-                builder.append(" ");
-            });
-        }
-
-        byte[] byt = StringUtils.getBytesUtf8(builder.toString());
-        String txt = StringUtils.newStringUtf8(byt);
-        text.put("title", title);
-        text.put("text", txt);
-    }
-
-    /**
      * configure msg @person
      *
      * @param items items
@@ -329,11 +291,11 @@ public final class DingTalkSender {
         Map<String, Object> at = new HashMap<>();
 
         String[] atMobileArray =
-                org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
-                        : new String[0];
+            org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
+                : new String[0];
         String[] atUserArray =
-                org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
-                        : new String[0];
+            org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
+                : new String[0];
         boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
 
         at.put("atMobiles", atMobileArray);
@@ -423,7 +385,7 @@ public final class DingTalkSender {
         @Override
         public String toString() {
             return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg="
-                    + this.getErrmsg() + ")";
+                + this.getErrmsg() + ")";
         }
     }
 }
