@@ -196,7 +196,13 @@ $bgLight: #ffffff;
       background-image: url('/images/task-icons/dms.png');
     }
     &.icon-datasync {
-      background-image: url('/images/task-icons/datasync_hover.png');
+      background-image: url('/images/task-icons/datasync.png');
+    }
+    &.icon-linkis {
+      background-image: url('/images/task-icons/linkis.png');
+    }
+    &.icon-kubeflow {
+      background-image: url('/images/task-icons/kubeflow.png');
     }
   }
 
@@ -297,7 +303,13 @@ $bgLight: #ffffff;
         background-image: url('/images/task-icons/dms_hover.png');
       }
       &.icon-datasync {
-        background-image: url('/images/task-icons/datasync.png');
+        background-image: url('/images/task-icons/datasync_hover.png');
+      }
+      &.icon-linkis {
+        background-image: url('/images/task-icons/linkis_hover.png');
+      }
+      &.icon-kubeflow {
+        background-image: url('/images/task-icons/kubeflow_hover.png');
       }
     }
   }

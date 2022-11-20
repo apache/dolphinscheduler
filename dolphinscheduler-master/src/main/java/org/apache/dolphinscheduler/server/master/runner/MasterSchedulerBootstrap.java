@@ -269,16 +269,16 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 logger.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
                 return Collections.emptyList();
             }
-            int pageNumber = 0;
             int pageSize = masterConfig.getFetchCommandNum();
             final List<Command> result =
-                    commandService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+                    commandService.findCommandPageBySlot(pageSize, masterCount, thisMasterSlot);
             if (CollectionUtils.isNotEmpty(result)) {
+                long cost = System.currentTimeMillis() - scheduleStartTime;
                 logger.info(
-                        "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
-                        result.size(), thisMasterSlot, masterCount);
+                        "Master schedule bootstrap loop command success, fetch command size: {}, cost: {}ms, current slot: {}, total slot size: {}",
+                        result.size(), cost, thisMasterSlot, masterCount);
+                ProcessInstanceMetrics.recordCommandQueryTime(cost);
             }
-            ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
             return result;
         } catch (Exception ex) {
             throw new MasterException("Master loop command from database error", ex);

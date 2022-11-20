@@ -56,10 +56,11 @@ const list = defineComponent({
     const { data, changePage, changePageSize, deleteRecord, updateList } =
       useTable()
 
-    const { getColumns } = useColumns((id: number, type: 'edit' | 'delete') => {
+    const { getColumns } = useColumns((id: number, type: 'edit' | 'delete', row?: any) => {
       if (type === 'edit') {
         showDetailModal.value = true
         selectId.value = id
+        selectType.value = row.type
       } else {
         deleteRecord(id)
       }

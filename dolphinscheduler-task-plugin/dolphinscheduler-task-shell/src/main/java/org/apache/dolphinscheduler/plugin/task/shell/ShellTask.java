@@ -137,7 +137,7 @@ public class ShellTask extends AbstractTask {
             return fileName;
         }
 
-        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = shellParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         shellParameters.setRawScript(script);
 
