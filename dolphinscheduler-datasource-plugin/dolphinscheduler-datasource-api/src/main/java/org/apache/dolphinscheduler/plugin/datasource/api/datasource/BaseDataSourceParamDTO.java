@@ -39,6 +39,8 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     protected String database;
 
+    protected String datawarehouse;
+
     protected String userName;
 
     protected String password;
@@ -144,4 +146,12 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
      * @return datasource type code
      */
     public abstract DbType getType();
+
+    public String getDatawarehouse() {
+        return datawarehouse;
+    }
+
+    public void setDatawarehouse(String datawarehouse) {
+        this.datawarehouse = datawarehouse;
+    }
 }
