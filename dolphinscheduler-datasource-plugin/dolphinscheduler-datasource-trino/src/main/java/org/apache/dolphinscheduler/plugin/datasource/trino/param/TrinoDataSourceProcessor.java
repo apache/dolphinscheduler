@@ -57,10 +57,9 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
         TrinoDataSourceParamDTO TrinoDatasourceParamDTO = new TrinoDataSourceParamDTO();
-        if (isNumeric(hostPortArray[0].split(Constants.COLON)[1])) {
-            TrinoDatasourceParamDTO.setPort(Integer.valueOf(hostPortArray[0].split(Constants.COLON)[1]));
-        }
-        TrinoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        String[] split = hostPortArray[0].split(Constants.COLON);
+        TrinoDatasourceParamDTO.setHost(split[0]);
+        TrinoDatasourceParamDTO.setPort(Integer.valueOf(split[1]));
         TrinoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         TrinoDatasourceParamDTO.setUserName(connectionParams.getUser());
         TrinoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
@@ -150,12 +149,5 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
             otherMap.put(config.split("=")[0], config.split("=")[1]);
         }
         return otherMap;
-    }
-    public boolean isNumeric(String str) {
-        if (str != null && !"".equals(str.trim())) {
-            return str.matches("^[0-9]*$");
-        } else {
-            return false;
-        }
     }
 }
