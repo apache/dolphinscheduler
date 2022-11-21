@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.snowflake.param;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -29,12 +28,14 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
+
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, SnowflakeDatasourceParamDTO.class);
@@ -42,7 +43,8 @@ public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        SnowflakeConnectionParam snowFlakeConnectionParam = (SnowflakeConnectionParam) createConnectionParams(connectionJson);
+        SnowflakeConnectionParam snowFlakeConnectionParam =
+                (SnowflakeConnectionParam) createConnectionParams(connectionJson);
         String[] tmpArray = snowFlakeConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
         StringBuilder hosts = new StringBuilder();
         String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
@@ -110,7 +112,8 @@ public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
         SnowflakeConnectionParam snowFlakeConnectionParam = (SnowflakeConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                snowFlakeConnectionParam.getUser(), PasswordUtils.decodePassword(snowFlakeConnectionParam.getPassword()));
+                snowFlakeConnectionParam.getUser(),
+                PasswordUtils.decodePassword(snowFlakeConnectionParam.getPassword()));
     }
     @Override
     public DataSourceProcessor create() {
@@ -120,7 +123,5 @@ public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
     public DbType getDbType() {
         return DbType.SNOWFLAKE;
     }
-
-
 
 }

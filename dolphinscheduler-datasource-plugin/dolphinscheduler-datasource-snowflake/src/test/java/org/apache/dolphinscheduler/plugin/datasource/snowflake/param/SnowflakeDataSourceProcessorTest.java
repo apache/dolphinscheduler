@@ -61,8 +61,9 @@ public class SnowflakeDataSourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:snowflake://localhost1:5142,localhost2:5142\""
-                + ",\"jdbcUrl\":\"jdbc:snowflake://localhost1:5142,localhost2:5142/default\"}";
+        String connectionParam =
+                "{\"user\":\"default\",\"address\":\"jdbc:snowflake://localhost1:5142,localhost2:5142\""
+                        + ",\"jdbcUrl\":\"jdbc:snowflake://localhost1:5142,localhost2:5142/default\"}";
         SnowflakeConnectionParam connectionParams = (SnowflakeConnectionParam) snowflakeDataSourceProcessor
                 .createConnectionParams(connectionParam);
         Assertions.assertNotNull(connectionParam);
