@@ -144,7 +144,7 @@ const list = defineComponent({
             </NButton>
             <NSpace justify='end' wrap={false}>
               <Search
-                  v-model:vaule = {this.searchVal}
+                  v-model:value = {this.searchVal}
                   placeholder = {t('datasource.search_input_tips')}
                   onSearch={onUpdatedList}
               />

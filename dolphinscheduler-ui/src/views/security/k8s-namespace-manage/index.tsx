@@ -118,7 +118,7 @@ const k8sNamespaceManage = defineComponent({
             </NButton>
             <NSpace>
               <Search
-                v-model:vaule={this.searchVal}
+                v-model:value={this.searchVal}
                 placeholder={t('security.k8s_namespace.search_tips')}
                 onSearch={onSearch}
               />

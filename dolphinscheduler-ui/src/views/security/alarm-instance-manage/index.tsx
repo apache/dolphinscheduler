@@ -130,7 +130,7 @@ const AlarmInstanceManage = defineComponent({
                 )}
                 <NSpace justify='end' wrap={false}>
                   <Search
-                    v-model:vaule={this.searchVal}
+                    v-model:value={this.searchVal}
                     placeholder={`${t(
                       'security.alarm_instance.search_input_tips'
                     )}`}

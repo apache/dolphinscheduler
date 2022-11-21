@@ -167,7 +167,7 @@ const taskGroupOption = defineComponent({
                   placeholder={t(
                       'resource.task_group_option.please_enter_keywords'
                   )}
-                  v-model:vaule={this.name}
+                  v-model:value={this.name}
                   onSearch={this.onSearch}
               ></Search>
               <NButton size='small' type='primary' onClick={onSearch}>

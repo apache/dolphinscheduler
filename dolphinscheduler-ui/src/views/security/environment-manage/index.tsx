@@ -123,7 +123,7 @@ const environmentManage = defineComponent({
             </NButton>
             <NSpace>
               <Search
-                v-model:vaule={this.searchVal}
+                v-model:value={this.searchVal}
                 placeholder={t('security.environment.search_tips')}
                 onSearch={onSearch}
               />

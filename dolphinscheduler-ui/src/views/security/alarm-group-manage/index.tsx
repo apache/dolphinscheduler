@@ -119,7 +119,7 @@ const alarmGroupManage = defineComponent({
             </NButton>
             <NSpace>
               <Search
-                v-model:vaule={this.searchVal}
+                v-model:value={this.searchVal}
                 placeholder={t('security.alarm_group.search_tips')}
                 onSearch={onSearch}
               />

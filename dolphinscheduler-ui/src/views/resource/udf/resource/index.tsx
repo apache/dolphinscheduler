@@ -151,7 +151,7 @@ export default defineComponent({
             <NSpace>
               <Search
                 placeholder={t('resource.udf.enter_keyword_tips')}
-                v-model:vaule={this.searchVal}
+                v-model:value={this.searchVal}
                 onSearch={this.handleSearch}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>

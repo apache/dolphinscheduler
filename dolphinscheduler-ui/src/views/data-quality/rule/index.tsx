@@ -20,9 +20,9 @@ import {
   getCurrentInstance,
   onMounted,
   ref,
-  toRefs
+  toRefs, withKeys
 } from 'vue'
-import { NSpace, NButton, NIcon, NDataTable, NPagination } from 'naive-ui'
+import {NSpace, NButton, NIcon, NDataTable, NPagination, NInput} from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import Card from '@/components/card'
@@ -51,9 +51,7 @@ const TaskResult = defineComponent({
       requestTableData()
     }
 
-    const onSearch = (value?: string) => {
-      value !== undefined && (variables.searchVal = value)
-      variables.page = 1
+    const onSearch = () => {
       requestTableData()
     }
 
@@ -111,16 +109,14 @@ const TaskResult = defineComponent({
         <Card>
           <NSpace justify='end'>
             <Search
-              inputProps={{
-                placeholder: t('data_quality.rule.name'),
-                onChange: (value: string) => void (this.searchVal = value)
-              }}
+              v-model:value={this.searchVal}
+              placeholder={t('data_quality.rule.name')}
               onSearch={onSearch}
             />
             <NButton
               size='small'
               type='primary'
-              onClick={() => void onSearch()}
+              onClick={onSearch}
             >
               <NIcon>
                 <SearchOutlined />

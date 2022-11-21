@@ -29,19 +29,24 @@ const props = {
 
 const Search = defineComponent({
   name: 'Search',
-  emits: ['search'],
+  emits: ['search','clear'],
   props: props,
   setup(props, ctx) {
     const onKeyDown = (ev: KeyboardEvent) => {
       ctx.emit('search', (ev.target as HTMLInputElement)?.value || '')
     }
+    const onClear = (ev: Event) => {
+      ctx.emit('clear', (ev.target as HTMLInputElement)?.value || '')
+    }
     return () => (
-      <NInput
-        size='small'
-        clearable
-        placeholder = {props.placeholder?props.placeholder:placeholder}
-        onKeydown={withKeys(onKeyDown, ['enter'])}
-      />
+
+        <NInput
+            size='small'
+            clearable
+            placeholder = {props.placeholder?props.placeholder:placeholder}
+            onKeydown={withKeys(onKeyDown, ['enter'])}
+            onClear = {onClear}
+        />
     )
   }
 })

@@ -20,6 +20,7 @@ import {
   NButton,
   NDataTable,
   NIcon,
+  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -122,11 +123,12 @@ const list = defineComponent({
             </NButton>
             <NSpace>
               <Search
-                  v-model:vaule = {this.searchVal}
+                  v-model:value = {this.searchVal}
                   placeholder={t('project.list.project_tips')}
                   onSearch={this.handleSearch}
                   onClear={this.onClearSearch}
               />
+
               <NButton size='small' type='primary' onClick={this.handleSearch}>
                 <NIcon>
                   <SearchOutlined />

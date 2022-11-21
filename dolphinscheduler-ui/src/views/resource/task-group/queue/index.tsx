@@ -185,7 +185,7 @@ const taskGroupQueue = defineComponent({
               onSearch={onSearch}
             ></Search>
             <Search
-                v-model:vaule={this.searchParamRef.instanceName}
+                v-model:value={this.searchParamRef.instanceName}
                 placeholder={t('resource.task_group_queue.task_instance_name')}
                 onSearch ={onSearch}
             ></Search>

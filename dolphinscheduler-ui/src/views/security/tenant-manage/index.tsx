@@ -113,7 +113,7 @@ const tenementManage = defineComponent({
             </NButton>
             <NSpace>
               <Search
-                v-model:vaule={this.searchVal}
+                v-model:value={this.searchVal}
                 placeholder={t('security.tenant.search_tips')}
                 onSearch={this.handleSearch}
               />
