@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.snowflake.param;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
 public class SnowflakeConnectionParam extends BaseConnectionParam {
+
     @Override
     public String toString() {
         return "SnowFlakeConnectionParam{"

@@ -55,7 +55,8 @@ export function useForm(id?: number) {
     bindTestId: undefined,
     endpoint: '',
     MSIClientId: '',
-    dbUser: ''
+    dbUser: '',
+    datawarehouse: ''
   } as IDataSourceDetail
 
   const state = reactive({
@@ -138,6 +139,14 @@ export function useForm(id?: number) {
         validator() {
           if (!state.detailForm.database && state.requiredDataBase) {
             return new Error(t('datasource.database_name_tips'))
+          }
+        }
+      },
+      datawarehouse: {
+        trigger: ['input'],
+        validator() {
+          if (!state.detailForm.datawarehouse) {
+            return new Error(t('datasource.datawarehouse_tips'))
           }
         }
       },
@@ -406,6 +415,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'OCEANBASE',
     label: 'OCEANBASE',
     defaultPort: 2881
+  },
+  SNOWFLAKE: {
+    value: 'SNOWFLAKE',
+    label: 'SNOWFLAKE',
+    defaultPort: 3306
   }
 }
 

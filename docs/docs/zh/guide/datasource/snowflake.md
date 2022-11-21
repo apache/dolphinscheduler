@@ -14,3 +14,4 @@
 - 数据库名：输入连接 SNOWFLAKE数据源 的数据库名称
 - 数据仓库： 输入数据 SNOWFLAKE的数据仓库名称
 - Jdbc 连接参数：用于 SNOWFLAKE数据源 连接的参数设置，以 JSON 形式填写
+

@@ -32,6 +32,7 @@ type IDataBase =
   | 'STARROCKS'
   | 'DAMENG'
   | 'OCEANBASE'
+  | 'SNOWFLAKE'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -76,6 +77,7 @@ interface IDataSource {
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string
+  datawarehouse?: string
 }
 
 interface ListReq {
