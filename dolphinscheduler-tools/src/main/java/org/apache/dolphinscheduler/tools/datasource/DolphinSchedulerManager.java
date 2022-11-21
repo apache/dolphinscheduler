@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.tools.datasource;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.tools.datasource.dao.UpgradeDao;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
