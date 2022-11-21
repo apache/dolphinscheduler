@@ -277,7 +277,7 @@ Location: `master-server/conf/application.yaml`
 |master.failover-interval|10|failover interval, the unit is minute|
 |master.kill-yarn-job-when-task-failover|true|whether to kill yarn job when failover taskInstance|
 |master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
-|master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will waitting infinitely|
+|master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will wait infinitely|
 |master.worker-group-refresh-interval|10s|The interval to refresh worker group from db to memory|
 
 ### Worker Server related configuration
@@ -296,7 +296,7 @@ Location: `worker-server/conf/application.yaml`
 |worker.alert-listen-host|localhost|the alert listen host of worker|
 |worker.alert-listen-port|50052|the alert listen port of worker|
 |worker.registry-disconnect-strategy.strategy|stop|Used when the worker disconnect from registry, default value: stop. Optional values include stop, waiting|
-|worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will waitting infinitely |
+|worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will wait infinitely |
 |worker.task-execute-threads-full-policy|REJECT|If REJECT, when the task waiting in the worker reaches exec-threads, it will reject the received task and the Master will redispatch it; If CONTINUE, it will put the task into the worker's execution queue and wait for a free thread to start execution|
 
 ### Alert Server related configuration
