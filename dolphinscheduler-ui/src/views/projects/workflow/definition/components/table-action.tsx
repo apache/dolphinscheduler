@@ -28,7 +28,8 @@ import {
   FieldTimeOutlined,
   ExportOutlined,
   ApartmentOutlined,
-  UploadOutlined
+  UploadOutlined,
+  ArrowRightOutlined
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { IDefinitionData } from '../types'
@@ -53,7 +54,8 @@ export default defineComponent({
     'copyWorkflow',
     'exportWorkflow',
     'gotoTimingManage',
-    'gotoWorkflowTree'
+    'gotoWorkflowTree',
+    'gotoWorkflowInstance'
   ],
   setup(props, ctx) {
     const handleEditWorkflow = () => {
@@ -96,6 +98,10 @@ export default defineComponent({
       ctx.emit('gotoWorkflowTree')
     }
 
+    const handleGotoWorkflowInstance = () => {
+      ctx.emit('gotoWorkflowInstance')
+    }
+
     return {
       handleEditWorkflow,
       handleStartWorkflow,
@@ -107,6 +113,7 @@ export default defineComponent({
       handleExportWorkflow,
       handleGotoTimingManage,
       handleGotoWorkflowTree,
+      handleGotoWorkflowInstance,
       ...toRefs(props)
     }
   },
@@ -129,7 +136,7 @@ export default defineComponent({
                 onClick={this.handleEditWorkflow}
                 disabled={releaseState === 'ONLINE'}
                 class='btn-edit'
-                /* TODO: Edit workflow */
+              /* TODO: Edit workflow */
               >
                 <NIcon>
                   <FormOutlined />
@@ -305,6 +312,24 @@ export default defineComponent({
               >
                 <NIcon>
                   <ExportOutlined />
+                </NIcon>
+              </NButton>
+            )
+          }}
+        </NTooltip>
+        <NTooltip trigger={'hover'}>
+          {{
+            default: () => t('project.workflow.workflow_instance'),
+            trigger: () => (
+              <NButton
+                size='small'
+                type='info'
+                tag='div'
+                circle
+                onClick={this.handleGotoWorkflowInstance}
+              >
+                <NIcon>
+                  <ArrowRightOutlined />
                 </NIcon>
               </NButton>
             )

@@ -208,7 +208,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](10),
+        ...COLUMN_WIDTH_CONFIG['operation'](11),
         render: (row) =>
           h(TableAction, {
             row,
@@ -221,7 +221,8 @@ export function useTable() {
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
             onGotoTimingManage: () => gotoTimingManage(row),
-            onGotoWorkflowTree: () => gotoWorkflowTree(row)
+            onGotoWorkflowTree: () => gotoWorkflowTree(row),
+            onGotoWorkflowInstance: () => gotoWorkflowInstance(row)
           })
       }
     ] as TableColumns<any>
@@ -382,6 +383,15 @@ export function useTable() {
     router.push({
       name: 'workflow-definition-tree',
       params: { projectCode: variables.projectCode, definitionCode: row.code }
+    })
+  }
+
+  const gotoWorkflowInstance = (row: any) => {
+    debugger
+    router.push({
+      name: 'workflow-instance-list',
+      params: { projectCode: variables.projectCode },
+      query: { processDefineCode: row.code }
     })
   }
 

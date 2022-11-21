@@ -21,7 +21,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
-import { NEllipsis} from 'naive-ui'
+import { NEllipsis } from 'naive-ui'
 import {
   queryProcessInstanceListPaging,
   deleteProcessInstanceById,
@@ -43,7 +43,7 @@ import type { Router } from 'vue-router'
 import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
-import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+import { renderEnvironmentalDistinctionCell } from "@/utils/environmental-distinction";
 
 export function useTable() {
   const { t } = useI18n()
@@ -51,6 +51,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
+    processDefineCode: router.currentRoute.value.query.processDefineCode ? Number(router.currentRoute.value.query.processDefineCode) : 0,
     tableWidth: DefaultTableWidth,
     checkedRowKeys: [] as Array<RowKey>,
     tableData: [] as Array<IWorkflowInstance>,
@@ -244,11 +245,13 @@ export function useTable() {
   }
 
   const getTableData = () => {
+    debugger
     if (variables.loadingRef) return
     variables.loadingRef = true
     const params = {
       pageNo: variables.page,
       pageSize: variables.pageSize,
+      processDefineCode: variables.processDefineCode,
       searchVal: variables.searchVal,
       executorName: variables.executorName,
       host: variables.host,
