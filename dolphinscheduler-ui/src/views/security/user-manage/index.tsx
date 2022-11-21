@@ -22,7 +22,6 @@ import {
 } from 'vue'
 import {
   NButton,
-  NInput,
   NIcon,
   NSpace,
   NDataTable,

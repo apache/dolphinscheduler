@@ -20,9 +20,9 @@ import {
   getCurrentInstance,
   onMounted,
   ref,
-  toRefs, withKeys
+  toRefs
 } from 'vue'
-import {NSpace, NButton, NIcon, NDataTable, NPagination, NInput} from 'naive-ui'
+import {NSpace, NButton, NIcon, NDataTable, NPagination} from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import Card from '@/components/card'

@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, withKeys, PropType } from 'vue'
-import { NInput, InputProps } from 'naive-ui'
+import { NInput } from 'naive-ui'
 
 const placeholder ='Please enter keyword'
 
