@@ -70,9 +70,7 @@ public class ProxyProcessDefinitionController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ProxyResult proxyResult = JSONUtils.parseObject(responseBody, ProxyResult.class);
-
-        return proxyResult;
+        return JSONUtils.parseObject(responseBody, ProxyResult.class);
 
     }
 }
