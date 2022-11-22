@@ -35,7 +35,6 @@ const TaskDefinition = defineComponent({
       selectedTab.value = router.currentRoute.value.query.taskExecuteType.toString()
     }
     const onTabChange = (newSelectedTab: string) => {
-      debugger
       if (router.currentRoute.value.query.taskExecuteType) {
         selectedTab.value = newSelectedTab
       }
