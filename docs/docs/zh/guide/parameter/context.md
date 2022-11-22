@@ -78,7 +78,6 @@ Node_mysql 运行结果如下：
 
 但是 value 的值却只有在 Node_A 中输出为 66，其原因为 value 的方向选择为 IN，只有当方向为 OUT 时才会被定义为变量输出。
 
-
 #### Python 任务传递参数
 
 使用 `print('${setValue(key=%s)}' % value)`，DolphinScheduler会捕捉输出中的 `${setValue(key=value}`来进行参数捕捉，从而传递到下游
