@@ -812,76 +812,69 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (result.get(Constants.STATUS) != Status.SUCCESS && taskDefinitionToUpdate == null) {
             return result;
         }
+        // get sourceUpstreamTaskCodeSet
         List<ProcessTaskRelation> upstreamTaskRelations =
                 processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
-        Set<Long> upstreamCodeSet =
+        Set<Long> sourceUpstreamCodeSet =
                 upstreamTaskRelations.stream().map(ProcessTaskRelation::getPreTaskCode).collect(Collectors.toSet());
-        Set<Long> upstreamTaskCodes = Collections.emptySet();
+        // get updateUpstreamTaskCodeSet
+        Set<Long> updateUpstreamTaskCodeSet = Collections.emptySet();
         if (StringUtils.isNotEmpty(upstreamCodes)) {
-            upstreamTaskCodes = Arrays.stream(upstreamCodes.split(Constants.COMMA)).map(Long::parseLong)
+            updateUpstreamTaskCodeSet = Arrays.stream(upstreamCodes.split(Constants.COMMA)).map(Long::parseLong)
                     .collect(Collectors.toSet());
         }
-        if (CollectionUtils.isEqualCollection(upstreamCodeSet, upstreamTaskCodes) && taskDefinitionToUpdate == null) {
+        if (CollectionUtils.isEqualCollection(sourceUpstreamCodeSet, updateUpstreamTaskCodeSet)
+                && taskDefinitionToUpdate == null) {
             putMsg(result, Status.SUCCESS);
             return result;
-        } else {
-            if (taskDefinitionToUpdate == null) {
-                taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
-            }
+        } else if (taskDefinitionToUpdate == null) {
+            taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
         }
-        Map<Long, TaskDefinition> queryUpStreamTaskCodeMap;
-        if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
-            List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionMapper.queryByCodeList(upstreamTaskCodes);
-            queryUpStreamTaskCodeMap = upstreamTaskDefinitionList.stream()
-                    .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinition -> taskDefinition));
-            // upstreamTaskCodes - queryUpStreamTaskCodeMap.keySet
-            upstreamTaskCodes.removeAll(queryUpStreamTaskCodeMap.keySet());
-            if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
-                String notExistTaskCodes = StringUtils.join(upstreamTaskCodes, Constants.COMMA);
-                logger.error("Some task definitions in parameter upstreamTaskCodes do not exist, notExistTaskCodes:{}.",
-                        notExistTaskCodes);
-                putMsg(result, Status.TASK_DEFINE_NOT_EXIST, notExistTaskCodes);
-                return result;
-            }
-        } else {
-            queryUpStreamTaskCodeMap = new HashMap<>();
+        // get survive upstreamTask
+        Map<Long, TaskDefinition> updateUpstreamTask = getUpdateUpstreamTaskCodeMap(updateUpstreamTaskCodeSet, result);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
-        if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
+        // update log
+        if (CollectionUtils.isNotEmpty(updateUpstreamTaskCodeSet)) {
             ProcessTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<ProcessTaskRelation> processTaskRelations =
                     processTaskRelationMapper.queryByProcessCode(projectCode, taskRelation.getProcessDefinitionCode());
-            List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
-            List<ProcessTaskRelation> relationList = Lists.newArrayList();
-            for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
-                if (processTaskRelation.getPostTaskCode() == taskCode) {
-                    if (queryUpStreamTaskCodeMap.containsKey(processTaskRelation.getPreTaskCode())
-                            && processTaskRelation.getPreTaskCode() != 0L) {
-                        queryUpStreamTaskCodeMap.remove(processTaskRelation.getPreTaskCode());
-                    } else {
-                        processTaskRelation.setPreTaskCode(0L);
-                        processTaskRelation.setPreTaskVersion(0);
-                        relationList.add(processTaskRelation);
-                    }
-                }
-            }
-            processTaskRelationList.removeAll(relationList);
-            for (Map.Entry<Long, TaskDefinition> queryUpStreamTask : queryUpStreamTaskCodeMap.entrySet()) {
-                taskRelation.setPreTaskCode(queryUpStreamTask.getKey());
-                taskRelation.setPreTaskVersion(queryUpStreamTask.getValue().getVersion());
-                processTaskRelationList.add(taskRelation);
-            }
-            if (MapUtils.isEmpty(queryUpStreamTaskCodeMap) && CollectionUtils.isNotEmpty(processTaskRelationList)) {
-                processTaskRelationList.add(processTaskRelationList.get(0));
-            }
             updateDag(loginUser, taskRelation.getProcessDefinitionCode(), processTaskRelations,
                     Lists.newArrayList(taskDefinitionToUpdate));
         }
         logger.info(
                 "Update task with upstream tasks complete, projectCode:{}, taskDefinitionCode:{}, upstreamTaskCodes:{}.",
-                projectCode, taskCode, upstreamTaskCodes);
+                projectCode, taskCode, updateUpstreamTaskCodeSet);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * get survival updateUpstreamTask
+     * @param updateUpstreamTaskCodeSet will update upstreamTaskSet
+     * @param result result
+     * @return survival updateUpstreamTask
+     */
+    private Map<Long, TaskDefinition> getUpdateUpstreamTaskCodeMap(Set<Long> updateUpstreamTaskCodeSet,
+                                                                   Map<String, Object> result) {
+        Map<Long, TaskDefinition> queryUpStreamTaskCodeMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(updateUpstreamTaskCodeSet)) {
+            List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionMapper.queryByCodeList(updateUpstreamTaskCodeSet);
+            queryUpStreamTaskCodeMap = upstreamTaskDefinitionList.stream()
+                    .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinition -> taskDefinition));
+            updateUpstreamTaskCodeSet.removeAll(queryUpStreamTaskCodeMap.keySet());
+            if (CollectionUtils.isNotEmpty(updateUpstreamTaskCodeSet)) {
+                String notExistTaskCodes = StringUtils.join(updateUpstreamTaskCodeSet, Constants.COMMA);
+                logger.error("Some task definitions in parameter upstreamTaskCodes do not exist, notExistTaskCodes:{}.",
+                        notExistTaskCodes);
+                putMsg(result, Status.TASK_DEFINE_NOT_EXIST, notExistTaskCodes);
+                return queryUpStreamTaskCodeMap;
+            }
+        }
+        putMsg(result, Status.SUCCESS);
+        return queryUpStreamTaskCodeMap;
     }
 
     /**
