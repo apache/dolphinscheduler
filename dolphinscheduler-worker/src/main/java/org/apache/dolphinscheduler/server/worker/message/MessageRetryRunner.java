@@ -17,24 +17,30 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
-import lombok.NonNull;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import org.apache.commons.collections.MapUtils;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class MessageRetryRunner extends BaseDaemonThread {
@@ -98,16 +104,24 @@ public class MessageRetryRunner extends BaseDaemonThread {
     public void run() {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
-                if (needToRetryMessages.isEmpty()) {
+                if (MapUtils.isEmpty(needToRetryMessages)) {
                     Thread.sleep(MESSAGE_RETRY_WINDOW);
                 }
 
                 long now = System.currentTimeMillis();
-                for (Map.Entry<Integer, Map<CommandType, BaseCommand>> taskEntry : needToRetryMessages.entrySet()) {
+                Iterator<Map.Entry<Integer, Map<CommandType, BaseCommand>>> iterator =
+                        needToRetryMessages.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Integer, Map<CommandType, BaseCommand>> taskEntry = iterator.next();
                     Integer taskInstanceId = taskEntry.getKey();
+                    Map<CommandType, BaseCommand> retryMessageMap = taskEntry.getValue();
+                    if (retryMessageMap.isEmpty()) {
+                        iterator.remove();
+                        continue;
+                    }
                     LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
                     try {
-                        for (Map.Entry<CommandType, BaseCommand> messageEntry : taskEntry.getValue().entrySet()) {
+                        for (Map.Entry<CommandType, BaseCommand> messageEntry : retryMessageMap.entrySet()) {
                             CommandType messageType = messageEntry.getKey();
                             BaseCommand message = messageEntry.getValue();
                             if (now - message.getMessageSendTime() > MESSAGE_RETRY_WINDOW) {

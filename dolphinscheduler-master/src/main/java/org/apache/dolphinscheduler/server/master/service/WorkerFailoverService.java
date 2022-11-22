@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
@@ -36,9 +35,11 @@ import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
-import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,11 +55,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import lombok.NonNull;
 
 @Service
 public class WorkerFailoverService {
@@ -70,19 +71,26 @@ public class WorkerFailoverService {
     private final ProcessService processService;
     private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
     private final ProcessInstanceExecCacheManager cacheManager;
+    private final LogClient logClient;
     private final String localAddress;
+
+    private final TaskInstanceDao taskInstanceDao;
 
     public WorkerFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
                                  @NonNull ProcessService processService,
                                  @NonNull WorkflowExecuteThreadPool workflowExecuteThreadPool,
-                                 @NonNull ProcessInstanceExecCacheManager cacheManager) {
+                                 @NonNull ProcessInstanceExecCacheManager cacheManager,
+                                 @NonNull LogClient logClient,
+                                 @NonNull TaskInstanceDao taskInstanceDao) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
         this.workflowExecuteThreadPool = workflowExecuteThreadPool;
         this.cacheManager = cacheManager;
-        this.localAddress = NetUtils.getAddr(masterConfig.getListenPort());
+        this.logClient = logClient;
+        this.localAddress = masterConfig.getMasterAddress();
+        this.taskInstanceDao = taskInstanceDao;
     }
 
     /**
@@ -172,7 +180,7 @@ public class WorkerFailoverService {
             if (masterConfig.isKillYarnJobWhenTaskFailover()) {
                 // only kill yarn job if exists , the local thread has exited
                 LOGGER.info("TaskInstance failover begin kill the task related yarn job");
-                ProcessUtils.killYarnJob(taskExecutionContext);
+                ProcessUtils.killYarnJob(logClient, taskExecutionContext);
             }
         } else {
             LOGGER.info("The failover taskInstance is a master task");
@@ -180,7 +188,7 @@ public class WorkerFailoverService {
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
         taskInstance.setFlag(Flag.NO);
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
 
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(processInstance.getId())

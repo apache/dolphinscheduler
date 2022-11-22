@@ -15,40 +15,19 @@
  * limitations under the License.
 */
 
-delimiter d//
-
-
-
-CREATE OR REPLACE FUNCTION public.dolphin_update_metadata(
-    )
-    RETURNS character varying
-    LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-AS $BODY$
+--- rename t_ds_fav_task task_name to task_type
+DO $$
 DECLARE
 v_schema varchar;
 BEGIN
-    ---get schema name
     v_schema =current_schema();
-
-
+  IF EXISTS(SELECT *
+    FROM information_schema.columns
+    WHERE table_name='t_ds_fav_task' and column_name='task_name')
+  then
+   EXECUTE 'ALTER TABLE IF EXISTS ' || quote_ident(v_schema) ||'.t_ds_fav_task RENAME COLUMN task_name TO task_type';
+END IF;
+END $$;
 
 --- add column
-EXECUTE 'ALTER TABLE ' || quote_ident(v_schema) ||'.t_ds_worker_group ADD COLUMN IF NOT EXISTS other_params_json int DEFAULT NULL  ';
-
-
-
-return 'Success!';
-exception when others then
-        ---Raise EXCEPTION '(%)',SQLERRM;
-
-        return SQLERRM;
-END;
-$BODY$;
-
-select dolphin_update_metadata();
-
-
-d//
-
+ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS description varchar(255) DEFAULT NULL;

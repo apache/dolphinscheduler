@@ -30,11 +30,6 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,10 +37,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.lang.String.format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
 @Component
 public final class AlertPluginManager {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
     private final PluginDao pluginDao;
@@ -59,20 +59,22 @@ public final class AlertPluginManager {
     private final PluginParams warningTypeParams = getWarningTypeParams();
 
     public PluginParams getWarningTypeParams() {
-        return
-                RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                        .addParamsOptions(new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                        .addParamsOptions(new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                        .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                        .setValue(WarningType.ALL.getDescp())
-                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                        .build();
+        return RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                .addParamsOptions(
+                        new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
+                .addParamsOptions(
+                        new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
+                .setValue(WarningType.ALL.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
     }
 
     @EventListener
     public void installPlugin(ApplicationReadyEvent readyEvent) {
 
-        PrioritySPIFactory<AlertChannelFactory> prioritySPIFactory = new PrioritySPIFactory<>(AlertChannelFactory.class);
+        PrioritySPIFactory<AlertChannelFactory> prioritySPIFactory =
+                new PrioritySPIFactory<>(AlertChannelFactory.class);
         for (Map.Entry<String, AlertChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
             String name = entry.getKey();
             AlertChannelFactory factory = entry.getValue();

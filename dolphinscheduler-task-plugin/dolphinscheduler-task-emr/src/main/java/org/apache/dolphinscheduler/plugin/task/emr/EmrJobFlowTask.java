@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.amazonaws.SdkBaseException;
@@ -41,10 +43,9 @@ import com.google.common.collect.Sets;
 public class EmrJobFlowTask extends AbstractEmrTask {
 
     private final HashSet<String> waitingStateSet = Sets.newHashSet(
-        ClusterState.STARTING.toString(),
-        ClusterState.BOOTSTRAPPING.toString(),
-        ClusterState.RUNNING.toString()
-    );
+            ClusterState.STARTING.toString(),
+            ClusterState.BOOTSTRAPPING.toString(),
+            ClusterState.RUNNING.toString());
 
     /**
      * constructor
@@ -56,7 +57,12 @@ public class EmrJobFlowTask extends AbstractEmrTask {
     }
 
     @Override
-    public void handle() throws TaskException {
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
         ClusterStatus clusterStatus = null;
         try {
             RunJobFlowRequest runJobFlowRequest = createRunJobFlowRequest();
@@ -65,18 +71,34 @@ public class EmrJobFlowTask extends AbstractEmrTask {
             RunJobFlowResult result = emrClient.runJobFlow(runJobFlowRequest);
 
             clusterId = result.getJobFlowId();
-            // Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
+            // Failover on EMR Task type has not been implemented. In this time, DS only supports failover on yarn task
+            // type . Other task type, such as EMR task, k8s task not ready yet.
             setAppIds(clusterId);
 
+            clusterStatus = getClusterStatus();
+
+        } catch (EmrTaskException | SdkBaseException e) {
+            logger.error("emr task submit failed with error", e);
+            throw new TaskException("emr task submit failed", e);
+        } finally {
+            final int exitStatusCode = calculateExitStatusCode(clusterStatus);
+            setExitStatusCode(exitStatusCode);
+            logger.info("emr task finished with cluster status : {}", clusterStatus);
+        }
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+        ClusterStatus clusterStatus = null;
+        try {
             clusterStatus = getClusterStatus();
 
             while (waitingStateSet.contains(clusterStatus.getState())) {
                 TimeUnit.SECONDS.sleep(10);
                 clusterStatus = getClusterStatus();
             }
-
         } catch (EmrTaskException | SdkBaseException e) {
-            logger.error("emr task submit failed with error", e);
+            logger.error("emr task failed with error", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new TaskException("Execute emr task failed", e);
@@ -92,7 +114,7 @@ public class EmrJobFlowTask extends AbstractEmrTask {
      *
      * @return RunJobFlowRequest
      */
-    private RunJobFlowRequest createRunJobFlowRequest() {
+    protected RunJobFlowRequest createRunJobFlowRequest() {
 
         final RunJobFlowRequest runJobFlowRequest;
         try {
@@ -123,7 +145,8 @@ public class EmrJobFlowTask extends AbstractEmrTask {
                 case TERMINATED:
                 case TERMINATING:
                     String code = stateChangeReason.getCode();
-                    if (code != null && code.equalsIgnoreCase(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED.toString())) {
+                    if (code != null
+                            && code.equalsIgnoreCase(ClusterStateChangeReasonCode.ALL_STEPS_COMPLETED.toString())) {
                         return TaskConstants.EXIT_CODE_SUCCESS;
                     } else {
                         return TaskConstants.EXIT_CODE_KILL;
@@ -148,9 +171,9 @@ public class EmrJobFlowTask extends AbstractEmrTask {
     }
 
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        super.cancelApplication(status);
-        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(), clusterId);
+    public void cancelApplication() throws TaskException {
+        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(),
+                clusterId);
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
         logger.info("the result of terminate job flow is:{}", terminateJobFlowsResult);

@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_Q
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.UNIQUE_CODE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
 import org.apache.dolphinscheduler.plugin.task.api.parser.BusinessTimeUtils;
@@ -34,7 +35,6 @@ import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.SingleTableCustomS
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parser.SingleTableRuleParser;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.RuleParserUtils;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -67,15 +67,15 @@ public class RuleManager {
                     + "${update_time} as update_time ";
 
     public static final String DEFAULT_COMPARISON_WRITER_SQL =
-                    BASE_SQL + "from ${statistics_table} full join ${comparison_table}";
+            BASE_SQL + "from ${statistics_table} full join ${comparison_table}";
 
     public static final String MULTI_TABLE_COMPARISON_WRITER_SQL =
-                    BASE_SQL
+            BASE_SQL
                     + "from ( ${statistics_execute_sql} ) tmp1 "
                     + "join ( ${comparison_execute_sql} ) tmp2";
 
     public static final String SINGLE_TABLE_CUSTOM_SQL_WRITER_SQL =
-                    BASE_SQL
+            BASE_SQL
                     + "from ( ${statistics_table} ) tmp1 "
                     + "join ${comparison_table}";
     public static final String TASK_STATISTICS_VALUE_WRITER_SQL =
@@ -91,7 +91,8 @@ public class RuleManager {
                     + "${update_time} as update_time "
                     + "from ${statistics_table}";
 
-    public RuleManager(Map<String, String> inputParameterValue, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+    public RuleManager(Map<String, String> inputParameterValue,
+                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         this.inputParameterValue = inputParameterValue;
         this.dataQualityTaskExecutionContext = dataQualityTaskExecutionContext;
     }
@@ -104,7 +105,8 @@ public class RuleManager {
 
         Map<String, String> inputParameterValueResult =
                 RuleParserUtils.getInputParameterMapFromEntryList(
-                        JSONUtils.toList(dataQualityTaskExecutionContext.getRuleInputEntryList(), DqRuleInputEntry.class));
+                        JSONUtils.toList(dataQualityTaskExecutionContext.getRuleInputEntryList(),
+                                DqRuleInputEntry.class));
         inputParameterValueResult.putAll(inputParameterValue);
         inputParameterValueResult.putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date()));
         inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, NONE_COMPARISON_TYPE);

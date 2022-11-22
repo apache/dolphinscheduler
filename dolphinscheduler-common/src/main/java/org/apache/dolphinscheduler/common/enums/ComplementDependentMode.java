@@ -23,12 +23,13 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * task node depend type
  */
 public enum ComplementDependentMode {
+
     /**
      * 0 off mode
      * 1 run complement data with all dependent process
      */
-    OFF_MODE(0,"off mode"),
-    ALL_DEPENDENT(1,"all dependent");
+    OFF_MODE(0, "off mode"),
+    ALL_DEPENDENT(1, "all dependent");
 
     ComplementDependentMode(int code, String desc) {
         this.code = code;

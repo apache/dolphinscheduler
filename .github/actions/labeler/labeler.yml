@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 
-Python:
-  - any: ['dolphinscheduler-python/**/*']
-
 backend:
   - 'dolphinscheduler-alert/**/*'
   - 'dolphinscheduler-api/**/*'
@@ -26,12 +23,10 @@ backend:
   - 'dolphinscheduler-data-quality/**/*'
   - 'dolphinscheduler-datasource-plugin/**/*'
   - 'dolphinscheduler-dist/**/*'
-  - 'dolphinscheduler-log-server/**/*'
   - 'dolphinscheduler-master/**/*'
   - 'dolphinscheduler-registry/**/*'
   - 'dolphinscheduler-remote/**/*'
   - 'dolphinscheduler-scheduler-plugin/**/*'
-  - 'dolphinscheduler-server/**/*'
   - 'dolphinscheduler-service/**/*'
   - 'dolphinscheduler-spi/**/*'
   - 'dolphinscheduler-standalone-server/**/*'
@@ -42,7 +37,6 @@ backend:
 
 document:
   - 'docs/**/*'
-  - 'dolphinscheduler-python/pydolphinscheduler/docs/**/*'
 
 CI&CD:
   - any: ['.github/**/*']

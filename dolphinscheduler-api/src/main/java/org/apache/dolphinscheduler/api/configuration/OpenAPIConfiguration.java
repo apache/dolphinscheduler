@@ -16,33 +16,18 @@
  */
 package org.apache.dolphinscheduler.api.configuration;
 
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
-import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 
 /**
- *
  * swager2 config class
- *
  */
 @Configuration
 @ConditionalOnWebApplication
@@ -50,73 +35,27 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMappi
 public class OpenAPIConfiguration implements WebMvcConfigurer {
 
     @Bean
-    public Docket createV1RestApi() {
-        return new Docket(DocumentationType.OAS_30)
-                .groupName("v1(current)")
-                .apiInfo(apiV1Info())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
-                .paths(PathSelectors.any().and(PathSelectors.ant("/v2/**").negate()))
-                .build();
+    public OpenAPI apiV1Info1() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Dolphin Scheduler Api Docs")
+                        .description("Dolphin Scheduler Api Docs")
+                        .version("V1"));
     }
 
-    private ApiInfo apiV1Info() {
-        return new ApiInfoBuilder()
-                .title("Dolphin Scheduler Api Docs")
-                .description("Dolphin Scheduler Api Docs")
-                .version("V1")
+    @Bean
+    public GroupedOpenApi publicApi1() {
+        return GroupedOpenApi.builder()
+                .group("v1")
+                .pathsToExclude("/v2/**")
                 .build();
     }
 
     @Bean
-    public Docket createV2RestApi() {
-        return new Docket(DocumentationType.OAS_30)
-                .groupName("v2")
-                .apiInfo(apiV2Info())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller"))
-                .paths(PathSelectors.any().and(PathSelectors.ant("/v2/**")))
+    public GroupedOpenApi publicApi2() {
+        return GroupedOpenApi.builder()
+                .group("v2")
+                .pathsToMatch("/v2/**")
                 .build();
-    }
-
-    private ApiInfo apiV2Info() {
-        return new ApiInfoBuilder()
-                .title("Dolphin Scheduler Api Docs")
-                .description("Dolphin Scheduler Api Docs")
-                .version("V2")
-                .build();
-    }
-
-    @Bean
-    public static BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
-        return new BeanPostProcessor() {
-
-            @Override
-            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                if (bean instanceof WebMvcRequestHandlerProvider || bean instanceof WebFluxRequestHandlerProvider) {
-                    customizeSpringfoxHandlerMappings(getHandlerMappings(bean));
-                }
-                return bean;
-            }
-
-            private <T extends RequestMappingInfoHandlerMapping> void customizeSpringfoxHandlerMappings(List<T> mappings) {
-                List<T> copy = mappings.stream()
-                        .filter(mapping -> mapping.getPatternParser() == null)
-                        .collect(Collectors.toList());
-                mappings.clear();
-                mappings.addAll(copy);
-            }
-
-            @SuppressWarnings("unchecked")
-            private List<RequestMappingInfoHandlerMapping> getHandlerMappings(Object bean) {
-                try {
-                    Field field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
-                    field.setAccessible(true);
-                    return (List<RequestMappingInfoHandlerMapping>) field.get(bean);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-        };
     }
 }

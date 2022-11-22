@@ -29,13 +29,14 @@ import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import java.time.Duration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 /**
  * This strategy will change the server status to {@link ServerStatus#WAITING} when disconnect from {@link Registry}.
@@ -63,7 +64,6 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     public void disconnect() {
         try {
             ServerLifeCycleManager.toWaiting();
-            // todo: clear the current resource
             clearMasterResource();
             Duration maxWaitingTime = masterConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {

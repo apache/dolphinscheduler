@@ -268,6 +268,7 @@ CREATE TABLE t_ds_command (
   dry_run                   int DEFAULT '0' ,
   process_instance_id       int DEFAULT 0,
   process_definition_version int DEFAULT 0,
+  test_flag                 int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
@@ -287,6 +288,8 @@ CREATE TABLE t_ds_datasource (
   connection_params text NOT NULL ,
   create_time timestamp NOT NULL ,
   update_time timestamp DEFAULT NULL ,
+  test_flag   int DEFAULT NULL ,
+  bind_test_id   int DEFAULT NULL ,
   PRIMARY KEY (id),
   CONSTRAINT t_ds_datasource_name_un UNIQUE (name, type)
 ) ;
@@ -375,6 +378,8 @@ CREATE TABLE t_ds_process_definition_log (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
+
+create UNIQUE index uniq_idx_code_version on t_ds_process_definition_log (code,version);
 
 --
 -- Table structure for table t_ds_task_definition
@@ -518,6 +523,7 @@ CREATE TABLE t_ds_process_instance (
   process_definition_code bigint DEFAULT NULL ,
   process_definition_version int DEFAULT NULL ,
   state int DEFAULT NULL ,
+  state_history text,
   recovery int DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
   end_time timestamp DEFAULT NULL ,
@@ -549,6 +555,7 @@ CREATE TABLE t_ds_process_instance (
   dry_run int DEFAULT '0' ,
   next_process_instance_id int DEFAULT '0',
   restart_time timestamp DEFAULT NULL ,
+  test_flag int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
@@ -693,6 +700,18 @@ CREATE TABLE t_ds_resources (
   CONSTRAINT t_ds_resources_un UNIQUE (full_name, type)
 ) ;
 
+--
+-- Table structure for table t_ds_relation_resources_task
+--
+DROP TABLE IF EXISTS t_ds_relation_resources_task;
+CREATE TABLE t_ds_relation_resources_task (
+  id SERIAL NOT NULL,
+  task_id int DEFAULT NULL,
+  full_name varchar(255) DEFAULT NULL,
+  type int DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_relation_resources_task_un UNIQUE (task_id, full_name)
+);
 
 --
 -- Table structure for table t_ds_schedules
@@ -772,6 +791,7 @@ CREATE TABLE t_ds_task_instance (
   dry_run int DEFAULT '0' ,
   cpu_quota int DEFAULT '-1' NOT NULL,
   memory_max int DEFAULT '-1' NOT NULL,
+  test_flag int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
@@ -1937,16 +1957,29 @@ CREATE TABLE t_ds_alert_send_status (
 --
 
 DROP TABLE IF EXISTS t_ds_cluster;
-CREATE TABLE t_ds_cluster (
-    id serial NOT NULL,
-    code bigint NOT NULL,
-    name varchar(100) DEFAULT NULL,
-    config text DEFAULT NULL,
-    description text,
-    operator int DEFAULT NULL,
-    create_time timestamp DEFAULT NULL,
-    update_time timestamp DEFAULT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT cluster_name_unique UNIQUE (name),
-    CONSTRAINT cluster_code_unique UNIQUE (code)
+CREATE TABLE t_ds_cluster(
+                             id          serial NOT NULL,
+                             code        bigint NOT NULL,
+                             name        varchar(100) DEFAULT NULL,
+                             config      text         DEFAULT NULL,
+                             description text,
+                             operator    int          DEFAULT NULL,
+                             create_time timestamp    DEFAULT NULL,
+                             update_time timestamp    DEFAULT NULL,
+                             PRIMARY KEY (id),
+                             CONSTRAINT cluster_name_unique UNIQUE (name),
+                             CONSTRAINT cluster_code_unique UNIQUE (code)
+);
+
+--
+-- Table structure for t_ds_fav_task
+--
+
+DROP TABLE IF EXISTS t_ds_fav_task;
+CREATE TABLE t_ds_fav_task
+(
+    id        serial      NOT NULL,
+    task_type varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
 );

@@ -17,7 +17,7 @@
 name: Feature request
 description: Suggest an idea for this project
 title: "[Feature][Module Name] Feature title"
-labels: [ "new feature", "Waiting for reply" ]
+labels: [ "feature", "Waiting for reply" ]
 body:
   - type: markdown
     attributes:

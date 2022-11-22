@@ -22,26 +22,17 @@
 
 ## 任务参数
 
-- 前置任务：选择当前任务的前置任务，会将被选择的前置任务设置为当前任务的上游。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
-|   **任务参数**    |                                                               **描述**                                                                |
-|---------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| 任务名称          | 设置任务的名称。一个工作流定义中的节点名称是唯一的。                                                                                                          |
-| 运行标志          | 标识这个节点是否需要正常调度，如果不需要执行，可以打开禁止执行开关。                                                                                                  |
-| 描述            | 描述该节点的功能。                                                                                                                           |
-| 任务优先级         | worker线程数不足时，根据优先级从高到低依次执行，优先级一样时根据先进先出原则执行。                                                                                        |
-| Worker分组      | 任务分配给worker组的机器机执行，选择Default，会随机选择一台worker机执行。                                                                                      |
-| 任务组名称         | 任务资源组，如果没有配置的话就不会生效。                                                                                                                |
-| 环境名称          | 配置任务执行的环境。                                                                                                                          |
-| 失败重试次数        | 任务失败重新提交的次数，支持下拉和手填。                                                                                                                |
-| 失败重试间隔        | 任务失败重新提交任务的时间间隔，支持下拉和手填。                                                                                                            |
-| CPU 配额        | 为执行的任务分配指定的CPU时间配额，单位百分比，默认-1代表不限制，例如1个核心的CPU满载是100%，16个核心的是1600%。 [task.resource.limit.state](../../architecture/configuration.md) |
-| 最大内存          | 为执行的任务分配指定的内存大小，超过会触发OOM被Kill同时不会进行自动重试，单位MB，默认-1代表不限制。这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制。   |
-| 超时告警          | 勾选超时告警、超时失败，当任务超过"超时时长"后，会发送告警邮件并且任务执行失败.这个功能由 [task.resource.limit.state](../../architecture/configuration.md) 控制。                 |
-| Hive Cli 任务类型 | Hive Cli任务执行方式，可以选择`FROM_SCRIPT`或者`FROM_FILE`。                                                                                      |
-| Hive SQL 脚本   | 手动填入您的Hive SQL脚本语句。                                                                                                                 |
-| Hive Cli 选项   | Hive Cli的其他选项，如`--verbose`。                                                                                                         |
-| 资源            | 如果您选择`FROM_FILE`作为Hive Cli任务类型，您需要在资源中选择Hive SQL文件。                                                                                 |
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+
+|   **任务参数**    |                       **描述**                        |
+|---------------|-----------------------------------------------------|
+| Hive Cli 任务类型 | Hive Cli任务执行方式，可以选择`FROM_SCRIPT`或者`FROM_FILE`。      |
+| Hive SQL 脚本   | 手动填入您的Hive SQL脚本语句。                                 |
+| Hive Cli 选项   | Hive Cli的其他选项，如`--verbose`来查看任务结果。                  |
+| 资源            | 如果您选择`FROM_FILE`作为Hive Cli任务类型，您需要在资源中选择Hive SQL文件。 |
 
 ## 任务样例
 

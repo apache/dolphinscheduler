@@ -42,7 +42,8 @@ public class NettyDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf,
+                          List<Object> list) throws Exception {
         if (byteBuf.readableBytes() < RpcProtocolConstants.HEADER_LENGTH) {
             return;
         }

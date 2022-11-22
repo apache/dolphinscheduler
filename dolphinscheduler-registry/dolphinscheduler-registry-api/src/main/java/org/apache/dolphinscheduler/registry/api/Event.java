@@ -20,9 +20,14 @@
 package org.apache.dolphinscheduler.registry.api;
 
 public class Event {
+
+    // The prefix which is watched
     private String key;
+    // The full path where the event was generated
     private String path;
+    // The value corresponding to the path
     private String data;
+    // The event type {ADD, REMOVE, UPDATE}
     private Type type;
 
     public Event(String key, String path, String data, Type type) {
@@ -76,7 +81,8 @@ public class Event {
     }
 
     public String toString() {
-        return "Event(key=" + this.key() + ", path=" + this.path() + ", data=" + this.data() + ", type=" + this.type() + ")";
+        return "Event(key=" + this.key() + ", path=" + this.path() + ", data=" + this.data() + ", type=" + this.type()
+                + ")";
     }
 
     public enum Type {
@@ -86,6 +92,7 @@ public class Event {
     }
 
     public static class EventBuilder {
+
         private String key;
         private String path;
         private String data;
@@ -119,7 +126,8 @@ public class Event {
         }
 
         public String toString() {
-            return "Event.EventBuilder(key=" + this.key + ", path=" + this.path + ", data=" + this.data + ", type=" + this.type + ")";
+            return "Event.EventBuilder(key=" + this.key + ", path=" + this.path + ", data=" + this.data + ", type="
+                    + this.type + ")";
         }
     }
 }

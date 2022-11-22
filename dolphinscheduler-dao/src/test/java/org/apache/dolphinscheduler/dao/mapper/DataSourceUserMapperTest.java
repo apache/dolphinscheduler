@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DataSourceUserMapperTest extends BaseDaoTest {
@@ -38,7 +38,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
      * @return DatasourceUser
      */
     private DatasourceUser insertOne() {
-        //insertOne
+        // insertOne
         DatasourceUser dataSourceUser = new DatasourceUser();
         dataSourceUser.setUserId(4);
         dataSourceUser.setDatasourceId(1010);
@@ -54,12 +54,12 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         DatasourceUser dataSourceUser = insertOne();
-        //update
+        // update
         dataSourceUser.setUpdateTime(new Date());
         int update = dataSourceUserMapper.updateById(dataSourceUser);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
@@ -70,7 +70,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
 
         DatasourceUser dataSourceUser = insertOne();
         int delete = dataSourceUserMapper.deleteById(dataSourceUser.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -79,9 +79,9 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         DatasourceUser dataSourceUser = insertOne();
-        //query
+        // query
         List<DatasourceUser> dataSources = dataSourceUserMapper.selectList(null);
-        Assert.assertNotEquals(dataSources.size(), 0);
+        Assertions.assertNotEquals(dataSources.size(), 0);
     }
 
     /**
@@ -91,7 +91,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
     public void testDeleteByUserId() {
         DatasourceUser dataSourceUser = insertOne();
         int delete = dataSourceUserMapper.deleteByUserId(dataSourceUser.getUserId());
-        Assert.assertNotEquals(delete, 0);
+        Assertions.assertNotEquals(delete, 0);
     }
 
     /**
@@ -101,6 +101,6 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
     public void testDeleteByDatasourceId() {
         DatasourceUser dataSourceUser = insertOne();
         int delete = dataSourceUserMapper.deleteByDatasourceId(dataSourceUser.getDatasourceId());
-        Assert.assertNotEquals(delete, 0);
+        Assertions.assertNotEquals(delete, 0);
     }
 }

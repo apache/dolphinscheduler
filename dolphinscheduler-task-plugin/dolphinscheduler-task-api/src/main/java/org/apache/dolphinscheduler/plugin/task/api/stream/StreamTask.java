@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.stream;
 
-import java.io.IOException;
-
 public interface StreamTask {
+
     public void savePoint() throws Exception;
 }

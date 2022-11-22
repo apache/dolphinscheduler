@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.google.auto.service.AutoService;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -29,7 +28,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
+import org.apache.dolphinscheduler.service.utils.LogUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -39,7 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
+import com.google.auto.service.AutoService;
 
 /**
  * switch task processor
@@ -78,7 +80,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
 
         if (!this.taskInstance().getState().isFinished()) {
             setSwitchResult();
@@ -102,7 +104,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     protected boolean pauseTask() {
         this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -110,7 +112,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -125,8 +127,8 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     }
 
     private boolean setSwitchResult() {
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId());
+        List<TaskInstance> taskInstances = taskInstanceDao.findValidTaskListByProcessId(
+                taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
         Map<String, TaskExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());
@@ -186,7 +188,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                 (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setEndTime(new Date());
         taskInstance.setState(status);
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
     }
 
     public String setTaskParams(String content, String rgex) {

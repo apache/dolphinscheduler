@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+import static org.apache.dolphinscheduler.common.constants.Constants.SEC_2_MINUTES_TIME_UNIT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
@@ -38,13 +38,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.core.type.TypeReference;
-
-import lombok.Data;
 
 /**
  * task instance
@@ -57,7 +57,7 @@ public class TaskInstance implements Serializable {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * task name
@@ -300,6 +300,11 @@ public class TaskInstance implements Serializable {
      */
     private TaskExecuteType taskExecuteType;
 
+    /**
+     * test flag
+     */
+    private int testFlag;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
@@ -370,7 +375,6 @@ public class TaskInstance implements Serializable {
     public boolean isFirstRun() {
         return endTime == null;
     }
-
 
     /**
      * determine if a task instance can retry

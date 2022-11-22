@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -174,6 +175,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             start = DateUtils.stringToDate(startDate);
             end = DateUtils.stringToDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
+                logger.warn("Parameter startDate or endDate is invalid.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }

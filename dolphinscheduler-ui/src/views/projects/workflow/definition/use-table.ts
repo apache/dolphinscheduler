@@ -83,7 +83,8 @@ export function useTable() {
         title: t('project.workflow.workflow_name'),
         key: 'name',
         className: 'workflow-name',
-        width: 200,
+        ...COLUMN_WIDTH_CONFIG['name'],
+        titleColSpan: 2,
         render: (row) =>
           h(
             NSpace,
@@ -93,7 +94,7 @@ export function useTable() {
               class: styles['workflow-name']
             },
             {
-              default: () => [
+              default: () =>
                 h(
                   ButtonLink,
                   {
@@ -104,22 +105,32 @@ export function useTable() {
                       })
                   },
                   {
-                    default: () => h(NEllipsis, null, () => row.name)
+                    default: () =>
+                      h(
+                        NEllipsis,
+                        COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                        () => row.name
+                      )
                   }
-                ),
-                h(
-                  NButton,
-                  {
-                    quaternary: true,
-                    circle: true,
-                    type: 'info',
-                    size: 'tiny',
-                    onClick: () => void copy(row.name)
-                  },
-                  { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
                 )
-              ]
             }
+          )
+      },
+      {
+        title: 'Copy',
+        key: 'copy',
+        ...COLUMN_WIDTH_CONFIG['copy'],
+        render: (row) =>
+          h(
+            NButton,
+            {
+              quaternary: true,
+              circle: true,
+              type: 'info',
+              size: 'tiny',
+              onClick: () => void copy(row.name)
+            },
+            { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
           )
       },
       {
@@ -128,33 +139,20 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['state'],
         render: (row) =>
           row.releaseState === 'ONLINE'
-            ? t('project.workflow.up_line')
-            : t('project.workflow.down_line')
-      },
-      {
-        title: t('project.workflow.create_time'),
-        key: 'createTime',
-        ...COLUMN_WIDTH_CONFIG['time']
-      },
-      {
-        title: t('project.workflow.update_time'),
-        key: 'updateTime',
-        ...COLUMN_WIDTH_CONFIG['time']
-      },
-      {
-        title: t('project.workflow.description'),
-        key: 'description',
-        ...COLUMN_WIDTH_CONFIG['note']
-      },
-      {
-        title: t('project.workflow.create_user'),
-        key: 'userName',
-        ...COLUMN_WIDTH_CONFIG['userName']
-      },
-      {
-        title: t('project.workflow.modify_user'),
-        key: 'modifyBy',
-        ...COLUMN_WIDTH_CONFIG['userName']
+            ? h(
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('project.workflow.up_line')
+              }
+            )
+            : h(
+              NTag,
+              { type: 'warning', size: 'small' },
+              {
+                default: () => t('project.workflow.down_line')
+              }
+            )
       },
       {
         title: t('project.workflow.schedule_publish_status'),
@@ -181,6 +179,31 @@ export function useTable() {
             return '-'
           }
         }
+      },
+      {
+        title: t('project.workflow.create_time'),
+        key: 'createTime',
+        ...COLUMN_WIDTH_CONFIG['time']
+      },
+      {
+        title: t('project.workflow.update_time'),
+        key: 'updateTime',
+        ...COLUMN_WIDTH_CONFIG['time']
+      },
+      {
+        title: t('project.workflow.description'),
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
+      },
+      {
+        title: t('project.workflow.create_user'),
+        key: 'userName',
+        ...COLUMN_WIDTH_CONFIG['userName']
+      },
+      {
+        title: t('project.workflow.modify_user'),
+        key: 'modifyBy',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
         title: t('project.workflow.operation'),
@@ -278,7 +301,7 @@ export function useTable() {
     })
   }
 
-  const batchCopyWorkflow = () => {}
+  const batchCopyWorkflow = () => { }
 
   const releaseWorkflow = (row: any) => {
     const data = {

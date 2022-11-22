@@ -1,23 +1,33 @@
 ## Unit Test 覆盖率
-Unit Test 
+
+Unit Test
+
 ### 1.写单元测试的收益
+
 * 单元测试能帮助每个人深入代码细节，了解代码的功能。
 * 通过测试用例我们能发现 bug，并提交代码的健壮性。
 * 测试用例同时也是代码的 demo 用法。
+
 ### 2.单元测试用例的一些设计原则
+
 * 应该精心设计好步骤，颗粒度和组合条件。
 * 注意边界条件。
 * 单元测试也应该好好设计，不要写无用的代码。
 * 当你发现一个`方法`很难写单元测试时，如果可以确认这个`方法`是`臭代码`，那么就和开发者一起重构它。
+
 <!-- markdown-link-check-disable -->
 * DolphinScheduler: [mockito](http://site.mockito.org/). 下面是一些开发向导: [mockito tutorial](https://www.baeldung.com/bdd-mockito), [mockito refcard](https://dzone.com/refcardz/mockito)
+
 <!-- markdown-link-check-enable -->
 * TDD（可选）：当你开始写一个新的功能时，你可以试着先写测试用例。
+
 ### 3.测试覆盖率设定值
+
 * 在现阶段，Delta 更改代码的测试覆盖设定值为：>＝60%，越高越好。
 * 我们可以在这个页面中看到测试报告: https://codecov.io/gh/apache/dolphinscheduler
 
 ## 单元测试基本准则
+
 ### 1： 隔离性与单一性
 
 一个测试用例应该精确到方法级别，并应该能够单独执行该测试用例。同时关注点也始终在该方法上（只测试该方法）。
@@ -67,6 +77,7 @@ Unit Test
 3:断言尽可能采用肯定断言而非否定断言，断言尽可能在一个预知结果范围内,或者是准确的数值，（否则有可能会导致一些不符合你的实际预期但是通过了断言）除非你的代码只关心他是否为空。
 
 ### 8:一些单测的注意点
+
 1:Thread.sleep()
 
 测试代码中尽量不要使用 Thread.sleep，这让测试变得不稳定，可能会因为环境或者负载而意外导致失败。建议采用以下方式：
@@ -75,9 +86,9 @@ Awaitility.await().atMost(…)
 
 2:忽略某些测试类
 
-@Ignore 注解应该附上相关 issue 地址，方便后续开发者追踪了解该测试被忽略的历史原因。
+@Disabled 注解应该附上相关 issue 地址，方便后续开发者追踪了解该测试被忽略的历史原因。
 
-如 @Ignore("see #1")
+如 @Disabled("see #1")
 
 3: try-catch 单元测试异常
 
@@ -93,13 +104,16 @@ public void testMethod() {
   }
 }
 ```
+
 你应该这样做：
+
 ```
 @Test
 public void testMethod() throws MyException {
     // Some code
 }
 ```
+
 4:测试异常情况
 
 当你需要进行异常情况测试时，应该避免在测试代码中包含多个方法的调用（尤其是有多个可以引发相同异常的方法），同时应该明确说明你要测试什么。

@@ -26,7 +26,6 @@
     <artifactId>dolphinscheduler-api</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -38,7 +37,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -137,11 +135,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
@@ -170,15 +163,25 @@
             </exclusions>
         </dependency>
 
-        <!-- Python -->
+        <!-- Python API's Gateway server -->
         <dependency>
             <groupId>net.sf.py4j</groupId>
             <artifactId>py4j</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-ldap</artifactId>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes-fabric8-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase.thirdparty</groupId>
+            <artifactId>hbase-noop-htrace</artifactId>
         </dependency>
 
         <dependency>
@@ -186,8 +189,12 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
-    </dependencies>
 
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+        </dependency>
+    </dependencies>
     <build>
         <testResources>
             <testResource>

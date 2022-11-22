@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SlackAlertChannelFactoryTest {
 
@@ -31,18 +31,18 @@ public class SlackAlertChannelFactoryTest {
 
     @Test
     public void testTestGetName() {
-        Assert.assertEquals("Slack", slackAlertChannelFactory.name());
+        Assertions.assertEquals("Slack", slackAlertChannelFactory.name());
     }
 
     @Test
     public void testGetParams() {
         List<PluginParams> params = slackAlertChannelFactory.params();
-        Assert.assertEquals(2, params.size());
+        Assertions.assertEquals(2, params.size());
     }
 
     @Test
     public void testCreate() {
         AlertChannel alertChannel = slackAlertChannelFactory.create();
-        Assert.assertTrue(alertChannel instanceof SlackAlertChannel);
+        Assertions.assertTrue(alertChannel instanceof SlackAlertChannel);
     }
 }

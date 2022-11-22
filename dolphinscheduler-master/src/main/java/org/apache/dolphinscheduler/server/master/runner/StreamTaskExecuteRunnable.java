@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
@@ -32,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -58,6 +58,7 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -73,10 +74,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.NonNull;
 
 /**
  * stream task execute
@@ -88,6 +89,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
     protected MasterConfig masterConfig;
 
     protected ProcessService processService;
+
+    protected TaskInstanceDao taskInstanceDao;
 
     protected ExecutorDispatcher dispatcher;
 
@@ -118,7 +121,9 @@ public class StreamTaskExecuteRunnable implements Runnable {
         this.dispatcher = SpringApplicationContext.getBean(ExecutorDispatcher.class);
         this.taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         this.processTaskRelationMapper = SpringApplicationContext.getBean(ProcessTaskRelationMapper.class);
-        this.streamTaskInstanceExecCacheManager = SpringApplicationContext.getBean(StreamTaskInstanceExecCacheManager.class);
+        this.taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
+        this.streamTaskInstanceExecCacheManager =
+                SpringApplicationContext.getBean(StreamTaskInstanceExecCacheManager.class);
         this.taskDefinition = taskDefinition;
         this.taskExecuteStartCommand = taskExecuteStartCommand;
     }
@@ -132,12 +137,13 @@ public class StreamTaskExecuteRunnable implements Runnable {
         // submit task
         processService.updateTaskDefinitionResources(taskDefinition);
         taskInstance = newTaskInstance(taskDefinition);
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
 
         // add cache
         streamTaskInstanceExecCacheManager.cache(taskInstance.getId(), this);
 
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskDefinition.getCode());
+        List<ProcessTaskRelation> processTaskRelationList =
+                processTaskRelationMapper.queryByTaskCode(taskDefinition.getCode());
         long processDefinitionCode = processTaskRelationList.get(0).getProcessDefinitionCode();
         int processDefinitionVersion = processTaskRelationList.get(0).getProcessDefinitionVersion();
         processDefinition = processService.findProcessDefinition(processDefinitionCode, processDefinitionVersion);
@@ -146,33 +152,34 @@ public class StreamTaskExecuteRunnable implements Runnable {
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
         if (taskExecutionContext == null) {
             taskInstance.setState(TaskExecutionStatus.FAILURE);
-            processService.saveTaskInstance(taskInstance);
+            taskInstanceDao.upsertTaskInstance(taskInstance);
             return;
         }
 
         TaskDispatchCommand dispatchCommand = new TaskDispatchCommand(taskExecutionContext,
-            masterConfig.getMasterAddress(),
-            taskExecutionContext.getHost(),
-            System.currentTimeMillis());
+                masterConfig.getMasterAddress(),
+                taskExecutionContext.getHost(),
+                System.currentTimeMillis());
 
-        ExecutionContext executionContext = new ExecutionContext(dispatchCommand.convert2Command(), ExecutorType.WORKER, taskExecutionContext.getWorkerGroup(), taskInstance);
+        ExecutionContext executionContext = new ExecutionContext(dispatchCommand.convert2Command(), ExecutorType.WORKER,
+                taskExecutionContext.getWorkerGroup(), taskInstance);
         Boolean dispatchSuccess = false;
         try {
             dispatchSuccess = dispatcher.dispatch(executionContext);
         } catch (ExecuteException e) {
             logger.error("Master dispatch task to worker error, taskInstanceId: {}, worker: {}",
-                taskInstance.getId(),
-                executionContext.getHost(),
-                e);
+                    taskInstance.getId(),
+                    executionContext.getHost(),
+                    e);
         }
         if (!dispatchSuccess) {
             logger.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
-                taskInstance.getId(),
-                executionContext.getHost());
+                    taskInstance.getId(),
+                    executionContext.getHost());
 
             // set task instance fail
             taskInstance.setState(TaskExecutionStatus.FAILURE);
-            processService.saveTaskInstance(taskInstance);
+            taskInstanceDao.upsertTaskInstance(taskInstance);
             return;
         }
 
@@ -180,8 +187,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskRunnableStatus = TaskRunnableStatus.STARTED;
 
         logger.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
-            taskInstance.getId(),
-            executionContext.getHost());
+                taskInstance.getId(),
+                executionContext.getHost());
     }
 
     public boolean isStart() {
@@ -190,7 +197,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     public boolean addTaskEvent(TaskEvent taskEvent) {
         if (taskInstance.getId() != taskEvent.getTaskInstanceId()) {
-            logger.info("state event would be abounded, taskInstanceId:{}, eventType:{}, state:{}", taskEvent.getTaskInstanceId(), taskEvent.getEvent(), taskEvent.getState());
+            logger.info("state event would be abounded, taskInstanceId:{}, eventType:{}, state:{}",
+                    taskEvent.getTaskInstanceId(), taskEvent.getEvent(), taskEvent.getState());
             return false;
         }
         taskEvents.add(taskEvent);
@@ -207,8 +215,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
     public void handleEvents() {
         if (!isStart()) {
             logger.info(
-                "The stream task instance is not started, will not handle its state event, current state event size: {}",
-                taskEvents.size());
+                    "The stream task instance is not started, will not handle its state event, current state event size: {}",
+                    taskEvents.size());
             return;
         }
         TaskEvent taskEvent = null;
@@ -227,14 +235,15 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (StateEventHandleException stateEventHandleException) {
                 logger.error("State event handle error, will retry this event: {}",
-                    taskEvent,
-                    stateEventHandleException);
+                        taskEvent,
+                        stateEventHandleException);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
-                // we catch the exception here, since if the state event handle failed, the state event will still keep in the stateEvents queue.
+                // we catch the exception here, since if the state event handle failed, the state event will still keep
+                // in the stateEvents queue.
                 logger.error("State event handle error, get a unknown exception, will retry this event: {}",
-                    taskEvent,
-                    e);
+                        taskEvent,
+                        e);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
@@ -267,14 +276,14 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
         taskInstance.setRetryInterval(taskDefinition.getFailRetryInterval());
 
-        //set task param
+        // set task param
         taskInstance.setTaskParams(taskDefinition.getTaskParams());
 
-        //set task group and priority
+        // set task group and priority
         taskInstance.setTaskGroupId(taskDefinition.getTaskGroupId());
         taskInstance.setTaskGroupPriority(taskDefinition.getTaskGroupPriority());
 
-        //set task cpu quota and max memory
+        // set task cpu quota and max memory
         taskInstance.setCpuQuota(taskDefinition.getCpuQuota());
         taskInstance.setMemoryMax(taskDefinition.getMemoryMax());
 
@@ -290,8 +299,10 @@ public class StreamTaskExecuteRunnable implements Runnable {
         // task dry run flag
         taskInstance.setDryRun(taskExecuteStartCommand.getDryRun());
 
-        taskInstance.setWorkerGroup(StringUtils.isBlank(taskDefinition.getWorkerGroup()) ? DEFAULT_WORKER_GROUP : taskDefinition.getWorkerGroup());
-        taskInstance.setEnvironmentCode(taskDefinition.getEnvironmentCode() == 0 ? -1 : taskDefinition.getEnvironmentCode());
+        taskInstance.setWorkerGroup(StringUtils.isBlank(taskDefinition.getWorkerGroup()) ? DEFAULT_WORKER_GROUP
+                : taskDefinition.getWorkerGroup());
+        taskInstance.setEnvironmentCode(
+                taskDefinition.getEnvironmentCode() == 0 ? -1 : taskDefinition.getEnvironmentCode());
 
         if (!taskInstance.getEnvironmentCode().equals(-1L)) {
             Environment environment = processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
@@ -335,15 +346,16 @@ public class StreamTaskExecuteRunnable implements Runnable {
         TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
         ResourceParametersHelper resources = taskChannel.getResources(taskInstance.getTaskParams());
 
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
+                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
         Map<String, Property> propertyMap = paramParsingPreparation(taskInstance, baseParam);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-            .buildTaskInstanceRelatedInfo(taskInstance)
-            .buildTaskDefinitionRelatedInfo(taskDefinition)
-            .buildResourceParametersInfo(resources)
-            .buildBusinessParamsMap(new HashMap<>())
-            .buildParamInfo(propertyMap)
-            .create();
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildTaskDefinitionRelatedInfo(taskDefinition)
+                .buildResourceParametersInfo(resources)
+                .buildBusinessParamsMap(new HashMap<>())
+                .buildParamInfo(propertyMap)
+                .create();
 
         taskExecutionContext.setTenantCode(tenant.getTenantCode());
         taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
@@ -360,15 +372,18 @@ public class StreamTaskExecuteRunnable implements Runnable {
      */
     protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
         Map<String, String> resourcesMap = new HashMap<>();
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder().taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
+                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
-                Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
+                Set<ResourceInfo> oldVersionResources =
+                        projectResourceFiles.stream().filter(t -> t.getId() == null).collect(Collectors.toSet());
                 if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
+                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(),
+                            processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
                 }
 
                 // get the resource id in order to get the resource names in batch
@@ -379,7 +394,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
                     Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
 
                     List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resources.forEach(t -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
+                    resources.forEach(t -> resourcesMap.put(t.getFullName(),
+                            processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
                 }
             }
         }
@@ -387,7 +403,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         return resourcesMap;
     }
 
-    protected boolean handleTaskEvent(TaskEvent taskEvent)  throws StateEventHandleException, StateEventHandleError {
+    protected boolean handleTaskEvent(TaskEvent taskEvent) throws StateEventHandleException, StateEventHandleError {
         measureTaskState(taskEvent);
 
         if (taskInstance.getState() == null) {
@@ -404,14 +420,15 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setEndTime(taskEvent.getEndTime());
         taskInstance.setVarPool(taskEvent.getVarPool());
         processService.changeOutParam(taskInstance);
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
 
         // send ack
         sendAckToWorker(taskEvent);
 
         if (taskInstance.getState().isFinished()) {
             streamTaskInstanceExecCacheManager.removeByTaskInstanceId(taskInstance.getId());
-            logger.info("The stream task instance is finish, taskInstanceId:{}, state:{}", taskInstance.getId(), taskEvent.getState());
+            logger.info("The stream task instance is finish, taskInstanceId:{}, state:{}", taskInstance.getId(),
+                    taskEvent.getState());
         }
 
         return true;
@@ -441,15 +458,16 @@ public class StreamTaskExecuteRunnable implements Runnable {
         }
     }
 
-    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance, @NonNull AbstractParameters parameters) {
+    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
+                                                         @NonNull AbstractParameters parameters) {
         // assign value to definedParams here
-        Map<String,String> globalParamsMap = taskExecuteStartCommand.getStartParams();
+        Map<String, String> globalParamsMap = taskExecuteStartCommand.getStartParams();
         Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
 
-        //stream pass params
+        // stream pass params
         parameters.setVarPool(taskInstance.getVarPool());
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
@@ -470,7 +488,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
         TaskExecuteRunningAckMessage taskExecuteRunningAckMessage =
-            new TaskExecuteRunningAckMessage(true, taskEvent.getTaskInstanceId());
+                new TaskExecuteRunningAckMessage(true, taskEvent.getTaskInstanceId());
         taskEvent.getChannel().writeAndFlush(taskExecuteRunningAckMessage.convert2Command());
     }
 

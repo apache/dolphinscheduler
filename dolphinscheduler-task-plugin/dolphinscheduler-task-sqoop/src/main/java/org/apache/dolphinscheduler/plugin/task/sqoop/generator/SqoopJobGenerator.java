@@ -65,7 +65,8 @@ public class SqoopJobGenerator {
      * @param sqoopTaskExecutionContext
      * @return sqoop scripts
      */
-    public String generateSqoopJob(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
+    public String generateSqoopJob(SqoopParameters sqoopParameters,
+                                   SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         String sqoopScripts = "";
 
@@ -76,10 +77,10 @@ public class SqoopJobGenerator {
             }
 
             sqoopScripts = String.format("%s%s%s", commonGenerator.generate(sqoopParameters),
-                sourceGenerator.generate(sqoopParameters, sqoopTaskExecutionContext),
-                targetGenerator.generate(sqoopParameters, sqoopTaskExecutionContext));
+                    sourceGenerator.generate(sqoopParameters, sqoopTaskExecutionContext),
+                    targetGenerator.generate(sqoopParameters, sqoopTaskExecutionContext));
         } else if (SqoopJobType.CUSTOM.getDescp().equals(sqoopParameters.getJobType())) {
-            sqoopScripts = sqoopParameters.getCustomShell().replaceAll("\\r\\n", "\n");
+            sqoopScripts = sqoopParameters.getCustomShell().replaceAll("\\r\\n", System.lineSeparator());
         }
 
         return sqoopScripts;

@@ -1,9 +1,11 @@
 <!-- markdown-link-check-disable -->
 
 # 前言
+
 本文档为dolphinscheduler配置文件说明文档。
 
 # 目录结构
+
 DolphinScheduler的目录结构如下：
 
 ```
@@ -13,13 +15,13 @@ DolphinScheduler的目录结构如下：
 │
 ├── licenses                                    licenses存放目录
 │
-├── bin                                         DolphinScheduler命令和环境变量配置存放目录 
+├── bin                                         DolphinScheduler命令和环境变量配置存放目录
 │   ├── dolphinscheduler-daemon.sh              启动/关闭DolphinScheduler服务脚本
 │   ├── env                                     环境变量配置存放目录
-│   │   ├── dolphinscheduler_env.sh             当使用`dolphinscheduler-daemon.sh`脚本起停服务时，运行此脚本加载环境变量配置文件 [如：JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] 
-│   │   └── install_env.sh                      当使用`install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`脚本时，运行此脚本为DolphinScheduler安装加载环境变量配置 
-│   ├── install.sh                              当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本自动安装服务  
-│   ├── remove-zk-node.sh                       清理zookeeper缓存文件脚本 
+│   │   ├── dolphinscheduler_env.sh             当使用`dolphinscheduler-daemon.sh`脚本起停服务时，运行此脚本加载环境变量配置文件 [如：JAVA_HOME,HADOOP_HOME, HIVE_HOME ...]
+│   │   └── install_env.sh                      当使用`install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`脚本时，运行此脚本为DolphinScheduler安装加载环境变量配置
+│   ├── install.sh                              当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本自动安装服务
+│   ├── remove-zk-node.sh                       清理zookeeper缓存文件脚本
 │   ├── scp-hosts.sh                            安装文件传输脚本
 │   ├── start-all.sh                            当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本启动所有服务
 │   ├── status-all.sh                           当使用`集群`模式或`伪集群`模式部署DolphinScheduler时，运行此脚本获取所有服务状态
@@ -30,7 +32,8 @@ DolphinScheduler的目录结构如下：
 │   │   └── start.sh                            DolphinScheduler alert-server启动脚本
 │   ├── conf
 │   │   ├── application.yaml                    alert-server配置文件
-│   │   ├── common.properties                   公共服务（存储等信息）配置文件 
+│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
+│   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             alert-server环境变量配置加载脚本
 │   │   └── logback-spring.xml                  alert-service日志配置文件
 │   └── libs                                    alert-server依赖jar包存放目录
@@ -40,17 +43,19 @@ DolphinScheduler的目录结构如下：
 │   │   └── start.sh                            DolphinScheduler api-server启动脚本
 │   ├── conf
 │   │   ├── application.yaml                    api-server配置文件
+│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             api-server环境变量配置加载脚本
 │   │   └── logback-spring.xml                  api-service日志配置文件
 │   ├── libs                                    api-server依赖jar包存放目录
-│   └── ui                                      api-server相关前端WEB资源存放目录 
+│   └── ui                                      api-server相关前端WEB资源存放目录
 │
 ├── master-server                               DolphinScheduler master-server命令、配置和依赖存放目录
-│   ├── bin                                
+│   ├── bin
 │   │   └── start.sh                            DolphinScheduler master-server启动脚本
 │   ├── conf
 │   │   ├── application.yaml                    master-server配置文件
+│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             master-server环境变量配置加载脚本
 │   │   └── logback-spring.xml                  master-service日志配置文件
@@ -61,13 +66,14 @@ DolphinScheduler的目录结构如下：
 │   │   └── start.sh                            DolphinScheduler standalone-server启动脚本
 │   ├── conf
 │   │   ├── application.yaml                    standalone-server配置文件
+│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             standalone-server环境变量配置加载脚本
 │   │   ├── logback-spring.xml                  standalone-service日志配置文件
 │   │   └── sql                                 DolphinScheduler元数据创建/升级sql文件
 │   ├── libs                                    standalone-server依赖jar包存放目录
 │   └── ui                                      standalone-server相关前端WEB资源存放目录
-│       
+│  
 ├── tools                                       DolphinScheduler元数据工具命令、配置和依赖存放目录
 │   ├── bin
 │   │   └── upgrade-schema.sh                   DolphinScheduler元数据创建/升级脚本
@@ -76,12 +82,13 @@ DolphinScheduler的目录结构如下：
 │   │   └── common.properties                   公共服务（存储等信息）配置文件
 │   ├── libs                                    元数据工具依赖jar包存放目录
 │   └── sql                                     DolphinScheduler元数据创建/升级sql文件
-│     
+│  
 ├── worker-server                               DolphinScheduler worker-server命令、配置和依赖存放目录
 │       ├── bin
 │       │   └── start.sh                        DolphinScheduler worker-server启动脚本
 │       ├── conf
 │       │   ├── application.yaml                worker-server配置文件
+│       │   ├── bootstrap.yaml                  Spring Cloud 启动阶段配置文件, 通常不需要修改
 │       │   ├── common.properties               公共服务（存储等信息）配置文件
 │       │   ├── dolphinscheduler_env.sh         worker-server环境变量配置加载脚本
 │       │   └── logback-spring.xml              worker-service日志配置文件
@@ -93,21 +100,23 @@ DolphinScheduler的目录结构如下：
 # 配置文件详解
 
 ## dolphinscheduler-daemon.sh [启动/关闭DolphinScheduler服务脚本]
-dolphinscheduler-daemon.sh脚本负责DolphinScheduler的启动&关闭. 
+
+dolphinscheduler-daemon.sh脚本负责DolphinScheduler的启动&关闭.
 start-all.sh/stop-all.sh最终也是通过dolphinscheduler-daemon.sh对集群进行启动/关闭操作.
 目前DolphinScheduler只是做了一个基本的设置,JVM参数请根据各自资源的实际情况自行设置.
 
 默认简化参数如下:
+
 ```bash
 export DOLPHINSCHEDULER_OPTS="
--server 
--Xmx16g 
--Xms1g 
--Xss512k 
--XX:+UseConcMarkSweepGC 
--XX:+CMSParallelRemarkEnabled 
--XX:+UseFastAccessorMethods 
--XX:+UseCMSInitiatingOccupancyOnly 
+-server
+-Xmx16g
+-Xms1g
+-Xss512k
+-XX:+UseConcMarkSweepGC
+-XX:+CMSParallelRemarkEnabled
+-XX:+UseFastAccessorMethods
+-XX:+UseCMSInitiatingOccupancyOnly
 -XX:CMSInitiatingOccupancyFraction=70
 "
 ```
@@ -115,6 +124,7 @@ export DOLPHINSCHEDULER_OPTS="
 > 不建议设置"-XX:DisableExplicitGC" , DolphinScheduler使用Netty进行通讯,设置该参数,可能会导致内存泄漏.
 
 ## 数据库连接相关配置
+
 在DolphinScheduler中使用Spring Hikari对数据库连接进行管理，配置文件位置：
 
 |服务名称| 配置文件 |
@@ -142,10 +152,10 @@ export DOLPHINSCHEDULER_OPTS="
 |spring.datasource.hikari.leak-detection-threshold|0|连接泄露检测阈值|
 |spring.datasource.hikari.initialization-fail-timeout|1|连接池初始化失败timeout|
 
-DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行数据库连接相关的配置。
-
+DolphinScheduler同样可以通过设置环境变量进行数据库连接相关的配置, 将以上小写字母转成大写并把`.`换成`_`作为环境变量名, 设置值即可。
 
 ## Zookeeper相关配置
+
 DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功能，配置文件位置：
 |服务名称| 配置文件 |
 |--|--|
@@ -155,7 +165,7 @@ DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功�
 
 默认配置如下：
 
-|参数 |默认值| 描述| 
+|参数 |默认值| 描述|
 |--|--|--|
 |registry.zookeeper.namespace|dolphinscheduler|Zookeeper集群使用的namespace|
 |registry.zookeeper.connect-string|localhost:2181| Zookeeper集群连接信息|
@@ -170,7 +180,8 @@ DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功�
 DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeeper相关的配置。
 
 ## common.properties [hadoop、s3、yarn配置]
-common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置，配置文件位置：
+
+common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId收集相关的配置，配置文件位置：
 |服务名称| 配置文件 |
 |--|--|
 |Master Server | `master-server/conf/common.properties`|
@@ -210,10 +221,12 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |sudo.enable | true | 是否开启sudo|
 |alert.rpc.port | 50052 | Alert Server的RPC端口|
 |zeppelin.rest.url | http://localhost:8080 | zeppelin RESTful API 接口地址|
+|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop，并将`bin/env/dolphinscheduler_env.sh`自动收集applicationId相关环境变量配置的注释取消掉，注意：aop不支持远程主机提交yarn作业的方式比如Beeline客户端提交，且如果用户环境覆盖了dolphinscheduler_env.sh收集applicationId相关环境变量配置，aop方法会失效|
 
 ## Api-server相关配置
+
 位置：`api-server/conf/application.yaml`
-|参数 |默认值| 描述| 
+|参数 |默认值| 描述|
 |--|--|--|
 |server.port|12345|api服务通讯端口|
 |server.servlet.session.timeout|120m|session超时时间|
@@ -240,8 +253,9 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制|
 
 ## Master Server相关配置
+
 位置：`master-server/conf/application.yaml`
-|参数 |默认值| 描述| 
+|参数 |默认值| 描述|
 |--|--|--|
 |master.listen-port|5678|master监听端口|
 |master.fetch-command-num|10|master拉取command数量|
@@ -259,10 +273,12 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |master.kill-yarn-job-when-task-failover|true|当任务实例failover时，是否kill掉yarn job|
 |master.registry-disconnect-strategy.strategy|stop|当Master与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
 |master.registry-disconnect-strategy.max-waiting-time|100s|当Master与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Master与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Master会丢弃目前正在执行的工作流，值为0表示会无限期等待 |
+|master.master.worker-group-refresh-interval|10s|定期将workerGroup从数据库中同步到内存的时间间隔|
 
 ## Worker Server相关配置
+
 位置：`worker-server/conf/application.yaml`
-|参数 |默认值| 描述| 
+|参数 |默认值| 描述|
 |--|--|--|
 |worker.listen-port|1234|worker监听端口|
 |worker.exec-threads|100|worker工作线程数量,用于限制并行的任务实例数量|
@@ -271,22 +287,22 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |worker.tenant-auto-create|true|租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。|
 |worker.max-cpu-load-avg|-1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为-1: cpu cores * 2|
 |worker.reserved-memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务,单位为G|
-|worker.groups|default|worker分组配置,逗号分隔,例如'worker.groups=default,test' <br> worker启动时会根据该配置自动加入对应的分组|
 |worker.alert-listen-host|localhost|alert监听host|
 |worker.alert-listen-port|50052|alert监听端口|
 |worker.registry-disconnect-strategy.strategy|stop|当Worker与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
 |worker.registry-disconnect-strategy.max-waiting-time|100s|当Worker与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Worker与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Worker会丢弃kill正在执行的任务。值为0表示会无限期等待 |
-
+|worker.task-execute-threads-full-policy|REJECT|如果是 REJECT, 当Worker中等待队列中的任务数达到exec-threads时, Worker将会拒绝接下来新接收的任务，Master将会重新分发该任务; 如果是 CONTINUE, Worker将会接收任务，放入等待队列中等待空闲线程去执行该任务|
 
 ## Alert Server相关配置
+
 位置：`alert-server/conf/application.yaml`
-|参数 |默认值| 描述| 
+|参数 |默认值| 描述|
 |--|--|--|
 |server.port|50053|Alert Server监听端口|
 |alert.port|50052|alert监听端口|
 
-
 ## Quartz相关配置
+
 这里面主要是quartz配置,请结合实际业务场景&资源进行配置,本文暂时不做展开，配置文件位置：
 
 |服务名称| 配置文件 |
@@ -314,45 +330,35 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |spring.quartz.properties.org.quartz.jobStore.driverDelegateClass | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate|
 |spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval | 5000|
 
-
 ## dolphinscheduler_env.sh [环境变量配置]
 
-通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME`、元数据库、注册中心和任务类型配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
+通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME` 任务类型的环境配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
 
 ```bash
 # JAVA_HOME, will use it to start DolphinScheduler server
 export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
-# Database related configuration, set database type, username and password
-export DATABASE=${DATABASE:-postgresql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL
-export SPRING_DATASOURCE_USERNAME
-export SPRING_DATASOURCE_PASSWORD
-
-# DolphinScheduler server related configuration
-export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
-export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
-export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
-
-# Registry center configuration, determines the type and link of the registry center
-export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
-export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
-
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
-export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
-export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
 export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+
+# applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
+export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
+export SPARK_DIST_CLASSPATH=$HADOOP_CLASSPATH:$SPARK_DIST_CLASS_PATH
+export HADOOP_CLIENT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$HADOOP_CLIENT_OPTS
+export SPARK_SUBMIT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$SPARK_SUBMIT_OPTS
+export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$FLINK_ENV_JAVA_OPTS
 ```
 
 ## 日志相关配置
+
 |服务名称| 配置文件 |
 |--|--|
 |Master Server | `master-server/conf/logback-spring.xml`|

@@ -94,6 +94,12 @@ export const COLUMN_WIDTH_CONFIG = {
   },
   tag: {
     width: 160
+  },
+  checkbox:{
+    width: 20
+  },
+  copy: {
+    width: 50
   }
 }
 

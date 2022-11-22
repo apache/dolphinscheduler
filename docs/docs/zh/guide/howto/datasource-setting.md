@@ -4,12 +4,15 @@
 
 我们这里以 MySQL 为例来说明如何配置外部数据库：
 
+> 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
+
 * 首先，参照 [数据源配置](datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
-* 在你的命令行或者修改 bin/env/dolphinscheduler_env.sh 设定下列环境变量，将 `{user}` 和 `{password}` 改为你数据库的用户名和密码
+* 在你的命令行设定下列环境变量，将 `{address}`, `{user}` 和 `{password}` 改为你数据库的地址, 用户名和密码
 
 ```shell
 export DATABASE=mysql
 export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL="jdbc:mysql://{address}/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```
@@ -19,8 +22,9 @@ export SPRING_DATASOURCE_PASSWORD={password}
 
 ## 伪分布式/分布式安装初始化数据库
 
-DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreSQL 和 MySQL，如果使用 MySQL 则需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下
-其中包括 `api-server/libs/` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs` 和 `tools/libs`。下面以 MySQL 为例，说明如何初始化数据库
+DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreSQL 和 MySQL。下面分别介绍如何使用 MySQL 和 PostgresQL 初始化数据库。
+
+> 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
 
 对于mysql 5.6 / 5.7：
 
@@ -51,15 +55,46 @@ mysql> GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost';
 mysql> FLUSH PRIVILEGES;
 ```
 
-然后修改`./bin/env/dolphinscheduler_env.sh`，将username和password改成你在上一步中设置的用户名{user}和密码{password}
+对于 PostgreSQL：
 
 ```shell
+# 采用命令行工具登陆 PostgreSQL
+psql
+# 创建数据库
+postgres=# CREATE DATABASE dolphinscheduler;
+# 修改 {user} 和 {password} 为你希望的用户名和密码
+postgres=# CREATE USER {user} PASSWORD {password};
+postgres=# ALTER DATABASE dolphinscheduler OWNER TO {user};
+# 退出 PostgreSQL
+postgres=#\q
+# 在终端执行如下命令，向配置文件新增登陆权限，并重载 PostgreSQL 配置，替换 {ip} 为对应的 DS 集群服务器 IP 地址段
+echo "host    dolphinscheduler   {user}    {ip}     md5" >> $PGDATA/pg_hba.conf
+pg_ctl reload
+```
+
+然后设置以下环境变量，将username和password改成你在上一步中设置的用户名{user}和密码{password}
+
+对于 MySQL：
+
+```shell
+# for mysql
 export DATABASE=${DATABASE:-mysql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
-```  
+```
+
+对于 PostgreSQL：
+
+```shell
+# for postgresql
+export DATABASE=${DATABASE:-postgresql}
+export SPRING_PROFILES_ACTIVE=${DATABASE}
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
+export SPRING_DATASOURCE_USERNAME={user}
+export SPRING_DATASOURCE_PASSWORD={password}
+```
 
 完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
 
@@ -90,3 +125,4 @@ DolphinScheduler 分发的二进制包中包含他们。这部分数据源主要
 > 则仅支持 [8.0.16 及以上](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)的版本。
 
 [mysql]: https://downloads.MySQL.com/archives/c-j/
+

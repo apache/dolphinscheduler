@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TaskDefinitionLogMapperTest extends BaseDaoTest {
@@ -57,7 +57,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
-        Assert.assertNotEquals(taskDefinitionLog.getId(), 0);
+        Assertions.assertNotEquals(taskDefinitionLog.getId().intValue(), 0);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         int version = taskDefinitionLogMapper
                 .queryMaxVersionForDefinition(taskDefinitionLog.getCode());
-        Assert.assertNotEquals(version, 0);
+        Assertions.assertNotEquals(version, 0);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         TaskDefinitionLog tdl = taskDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
-        Assert.assertNotNull(tdl);
+        Assertions.assertNotNull(tdl);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
 
         TaskDefinitionLog taskDefinitionLog = insertOne();
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
-        Assert.assertNotEquals(taskDefinitionLogs.size(), 0);
+        Assertions.assertNotEquals(taskDefinitionLogs.size(), 0);
     }
 
 }

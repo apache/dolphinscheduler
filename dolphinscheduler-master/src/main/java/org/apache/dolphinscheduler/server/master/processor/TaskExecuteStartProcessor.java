@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteThreadPool;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
-
-import org.apache.directory.api.util.Strings;
 
 /**
  * task execute start processor, from api to master
@@ -51,17 +47,22 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
     private StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
 
     @Autowired
-    private ProcessService processService;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_START == command.getType(), String.format("invalid command type : %s", command.getType()));
-        TaskExecuteStartCommand taskExecuteStartCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteStartCommand.class);
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_START == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
+        TaskExecuteStartCommand taskExecuteStartCommand =
+                JSONUtils.parseObject(command.getBody(), TaskExecuteStartCommand.class);
         logger.info("taskExecuteStartCommand: {}", taskExecuteStartCommand);
 
-        TaskDefinition taskDefinition = processService.findTaskDefinition(taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
+        TaskDefinition taskDefinition = taskDefinitionDao.findTaskDefinition(
+                taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
         if (taskDefinition == null) {
-            logger.error("Task definition can not be found, taskDefinitionCode:{}, taskDefinitionVersion:{}", taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
+            logger.error("Task definition can not be found, taskDefinitionCode:{}, taskDefinitionVersion:{}",
+                    taskExecuteStartCommand.getTaskDefinitionCode(),
+                    taskExecuteStartCommand.getTaskDefinitionVersion());
             return;
         }
         streamTaskExecuteThreadPool.execute(new StreamTaskExecuteRunnable(taskDefinition, taskExecuteStartCommand));
@@ -69,7 +70,7 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
         // response
         Command response = new Command(command.getOpaque());
         response.setType(CommandType.TASK_EXECUTE_START);
-        response.setBody(Strings.EMPTY_BYTES);
+        response.setBody(new byte[0]);
         channel.writeAndFlush(response);
     }
 

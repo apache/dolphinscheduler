@@ -378,7 +378,7 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          <NFormItem
+          {this.timingForm.warningType !== 'NONE' && ( <NFormItem
             label={t('project.workflow.alarm_group')}
             path='warningGroupId'
           >
@@ -388,7 +388,7 @@ export default defineComponent({
               v-model:value={this.timingForm.warningGroupId}
               clearable
             />
-          </NFormItem>
+          </NFormItem> )}
         </NForm>
       </Modal>
     )

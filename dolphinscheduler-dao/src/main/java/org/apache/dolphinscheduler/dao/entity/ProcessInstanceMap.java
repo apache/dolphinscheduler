@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * process instance map
- */
+@Data
 @TableName("t_ds_relation_process_instance")
 public class ProcessInstanceMap {
 
@@ -31,7 +31,7 @@ public class ProcessInstanceMap {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * parent process instance id
@@ -47,48 +47,6 @@ public class ProcessInstanceMap {
      * process instance id
      */
     private int processInstanceId;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getParentProcessInstanceId() {
-        return parentProcessInstanceId;
-    }
-
-    public void setParentProcessInstanceId(int parentProcessInstanceId) {
-        this.parentProcessInstanceId = parentProcessInstanceId;
-    }
-
-    public int getParentTaskInstanceId() {
-        return parentTaskInstanceId;
-    }
-
-    public void setParentTaskInstanceId(int parentTaskInstanceId) {
-        this.parentTaskInstanceId = parentTaskInstanceId;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    @Override
-    public String toString() {
-        return "ProcessInstanceMap{"
-                + "id=" + id
-                + ", parentProcessInstanceId=" + parentProcessInstanceId
-                + ", parentTaskInstanceId=" + parentTaskInstanceId
-                + ", processInstanceId=" + processInstanceId
-                + '}';
-    }
 
     @Override
     public boolean equals(Object o) {

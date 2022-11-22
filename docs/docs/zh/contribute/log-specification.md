@@ -41,6 +41,26 @@ Master模块和Worker模块的日志打印使用如下格式。即在打印的�
 [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %msg%n
 ```
 
+## 日志配置修改
+
+DolphinScheduler使用[`LogBack`](https://docs.spring.io/spring-boot/docs/2.1.8.RELEASE/reference/html/howto-logging.html)作为日志工具。若您要修改某个包的日志打点级别，您需要修改对应模块的`logback-spring.xml`文件。
+举例来说，若您需要将`standalone`模式下`org.springframework.web`包日志提升到`DEBUG`级别，您需要在`apache-dolphinscheduler-dev-SNAPSHOT-bin/standalone-server/conf/logback-spring.xml`文件中加入如下配置：
+
+```xml
+<configuration scan="true" scanPeriod="120 seconds">
+
+......
+
+  <logger name="org.springframework.web" level="DEBUG">
+    <appender-ref ref="STANDALONELOGFILE" />
+    <appender-ref ref="TASKLOGFILE"/>
+  </logger>
+
+......
+
+</configuration>
+```
+
 ## 注意事项
 
 - 禁止使用标准输出打印日志。标准输出会极大影响系统性能。
@@ -48,3 +68,4 @@ Master模块和Worker模块的日志打印使用如下格式。即在打印的�
 - 禁止分行打印日志。日志的内容需要与日志格式中的相关信息关联，如果分行打印会导致日志内容与时间等信息匹配不上，并且在大量日志环境下导致日志混合，会加大日志检索难度。
 - 禁止使用"+"运算符对日志内容进行拼接。使用占位符进行日志格式化打印，提高内存使用效率。
 - 日志内容中包括对象实例时，需要确保重写toString()方法，防止打印无意义的hashcode。
+

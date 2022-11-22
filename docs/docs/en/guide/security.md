@@ -99,20 +99,20 @@ public  void doPOSTParam()throws Exception{
 
 ## Granted Permissions
 
-- Granted permissions include project permissions, resource permissions, data source permissions, and UDF function permissions.
-- Administrators can authorize projects, resources, data sources, and UDF functions that ordinary users do not create. Because the authorization methods of projects, resources, data sources and UDF functions are all the same, the project authorization is used as an example to introduce.
-- Note: For projects created by the user, the user has all permissions. The item list and the selected items list are not displayed.
+* Granted permissions include project permissions, resource permissions, data source permissions, and UDF function permissions.
+* Administrators can authorize projects, resources, data sources, and UDF functions that ordinary users do not create. Because the authorization methods of projects, resources, data sources and UDF functions are all the same, the project authorization is used as an example to introduce.
+* Note: For projects created by the user, the user has all permissions. Therefore, permission changes to projects created by users themselves are not valid.
 - The administrator enters the `Security Center -> User Management` page, and clicks the "Authorize" button of the user to be authorized, as shown in the following figure:
 
-<p align="center">
-  <img src="../../../img/auth-en.png" width="80%" />
-</p>
+![project-authroize-step-1](../../../img/new_ui/dev/security/project-authroize-step-1.png)
 
-- Select the project to authorize the project.
+- Select one or more projects and click the button above to authorize the project. The upper buttons from left to right correspond to `revoke all permissions`, `grant read permissions`, and `grant all permissions` (which including both read and write permissions).
 
-<p align="center">
-   <img src="../../../img/auth-project-en.png" width="80%" />
-</p>
+![project-authroize-step-2](../../../img/new_ui/dev/security/project-authroize-step-2.png)
+
+- If a user has only the read permission but not the write permission for a project, and the user is trying to do something like delete or update the project, an error message is displayed indicating that the user has no write permission and cannot complete the operation.
+
+![no-permission-error](../../../img/new_ui/dev/security/no-permission-error.png)
 
 - Resources, data sources, and UDF function authorization are the same as project authorization.
 
@@ -138,8 +138,8 @@ worker:
 ......
 ```
 
-- You can add new worker groups for the workers during runtime regardless of the configurations in `application.yaml` as below: 
-`Security Center` -> `Worker Group Manage` -> `Create Worker Group` -> fill in `Group Name` and `Worker Addresses` -> click `confirm`. 
+- You can add new worker groups for the workers during runtime regardless of the configurations in `application.yaml` as below:
+  `Security Center` -> `Worker Group Manage` -> `Create Worker Group` -> fill in `Group Name` and `Worker Addresses` -> click `confirm`.
 
 ## Environmental Management
 
@@ -164,10 +164,10 @@ Create a task node in the workflow definition, select the worker group and the e
 ## Cluster Management
 
 > Add or update cluster
-- Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
-
+> - Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
+>
 > Usage cluster
-- After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
+> - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
 
 ![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
 
@@ -182,5 +182,4 @@ Create a task node in the workflow definition, select the worker group and the e
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
-
 

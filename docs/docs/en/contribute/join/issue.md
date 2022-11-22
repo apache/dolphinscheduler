@@ -1,6 +1,7 @@
 # Issue Notice
 
 ## Preface
+
 Issues function is used to track various Features, Bugs, Functions, etc. The project maintainer can organize the tasks to be completed through issues.
 
 Issue is an important step in drawing out a feature or bug,
@@ -29,7 +30,7 @@ The `Issue Type` is as follows:
     <tbody>
         <tr>
             <td style="text-align: center;">Feature</td>
-            <td style="text-align: center;">Include expected new features and functions</td>
+            <td style="text-align: center;">Include expected features and functions</td>
             <td style="text-align: center;">[Feature][api] Add xxx api in xxx controller</td>
         </tr>
         <tr>
@@ -129,8 +130,8 @@ The main purpose of this is to avoid wasting time caused by different opinions o
 
 - How to deal with the user who raises an issue does not know the module corresponding to the issue.
 
-    It is true that most users when raising issue do not know which module the issue belongs to.
-    In fact, this is very common in many open source communities. In this case, the committer / contributor actually knows the module affected by the issue.
-    If the issue is really valuable after being approved by committer and contributor, then the committer can modify the issue title according to the specific module involved in the issue,
-    or leave a message to the user who raises the issue to modify it into the corresponding title.
+  It is true that most users when raising issue do not know which module the issue belongs to.
+  In fact, this is very common in many open source communities. In this case, the committer / contributor actually knows the module affected by the issue.
+  If the issue is really valuable after being approved by committer and contributor, then the committer can modify the issue title according to the specific module involved in the issue,
+  or leave a message to the user who raises the issue to modify it into the corresponding title.
 

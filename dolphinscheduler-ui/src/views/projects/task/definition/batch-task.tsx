@@ -36,7 +36,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import { useTask } from './use-task'
-import { TASK_TYPES_MAP } from '@/views/projects/task/constants/task-type'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import Card from '@/components/card'
 import VersionModal from './components/version-modal'
 import MoveModal from './components/move-modal'
@@ -75,6 +75,21 @@ const BatchTaskDefinition = defineComponent({
       requestData()
     }
 
+    const onClearSearchTaskName = () => {
+      variables.searchTaskName = null
+      onSearch()
+    }
+
+    const onClearSearchWorkflowName = () => {
+      variables.searchWorkflowName = null
+      onSearch()
+    }
+
+    const onClearSearchTaskType = () => {
+      variables.taskType = null
+      onSearch()
+    }
+
     const onRefresh = () => {
       variables.showVersionModalRef = false
       variables.showMoveModalRef = false
@@ -110,6 +125,9 @@ const BatchTaskDefinition = defineComponent({
       ...toRefs(variables),
       ...toRefs(task),
       onSearch,
+      onClearSearchTaskName,
+      onClearSearchWorkflowName,
+      onClearSearchTaskType,
       requestData,
       onUpdatePageSize,
       onRefresh,
@@ -145,6 +163,7 @@ const BatchTaskDefinition = defineComponent({
                 clearable
                 v-model={[this.searchTaskName, 'value']}
                 placeholder={t('project.task.task_name')}
+                onClear={this.onClearSearchTaskName}
               />
               <NInput
                 allowInput={this.trim}
@@ -152,6 +171,7 @@ const BatchTaskDefinition = defineComponent({
                 clearable
                 v-model={[this.searchWorkflowName, 'value']}
                 placeholder={t('project.task.workflow_name')}
+                onClear={this.onClearSearchWorkflowName}
               />
               <NSelect
                 v-model={[this.taskType, 'value']}
@@ -162,6 +182,7 @@ const BatchTaskDefinition = defineComponent({
                 placeholder={t('project.task.task_type')}
                 style={{ width: '180px' }}
                 clearable
+                onClear={this.onClearSearchTaskType}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>

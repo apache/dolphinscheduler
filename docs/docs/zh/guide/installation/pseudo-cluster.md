@@ -11,7 +11,7 @@
 * JDK：下载[JDK][jdk] (1.8+)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
 * 二进制包：在[下载页面](https://dolphinscheduler.apache.org/zh-cn/download/download.html)下载 DolphinScheduler 二进制包
 * 数据库：[PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) 或者 [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+)，两者任选其一即可，如 MySQL 则需要 JDBC Driver 8.0.16
-* 注册中心：[ZooKeeper](https://zookeeper.apache.org/releases.html) (3.4.6+)，[下载地址][zookeeper]
+* 注册中心：[ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0+)，[下载地址][zookeeper]
 * 进程树分析
   * macOS安装`pstree`
   * Fedora/Red/Hat/CentOS/Ubuntu/Debian安装`psmisc`
@@ -37,6 +37,7 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 # 修改目录权限，使得部署用户对二进制包解压后的 apache-dolphinscheduler-*-bin 目录有操作权限
 chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
+chmod -R 755 apache-dolphinscheduler-*-bin
 ```
 
 > **_注意:_**
@@ -100,8 +101,6 @@ deployUser="dolphinscheduler"
 
 * DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库](#初始化数据库)
 * 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
-* 注册中心`zookeeper`
-* 服务端相关配置，比如缓存，时区设置等
 
 如果您不使用某些任务类型，您可以忽略任务外部依赖项，但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
 
@@ -128,14 +127,13 @@ export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-lo
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
-export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
-export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
 export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 ```
 
 ## 初始化数据库
@@ -150,7 +148,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:
 bash ./bin/install.sh
 ```
 
-> **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，次为非重要信息直接忽略即可
+> **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，此为非重要信息直接忽略即可
 
 ## 登录 DolphinScheduler
 
@@ -186,10 +184,11 @@ bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 > 服务需求提供便利。意味着您可以基于不同的环境变量来启动各个服务，只需要在对应服务中配置 `<service>/conf/dolphinscheduler_env.sh` 然后通过 `<service>/bin/start.sh`
 > 命令启动即可。但是如果您使用命令 `/bin/dolphinscheduler-daemon.sh start <service>` 启动服务器，它将会用文件 `bin/env/dolphinscheduler_env.sh`
 > 覆盖 `<service>/conf/dolphinscheduler_env.sh` 然后启动服务，目的是为了减少用户修改配置的成本.
-
+>
 > **_注意2:_**：服务用途请具体参见《系统架构设计》小节。Python gateway service 默认与 api-server 一起启动，如果您不想启动 Python gateway service
 > 请通过更改 api-server 配置文件 `api-server/conf/application.yaml` 中的 `python-gateway.enabled : false` 来禁用它。
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
 [issue]: https://github.com/apache/dolphinscheduler/issues/6597
+

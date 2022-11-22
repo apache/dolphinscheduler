@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.hive.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSConnectionParam;
 
 public class HiveConnectionParam extends BaseHDFSConnectionParam {
+
     @Override
     public String toString() {
         return "HiveConnectionParam{"

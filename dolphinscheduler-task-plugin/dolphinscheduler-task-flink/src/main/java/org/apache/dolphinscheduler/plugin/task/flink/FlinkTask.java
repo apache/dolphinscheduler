@@ -17,30 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,39 +85,21 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     protected void setMainJarName() {
+        if (flinkParameters.getProgramType() == ProgramType.SQL) {
+            logger.info("The current flink job type is SQL, will no need to set main jar");
+            return;
+        }
+
         ResourceInfo mainJar = flinkParameters.getMainJar();
         String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);
         flinkParameters.setMainJar(mainJar);
+        logger.info("Success set flink jar: {}", resourceName);
     }
 
     @Override
     public AbstractParameters getParameters() {
         return flinkParameters;
-    }
-
-    @Override
-    public Set<String> getApplicationIds() throws IOException {
-        Set<String> appIds = new HashSet<>();
-
-        File file = new File(taskRequest.getLogPath());
-        if (!file.exists()) {
-            return appIds;
-        }
-
-        /*
-         * analysis log? get submitted yarn application id
-         */
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String appId = findAppId(line);
-                if (StringUtils.isNotEmpty(appId)) {
-                    appIds.add(appId);
-                }
-            }
-        }
-        return appIds;
     }
 
     /**

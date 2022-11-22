@@ -19,15 +19,15 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * t_ds_alert_plugin_instance
- */
+@Data
 @TableName("t_ds_alert_plugin_instance")
 public class AlertPluginInstance {
 
@@ -35,7 +35,7 @@ public class AlertPluginInstance {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * plugin_define_id
@@ -86,53 +86,4 @@ public class AlertPluginInstance {
         this.updateTime = updateDate;
         this.instanceName = instanceName;
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getPluginDefineId() {
-        return pluginDefineId;
-    }
-
-    public void setPluginDefineId(int pluginDefineId) {
-        this.pluginDefineId = pluginDefineId;
-    }
-
-    public String getPluginInstanceParams() {
-        return pluginInstanceParams;
-    }
-
-    public void setPluginInstanceParams(String pluginInstanceParams) {
-        this.pluginInstanceParams = pluginInstanceParams;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getInstanceName() {
-        return instanceName;
-    }
-
-    public void setInstanceName(String instanceName) {
-        this.instanceName = instanceName;
-    }
 }
-

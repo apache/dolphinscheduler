@@ -19,8 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.hivecli;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -29,15 +31,15 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class HiveCliTask extends AbstractTaskExecutor {
+public class HiveCliTask extends AbstractRemoteTask {
 
     private HiveCliParameters hiveCliParameters;
 
@@ -55,6 +57,11 @@ public class HiveCliTask extends AbstractTaskExecutor {
     }
 
     @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
+    }
+
+    @Override
     public void init() {
         logger.info("hiveCli task params {}", taskExecutionContext.getTaskParams());
 
@@ -65,8 +72,9 @@ public class HiveCliTask extends AbstractTaskExecutor {
         }
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws TaskException {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand());
             setExitStatusCode(taskResponse.getExitStatusCode());
@@ -83,6 +91,16 @@ public class HiveCliTask extends AbstractTaskExecutor {
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("run hiveCli task error", e);
         }
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
     }
 
     protected String buildCommand() {
@@ -126,8 +144,12 @@ public class HiveCliTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
-        shellCommandExecutor.cancelApplication();
+    public void cancelApplication() throws TaskException {
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
 }
