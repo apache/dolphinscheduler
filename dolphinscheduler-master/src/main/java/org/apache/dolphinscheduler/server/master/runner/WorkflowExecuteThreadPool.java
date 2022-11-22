@@ -122,6 +122,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
                 try {
                     logger.error("Workflow instance events handle failed", ex);
+                    notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
                 } finally {
                     LoggerUtils.removeWorkflowInstanceIdMDC();
