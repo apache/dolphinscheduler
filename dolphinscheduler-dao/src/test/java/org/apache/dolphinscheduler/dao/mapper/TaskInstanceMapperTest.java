@@ -367,13 +367,14 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         // insert taskInstance
         TaskInstance task = insertTaskInstance(processInstance.getId());
 
-        Page<TaskInstance> page = new Page(1, 3);
+        Page<TaskInstance> page = new Page<>(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                 page,
                 definition.getProjectCode(),
                 task.getProcessInstanceId(),
                 "",
                 "",
+                0,
                 "",
                 0,
                 new int[0],
