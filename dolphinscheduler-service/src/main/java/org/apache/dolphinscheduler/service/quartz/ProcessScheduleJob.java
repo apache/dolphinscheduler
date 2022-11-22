@@ -91,6 +91,7 @@ public class ProcessScheduleJob extends QuartzJobBean {
         command.setWarningGroupId(schedule.getWarningGroupId());
         String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : schedule.getWorkerGroup();
         command.setWorkerGroup(workerGroup);
+        command.setEnvironmentCode(schedule.getEnvironmentCode());
         command.setWarningType(schedule.getWarningType());
         command.setProcessInstancePriority(schedule.getProcessInstancePriority());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
