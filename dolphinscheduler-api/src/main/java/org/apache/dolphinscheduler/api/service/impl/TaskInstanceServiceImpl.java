@@ -155,11 +155,13 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without process instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
-                    page, project.getCode(), processDefinitionName, searchVal,taskCode, taskName, executorId, statusArray, host,
+                    page, project.getCode(), processDefinitionName, searchVal, taskCode, taskName, executorId,
+                    statusArray, host,
                     taskExecuteType, start, end);
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                    page, project.getCode(), processInstanceId, processInstanceName, searchVal,taskCode, taskName, executorId,
+                    page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskCode, taskName,
+                    executorId,
                     statusArray, host, taskExecuteType, start, end);
         }
         Set<String> exclusionSet = new HashSet<>();
