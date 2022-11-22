@@ -13,6 +13,7 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [Shell](../task/shell.md)
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
+* [Python](../task/python.md)
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. At present, we mainly focus on the SQL and shell nodes to pass parameters downstream.
 
@@ -76,3 +77,11 @@ The result of Node_mysql is as follows:
 Even though output is assigned a value of 1 in Node_A's script, the log still shows a value of 100. But according to the principle from [parameter priority](priority.md): `Local Parameter > Parameter Context > Global Parameter`, the output value in Node_B is 1. It proves that the output parameter is passed in the workflow with reference to the expected value, and the query operation is completed using this value in Node_mysql.
 
 But the output value 66 only shows in the Node_A, the reason is that the direction of value is selected as IN, and only when the direction is OUT will it be defined as a variable output.
+
+#### Pass parameter from Python task to downstream
+
+Use `print('${setValue(key=%s)}' % value)`, DolphinScheduler will capture the `${setValue(key=value}` in the output to capture the parameters and pass them downstream.
+
+For example
+
+![img.png](../../../../img/new_ui/dev/parameter/python_context_param.png)
