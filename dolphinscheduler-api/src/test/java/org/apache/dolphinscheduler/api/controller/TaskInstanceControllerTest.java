@@ -66,7 +66,8 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
 
-        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(0L),eq(""), eq(""), any(),
+        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(0L), eq(""), eq(""),
+                any(),
                 any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(result);
