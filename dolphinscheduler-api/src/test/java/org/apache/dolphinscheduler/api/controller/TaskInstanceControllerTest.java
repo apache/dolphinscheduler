@@ -66,11 +66,12 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
 
-        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""),eq(0), eq(""), eq(""), any(), any(),
+        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(0), eq(""), eq(""), any(),
+                any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(result);
         Result taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
-                0L,"", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
+                0L, "", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
                 TaskExecuteType.BATCH, pageNo, pageSize);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
     }
