@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.api.dto.dataAnalysis.TaskStateCountResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +47,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * data analysis controller
  */
-@Api(tags = "DATA_ANALYSIS_TAG")
+@Tag(name = "DATA_ANALYSIS_TAG")
 @RestController
 @RequestMapping("/v2/projects/analysis")
 public class DataAnalysisV2Controller extends BaseController {
@@ -67,24 +67,22 @@ public class DataAnalysisV2Controller extends BaseController {
     /**
      * statistical task instance status data
      *
-     * @param loginUser login user
+     * @param loginUser         login user
      * @param taskStateCountReq taskStateCountReq
      * @return task instance count data
      */
-    @ApiOperation(value = "countTaskState", notes = "COUNT_TASK_STATE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
+    @Operation(summary = "countTaskState", description = "COUNT_TASK_STATE_NOTES")
+    @Parameters({
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/task-state-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_INSTANCE_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-
-    public TaskStateCountResponse countTaskState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public TaskStateCountResponse countTaskState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @RequestBody TaskStateCountRequest taskStateCountReq) {
-
         Result result = dataAnalysisService.countTaskStateByProject(loginUser, taskStateCountReq.getProjectCode(),
                 taskStateCountReq.getStartDate(), taskStateCountReq.getEndDate());
         return new TaskStateCountResponse(result);
@@ -93,21 +91,21 @@ public class DataAnalysisV2Controller extends BaseController {
     /**
      * statistical process instance status data
      *
-     * @param loginUser login user
-     * @param processInstanceStateCountReq  processInstanceStateCountReq
+     * @param loginUser                    login user
+     * @param processInstanceStateCountReq processInstanceStateCountReq
      * @return process instance data
      */
-    @ApiOperation(value = "countProcessInstanceState", notes = "COUNT_PROCESS_INSTANCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataTypeClass = String.class),
-            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
+    @Operation(summary = "countProcessInstanceState", description = "COUNT_PROCESS_INSTANCE_NOTES")
+    @Parameters({
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/process-state-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_INSTANCE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ProcessInstanceStateCountResponse countProcessInstanceState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProcessInstanceStateCountResponse countProcessInstanceState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                        @RequestBody ProcessInstanceStateCountRequest processInstanceStateCountReq) {
 
         Result result = dataAnalysisService.countProcessInstanceStateByProject(loginUser,
@@ -119,19 +117,19 @@ public class DataAnalysisV2Controller extends BaseController {
     /**
      * statistics the process definition quantities of certain person
      *
-     * @param loginUser login user
+     * @param loginUser                      login user
      * @param processDefinitionStateCountReq processDefinitionStateCountReq
      * @return definition count in project code
      */
-    @ApiOperation(value = "countDefinitionByUser", notes = "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class, example = "100")
+    @Operation(summary = "countDefinitionByUser", description = "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/define-user-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public ProcessDefinitionStateCountResponse countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ProcessDefinitionStateCountResponse countDefinitionByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                      @RequestBody ProcessDefinitionStateCountRequest processDefinitionStateCountReq) {
 
         Result result =
@@ -145,12 +143,12 @@ public class DataAnalysisV2Controller extends BaseController {
      * @param loginUser login user
      * @return command state of user projects
      */
-    @ApiOperation(value = "countCommandState", notes = "COUNT_COMMAND_STATE_NOTES")
+    @Operation(summary = "countCommandState", description = "COUNT_COMMAND_STATE_NOTES")
     @GetMapping(value = "/command-state-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COMMAND_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public CommandStateCountResponse countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public CommandStateCountResponse countCommandState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         Result result = dataAnalysisService.countCommandState(loginUser);
         return new CommandStateCountResponse(result);
@@ -162,12 +160,12 @@ public class DataAnalysisV2Controller extends BaseController {
      * @param loginUser login user
      * @return queue state count
      */
-    @ApiOperation(value = "countQueueState", notes = "COUNT_QUEUE_STATE_NOTES")
+    @Operation(summary = "countQueueState", description = "COUNT_QUEUE_STATE_NOTES")
     @GetMapping(value = "/queue-count", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUEUE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public QueueStateCountResponse countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public QueueStateCountResponse countQueueState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         Result result = dataAnalysisService.countQueueState(loginUser);
         return new QueueStateCountResponse(result);

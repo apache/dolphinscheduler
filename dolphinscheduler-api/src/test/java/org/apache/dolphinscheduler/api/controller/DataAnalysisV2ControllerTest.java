@@ -38,7 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +47,11 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
-
 /**
  * data analysis controller test
  */
 public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisV2ControllerTest.class);
 
     @Autowired
@@ -67,7 +67,7 @@ public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
         return project.getCode();
     }
 
-    private void cleanProjectByCode( long projectCode) {
+    private void cleanProjectByCode(long projectCode) {
         QueryWrapper<Project> projectWrapper = new QueryWrapper<>();
         projectWrapper.eq("code", projectCode);
         projectMapper.delete(projectWrapper);
@@ -85,9 +85,10 @@ public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
                 .contentType(APPLICATION_JSON_VALUE)
                 .content(JSONUtils.toJsonString(taskStateCountRequest)))
                 .andExpect(status().isOk())
-                //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                // .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        TaskStateCountResponse result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), TaskStateCountResponse.class);
+        TaskStateCountResponse result =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), TaskStateCountResponse.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
         cleanProjectByCode(projectCode);
@@ -108,7 +109,8 @@ public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        ProcessInstanceStateCountResponse result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), ProcessInstanceStateCountResponse.class);
+        ProcessInstanceStateCountResponse result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                ProcessInstanceStateCountResponse.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
         cleanProjectByCode(projectCode);
@@ -117,7 +119,8 @@ public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
     @Test
     public void testCountDefinitionByUser() throws Exception {
         long projectCode = createProject();
-        ProcessDefinitionStateCountRequest processDefinitionStateCountRequest = new ProcessDefinitionStateCountRequest();
+        ProcessDefinitionStateCountRequest processDefinitionStateCountRequest =
+                new ProcessDefinitionStateCountRequest();
         processDefinitionStateCountRequest.setProjectCode(projectCode);
 
         MvcResult mvcResult = mockMvc.perform(get("/v2/projects/analysis/define-user-count")
@@ -127,7 +130,8 @@ public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        ProcessDefinitionStateCountResponse result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), ProcessDefinitionStateCountResponse.class);
+        ProcessDefinitionStateCountResponse result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                ProcessDefinitionStateCountResponse.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
         cleanProjectByCode(projectCode);
@@ -141,7 +145,8 @@ public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        CommandStateCountResponse result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), CommandStateCountResponse.class);
+        CommandStateCountResponse result =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), CommandStateCountResponse.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
@@ -154,7 +159,8 @@ public class DataAnalysisV2ControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        QueueStateCountResponse result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), QueueStateCountResponse.class);
+        QueueStateCountResponse result =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), QueueStateCountResponse.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }

@@ -51,7 +51,7 @@ public interface DataAnalysisService {
      * @param endDate     end date
      * @return process instance state count data
      */
-    Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate);
+    Result countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate);
 
     /**
      * statistics the process definition quantities of a certain person

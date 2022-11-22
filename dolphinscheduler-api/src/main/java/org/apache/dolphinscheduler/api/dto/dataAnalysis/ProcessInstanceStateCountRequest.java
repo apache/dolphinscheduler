@@ -17,28 +17,26 @@
 
 package org.apache.dolphinscheduler.api.dto.dataAnalysis;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * process instance state count
  */
-@ApiModel("PROCESS-INSTANCE-STATE-COUNT")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class ProcessInstanceStateCountRequest {
 
-    @ApiModelProperty(name = "startDate", example = "START_DATE")
+    @Schema(name = "startDate", example = "START_DATE")
     String startDate;
 
-    @ApiModelProperty(name = "endDate", example = "END_DATE")
+    @Schema(name = "endDate", example = "END_DATE")
     String endDate;
 
-    @ApiModelProperty(name = "projectCode", example = "PROJECT_CODE", value = "0")
+    @Schema(name = "projectCode", example = "PROJECT_CODE", defaultValue = "0")
     long projectCode;
 }
