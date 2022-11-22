@@ -245,7 +245,6 @@ export function useTable() {
   }
 
   const getTableData = () => {
-    debugger
     if (variables.loadingRef) return
     variables.loadingRef = true
     const params = {

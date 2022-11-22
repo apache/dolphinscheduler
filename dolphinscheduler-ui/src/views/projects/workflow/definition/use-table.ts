@@ -387,7 +387,6 @@ export function useTable() {
   }
 
   const gotoWorkflowInstance = (row: any) => {
-    debugger
     router.push({
       name: 'workflow-instance-list',
       params: { projectCode: variables.projectCode },
