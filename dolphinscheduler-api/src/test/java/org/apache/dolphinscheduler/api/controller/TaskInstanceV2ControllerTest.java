@@ -52,6 +52,7 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
         taskInstanceQueryReq.setProcessInstanceId(1);
         taskInstanceQueryReq.setProcessInstanceName("");
         taskInstanceQueryReq.setProcessDefinitionName("");
+        taskInstanceQueryReq.setTaskCode(0L);
         taskInstanceQueryReq.setTaskName("");
         taskInstanceQueryReq.setExecutorName("");
         taskInstanceQueryReq.setStartTime("2022-06-01 00:00:00");

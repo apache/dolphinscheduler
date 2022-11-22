@@ -48,7 +48,7 @@ public class TaskInstanceQueryRequest extends PageQueryDto {
     String searchVal;
 
     @Schema(name = "taskCode", example = "TASK-CODE", defaultValue = "0")
-    Integer taskCode;
+    Long taskCode;
 
     @Schema(name = "taskName", example = "TASK-NAME")
     String taskName;
