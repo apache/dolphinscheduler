@@ -15,19 +15,33 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NTabPane, NTabs } from 'naive-ui'
+import { useRouter } from 'vue-router'
 import BatchTaskInstance from './batch-task'
 import StreamTaskInstance from './stream-task'
+import type { Router } from 'vue-router'
+
 
 
 const TaskDefinition = defineComponent({
   name: 'task-instance',
   setup() {
     const { t } = useI18n()
+    const selectedTab = ref<string>()
+    const router: Router = useRouter()
+    if (router.currentRoute.value.query.taskExecuteType) {
+      selectedTab.value = router.currentRoute.value.query.taskExecuteType.toString()
+    }
+    const onTabChange = (newSelectedTab: string) => {
+      debugger
+      if (router.currentRoute.value.query.taskExecuteType) {
+        selectedTab.value = newSelectedTab
+      }
+    }
     return () => (
-      <NTabs type='line' animated>
+      <NTabs value={selectedTab.value} type='line' animated onUpdate:value={onTabChange}>
         <NTabPane name='Batch' tab={t('project.task.batch_task')}>
           <BatchTaskInstance />
         </NTabPane>

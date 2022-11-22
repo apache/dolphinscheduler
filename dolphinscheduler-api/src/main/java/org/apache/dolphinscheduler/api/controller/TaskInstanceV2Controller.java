@@ -96,7 +96,7 @@ public class TaskInstanceV2Controller extends BaseController {
         String searchVal = ParameterUtils.handleEscapes(taskInstanceQueryReq.getSearchVal());
         result = taskInstanceService.queryTaskListPaging(loginUser, projectCode,
                 taskInstanceQueryReq.getProcessInstanceId(), taskInstanceQueryReq.getProcessInstanceName(),
-                taskInstanceQueryReq.getProcessDefinitionName(),
+                taskInstanceQueryReq.getProcessDefinitionName(),taskInstanceQueryReq.getTaskCode(),
                 taskInstanceQueryReq.getTaskName(), taskInstanceQueryReq.getExecutorName(),
                 taskInstanceQueryReq.getStartTime(), taskInstanceQueryReq.getEndTime(), searchVal,
                 taskInstanceQueryReq.getStateType(), taskInstanceQueryReq.getHost(),

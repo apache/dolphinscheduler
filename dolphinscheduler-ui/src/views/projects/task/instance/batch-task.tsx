@@ -59,7 +59,8 @@ const BatchTaskInstance = defineComponent({
         stateType: variables.stateType,
         datePickerRange: variables.datePickerRange,
         executorName: variables.executorName,
-        processInstanceName: variables.processInstanceName
+        processInstanceName: variables.processInstanceName,
+        taskCode: variables.taskCode
       })
     }
 

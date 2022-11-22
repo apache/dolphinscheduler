@@ -50,7 +50,7 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
-import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+import { renderEnvironmentalDistinctionCell } from "@/utils/environmental-distinction";
 
 
 export function useTable() {
@@ -69,6 +69,7 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(taskName || null),
     processInstanceId: ref(processInstanceId ? processInstanceId : null),
+    taskCode: router.currentRoute.value.query.taskCode ? Number(router.currentRoute.value.query.taskCode) : 0,
     host: ref(null),
     stateType: ref(null),
     datePickerRange: ref(null),
@@ -301,7 +302,8 @@ export function useTable() {
         stateType: variables.stateType,
         datePickerRange: variables.datePickerRange,
         executorName: variables.executorName,
-        processInstanceName: variables.processInstanceName
+        processInstanceName: variables.processInstanceName,
+        taskCode: variables.taskCode
       })
     })
   }
@@ -323,7 +325,8 @@ export function useTable() {
         ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: params.executorName,
-      processInstanceName: params.processInstanceName
+      processInstanceName: params.processInstanceName,
+      taskCode: params.taskCode,
     }
 
     const { state } = useAsyncState(

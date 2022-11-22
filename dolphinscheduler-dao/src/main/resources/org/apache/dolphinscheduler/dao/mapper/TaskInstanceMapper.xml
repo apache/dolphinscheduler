@@ -196,6 +196,9 @@
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')
         </if>
+        <if test="taskCode != 0">
+            and instance.task_code = #{taskCode}
+        </if>
         <if test="taskName != null and taskName != ''">
             and instance.name=#{taskName}
         </if>
@@ -239,6 +242,9 @@
         </if>
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')
+        </if>
+        <if test="taskCode != 0">
+            and instance.task_code = #{taskCode}
         </if>
         <if test="taskName != null and taskName != ''">
             and instance.name=#{taskName}

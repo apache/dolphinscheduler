@@ -32,13 +32,14 @@ import {
   DeleteOutlined,
   EditOutlined,
   DragOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
+  ArrowRightOutlined
 } from '@vicons/antd'
 import {
   queryTaskDefinitionListPaging,
   deleteTaskDefinition
 } from '@/service/modules/task-definition'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -49,10 +50,12 @@ import type {
   TaskDefinitionRes
 } from '@/service/modules/task-definition/types'
 import type { IRecord } from './types'
+import type { Router } from 'vue-router'
 
 export function useTable(onEdit: Function) {
   const { t } = useI18n()
   const route = useRoute()
+  const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
 
   const createColumns = (variables: any) => {
@@ -138,7 +141,7 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](4),
+        ...COLUMN_WIDTH_CONFIG['operation'](5),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -223,6 +226,31 @@ export function useTable(onEdit: Function) {
                 }
               ),
               h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        onClick: () => {
+                          handleGotoTaskInstance(row)
+                        }
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(ArrowRightOutlined)
+                          })
+                      }
+                    ),
+                  default: () => t('project.task.task_instance')
+                }
+              ),
+              h(
                 NPopconfirm,
                 {
                   onPositiveClick: () => {
@@ -282,8 +310,17 @@ export function useTable(onEdit: Function) {
     showVersionModalRef: ref(false),
     showMoveModalRef: ref(false),
     row: {},
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
   })
+
+  const handleGotoTaskInstance = (row: any) => {
+    router.push({
+      name: 'task-instance',
+      params: { projectCode: variables.projectCode },
+      query: { taskCode: row.taskCode, taskExecuteType: "Batch" }
+    })
+  }
 
   const handleDelete = (row: any) => {
     deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(() => {

@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-import { reactive, h } from 'vue'
+import { reactive, h, ref } from 'vue'
 import { NButton, NIcon, NSpace, NTooltip, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import { useI18n } from 'vue-i18n'
-import { EditOutlined, PlayCircleOutlined } from '@vicons/antd'
+import { EditOutlined, PlayCircleOutlined, ArrowRightOutlined } from '@vicons/antd'
 import { queryTaskDefinitionListPaging } from '@/service/modules/task-definition'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -32,11 +32,22 @@ import type {
   TaskDefinitionRes
 } from '@/service/modules/task-definition/types'
 import type { IRecord } from './types'
+import type { Router, } from 'vue-router'
 
 export function useTable(onEdit: Function) {
   const { t } = useI18n()
   const route = useRoute()
+  const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
+
+
+  const handleGotoTaskInstance = (row: any) => {
+    router.push({
+      name: 'task-instance',
+      params: { projectCode: variables.projectCode },
+      query: { taskCode: row.taskCode, taskExecuteType: "Stream" }
+    })
+  }
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -96,7 +107,7 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](2),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -121,6 +132,31 @@ export function useTable(onEdit: Function) {
                       }
                     ),
                   default: () => t('project.task.execute')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        onClick: () => {
+                          handleGotoTaskInstance(row)
+                        }
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(ArrowRightOutlined)
+                          })
+                      }
+                    ),
+                  default: () => t('project.task.task_instance')
                 }
               ),
               h(
@@ -165,7 +201,8 @@ export function useTable(onEdit: Function) {
     totalPage: 1,
     row: {},
     loading: false,
-    startShow: false
+    startShow: false,
+    projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
   })
 
   const getTableData = () => {

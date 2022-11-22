@@ -35,6 +35,7 @@ interface TaskListReq {
   searchVal?: string
   startDate?: string
   stateType?: string
+  taskCode?: number
   taskName?: string
   taskExecuteType?: 'BATCH' | 'STREAM'
 }

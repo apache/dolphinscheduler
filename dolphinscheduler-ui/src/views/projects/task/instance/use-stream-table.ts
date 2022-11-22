@@ -32,7 +32,7 @@ import {
   StopOutlined
 } from '@vicons/antd'
 import { format } from 'date-fns'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { parseTime, renderTableTime, tasksState } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -40,10 +40,12 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { TaskInstancesRes, ITaskState } from './types'
+import type { Router } from 'vue-router'
 
 export function useTable() {
   const { t } = useI18n()
   const route = useRoute()
+  const router: Router = useRouter()
   const projectCode = Number(route.params.projectCode)
   const processInstanceId = Number(route.params.processInstanceId)
 
@@ -54,6 +56,7 @@ export function useTable() {
     page: 1,
     pageSize: 10,
     searchVal: null,
+    taskCode: router.currentRoute.value.query.taskCode ? Number(router.currentRoute.value.query.taskCode) : 0,
     processInstanceId: processInstanceId ? processInstanceId : null,
     host: null,
     stateType: null,
@@ -286,6 +289,7 @@ export function useTable() {
       pageSize: variables.pageSize,
       pageNo: variables.page,
       searchVal: variables.searchVal,
+      taskCode: variables.taskCode,
       processInstanceId: variables.processInstanceId,
       host: variables.host,
       stateType: variables.stateType,

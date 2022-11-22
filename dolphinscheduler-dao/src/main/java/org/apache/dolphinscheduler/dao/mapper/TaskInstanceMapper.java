@@ -17,19 +17,17 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * task instance mapper interface
@@ -96,6 +94,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("processInstanceId") Integer processInstanceId,
                                                     @Param("processInstanceName") String processInstanceName,
                                                     @Param("searchVal") String searchVal,
+                                                    @Param("taskCode") long taskCode,
                                                     @Param("taskName") String taskName,
                                                     @Param("executorId") int executorId,
                                                     @Param("states") int[] statusArray,
@@ -108,6 +107,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                           @Param("projectCode") Long projectCode,
                                                           @Param("processDefinitionName") String processDefinitionName,
                                                           @Param("searchVal") String searchVal,
+                                                          @Param("taskCode") long taskCode,
                                                           @Param("taskName") String taskName,
                                                           @Param("executorId") int executorId,
                                                           @Param("states") int[] statusArray,

@@ -34,6 +34,7 @@ public interface TaskInstanceService {
      * @param projectCode project code
      * @param processInstanceId process instance id
      * @param searchVal search value
+     * @param taskCode task code
      * @param taskName task name
      * @param stateType state type
      * @param host host
@@ -49,6 +50,7 @@ public interface TaskInstanceService {
                                Integer processInstanceId,
                                String processInstanceName,
                                String processDefinitionName,
+                               long taskCode,
                                String taskName,
                                String executorName,
                                String startDate,

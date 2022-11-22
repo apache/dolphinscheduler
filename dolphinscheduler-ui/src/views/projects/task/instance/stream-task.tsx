@@ -43,7 +43,7 @@ import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 
-const BatchTaskInstance = defineComponent({
+const StreamTaskInstance = defineComponent({
   name: 'task-instance',
   setup() {
     let setIntervalP: number
@@ -288,4 +288,4 @@ const BatchTaskInstance = defineComponent({
   }
 })
 
-export default BatchTaskInstance
+export default StreamTaskInstance
