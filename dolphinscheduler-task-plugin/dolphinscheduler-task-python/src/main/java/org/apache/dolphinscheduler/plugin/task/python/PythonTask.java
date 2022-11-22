@@ -114,6 +114,7 @@ public class PythonTask extends AbstractTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
+            pythonParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
