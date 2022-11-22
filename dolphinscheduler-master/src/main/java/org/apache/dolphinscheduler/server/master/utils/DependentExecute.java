@@ -206,7 +206,7 @@ public class DependentExecute {
         }
 
         // In the time range, there are both manual and scheduled workflow instances, return the last workflow instance
-        return lastManualProcess.getId() > lastSchedulerProcess.getId() ? lastManualProcess  : lastSchedulerProcess;
+        return lastManualProcess.getId() > lastSchedulerProcess.getId() ? lastManualProcess : lastSchedulerProcess;
     }
 
     /**
