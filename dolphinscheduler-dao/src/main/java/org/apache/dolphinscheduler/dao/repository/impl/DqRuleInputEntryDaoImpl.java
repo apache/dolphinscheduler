@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public class DqRuleInputEntryDaoImpl implements DqRuleInputEntryDao {
 
     @Autowired

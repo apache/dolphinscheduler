@@ -24,11 +24,11 @@ import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
 import org.apache.dolphinscheduler.dao.repository.DqTaskStatisticsValueDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
-@Component
+@Repository
 public class DqTaskStatisticsValueDaoImpl implements DqTaskStatisticsValueDao {
 
     @Autowired

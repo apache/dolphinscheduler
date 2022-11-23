@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
 import org.apache.dolphinscheduler.dao.repository.DqComparisonTypeDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public class DqComparisonTypeDaoImpl implements DqComparisonTypeDao {
 
     @Autowired

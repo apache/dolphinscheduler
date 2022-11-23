@@ -29,11 +29,11 @@ import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
-@Component
+@Repository
 public class DqExecuteResultDaoImpl implements DqExecuteResultDao {
 
     @Autowired
