@@ -69,7 +69,7 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(taskName || null),
     processInstanceId: ref(processInstanceId ? processInstanceId : null),
-    taskCode: router.currentRoute.value.query.taskCode ? Number(router.currentRoute.value.query.taskCode) : 0,
+    taskCode: ref(Number(router.currentRoute.value.query.taskCode)||0),
     host: ref(null),
     stateType: ref(null),
     datePickerRange: ref(null),
