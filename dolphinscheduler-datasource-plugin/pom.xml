@@ -41,6 +41,7 @@
         <module>dolphinscheduler-datasource-all</module>
         <module>dolphinscheduler-datasource-redshift</module>
         <module>dolphinscheduler-datasource-athena</module>
+        <module>dolphinscheduler-datasource-trino</module>
     </modules>
 
     <dependencyManagement>
