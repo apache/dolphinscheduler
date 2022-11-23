@@ -31,8 +31,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  style:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Style Check
+        run: ./mvnw spotless:check
   img-check:
-    name: Image Check
     timeout-minutes: 15
     runs-on: ubuntu-latest
     defaults:
@@ -49,7 +55,6 @@ jobs:
       - name: Run Image Check
         run: python img_utils.py -v check
   dead-link:
-    name: Dead Link
     if: (github.event_name == 'schedule' && github.repository == 'apache/dolphinscheduler') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -62,3 +67,17 @@ jobs:
           for file in $(find . -name "*.md"); do
             markdown-link-check -c .dlc.json -q "$file"
           done
+  result:
+    name: Docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs:
+      - style
+      - img-check
+      - dead-link
+    if: success()
+    steps:
+      - name: success
+        run: |
+          echo "Docs check success"
+          exit 0

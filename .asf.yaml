@@ -41,6 +41,7 @@ github:
           - Build
           - Unit Test
           - E2E
+          - Docs
           - "Mergeable: milestone-label-check"
       required_pull_request_reviews:
         dismiss_stale_reviews: true
