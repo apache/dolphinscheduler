@@ -469,6 +469,8 @@ BEGIN
 ALTER TABLE `t_ds_alert` ADD COLUMN `project_code` bigint DEFAULT NULL COMMENT 'project_code';
 ALTER TABLE `t_ds_alert` ADD COLUMN `process_definition_code` bigint DEFAULT NULL COMMENT 'process_definition_code';
 ALTER TABLE `t_ds_alert` ADD COLUMN `process_instance_id` int DEFAULT NULL COMMENT 'process_instance_id';
+ALTER TABLE `t_ds_process_definition` ADD COLUMN `execution_type` tinyint(4) NULL DEFAULT 0 COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
+ALTER TABLE `t_ds_process_definition_log` ADD COLUMN `execution_type` tinyint(4) NULL DEFAULT 0 COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
 -- ALTER TABLE `t_ds_alert` ADD COLUMN `alert_type` int DEFAULT NULL COMMENT 'alert_type';
 END IF;
 END;
