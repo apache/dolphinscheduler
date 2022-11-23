@@ -153,27 +153,13 @@ public class ServerNodeManager implements InitializingBean {
         @Override
         public void run() {
             try {
-
                 // sync worker node info
                 updateWorkerNodes();
                 updateWorkerGroupMappings();
-                notifyWorkerInfoChangeListeners();
             } catch (Exception e) {
                 logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
-    }
-
-    protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo,
-                                                        WorkerGroup wg) {
-        Set<String> nodes = new HashSet<>();
-        String[] addrs = wg.getAddrList().split(Constants.COMMA);
-        for (String addr : addrs) {
-            if (newWorkerNodeInfo.containsKey(addr)) {
-                nodes.add(addr);
-            }
-        }
-        return nodes;
     }
 
     /**
@@ -204,7 +190,15 @@ public class ServerNodeManager implements InitializingBean {
                 } catch (Exception ex) {
                     logger.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
+            }
+        }
 
+        private void syncSingleWorkerNodeInfo(String workerAddress, WorkerHeartBeat info) {
+            workerNodeInfoWriteLock.lock();
+            try {
+                workerNodeInfo.put(workerAddress, info);
+            } finally {
+                workerNodeInfoWriteLock.unlock();
             }
         }
     }
@@ -241,8 +235,7 @@ public class ServerNodeManager implements InitializingBean {
         try {
             registryClient.getLock(nodeLock);
             Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
-            List<Server> masterNodes = registryClient.getServerList(NodeType.MASTER);
-            syncMasterNodes(currentNodes, masterNodes);
+            syncMasterNodes(currentNodes, registryClient.getServerList(NodeType.MASTER));
         } catch (Exception e) {
             logger.error("update master nodes error", e);
         } finally {
@@ -363,15 +356,6 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
-    private void syncSingleWorkerNodeInfo(String workerAddress, WorkerHeartBeat info) {
-        workerNodeInfoWriteLock.lock();
-        try {
-            workerNodeInfo.put(workerAddress, info);
-        } finally {
-            workerNodeInfoWriteLock.unlock();
-        }
-    }
-
     /**
      * Add the resource change listener, when the resource changed, the listener will be notified.
      *
@@ -382,10 +366,8 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void notifyWorkerInfoChangeListeners() {
-        Map<String, Set<String>> workerGroupNodes = getWorkerGroupNodes();
-        Map<String, WorkerHeartBeat> workerNodeInfo = getWorkerNodeInfo();
         for (WorkerInfoChangeListener listener : workerInfoChangeListeners) {
-            listener.notify(workerGroupNodes, workerNodeInfo);
+            listener.notify(getWorkerGroupNodes(), getWorkerNodeInfo());
         }
     }
 
