@@ -18,10 +18,10 @@ spring:
   main:
     banner-mode: off
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/whalescheduler?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
     username: root
-    password: root
+    password: root@123
     hikari:
       connection-test-query: select 1
       minimum-idle: 5
@@ -33,22 +33,3 @@ spring:
       idle-timeout: 600000
       leak-detection-threshold: 0
       initialization-fail-timeout: 1
-
-# Override by profile
-
----
-spring:
-  config:
-    activate:
-      on-profile: mysql
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
-
----
-spring:
-  config:
-    activate:
-      on-profile: postgresql
-  datasource:
-    driver-class-name: org.postgresql.Driver

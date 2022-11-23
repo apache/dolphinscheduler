@@ -50,6 +50,7 @@ public class DolphinSchedulerManager {
     private DbType getCurrentDbType(DataSource dataSource) throws Exception {
         try (Connection conn = dataSource.getConnection()) {
             String name = conn.getMetaData().getDatabaseProductName().toUpperCase();
+            logger.info("Current db type: {}", name);
             return DbType.valueOf(name);
         }
     }
@@ -101,6 +102,7 @@ public class DolphinSchedulerManager {
             // The target version of the upgrade
             String schemaVersion = "";
             String currentVersion = version;
+            logger.info("Begin upgrading handle schemaList");
             for (String schemaDir : schemaList) {
                 schemaVersion = schemaDir.split("_")[0];
                 if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {

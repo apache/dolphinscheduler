@@ -32,7 +32,6 @@ public class UpgradeDolphinScheduler {
     }
 
     @Component
-    @Profile("upgrade")
     static class UpgradeRunner implements CommandLineRunner {
         private static final Logger logger = LoggerFactory.getLogger(UpgradeRunner.class);
 

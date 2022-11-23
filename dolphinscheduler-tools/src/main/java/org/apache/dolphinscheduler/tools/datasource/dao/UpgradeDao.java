@@ -291,6 +291,10 @@ public abstract class UpgradeDao {
         String schemaVersion = schemaDir.split("_")[0];
         Resource sqlFilePath = new ClassPathResource(String.format("sql/upgrade/%s/%s/dolphinscheduler_dml.sql", schemaDir, getDbType().name().toLowerCase()));
         logger.info("sqlSQLFilePath: {}", sqlFilePath);
+        if (!sqlFilePath.exists()) {
+            logger.info("sqlSQLFilePath: {} not exist", sqlFilePath);
+            return;
+        }
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -353,6 +357,10 @@ public abstract class UpgradeDao {
      */
     private void upgradeDolphinSchedulerDDL(String schemaDir, String scriptFile) {
         Resource sqlFilePath = new ClassPathResource(String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile));
+        if (!sqlFilePath.exists()) {
+            logger.info("sqlFilePath {} not exist", sqlFilePath);
+            return;
+        }
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -363,6 +371,7 @@ public abstract class UpgradeDao {
             // Execute the dolphinscheduler ddl.sql for the upgrade
             ScriptRunner scriptRunner = new ScriptRunner(conn, true, true);
             Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream());
+            logger.info("Start ddl file: {}-{}", schemaDir, scriptFile);
             scriptRunner.runScript(sqlReader);
 
         } catch (FileNotFoundException e) {
