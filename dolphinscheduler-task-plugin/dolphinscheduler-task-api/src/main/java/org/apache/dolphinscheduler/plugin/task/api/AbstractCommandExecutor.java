@@ -225,7 +225,7 @@ public abstract class AbstractCommandExecutor {
         if (status) {
 
             // SHELL task state
-            result.setExitStatusCode(process.exitValue());
+            result.setExitStatusCode(process == null ? EXIT_CODE_FAILURE : process.exitValue());
 
         } else {
             logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...",
@@ -236,7 +236,7 @@ public abstract class AbstractCommandExecutor {
 
         logger.info(
                 "process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
-                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
+                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process == null ? null : process.exitValue());
         return result;
 
     }
@@ -263,9 +263,9 @@ public abstract class AbstractCommandExecutor {
         logger.info("cancel process: {}", processId);
 
         // kill , waiting for completion
-        boolean killed = softKill(processId);
+        boolean alive = softKill(processId);
 
-        if (!killed) {
+        if (alive) {
             // hard kill
             hardKill(processId);
 
