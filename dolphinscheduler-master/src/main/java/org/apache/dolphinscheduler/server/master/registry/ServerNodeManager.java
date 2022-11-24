@@ -235,7 +235,8 @@ public class ServerNodeManager implements InitializingBean {
         try {
             registryClient.getLock(nodeLock);
             Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
-            syncMasterNodes(currentNodes, registryClient.getServerList(NodeType.MASTER));
+            List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
+            syncMasterNodes(currentNodes, masterNodeList);
         } catch (Exception e) {
             logger.error("update master nodes error", e);
         } finally {
@@ -366,8 +367,10 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void notifyWorkerInfoChangeListeners() {
+        Map<String, Set<String>> workerGroupNodeMap = getWorkerGroupNodes();
+        Map<String, WorkerHeartBeat> workerNodeInfoMap = getWorkerNodeInfo();
         for (WorkerInfoChangeListener listener : workerInfoChangeListeners) {
-            listener.notify(getWorkerGroupNodes(), getWorkerNodeInfo());
+            listener.notify(workerGroupNodeMap, workerNodeInfoMap);
         }
     }
 
