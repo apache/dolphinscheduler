@@ -216,7 +216,7 @@
         <if test="processInstanceName != null and processInstanceName != ''">
             and process.name like concat('%', #{processInstanceName}, '%')
         </if>
-        order by instance.start_time desc
+        order by instance.submit_time desc
     </select>
     <select id="queryStreamTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
