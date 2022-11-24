@@ -129,8 +129,7 @@ public class ServerNodeManager implements InitializingBean {
 
         // load nodes from zookeeper
         updateMasterNodes();
-        updateWorkerNodes();
-        updateWorkerGroupMappings();
+        refreshWorkerNodesAndGroupMappings();
 
         // init executor service
         executorService =
@@ -154,12 +153,20 @@ public class ServerNodeManager implements InitializingBean {
         public void run() {
             try {
                 // sync worker node info
-                updateWorkerNodes();
-                updateWorkerGroupMappings();
+                refreshWorkerNodesAndGroupMappings();
             } catch (Exception e) {
                 logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
+    }
+
+    /**
+     * Refresh worker nodes and worker group mapping information
+     */
+    private void refreshWorkerNodesAndGroupMappings() {
+        updateWorkerNodes();
+        updateWorkerGroupMappings();
+        notifyWorkerInfoChangeListeners();
     }
 
     /**
@@ -283,7 +290,6 @@ public class ServerNodeManager implements InitializingBean {
         try {
             workerGroupNodes.clear();
             workerGroupNodes.putAll(tmpWorkerGroupMappings);
-            notifyWorkerInfoChangeListeners();
         } finally {
             workerGroupWriteLock.unlock();
         }
