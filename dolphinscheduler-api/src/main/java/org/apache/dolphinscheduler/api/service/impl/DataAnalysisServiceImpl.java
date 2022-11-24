@@ -158,14 +158,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                                        TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
         Result result = new Result();
         if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            Map<String, Object> checkResult =
-                    projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-            if (resultStatus != Status.SUCCESS) {
-                putMsg(result, resultStatus);
+            if (checkResult(loginUser, projectCode, result))
                 return result;
-            }
         }
 
         Date start = null;
@@ -211,15 +205,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     @Override
     public Result countDefinitionByUser(User loginUser, long projectCode) {
         Result result = new Result();
-        if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            Map<String, Object> checkResult =
-                    projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-            if (resultStatus != Status.SUCCESS) {
-                putMsg(result, resultStatus);
+        if (projectCode != 0L) {
+            if (checkResult(loginUser, projectCode, result))
                 return result;
-            }
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
@@ -241,6 +229,18 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         result.setData(dto);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    private boolean checkResult(User loginUser, long projectCode, Result result) {
+        Project project = projectMapper.queryByCode(projectCode);
+        Map<String, Object> checkResult =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            putMsg(result, resultStatus);
+            return true;
+        }
+        return false;
     }
 
     /**
