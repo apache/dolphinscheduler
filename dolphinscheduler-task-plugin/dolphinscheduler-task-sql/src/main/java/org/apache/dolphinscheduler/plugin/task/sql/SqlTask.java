@@ -274,7 +274,7 @@ public class SqlTask extends AbstractTask {
             }
         }
         String result = JSONUtils.toJsonString(resultJSONArray);
-        if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
+        if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
                     : taskExecutionContext.getTaskName() + " query result sets", result);
