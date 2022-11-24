@@ -99,11 +99,10 @@ public class DruidDataSourceClient implements DataSourceClient {
         Stopwatch stopwatch = Stopwatch.createStarted();
         try {
             this.jdbcTemplate.execute(this.baseConnectionParam.getValidationQuery());
-        } catch (Exception e) {
-            throw new RuntimeException("JDBC connect failed", e);
-        } finally {
             logger.info("Time to execute check jdbc client with sql {} for {} ms ",
                     this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+        } catch (Exception e) {
+            throw new RuntimeException("JDBC connect failed", e);
         }
     }
 
@@ -112,7 +111,7 @@ public class DruidDataSourceClient implements DataSourceClient {
         try {
             return this.dataSource.getConnection();
         } catch (SQLException e) {
-            logger.error("get druidDataSource Connection fail SQLException: {}", e.getMessage(), e);
+            logger.error("get druidDataSource Connection fail SQLException: ", e);
             return null;
         }
     }
