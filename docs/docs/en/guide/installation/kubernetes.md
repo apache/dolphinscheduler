@@ -479,7 +479,7 @@ common:
 
 ## Appendix-Configuration
 
-|                              Parameter                               |                                                          Description                                                          | Default                               |
+|                              Parameter                               |                                                          Description                                                          |                Default                |
 |----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
 | `timezone`                                                           | World time and date for cities in all time zones                                                                              | `Asia/Shanghai`                       |
 |                                                                      |                                                                                                                               |                                       |
