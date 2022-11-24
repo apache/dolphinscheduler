@@ -199,8 +199,8 @@ public class DependentExecute {
             return lastManualProcess;
         }
 
-        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess
-                : lastSchedulerProcess;
+        // In the time range, there are both manual and scheduled workflow instances, return the last workflow instance
+        return lastManualProcess.getId() > lastSchedulerProcess.getId() ? lastManualProcess : lastSchedulerProcess;
     }
 
     /**
