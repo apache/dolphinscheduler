@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -67,6 +68,8 @@ public class SqoopTask extends AbstractYarnTask {
 
         sqoopTaskExecutionContext =
                 sqoopParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+
+        SensitiveDataConverter.addMaskPattern(SqoopConstants.SQOOP_PASSWORD_REGEX);
     }
 
     @Override

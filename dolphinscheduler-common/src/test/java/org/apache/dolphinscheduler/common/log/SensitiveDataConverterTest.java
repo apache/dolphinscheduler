@@ -15,13 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.log;
-
-import static org.apache.dolphinscheduler.service.log.SensitiveDataConverter.passwordHandler;
-
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
-
-import java.util.regex.Pattern;
+package org.apache.dolphinscheduler.common.log;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,11 +25,6 @@ import org.slf4j.LoggerFactory;
 public class SensitiveDataConverterTest {
 
     private final Logger logger = LoggerFactory.getLogger(SensitiveDataConverterTest.class);
-
-    /**
-     * password pattern
-     */
-    private final Pattern pwdPattern = Pattern.compile(DataSourceConstants.DATASOURCE_PASSWORD_REGEX);
 
     private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
             + "\"database\":\"carbond\","
@@ -49,21 +38,17 @@ public class SensitiveDataConverterTest {
             + "\"user\":\"view\","
             + "\"password\":\"*****\"}";
 
-    @Test
-    public void convert() {
-        Assertions.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
-    }
-
     /**
      * mask sensitive logMsg - sql task datasource password
      */
     @Test
     public void testPwdLogMsgConverter() {
-        logger.info("parameter : {}", logMsg);
-        logger.info("parameter : {}", passwordHandler(pwdPattern, logMsg));
+        final String maskedLog = SensitiveDataConverter.maskSensitiveData(logMsg);
 
-        Assertions.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
-        Assertions.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        logger.info("original parameter : {}", logMsg);
+        logger.info("masked parameter : {}", maskedLog);
+
+        Assertions.assertEquals(maskLogMsg, maskedLog);
 
     }
 
