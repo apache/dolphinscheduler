@@ -15,11 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.log;
+package org.apache.dolphinscheduler.common.log;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,10 +37,9 @@ import com.google.common.base.Strings;
  */
 public class SensitiveDataConverter extends MessageConverter {
 
-    /**
-     * password pattern
-     */
-    private final Pattern pwdPattern = Pattern.compile(DataSourceConstants.DATASOURCE_PASSWORD_REGEX);
+    private static Pattern multilinePattern;
+    private static HashSet<String> maskPatterns =
+            new HashSet<>(Arrays.asList(DataSourceConstants.DATASOURCE_PASSWORD_REGEX));
 
     @Override
     public String convert(ILoggingEvent event) {
@@ -45,41 +48,25 @@ public class SensitiveDataConverter extends MessageConverter {
         String requestLogMsg = event.getFormattedMessage();
 
         // desensitization log
-        return convertMsg(requestLogMsg);
+        return maskSensitiveData(requestLogMsg);
     }
 
-    /**
-     * deal with sensitive log
-     *
-     * @param oriLogMsg original log
-     */
-    private String convertMsg(final String oriLogMsg) {
+    public static void addMaskPattern(String maskPattern) {
+        maskPatterns.add(maskPattern);
+    }
 
-        String tempLogMsg = oriLogMsg;
-
-        if (!Strings.isNullOrEmpty(tempLogMsg)) {
-            tempLogMsg = passwordHandler(pwdPattern, tempLogMsg);
+    public static String maskSensitiveData(final String logMsg) {
+        if (StringUtils.isEmpty(logMsg)) {
+            return logMsg;
         }
-        return tempLogMsg;
-    }
-
-    /**
-     * password regex
-     *
-     * @param logMsg original log
-     */
-    static String passwordHandler(Pattern pwdPattern, String logMsg) {
-
-        Matcher matcher = pwdPattern.matcher(logMsg);
+        multilinePattern = Pattern.compile(String.join("|", maskPatterns), Pattern.MULTILINE);
 
         StringBuffer sb = new StringBuffer(logMsg.length());
+        Matcher matcher = multilinePattern.matcher(logMsg);
 
         while (matcher.find()) {
-
             String password = matcher.group();
-
             String maskPassword = Strings.repeat(Constants.STAR, password.length());
-
             matcher.appendReplacement(sb, maskPassword);
         }
         matcher.appendTail(sb);
