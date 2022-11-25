@@ -81,7 +81,7 @@ public class LoggerController extends BaseController {
                                             @RequestParam(value = "taskInstanceId") int taskInstanceId,
                                             @RequestParam(value = "skipLineNum") int skipNum,
                                             @RequestParam(value = "limit") int limit) {
-        return loggerService.queryLog(taskInstanceId, skipNum, limit);
+        return loggerService.queryLog(loginUser, taskInstanceId, skipNum, limit);
     }
 
     /**
@@ -101,7 +101,7 @@ public class LoggerController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ResponseEntity downloadTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "taskInstanceId") int taskInstanceId) {
-        byte[] logBytes = loggerService.getLogBytes(taskInstanceId);
+        byte[] logBytes = loggerService.getLogBytes(loginUser, taskInstanceId);
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
