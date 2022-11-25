@@ -266,7 +266,7 @@ export default {
                             },
                             {
                                 title: 'Slack',
-                                link: '/en-us/docs/dev/user_doc/guide/alert/slack.html',
+                                link: '/en-us/docs/3.0.2/user_doc/guide/alert/slack.html',
                             },
                         ],
                     },
@@ -385,7 +385,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/3.0.2/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: 'Health Check',
@@ -804,7 +804,7 @@ export default {
                             },
                             {
                                 title: 'Slack告警',
-                                link: '/zh-cn/docs/dev/user_doc/guide/alert/slack.html',
+                                link: '/zh-cn/docs/3.0.2/user_doc/guide/alert/slack.html',
                             },
                         ],
                     },
@@ -923,7 +923,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/3.0.2/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: '健康检查',
