@@ -375,7 +375,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         List<TaskInstance> taskInstanceList =
                 taskInstanceDao.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
-        addDependResultForTaskList(taskInstanceList);
+        addDependResultForTaskList(loginUser, taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
         resultMap.put(TASK_LIST, taskInstanceList);
@@ -388,12 +388,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * add dependent result for dependent task
      */
-    private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
+    private void addDependResultForTaskList(User loginUser, List<TaskInstance> taskInstanceList) throws IOException {
         for (TaskInstance taskInstance : taskInstanceList) {
             if (TASK_TYPE_DEPENDENT.equalsIgnoreCase(taskInstance.getTaskType())) {
                 logger.info("DEPENDENT type task instance need to set dependent result, taskCode:{}, taskInstanceId:{}",
                         taskInstance.getTaskCode(), taskInstance.getId());
-                Result<ResponseTaskLog> logResult = loggerService.queryLog(
+                Result<ResponseTaskLog> logResult = loggerService.queryLog(loginUser,
                         taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {
                     String log = logResult.getData().getMessage();
