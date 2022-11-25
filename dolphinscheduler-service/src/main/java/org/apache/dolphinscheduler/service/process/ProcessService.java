@@ -83,7 +83,7 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void deleteWorkTaskInstanceByProcessInstanceId(ProcessInstance processInstance);
+    void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId);
 
     void recurseFindSubProcess(long parentCode, List<Long> ids);
 

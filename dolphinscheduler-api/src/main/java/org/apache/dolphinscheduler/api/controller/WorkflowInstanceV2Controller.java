@@ -3,7 +3,6 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -12,7 +11,6 @@ import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
@@ -51,23 +49,16 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public WorkflowInstanceListPagingResponse queryWorkflowInstanceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                              @RequestBody WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
+    public Result queryWorkflowInstanceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @RequestBody WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
         Result result =
                 checkPageParams(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
         if (!result.checkResult()) {
-            return new WorkflowInstanceListPagingResponse(result);
+            return result;
         }
 
-        String searchVal = ParameterUtils.handleEscapes(workflowInstanceQueryRequest.getSearchVal());
-        result = processInstanceService.queryProcessInstanceList(loginUser,
-                workflowInstanceQueryRequest.getProjectName(),
-                workflowInstanceQueryRequest.getWorkflowName(), workflowInstanceQueryRequest.getStartTime(),
-                workflowInstanceQueryRequest.getEndTime(), searchVal,
-                workflowInstanceQueryRequest.getExecutorName(), workflowInstanceQueryRequest.getStateType(),
-                workflowInstanceQueryRequest.getHost(), workflowInstanceQueryRequest.getPageNo(),
-                workflowInstanceQueryRequest.getPageSize());
-        return new WorkflowInstanceListPagingResponse(result);
+        result = processInstanceService.queryProcessInstanceList(loginUser, workflowInstanceQueryRequest);
+        return result;
     }
 
     /**
@@ -85,10 +76,10 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public WorkflowInstanceListPagingResponse queryWorkflowInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                        @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
+    public Result queryWorkflowInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, workflowInstanceId);
-        return new WorkflowInstanceListPagingResponse(returnDataList(result));
+        return returnDataList(result);
     }
 
     /**
@@ -106,10 +97,10 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public WorkflowInstanceListPagingResponse deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                     @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
+    public Result deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         processInstanceService.deleteProcessInstanceById(loginUser, workflowInstanceId);
-        return new WorkflowInstanceListPagingResponse(Result.success());
+        return Result.success();
     }
 
     /**
@@ -129,10 +120,10 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public WorkflowInstanceListPagingResponse execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                      @PathVariable("workflowInstanceId") Integer workflowInstanceId,
-                                                      @PathVariable("executeType") ExecuteType executeType) {
+    public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                          @PathVariable("workflowInstanceId") Integer workflowInstanceId,
+                          @PathVariable("executeType") ExecuteType executeType) {
         Map<String, Object> result = execService.execute(loginUser, workflowInstanceId, executeType);
-        return new WorkflowInstanceListPagingResponse(returnDataList(result));
+        return returnDataList(result);
     }
 }

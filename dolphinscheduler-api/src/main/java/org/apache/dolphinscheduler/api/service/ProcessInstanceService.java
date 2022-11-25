@@ -18,6 +18,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -98,28 +99,11 @@ public interface ProcessInstanceService {
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param processDefineName process definition name
-     * @param searchVal search value
-     * @param stateType state type
-     * @param host host
-     * @param startDate start time
-     * @param endDate end time
+     * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
      * @return process instance list
      */
     Result queryProcessInstanceList(User loginUser,
-                                    String projectName,
-                                    String processDefineName,
-                                    String startDate,
-                                    String endDate,
-                                    String searchVal,
-                                    String executorName,
-                                    WorkflowExecutionStatus stateType,
-                                    String host,
-                                    Integer pageNo,
-                                    Integer pageSize);
+                                    WorkflowInstanceQueryRequest workflowInstanceQueryRequest);
 
     /**
      * query task list by process instance id

@@ -266,4 +266,14 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode,
                                            @Param("state") int state, @Param("id") int id);
+
+    /**
+     * Filter process instance
+     *
+     * @param page page
+     * @param processInstance process instance object
+     * @return process instance IPage
+     */
+    IPage<ProcessInstance> queryProcessInstanceListV2Paging(Page<ProcessInstance> page,
+                                                            @Param("ps") ProcessInstance processInstance);
 }

@@ -274,6 +274,22 @@
         and id <![CDATA[ > ]]> #{id}
         order by id asc limit 1
     </select>
+    <select id="queryProcessInstanceListV2Paging"
+            parameterType="org.apache.dolphinscheduler.dao.entity.ProcessInstance"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_process_instance
+        <where>
+            <if test=" ps.processDefinitionCode != 0">
+                and process_definition_code = #{ps.processDefinitionCode}
+            </if>
+            <if test=" ps.name != null and ps.name != ''">
+                and name like concat('%', #{ps.name}, '%')
+            </if>
+        </where>
+        order by update_time desc, id asc
+    </select>
     <update id="updateGlobalParamsById">
         update t_ds_process_instance
         set global_params = #{globalParams}

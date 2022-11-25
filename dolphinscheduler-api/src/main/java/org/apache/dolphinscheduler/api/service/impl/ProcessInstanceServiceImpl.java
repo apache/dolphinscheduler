@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
@@ -33,6 +31,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -364,29 +363,54 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param processDefineName process definition name
-     * @param searchVal search value
-     * @param stateType state type
-     * @param host host
-     * @param startDate start time
-     * @param endDate end time
+     * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
      * @return process instance list
      */
     @Override
-    public Result queryProcessInstanceList(User loginUser, String projectName, String processDefineName,
-                                           String startDate, String endDate, String searchVal, String executorName,
-                                           WorkflowExecutionStatus stateType, String host, Integer pageNo,
-                                           Integer pageSize) {
-        Project project = projectMapper.queryByName(projectName);
-        ProcessDefinition processDefinition =
-                processDefineMapper.queryByDefineName(project.getCode(), processDefineName);
+    public Result queryProcessInstanceList(User loginUser, WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
+        Result result = new Result();
+        ProcessInstance processInstance = workflowInstanceQueryRequest.convert2ProcessInstance();
+        String projectName = workflowInstanceQueryRequest.getProjectName();
+        if (!StringUtils.isBlank(projectName)) {
+            Project project = projectMapper.queryByName(projectName);
+            projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+            ProcessDefinition processDefinition =
+                    processDefineMapper.queryByDefineName(project.getCode(), processInstance.getName());
+            processInstance.setProcessDefinitionCode(processDefinition.getCode());
+        }
 
-        return queryProcessInstanceList(loginUser, project.getCode(), processDefinition.getCode(),
-                startDate, endDate, searchVal, executorName, stateType,
-                host, null, pageNo, pageSize);
+        Page<ProcessInstance> page =
+                new Page<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
+        PageInfo<ProcessInstance> pageInfo =
+                new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
+
+        IPage<ProcessInstance> processInstanceList =
+                processInstanceMapper.queryProcessInstanceListV2Paging(page, processInstance);
+
+        List<ProcessInstance> processInstances = processInstanceList.getRecords();
+        List<Integer> userIds = Collections.emptyList();
+        if (CollectionUtils.isNotEmpty(processInstances)) {
+            userIds = processInstances.stream().map(ProcessInstance::getExecutorId).collect(Collectors.toList());
+        }
+        List<User> users = usersService.queryUser(userIds);
+        Map<Integer, User> idToUserMap = Collections.emptyMap();
+        if (CollectionUtils.isNotEmpty(users)) {
+            idToUserMap = users.stream().collect(Collectors.toMap(User::getId, Function.identity()));
+        }
+
+        for (ProcessInstance Instance : processInstances) {
+            Instance.setDuration(WorkflowUtils.getWorkflowInstanceDuration(Instance));
+            User executor = idToUserMap.get(Instance.getExecutorId());
+            if (null != executor) {
+                Instance.setExecutorName(executor.getUserName());
+            }
+        }
+
+        pageInfo.setTotal((int) processInstanceList.getTotal());
+        pageInfo.setTotalList(processInstances);
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     /**
@@ -793,7 +817,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
-        processService.deleteWorkTaskInstanceByProcessInstanceId(processInstance);
+        processService.deleteWorkTaskInstanceByProcessInstanceId(processInstanceId);
 
         if (delete > 0) {
             logger.info(
@@ -820,7 +844,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     @Override
     public Map<String, Object> deleteProcessInstanceById(User loginUser, Integer workflowInstanceId) {
-        ProcessInstance processInstance = processInstanceMapper.selectById(workflowInstanceId);
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(workflowInstanceId)
+                .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, workflowInstanceId));
         ProcessDefinition processDefinition =
                 processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
 
