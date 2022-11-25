@@ -264,6 +264,22 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     }
 
     /**
+     * query workflow instance by id
+     *
+     * @param loginUser login user
+     * @param workflowInstanceId workflow instance id
+     * @return workflow instance detail
+     */
+    @Override
+    public Map<String, Object> queryProcessInstanceById(User loginUser, Integer workflowInstanceId) {
+        ProcessInstance processInstance = processInstanceMapper.selectById(workflowInstanceId);
+        ProcessDefinition processDefinition =
+                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+
+        return queryProcessInstanceById(loginUser, processDefinition.getProjectCode(), workflowInstanceId);
+    }
+
+    /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
      * @param loginUser login user
@@ -342,6 +358,35 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param processDefineName process definition name
+     * @param searchVal search value
+     * @param stateType state type
+     * @param host host
+     * @param startDate start time
+     * @param endDate end time
+     * @return process instance list
+     */
+    @Override
+    public Result queryProcessInstanceList(User loginUser, String projectName, String processDefineName,
+                                           String startDate, String endDate, String searchVal, String executorName,
+                                           WorkflowExecutionStatus stateType, String host, Integer pageNo,
+                                           Integer pageSize) {
+        Project project = projectMapper.queryByName(projectName);
+        ProcessDefinition processDefinition =
+                processDefineMapper.queryByDefineName(project.getCode(), processDefineName);
+
+        return queryProcessInstanceList(loginUser, project.getCode(), processDefinition.getCode(),
+                startDate, endDate, searchVal, executorName, stateType,
+                host, null, pageNo, pageSize);
     }
 
     /**
@@ -748,7 +793,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
-        processService.deleteWorkTaskInstanceByProcessInstanceId(processInstanceId);
+        processService.deleteWorkTaskInstanceByProcessInstanceId(processInstance);
 
         if (delete > 0) {
             logger.info(
@@ -764,6 +809,22 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         return result;
+    }
+
+    /**
+     * delete workflow instance by id, at the same time，delete task instance and their mapping relation data
+     *
+     * @param loginUser login user
+     * @param workflowInstanceId workflow instance id
+     * @return delete result code
+     */
+    @Override
+    public Map<String, Object> deleteProcessInstanceById(User loginUser, Integer workflowInstanceId) {
+        ProcessInstance processInstance = processInstanceMapper.selectById(workflowInstanceId);
+        ProcessDefinition processDefinition =
+                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+
+        return deleteProcessInstanceById(loginUser, processDefinition.getProjectCode(), workflowInstanceId);
     }
 
     /**

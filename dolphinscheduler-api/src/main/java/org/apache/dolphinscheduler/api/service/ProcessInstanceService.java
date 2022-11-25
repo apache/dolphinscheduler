@@ -56,6 +56,16 @@ public interface ProcessInstanceService {
                                                  Integer processId);
 
     /**
+     * query process instance by id
+     *
+     * @param loginUser login user
+     * @param processId process instance id
+     * @return process instance detail
+     */
+    Map<String, Object> queryProcessInstanceById(User loginUser,
+                                                 Integer processId);
+
+    /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
      * @param loginUser login user
@@ -81,6 +91,33 @@ public interface ProcessInstanceService {
                                     WorkflowExecutionStatus stateType,
                                     String host,
                                     String otherParamsJson,
+                                    Integer pageNo,
+                                    Integer pageSize);
+
+    /**
+     * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param processDefineName process definition name
+     * @param searchVal search value
+     * @param stateType state type
+     * @param host host
+     * @param startDate start time
+     * @param endDate end time
+     * @return process instance list
+     */
+    Result queryProcessInstanceList(User loginUser,
+                                    String projectName,
+                                    String processDefineName,
+                                    String startDate,
+                                    String endDate,
+                                    String searchVal,
+                                    String executorName,
+                                    WorkflowExecutionStatus stateType,
+                                    String host,
                                     Integer pageNo,
                                     Integer pageSize);
 
@@ -162,6 +199,16 @@ public interface ProcessInstanceService {
     Map<String, Object> deleteProcessInstanceById(User loginUser,
                                                   long projectCode,
                                                   Integer processInstanceId);
+
+    /**
+     * delete process instance by id, at the same time，delete task instance and their mapping relation data
+     *
+     * @param loginUser login user
+     * @param workflowInstanceId work instance id
+     * @return delete result code
+     */
+    Map<String, Object> deleteProcessInstanceById(User loginUser,
+                                                  Integer workflowInstanceId);
 
     /**
      * view process instance variables
