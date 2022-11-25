@@ -77,6 +77,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * view log
      *
+     * @param loginUser   login user
      * @param taskInstId task instance id
      * @param skipLineNum skip line number
      * @param limit limit
@@ -84,7 +85,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Result<ResponseTaskLog> queryLog(int taskInstId, int skipLineNum, int limit) {
+    public Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit) {
 
         TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
 
@@ -96,6 +97,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             logger.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
+        Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
         Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
         String log = queryLog(taskInstance, skipLineNum, limit);
         int lineNum = log.split("\\r\\n").length;
@@ -106,15 +109,18 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * get log size
      *
+     * @param loginUser   login user
      * @param taskInstId task instance id
      * @return log byte array
      */
     @Override
-    public byte[] getLogBytes(int taskInstId) {
+    public byte[] getLogBytes(User loginUser, int taskInstId) {
         TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }
+        Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
         return getLogBytes(taskInstance);
     }
 

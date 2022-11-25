@@ -99,34 +99,44 @@ public class LowerWeightHostManager extends CommonHostManager {
         public void notify(Map<String, Set<String>> workerGroups, Map<String, WorkerHeartBeat> workerNodeInfo) {
             syncWorkerResources(workerGroups, workerNodeInfo);
         }
-    }
 
-    /**
-     * Sync worker resource.
-     *
-     * @param workerGroupNodes  worker group nodes, key is worker group, value is worker group nodes.
-     * @param workerNodeInfoMap worker node info map, key is worker node, value is worker info.
-     */
-    private void syncWorkerResources(final Map<String, Set<String>> workerGroupNodes,
-                                     final Map<String, WorkerHeartBeat> workerNodeInfoMap) {
-        try {
-            Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
-            for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
-                String workerGroup = entry.getKey();
-                Set<String> nodes = entry.getValue();
-                Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
-                for (String node : nodes) {
-                    WorkerHeartBeat heartbeat = workerNodeInfoMap.getOrDefault(node, null);
-                    Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, heartbeat);
-                    hostWeightOpt.ifPresent(hostWeights::add);
+        /**
+         * Sync worker resource.
+         *
+         * @param workerGroupNodes  worker group nodes, key is worker group, value is worker group nodes.
+         * @param workerNodeInfoMap worker node info map, key is worker node, value is worker info.
+         */
+        private void syncWorkerResources(final Map<String, Set<String>> workerGroupNodes,
+                                         final Map<String, WorkerHeartBeat> workerNodeInfoMap) {
+            try {
+                Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
+                for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
+                    String workerGroup = entry.getKey();
+                    Set<String> nodes = entry.getValue();
+                    Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
+                    for (String node : nodes) {
+                        WorkerHeartBeat heartbeat = workerNodeInfoMap.getOrDefault(node, null);
+                        Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, heartbeat);
+                        hostWeightOpt.ifPresent(hostWeights::add);
+                    }
+                    if (!hostWeights.isEmpty()) {
+                        workerHostWeights.put(workerGroup, hostWeights);
+                    }
                 }
-                if (!hostWeights.isEmpty()) {
-                    workerHostWeights.put(workerGroup, hostWeights);
-                }
+                syncWorkerHostWeight(workerHostWeights);
+            } catch (Throwable ex) {
+                logger.error("Sync worker resource error", ex);
             }
-            syncWorkerHostWeight(workerHostWeights);
-        } catch (Throwable ex) {
-            logger.error("Sync worker resource error", ex);
+        }
+
+        private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
+            lock.lock();
+            try {
+                workerHostWeightsMap.clear();
+                workerHostWeightsMap.putAll(workerHostWeights);
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -153,16 +163,6 @@ public class LowerWeightHostManager extends CommonHostManager {
                         heartBeat.getLoadAverage(),
                         heartBeat.getWorkerWaitingTaskCount(),
                         heartBeat.getStartupTime()));
-    }
-
-    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
-        lock.lock();
-        try {
-            workerHostWeightsMap.clear();
-            workerHostWeightsMap.putAll(workerHostWeights);
-        } finally {
-            lock.unlock();
-        }
     }
 
     private Set<HostWeight> getWorkerHostWeights(String workerGroup) {

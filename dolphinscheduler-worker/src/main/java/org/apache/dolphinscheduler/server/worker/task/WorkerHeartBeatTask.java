@@ -59,9 +59,8 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
         double reservedMemory = workerConfig.getReservedMemory();
         double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
         int execThreads = workerConfig.getExecThreads();
-        int workerWaitingTaskCount = this.workerWaitingTaskCount.get();
         int serverStatus = getServerStatus(loadAverage, maxCpuLoadAvg, availablePhysicalMemorySize, reservedMemory,
-                execThreads, workerWaitingTaskCount);
+                execThreads, this.workerWaitingTaskCount.get());
 
         return WorkerHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
@@ -86,7 +85,7 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
         String workerHeartBeatJson = JSONUtils.toJsonString(workerHeartBeat);
         String workerRegistryPath = workerConfig.getWorkerRegistryPath();
         registryClient.persistEphemeral(workerRegistryPath, workerHeartBeatJson);
-        log.info(
+        log.debug(
                 "Success write worker group heartBeatInfo into registry, workerRegistryPath: {} workerHeartBeatInfo: {}",
                 workerRegistryPath, workerHeartBeatJson);
     }

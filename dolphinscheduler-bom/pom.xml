@@ -101,6 +101,7 @@
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
         <aspectj.version>1.9.7</aspectj.version>
         <zt-zip.version>1.15</zt-zip.version>
+        <trino-jdbc.version>402</trino-jdbc.version>
     </properties>
 
     <dependencyManagement>
@@ -694,6 +695,12 @@
                 <groupId>org.springframework.ldap</groupId>
                 <artifactId>spring-ldap-core</artifactId>
                 <version>${spring-ldap.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.trino</groupId>
+                <artifactId>trino-jdbc</artifactId>
+                <version>${trino-jdbc.version}</version>
             </dependency>
 
             <dependency>

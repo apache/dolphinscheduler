@@ -43,7 +43,7 @@ A: This is the python connection Zookeeper needs to use, it is used to delete th
 
 ## Q: How to specify the machine running task
 
-A: version 1.2 and berfore, Use **the administrator** to create a Worker group, **specify the Worker group** when the **process definition starts**, or **specify the Worker group on the task node**. If not specified, use Default, **Default is to select one of all the workers in the cluster to use for task submission and execution.**
+A: version 1.2 and before, Use **the administrator** to create a Worker group, **specify the Worker group** when the **process definition starts**, or **specify the Worker group on the task node**. If not specified, use Default, **Default is to select one of all the workers in the cluster to use for task submission and execution.**
 version 1.3, you can set worker group for the worker
 
 ---
@@ -101,7 +101,7 @@ A:   1, first **check whether the MasterServer service exists through jps**, or 
 
 A:   1, **first check whether the WorkerServer service exists through jps**, or directly check whether there is a worker service in zk from the service monitoring.
 
-​       2,If the **WorkerServer** service is normal, you need to **check whether the MasterServer puts the task task in the zk queue. You need to check whether the task is blocked in the MasterServer log and the zk queue.**
+​       2,If the **WorkerServer** service is normal, you need to **check whether the MasterServer puts the task in the zk queue. You need to check whether the task is blocked in the MasterServer log and the zk queue.**
 
 ​       3, if there is no problem above, you need to locate whether the Worker group is specified, but **the machine grouped by the worker is not online**.
 
@@ -365,7 +365,7 @@ A: The license of mysql jdbc connector is not compatible with apache v2 license,
 
 ---
 
-## Q : Allways fail when a task instance submit multiple yarn application
+## Q : Always fail when a task instance submit multiple yarn application
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/16174111/81312485-476e9380-90b9-11ea-9aad-ed009db899b1.png" width="60%" />
@@ -411,7 +411,7 @@ A: This problem is solved in dev-1.3.0. This [pr](https://github.com/apache/dolp
    <img src="https://user-images.githubusercontent.com/51871547/80302626-b1478d00-87dd-11ea-97d4-08aa2244a6d0.jpg" width="60%" />
  </p>
 
-A: This [bug](https://github.com/apache/dolphinscheduler/issues/1477) describe the problem detail and it has been been solved in version 1.2.1.
+A: This [bug](https://github.com/apache/dolphinscheduler/issues/1477) describe the problem detail and it has been solved in version 1.2.1.
 
 For version under 1.2.1, some tips for this situation:
 
@@ -441,7 +441,7 @@ $cat /etc/hosts
 10.3.57.15
 ```
 
-Hostname cmd return server hostname, hostname -i return all matched ips configured in /etc/hosts. So after I delete the hostname matched with 127.0.0.1, and only remain internal ip resolution, instead of remove all the 127.0.0.1 resolution record. As long as hostname cmd return the correct internal ip configured in /etc/hosts can fix this bug. DolphinScheduler use the first record returned by hostname -i command. In my opion, DS should not use hostname -i to get the ip , as in many companies the devops configured the server name, we suggest use ip configured in configuration file or znode instead of /etc/hosts.
+Hostname cmd return server hostname, hostname -i return all matched ips configured in /etc/hosts. So after I delete the hostname matched with 127.0.0.1, and only remain internal ip resolution, instead of remove all the 127.0.0.1 resolution record. As long as hostname cmd return the correct internal ip configured in /etc/hosts can fix this bug. DolphinScheduler use the first record returned by hostname -i command. In my opinion, DS should not use hostname -i to get the ip , as in many companies the devops configured the server name, we suggest use ip configured in configuration file or znode instead of /etc/hosts.
 
 ---
 
@@ -490,7 +490,7 @@ A: 1, Edit project root dir maven config file, remove scope test property so tha
 ```
 
 ​	2, Edit application-dao.properties and quzrtz.properties config file to use mysql driver.
-Default is postgresSql driver because of license problem.
+Default is postgresql driver because of license problem.
 
 ---
 
@@ -498,7 +498,7 @@ Default is postgresSql driver because of license problem.
 
 A: 1, Where is the executed server? Specify one worker to run the task, you can create worker group in Security Center, then the task can be send to the particular worker. If a worker group have multiple servers, which server actually execute is determined by scheduling and has randomness.
 
-​	2, If it is a shell file of a path on the server, how to point to the path? The server shell file, involving permissions issues, it is not recommended to do so. It is recommended that you use the storage function of the resource center, and then use the resource reference in the shell editor. The system will help you download the script to the execution directory. If the task dependent on resource center files, worker use "hdfs dfs -get" to get the resource files in HDFS, then run the task in /tmp/escheduler/exec/process, this path can be customized when installtion dolphinscheduler.
+​	2, If it is a shell file of a path on the server, how to point to the path? The server shell file, involving permissions issues, it is not recommended to do so. It is recommended that you use the storage function of the resource center, and then use the resource reference in the shell editor. The system will help you download the script to the execution directory. If the task dependent on resource center files, worker use "hdfs dfs -get" to get the resource files in HDFS, then run the task in /tmp/escheduler/exec/process, this path can be customized when installing dolphinscheduler.
 
 3, Which user execute the task? Task is run by the tenant through "sudo -u ${tenant}", tenant is a linux user.
 
@@ -527,7 +527,7 @@ A: 1, modify application_master.properties, for example: server.port=12345.
 
 ## Q : Scheduled tasks cannot be online
 
-A: 1, We can successly create scheduled task and add one record into t_scheduler_schedules table, but when I click online, front page no reaction and will lock table t_scheduler_schedules, and tested set field release_state value to 1 in table t_scheduler_schedules, and task display online state. For DS version above 1.2 table name is t_ds_schedules, other version table name is t_scheduler_schedules.
+A: 1, We can successfully create scheduled task and add one record into t_scheduler_schedules table, but when I click online, front page no reaction and will lock table t_scheduler_schedules, and tested set field release_state value to 1 in table t_scheduler_schedules, and task display online state. For DS version above 1.2 table name is t_ds_schedules, other version table name is t_scheduler_schedules.
 
 ---
 
@@ -581,7 +581,7 @@ A: 1, It is currently judged according to natural days, at the end of last month
 
 ---
 
-## Q : DS Backend Inteface Document
+## Q : DS Backend Interface Document
 
 A: 1, http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=en.
 

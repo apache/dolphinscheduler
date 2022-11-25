@@ -372,3 +372,4 @@ jdom2-2.0.6.1.jar
 jettison-1.1.jar
 stax-api-1.0.1.jar
 commons-pool2-2.11.1.jar
+trino-jdbc-402.jar
