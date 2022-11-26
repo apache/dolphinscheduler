@@ -21,7 +21,7 @@
 
 ## 发布 pydolphinscheduler 到 PyPI
 
-需要将 Python API 发布到 PyPI，请参考 [Python API release](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-python/pydolphinscheduler/RELEASE.md#to-pypi)
+需要将 Python API 发布到 PyPI，请参考 [Python API release](https://github.com/apache/dolphinscheduler-sdk-python/blob/main/RELEASE.md)
 完成 PyPI 的发版
 
 ## 获取全部的贡献者

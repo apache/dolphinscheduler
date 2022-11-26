@@ -22,7 +22,7 @@ We could reuse the main command the CI run and publish our Docker images to Dock
 
 ## Publish pydolphinscheduler to PyPI
 
-Python API need to release to PyPI for easier download and use, you can see more detail in [Python API release](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-python/pydolphinscheduler/RELEASE.md#to-pypi)
+Python API need to release to PyPI for easier download and use, you can see more detail in [Python API release](https://github.com/apache/dolphinscheduler-sdk-python/blob/main/RELEASE.md)
 to finish PyPI release.
 
 ## Get All Contributors
