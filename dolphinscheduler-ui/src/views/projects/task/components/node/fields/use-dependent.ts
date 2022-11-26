@@ -239,7 +239,6 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   watch(
     () => model.dependTaskList,
     (value) => {
-      debugger
       selectOptions.value = []
       value.forEach((item: IDependTask, taskIndex: number) => {
         if (!item.dependItemList?.length) return
@@ -290,7 +289,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 const itemListOptions = options?.dependItemList || []
                 const itemOptions = {} as IDependentItemOptions
                 itemOptions.definitionCodeOptions = await getProcessList(projectCode)
-                itemListOptions[j] = itemOptions;
+                itemListOptions[j] = itemOptions
                 options.dependItemList = itemListOptions
                 selectOptions.value[i] = options
                 item.depTaskCode = null
@@ -347,7 +346,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               filterable: true
             },
             options:
-                selectOptions.value[i]?.dependItemList[j]?.depTaskCodeOptions ||
+              selectOptions.value[i]?.dependItemList[j]?.depTaskCodeOptions ||
               [],
             path: `dependTaskList.${i}.dependItemList.${j}.depTaskCode`,
             rule: {
@@ -390,7 +389,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 10,
             name: ' ',
             options:
-                selectOptions.value[i]?.dependItemList[j]?.dateOptions || [],
+              selectOptions.value[i]?.dependItemList[j]?.dateOptions || [],
             path: `dependTaskList.${i}.dependItemList.${j}.dateValue`,
             rule: {
               trigger: ['input', 'blur'],
