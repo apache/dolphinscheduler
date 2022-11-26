@@ -1398,28 +1398,28 @@ packages:
     hasBin: true
     requiresBuild: true
     optionalDependencies:
-      '@esbuild/android-arm': registry.npmmirror.com/@esbuild/android-arm/0.15.8
-      '@esbuild/linux-loong64': registry.npmmirror.com/@esbuild/linux-loong64/0.15.8
-      esbuild-android-64: registry.npmmirror.com/esbuild-android-64/0.15.8
-      esbuild-android-arm64: registry.npmmirror.com/esbuild-android-arm64/0.15.8
-      esbuild-darwin-64: registry.npmmirror.com/esbuild-darwin-64/0.15.8
-      esbuild-darwin-arm64: registry.npmmirror.com/esbuild-darwin-arm64/0.15.8
-      esbuild-freebsd-64: registry.npmmirror.com/esbuild-freebsd-64/0.15.8
-      esbuild-freebsd-arm64: registry.npmmirror.com/esbuild-freebsd-arm64/0.15.8
-      esbuild-linux-32: registry.npmmirror.com/esbuild-linux-32/0.15.8
-      esbuild-linux-64: registry.npmmirror.com/esbuild-linux-64/0.15.8
-      esbuild-linux-arm: registry.npmmirror.com/esbuild-linux-arm/0.15.8
-      esbuild-linux-arm64: registry.npmmirror.com/esbuild-linux-arm64/0.15.8
-      esbuild-linux-mips64le: registry.npmmirror.com/esbuild-linux-mips64le/0.15.8
-      esbuild-linux-ppc64le: registry.npmmirror.com/esbuild-linux-ppc64le/0.15.8
-      esbuild-linux-riscv64: registry.npmmirror.com/esbuild-linux-riscv64/0.15.8
-      esbuild-linux-s390x: registry.npmmirror.com/esbuild-linux-s390x/0.15.8
-      esbuild-netbsd-64: registry.npmmirror.com/esbuild-netbsd-64/0.15.8
-      esbuild-openbsd-64: registry.npmmirror.com/esbuild-openbsd-64/0.15.8
-      esbuild-sunos-64: registry.npmmirror.com/esbuild-sunos-64/0.15.8
-      esbuild-windows-32: registry.npmmirror.com/esbuild-windows-32/0.15.8
-      esbuild-windows-64: registry.npmmirror.com/esbuild-windows-64/0.15.8
-      esbuild-windows-arm64: registry.npmmirror.com/esbuild-windows-arm64/0.15.8
+      '@esbuild/android-arm': 0.15.8
+      '@esbuild/linux-loong64': 0.15.8
+      esbuild-android-64: 0.15.8
+      esbuild-android-arm64: 0.15.8
+      esbuild-darwin-64: 0.15.8
+      esbuild-darwin-arm64: 0.15.8
+      esbuild-freebsd-64: 0.15.8
+      esbuild-freebsd-arm64: 0.15.8
+      esbuild-linux-32: 0.15.8
+      esbuild-linux-64: 0.15.8
+      esbuild-linux-arm: 0.15.8
+      esbuild-linux-arm64: 0.15.8
+      esbuild-linux-mips64le: 0.15.8
+      esbuild-linux-ppc64le: 0.15.8
+      esbuild-linux-riscv64: 0.15.8
+      esbuild-linux-s390x: 0.15.8
+      esbuild-netbsd-64: 0.15.8
+      esbuild-openbsd-64: 0.15.8
+      esbuild-sunos-64: 0.15.8
+      esbuild-windows-32: 0.15.8
+      esbuild-windows-64: 0.15.8
+      esbuild-windows-arm64: 0.15.8
     dev: true
 
   /escalade/3.1.1:
@@ -2006,7 +2006,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: 4.2.10
     dev: true
 
   /klona/2.0.5:
@@ -2023,13 +2023,13 @@ packages:
       parse-node-version: 1.0.1
       tslib: 2.4.0
     optionalDependencies:
-      errno: registry.npmmirror.com/errno/0.1.8
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
-      image-size: registry.npmmirror.com/image-size/0.5.5
-      make-dir: registry.npmmirror.com/make-dir/2.1.0
-      mime: registry.npmmirror.com/mime/1.6.0
-      needle: registry.npmmirror.com/needle/3.1.0
-      source-map: registry.npmmirror.com/source-map/0.6.1
+      errno: 0.1.8
+      graceful-fs: 4.2.10
+      image-size: 0.5.5
+      make-dir: 2.1.0
+      mime: 1.6.0
+      needle: 3.1.0
+      source-map: 0.6.1
     dev: true
 
   /levn/0.4.1:
@@ -2523,7 +2523,7 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
-      fsevents: registry.npmmirror.com/fsevents/2.3.2
+      fsevents: 2.3.2
     dev: true
 
   /run-parallel/1.2.0:
@@ -2878,7 +2878,7 @@ packages:
       rollup: 2.78.1
       sass: 1.54.9
     optionalDependencies:
-      fsevents: registry.npmmirror.com/fsevents/2.3.2
+      fsevents: 2.3.2
     dev: true
 
   /vue-demi/0.13.11_vue@3.2.39:
@@ -3088,9 +3088,9 @@ packages:
     name: css-render
     version: 0.15.11
     dependencies:
-      '@emotion/hash': registry.npmmirror.com/@emotion/hash/0.8.0
-      '@types/node': registry.npmmirror.com/@types/node/17.0.45
-      csstype: registry.npmmirror.com/csstype/3.0.11
+      '@emotion/hash': 0.8.0
+      '@types/node': 17.0.45
+      csstype: 3.0.11
     dev: false
 
   registry.npmmirror.com/csstype/3.0.11:
@@ -3107,7 +3107,7 @@ packages:
     peerDependencies:
       date-fns: '>=2.0.0'
     dependencies:
-      date-fns: registry.npmmirror.com/date-fns/2.29.3
+      date-fns: 2.29.3
     dev: false
 
   registry.npmmirror.com/date-fns/2.29.3:
@@ -3137,7 +3137,7 @@ packages:
     os: [android]
     requiresBuild: true
     dependencies:
-      esbuild-wasm: registry.npmmirror.com/esbuild-wasm/0.15.8
+      esbuild-wasm: 0.15.8
     dev: true
     optional: true
 
