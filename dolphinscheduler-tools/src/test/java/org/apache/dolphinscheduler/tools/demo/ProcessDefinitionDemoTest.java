@@ -17,48 +17,25 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
-import io.netty.util.internal.ReflectionUtil;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import static org.mockito.ArgumentMatchers.eq;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import org.springframework.util.ReflectionUtils;
-
-import static org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum.PARALLEL;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessDefinitionDemoTest {
-    
-    @Mock
-    ProjectMapper projectMapper;
-    
-    @Mock
-    UserMapper userMapper;
-    
+
     @Mock
     ProxyProcessDefinitionController proxyProcessDefinitionController;
-    
+
     @InjectMocks
     ProcessDefinitionDemo processDefinitionDemo;
-    
+
     @Test
     void swicthDemo() {
         Mockito.doReturn(ProxyResult.success("ok"))
@@ -74,13 +51,12 @@ class ProcessDefinitionDemoTest {
                         Mockito.anyString(),
                         Mockito.anyString(),
                         Mockito.anyString(),
-                        Mockito.any()
-                );
+                        Mockito.any());
         ProxyResult proxyResult = processDefinitionDemo.swicthDemo("test", 1L, "test");
         Assertions.assertNotNull(proxyResult);
         Assertions.assertEquals("ok", proxyResult.getData());
     }
-    
+
     @Test
     void parameterContextDemo() {
         Mockito.doReturn(ProxyResult.success("ok"))
@@ -96,13 +72,12 @@ class ProcessDefinitionDemoTest {
                         Mockito.anyString(),
                         Mockito.anyString(),
                         Mockito.anyString(),
-                        Mockito.any()
-                );
+                        Mockito.any());
         ProxyResult proxyResult = processDefinitionDemo.parameterContextDemo("test", 1L, "test");
         Assertions.assertNotNull(proxyResult);
         Assertions.assertEquals("ok", proxyResult.getData());
     }
-    
+
     @Test
     void shellDemo() {
         Mockito.doReturn(ProxyResult.success("ok"))
@@ -118,8 +93,7 @@ class ProcessDefinitionDemoTest {
                         Mockito.anyString(),
                         Mockito.anyString(),
                         Mockito.anyString(),
-                        Mockito.any()
-                );
+                        Mockito.any());
         ProxyResult proxyResult = processDefinitionDemo.shellDemo("test", 1L, "test");
         Assertions.assertNotNull(proxyResult);
         Assertions.assertEquals("ok", proxyResult.getData());

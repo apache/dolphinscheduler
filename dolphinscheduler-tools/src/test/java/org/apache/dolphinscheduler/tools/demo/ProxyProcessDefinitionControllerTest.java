@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,14 +30,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class ProxyProcessDefinitionControllerTest {
-    
-    
-     private ProxyProcessDefinitionController controller = new ProxyProcessDefinitionController();
-    
+
+    private ProxyProcessDefinitionController controller = new ProxyProcessDefinitionController();
+
     @Test
     void createProcessDefinition() {
         try (MockedStatic<OkHttpUtils> mockOkHttpUtils = Mockito.mockStatic(OkHttpUtils.class)) {
@@ -51,8 +51,7 @@ class ProxyProcessDefinitionControllerTest {
                     "test",
                     "test",
                     "test",
-                    ProcessExecutionTypeEnum.SERIAL_PRIORITY
-            );
+                    ProcessExecutionTypeEnum.SERIAL_PRIORITY);
             Assertions.assertNotNull(proxyResult);
             Assertions.assertEquals("ok", proxyResult.getData());
         }
