@@ -28,7 +28,10 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 
 import static java.util.stream.Collectors.toSet;
+import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.common.enums.Direct.IN;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -654,12 +657,21 @@ public class ProcessService {
         }
         startParamMap.putAll(fatherParamMap);
         // set start param into global params
-        if (startParamMap.size() > 0
-                && processDefinition.getGlobalParamMap() != null) {
-            for (Map.Entry<String, String> param : processDefinition.getGlobalParamMap().entrySet()) {
+        Map<String, String> globalMap = processDefinition.getGlobalParamMap();
+        List<Property> globalParamList = processDefinition.getGlobalParamList();
+        if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
+            // start param to overwrite global param
+            for (Map.Entry<String, String> param : globalMap.entrySet()) {
                 String val = startParamMap.get(param.getKey());
                 if (val != null) {
                     param.setValue(val);
+                }
+            }
+            // start param to create new global param if global not exist
+            for (Entry<String, String> startParam : startParamMap.entrySet()) {
+                if (!globalMap.containsKey(startParam.getKey())) {
+                    globalMap.put(startParam.getKey(), startParam.getValue());
+                    globalParamList.add(new Property(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
                 }
             }
         }

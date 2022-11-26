@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.spi.task.paramparser;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
 import org.apache.dolphinscheduler.spi.enums.DataType;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
@@ -65,7 +66,7 @@ public class ParamUtils {
 
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (globalParams == null && localParams == null) {
+        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams)) {
             return null;
         }
         // if it is a complement,
@@ -75,8 +76,7 @@ public class ParamUtils {
                 .getBusinessTime(commandType,
                         scheduleTime);
 
-        if (globalParamsMap != null) {
-
+        if (MapUtils.isNotEmpty(globalParamsMap)) {
             params.putAll(globalParamsMap);
         }
 
