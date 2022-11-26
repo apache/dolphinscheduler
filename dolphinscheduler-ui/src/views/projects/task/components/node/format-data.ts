@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-import { omit, cloneDeep } from 'lodash'
+import { omit } from 'lodash'
 import type {
   INodeData,
   ITaskData,
   ITaskParams,
   ISqoopTargetParams,
   ISqoopSourceParams,
-  ILocalParam,
-  IDependTask
+  ILocalParam
 } from './types'
 
 export function formatParams(data: INodeData): {
