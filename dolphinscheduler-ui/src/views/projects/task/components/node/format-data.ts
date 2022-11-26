@@ -270,21 +270,9 @@ export function formatParams(data: INodeData): {
     taskParams.xmx = data.xmx
   }
   if (data.taskType === 'DEPENDENT') {
-    const dependTaskList = cloneDeep(data.dependTaskList)?.map(
-      (taskItem: IDependTask) => {
-        if (taskItem.dependItemList?.length) {
-          taskItem.dependItemList.forEach((dependItem) => {
-            delete dependItem.definitionCodeOptions
-            delete dependItem.depTaskCodeOptions
-            delete dependItem.dateOptions
-          })
-        }
-        return taskItem
-      }
-    )
     taskParams.dependence = {
       relation: data.relation,
-      dependTaskList: dependTaskList
+      dependTaskList: data.dependTaskList
     }
   }
   if (data.taskType === 'DATA_QUALITY') {
