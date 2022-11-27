@@ -37,6 +37,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -95,6 +96,7 @@ public class ProcessInstance {
     /**
      * end time
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Date endTime;
 
     /**
