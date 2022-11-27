@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-import { omit, cloneDeep } from 'lodash'
+import { omit } from 'lodash'
 import type {
   INodeData,
   ITaskData,
   ITaskParams,
   ISqoopTargetParams,
   ISqoopSourceParams,
-  ILocalParam,
-  IDependTask
+  ILocalParam
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -261,21 +260,9 @@ export function formatParams(data: INodeData): {
     taskParams.xmx = data.xmx
   }
   if (data.taskType === 'DEPENDENT') {
-    const dependTaskList = cloneDeep(data.dependTaskList)?.map(
-      (taskItem: IDependTask) => {
-        if (taskItem.dependItemList?.length) {
-          taskItem.dependItemList.forEach((dependItem) => {
-            delete dependItem.definitionCodeOptions
-            delete dependItem.depTaskCodeOptions
-            delete dependItem.dateOptions
-          })
-        }
-        return taskItem
-      }
-    )
     taskParams.dependence = {
       relation: data.relation,
-      dependTaskList: dependTaskList
+      dependTaskList: data.dependTaskList
     }
   }
   if (data.taskType === 'DATA_QUALITY') {

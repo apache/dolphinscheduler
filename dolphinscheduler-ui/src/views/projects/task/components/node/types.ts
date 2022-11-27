@@ -69,12 +69,19 @@ interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
   emit: 'change'[]
 }
 
-interface IDependpendItem {
-  depTaskCode?: number
-  status?: 'SUCCESS' | 'FAILURE'
+interface IDependentItemOptions {
   definitionCodeOptions?: IOption[]
   depTaskCodeOptions?: IOption[]
   dateOptions?: IOption[]
+}
+
+interface IDependTaskOptions {
+  dependItemList: IDependentItemOptions[]
+}
+
+interface IDependentItem {
+  depTaskCode?: number
+  status?: 'SUCCESS' | 'FAILURE'
   projectCode?: number
   definitionCode?: number
   cycle?: 'month' | 'week' | 'day' | 'hour'
@@ -85,7 +92,7 @@ interface IDependTask {
   condition?: string
   nextNode?: number
   relation?: RelationType
-  dependItemList?: IDependpendItem[]
+  dependItemList?: IDependentItem[]
 }
 
 interface ISwitchResult {
@@ -459,7 +466,9 @@ export {
   ISqoopSourceParams,
   ISqoopTargetParams,
   IDependTask,
-  IDependpendItem,
+  IDependentItem,
+  IDependentItemOptions,
+  IDependTaskOptions,
   IFormItem,
   IJsonItem,
   FormRules,
