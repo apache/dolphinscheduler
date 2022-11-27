@@ -46,6 +46,8 @@ public class FileUtils {
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
+    public static final String APPINFO_PATH = "appInfo.log";
+
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
     }
@@ -111,6 +113,16 @@ public class FileUtils {
                 processDefineVersion,
                 processInstanceId,
                 taskInstanceId);
+    }
+
+    /**
+     * absolute path of appInfo file
+     *
+     * @param execPath  directory of process execution
+     * @return
+     */
+    public static String getAppInfoPath(String execPath) {
+        return String.format("%s/%s", execPath, APPINFO_PATH);
     }
 
     /**

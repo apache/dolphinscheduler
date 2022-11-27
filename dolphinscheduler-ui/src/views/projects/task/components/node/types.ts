@@ -337,6 +337,7 @@ interface ITaskParams {
   minCpuCores?: string
   minMemorySpace?: string
   image?: string
+  command?: string
   algorithm?: string
   params?: string
   searchParams?: string
@@ -394,6 +395,8 @@ interface ITaskParams {
   sourceLocationArn?: string
   name?: string
   cloudWatchLogGroupArn?: string
+  yamlContent?: string
+  paramScript?: ILocalParam[]
 }
 
 interface INodeData

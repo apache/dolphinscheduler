@@ -17,7 +17,7 @@ In the case of upstream tasks can pass parameters to the downstream, there may b
 
 ## Example
 
-Followings are examples showing task parameters priority problems:
+The following are examples showing task parameters priority problems:
 
 1: Use shell nodes to explain the first case.
 

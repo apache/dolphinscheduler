@@ -347,6 +347,7 @@ export function formatParams(data: INodeData): {
     taskParams.minCpuCores = data.minCpuCores
     taskParams.minMemorySpace = data.minMemorySpace
     taskParams.image = data.image
+    taskParams.command = data.command
   }
 
   if (data.taskType === 'JUPYTER') {
@@ -453,6 +454,17 @@ export function formatParams(data: INodeData): {
     taskParams.sourceLocationArn = data.sourceLocationArn
     taskParams.name = data.name
     taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
+  }
+
+  if (data.taskType === 'KUBEFLOW') {
+    taskParams.yamlContent = data.yamlContent
+    taskParams.namespace = data.namespace
+  }
+  
+  if (data.taskType === 'LINKIS') {
+    taskParams.useCustom = data.useCustom
+    taskParams.paramScript = data.paramScript
+    taskParams.rawScript = data.rawScript
   }
 
   let timeoutNotifyStrategy = ''

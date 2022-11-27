@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
+import { NodeShape } from './dag-setting'
+
 export function useDagNode() {
   return {
-    inherit: 'rect'
+    inherit: NodeShape
   }
 }

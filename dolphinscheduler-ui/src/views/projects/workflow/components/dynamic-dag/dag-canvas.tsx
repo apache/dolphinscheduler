@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, watch } from 'vue'
 import { Graph } from '@antv/x6'
 import { useDagResize } from './use-dag-resize'
 import { useDagGraph } from './use-dag-graph'
 import { useDagNode } from './use-dag-node'
-import { useDagEdge } from './use-dag-edge'
-import { DagNodeName, DagEdgeName } from './dag-setting'
+import { useAddDagShape } from './use-add-dag-shape'
+import { useDagStore } from '@/store/project/dynamic/dag'
+import { DagNodeName } from './dag-setting'
 import styles from './dag-canvas.module.scss'
 
 const DagCanvas = defineComponent({
@@ -32,6 +33,7 @@ const DagCanvas = defineComponent({
     const dagContainer = ref()
     const minimapContainer = ref()
     const graph = ref<Graph>()
+    const dagTasks = useDagStore().getDagTasks
 
     if (graph.value) {
       useDagResize(dagContainer.value, graph.value)
@@ -46,15 +48,6 @@ const DagCanvas = defineComponent({
       Graph.registerNode(DagNodeName, useDagNode())
     }
 
-    const registerEdge = () => {
-      Graph.unregisterEdge(DagEdgeName)
-      Graph.registerEdge(
-        DagEdgeName,
-        useDagEdge(),
-        true
-      )
-    }
-
     const handlePreventDefault = (e: DragEvent) => {
       e.preventDefault()
     }
@@ -66,7 +59,10 @@ const DagCanvas = defineComponent({
     onMounted(() => {
       initGraph()
       registerNode()
-      registerEdge()
+    })
+
+    watch(dagTasks, () => {
+      useAddDagShape((graph.value as Graph))
     })
 
     return {

@@ -88,7 +88,9 @@ public class TaskExecutionCheckerUtils {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             taskExecutionContext.setExecutePath(execLocalPath);
-            createDirectoryWithOwner(Paths.get(execLocalPath), taskExecutionContext.getTenantCode());
+            taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
+            createDirectoryWithOwner(Paths.get(taskExecutionContext.getExecutePath()),
+                    taskExecutionContext.getTenantCode());
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }

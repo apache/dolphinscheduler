@@ -15,37 +15,77 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { DagSidebar } from './dag-sidebar'
 import { DagCanvas } from './dag-canvas'
+import { useDagStore } from '@/store/project/dynamic/dag'
+import { NodeShape, NodeHeight, NodeWidth } from './dag-setting'
+import { TaskForm } from './task'
+import { queryDynamicTaskResource } from '@/service/modules/dynamic-dag'
 import styles from './index.module.scss'
 
 const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
-    const handelDragend = () => {
-      //console.log(e, task)
-      //if (readonly.value) {
-      //  e.preventDefault()
-      //  return
-      //}
-      //dragged.value = {
-      //  x: e.offsetX,
-      //  y: e.offsetY,
-      //  type: task
-      //}
+    const draggedTask = ref()
+    const formData = ref()
+    const showModal = ref(false)
+
+    const handelDragstart = (task: any) => {
+      draggedTask.value = task.name
+
+      queryDynamicTaskResource(task.json).then((res: any) => {
+        formData.value = res
+      })
+    }
+
+    const handelDrop = (e: DragEvent) => {
+      if (!draggedTask) return
+
+      const shapes = useDagStore().getDagTasks
+
+      shapes.push({
+        id: String(shapes.length + 1),
+        x: e.offsetX,
+        y: e.offsetY,
+        width: NodeWidth,
+        height: NodeHeight,
+        shape: NodeShape,
+        label: draggedTask.value.name + String(shapes.length + 1),
+        zIndex: 1,
+        task: draggedTask.value.name
+      })
+
+      useDagStore().setDagTasks(shapes)
+
+      showModal.value = true
     }
 
     return {
-      handelDragend
+      draggedTask,
+      formData,
+      handelDragstart,
+      handelDrop,
+      showModal
     }
   },
   render() {
     return (
-      <div class={styles['workflow-dag']}>
-        <DagSidebar onDragend={this.handelDragend} />
-        <DagCanvas />
-      </div>
+      <>
+        <div class={styles['workflow-dag']}>
+          <DagSidebar onDragstart={this.handelDragstart}/>
+          <DagCanvas onDrop={this.handelDrop}/>
+        </div>
+        {
+          this.draggedTask && this.formData && <TaskForm
+            task={this.draggedTask}
+            formData={this.formData}
+            showModal={this.showModal}
+            onCancelModal={() => this.showModal = false}
+            onConfirmModal={() => this.showModal = false}
+          />
+        }
+      </>
     )
   }
 })

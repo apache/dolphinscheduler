@@ -17,20 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
-
-import com.google.common.base.Strings;
 
 /**
  * shell command executor
@@ -80,42 +80,45 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-        logger.info("tenantCode user:{}, task dir:{}", taskRequest.getTenantCode(),
-                taskRequest.getTaskAppId());
-
         // create if non existence
-        if (!Files.exists(Paths.get(commandFile))) {
-            logger.info("create command file:{}", commandFile);
+        logger.info("Begin to create command file:{}", commandFile);
 
-            StringBuilder sb = new StringBuilder();
-            if (SystemUtils.IS_OS_WINDOWS) {
-                sb.append("@echo off\n");
-                sb.append("cd /d %~dp0\n");
-                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
-                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-                } else {
-                    if (taskRequest.getEnvFile() != null) {
-                        sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
-                    }
-                }
+        Path commandFilePath = Paths.get(commandFile);
+        if (Files.exists(commandFilePath)) {
+            logger.warn("The command file: {} is already exist, will not create a again", commandFile);
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            sb.append("@echo off").append(System.lineSeparator());
+            sb.append("cd /d %~dp0").append(System.lineSeparator());
+            if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
             } else {
-                sb.append("#!/bin/bash\n");
-                sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-                sb.append("cd $BASEDIR\n");
-                if (!Strings.isNullOrEmpty(taskRequest.getEnvironmentConfig())) {
-                    sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-                } else {
-                    if (taskRequest.getEnvFile() != null) {
-                        sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
-                    }
+                if (taskRequest.getEnvFile() != null) {
+                    sb.append("call ").append(taskRequest.getEnvFile()).append(System.lineSeparator());
                 }
             }
-            sb.append(execCommand);
-            logger.info("command : {}", sb);
-
-            // write data to file
-            FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
+        } else {
+            sb.append("#!/bin/bash").append(System.lineSeparator());
+            sb.append("BASEDIR=$(cd `dirname $0`; pwd)").append(System.lineSeparator());
+            sb.append("cd $BASEDIR").append(System.lineSeparator());
+            if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
+            } else {
+                if (taskRequest.getEnvFile() != null) {
+                    sb.append("source ").append(taskRequest.getEnvFile()).append(System.lineSeparator());
+                }
+            }
         }
+        sb.append(execCommand);
+        String commandContent = sb.toString();
+
+        FileUtils.createFileWith755(commandFilePath);
+        Files.write(commandFilePath, commandContent.getBytes(), StandardOpenOption.APPEND);
+
+        logger.info("Success create command file, command: {}", commandContent);
     }
 
     @Override
