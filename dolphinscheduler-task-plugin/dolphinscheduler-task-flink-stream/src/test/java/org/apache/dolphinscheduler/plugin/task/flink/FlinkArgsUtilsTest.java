@@ -118,7 +118,6 @@ public class FlinkArgsUtilsTest {
     public void testInitOptionsInClusterMode() throws Exception {
         List<String> initOptions =
                 FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL));
-        Assertions.assertEquals(2, initOptions.size());
         Assertions.assertTrue(initOptions.contains("set execution.target=local"));
         Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
     }
