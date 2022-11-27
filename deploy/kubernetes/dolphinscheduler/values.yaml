@@ -57,6 +57,15 @@ mysql:
       size: "20Gi"
       storageClass: "-"
 
+minio:
+  enabled: false
+  auth:
+    rootUser: minioadmin
+    rootPassword: minioadmin
+  persistence:
+    enabled: false
+  defaultBuckets: "dolphinscheduler"
+
 ## If exists external database, and set postgresql.enable value to false.
 ## external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
@@ -91,7 +100,7 @@ conf:
     data.basedir.path: /tmp/dolphinscheduler
 
     # resource storage type: HDFS, S3, NONE
-    resource.storage.type: HDFS
+    resource.storage.type: NONE
 
     # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
     resource.storage.upload.base.path: /dolphinscheduler
@@ -103,13 +112,13 @@ conf:
     resource.aws.secret.access.key: minioadmin
 
     # The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
-    resource.aws.region: cn-north-1
+    resource.aws.region: ca-central-1
 
     # The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
     resource.aws.s3.bucket.name: dolphinscheduler
 
     # You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
-    resource.aws.s3.endpoint: http://localhost:9000
+    resource.aws.s3.endpoint: http://minio:9000
 
     # alibaba cloud access key id, required if you set resource.storage.type=OSS
     resource.alibaba.cloud.access.key.id: <your-access-key-id>
@@ -207,7 +216,7 @@ common:
     HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
     SPARK_HOME: "/opt/soft/spark"
     PYTHON_HOME: "/usr/bin/python"
-    JAVA_HOME: "/usr/local/openjdk-8"
+    JAVA_HOME: "/opt/java/openjdk"
     HIVE_HOME: "/opt/soft/hive"
     FLINK_HOME: "/opt/soft/flink"
     DATAX_HOME: "/opt/soft/datax"

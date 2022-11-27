@@ -27,6 +27,7 @@ type IDataBase =
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'
+  | 'TRINO'
   | 'DM'
 
 type IDataBaseLabel =
@@ -41,6 +42,7 @@ type IDataBaseLabel =
 | 'PRESTO'
 | 'REDSHIFT'
 | 'ATHENA'
+| 'TRINO'
 | 'DM'
 
 interface IDataSource {

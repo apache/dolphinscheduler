@@ -14,8 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if index .Values.conf "common" }}
-{{- range $key, $value := index .Values.conf "common" }}
-{{ $key }}={{ $value }}
-{{- end }}
-{{- end }}
+
+
+apiVersion: "kubeflow.org/v1"
+kind: TFJob
+metadata:
+  name: test-tfjob
+  namespace: kubeflow-user-example-com
+spec:
+  tfReplicaSpecs:
+    Worker:
+      replicas: 2
+      restartPolicy: OnFailure
+      template:
+        spec:
+          containers:
+            - name: tensorflow
+              image: repo/mnist_with_summaries:v1
+              command:
+                - "python"
+                - "mnist_with_summaries.py"
