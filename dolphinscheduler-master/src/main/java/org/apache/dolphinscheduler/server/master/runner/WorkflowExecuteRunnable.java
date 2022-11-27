@@ -285,10 +285,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     stateEvents);
             return;
         }
-        StateEvent stateEvent = null;
-        while (!this.stateEvents.isEmpty()) {
+        int loopTimes = stateEvents.size();
+        for (int i = 0; i < loopTimes; i++) {
+            final StateEvent stateEvent = this.stateEvents.peek();
             try {
-                stateEvent = this.stateEvents.peek();
+                if (stateEvent == null) {
+                    return;
+                }
                 LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
                         stateEvent.getTaskInstanceId());
                 // if state handle success then will remove this state, otherwise will retry this state next time.
