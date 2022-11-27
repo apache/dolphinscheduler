@@ -23,10 +23,25 @@ public class WorkflowInstanceQueryRequest extends PageQueryDto {
     @Schema(name = "workflowName", example = "WORKFLOW-NAME")
     String workflowName;
 
+    @Schema(name = "host", example = "HOST")
+    String host;
+
+    @Schema(name = "startDate", example = "START-TIME")
+    String startTime;
+
+    @Schema(name = "endDate", example = "END-DATE")
+    String endTime;
+
+    @Schema(name = "state", example = "STATE")
+    Integer state;
+
     public ProcessInstance convert2ProcessInstance() {
         ProcessInstance processInstance = new ProcessInstance();
         if (this.workflowName != null) {
             processInstance.setName(this.workflowName);
+        }
+        if (this.host != null) {
+            processInstance.setHost(this.host);
         }
         return processInstance;
     }
