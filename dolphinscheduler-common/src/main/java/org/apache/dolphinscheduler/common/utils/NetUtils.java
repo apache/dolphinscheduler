@@ -22,6 +22,7 @@ import static java.util.Collections.emptyList;
 import org.apache.dolphinscheduler.common.constants.Constants;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -330,6 +332,37 @@ public class NetUtils {
             }
         }
         return networkInterface;
+    }
+
+    /**
+     * check if address is legal address, a legal address should be ip:port
+     * @param ipAndPortAddress address to check
+     * @return true if address is legal
+     */
+    public static boolean isLegalAddress(String ipAndPortAddress) {
+        if (StringUtils.isEmpty(ipAndPortAddress)) {
+            return false;
+        }
+        String[] ipAndPort = ipAndPortAddress.split(":");
+        if (ipAndPort.length != 2) {
+            return false;
+        }
+        return isValidIPv4Address(ipAndPort[0]) && isValidPort(ipAndPort[1]);
+    }
+
+    public static boolean isValidIPv4Address(String ipAddress) {
+        if (ipAddress == null) {
+            return false;
+        }
+        return InetAddressUtils.isIPv4Address(ipAddress);
+    }
+
+    public static boolean isValidPort(String port) {
+        if (StringUtils.isEmpty(port)) {
+            return false;
+        }
+        String portRegex = "^([1-9]|[1-9]\\d{1,4}|[1-6][0-5][0-5][0-3][0-5])$";
+        return Pattern.matches(portRegex, port);
     }
 
 }

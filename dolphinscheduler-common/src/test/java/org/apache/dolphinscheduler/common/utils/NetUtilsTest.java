@@ -115,4 +115,33 @@ public class NetUtilsTest {
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
     }
 
+    @Test
+    public void giveIpAddress_thenCheckIsValidIPv4Address_thenCheck_expectNormal() {
+        Assertions.assertFalse(NetUtils.isValidIPv4Address(""));
+
+        String ipAddress = "127.0.0.1";
+        Assertions.assertTrue(NetUtils.isValidIPv4Address(ipAddress));
+
+        String wrongIpAddress = "this is a ip";
+        Assertions.assertFalse(NetUtils.isValidIPv4Address(wrongIpAddress));
+    }
+
+    @Test
+    public void givePort_thenCheckIsValidPort_expectNormal() {
+        Assertions.assertFalse(NetUtils.isValidPort(""));
+        Assertions.assertFalse(NetUtils.isValidPort("0"));
+        Assertions.assertFalse(NetUtils.isValidPort("this is a port"));
+        Assertions.assertFalse(NetUtils.isValidPort("110000"));
+        Assertions.assertTrue(NetUtils.isValidPort("12345"));
+    }
+
+    @Test
+    public void giveIpAndPort_thenIsLegalAddress_expectNormal() {
+        Assertions.assertFalse(NetUtils.isLegalAddress(""));
+        Assertions.assertFalse(NetUtils.isLegalAddress("127.0.0.1"));
+        Assertions.assertFalse(NetUtils.isLegalAddress("default"));
+        Assertions.assertFalse(NetUtils.isLegalAddress("worker"));
+        Assertions.assertTrue(NetUtils.isLegalAddress("127.0.0.1:12345"));
+    }
+
 }

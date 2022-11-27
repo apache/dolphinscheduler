@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -144,7 +145,9 @@ public class RegistryClient {
             String path = rootNodePath(nodeType);
             Collection<String> serverList = getServerNodes(nodeType);
             for (String server : serverList) {
-                serverMap.putIfAbsent(server, get(path + SINGLE_SLASH + server));
+                if (NetUtils.isLegalAddress(server)) {
+                    serverMap.putIfAbsent(server, get(path + SINGLE_SLASH + server));
+                }
             }
         } catch (Exception e) {
             logger.error("get server list failed", e);

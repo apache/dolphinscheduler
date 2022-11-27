@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
@@ -190,6 +191,7 @@ public class ServerNodeManager implements InitializingBean {
                         logger.info("Worker: {} added, currentNode : {}", path, workerAddress);
                     } else if (type == Type.REMOVE) {
                         logger.info("Worker node : {} down.", path);
+                        clearWorkerNodeInfo(workerAddress);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
@@ -201,9 +203,21 @@ public class ServerNodeManager implements InitializingBean {
         }
 
         private void syncSingleWorkerNodeInfo(String workerAddress, WorkerHeartBeat info) {
+            if (!NetUtils.isLegalAddress(workerAddress)) {
+                return;
+            }
             workerNodeInfoWriteLock.lock();
             try {
                 workerNodeInfo.put(workerAddress, info);
+            } finally {
+                workerNodeInfoWriteLock.unlock();
+            }
+        }
+
+        private void clearWorkerNodeInfo(String workerAddress) {
+            workerNodeInfoWriteLock.lock();
+            try {
+                workerNodeInfo.remove(workerAddress);
             } finally {
                 workerNodeInfoWriteLock.unlock();
             }
@@ -322,6 +336,7 @@ public class ServerNodeManager implements InitializingBean {
     public Map<String, Set<String>> getWorkerGroupNodes() {
         workerGroupReadLock.lock();
         try {
+            logger.info("WorkerGroup list {}", workerGroupNodes);
             return Collections.unmodifiableMap(workerGroupNodes);
         } finally {
             workerGroupReadLock.unlock();
