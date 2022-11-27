@@ -185,4 +185,16 @@
         select code, name
         from t_ds_project
     </select>
+
+    <select id="queryProjectByTaskInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        from t_ds_task_instance ti
+        join t_ds_process_instance pi on ti.process_instance_id = pi.id
+        join t_ds_process_definition pd on pi.process_definition_code = pd.code
+        join t_ds_project p on p.code = pd.project_code
+        where ti.id = #{taskInstanceId}
+    </select>
 </mapper>

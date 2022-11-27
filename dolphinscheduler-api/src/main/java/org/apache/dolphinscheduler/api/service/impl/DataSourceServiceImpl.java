@@ -119,13 +119,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
-        // check connect
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
-        Result<Object> isConnection = checkConnection(datasourceParam.getType(), connectionParam);
-        if (Status.SUCCESS.getCode() != isConnection.getCode()) {
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-            return result;
-        }
 
         // build datasource
         DataSource dataSource = new DataSource();
@@ -182,7 +176,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         // check name can use or not
-        if (!dataSource.getName().trim().equals(dataSource.getName()) && checkName(dataSource.getName())) {
+        if (!dataSourceParam.getName().trim().equals(dataSource.getName()) && checkName(dataSourceParam.getName())) {
             logger.warn("Datasource with the same name already exists, name:{}.", dataSource.getName());
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
@@ -200,11 +194,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             String oldConnectionParams = dataSource.getConnectionParams();
             ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
             connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
-        }
-
-        Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
-        if (isConnection.isFailed()) {
-            return isConnection;
         }
 
         Date now = new Date();

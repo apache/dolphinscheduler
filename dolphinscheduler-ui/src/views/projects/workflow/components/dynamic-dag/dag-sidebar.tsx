@@ -21,12 +21,12 @@ import styles from './dag-sidebar.module.scss'
 
 const DagSidebar = defineComponent({
   name: 'DagSidebar',
-  emits: ['Dragend'],
+  emits: ['Dragstart'],
   setup(props, context) {
     const { variables, getTaskList } = useSidebar()
 
-    const handleDragend = (e: DragEvent, task: any) => {
-      context.emit('Dragend', e, task)
+    const handleDragstart = (task: string) => {
+      context.emit('Dragstart', task)
     }
 
     onMounted(() => {
@@ -35,17 +35,17 @@ const DagSidebar = defineComponent({
 
     return {
       ...toRefs(variables),
-      handleDragend
+      handleDragstart
     }
   },
   render() {
     return (
       <div>
         {
-          this.taskList.map(task => {
+          this.taskList.map((task: any) => {
             return (
-              <div class={styles['task-item']} draggable='true' onDragend={(e: DragEvent) => this.handleDragend(e, task)}>
-                {task}
+              <div class={styles['task-item']} draggable='true' onDragstart={() => this.handleDragstart(task)}>
+                {task.name}
               </div>
             )
           })

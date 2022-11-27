@@ -70,7 +70,7 @@
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
-        <clickhouse-jdbc.version>0.1.52</clickhouse-jdbc.version>
+        <clickhouse-jdbc.version>0.3.2-patch11</clickhouse-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
         <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
@@ -94,14 +94,29 @@
         <snappy.version>1.1.8.4</snappy.version>
         <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
-        <snakeyaml.version>1.31</snakeyaml.version>
+        <snakeyaml.version>1.33</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
         <datasync.version>2.17.282</datasync.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
+        <aspectj.version>1.9.7</aspectj.version>
+        <zt-zip.version>1.15</zt-zip.version>
+        <trino-jdbc.version>402</trino-jdbc.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- aspectj -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
             <!-- netty -->
             <dependency>
                 <groupId>io.netty</groupId>
@@ -461,7 +476,11 @@
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.htrace</groupId>
                 <artifactId>htrace-core4</artifactId>
@@ -533,7 +552,7 @@
             </dependency>
 
             <dependency>
-                <groupId>ru.yandex.clickhouse</groupId>
+                <groupId>com.clickhouse</groupId>
                 <artifactId>clickhouse-jdbc</artifactId>
                 <version>${clickhouse-jdbc.version}</version>
             </dependency>
@@ -674,6 +693,12 @@
             </dependency>
 
             <dependency>
+                <groupId>io.trino</groupId>
+                <artifactId>trino-jdbc</artifactId>
+                <version>${trino-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>
@@ -754,6 +779,13 @@
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc-openapi-ui.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-zip</artifactId>
+                <version>${zt-zip.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>

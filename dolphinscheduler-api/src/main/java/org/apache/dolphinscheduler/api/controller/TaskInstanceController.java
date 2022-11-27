@@ -32,8 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -141,11 +139,10 @@ public class TaskInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @PathVariable(value = "id") Integer id) {
-        Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
-        return returnDataList(result);
+    public Result forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
+                                   @PathVariable(value = "id") Integer id) {
+        return taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
     }
 
     /**

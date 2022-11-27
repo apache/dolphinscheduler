@@ -106,7 +106,12 @@
         </dependency>
 
         <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
+            <groupId>io.trino</groupId>
+            <artifactId>trino-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
             <exclusions>
                 <exclusion>

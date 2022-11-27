@@ -1427,10 +1427,8 @@ public class ProcessServiceImpl implements ProcessService {
                 resourceInfo.setRes(res.getRes());
                 resourceInfo.setResourceName(resourceFullName);
             }
-            if (logger.isInfoEnabled()) {
-                logger.info("updated resource info {}",
-                        JSONUtils.toJsonString(resourceInfo));
-            }
+            logger.info("updated resource info {}",
+                    JSONUtils.toJsonString(resourceInfo));
         }
         return resourceInfo;
     }

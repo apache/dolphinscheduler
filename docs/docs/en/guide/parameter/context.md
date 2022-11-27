@@ -13,6 +13,7 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [Shell](../task/shell.md)
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
+* [Python](../task/python.md)
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. At present, we mainly focus on the SQL and shell nodes to pass parameters downstream.
 
@@ -91,3 +92,11 @@ It can be anything, it can be body, it can be anything, parameter,value, it must
 
 The configuration is complete
 ![httpParam-3](../../../../img/httpParam/httpParam-3.png)
+
+#### Pass parameter from Python task to downstream
+
+Use `print('${setValue(key=%s)}' % value)`, DolphinScheduler will capture the `${setValue(key=value}` in the output to capture the parameters and pass them downstream.
+
+For example
+
+![img.png](../../../../img/new_ui/dev/parameter/python_context_param.png)

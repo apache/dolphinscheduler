@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.shell;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -31,19 +30,15 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
 
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * shell task
@@ -137,32 +132,19 @@ public class ShellTask extends AbstractTask {
         Path path = file.toPath();
 
         if (Files.exists(path)) {
+            // this shouldn't happen
+            logger.warn("The command file: {} is already exist", path);
             return fileName;
         }
 
-        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = shellParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         shellParameters.setRawScript(script);
 
         logger.info("raw script : {}", shellParameters.getRawScript());
         logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
-        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-
-        if (SystemUtils.IS_OS_WINDOWS) {
-            Files.createFile(path);
-        } else {
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            try {
-                Files.createFile(path, attr);
-            } catch (FileAlreadyExistsException ex) {
-                // this is expected
-            }
-        }
-
+        FileUtils.createFileWith755(path);
         Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
 
         return fileName;

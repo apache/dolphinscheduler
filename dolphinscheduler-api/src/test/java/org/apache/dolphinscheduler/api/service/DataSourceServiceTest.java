@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -55,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -89,7 +88,15 @@ public class DataSourceServiceTest {
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
-    public void createDataSourceTest() {
+    private void passResourcePermissionCheckService() {
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
+                Mockito.anyString(), Mockito.any())).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(Mockito.any(), Mockito.any(),
+                Mockito.anyInt(), Mockito.any())).thenReturn(true);
+    }
+
+    @Test
+    public void createDataSourceTest() throws ExecutionException {
         User loginUser = getAdminUser();
         String dataSourceName = "dataSource01";
         String dataSourceDesc = "test dataSource";
@@ -102,47 +109,44 @@ public class DataSourceServiceTest {
         postgreSqlDatasourceParam.setDatabase("dolphinscheduler");
         postgreSqlDatasourceParam.setUserName("postgres");
         postgreSqlDatasourceParam.setPassword("");
+        postgreSqlDatasourceParam.setName(dataSourceName);
 
-        // data source exits
+        // USER_NO_OPERATION_PERM
+        Result result = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), result.getCode().intValue());
+
+        // DATASOURCE_EXIST
         List<DataSource> dataSourceList = new ArrayList<>();
         DataSource dataSource = new DataSource();
         dataSource.setName(dataSourceName);
         dataSourceList.add(dataSource);
         Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(dataSourceList);
+        passResourcePermissionCheckService();
         Result dataSourceExitsResult = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
         Assertions.assertEquals(Status.DATASOURCE_EXIST.getCode(), dataSourceExitsResult.getCode().intValue());
 
-        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
-        DbType dataSourceType = postgreSqlDatasourceParam.getType();
-        // data source exits
-        Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
-        Result connectionResult =
-                new Result(Status.DATASOURCE_CONNECT_FAILED.getCode(), Status.DATASOURCE_CONNECT_FAILED.getMsg());
+        try (
+                MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
+                        Mockito.mockStatic(DataSourceClientProvider.class)) {
+            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
+            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
-        Mockito.doReturn(connectionResult).when(dataSourceService).checkConnection(dataSourceType, connectionParam);
-        Result connectFailedResult = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
-        Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED.getCode(), connectFailedResult.getCode().intValue());
+            Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
 
-        // data source exits
-        Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
-        connectionResult = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
-        Mockito.when(dataSourceService.checkConnection(dataSourceType, connectionParam)).thenReturn(connectionResult);
-        Result notValidError = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), notValidError.getCode().intValue());
-
-        // success
-        Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
-        Mockito.when(dataSourceService.checkConnection(dataSourceType, connectionParam)).thenReturn(connectionResult);
-        Result success = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
+            // SUCCESS
+            Result success = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
+            Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
+        }
     }
 
-    public void updateDataSourceTest() {
+    @Test
+    public void updateDataSourceTest() throws ExecutionException {
         User loginUser = getAdminUser();
 
         int dataSourceId = 12;
         String dataSourceName = "dataSource01";
         String dataSourceDesc = "test dataSource";
+        String dataSourceUpdateName = "dataSource01-update";
 
         PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = new PostgreSQLDataSourceParamDTO();
         postgreSqlDatasourceParam.setDatabase(dataSourceName);
@@ -152,13 +156,15 @@ public class DataSourceServiceTest {
         postgreSqlDatasourceParam.setDatabase("dolphinscheduler");
         postgreSqlDatasourceParam.setUserName("postgres");
         postgreSqlDatasourceParam.setPassword("");
+        postgreSqlDatasourceParam.setName(dataSourceUpdateName);
 
-        // data source not exits
+        // RESOURCE_NOT_EXIST
         Mockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
         Result resourceNotExits =
                 dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getCode(), resourceNotExits.getCode().intValue());
-        // user no operation perm
+
+        // USER_NO_OPERATION_PERM
         DataSource dataSource = new DataSource();
         dataSource.setUserId(0);
         Mockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
@@ -166,35 +172,37 @@ public class DataSourceServiceTest {
                 dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
         Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), userNoOperationPerm.getCode().intValue());
 
-        // data source name exits
-        dataSource.setUserId(-1);
+        // DATASOURCE_EXIST
+        dataSource.setName(dataSourceName);
+        dataSource.setType(DbType.POSTGRESQL);
+        dataSource.setConnectionParams(
+                JSONUtils.toJsonString(DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam)));
+
+        DataSource anotherDataSource = new DataSource();
+        anotherDataSource.setName(dataSourceUpdateName);
         List<DataSource> dataSourceList = new ArrayList<>();
-        dataSourceList.add(dataSource);
+        dataSourceList.add(anotherDataSource);
         Mockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
-        Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName)).thenReturn(dataSourceList);
+        Mockito.when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName()))
+                .thenReturn(dataSourceList);
+        passResourcePermissionCheckService();
         Result dataSourceNameExist =
                 dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
         Assertions.assertEquals(Status.DATASOURCE_EXIST.getCode(), dataSourceNameExist.getCode().intValue());
 
-        // data source connect failed
-        DbType dataSourceType = postgreSqlDatasourceParam.getType();
-        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
-        Mockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
-        Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName)).thenReturn(null);
-        Result connectionResult = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
-        Mockito.when(dataSourceService.checkConnection(dataSourceType, connectionParam)).thenReturn(connectionResult);
-        Result connectFailed = dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
-        Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED.getCode(), connectFailed.getCode().intValue());
+        try (
+                MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
+                        Mockito.mockStatic(DataSourceClientProvider.class)) {
+            // DATASOURCE_CONNECT_FAILED
+            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
+            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
-        // success
-        Mockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
-        Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName)).thenReturn(null);
-        connectionResult =
-                new Result(Status.DATASOURCE_CONNECT_FAILED.getCode(), Status.DATASOURCE_CONNECT_FAILED.getMsg());
-        Mockito.when(dataSourceService.checkConnection(dataSourceType, connectionParam)).thenReturn(connectionResult);
-        Result success = dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
+            Mockito.when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
 
+            // SUCCESS
+            Result success = dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
+            Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
+        }
     }
 
     @Test
@@ -239,10 +247,7 @@ public class DataSourceServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(1);
         dataSource.setId(22);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null,
-                loginUser.getId(), DATASOURCE_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,
-                new Object[]{dataSource.getId()}, 0, baseServiceLogger)).thenReturn(true);
+        passResourcePermissionCheckService();
         Mockito.when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
         Assertions.assertEquals(result.getCode(), dataSourceService.delete(loginUser, dataSourceId).getCode());
 
@@ -254,7 +259,7 @@ public class DataSourceServiceTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         int userId = 3;
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE,
                 loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0,
                 baseServiceLogger)).thenReturn(true);
@@ -486,7 +491,6 @@ public class DataSourceServiceTest {
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
             DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-            Mockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
             mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Result result = dataSourceService.checkConnection(dataSourceType, connectionParam);
