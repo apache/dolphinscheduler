@@ -82,7 +82,7 @@ public class StatisticsV2Controller extends BaseController {
     @ApiException(QUERY_ALL_WORKFLOW_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryWorkflowStatesCounts(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                @RequestBody(required = false) StatisticsStateRequest statisticsStateRequest) {
+                                            @RequestBody(required = false) StatisticsStateRequest statisticsStateRequest) {
         Map<String, Object> result =
                 projectService.countWorkflowStates(loginUser, statisticsStateRequest);
         return returnDataList(result);
@@ -100,7 +100,7 @@ public class StatisticsV2Controller extends BaseController {
     @ApiException(QUERY_ALL_WORKFLOW_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryOneWorkflowStates(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                @PathVariable("workflowName") String workflowName) {
+                                         @PathVariable("workflowName") String workflowName) {
         Map<String, Object> result =
                 projectService.countOneWorkflowStates(loginUser, workflowName);
         return returnDataList(result);

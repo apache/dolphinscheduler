@@ -219,7 +219,7 @@ public interface ProjectService {
      * @return workflow States count
      */
     Map<String, Object> countWorkflowStates(User loginUser,
-                                                           StatisticsStateRequest statisticsStateRequest);
+                                            StatisticsStateRequest statisticsStateRequest);
 
     /**
      * query one workflow States count
