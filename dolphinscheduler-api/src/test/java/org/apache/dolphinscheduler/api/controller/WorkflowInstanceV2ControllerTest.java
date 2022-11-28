@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -73,7 +74,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
 
         Result result1 =
                 workflowInstanceV2Controller.queryWorkflowInstanceListPaging(loginUser, workflowInstanceQueryRequest);
-        Assert.assertTrue(result1.isSuccess());
+        Assertions.assertTrue(result1.isSuccess());
     }
 
     @Test
@@ -86,7 +87,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
 
         Mockito.when(processInstanceService.queryProcessInstanceById(any(), eq(1))).thenReturn(result);
         Result result1 = workflowInstanceV2Controller.queryWorkflowInstanceById(loginUser, 1);
-        Assert.assertTrue(result1.isSuccess());
+        Assertions.assertTrue(result1.isSuccess());
     }
 
     @Test
@@ -95,7 +96,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
 
         Mockito.when(processInstanceService.deleteProcessInstanceById(any(), eq(1))).thenReturn(null);
         Result result = workflowInstanceV2Controller.deleteWorkflowInstance(loginUser, 1);
-        Assert.assertTrue(result.isSuccess());
+        Assertions.assertTrue(result.isSuccess());
     }
 
     @Test
@@ -108,7 +109,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
         Mockito.when(execService.execute(any(), eq(1), any(ExecuteType.class))).thenReturn(result);
 
         Result result1 = workflowInstanceV2Controller.execute(loginUser, 1, ExecuteType.STOP);
-        Assert.assertTrue(result1.isSuccess());
+        Assertions.assertTrue(result1.isSuccess());
     }
 
     private User getLoginUser() {
