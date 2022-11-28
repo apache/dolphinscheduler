@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
-
+import org.apache.dolphinscheduler.api.dto.TaskCountDto;
+import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCountResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -31,11 +30,14 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -52,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -65,6 +68,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * project service impl
@@ -86,12 +91,15 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private ProcessInstanceMapper processInstanceMapper;
+
     /**
      * create project
      *
      * @param loginUser login user
-     * @param name project name
-     * @param desc description
+     * @param name      project name
+     * @param desc      description
      * @return returns an error if it exists
      */
     @Override
@@ -331,8 +339,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which the login user have permission to see
      */
     @Override
@@ -366,11 +374,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * admin can view all projects
      *
-     * @param userId user id
+     * @param userId    user id
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which with the login user's authorized level
      */
     @Override
@@ -417,7 +425,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * delete project by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return delete result code
      */
@@ -462,7 +470,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * get check result
      *
      * @param loginUser login user
-     * @param project project
+     * @param project   project
      * @return check result
      */
     private Map<String, Object> getCheckResult(User loginUser, Project project, String perm) {
@@ -478,11 +486,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * updateProcessInstance project
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param projectName project name
-     * @param desc description
-     * @param userName project owner
+     * @param desc        description
+     * @param userName    project owner
      * @return update result code
      */
     @Override
@@ -528,6 +536,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * query all project with authorized level
+     *
      * @param loginUser login user
      * @return project list
      */
@@ -571,7 +580,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query unauthorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return the projects which user have not permission to see
      */
     @Override
@@ -606,7 +615,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * get unauthorized project
      *
-     * @param projectSet project set
+     * @param projectSet        project set
      * @param authedProjectList authed project list
      * @return project list that unauthorized
      */
@@ -625,7 +634,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
     @Override
@@ -642,8 +651,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query authorized user
      *
-     * @param loginUser     login user
-     * @param projectCode   project code
+     * @param loginUser   login user
+     * @param projectCode project code
      * @return users        who have permission for the specified project
      */
     @Override
@@ -709,7 +718,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check whether have read permission
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return true if the user have permission to see the project, otherwise return false
      */
@@ -721,7 +730,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query permission id
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return permission
      */
@@ -746,6 +755,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * query all project list
+     *
      * @param user
      * @return project list
      */
@@ -799,4 +809,85 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return result;
     }
 
+    /**
+     * query all workflow count
+     *
+     * @param loginUser login user
+     * @return workflow count
+     */
+    @Override
+    public Result queryAllWorkflowCounts(User loginUser) {
+        Result result = new Result();
+        WorkflowCountResponse workflowCountResponse = new WorkflowCountResponse();
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        if (projectIds.isEmpty()) {
+            result.setData(workflowCountResponse);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        List<Project> projects = projectMapper.selectBatchIds(projectIds);
+
+        List<Long> projectCodes = projects.stream().map(project -> project.getCode()).collect(Collectors.toList());
+
+        workflowCountResponse.setWorkflowCounts(projectMapper.queryAllWorkflowCounts(projectCodes));
+
+        putMsg(workflowCountResponse, Status.SUCCESS);
+        return workflowCountResponse;
+    }
+
+    /**
+     * query all workflow States count
+     * @param loginUser login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return workflow States count
+     */
+    @Override
+    public Map<String, Object> countWorkflowStates(User loginUser,
+                                                   StatisticsStateRequest statisticsStateRequest) {
+        Map<String, Object> result = new HashMap<>();
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        if (projectIds.isEmpty()) {
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        String projectName = statisticsStateRequest.getProjectName();
+        String workflowName = statisticsStateRequest.getWorkflowName();
+        Date date = new Date();
+        Date startTime = statisticsStateRequest.getStartTime() == null ? DateUtils.getMonthAgo(date)
+                : statisticsStateRequest.getStartTime();
+        Date endTime = statisticsStateRequest.getEndTime() == null ? date : statisticsStateRequest.getEndTime();
+        Integer model = Constants.QUERY_ALL_ON_SYSTEM;
+        if (!StringUtils.isBlank(projectName)) {
+            model = Constants.QUERY_ALL_ON_PROJECT;
+        }
+        if (!StringUtils.isBlank(workflowName)) {
+            model = Constants.QUERY_ALL_ON_WORKFLOW;
+        }
+        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(
+                startTime, endTime, projectName, workflowName, model, projectIds);
+        TaskCountDto taskCountResult = new TaskCountDto(executeStatusCounts);
+        result.put(Constants.DATA_LIST, taskCountResult);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> countOneWorkflowStates(User loginUser, String workflowName) {
+        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByName(workflowName);
+        boolean hasProjectAndWritePerm = hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
+            return result;
+        }
+        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(
+                null, null, null, workflowName, Constants.QUERY_ALL_ON_WORKFLOW, null);
+        if (executeStatusCounts != null) {
+            TaskCountDto taskCountResult = new TaskCountDto(executeStatusCounts);
+            result.put(Constants.DATA_LIST, taskCountResult);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
 }

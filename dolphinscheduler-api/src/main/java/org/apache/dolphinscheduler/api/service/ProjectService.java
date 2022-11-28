@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -204,4 +205,27 @@ public interface ProjectService {
      */
     Result queryAllProjectListForDependent();
 
+    /**
+     * query all workflow count
+     * @param loginUser login user
+     * @return workflow count
+     */
+    Result queryAllWorkflowCounts(User loginUser);
+
+    /**
+     * query all workflow States count
+     * @param loginUser login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return workflow States count
+     */
+    Map<String, Object> countWorkflowStates(User loginUser,
+                                                           StatisticsStateRequest statisticsStateRequest);
+
+    /**
+     * query one workflow States count
+     * @param loginUser login user
+     * @param workflowName workflowName
+     * @return workflow States count
+     */
+    Map<String, Object> countOneWorkflowStates(User loginUser, String workflowName);
 }
