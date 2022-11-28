@@ -2775,11 +2775,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             processDefinitionUpdate.setTenantId(tenant.getId());
         }
-        int update = processDefinitionMapper.updateById(processDefinitionUpdate);
-        if (update <= 0) {
+        int insertVersion =
+                processService.saveProcessDefine(loginUser, processDefinitionUpdate, Boolean.TRUE, Boolean.TRUE);
+        if (insertVersion <= 0) {
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
-        this.syncObj2Log(loginUser, processDefinition);
+        processDefinition = processDefinitionMapper.queryByCode(workflowCode);
+        processService.saveTaskRelationV2(loginUser, processDefinition.getProjectCode(),
+                processDefinition.getCode(),
+                insertVersion);
         return processDefinition;
     }
 
