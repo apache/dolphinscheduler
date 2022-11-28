@@ -43,6 +43,7 @@ public class FlinkConstants {
     public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
     public static final String FLINK_YARN_APPLICATION = "yarn-application";
     public static final String FLINK_YARN_PER_JOB = "yarn-per-job";
+    public static final String FLINK_LOCAL = "local";
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_EXECUTION_TARGET = "-t";
     public static final String FLINK_YARN_SLOT = "-ys";
