@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -278,16 +277,21 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
         Mockito.when(processTaskRelationMapper.queryByTaskCode(TASK_CODE)).thenReturn(new ArrayList<>());
 
-        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE)).thenReturn(getProcessTaskRelationList());
+        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
+                .thenReturn(getProcessTaskRelationList());
         taskDefinition.setCode(4);
-        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singleton(4L))).thenReturn(Collections.singletonList(taskDefinition));
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singleton(4L)))
+                .thenReturn(Collections.singletonList(taskDefinition));
         // success
-        Map<String, Object> successMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson, UPSTREAM_CODE);
+        Map<String, Object> successMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
+                taskDefinitionJson, UPSTREAM_CODE);
         Assertions.assertEquals(Status.SUCCESS, successMap.get(Constants.STATUS));
-        //fail
+        // fail
         taskDefinition.setCode(3);
-        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singleton(4L))).thenReturn(Collections.singletonList(taskDefinition));
-        Map<String, Object> failMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson, UPSTREAM_CODE);
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singleton(4L)))
+                .thenReturn(Collections.singletonList(taskDefinition));
+        Map<String, Object> failMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
+                taskDefinitionJson, UPSTREAM_CODE);
         Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST, failMap.get(Constants.STATUS));
         user.setUserType(UserType.GENERAL_USER);
     }
