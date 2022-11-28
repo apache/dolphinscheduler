@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -54,6 +55,7 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -263,7 +265,31 @@ public class TaskDefinitionServiceImplTest {
     @Test
     public void updateTaskWithUpstream() {
         String taskDefinitionJson = getTaskDefinitionJson();
-        taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson, UPSTREAM_CODE);
+        TaskDefinition taskDefinition = getTaskDefinition();
+        taskDefinition.setFlag(Flag.NO);
+
+        user.setUserType(UserType.ADMIN_USER);
+        Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject());
+        Mockito.when(projectService.hasProjectAndWritePerm(user, getProject(), new HashMap<>())).thenReturn(true);
+        Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
+        Mockito.when(taskDefinitionMapper.updateById(Mockito.any())).thenReturn(1);
+        Mockito.when(taskDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
+        Mockito.when(processTaskRelationMapper.queryByTaskCode(TASK_CODE)).thenReturn(new ArrayList<>());
+
+        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE)).thenReturn(getProcessTaskRelationList());
+        taskDefinition.setCode(4);
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singleton(4L))).thenReturn(Collections.singletonList(taskDefinition));
+        // success
+        Map<String, Object> successMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson, UPSTREAM_CODE);
+        Assertions.assertEquals(Status.SUCCESS, successMap.get(Constants.STATUS));
+        //fail
+        taskDefinition.setCode(3);
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singleton(4L))).thenReturn(Collections.singletonList(taskDefinition));
+        Map<String, Object> failMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson, UPSTREAM_CODE);
+        Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST, failMap.get(Constants.STATUS));
+        user.setUserType(UserType.GENERAL_USER);
     }
 
     @Test

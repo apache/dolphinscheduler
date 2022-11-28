@@ -830,7 +830,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         } else if (taskDefinitionToUpdate == null) {
             taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
         }
-        // get survive upstreamTask
+        // get survive updateUpstreamTask
         Map<Long, TaskDefinition> updateUpstreamTask = getUpdateUpstreamTaskCodeMap(updateUpstreamTaskCodeSet, result);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
