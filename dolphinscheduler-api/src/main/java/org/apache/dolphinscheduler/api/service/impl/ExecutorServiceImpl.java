@@ -125,6 +125,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
+    ProcessDefinitionMapper processDefineMapper;
+
+    @Autowired
     private MonitorService monitorService;
 
     @Autowired
@@ -463,6 +466,25 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         return result;
+    }
+
+    /**
+     * do action to workflow instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
+    
+    
+     *
+     * @param loginUser         login user
+     * @param workflowInstanceId workflow instance id
+     * @param executeType       execute type
+     * @return execute result code
+     */
+    @Override
+    public Map<String, Object> execute(User loginUser, Integer workflowInstanceId, ExecuteType executeType) {
+        ProcessInstance processInstance = processInstanceMapper.selectById(workflowInstanceId);
+        ProcessDefinition processDefinition =
+                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+
+        return execute(loginUser, processDefinition.getProjectCode(), workflowInstanceId, executeType);
     }
 
     @Override
