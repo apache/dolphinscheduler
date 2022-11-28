@@ -68,7 +68,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -861,7 +860,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                                    Map<String, Object> result) {
         Map<Long, TaskDefinition> queryUpStreamTaskCodeMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(updateUpstreamTaskCodeSet)) {
-            List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionMapper.queryByCodeList(updateUpstreamTaskCodeSet);
+            List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionMapper
+                    .queryByCodeList(updateUpstreamTaskCodeSet);
             queryUpStreamTaskCodeMap = upstreamTaskDefinitionList.stream()
                     .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinition -> taskDefinition));
             updateUpstreamTaskCodeSet.removeAll(queryUpStreamTaskCodeMap.keySet());
