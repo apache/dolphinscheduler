@@ -142,6 +142,13 @@ public class NetUtilsTest {
         Assertions.assertFalse(NetUtils.isLegalAddress("default"));
         Assertions.assertFalse(NetUtils.isLegalAddress("worker"));
         Assertions.assertTrue(NetUtils.isLegalAddress("127.0.0.1:12345"));
+        Assertions.assertTrue(NetUtils.isLegalAddress("[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:12345"));
+    }
+
+    @Test
+    public void giveIPv6_thenIsLegalAddress_expectNormal() {
+        Assertions.assertFalse(NetUtils.isValidIPv6Address("127.0.0.1"));
+        Assertions.assertTrue(NetUtils.isValidIPv6Address("2001:0db8:85a3:0000:0000:8a2e:0370:7334"));
     }
 
 }

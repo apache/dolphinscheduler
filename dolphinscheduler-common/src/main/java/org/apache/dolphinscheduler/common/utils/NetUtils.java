@@ -49,6 +49,10 @@ public class NetUtils {
     private static final String NETWORK_PRIORITY_DEFAULT = "default";
     private static final String NETWORK_PRIORITY_INNER = "inner";
     private static final String NETWORK_PRIORITY_OUTER = "outer";
+
+    private static final int IPV4_SEMICOLON_PART = 2;
+
+    private static final String IPV6_STARTER = "[";
     private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
     private static InetAddress LOCAL_ADDRESS = null;
     private static volatile String HOST_ADDRESS;
@@ -335,7 +339,9 @@ public class NetUtils {
     }
 
     /**
-     * check if address is legal address, a legal address should be ip:port
+     * check if address is legal address, a legal address should be:
+     * ipv4: ip:port
+     * ipv6: [ip]:port
      * @param ipAndPortAddress address to check
      * @return true if address is legal
      */
@@ -343,18 +349,33 @@ public class NetUtils {
         if (StringUtils.isEmpty(ipAndPortAddress)) {
             return false;
         }
+
         String[] ipAndPort = ipAndPortAddress.split(":");
-        if (ipAndPort.length != 2) {
-            return false;
+        if (ipAndPort.length == IPV4_SEMICOLON_PART) {
+            return isValidIPv4Address(ipAndPort[0]) && isValidPort(ipAndPort[1]);
         }
-        return isValidIPv4Address(ipAndPort[0]) && isValidPort(ipAndPort[1]);
+
+        if (ipAndPortAddress.startsWith(IPV6_STARTER)) {
+            String[] ipv6Formats = ipAndPortAddress.split("]");
+            return isValidIPv6Address(ipv6Formats[0].replace(IPV6_STARTER, ""))
+                    && isValidPort(ipv6Formats[1].replace(":", ""));
+        }
+
+        return false;
     }
 
     public static boolean isValidIPv4Address(String ipAddress) {
-        if (ipAddress == null) {
+        if (StringUtils.isEmpty(ipAddress)) {
             return false;
         }
         return InetAddressUtils.isIPv4Address(ipAddress);
+    }
+
+    public static boolean isValidIPv6Address(String ipAddress) {
+        if (StringUtils.isEmpty(ipAddress)) {
+            return false;
+        }
+        return InetAddressUtils.isIPv6Address(ipAddress);
     }
 
     public static boolean isValidPort(String port) {

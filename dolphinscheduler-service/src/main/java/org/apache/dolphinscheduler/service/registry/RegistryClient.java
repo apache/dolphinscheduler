@@ -48,6 +48,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -264,7 +265,7 @@ public class RegistryClient {
 
     private Collection<String> getServerNodes(NodeType nodeType) {
         final String path = rootNodePath(nodeType);
-        return getChildrenKeys(path);
+        return getChildrenKeys(path).stream().filter(NetUtils::isLegalAddress).collect(Collectors.toList());
     }
 
 }
