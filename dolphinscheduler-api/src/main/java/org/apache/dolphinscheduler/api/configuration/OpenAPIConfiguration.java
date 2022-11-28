@@ -23,8 +23,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 /**
  * swager2 config class
@@ -40,7 +42,10 @@ public class OpenAPIConfiguration implements WebMvcConfigurer {
                 .info(new Info()
                         .title("Dolphin Scheduler Api Docs")
                         .description("Dolphin Scheduler Api Docs")
-                        .version("V1"));
+                        .version("V1"))
+                .components(new Components()
+                        .addSecuritySchemes("sessionId", new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer").bearerFormat("JWT")));
     }
 
     @Bean
