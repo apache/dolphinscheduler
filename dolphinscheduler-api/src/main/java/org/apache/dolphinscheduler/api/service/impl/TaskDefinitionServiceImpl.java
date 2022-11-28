@@ -76,6 +76,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -817,11 +818,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Set<Long> sourceUpstreamCodeSet =
                 upstreamTaskRelations.stream().map(ProcessTaskRelation::getPreTaskCode).collect(Collectors.toSet());
         // get updateUpstreamTaskCodeSet
-        Set<Long> updateUpstreamTaskCodeSet = Collections.emptySet();
-        if (StringUtils.isNotEmpty(upstreamCodes)) {
-            updateUpstreamTaskCodeSet = Arrays.stream(upstreamCodes.split(Constants.COMMA)).map(Long::parseLong)
-                    .collect(Collectors.toSet());
-        }
+        Set<Long> updateUpstreamTaskCodeSet = getTaskCodeSet(upstreamCodes, result);
+
         if (CollectionUtils.isEqualCollection(sourceUpstreamCodeSet, updateUpstreamTaskCodeSet)
                 && taskDefinitionToUpdate == null) {
             putMsg(result, Status.SUCCESS);
@@ -830,7 +828,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
         }
         // get survive updateUpstreamTask
-        Map<Long, TaskDefinition> updateUpstreamTask = getUpdateUpstreamTaskCodeMap(updateUpstreamTaskCodeSet, result);
+        getUpdateUpstreamTaskCodeMap(updateUpstreamTaskCodeSet, result);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -848,6 +846,26 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * analysis upstreamCodes by Constants.COMMA
+     * @param upstreamCodes need analysis string
+     * @param result result
+     * @return codes set
+     */
+    private Set<Long> getTaskCodeSet(String upstreamCodes, Map<String, Object> result) {
+        if (StringUtils.isNotEmpty(upstreamCodes)) {
+            try {
+                return Arrays.stream(upstreamCodes.split(Constants.COMMA)).map(Long::parseLong)
+                        .collect(Collectors.toSet());
+            } catch (NumberFormatException e) {
+                logger.error("upstreamCodes numberFormatException : {}", upstreamCodes);
+                putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
+                throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
+            }
+        }
+        return Collections.emptySet();
     }
 
     /**
