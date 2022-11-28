@@ -65,6 +65,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
+import org.apache.dolphinscheduler.remote.command.HostUpdateResponseCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -386,6 +387,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 if (!processInstance.isBlocked()) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
                 }
+            } else if (taskInstance.getState().isNeedFaultTolerance()) {
+                // failOver task instance when worker crash
+                logger.info(
+                        "submit taskInstance {} because state is NEED_FAULT_TOLERANCE when receive state change event",
+                        taskInstance);
+                taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
+                addTaskToStandByList(taskInstance);
+                submitStandByTask();
             } else if (taskInstance.taskCanRetry() && processInstance.getState().isReadyStop()) {
                 // retry task
                 logger.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
@@ -841,6 +850,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         completeTaskMap.put(task.getTaskCode(), task.getId());
                         continue;
                     }
+                    // failOver task instance when master crash
+                    if (task.getState().isNeedFaultTolerance()) {
+                        addTaskToStandByList(task);
+                        submitStandByTask();
+                        continue;
+                    }
                     if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()),
                             dag)) {
                         continue;
@@ -925,9 +940,15 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
             taskProcessor.init(taskInstance, processInstance);
 
-            if (taskInstance.getState().isRunning()
+            // rebuild channel when master crashes
+            if (taskInstance.getState().isNeedFaultTolerance()
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
-                notifyProcessHostUpdate(taskInstance);
+                if (syncUpdateProcessHost(taskInstance)) {
+                    validTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+                    taskInstanceMap.put(taskInstance.getId(), taskInstance);
+                    activeTaskProcessorMaps.put(taskInstance.getTaskCode(), taskProcessor);
+                    return Optional.of(taskInstance);
+                }
             }
 
             boolean submit = taskProcessor.action(TaskAction.SUBMIT);
@@ -1012,6 +1033,33 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     taskInstance.getId(),
                     e);
             return Optional.empty();
+        }
+    }
+
+    private boolean syncUpdateProcessHost(TaskInstance taskInstance) {
+        if (StringUtils.isEmpty(taskInstance.getHost())) {
+            return false;
+        }
+        HostUpdateCommand hostUpdateCommand = new HostUpdateCommand();
+        hostUpdateCommand.setProcessHost(masterAddress);
+        hostUpdateCommand.setTaskInstanceId(taskInstance.getId());
+        Host host = new Host(taskInstance.getHost());
+        try {
+            org.apache.dolphinscheduler.remote.command.Command command = nettyExecutorManager.doSyncExecute(host,
+                    hostUpdateCommand.convert2Command(), Constants.SOCKET_TIMEOUT);
+            HostUpdateResponseCommand responseCommand =
+                    JSONUtils.parseObject(command.getBody(), HostUpdateResponseCommand.class);
+            if (Objects.nonNull(responseCommand) && responseCommand.getStatus() == 1) {
+                logger.info("rebuild channel to {}  hostUpdateCommand: {}, hostUpdateResponseCommand: {} success", host,
+                        hostUpdateCommand, responseCommand);
+                return true;
+            }
+            logger.info("rebuild channel to {}  hostUpdateCommand: {}, hostUpdateResponseCommand: {} failed", host,
+                    hostUpdateCommand, responseCommand);
+            return false;
+        } catch (Exception e) {
+            logger.info("rebuild channel to {}  hostUpdateCommand: {} error", host, hostUpdateCommand, e);
+            return false;
         }
     }
 

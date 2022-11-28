@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
 
 import java.util.Date;
 
-import io.netty.channel.Channel;
 import lombok.Data;
+import io.netty.channel.Channel;
 
 /**
  * task event
@@ -116,6 +116,7 @@ public class TaskEvent {
         event.setChannel(channel);
         event.setWorkerAddress(workerAddress);
         event.setEvent(TaskEventType.RUNNING);
+        event.setAppIds(command.getAppIds());
         return event;
     }
 

@@ -18,11 +18,17 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
+import org.apache.dolphinscheduler.remote.command.HostUpdateResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
+
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
 /**
@@ -45,16 +50,39 @@ public class HostUpdateProcessor implements NettyRequestProcessor {
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    @Autowired
+    private WorkerMessageSender workerMessageSender;
+
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_REQUEST == command.getType(),
-                                    String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
         HostUpdateCommand updateCommand = JSONUtils.parseObject(command.getBody(), HostUpdateCommand.class);
         if (updateCommand == null) {
             logger.error("host update command is null");
             return;
         }
         logger.info("received host update command : {}", updateCommand);
-        messageRetryRunner.updateMessageHost(updateCommand.getTaskInstanceId(), updateCommand.getProcessHost());
+
+        TaskExecutionContext taskExecutionContext =
+                TaskExecutionContextCacheManager.getByTaskInstanceId(updateCommand.getTaskInstanceId());
+        HostUpdateResponseCommand responseCommand =
+                new HostUpdateResponseCommand(updateCommand.getTaskInstanceId(), updateCommand.getProcessHost(), 0);
+        if (Objects.nonNull(taskExecutionContext)) {
+            logger.info("find task instance {}, appIds: {}", updateCommand.getTaskInstanceId(),
+                    taskExecutionContext.getAppIds());
+            messageRetryRunner.updateMessageHost(updateCommand.getTaskInstanceId(), updateCommand.getProcessHost());
+            responseCommand.setStatus(1);
+        } else {
+            logger.info("not find task instance {}", updateCommand.getTaskInstanceId());
+        }
+
+        channel.writeAndFlush(responseCommand.convert2ResponseCommand(command.getOpaque()));
+
+        if (Objects.nonNull(taskExecutionContext)) {
+            logger.info("report task {} state running", taskExecutionContext);
+            workerMessageSender.sendMessageWithRetry(taskExecutionContext, updateCommand.getProcessHost(),
+                    CommandType.TASK_EXECUTE_RUNNING);
+        }
     }
 }

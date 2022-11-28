@@ -56,7 +56,7 @@ public class TaskStateEventHandler implements StateEventHandler {
 
         Map<Long, Integer> completeTaskMap = workflowExecuteRunnable.getCompleteTaskMap();
 
-        if (task.getState().isFinished()) {
+        if (task.getState().isFinished() || task.getState().isNeedFaultTolerance()) {
             if (completeTaskMap.containsKey(task.getTaskCode())
                     && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
                 logger.warn("The task instance is already complete, stateEvent: {}", stateEvent);

@@ -27,8 +27,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
@@ -165,6 +163,31 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
         if (!success) {
             throw new ExecuteException(String.format("send command : %s to %s error", command, host));
         }
+    }
+
+    /**
+     * sync execute command
+     * @param host
+     * @param command
+     * @param timeoutMillis
+     * @return
+     * @throws ExecuteException
+     */
+    public Command doSyncExecute(final Host host, final Command command, long timeoutMillis) throws ExecuteException {
+        // retry count，default retry 3
+        int retryCount = 3;
+        do {
+            try {
+                return nettyRemotingClient.sendSync(host, command, timeoutMillis);
+            } catch (Exception ex) {
+                logger.error(String.format("send command : %s to %s error", command, host), ex);
+                retryCount--;
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            }
+        } while (retryCount >= 0);
+
+        throw new ExecuteException(String.format("send command : %s to %s error", command, host));
+
     }
 
     /**

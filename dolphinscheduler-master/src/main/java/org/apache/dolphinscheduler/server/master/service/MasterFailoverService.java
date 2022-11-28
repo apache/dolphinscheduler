@@ -17,13 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
-import lombok.NonNull;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -31,11 +25,9 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
@@ -43,19 +35,27 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutor
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
-import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 
 @Service
 public class MasterFailoverService {
@@ -219,29 +219,30 @@ public class MasterFailoverService {
 
         taskInstance.setProcessInstance(processInstance);
 
-        if (!isMasterTask) {
-            LOGGER.info("The failover taskInstance is not master task");
-            TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                    .buildTaskInstanceRelatedInfo(taskInstance)
-                    .buildProcessInstanceRelatedInfo(processInstance)
-                    .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
-                    .create();
-
-            if (masterConfig.isKillYarnJobWhenTaskFailover()) {
-                // only kill yarn job if exists , the local thread has exited
-                LOGGER.info("TaskInstance failover begin kill the task related yarn job");
-                ProcessUtils.killYarnJob(taskExecutionContext);
-            }
-            // kill worker task, When the master failover and worker failover happened in the same time,
-            // the task may not be failover if we don't set NEED_FAULT_TOLERANCE.
-            // This can be improved if we can load all task when cache a workflowInstance in memory
-            sendKillCommandToWorker(taskInstance);
-        } else {
-            LOGGER.info("The failover taskInstance is a master task");
-        }
+        // if (!isMasterTask) {
+        // LOGGER.info("The failover taskInstance is not master task");
+        // TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+        // .buildTaskInstanceRelatedInfo(taskInstance)
+        // .buildProcessInstanceRelatedInfo(processInstance)
+        // .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
+        // .create();
+        //
+        // if (masterConfig.isKillYarnJobWhenTaskFailover()) {
+        // // only kill yarn job if exists , the local thread has exited
+        // LOGGER.info("TaskInstance failover begin kill the task related yarn job");
+        // ProcessUtils.killYarnJob(taskExecutionContext);
+        // }
+        // // kill worker task, When the master failover and worker failover happened in the same time,
+        // // the task may not be failover if we don't set NEED_FAULT_TOLERANCE.
+        // // This can be improved if we can load all task when cache a workflowInstance in memory
+        // sendKillCommandToWorker(taskInstance);
+        // } else {
+        // LOGGER.info("The failover taskInstance is a master task");
+        // }
+        LOGGER.info("TaskInstance {} state change to NEED_FAULT_TOLERANCE", taskInstance);
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
-        taskInstance.setFlag(Flag.NO);
+        // taskInstance.setFlag(Flag.NO);
         processService.saveTaskInstance(taskInstance);
     }
 
@@ -285,7 +286,8 @@ public class MasterFailoverService {
             // The processInstance is newly created
             return false;
         }
-        if (processInstance.getRestartTime() != null && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
+        if (processInstance.getRestartTime() != null
+                && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
             // the processInstance is already be failovered.
             return false;
         }

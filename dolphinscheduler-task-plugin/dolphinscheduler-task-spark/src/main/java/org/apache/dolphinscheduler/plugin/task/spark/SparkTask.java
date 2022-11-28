@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -42,7 +41,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,7 +118,8 @@ public class SparkTask extends AbstractYarnTask {
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        String command =
+                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
         logger.info("spark task command: {}", command);
 
@@ -136,12 +135,17 @@ public class SparkTask extends AbstractYarnTask {
         List<String> args = new ArrayList<>();
         args.add(SparkConstants.MASTER);
 
-        String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode() : SparkConstants.DEPLOY_MODE_LOCAL;
+        String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode()
+                : SparkConstants.DEPLOY_MODE_LOCAL;
         if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)) {
             args.add(SparkConstants.SPARK_ON_YARN);
             args.add(SparkConstants.DEPLOY_MODE);
         }
         args.add(deployMode);
+
+        if (SparkConstants.DEPLOY_MODE_CLUSTER.equals(deployMode)) {
+            args.add("--conf spark.yarn.submit.waitAppCompletion=false");
+        }
 
         ProgramType programType = sparkParameters.getProgramType();
         String mainClass = sparkParameters.getMainClass();
@@ -159,7 +163,8 @@ public class SparkTask extends AbstractYarnTask {
         }
 
         String others = sparkParameters.getOthers();
-        if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode) && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
+        if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)
+                && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
             String queue = sparkParameters.getQueue();
             if (StringUtils.isNotEmpty(queue)) {
                 args.add(SparkConstants.SPARK_QUEUE);
@@ -223,7 +228,8 @@ public class SparkTask extends AbstractYarnTask {
     }
 
     private String generateScriptFile() {
-        String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+        String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
 
         File file = new File(scriptFileName);
         Path path = file.toPath();

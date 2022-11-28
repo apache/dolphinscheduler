@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import lombok.NonNull;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
@@ -31,8 +27,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +39,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * mainly used to get the start command line of a process.
@@ -69,6 +72,7 @@ public class ProcessUtils {
      * @param executePath execute path
      */
     public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
+        logger.info("cancelApplication appIds: {}", appIds);
         if (appIds == null || appIds.isEmpty()) {
             return;
         }
@@ -76,7 +80,7 @@ public class ProcessUtils {
         for (String appId : appIds) {
             try {
                 TaskExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-
+                logger.info("appIds {} applicationStatus {}", appIds, applicationStatus);
                 if (!applicationStatus.isFinished()) {
                     String commandFile = String.format("%s/%s.kill", executePath, appId);
                     String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
@@ -207,10 +211,12 @@ public class ProcessUtils {
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
+                        taskExecutionContext.getExecutePath());
                 return appIds;
             } else {
-                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId());
+                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",
+                        taskExecutionContext.getTaskInstanceId());
             }
         } catch (Exception e) {
             logger.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
