@@ -281,13 +281,9 @@
     <select id="queryProcessInstanceListV2Paging"
             resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         SELECT
-        instance.id
-        , instance.name, instance.process_definition_version, instance.process_definition_code, instance.state, instance.recovery, instance.start_time, instance.end_time, instance.run_times,host,
-        instance.command_type, instance.command_param, instance.task_depend_type, instance.max_try_times, instance.failure_strategy, instance.warning_type,
-        instance.warning_group_id, instance.schedule_time, instance.command_start_time, instance.global_params, instance.flag,
-        instance.update_time, instance.is_sub_process, instance.executor_id, instance.history_cmd,
-        instance.process_instance_priority, instance.worker_group,instance.environment_code, instance.timeout, instance.tenant_id, instance.var_pool,
-        instance.dry_run, instance.test_flag, instance.next_process_instance_id, instance.restart_time, instance.state_history
+        <include refid="baseSql">
+            <property name="alias" value="instance"/>
+        </include>
 
         FROM t_ds_process_instance instance
         join t_ds_process_definition define ON instance.process_definition_code = define.code
