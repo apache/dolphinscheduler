@@ -115,7 +115,7 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testInitOptionsInClusterMode() throws Exception {
+    public void testInitOptionsInLocalMode() throws Exception {
         List<String> initOptions =
                 FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL));
         Assertions.assertEquals(2, initOptions.size());
@@ -124,7 +124,7 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testInitOptionsInApplicationMode() throws Exception {
+    public void testInitOptionsInClusterMode() throws Exception {
         List<String> initOptions = FlinkArgsUtils
                 .buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
         Assertions.assertEquals(6, initOptions.size());
