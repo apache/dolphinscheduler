@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -100,14 +101,7 @@ public class PythonGatewayTest {
         String content = "content";
         String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
 
-        int resourceId = 3;
-
-        Mockito.when(resourcesService.createOrUpdateResource(user.getUserName(), resourceFullName, desc, content))
-                .thenReturn(resourceId);
-
-        int id = pythonGateway.createOrUpdateResource(
-                user.getUserName(), resourceFullName, desc, content);
-        Assert.assertEquals(id, resourceId);
+        Assertions.assertDoesNotThrow(() -> resourcesService.createOrUpdateResource(user.getUserName(), resourceFullName, desc, content));
     }
 
 

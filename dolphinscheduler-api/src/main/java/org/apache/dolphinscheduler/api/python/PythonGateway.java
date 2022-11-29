@@ -637,11 +637,10 @@ public class PythonGateway {
      * @param fullName The fullname of resource.Includes path and suffix.
      * @param description description of resource
      * @param resourceContent content of resource
-     * @return id of resource
      */
-    public Integer createOrUpdateResource(
+    public void createOrUpdateResource(
             String userName, String fullName, String description, String resourceContent) {
-        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
+        resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
     }
 
     @PostConstruct

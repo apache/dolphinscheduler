@@ -1233,7 +1233,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Override
     @Transactional
-    public Integer createOrUpdateResource(String userName, String fullName, String description,
+    public void createOrUpdateResource(String userName, String fullName, String description,
                                           String resourceContent) {
         User user = userMapper.queryByUserNameAccurately(userName);
         int suffixLabelIndex = fullName.indexOf(PERIOD);
@@ -1247,13 +1247,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         Result<Object> createResult = onlineCreateOrUpdateResourceWithDir(
                 user, fullName, description, resourceContent);
-        if (createResult.getCode() == Status.SUCCESS.getCode()) {
-            Map<String, Object> resultMap = (Map<String, Object>) createResult.getData();
-            return (int) resultMap.get("id");
+        if (createResult.getCode() != Status.SUCCESS.getCode()) {
+            throw new IllegalArgumentException(String.format("Can not create or update resource : %s", fullName));
         }
-        String msg = String.format("Can not create or update resource : %s", fullName);
-        logger.error(msg);
-        throw new IllegalArgumentException(msg);
     }
 
     private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {
@@ -1532,6 +1528,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Resource queryResourcesFileInfo(String userName, String fullName) {
         User user = userMapper.queryByUserNameAccurately(userName);
+        if (!fullName.startsWith(FOLDER_SEPARATOR)) {
+            fullName = FOLDER_SEPARATOR + fullName;
+        }
         Result<Object> resourceResponse = this.queryResource(user, fullName, null, ResourceType.FILE);
         if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
             String msg = String.format("Can not find valid resource by name %s", fullName);

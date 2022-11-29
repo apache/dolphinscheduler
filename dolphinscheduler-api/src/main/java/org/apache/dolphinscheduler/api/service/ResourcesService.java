@@ -189,9 +189,8 @@ public interface ResourcesService {
      * @param fullName The fullname of resource.Includes path and suffix.
      * @param description description of resource
      * @param resourceContent content of resource
-     * @return id of resource
      */
-    Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent);
+    void createOrUpdateResource(String userName, String fullName, String description, String resourceContent);
 
     /**
      * updateProcessInstance resource
