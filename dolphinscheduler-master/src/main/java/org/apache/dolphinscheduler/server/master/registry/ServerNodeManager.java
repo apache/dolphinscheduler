@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
@@ -203,9 +202,6 @@ public class ServerNodeManager implements InitializingBean {
         }
 
         private void syncSingleWorkerNodeInfo(String workerAddress, WorkerHeartBeat info) {
-            if (!NetUtils.isLegalAddress(workerAddress)) {
-                return;
-            }
             workerNodeInfoWriteLock.lock();
             try {
                 workerNodeInfo.put(workerAddress, info);

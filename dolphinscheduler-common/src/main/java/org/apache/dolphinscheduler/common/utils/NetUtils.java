@@ -53,6 +53,11 @@ public class NetUtils {
     private static final int IPV4_SEMICOLON_PART = 2;
 
     private static final String IPV6_STARTER = "[";
+
+    private static final String IPV6_END = "]";
+    private static final String COLON = ":";
+
+    private static final String PORT_PATTERN = "^([1-9]|[1-9]\\d{1,4}|[1-6][0-5][0-5][0-3][0-5])$";
     private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
     private static InetAddress LOCAL_ADDRESS = null;
     private static volatile String HOST_ADDRESS;
@@ -350,15 +355,15 @@ public class NetUtils {
             return false;
         }
 
-        String[] ipAndPort = ipAndPortAddress.split(":");
+        String[] ipAndPort = ipAndPortAddress.split(COLON);
         if (ipAndPort.length == IPV4_SEMICOLON_PART) {
             return isValidIPv4Address(ipAndPort[0]) && isValidPort(ipAndPort[1]);
         }
 
         if (ipAndPortAddress.startsWith(IPV6_STARTER)) {
-            String[] ipv6Formats = ipAndPortAddress.split("]");
+            String[] ipv6Formats = ipAndPortAddress.split(IPV6_END);
             return isValidIPv6Address(ipv6Formats[0].replace(IPV6_STARTER, ""))
-                    && isValidPort(ipv6Formats[1].replace(":", ""));
+                    && isValidPort(ipv6Formats[1].replace(COLON, ""));
         }
 
         return false;
@@ -382,8 +387,7 @@ public class NetUtils {
         if (StringUtils.isEmpty(port)) {
             return false;
         }
-        String portRegex = "^([1-9]|[1-9]\\d{1,4}|[1-6][0-5][0-5][0-3][0-5])$";
-        return Pattern.matches(portRegex, port);
+        return Pattern.matches(PORT_PATTERN, port);
     }
 
 }
