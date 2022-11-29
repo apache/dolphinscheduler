@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,8 +51,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.util.Map;
 
 /**
  * queue controller
@@ -169,14 +169,14 @@ public class QueueController extends BaseController {
      */
     @Operation(summary = "deleteQueueById", description = "DELETE_QUEUE_NOTES")
     @Parameters({
-        @Parameter(name = "id", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
+            @Parameter(name = "id", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_QUEUE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @PathVariable(value = "id") int id) throws Exception {
+                                  @PathVariable(value = "id") int id) throws Exception {
         Map<String, Object> result = queueService.deleteQueueById(loginUser, id);
         return returnDataList(result);
     }

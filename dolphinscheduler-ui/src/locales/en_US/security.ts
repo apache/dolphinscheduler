@@ -76,6 +76,8 @@ export default {
     update_time: 'Update Time',
     operation: 'Operation',
     edit: 'Edit',
+    delete: 'Delete',
+    delete_confirm: 'Delete?',
     queue_name_tips: 'Please enter your queue name',
     queue_value_tips: 'Please enter your queue value'
   },
