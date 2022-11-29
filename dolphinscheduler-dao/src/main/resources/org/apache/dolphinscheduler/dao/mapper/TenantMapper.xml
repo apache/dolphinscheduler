@@ -42,6 +42,13 @@
         where tenant_code = #{tenantCode}
     </select>
 
+    <select id="queryTenantListByQueueId" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
+        select
+        <include refid="baseSql"/>
+        from t_ds_tenant
+        where queue_id = #{queueId}
+    </select>
+
     <select id="queryAll" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
         select
         <include refid="baseSql"/>
