@@ -17,8 +17,7 @@
 
 import { defineComponent, withKeys, PropType } from 'vue'
 import { NInput } from 'naive-ui'
-
-const placeholder ='Please enter keyword'
+import { useI18n } from 'vue-i18n'
 
 const props = {
   placeholder: {
@@ -32,6 +31,8 @@ const Search = defineComponent({
   emits: ['search','clear'],
   props: props,
   setup(props, ctx) {
+    const { t } = useI18n()
+
     const onKeyDown = (ev: KeyboardEvent) => {
       ctx.emit('search', (ev.target as HTMLInputElement)?.value || '')
     }
@@ -43,7 +44,7 @@ const Search = defineComponent({
         <NInput
             size='small'
             clearable
-            placeholder = {props.placeholder?props.placeholder:placeholder}
+            placeholder = {props.placeholder?props.placeholder:t('input_search.placeholder')}
             onKeydown={withKeys(onKeyDown, ['enter'])}
             onClear = {onClear}
         />
