@@ -651,7 +651,8 @@ public class PythonGateway {
      * @param resourceContent content of resource
      * @return StorageEntity object which contains necessary information about resource
      */
-    public StorageEntity createOrUpdateResource(String userName, String fullName, String resourceContent) throws Exception {
+    public StorageEntity createOrUpdateResource(String userName, String fullName,
+                                                String resourceContent) throws Exception {
         return resourceService.createOrUpdateResource(userName, fullName, resourceContent);
     }
 

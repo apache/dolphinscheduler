@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
-import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_SS;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
@@ -68,7 +67,6 @@ import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -1501,11 +1499,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Override
     @Transactional
-    public StorageEntity createOrUpdateResource(String userName, String filepath, String resourceContent) throws Exception {
+    public StorageEntity createOrUpdateResource(String userName, String filepath,
+                                                String resourceContent) throws Exception {
         User user = userMapper.queryByUserNameAccurately(userName);
         int suffixLabelIndex = filepath.indexOf(PERIOD);
         if (suffixLabelIndex == -1) {
-            throw new IllegalArgumentException(String.format("Not allow create or update resources without extension name, filepath: %s", filepath));
+            throw new IllegalArgumentException(String
+                    .format("Not allow create or update resources without extension name, filepath: %s", filepath));
         }
 
         String defaultPath = storageOperate.getResDir(user.getTenantCode());
@@ -1789,7 +1789,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.queryByUserNameAccurately(userName);
 
         String defaultPath = storageOperate.getResDir(user.getTenantCode());
-        return storageOperate.getFileStatus(defaultPath + fileName, defaultPath, user.getTenantCode(), ResourceType.FILE);
+        return storageOperate.getFileStatus(defaultPath + fileName, defaultPath, user.getTenantCode(),
+                ResourceType.FILE);
     }
 
     @Override

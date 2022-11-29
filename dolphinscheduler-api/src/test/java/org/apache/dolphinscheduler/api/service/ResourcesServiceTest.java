@@ -578,15 +578,19 @@ public class ResourcesServiceTest {
         Mockito.when(userMapper.queryByUserNameAccurately(user.getUserName())).thenReturn(getUser());
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
-        exception = Assertions.assertThrows(IllegalArgumentException.class, () -> resourcesService.createOrUpdateResource(user.getUserName(), "filename", "my-content"));
-        Assertions.assertTrue(exception.getMessage().contains("Not allow create or update resources without extension name"));
+        exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> resourcesService.createOrUpdateResource(user.getUserName(), "filename", "my-content"));
+        Assertions.assertTrue(
+                exception.getMessage().contains("Not allow create or update resources without extension name"));
 
         // SUCCESS
         Mockito.when(storageOperate.getResDir(user.getTenantCode())).thenReturn("/dolphinscheduler/123/resources/");
         Mockito.when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
         Mockito.when(FileUtils.writeContent2File(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        Mockito.when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any())).thenReturn(getStorageEntityResource());
-        StorageEntity storageEntity = resourcesService.createOrUpdateResource(user.getUserName(), "filename.txt", "my-content");
+        Mockito.when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.any())).thenReturn(getStorageEntityResource());
+        StorageEntity storageEntity =
+                resourcesService.createOrUpdateResource(user.getUserName(), "filename.txt", "my-content");
         Assertions.assertNotNull(storageEntity);
         Assertions.assertEquals("/dolphinscheduler/123/resources/ResourcesServiceTest", storageEntity.getFullName());
     }

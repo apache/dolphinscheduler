@@ -106,7 +106,8 @@ public class PythonGatewayTest {
         String content = "content";
         String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
 
-        Assertions.assertDoesNotThrow(() -> pythonGateway.createOrUpdateResource(user.getUserName(), resourceFullName, content));
+        Assertions.assertDoesNotThrow(
+                () -> pythonGateway.createOrUpdateResource(user.getUserName(), resourceFullName, content));
     }
 
     @Test
