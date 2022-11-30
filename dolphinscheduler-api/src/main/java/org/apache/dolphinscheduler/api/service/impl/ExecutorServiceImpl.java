@@ -210,6 +210,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         this.checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode,
                 processDefinition.getVersion());
 
+        checkStartNodeList(startNodeList,processDefinitionCode,processDefinition.getVersion());
         if (!checkTenantSuitable(processDefinition)) {
             logger.error(
                     "There is not any valid tenant for the process definition, processDefinitionCode:{}, processDefinitionName:{}.",
@@ -358,8 +359,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
-    
-    
+
+
      *
      * @param loginUser         login user
      * @param projectCode       project code
@@ -470,8 +471,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * do action to workflow instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
-    
-    
+
+
      *
      * @param loginUser         login user
      * @param workflowInstanceId workflow instance id
@@ -519,6 +520,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         return tenant != null;
     }
 
+    public boolean checkStartNodeList(String startNodeList, Long processDefinitionCode, int version){
+        if(StringUtils.isNotEmpty(startNodeList)){
+            List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinitionCode, version);
+            List<Long> existsNodes = processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toList());
+           for (String startNode : startNodeList.split(Constants.COMMA)){
+               if (!existsNodes.contains(Long.valueOf(startNode))){
+                   throw new ServiceException(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS,startNode);
+               }
+           }
+        }
+        return true;
+    }
     /**
      * Check the state of process instance and the type of operation match
      *
