@@ -35,7 +35,8 @@ public class DateJsonSerializer extends JsonSerializer<Date> {
     @Override
     public void serialize(Date value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         Date temp = value;
-        // In the internal implementation of JDK, sql.Date is inherited from util.Date, and sql.Date has rewritten many methods in util.Date, but it has not been implemented.
+        // In the internal implementation of JDK, java.sql.Date is inherited from util.Date, and java.sql.Date has
+        // rewritten many methods in java.util.Date, but it has not been implemented.
         // Later, when formatting, you need to call the method in Date to report an error.
         if (value instanceof java.sql.Date) {
             Calendar calendar = Calendar.getInstance();
