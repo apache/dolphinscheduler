@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -64,6 +65,18 @@ public interface DataAnalysisService {
      * @return definition count data
      */
     Map<String, Object> countDefinitionByUser(User loginUser, long projectCode);
+    /**
+     * statistics the process definition quantities of a certain person
+     * <p>
+     * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param userId userId
+     * @param releaseState releaseState
+     * @return definition count data
+     */
+    Map<String, Object> countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId, Integer releaseState);
 
     /**
      * statistical command status data
@@ -94,4 +107,46 @@ public interface DataAnalysisService {
     List<ExecuteStatusCount> countTaskInstanceAllStatesByProjectCodes(@Param("startTime") Date startTime,
                                                                       @Param("endTime") Date endTime,
                                                                       @Param("projectCodes") Long[] projectCodes);
+
+    /**
+     * query all workflow count
+     * @param loginUser login user
+     * @return workflow count
+     */
+    Map<String, Object> queryAllWorkflowCounts(User loginUser);
+
+    /**
+     * query all workflow States count
+     * @param loginUser login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return workflow States count
+     */
+    Map<String, Object> countWorkflowStates(User loginUser,
+                                            StatisticsStateRequest statisticsStateRequest);
+
+    /**
+     * query one workflow States count
+     * @param loginUser login user
+     * @param workflowCode workflowCode
+     * @return workflow States count
+     */
+    Map<String, Object> countOneWorkflowStates(User loginUser, Long workflowCode);
+
+    /**
+     * query all task States count
+     * @param loginUser login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return tasks States count
+     */
+    Map<String, Object> countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest);
+
+    /**
+     * query one task States count
+     * @param loginUser login user
+     * @param taskCode taskCode
+     * @return tasks States count
+     */
+    Map<String, Object> countOneTaskStates(User loginUser, Long taskCode);
+
+    Long getProjectCodeByName(String projectName);
 }

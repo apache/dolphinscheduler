@@ -325,10 +325,10 @@
             and t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="model >= 1">
-           and p.name = #{projectName}
+           and p.code = #{projectCode}
         </if>
         <if test="model >= 2">
-            and d.name = #{workflowName}
+            and d.code = #{workflowCode}
         </if>
         group by t.state
     </select>

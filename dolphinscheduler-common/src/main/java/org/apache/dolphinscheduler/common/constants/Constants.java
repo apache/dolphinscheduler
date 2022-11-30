@@ -806,5 +806,5 @@ public final class Constants {
     public static final Integer QUERY_ALL_ON_SYSTEM = 0;
     public static final Integer QUERY_ALL_ON_PROJECT = 1;
     public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
-
+    public static final Integer QUERY_ALL_ON_TASK = 3;
 }

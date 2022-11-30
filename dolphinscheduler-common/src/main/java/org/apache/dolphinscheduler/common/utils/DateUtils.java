@@ -481,21 +481,6 @@ public final class DateUtils {
     }
 
     /**
-     * get a month ago
-     *
-     * @param date date
-     * @return get a month ago
-     */
-    public static Date getMonthAgo(Date date) {
-        Calendar cal = Calendar.getInstance();
-
-        cal.setTime(date);
-
-        cal.add(Calendar.MONTH, -1);
-        return cal.getTime();
-    }
-
-    /**
      * return YYYY-MM-DD 00:00:00
      *
      * @param inputDay date

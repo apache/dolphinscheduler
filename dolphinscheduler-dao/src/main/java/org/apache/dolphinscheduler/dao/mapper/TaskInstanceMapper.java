@@ -27,6 +27,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -77,6 +78,20 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                                   @Param("projectCodes") Long[] projectCodes);
 
     /**
+     * Statistics task instance group by given project ids list by start time
+     * <p>
+     * We only need project ids to determine whether the task instance belongs to the user or not.
+     *
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectIds Project ids list to filter
+     * @return List of ExecuteStatusCount
+     */
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectIdsV2(@Param("startTime") Date startTime,
+                                                                  @Param("endTime") Date endTime,
+                                                                  @Param("projectIds") Set<Integer> projectIds);
+
+    /**
      * Statistics task instance group by given project codes list by submit time
      * <p>
      * We only need project codes to determine whether the task instance belongs to the user or not.
@@ -90,6 +105,26 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                                                        @Param("endTime") Date endTime,
                                                                                        @Param("projectCodes") Long[] projectCodes,
                                                                                        @Param("states") List<TaskExecutionStatus> states);
+    /**
+     * Statistics task instance group by given project codes list by submit time
+     * <p>
+     * We only need project codes to determine whether the task instance belongs to the user or not.
+     *
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectCode  projectCode
+     * @param model model
+     * @param projectIds projectIds
+     * @return List of ExecuteStatusCount
+     */
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStatesBySubmitTimeV2(@Param("startTime") Date startTime,
+                                                                                         @Param("endTime") Date endTime,
+                                                                                         @Param("projectCode") Long projectCode,
+                                                                                         @Param("workflowCode") Long workflowCode,
+                                                                                         @Param("taskCode") Long taskCode,
+                                                                                         @Param("model") Integer model,
+                                                                                         @Param("projectIds") Set<Integer> projectIds,
+                                                                                         @Param("states") List<TaskExecutionStatus> states);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectCode") Long projectCode,

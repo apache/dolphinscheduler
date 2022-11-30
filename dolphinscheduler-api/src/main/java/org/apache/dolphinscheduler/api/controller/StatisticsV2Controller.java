@@ -17,16 +17,22 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_DEFINITION_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_WORKFLOW_COUNT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ONE_TASK_STATES_COUNT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ONE_WORKFLOW_STATE_COUNT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_STATES_COUNT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_STATES_COUNT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
-import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -44,7 +50,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 /**
- * workflow instance controller
+ * StatisticsV2 controller
  */
 @Tag(name = "STATISTICS_V2")
 @RestController
@@ -52,10 +58,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class StatisticsV2Controller extends BaseController {
 
     @Autowired
-    private ProjectService projectService;
-
-    @Autowired
     private DataAnalysisService dataAnalysisService;
+
     /**
      * query all workflow count
      * @param loginUser login user
@@ -67,7 +71,8 @@ public class StatisticsV2Controller extends BaseController {
     @ApiException(QUERY_ALL_WORKFLOW_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryWorkflowInstanceCounts(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        return projectService.queryAllWorkflowCounts(loginUser);
+        Map<String, Object> result = dataAnalysisService.queryAllWorkflowCounts(loginUser);
+        return returnDataList(result);
     }
 
     /**
@@ -79,30 +84,126 @@ public class StatisticsV2Controller extends BaseController {
     @Operation(summary = "queryAllWorkflowStatesCount", description = "QUERY_ALL_WORKFLOW_STATES_COUNT")
     @GetMapping(value = "/workflows/states/count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALL_WORKFLOW_COUNT_ERROR)
+    @ApiException(QUERY_WORKFLOW_STATES_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryWorkflowStatesCounts(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestBody(required = false) StatisticsStateRequest statisticsStateRequest) {
         Map<String, Object> result =
-                projectService.countWorkflowStates(loginUser, statisticsStateRequest);
+                dataAnalysisService.countWorkflowStates(loginUser, statisticsStateRequest);
         return returnDataList(result);
     }
 
     /**
      * query one workflow States count
      * @param loginUser login user
-     * @param workflowName workflowName
+     * @param workflowCode workflowCode
      * @return workflow States count
      */
-    @Operation(summary = "queryAllWorkflowStatesCount", description = "QUERY_ALL_WORKFLOW_STATES_COUNT")
-    @GetMapping(value = "/{workflowName}/states/count")
+    @Operation(summary = "queryOneWorkflowStatesCount", description = "QUERY_One_WORKFLOW_STATES_COUNT")
+    @GetMapping(value = "/{workflowCode}/states/count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALL_WORKFLOW_COUNT_ERROR)
+    @ApiException(QUERY_ONE_WORKFLOW_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryOneWorkflowStates(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable("workflowName") String workflowName) {
+                                         @PathVariable("workflowCode") Long workflowCode) {
         Map<String, Object> result =
-                projectService.countOneWorkflowStates(loginUser, workflowName);
+                dataAnalysisService.countOneWorkflowStates(loginUser, workflowCode);
+        return returnDataList(result);
+    }
+
+    /**
+     * query all task States count
+     * @param loginUser login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return tasks States count
+     */
+    @Operation(summary = "queryAllTaskStatesCount", description = "QUERY_ALL_TASK_STATES_COUNT")
+    @GetMapping(value = "/tasks/states/count")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_STATES_COUNT_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryTaskStatesCounts(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @RequestBody(required = false) StatisticsStateRequest statisticsStateRequest) {
+        Map<String, Object> result =
+                dataAnalysisService.countTaskStates(loginUser, statisticsStateRequest);
+        return returnDataList(result);
+    }
+
+    /**
+     * query one task States count
+     * @param loginUser login user
+     * @param taskCode taskCode
+     * @return tasks States count
+     */
+    @Operation(summary = "queryOneTaskStatesCount", description = "QUERY_ONE_TASK_STATES_COUNT")
+    @GetMapping(value = "/tasks/{taskCode}/states/count")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_ONE_TASK_STATES_COUNT_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryOneTaskStatesCounts(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @PathVariable("taskCode") Long taskCode) {
+        Map<String, Object> result =
+                dataAnalysisService.countOneTaskStates(loginUser, taskCode);
+        return returnDataList(result);
+    }
+
+    /**
+     * statistics the process definition quantities of certain person
+     *
+     * @param loginUser login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return definition count in project code
+     */
+    @Operation(summary = "countDefinitionV2ByUserId", description = "COUNT_PROCESS_DEFINITION_V2_BY_USERID_NOTES")
+    @GetMapping(value = "/workflows/users/count")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result countDefinitionByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @RequestBody(required = false) StatisticsStateRequest statisticsStateRequest) {
+        String projectName = statisticsStateRequest.getProjectName();
+        Long projectCode = statisticsStateRequest.getProjectCode();
+        if (null == projectCode && !StringUtils.isBlank(projectName)) {
+            projectCode = dataAnalysisService.getProjectCodeByName(projectName);
+        }
+        Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, projectCode, null, null);
+        return returnDataList(result);
+    }
+
+    /**
+     * statistics the process definition quantities of certain userId
+     *
+     * @param loginUser login user
+     * @param userId userId
+     * @return definition count in project code
+     */
+    @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
+    @GetMapping(value = "/workflows/users/{userId}/count")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result countDefinitionByUserId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @PathVariable("userId") Integer userId) {
+        Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, null);
+        return returnDataList(result);
+    }
+    /**
+    * statistics the process definition quantities of certain userId filter releaseState
+    *
+    * @param loginUser login user
+    * @param userId userId
+    * @param releaseState releaseState
+    * @return definition count in project code
+    */
+    @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
+    @GetMapping(value = "/workflows/users/{userId}/{releaseState}/count")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result countDefinitionByUserId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @PathVariable("userId") Integer userId,
+                                          @PathVariable("releaseState") Integer releaseState) {
+        Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, releaseState);
         return returnDataList(result);
     }
 }

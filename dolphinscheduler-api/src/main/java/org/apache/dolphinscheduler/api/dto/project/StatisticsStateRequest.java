@@ -30,19 +30,31 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StatisticsStateRequest {
 
-    @Schema(name = "isAll", example = "isAll")
+    @Schema(name = "isAll", example = "true")
     boolean isAll;
 
     @Schema(name = "projectName", example = "PROJECT-NAME")
     String projectName;
 
+    @Schema(name = "projectCode", example = "PROJECT-CODE")
+    Long projectCode;
+
     @Schema(name = "workflowName", example = "WORKFLOW-NAME")
     String workflowName;
 
-    @Schema(name = "startDate", example = "START-TIME")
+    @Schema(name = "workflowCode", example = "WORKFLOW-CODE")
+    Long workflowCode;
+
+    @Schema(name = "taskName", example = "TASK-NAME")
+    String taskName;
+
+    @Schema(name = "taskCode", example = "TASK-CODE")
+    Long taskCode;
+
+    @Schema(name = "startDate", example = "2022-01-01 10:01:02")
     Date startTime;
 
-    @Schema(name = "endDate", example = "END-DATE")
+    @Schema(name = "endDate", example = "2022-01-02 10:01:02")
     Date endTime;
 
 }

@@ -295,17 +295,17 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      *
      * @param startTime    startTime
      * @param endTime      endTime
-     * @param projectName  projectName
-     * @param workflowName workflowName
-     * @param model
-     * @param projectIds
+     * @param projectCode  projectCode
+     * @param workflowCode workflowCode
+     * @param model model
+     * @param projectIds projectIds
      * @return ExecuteStatusCount list
      */
     List<ExecuteStatusCount> countInstanceStateV2(
                                                   @Param("startTime") Date startTime,
                                                   @Param("endTime") Date endTime,
-                                                  @Param("projectName") String projectName,
-                                                  @Param("workflowName") String workflowName,
+                                                  @Param("projectCode") Long projectCode,
+                                                  @Param("workflowCode") Long workflowCode,
                                                   @Param("model") Integer model,
                                                   @Param("projectIds") Set<Integer> projectIds);
 
