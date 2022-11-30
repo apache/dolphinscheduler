@@ -199,7 +199,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                                 taskDefinitionLogDao);
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
-                                processInstance.getId(),masterConfig.getWorkflowMaxSubmitTimes()));
+                                processInstance.getId(), masterConfig.getWorkflowMaxSubmitTimes()));
                     } finally {
                         LoggerUtils.removeWorkflowInstanceIdMDC();
                     }

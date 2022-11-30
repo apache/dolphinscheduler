@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.event;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
@@ -75,9 +74,9 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);
                         workflowEvent.setMaxSubmitTimes(workflowEvent.getMaxSubmitTimes() - 1);
-                        if(workflowEvent.getMaxSubmitTimes() >= 0){
+                        if (workflowEvent.getMaxSubmitTimes() >= 0) {
                             workflowEventQueue.addEvent(workflowEvent);
-                        }else {
+                        } else {
                             WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
                                     .processInstanceId(processInstance.getId())
                                     .type(StateEventType.PROCESS_SUBMIT_FAILED)

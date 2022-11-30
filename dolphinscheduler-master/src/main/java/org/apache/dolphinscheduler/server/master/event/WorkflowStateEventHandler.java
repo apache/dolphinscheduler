@@ -59,7 +59,7 @@ public class WorkflowStateEventHandler implements StateEventHandler {
             return true;
         }
         if (workflowStateEvent.getStatus().isFinished()) {
-            if(workflowStateEvent.getType() == StateEventType.PROCESS_SUBMIT_FAILED){
+            if (workflowStateEvent.getType().equals(StateEventType.PROCESS_SUBMIT_FAILED)) {
                 workflowExecuteRunnable.updateProcessInstanceState(workflowStateEvent);
             }
             workflowExecuteRunnable.endProcess();
