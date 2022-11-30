@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
@@ -46,6 +47,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
@@ -135,6 +137,8 @@ public class ExecutorServiceTest {
 
     private int processDefinitionId = 1;
 
+    private int processDefinitionVersion = 1;
+
     private long processDefinitionCode = 1L;
 
     private int processInstanceId = 1;
@@ -150,6 +154,8 @@ public class ExecutorServiceTest {
     private ProcessInstance processInstance = new ProcessInstance();
 
     private TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
+
+    private List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
 
     private User loginUser = new User();
 
@@ -195,20 +201,30 @@ public class ExecutorServiceTest {
         // cronRangeTime
         cronTime = "2020-01-01 00:00:00,2020-01-31 23:00:00";
 
+        // processTaskRelations
+        ProcessTaskRelation processTaskRelation1 = new ProcessTaskRelation();
+        processTaskRelation1.setPostTaskCode(123456789L);
+        ProcessTaskRelation processTaskRelation2 = new ProcessTaskRelation();
+        processTaskRelation2.setPostTaskCode(987654321L);
+        processTaskRelations.add(processTaskRelation1);
+        processTaskRelations.add(processTaskRelation2);
+
         // mock
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START))
                 .thenReturn(checkProjectAndAuth());
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(this.processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
         doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
                 .thenReturn(Optional.ofNullable(processInstance));
-        Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(processDefinition);
+        Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(this.processDefinition);
         Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
         Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
+        Mockito.when(processService.findRelationByCode(processDefinitionCode, processDefinitionVersion))
+                .thenReturn(processTaskRelations);
     }
 
     @Test
@@ -253,7 +269,7 @@ public class ExecutorServiceTest {
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.START_PROCESS,
-                null, "n1,n2",
+                null, "123456789,987654321",
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
@@ -262,6 +278,27 @@ public class ExecutorServiceTest {
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
+    }
+
+    @Test
+    public void testComplementWithOldStartNodeList() {
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+                .thenReturn(zeroSchedulerList());
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = executorService.execProcessInstance(loginUser, projectCode,
+                    processDefinitionCode,
+                    "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                    CommandType.START_PROCESS,
+                    null, "1123456789,987654321",
+                    null, null, null,
+                    RunMode.RUN_MODE_SERIAL,
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                    Constants.TEST_FLAG_NO,
+                    ComplementDependentMode.OFF_MODE);
+        } catch (ServiceException e) {
+            Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
+        }
     }
 
     @Test
