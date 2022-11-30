@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -78,60 +79,111 @@ public class LoggerServiceTest {
     private LogClient logClient;
 
     @Test
-    public void testQueryDataSourceList() {
+    public void testQueryLog() {
 
+        User loginUser = new User();
+        loginUser.setId(1);
         TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setExecutorId(loginUser.getId() + 1);
         Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
-        Result result = loggerService.queryLog(2, 1, 1);
+        Result result = loggerService.queryLog(loginUser, 2, 1, 1);
         // TASK_INSTANCE_NOT_FOUND
         Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
 
         try {
             // HOST NOT FOUND OR ILLEGAL
-            result = loggerService.queryLog(1, 1, 1);
+            result = loggerService.queryLog(loginUser, 1, 1, 1);
         } catch (RuntimeException e) {
             Assertions.assertTrue(true);
             logger.error("testQueryDataSourceList error {}", e.getMessage());
         }
         Assertions.assertEquals(Status.TASK_INSTANCE_HOST_IS_NULL.getCode(), result.getCode().intValue());
 
-        // SUCCESS
+        // PROJECT_NOT_EXIST
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
+        try {
+            Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
+                    .checkProjectAndAuthThrowException(loginUser, null, VIEW_LOG);
+            loggerService.queryLog(loginUser, 1, 1, 1);
+        } catch (ServiceException serviceException) {
+            Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
+        }
+
+        // USER_NO_OPERATION_PERM
+        Project project = getProject(1);
+        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
+        try {
+            Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                    .checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
+            loggerService.queryLog(loginUser, 1, 1, 1);
+        } catch (ServiceException serviceException) {
+            Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), serviceException.getCode());
+        }
+
+        // SUCCESS
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
         Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
-        result = loggerService.queryLog(1, 1, 1);
+        result = loggerService.queryLog(loginUser, 1, 1, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testGetLogBytes() {
 
+        User loginUser = new User();
+        loginUser.setId(1);
         TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setExecutorId(loginUser.getId() + 1);
         Mockito.when(taskInstanceDao.findTaskInstanceById(1)).thenReturn(taskInstance);
 
         // task instance is null
         try {
-            loggerService.getLogBytes(2);
-        } catch (RuntimeException e) {
-            Assertions.assertTrue(true);
+            loggerService.getLogBytes(loginUser, 2);
+        } catch (ServiceException e) {
+            Assertions.assertEquals(new ServiceException("task instance is null or host is null").getMessage(),
+                    e.getMessage());
             logger.error("testGetLogBytes error: {}", "task instance is null");
         }
 
         // task instance host is null
         try {
-            loggerService.getLogBytes(1);
-        } catch (RuntimeException e) {
-            Assertions.assertTrue(true);
+            loggerService.getLogBytes(loginUser, 1);
+        } catch (ServiceException e) {
+            Assertions.assertEquals(new ServiceException("task instance is null or host is null").getMessage(),
+                    e.getMessage());
             logger.error("testGetLogBytes error: {}", "task instance host is null");
         }
 
-        // success
+        // PROJECT_NOT_EXIST
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
+        try {
+            Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
+                    .checkProjectAndAuthThrowException(loginUser, null, DOWNLOAD_LOG);
+            loggerService.queryLog(loginUser, 1, 1, 1);
+        } catch (ServiceException serviceException) {
+            Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
+        }
+
+        // USER_NO_OPERATION_PERM
+        Project project = getProject(1);
+        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
+        try {
+            Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                    .checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
+            loggerService.queryLog(loginUser, 1, 1, 1);
+        } catch (ServiceException serviceException) {
+            Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), serviceException.getCode());
+        }
+
+        // SUCCESS
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
         Mockito.when(logClient.getLogBytes(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
                 .thenReturn(new byte[0]);
-        loggerService.getLogBytes(1);
-
+        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
+        byte[] result = loggerService.getLogBytes(loginUser, 1);
+        Assertions.assertEquals(90, result.length);
     }
 
     @Test

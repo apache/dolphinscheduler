@@ -68,7 +68,7 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
     public void writeHeartBeat(MasterHeartBeat masterHeartBeat) {
         String masterHeartBeatJson = JSONUtils.toJsonString(masterHeartBeat);
         registryClient.persistEphemeral(heartBeatPath, masterHeartBeatJson);
-        log.info("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
+        log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
                 heartBeatPath, masterHeartBeatJson);
     }
 }

@@ -18,6 +18,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -56,6 +57,16 @@ public interface ProcessInstanceService {
                                                  Integer processId);
 
     /**
+     * query process instance by id
+     *
+     * @param loginUser login user
+     * @param processId process instance id
+     * @return process instance detail
+     */
+    Map<String, Object> queryProcessInstanceById(User loginUser,
+                                                 Integer processId);
+
+    /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
      * @param loginUser login user
@@ -83,6 +94,16 @@ public interface ProcessInstanceService {
                                     String otherParamsJson,
                                     Integer pageNo,
                                     Integer pageSize);
+
+    /**
+     * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
+     *
+     * @param loginUser login user
+     * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
+     * @return process instance list
+     */
+    Result queryProcessInstanceList(User loginUser,
+                                    WorkflowInstanceQueryRequest workflowInstanceQueryRequest);
 
     /**
      * query task list by process instance id
@@ -162,6 +183,16 @@ public interface ProcessInstanceService {
     Map<String, Object> deleteProcessInstanceById(User loginUser,
                                                   long projectCode,
                                                   Integer processInstanceId);
+
+    /**
+     * delete process instance by id, at the same time，delete task instance and their mapping relation data
+     *
+     * @param loginUser login user
+     * @param workflowInstanceId work instance id
+     * @return delete result code
+     */
+    Map<String, Object> deleteProcessInstanceById(User loginUser,
+                                                  Integer workflowInstanceId);
 
     /**
      * view process instance variables
