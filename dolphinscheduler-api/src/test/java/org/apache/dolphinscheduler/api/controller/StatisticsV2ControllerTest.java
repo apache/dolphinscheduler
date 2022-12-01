@@ -161,23 +161,6 @@ public class StatisticsV2ControllerTest extends AbstractControllerTest {
 
         Assertions.assertTrue(result1.isSuccess());
     }
-    @Test
-    public void testCountDefinitionByUserState() {
-        User loginUser = getLoginUser();
-
-        Integer releaseState = 0;
-        Map<String, Object> result = new HashMap<>();
-        Integer userId = 1;
-
-        putMsg(result, Status.SUCCESS);
-
-        Mockito.when(dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, releaseState))
-                .thenReturn(result);
-
-        Result result1 = statisticsV2Controller.countDefinitionByUserState(loginUser, userId, releaseState);
-
-        Assertions.assertTrue(result1.isSuccess());
-    }
 
     private User getLoginUser() {
         User user = new User();
