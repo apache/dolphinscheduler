@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -90,8 +88,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * create project
      *
      * @param loginUser login user
-     * @param name project name
-     * @param desc description
+     * @param name      project name
+     * @param desc      description
      * @return returns an error if it exists
      */
     @Override
@@ -331,8 +329,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which the login user have permission to see
      */
     @Override
@@ -366,11 +364,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * admin can view all projects
      *
-     * @param userId user id
+     * @param userId    user id
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which with the login user's authorized level
      */
     @Override
@@ -417,7 +415,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * delete project by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return delete result code
      */
@@ -462,7 +460,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * get check result
      *
      * @param loginUser login user
-     * @param project project
+     * @param project   project
      * @return check result
      */
     private Map<String, Object> getCheckResult(User loginUser, Project project, String perm) {
@@ -478,11 +476,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * updateProcessInstance project
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param projectName project name
-     * @param desc description
-     * @param userName project owner
+     * @param desc        description
+     * @param userName    project owner
      * @return update result code
      */
     @Override
@@ -528,6 +526,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * query all project with authorized level
+     *
      * @param loginUser login user
      * @return project list
      */
@@ -571,7 +570,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query unauthorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return the projects which user have not permission to see
      */
     @Override
@@ -606,7 +605,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * get unauthorized project
      *
-     * @param projectSet project set
+     * @param projectSet        project set
      * @param authedProjectList authed project list
      * @return project list that unauthorized
      */
@@ -625,7 +624,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
     @Override
@@ -642,8 +641,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query authorized user
      *
-     * @param loginUser     login user
-     * @param projectCode   project code
+     * @param loginUser   login user
+     * @param projectCode project code
      * @return users        who have permission for the specified project
      */
     @Override
@@ -709,7 +708,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check whether have read permission
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return true if the user have permission to see the project, otherwise return false
      */
@@ -721,7 +720,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query permission id
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return permission
      */
@@ -746,6 +745,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * query all project list
+     *
      * @param user
      * @return project list
      */
@@ -798,5 +798,4 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
 }
