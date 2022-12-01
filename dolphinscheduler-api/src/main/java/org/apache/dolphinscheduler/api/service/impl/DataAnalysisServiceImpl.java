@@ -382,10 +382,10 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     }
 
     /**
-     * query all workflow States count
+     * query all workflow states count
      * @param loginUser login user
      * @param statisticsStateRequest statisticsStateRequest
-     * @return workflow States count
+     * @return workflow states count
      */
     @Override
     public Map<String, Object> countWorkflowStates(User loginUser,
@@ -432,6 +432,12 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
+    /**
+     * query one workflow states count
+     * @param loginUser login user
+     * @param workflowCode workflowCode
+     * @return workflow states count
+     */
     @Override
     public Map<String, Object> countOneWorkflowStates(User loginUser, Long workflowCode) {
         Map<String, Object> result = new HashMap<>();
@@ -450,6 +456,12 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
+    /**
+     * query all task states count
+     * @param loginUser login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return tasks states count
+     */
     @Override
     public Map<String, Object> countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest) {
         Map<String, Object> result = new HashMap<>();
@@ -514,6 +526,12 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
+    /**
+     * query one task states count
+     * @param loginUser login user
+     * @param taskCode taskCode
+     * @return tasks states count
+     */
     @Override
     public Map<String, Object> countOneTaskStates(User loginUser, Long taskCode) {
         Map<String, Object> result = new HashMap<>();

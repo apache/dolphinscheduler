@@ -62,11 +62,11 @@ public interface DataAnalysisService {
      *
      * @param loginUser   login user
      * @param projectCode project code
-     * @return definition count data
+     * @return workflow count data
      */
     Map<String, Object> countDefinitionByUser(User loginUser, long projectCode);
     /**
-     * statistics the process definition quantities of a certain person
+     * statistics the workflow quantities of certain user
      * <p>
      * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
      *
@@ -74,7 +74,7 @@ public interface DataAnalysisService {
      * @param projectCode project code
      * @param userId userId
      * @param releaseState releaseState
-     * @return definition count data
+     * @return workflow count data
      */
     Map<String, Object> countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId, Integer releaseState);
 
@@ -116,35 +116,35 @@ public interface DataAnalysisService {
     Map<String, Object> queryAllWorkflowCounts(User loginUser);
 
     /**
-     * query all workflow States count
+     * query all workflow states count
      * @param loginUser login user
      * @param statisticsStateRequest statisticsStateRequest
-     * @return workflow States count
+     * @return workflow states count
      */
     Map<String, Object> countWorkflowStates(User loginUser,
                                             StatisticsStateRequest statisticsStateRequest);
 
     /**
-     * query one workflow States count
+     * query one workflow states count
      * @param loginUser login user
      * @param workflowCode workflowCode
-     * @return workflow States count
+     * @return workflow states count
      */
     Map<String, Object> countOneWorkflowStates(User loginUser, Long workflowCode);
 
     /**
-     * query all task States count
+     * query all task states count
      * @param loginUser login user
      * @param statisticsStateRequest statisticsStateRequest
-     * @return tasks States count
+     * @return tasks states count
      */
     Map<String, Object> countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest);
 
     /**
-     * query one task States count
+     * query one task states count
      * @param loginUser login user
      * @param taskCode taskCode
-     * @return tasks States count
+     * @return tasks states count
      */
     Map<String, Object> countOneTaskStates(User loginUser, Long taskCode);
 
