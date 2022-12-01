@@ -169,6 +169,20 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<DefinitionGroupByUser> countDefinitionByProjectCodes(@Param("projectCodes") Long[] projectCodes);
 
     /**
+     * Statistics process definition group by project codes list
+     * <p>
+     * We only need project codes to determine whether the definition belongs to the user or not.
+     *
+     * @param projectCodes projectCodes
+     * @param userId userId
+     * @param releaseState releaseState
+     * @return definition group by user
+     */
+    List<DefinitionGroupByUser> countDefinitionByProjectCodesV2(@Param("projectCodes") Long[] projectCodes,
+                                                                @Param("userId") Integer userId,
+                                                                @Param("releaseState") Integer releaseState);
+
+    /**
      * list all resource ids
      *
      * @return resource ids list
