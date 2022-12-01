@@ -48,15 +48,6 @@ public class StatisticsV2ControllerTest extends AbstractControllerTest {
     @Mock
     private DataAnalysisServiceImpl dataAnalysisService;
 
-    @Mock
-    private ProjectMapper projectMapper;
-
-    @Mock
-    private ProcessServiceImpl processService;
-
-    @Mock
-    private ResourcePermissionCheckServiceImpl resourcePermissionCheckService;
-
     @Test
     public void testQueryWorkflowInstanceCounts() {
         User loginUser = getLoginUser();
