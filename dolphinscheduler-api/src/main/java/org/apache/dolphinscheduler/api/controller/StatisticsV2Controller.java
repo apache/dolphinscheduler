@@ -79,7 +79,7 @@ public class StatisticsV2Controller extends BaseController {
      * query all workflow states count
      * @param loginUser login user
      * @param statisticsStateRequest statisticsStateRequest
-     * @return workflow States count
+     * @return workflow states count
      */
     @Operation(summary = "queryAllWorkflowStatesCount", description = "QUERY_ALL_WORKFLOW_STATES_COUNT")
     @GetMapping(value = "/workflows/states/count")
