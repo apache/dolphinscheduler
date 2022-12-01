@@ -94,10 +94,10 @@ public class StatisticsV2Controller extends BaseController {
     }
 
     /**
-     * query one workflow States count
+     * query one workflow states count
      * @param loginUser login user
      * @param workflowCode workflowCode
-     * @return workflow States count
+     * @return workflow states count
      */
     @Operation(summary = "queryOneWorkflowStatesCount", description = "QUERY_One_WORKFLOW_STATES_COUNT")
     @GetMapping(value = "/{workflowCode}/states/count")
@@ -112,10 +112,10 @@ public class StatisticsV2Controller extends BaseController {
     }
 
     /**
-     * query all task States count
+     * query all task states count
      * @param loginUser login user
      * @param statisticsStateRequest statisticsStateRequest
-     * @return tasks States count
+     * @return tasks states count
      */
     @Operation(summary = "queryAllTaskStatesCount", description = "QUERY_ALL_TASK_STATES_COUNT")
     @GetMapping(value = "/tasks/states/count")
@@ -130,10 +130,10 @@ public class StatisticsV2Controller extends BaseController {
     }
 
     /**
-     * query one task States count
+     * query one task states count
      * @param loginUser login user
      * @param taskCode taskCode
-     * @return tasks States count
+     * @return tasks states count
      */
     @Operation(summary = "queryOneTaskStatesCount", description = "QUERY_ONE_TASK_STATES_COUNT")
     @GetMapping(value = "/tasks/{taskCode}/states/count")
@@ -148,11 +148,10 @@ public class StatisticsV2Controller extends BaseController {
     }
 
     /**
-     * statistics the process definition quantities of certain person
-     *
+     * statistics the workflow quantities of certain user
      * @param loginUser login user
      * @param statisticsStateRequest statisticsStateRequest
-     * @return definition count in project code
+     * @return workflow count in project code
      */
     @Operation(summary = "countDefinitionV2ByUserId", description = "COUNT_PROCESS_DEFINITION_V2_BY_USERID_NOTES")
     @GetMapping(value = "/workflows/users/count")
@@ -171,11 +170,10 @@ public class StatisticsV2Controller extends BaseController {
     }
 
     /**
-     * statistics the process definition quantities of certain userId
-     *
+     * statistics the workflow quantities of certain userId
      * @param loginUser login user
      * @param userId userId
-     * @return definition count in project code
+     * @return workflow count in project code
      */
     @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
     @GetMapping(value = "/workflows/users/{userId}/count")
@@ -188,21 +186,20 @@ public class StatisticsV2Controller extends BaseController {
         return returnDataList(result);
     }
     /**
-    * statistics the process definition quantities of certain userId filter releaseState
-    *
+     * statistics the workflow quantities of certain userId and releaseState
     * @param loginUser login user
     * @param userId userId
     * @param releaseState releaseState
-    * @return definition count in project code
+    * @return workflow count in project code
     */
     @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
     @GetMapping(value = "/workflows/users/{userId}/{releaseState}/count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countDefinitionByUserId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @PathVariable("userId") Integer userId,
-                                          @PathVariable("releaseState") Integer releaseState) {
+    public Result countDefinitionByUserState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @PathVariable("userId") Integer userId,
+                                             @PathVariable("releaseState") Integer releaseState) {
         Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, releaseState);
         return returnDataList(result);
     }

@@ -416,7 +416,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 workflowCode = processDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
             }
         } catch (Exception e) {
-
+            logger.warn(e.getMessage());
         }
 
         Date date = new Date();
@@ -481,10 +481,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             if (null == taskCode || null == workflowCode || null == projectCode) {
                 projectCode = projectMapper.queryByName(projectName).getCode();
                 workflowCode = processDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
-                taskCode = relationMapper.queryTaskCodeByTaskName(workflowCode, taskName);
+                // todo The comment can be canceled after repairing the duplicate taskname of the existing workflow
+                // taskCode = relationMapper.queryTaskCodeByTaskName(workflowCode, taskName);
             }
         } catch (Exception e) {
-
+            logger.warn(e.getMessage());
         }
 
         Date date = new Date();

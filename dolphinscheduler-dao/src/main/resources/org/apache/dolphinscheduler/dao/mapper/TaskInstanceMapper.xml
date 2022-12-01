@@ -165,13 +165,13 @@
         <if test="endTime != null">
             and t.submit_time <![CDATA[ <= ]]> #{endTime}
         </if>
-        <if test="model == 1">
+        <if test="model == 1 and projectCode !=null">
             and p.code = #{projectCode}
         </if>
-        <if test="model == 2">
+        <if test="model == 2 and workflowCode !=null">
             and r.process_definition_code = #{workflowCode}
         </if>
-        <if test="model == 3">
+        <if test="model == 3 and taskCode !=null">
             and t.task_code = #{taskCode}
         </if>
         group by t.state

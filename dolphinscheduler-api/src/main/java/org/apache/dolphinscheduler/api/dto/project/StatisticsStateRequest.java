@@ -36,19 +36,19 @@ public class StatisticsStateRequest {
     @Schema(name = "projectName", example = "PROJECT-NAME")
     String projectName;
 
-    @Schema(name = "projectCode", example = "PROJECT-CODE")
+    @Schema(name = "projectCode", example = "1234567890")
     Long projectCode;
 
     @Schema(name = "workflowName", example = "WORKFLOW-NAME")
     String workflowName;
 
-    @Schema(name = "workflowCode", example = "WORKFLOW-CODE")
+    @Schema(name = "workflowCode", example = "1234567890")
     Long workflowCode;
 
     @Schema(name = "taskName", example = "TASK-NAME")
     String taskName;
 
-    @Schema(name = "taskCode", example = "TASK-CODE")
+    @Schema(name = "taskCode", example = "1234567890")
     Long taskCode;
 
     @Schema(name = "startDate", example = "2022-01-01 10:01:02")
