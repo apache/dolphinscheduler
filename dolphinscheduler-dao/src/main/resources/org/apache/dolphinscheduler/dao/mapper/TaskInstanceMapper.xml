@@ -330,4 +330,10 @@
         where instance.process_instance_id = #{processInstanceId}
         and que.status = #{status}
     </select>
+    <select id="selectByCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance instance
+        where instance.task_code = #{taskCode}
+    </select>
 </mapper>

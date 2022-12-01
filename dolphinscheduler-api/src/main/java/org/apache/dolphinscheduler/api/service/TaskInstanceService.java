@@ -89,4 +89,14 @@ public interface TaskInstanceService {
      * @return
      */
     Result stopTask(User loginUser, long projectCode, Integer taskInstanceId);
+
+    /**
+     * query taskInstance by taskInstanceCode
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param taskCode          task instance code
+     * @return the result code and msg
+     */
+    Result queryTaskInstanceByCode(User loginUser, long projectCode, Long taskCode);
 }
