@@ -446,4 +446,20 @@ public class OSUtils {
         return false;
     }
 
+    public static boolean userExist(String tenantCode) {
+        try {
+            if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_WINDOWS) {
+                return OSUtils.getUserList().contains(tenantCode);
+            } else {
+                String result = exeCmd("id " + tenantCode);
+                if(!StringUtils.isEmpty(result) && !result.contains("no such user")){
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
 }
