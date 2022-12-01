@@ -25,7 +25,6 @@ import {
 } from 'vue'
 import {
   NButton,
-  NInput,
   NIcon,
   NDataTable,
   NPagination,
@@ -37,6 +36,7 @@ import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import { DefaultTableWidth } from '@/common/column-width-config'
 import Card from '@/components/card'
+import Search from '@/components/input-search'
 import DetailModal from './detail'
 import type { TableColumns } from './types'
 import SourceModal from './source-modal'
@@ -143,11 +143,10 @@ const list = defineComponent({
               {t('datasource.create_datasource')}
             </NButton>
             <NSpace justify='end' wrap={false}>
-              <NInput
-                allowInput={this.trim}
-                v-model={[this.searchVal, 'value']}
-                size='small'
-                placeholder={`${t('datasource.search_input_tips')}`}
+              <Search
+                  v-model:value = {this.searchVal}
+                  placeholder = {t('datasource.search_input_tips')}
+                  onSearch={onUpdatedList}
               />
               <NButton type='primary' size='small' onClick={onUpdatedList}>
                 <NIcon>

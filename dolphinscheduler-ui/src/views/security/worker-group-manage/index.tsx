@@ -26,7 +26,6 @@ import {
   NButton,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -35,6 +34,7 @@ import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import WorkerGroupModal from './components/worker-group-modal'
 import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const workerGroupManage = defineComponent({
   name: 'worker-group-manage',
@@ -122,12 +122,10 @@ const workerGroupManage = defineComponent({
               {t('security.worker_group.create_worker_group')}
             </NButton>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                clearable
-                v-model={[this.searchVal, 'value']}
+              <Search
+                v-model:value={this.searchVal}
                 placeholder={t('security.worker_group.search_tips')}
+                onSearch={onSearch}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>
