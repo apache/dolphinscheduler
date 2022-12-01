@@ -295,7 +295,7 @@ public class OSUtils {
      */
     public static void createUserIfAbsent(String userName) {
         // if not exists this user, then create
-        if (!getUserList().contains(userName)) {
+        if (!userExist(userName)) {
             boolean isSuccess = createUser(userName);
             logger.info("create user {} {}", userName, isSuccess ? "success" : "fail");
         }
@@ -486,6 +486,25 @@ public class OSUtils {
             logger.warn(
                     "Current available memory {}G is too low, reserved.memory={}G", maxCpuLoadAvg, reservedMemory);
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if tenant is a exist os user.
+     *
+     * @param tenantCode  tenantCode
+     * @return True, if tenant exist is os level.
+     */
+    public static boolean userExist(String tenantCode) {
+        try {
+            if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_WINDOWS) {
+                return OSUtils.getUserList().contains(tenantCode);
+            } else {
+                return existTenantCodeInLinux(tenantCode);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
         return false;
     }
