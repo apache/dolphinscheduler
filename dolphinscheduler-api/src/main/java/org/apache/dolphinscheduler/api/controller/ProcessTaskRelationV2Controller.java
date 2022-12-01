@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
@@ -37,6 +38,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -127,5 +129,51 @@ public class ProcessTaskRelationV2Controller extends BaseController {
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationService
                 .updateUpstreamTaskDefinition(loginUser, code, taskRelationUpdateUpstreamRequest);
         return Result.success(processTaskRelations);
+    }
+
+    /**
+     * query task upstream relation
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param taskCode current task code (post task code)
+     * @return process task relation list
+     */
+    @Operation(summary = "queryUpstreamRelation", description = "QUERY_UPSTREAM_RELATION_NOTES")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
+    })
+    @GetMapping(value = "/{projectCode}/{taskCode}/upstream")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_PROCESS_RELATION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryUpstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @PathVariable("projectCode")long projectCode,
+                                        @PathVariable("taskCode") long taskCode) {
+        return returnDataList(processTaskRelationService.queryUpstreamRelation(loginUser, projectCode, taskCode));
+    }
+
+    /**
+     * query task downstream relation
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param taskCode pre task code
+     * @return process task relation list
+     */
+    @Operation(summary = "queryDownstreamRelation", description = "QUERY_DOWNSTREAM_RELATION_NOTES")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
+    })
+    @GetMapping(value = "/{projectCode}/{taskCode}/downstream")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_PROCESS_RELATION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryDownstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @PathVariable("projectCode")long projectCode,
+                                          @PathVariable("taskCode") long taskCode) {
+        return returnDataList(processTaskRelationService.queryDownstreamRelation(loginUser, projectCode, taskCode));
     }
 }
