@@ -95,7 +95,7 @@ public class DataQualityResultOperator {
     private void checkDqExecuteResult(TaskEvent taskResponseEvent,
                                       DqExecuteResult dqExecuteResult,
                                       ProcessInstance processInstance) {
-        if (isFailure(dqExecuteResult)) {
+        if (isFailed(dqExecuteResult)) {
             DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
             if (dqFailureStrategy != null) {
                 dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
@@ -124,7 +124,7 @@ public class DataQualityResultOperator {
      * @param dqExecuteResult
      * @return
      */
-    private boolean isFailure(DqExecuteResult dqExecuteResult) {
+    private boolean isFailed(DqExecuteResult dqExecuteResult) {
         CheckType checkType = CheckType.of(dqExecuteResult.getCheckType());
 
         double statisticsValue = dqExecuteResult.getStatisticsValue();
@@ -133,36 +133,36 @@ public class DataQualityResultOperator {
 
         OperatorType operatorType = OperatorType.of(dqExecuteResult.getOperator());
 
-        boolean isFailure = false;
+        boolean isFailed = false;
         if (operatorType != null) {
             double srcValue = 0;
             switch (checkType) {
                 case COMPARISON_MINUS_STATISTICS:
                     srcValue = comparisonValue - statisticsValue;
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailed = !getCompareResult(operatorType, srcValue, threshold);
                     break;
                 case STATISTICS_MINUS_COMPARISON:
                     srcValue = statisticsValue - comparisonValue;
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailed = !getCompareResult(operatorType, srcValue, threshold);
                     break;
                 case STATISTICS_COMPARISON_PERCENTAGE:
                     if (comparisonValue > 0) {
                         srcValue = statisticsValue / comparisonValue * 100;
                     }
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailed = !getCompareResult(operatorType, srcValue, threshold);
                     break;
                 case STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE:
                     if (comparisonValue > 0) {
                         srcValue = Math.abs(comparisonValue - statisticsValue) / comparisonValue * 100;
                     }
-                    isFailure = getCompareResult(operatorType,srcValue,threshold);
+                    isFailed = !getCompareResult(operatorType, srcValue, threshold);
                     break;
                 default:
                     break;
             }
         }
 
-        return isFailure;
+        return isFailed;
     }
 
     private void sendDqTaskResultAlert(DqExecuteResult dqExecuteResult, ProcessInstance processInstance) {
