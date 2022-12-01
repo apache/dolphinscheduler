@@ -76,7 +76,7 @@ public class StatisticsV2Controller extends BaseController {
     }
 
     /**
-     * query all workflow States count
+     * query all workflow states count
      * @param loginUser login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return workflow States count
