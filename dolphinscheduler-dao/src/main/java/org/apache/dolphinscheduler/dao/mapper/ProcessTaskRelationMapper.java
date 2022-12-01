@@ -220,5 +220,4 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      */
     int updateProcessTaskRelationTaskVersion(@Param("processTaskRelation") ProcessTaskRelation processTaskRelationList);
 
-    void updateDefinitionVersion(@Param("projectCode")long projectCode, @Param("processDefinitionCode")long definitionCode, @Param("version")int insertVersion);
 }

@@ -240,6 +240,4 @@ public interface ProcessService {
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 
     Integer queryTestDataSourceId(Integer onlineDataSourceId);
-
-    void saveTaskRelationV2(User loginUser, long projectCode, long definitionCode, int insertVersion);
 }

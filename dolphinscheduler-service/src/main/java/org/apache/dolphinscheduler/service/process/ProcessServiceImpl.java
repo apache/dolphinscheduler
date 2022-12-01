@@ -2687,16 +2687,6 @@ public class ProcessServiceImpl implements ProcessService {
         return null;
     }
 
-    @Override
-    public void saveTaskRelationV2(User loginUser, long projectCode, long definitionCode, int insertVersion) {
-        processTaskRelationMapper.updateDefinitionVersion(projectCode, definitionCode, insertVersion);
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(projectCode, definitionCode);
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            processTaskRelation.setProcessDefinitionVersion(insertVersion);
-            processTaskRelationLogMapper.insert(new ProcessTaskRelationLog(processTaskRelation));
-        }
-    }
-
     private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
         Set<String> resourceFullNames = null;
         AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder()

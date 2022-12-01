@@ -233,11 +233,5 @@
             post_task_version=#{processTaskRelation.postTaskVersion}
         where id = #{processTaskRelation.id}
     </update>
-    <update id="updateDefinitionVersion">
-        update t_ds_process_task_relation
-        set process_definition_version = #{version}
-        where project_code = #{projectCode}
-        and process_definition_code = #{processDefinitionCode}
-    </update>
 
 </mapper>

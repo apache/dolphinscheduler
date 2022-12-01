@@ -432,6 +432,12 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             processDefinition =
                     processDefinitionMapper.queryByCode(taskRelationUpdateUpstreamRequest.getWorkflowCode());
         }
+        processDefinition.setUpdateTime(new Date());
+        int insertVersion =
+                processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+        if (insertVersion <= 0) {
+            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+        }
         if (processDefinition == null) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                     taskRelationUpdateUpstreamRequest.toString());
@@ -462,7 +468,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         for (long createCode : taskCodeCreates) {
             TaskDefinition upstreamTask = taskDefinitionMapper.queryByCode(createCode);
             ProcessTaskRelation processTaskRelationCreate =
-                    new ProcessTaskRelation(null, processDefinition.getVersion(), downstreamTask.getProjectCode(),
+                    new ProcessTaskRelation(null, insertVersion, downstreamTask.getProjectCode(),
                             processDefinition.getCode(), upstreamTask.getCode(), upstreamTask.getVersion(),
                             downstreamTask.getCode(), downstreamTask.getVersion(), null, null);
             processTaskRelations.add(processTaskRelationCreate);

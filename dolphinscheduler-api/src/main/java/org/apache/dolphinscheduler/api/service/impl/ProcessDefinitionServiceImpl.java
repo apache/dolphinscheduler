@@ -2781,9 +2781,23 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
         processDefinition = processDefinitionMapper.queryByCode(workflowCode);
-        processService.saveTaskRelationV2(loginUser, processDefinition.getProjectCode(),
-                processDefinition.getCode(),
-                insertVersion);
+
+        // update relation
+        long projectCode = processDefinition.getProjectCode();
+        long processDefinitionCode = processDefinition.getCode();
+        List<ProcessTaskRelation> taskRelationList =
+                processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+        List<ProcessTaskRelationLog> processTaskRelations =
+                taskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
+
+        List<Long> taskCodeList =
+                taskRelationList.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toList());
+        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(taskCodeList);
+        List<TaskDefinitionLog> taskDefinitionLogs =
+                taskDefinitions.stream().map(TaskDefinitionLog::new).collect(Collectors.toList());
+
+        processService.saveTaskRelation(loginUser, projectCode, processDefinitionCode,
+                insertVersion, processTaskRelations, taskDefinitionLogs, true);
         return processDefinition;
     }
 
