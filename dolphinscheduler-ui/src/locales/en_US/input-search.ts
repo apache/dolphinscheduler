@@ -15,28 +15,6 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
-
-import lombok.Data;
-
-/**
- * count definition number group by user
- */
-@Data
-public class DefinitionGroupByUser {
-
-    /**
-     * user name
-     */
-    private String userName;
-
-    /**
-     * user id
-     */
-    private Integer userId;
-
-    /**
-     * count number
-     */
-    private int count;
+export default {
+    placeholder: 'Please enter keyword'
 }
