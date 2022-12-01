@@ -203,5 +203,4 @@ public interface ProjectService {
      * @return project list
      */
     Result queryAllProjectListForDependent();
-
 }

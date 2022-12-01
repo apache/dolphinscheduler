@@ -25,6 +25,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -286,5 +287,26 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                             @Param("endTime") String endTime,
                                                             @Param("state") Integer state,
                                                             @Param("host") String host);
+
+    /**
+     * Statistics process instance state v2
+     * <p>
+     * We only need project codes to determine whether the process instance belongs to the user or not.
+     *
+     * @param startTime    startTime
+     * @param endTime      endTime
+     * @param projectCode  projectCode
+     * @param workflowCode workflowCode
+     * @param model model
+     * @param projectIds projectIds
+     * @return ExecuteStatusCount list
+     */
+    List<ExecuteStatusCount> countInstanceStateV2(
+                                                  @Param("startTime") Date startTime,
+                                                  @Param("endTime") Date endTime,
+                                                  @Param("projectCode") Long projectCode,
+                                                  @Param("workflowCode") Long workflowCode,
+                                                  @Param("model") Integer model,
+                                                  @Param("projectIds") Set<Integer> projectIds);
 
 }
