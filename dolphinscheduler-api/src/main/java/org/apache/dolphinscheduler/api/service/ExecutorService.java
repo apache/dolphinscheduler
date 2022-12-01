@@ -93,6 +93,16 @@ public interface ExecutorService {
     Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId, ExecuteType executeType);
 
     /**
+     * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
+     *
+     * @param loginUser login user
+     * @param workflowInstanceId workflow instance id
+     * @param executeType execute type
+     * @return execute result code
+     */
+    Map<String, Object> execute(User loginUser, Integer workflowInstanceId, ExecuteType executeType);
+
+    /**
      * check if sub processes are offline before starting process definition
      *
      * @param processDefinitionCode process definition code
