@@ -61,9 +61,9 @@ public class TaskExecutionCheckerUtils {
             } else if (OSUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
                 // if not exists this user, then create
                 OSUtils.createUserIfAbsent(tenantCode);
-                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
+                osUserExistFlag = OSUtils.userExist(tenantCode);
             } else {
-                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
+                osUserExistFlag = OSUtils.userExist(tenantCode);
             }
             if (!osUserExistFlag) {
                 throw new TaskException(
