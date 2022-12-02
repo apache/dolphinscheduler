@@ -482,6 +482,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
         waitToRetryTaskInstanceMap.put(newTaskInstance.getTaskCode(), newTaskInstance);
         if (!taskInstance.retryTaskIntervalOverTime()) {
+            // set task instance id message, will be reset in TaskRetryStateEventHandler
+            newTaskInstance.setId(taskInstance.getId());
             logger.info(
                     "Failure task will be submitted, process id: {}, task instance code: {}, state: {}, retry times: {} / {}, interval: {}",
                     processInstance.getId(), newTaskInstance.getTaskCode(),
