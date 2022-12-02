@@ -32,7 +32,7 @@ runs:
   using: "composite"
   steps:
     - name: Check License Header
-      uses: apache/skywalking-eyes@30367d8286e324d5efc58de4c70c37ea3648306d
+      uses: apache/skywalking-eyes/header@main
 
     - shell: bash
       run: ./mvnw spotless:check
