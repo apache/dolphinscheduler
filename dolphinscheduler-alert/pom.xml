@@ -29,7 +29,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>dolphinscheduler-alert-api</module>
         <module>dolphinscheduler-alert-plugins</module>
         <module>dolphinscheduler-alert-server</module>
     </modules>

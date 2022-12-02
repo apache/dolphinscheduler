@@ -20,25 +20,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler-alert-plugins</artifactId>
+        <artifactId>dolphinscheduler-scheduler-plugin</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <artifactId>dolphinscheduler-alert-slack</artifactId>
-    <packaging>jar</packaging>
+
+    <artifactId>dolphinscheduler-scheduler-all</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-alert-api</artifactId>
+            <artifactId>dolphinscheduler-scheduler-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

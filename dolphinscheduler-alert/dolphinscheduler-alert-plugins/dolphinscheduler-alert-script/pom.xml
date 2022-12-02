@@ -25,4 +25,11 @@
     </parent>
     <artifactId>dolphinscheduler-alert-script</artifactId>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-api</artifactId>
+        </dependency>
+    </dependencies>
 </project>
