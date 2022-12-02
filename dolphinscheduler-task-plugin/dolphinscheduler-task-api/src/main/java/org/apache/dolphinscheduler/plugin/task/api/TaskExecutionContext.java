@@ -167,11 +167,6 @@ public class TaskExecutionContext implements Serializable {
     private String taskParams;
 
     /**
-     * envFile
-     */
-    private String envFile;
-
-    /**
      * environmentConfig
      */
     private String environmentConfig;

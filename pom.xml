@@ -669,7 +669,7 @@
                         </importOrder>
                         <replaceRegex>
                             <name>Remove wildcard imports</name>
-                            <searchRegex>import\s+[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
+                            <searchRegex>import\s+(static)*\s*[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
                         <replaceRegex>
