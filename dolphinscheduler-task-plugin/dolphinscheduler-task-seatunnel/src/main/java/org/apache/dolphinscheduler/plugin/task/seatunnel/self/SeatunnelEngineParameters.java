@@ -15,26 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.seatunnel;
+package org.apache.dolphinscheduler.plugin.task.seatunnel.self;
 
-public enum EngineEnum {
+import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
-    FLINK("${SEATUNNEL_HOME}/bin/start-seatunnel-flink.sh"),
-    SPARK("${SEATUNNEL_HOME}/bin/start-seatunnel-spark.sh"),
+public class SeatunnelEngineParameters extends SeatunnelParameters {
 
-    FLINK_V2("${SEATUNNEL_HOME}/bin/start-seatunnel-flink-connector-v2.sh"),
+    private DeployModeEnum deployMode;
 
-    SPARK_V2("${SEATUNNEL_HOME}/bin/start-seatunnel-spark-connector-v2.sh"),
+    private String others;
 
-    SEATUNNEL_ENGINE("${SEATUNNEL_HOME}/bin/seatunnel.sh");
-
-    private String command;
-
-    EngineEnum(String command) {
-        this.command = command;
+    public DeployModeEnum getDeployMode() {
+        return deployMode;
     }
 
-    public String getCommand() {
-        return command;
+    public void setDeployMode(DeployModeEnum deployMode) {
+        this.deployMode = deployMode;
+    }
+
+    public String getOthers() {
+        return others;
+    }
+
+    public void setOthers(String others) {
+        this.others = others;
     }
 }

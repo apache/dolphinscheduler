@@ -21,7 +21,8 @@ import type { IJsonItem, IOption } from '../types'
 export function useDeployMode(
   span: number | Ref<number> = 24,
   showClient = ref(true),
-  showCluster = ref(true)
+  showCluster = ref(true),
+  showLocal = ref(true)
 ): IJsonItem {
   const { t } = useI18n()
 
@@ -34,6 +35,8 @@ export function useDeployMode(
           return showCluster.value
         case 'client':
           return showClient.value
+        case 'local':
+          return showLocal.value
         default:
           return true
       }
