@@ -33,9 +33,13 @@
     </select>
     <select id="queryByUserNameAccurately" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
-        <include refid="baseSql"/>
-        from t_ds_user
-        where user_name=#{userName}
+        <include refid="baseSqlV2">
+            <property name="alias" value="u"/>
+        </include>
+        , t.tenant_code
+        from t_ds_user u
+        left join t_ds_tenant t on u.tenant_id = t.id
+        where u.user_name = #{userName}
     </select>
     <select id="queryUserByNamePassword" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
