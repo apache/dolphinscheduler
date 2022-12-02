@@ -213,7 +213,7 @@ export function useTable() {
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
-    searchVal: ref(null),
+    searchVal: ref(''),
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),

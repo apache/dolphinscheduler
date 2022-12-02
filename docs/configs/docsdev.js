@@ -213,6 +213,14 @@ export default {
                                 title: 'AWS Datasync',
                                 link: '/en-us/docs/dev/user_doc/guide/task/datasync.html',
                             },
+                            {
+                                title: 'Kubeflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
+                            },
                         ],
                     },
                     {
@@ -475,7 +483,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/dev/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: 'Health Check',
@@ -869,6 +877,14 @@ export default {
                                 title: 'AWS Datasync',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datasync.html',
                             },
+                            {
+                                title: 'Kubeflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
+                            },
                         ],
                     },
                     {
@@ -1107,7 +1123,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/dev/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: '健康检查',

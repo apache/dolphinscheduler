@@ -89,7 +89,7 @@ public class PythonTask extends AbstractTask {
 
     @Override
     public String getPreScript() {
-        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         try {
             rawPythonScript = convertPythonScriptPlaceholders(rawPythonScript);
         } catch (StringIndexOutOfBoundsException e) {
@@ -114,6 +114,7 @@ public class PythonTask extends AbstractTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
+            pythonParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
@@ -182,9 +183,9 @@ public class PythonTask extends AbstractTask {
             logger.info("generate python script file:{}", pythonScriptFile);
 
             StringBuilder sb = new StringBuilder();
-            sb.append("#-*- encoding=utf8 -*-\n");
+            sb.append("#-*- encoding=utf8 -*-").append(System.lineSeparator());
 
-            sb.append("\n\n");
+            sb.append(System.lineSeparator());
             sb.append(pythonScript);
             logger.info(sb.toString());
 
@@ -212,7 +213,7 @@ public class PythonTask extends AbstractTask {
      */
     protected String buildPythonScriptContent() throws Exception {
         logger.info("raw python script : {}", pythonParameters.getRawScript());
-        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         Map<String, Property> paramsMap = mergeParamsWithContext(pythonParameters);
         return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
     }

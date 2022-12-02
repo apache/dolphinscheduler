@@ -13,6 +13,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [Shell](../task/shell.md)
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
+* [Python](../task/python.md)
 
 当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。目前我们主要针对 SQL 和 SHELL 节点做了可以向下传递参数的功能。
 
@@ -76,3 +77,10 @@ Node_mysql 运行结果如下：
 虽然在 Node_A 的脚本中为 output 赋值为 1，但日志中显示的值仍然为 100。但根据[参数优先级](priority.md)的原则：`本地参数 > 上游任务传递的参数 > 全局参数`，在 Node_B 中输出的值为 1。则证明 output 参数参照预期的值在该工作流中传递，并在 Node_mysql 中使用该值完成查询操作。
 
 但是 value 的值却只有在 Node_A 中输出为 66，其原因为 value 的方向选择为 IN，只有当方向为 OUT 时才会被定义为变量输出。
+
+#### Python 任务传递参数
+
+使用 `print('${setValue(key=%s)}' % value)`，DolphinScheduler会捕捉输出中的 `${setValue(key=value}`来进行参数捕捉，从而传递到下游
+
+如
+![img.png](../../../../img/new_ui/dev/parameter/python_context_param.png)
