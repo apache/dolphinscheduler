@@ -54,6 +54,7 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +109,7 @@ public class TaskDefinitionServiceImplTest {
     private static final long PROJECT_CODE = 1L;
     private static final long PROCESS_DEFINITION_CODE = 2L;
     private static final long TASK_CODE = 3L;
+    private static final String UPSTREAM_CODE = "3";
     private static final int VERSION = 1;
     private static final int RESOURCE_RATE = -1;
     protected User user;
@@ -148,14 +150,7 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void updateTaskDefinition() {
-        String taskDefinitionJson =
-                "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                        + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
-                        + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
-                        + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
-                        + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
-                        + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
-                        + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}";
+        String taskDefinitionJson = getTaskDefinitionJson();;
 
         Project project = getProject();
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
@@ -482,6 +477,48 @@ public class TaskDefinitionServiceImplTest {
         // success
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, getProject(), TASK_DEFINITION);
         Assertions.assertDoesNotThrow(() -> taskDefinitionService.getTaskDefinition(user, TASK_CODE));
+    }
+
+    @Test
+    public void testUpdateTaskWithUpstream() {
+        String taskDefinitionJson = getTaskDefinitionJson();
+        TaskDefinition taskDefinition = getTaskDefinition();
+        taskDefinition.setFlag(Flag.NO);
+
+        user.setUserType(UserType.ADMIN_USER);
+        Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject());
+        Mockito.when(projectService.hasProjectAndWritePerm(user, getProject(), new HashMap<>())).thenReturn(true);
+        Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
+        Mockito.when(taskDefinitionMapper.updateById(Mockito.any())).thenReturn(1);
+        Mockito.when(taskDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
+
+        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
+                .thenReturn(getProcessTaskRelationList());
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Collections.singleton(TASK_CODE)))
+                .thenReturn(Collections.singletonList(taskDefinition));
+
+        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
+                .thenReturn(getProcessTaskRelationList());
+        Mockito.when(processDefinitionMapper.queryByCode(PROCESS_DEFINITION_CODE)).thenReturn(getProcessDefinition());
+        // success
+        Map<String, Object> successMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
+                taskDefinitionJson, UPSTREAM_CODE);
+        Assertions.assertEquals(Status.SUCCESS, successMap.get(Constants.STATUS));
+        user.setUserType(UserType.GENERAL_USER);
+    }
+
+    private String getTaskDefinitionJson() {
+        return "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
+                + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\","
+                + "\\\"direct\\\":\\\"IN\\\",\\\"type\\\":\\\"VARCHAR\\\","
+                + "\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":\\\"echo ${datetime}\\\","
+                + "\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+                + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\","
+                + "\"flag\":0,\"taskPriority\":0,\"workerGroup\":\"default\",\"failRetryTimes\":0,"
+                + "\"failRetryInterval\":0,\"timeoutFlag\":0,\"timeoutNotifyStrategy\":0,\"timeout\":0,"
+                + "\"delayTime\":0,\"resourceIds\":\"\"}";
     }
 
     /**
