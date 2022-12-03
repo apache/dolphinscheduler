@@ -120,4 +120,4 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_R_test_flag;
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_R_test_flag;
-alter table t_ds_task_instance  add index idx_task_instance_process_instance_flag(process_instance_id, flag);
+alter table t_ds_task_instance add index idx_task_instance_process_instance_flag(process_instance_id, flag);
