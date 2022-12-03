@@ -15,40 +15,6 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.model;
-
-import java.util.Date;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MysqlRegistryLock {
-
-    private long id;
-    /**
-     * The lock key.
-     */
-    private String key;
-    /**
-     * acquire lock host.
-     */
-    private String lockOwner;
-    /**
-     * The last term, if the (currentTime - lastTerm) > termExpire time, the lock will be expired.
-     */
-    private Long lastTerm;
-    /**
-     * The lock last update time.
-     */
-    private Date lastUpdateTime;
-    /**
-     * The lock create time.
-     */
-    private Date createTime;
+export default {
+    placeholder: 'Please enter keyword'
 }
