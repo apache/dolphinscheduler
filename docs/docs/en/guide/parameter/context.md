@@ -16,6 +16,10 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. At present, we mainly focus on the SQL and shell nodes to pass parameters downstream.
 
+The value of upstream parameter can be updated in downstream node in the same way as [setting parameter](#create-a-shell-task-and-set-parameters).
+
+Upstream parameter will be override when defining parameter with the same name in downstream node.
+
 > Note: If there are no dependencies between nodes, local parameters cannot be passed upstream.
 
 ### Example
