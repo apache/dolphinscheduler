@@ -42,7 +42,7 @@ public class MysqlRegistryLock {
     /**
      * The last term, if the (currentTime - lastTerm) > termExpire time, the lock will be expired.
      */
-    private Date lastTerm;
+    private Long lastTerm;
     /**
      * The lock last update time.
      */
