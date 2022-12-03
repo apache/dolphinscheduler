@@ -125,6 +125,15 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
                                               @Param("taskExecuteType") TaskExecuteType taskExecuteType);
 
     /**
+     * task main info
+     * @param projectCode project code
+     * @param codeList code list
+     * @return task main info
+     */
+    List<TaskMainInfo> queryDefineListByCodeList(@Param("projectCode") long projectCode,
+                                                 @Param("codeList") List<Long> codeList);
+
+    /**
      * query task definition by code list
      *
      * @param codes taskDefinitionCode list

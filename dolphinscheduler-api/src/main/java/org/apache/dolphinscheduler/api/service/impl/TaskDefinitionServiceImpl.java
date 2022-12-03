@@ -1066,7 +1066,22 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         IPage<TaskMainInfo> taskMainInfoIPage =
                 taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
                         searchTaskName, taskType, taskExecuteType);
-        List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
+        fillRecords(projectCode, taskMainInfoIPage);
+        PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
+        pageInfo.setTotalList(taskMainInfoIPage.getRecords());
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    private void fillRecords(long projectCode, IPage<TaskMainInfo> taskMainInfoIPage) {
+        List<TaskMainInfo> records = Collections.emptyList();
+        if (CollectionUtils.isNotEmpty(taskMainInfoIPage.getRecords())) {
+            records = taskDefinitionMapper.queryDefineListByCodeList(projectCode,
+                    taskMainInfoIPage.getRecords().stream().map(TaskMainInfo::getTaskCode).collect(Collectors.toList()));
+        }
+        taskMainInfoIPage.setRecords(Collections.emptyList());
         if (CollectionUtils.isNotEmpty(records)) {
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
             for (TaskMainInfo info : records) {
@@ -1089,12 +1104,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             }
             taskMainInfoIPage.setRecords(Lists.newArrayList(taskMainInfoMap.values()));
         }
-        PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
-        pageInfo.setTotalList(taskMainInfoIPage.getRecords());
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     @Override

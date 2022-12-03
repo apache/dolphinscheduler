@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -43,6 +44,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
@@ -54,6 +56,7 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +69,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskDefinitionServiceImplTest {
@@ -304,6 +310,33 @@ public class TaskDefinitionServiceImplTest {
     public void genTaskCodeList() {
         Map<String, Object> genTaskCodeList = taskDefinitionService.genTaskCodeList(10);
         Assertions.assertEquals(Status.SUCCESS, genTaskCodeList.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testQueryTaskDefinitionListPaging() {
+        Project project = getProject();
+        Map<String, Object> checkResult = new HashMap<>();
+        checkResult.put(Constants.STATUS, Status.SUCCESS);
+        Integer pageNo = 1;
+        Integer pageSize = 10;
+        IPage<TaskMainInfo> taskMainInfoIPage = new Page<>();
+        TaskMainInfo taskMainInfo = new TaskMainInfo();
+        taskMainInfo.setTaskCode(TASK_CODE);
+        taskMainInfo.setUpstreamTaskCode(4L);
+        taskMainInfo.setUpstreamTaskName("4");
+        taskMainInfoIPage.setRecords(Collections.singletonList(taskMainInfo));
+        taskMainInfoIPage.setTotal(10L);
+        Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
+        Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION))
+                .thenReturn(checkResult);
+        Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
+        Mockito.when(taskDefinitionMapper.queryDefineListPaging(Mockito.any(Page.class), Mockito.anyLong(),
+                Mockito.isNull(), Mockito.isNull(), Mockito.anyString(), Mockito.isNull())).thenReturn(taskMainInfoIPage);
+        Mockito.when(taskDefinitionMapper.queryDefineListByCodeList(PROJECT_CODE, Collections.singletonList(3L)))
+                .thenReturn(Collections.singletonList(taskMainInfo));
+        Result result = taskDefinitionService.queryTaskDefinitionListPaging(user, PROJECT_CODE, null,
+                null, null, null, pageNo, pageSize);
+        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
     @Test
