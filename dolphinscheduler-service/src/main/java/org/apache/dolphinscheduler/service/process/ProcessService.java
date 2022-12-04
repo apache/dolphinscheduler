@@ -83,8 +83,6 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId);
-
     void recurseFindSubProcess(long parentCode, List<Long> ids);
 
     Tenant getTenantForProcess(int tenantId, int userId);
