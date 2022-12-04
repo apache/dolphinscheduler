@@ -105,8 +105,8 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private static final int processDefinitionVersion = 3;
     private static final int scheduleId = 3;
     private static final long environmentCode = 4L;
-    private static final String startTime = "2020-01-01 12:13:14";
-    private static final String endTime = "2020-02-01 12:13:14";
+    private static final String startTime = "2220-01-01 12:13:14";
+    private static final String endTime = "2220-02-01 12:13:14";
     private static final String crontab = "0 0 * * * ? *";
 
     @BeforeEach
@@ -175,6 +175,8 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         ScheduleCreateRequest scheduleCreateRequest = new ScheduleCreateRequest();
         scheduleCreateRequest.setProcessDefinitionCode(processDefinitionCode);
         scheduleCreateRequest.setEnvironmentCode(environmentCode);
+        scheduleCreateRequest.setStartTime(startTime);
+        scheduleCreateRequest.setEndTime(endTime);
 
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
@@ -209,6 +211,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 ((ServiceException) exception).getCode());
 
         // error schedule parameter same start time and end time
+        scheduleCreateRequest.setStartTime(endTime);
         Mockito.when(environmentMapper.queryByEnvironmentCode(environmentCode)).thenReturn(this.getEnvironment());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
@@ -216,8 +219,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 ((ServiceException) exception).getCode());
 
         // error schedule parameter same start time after than end time
-        scheduleCreateRequest.setEndTime(endTime);
-        String badStartTime = "2022-01-01 12:13:14";
+        String badStartTime = "2222-01-01 12:13:14";
         scheduleCreateRequest.setStartTime(badStartTime);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
@@ -371,7 +373,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 ((ServiceException) exception).getCode());
 
         // error schedule parameter same start time after than end time
-        String badStartTime = "2022-01-01 12:13:14";
+        String badStartTime = "2222-01-01 12:13:14";
         scheduleUpdateRequest.setStartTime(badStartTime);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
