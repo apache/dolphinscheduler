@@ -1079,7 +1079,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<TaskMainInfo> records = Collections.emptyList();
         if (CollectionUtils.isNotEmpty(taskMainInfoIPage.getRecords())) {
             records = taskDefinitionMapper.queryDefineListByCodeList(projectCode,
-                    taskMainInfoIPage.getRecords().stream().map(TaskMainInfo::getTaskCode).collect(Collectors.toList()));
+                    taskMainInfoIPage.getRecords().stream().map(TaskMainInfo::getTaskCode)
+                            .collect(Collectors.toList()));
         }
         taskMainInfoIPage.setRecords(Collections.emptyList());
         if (CollectionUtils.isNotEmpty(records)) {
