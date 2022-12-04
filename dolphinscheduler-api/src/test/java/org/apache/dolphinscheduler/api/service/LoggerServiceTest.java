@@ -97,7 +97,7 @@ public class LoggerServiceTest {
             Assertions.assertTrue(true);
             logger.error("testQueryDataSourceList error {}", e.getMessage());
         }
-        Assertions.assertEquals(Status.TASK_INSTANCE_HOST_IS_NULL.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.TASK_INSTANCE_WAITING_TO_BE_DISTRIBUTED.getCode(), result.getCode().intValue());
 
         // PROJECT_NOT_EXIST
         taskInstance.setHost("127.0.0.1:8080");

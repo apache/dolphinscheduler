@@ -95,7 +95,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
         if (StringUtils.isBlank(taskInstance.getHost())) {
             logger.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
-            return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
+            return Result.error(Status.TASK_INSTANCE_WAITING_TO_BE_DISTRIBUTED);
         }
         Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
         projectService.checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
@@ -145,11 +145,14 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
         // check whether the task instance can be found
         TaskInstance task = taskInstanceDao.findTaskInstanceById(taskInstId);
-        if (task == null || StringUtils.isBlank(task.getHost())) {
+        if (task == null) {
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
-
+        if(StringUtils.isBlank(task.getHost())){
+            putMsg(result, Status.TASK_INSTANCE_WAITING_TO_BE_DISTRIBUTED);
+            return result;
+        }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstId);

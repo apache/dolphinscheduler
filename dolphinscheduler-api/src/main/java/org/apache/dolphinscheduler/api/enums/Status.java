@@ -243,7 +243,7 @@ public enum Status {
     REVOKE_PROJECT_ERROR(10182, "revoke project error", "撤销项目授权错误"),
     QUERY_AUTHORIZED_USER(10183, "query authorized user error", "查询拥有项目权限的用户错误"),
     PROJECT_NOT_EXIST(10190, "This project was not found. Please refresh page.", "该项目不存在,请刷新页面"),
-    TASK_INSTANCE_HOST_IS_NULL(10191, "task instance host is null", "任务实例host为空"),
+    TASK_INSTANCE_WAITING_TO_BE_DISTRIBUTED(10191, "task instance is waiting to be distributed, the log can not be obtained currently", "任务实例等待分发中,当前无法获取日志"),
     QUERY_EXECUTING_WORKFLOW_ERROR(10192, "query executing workflow error", "查询运行的工作流实例错误"),
     DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL(10193, "delete process definition fail, cause used by other tasks: {0}",
             "删除工作流定时失败，被其他任务引用：{0}"),
