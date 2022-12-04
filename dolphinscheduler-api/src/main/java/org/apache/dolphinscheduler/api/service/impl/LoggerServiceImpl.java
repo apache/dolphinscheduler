@@ -149,7 +149,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
-        if(StringUtils.isBlank(task.getHost())){
+        if (StringUtils.isBlank(task.getHost())) {
             putMsg(result, Status.TASK_INSTANCE_WAITING_TO_BE_DISTRIBUTED);
             return result;
         }
