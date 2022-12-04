@@ -171,6 +171,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
 
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
+        if (now.after(scheduleParam.getStartTime())) {
+            scheduleParam.setStartTime(now);
+        }
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
             logger.warn("The start time must not be the same as the end or time can not be null.");
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
@@ -233,6 +236,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleParamStr, ScheduleParam.class);
         if (scheduleParam == null) {
             throw new ServiceException(Status.PARSE_SCHEDULE_PARAM_ERROR, scheduleParamStr);
+        }
+        Date now = new Date();
+        if (now.after(scheduleParam.getStartTime())) {
+            scheduleParam.setStartTime(now);
         }
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
             throw new ServiceException(Status.SCHEDULE_START_TIME_END_TIME_SAME);
@@ -832,6 +839,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 logger.warn("Parameter scheduleExpression is invalid, so parse cron error.");
                 putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
                 return;
+            }
+            if (now.after(scheduleParam.getStartTime())) {
+                scheduleParam.setStartTime(now);
             }
             if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
                 logger.warn("The start time must not be the same as the end or time can not be null.");
