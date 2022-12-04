@@ -214,8 +214,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                           String upstreamCodes) {
         TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest = new TaskRelationUpdateUpstreamRequest();
         taskRelationUpdateUpstreamRequest.setWorkflowCode(workflowCode);
-        taskRelationUpdateUpstreamRequest.setUpstreams(upstreamCodes);
-        return processTaskRelationService.updateUpstreamTaskDefinition(user, taskCode,
+        if (upstreamCodes != null) {
+            taskRelationUpdateUpstreamRequest.setUpstreams(upstreamCodes);
+        }
+        return processTaskRelationService.updateUpstreamTaskDefinition(user, taskCode, Boolean.FALSE,
                 taskRelationUpdateUpstreamRequest);
     }
 
@@ -625,6 +627,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         List<ProcessTaskRelation> taskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(taskDefinitionUpdate.getProjectCode(), taskCode);
+        this.updateTaskUpstreams(loginUser, taskUpdateRequest.getWorkflowCode(), taskDefinitionUpdate.getCode(),
+                taskUpdateRequest.getUpstreamTasksCodes());
         if (CollectionUtils.isNotEmpty(taskRelationList)) {
             logger.info(
                     "Task definition has upstream tasks, start handle them after update task, taskDefinitionCode:{}.",
@@ -634,9 +638,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     .queryByProcessCode(taskDefinitionUpdate.getProjectCode(), processDefinitionCode);
             updateDag(loginUser, processDefinitionCode, processTaskRelations, Lists.newArrayList(taskDefinitionLog));
         }
-
-        this.updateTaskUpstreams(loginUser, taskUpdateRequest.getWorkflowCode(), taskDefinitionUpdate.getCode(),
-                taskUpdateRequest.getUpstreamTasksCodes());
 
         return taskDefinitionUpdate;
     }

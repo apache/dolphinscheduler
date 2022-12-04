@@ -90,6 +90,7 @@ public interface ProcessTaskRelationService {
      */
     List<ProcessTaskRelation> updateUpstreamTaskDefinition(User loginUser,
                                                            long taskCode,
+                                                           boolean needSyncDag,
                                                            TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
 
     /**

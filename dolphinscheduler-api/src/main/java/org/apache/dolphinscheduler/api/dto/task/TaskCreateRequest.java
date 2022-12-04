@@ -97,7 +97,7 @@ public class TaskCreateRequest {
     private Integer memoryMax;
 
     @Schema(example = "upstream-task-codes1,upstream-task-codes2", description = "use , to split multiple upstream task codes")
-    private String upstreamTasksCodes;
+    private String upstreamTasksCodes = "0";
 
     public TaskDefinition convert2TaskDefinition() {
         TaskDefinition taskDefinition = new TaskDefinition();

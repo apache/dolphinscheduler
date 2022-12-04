@@ -31,12 +31,14 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
@@ -92,6 +94,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     @Autowired
     private ProcessService processService;
@@ -408,6 +413,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     @Transactional
     public List<ProcessTaskRelation> updateUpstreamTaskDefinition(User loginUser,
                                                                   long taskCode,
+                                                                  boolean needSyncDag,
                                                                   TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
         TaskDefinition downstreamTask = taskDefinitionMapper.queryByCode(taskCode);
         if (downstreamTask == null) {
@@ -436,17 +442,23 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                     taskRelationUpdateUpstreamRequest.toString());
         }
-
+        processDefinition.setUpdateTime(new Date());
+        if (needSyncDag) {
+            int insertVersion =
+                    this.saveProcessDefine(loginUser, processDefinition);
+            if (insertVersion <= 0) {
+                throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            }
+        }
         // get new relation to create and out of date relation to delete
         List<Long> taskCodeCreates = upstreamTaskCodes
                 .stream()
                 .filter(upstreamTaskCode -> processTaskRelationExists.stream().noneMatch(
                         processTaskRelationExist -> processTaskRelationExist.getPreTaskCode() == upstreamTaskCode))
                 .collect(Collectors.toList());
-        List<Long> taskCodeDeletes = processTaskRelationExists
-                .stream()
-                .map(ProcessTaskRelation::getPreTaskCode)
-                .filter(preTaskCode -> !upstreamTaskCodes.contains(preTaskCode))
+        List<Integer> taskCodeDeletes = processTaskRelationExists.stream()
+                .filter(ptr -> !upstreamTaskCodes.contains(ptr.getPreTaskCode()))
+                .map(ProcessTaskRelation::getId)
                 .collect(Collectors.toList());
 
         // delete relation not exists
@@ -460,10 +472,19 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         // create relation not exists
         List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
         for (long createCode : taskCodeCreates) {
-            TaskDefinition upstreamTask = taskDefinitionMapper.queryByCode(createCode);
+            long upstreamCode = 0L;
+            int version = 0;
+            if (createCode != 0L) {
+                TaskDefinition upstreamTask = taskDefinitionMapper.queryByCode(createCode);
+                if (upstreamTask == null) {
+                    throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, createCode);
+                }
+                upstreamCode = upstreamTask.getCode();
+                version = upstreamTask.getVersion();
+            }
             ProcessTaskRelation processTaskRelationCreate =
                     new ProcessTaskRelation(null, processDefinition.getVersion(), downstreamTask.getProjectCode(),
-                            processDefinition.getCode(), upstreamTask.getCode(), upstreamTask.getVersion(),
+                            processDefinition.getCode(), upstreamCode, version,
                             downstreamTask.getCode(), downstreamTask.getVersion(), null, null);
             processTaskRelations.add(processTaskRelationCreate);
         }
@@ -473,8 +494,25 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
 
         // batch sync to process task relation log
-        this.batchPersist2ProcessTaskRelationLog(loginUser, processTaskRelations);
+        if (needSyncDag) {
+            this.batchPersist2ProcessTaskRelationLog(loginUser, processTaskRelations);
+        }
         return processTaskRelations;
+    }
+
+    public int saveProcessDefine(User loginUser, ProcessDefinition processDefinition) {
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
+        Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
+        int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
+        processDefinitionLog.setVersion(insertVersion);
+        processDefinitionLog.setOperator(loginUser.getId());
+        processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
+        processDefinitionLog.setId(null);
+        int insertLog = processDefinitionLogMapper.insert(processDefinitionLog);
+
+        processDefinitionLog.setId(processDefinition.getId());
+        int result = processDefinitionMapper.updateById(processDefinitionLog);
+        return (insertLog & result) > 0 ? insertVersion : 0;
     }
 
     private void updateRelation(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition,

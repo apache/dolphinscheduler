@@ -1068,11 +1068,23 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 ((ServiceException) exception).getCode());
 
         // success
+        Mockito.when(processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinition.getCode()))
+                .thenReturn(processDefinition.getVersion());
         Mockito.when(processDefinitionMapper.updateById(isA(ProcessDefinition.class))).thenReturn(1);
         ProcessDefinition processDefinitionUpdate =
                 processDefinitionService.updateSingleProcessDefinition(user, processDefinitionCode,
                         workflowUpdateRequest);
-        Assertions.assertEquals(processDefinition, processDefinitionUpdate);
+        Assertions.assertNotNull(processDefinitionUpdate);
+
+        // check version
+        Assertions.assertEquals(processDefinition.getVersion() + 1, processDefinitionUpdate.getVersion());
+    }
+
+    @Test
+    public void testCheckVersion() {
+        WorkflowFilterRequest workflowFilterRequest = new WorkflowFilterRequest();
+        workflowFilterRequest.setWorkflowName(name);
+
     }
 
     @Test
