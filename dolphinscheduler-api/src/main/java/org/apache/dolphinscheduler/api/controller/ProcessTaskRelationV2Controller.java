@@ -149,7 +149,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     @ApiException(QUERY_TASK_PROCESS_RELATION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryUpstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @PathVariable("projectCode")long projectCode,
+                                        @PathVariable("projectCode") long projectCode,
                                         @PathVariable("taskCode") long taskCode) {
         return returnDataList(processTaskRelationService.queryUpstreamRelation(loginUser, projectCode, taskCode));
     }
@@ -172,7 +172,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     @ApiException(QUERY_TASK_PROCESS_RELATION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDownstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @PathVariable("projectCode")long projectCode,
+                                          @PathVariable("projectCode") long projectCode,
                                           @PathVariable("taskCode") long taskCode) {
         return returnDataList(processTaskRelationService.queryDownstreamRelation(loginUser, projectCode, taskCode));
     }
