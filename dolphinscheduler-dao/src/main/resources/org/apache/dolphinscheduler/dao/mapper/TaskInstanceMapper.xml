@@ -336,4 +336,10 @@
         from t_ds_task_instance instance
         where instance.task_code = #{taskCode}
     </select>
+    
+    <delete id="deleteByWorkflowInstanceId">
+        delete
+        from t_ds_task_instance
+        where process_instance_id = #{workflowInstanceId}
+    </delete>
 </mapper>

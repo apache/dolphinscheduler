@@ -816,11 +816,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         try {
             processService.removeTaskLogFile(processInstanceId);
-        } catch (Exception ignore) {
+        } catch (Exception ex) {
             // ignore
-            logger.warn(
-                    "Remove task log file exception, projectCode:{}, ProcessDefinitionCode{}, processInstanceId:{}.",
-                    projectCode, processInstance.getProcessDefinitionCode(), processInstanceId);
+            logger.warn("Remove task log file exception, processInstanceId:{}.", processInstanceId, ex);
         }
 
         // delete database cascade
@@ -828,7 +826,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
-        processService.deleteWorkTaskInstanceByProcessInstanceId(processInstanceId);
+        taskInstanceDao.deleteByWorkflowInstanceId(processInstanceId);
 
         if (delete > 0) {
             logger.info(

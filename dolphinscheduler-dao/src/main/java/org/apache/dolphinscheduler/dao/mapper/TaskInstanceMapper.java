@@ -155,4 +155,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                              @Param("status") int status);
 
     TaskInstance selectByCode(Long taskCode);
+
+    void deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 }
