@@ -51,7 +51,7 @@ export function useTable() {
 
   const variables = reactive({
     columns: [],
-    processDefineCode: ref(Number(router.currentRoute.value.query.processDefineCode) || 0),
+    processDefineCode: ref(Number(router.currentRoute.value.query.processDefineCode)||0),
     tableWidth: DefaultTableWidth,
     checkedRowKeys: [] as Array<RowKey>,
     tableData: [] as Array<IWorkflowInstance>,
