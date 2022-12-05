@@ -48,6 +48,7 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryTaskListPaging() {
+
         TaskInstanceQueryRequest taskInstanceQueryReq = new TaskInstanceQueryRequest();
         taskInstanceQueryReq.setProcessInstanceId(1);
         taskInstanceQueryReq.setProcessInstanceName("");
