@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -187,10 +188,10 @@ public class CommandMapperTest extends BaseDaoTest {
         boolean hit = id % masterCount == thisMasterSlot;
         List<Command> commandList = commandMapper.queryCommandPageBySlot(1, 0, masterCount, thisMasterSlot);
         if (hit) {
-            assertEquals(id,commandList.get(0).getId());
+            Assertions.assertEquals(id, commandList.get(0).getId());
         } else {
             commandList.forEach(o -> {
-                assertNotEquals(id, o.getId());
+                Assertions.assertNotEquals(id, o.getId());
                 assertEquals(thisMasterSlot, o.getId() % masterCount);
             });
         }
