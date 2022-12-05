@@ -293,6 +293,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'ATHENA',
     label: 'ATHENA',
     defaultPort: 0
+  },
+  TRINO: {
+    value: 'TRINO',
+    label: 'TRINO',
+    defaultPort: 8080
   }
 }
 

@@ -19,7 +19,7 @@
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.34.0",
-    "naive-ui": "2.30.7",
+    "naive-ui": "2.33.5",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.22",
     "pinia-plugin-persistedstate": "^2.2.0",
