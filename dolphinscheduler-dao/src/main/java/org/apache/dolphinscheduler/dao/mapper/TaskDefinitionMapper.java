@@ -111,7 +111,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      *
      * @param page page
      * @param projectCode projectCode
-     * @param searchWorkflowName searchWorkflowName
      * @param searchTaskName searchTaskName
      * @param taskType taskType
      * @param taskExecuteType taskExecuteType
@@ -119,7 +118,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      */
     IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,
                                               @Param("projectCode") long projectCode,
-                                              @Param("searchWorkflowName") String searchWorkflowName,
                                               @Param("searchTaskName") String searchTaskName,
                                               @Param("taskType") String taskType,
                                               @Param("taskExecuteType") TaskExecuteType taskExecuteType);

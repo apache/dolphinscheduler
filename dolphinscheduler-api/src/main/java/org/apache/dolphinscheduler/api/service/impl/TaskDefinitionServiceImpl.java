@@ -1045,7 +1045,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public Result queryTaskDefinitionListPaging(User loginUser,
                                                 long projectCode,
-                                                String searchWorkflowName,
                                                 String searchTaskName,
                                                 String taskType,
                                                 TaskExecuteType taskExecuteType,
@@ -1064,7 +1063,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskType = taskType == null ? StringUtils.EMPTY : taskType;
         Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
         IPage<TaskMainInfo> taskMainInfoIPage =
-                taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
+                taskDefinitionMapper.queryDefineListPaging(page, projectCode,
                         searchTaskName, taskType, taskExecuteType);
         fillRecords(projectCode, taskMainInfoIPage);
         PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
