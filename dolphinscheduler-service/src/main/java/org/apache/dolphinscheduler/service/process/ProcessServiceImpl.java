@@ -528,27 +528,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * recursive delete all task instance by process instance id
-     */
-    @Override
-    public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
-        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
-        List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
-        if (CollectionUtils.isEmpty(taskInstanceList)) {
-            return;
-        }
-
-        List<Integer> taskInstanceIdList = new ArrayList<>();
-
-        for (TaskInstance taskInstance : taskInstanceList) {
-            taskInstanceIdList.add(taskInstance.getId());
-        }
-
-        taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
-    }
-
-    /**
      * recursive query sub process definition id by parent id.
      *
      * @param parentCode parentCode

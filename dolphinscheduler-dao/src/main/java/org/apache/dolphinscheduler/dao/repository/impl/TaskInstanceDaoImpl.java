@@ -167,4 +167,9 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
         return taskInstanceMapper.selectBatchIds(idList);
     }
 
+    @Override
+    public void deleteByWorkflowInstanceId(int workflowInstanceId) {
+        taskInstanceMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+    }
+
 }

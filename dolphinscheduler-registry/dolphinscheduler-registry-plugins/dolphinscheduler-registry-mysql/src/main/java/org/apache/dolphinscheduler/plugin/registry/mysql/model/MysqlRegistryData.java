@@ -34,6 +34,7 @@ public class MysqlRegistryData {
     private String key;
     private String data;
     private int type;
+    private long lastTerm;
     private Date createTime;
     private Date lastUpdateTime;
 
