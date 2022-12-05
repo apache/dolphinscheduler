@@ -133,6 +133,24 @@ public class SubProcessTaskTest {
         Assertions.assertEquals(TaskExecutionStatus.SUCCESS, status);
     }
 
+    @Test
+    public void testStop() {
+        TaskInstance taskInstance = testBasicInit(WorkflowExecutionStatus.STOP);
+        taskInstance.setVarPool(getProperty());
+        taskInstance.setTaskParams("{\"processDefinitionCode\":110," +
+                "\"dependence\":{},\"localParams\":[{\"prop\":\"key\"," +
+                "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"}," +
+                "{\"prop\":\"database_name\",\"direct\":\"OUT\"," +
+                "\"type\":\"VARCHAR\",\"value\":\"\"}]," +
+                "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]}," +
+                "\"waitStartTimeout\":{},\"switchResult\":{}}");
+        SubTaskProcessor subTaskProcessor = new SubTaskProcessor();
+        subTaskProcessor.init(taskInstance, processInstance);
+        subTaskProcessor.action(TaskAction.RUN);
+        TaskExecutionStatus status = taskInstance.getState();
+        Assertions.assertEquals(TaskExecutionStatus.STOP, status);
+    }
+
     private String getProperty() {
         List<Property> varPools = new ArrayList<>();
         Property property = new Property();
