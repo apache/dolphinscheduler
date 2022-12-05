@@ -330,7 +330,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION))
                 .thenReturn(checkResult);
         Mockito.when(taskDefinitionMapper.queryDefineListPaging(Mockito.any(Page.class), Mockito.anyLong(),
-                        Mockito.isNull(), Mockito.anyString(), Mockito.isNull()))
+                Mockito.isNull(), Mockito.anyString(), Mockito.isNull()))
                 .thenReturn(taskMainInfoIPage);
         Mockito.when(taskDefinitionMapper.queryDefineListByCodeList(PROJECT_CODE, Collections.singletonList(3L)))
                 .thenReturn(Collections.singletonList(taskMainInfo));
