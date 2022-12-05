@@ -47,5 +47,6 @@ header:
     - '.github/actions/reviewdog-setup/**'
     - '.github/actions/translate-on-issue/**'
     - '**/.gitkeep'
+    - dolphinscheduler-ui/pnpm-lock.yaml
 
   comment: on-failure
