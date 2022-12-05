@@ -419,7 +419,6 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
     private void addTaskRetryEvent(TaskInstance taskInstance) {
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(taskInstance.getProcessInstanceId())
-                .taskInstanceId(taskInstance.getId())
                 .taskCode(taskInstance.getTaskCode())
                 .status(TaskExecutionStatus.RUNNING_EXECUTION)
                 .type(StateEventType.TASK_RETRY)
