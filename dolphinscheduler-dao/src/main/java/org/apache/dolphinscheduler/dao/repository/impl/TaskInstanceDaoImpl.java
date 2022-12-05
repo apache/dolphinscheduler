@@ -172,4 +172,9 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
         taskInstanceMapper.deleteByWorkflowInstanceId(workflowInstanceId);
     }
 
+    @Override
+    public List<TaskInstance> findTaskInstanceByWorkflowInstanceId(Integer workflowInstanceId) {
+        return taskInstanceMapper.findByWorkflowInstanceId(workflowInstanceId);
+    }
+
 }

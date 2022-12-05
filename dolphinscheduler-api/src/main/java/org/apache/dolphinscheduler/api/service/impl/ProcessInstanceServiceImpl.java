@@ -814,18 +814,15 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
         }
 
-        try {
-            processService.removeTaskLogFile(processInstanceId);
-        } catch (Exception ex) {
-            // ignore
-            logger.warn("Remove task log file exception, processInstanceId:{}.", processInstanceId, ex);
-        }
-
         // delete database cascade
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
 
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
+        // We need to remove the task log file before deleting the task instance
+        // because the task log file is query from task instance.
+        // When delete task instance error, the task log file will also be deleted, this may cause data inconsistency.
+        processService.removeTaskLogFile(processInstanceId);
         taskInstanceDao.deleteByWorkflowInstanceId(processInstanceId);
 
         if (delete > 0) {
