@@ -154,5 +154,6 @@ public final class TokenPage extends NavBarPage implements Tab {
 
         @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
+
     }
 }
