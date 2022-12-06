@@ -109,10 +109,8 @@
         </foreach>
     </insert>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
-        select td.code task_code
+        select td.code        task_code
         from t_ds_task_definition td
-        LEFT JOIN t_ds_process_task_relation pt ON td.code	= pt.post_task_code and td.version=pt.post_task_version
-        LEFT JOIN t_ds_process_definition pd ON pt.process_definition_code = pd.code and pt.process_definition_version=pd.version
         WHERE td.project_code = #{projectCode}
         <if test="taskType != ''">
             and td.task_type = #{taskType}
@@ -123,7 +121,7 @@
         <if test="searchTaskName != null and searchTaskName != ''">
             and td.name like concat('%', #{searchTaskName}, '%')
         </if>
-        group by td.code order by max(td.update_time) desc
+        order by td.update_time desc
     </select>
 
     <select id="queryDefineListByCodeList" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
