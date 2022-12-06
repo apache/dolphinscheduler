@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.params;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -178,7 +180,9 @@ public class PluginParamsTransferTest {
                 + ",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\""
                 + ":\"attachment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"tableattachment\""
                 + ",\"value\":\"tableattachment\",\"disabled\":false}]}]";
-        Assertions.assertEquals(paramsJsonAssert, paramsJson);
+        JsonElement paramsJsonElement = JsonParser.parseString(paramsJson);
+        JsonElement paramsAssertJsonElement = JsonParser.parseString(paramsJsonAssert);
+        Assertions.assertEquals(paramsAssertJsonElement, paramsJsonElement);
     }
 
     @Test
