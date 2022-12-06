@@ -69,6 +69,13 @@ public interface StorageOperate {
     String getResourceFileName(String tenantCode, String fullName);
 
     /**
+     * get the path of the resource file excluding the base path.
+     * @param fullName
+     * @return
+     */
+    String getResourceFileName(String fullName);
+
+    /**
      * get the path of the file
      * @param resourceType
      * @param tenantCode
@@ -79,23 +86,23 @@ public interface StorageOperate {
 
     /**
      * predicate  if the resource of tenant exists
-     * @param tenantCode
-     * @param fileName
+     * @param fullName
      * @return
      * @throws IOException
      */
-    boolean exists(String tenantCode, String fileName) throws IOException;
+    boolean exists(String fullName) throws IOException;
 
     /**
      * delete the resource of  filePath
      * todo if the filePath is the type of directory ,the files in the filePath need to be deleted at all
-     * @param tenantCode
      * @param filePath
      * @param recursive
      * @return
      * @throws IOException
      */
-    boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException;
+    boolean delete(String filePath, boolean recursive) throws IOException;
+
+    boolean delete(String filePath, List<String> childrenPathArray, boolean recursive) throws IOException;
 
     /**
      * copy the file from srcPath to dstPath
@@ -167,4 +174,21 @@ public interface StorageOperate {
      */
     ResUploadType returnStorageType();
 
+    /**
+     * return files and folders in the current directory and subdirectories
+     * */
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type);
+
+    /**
+    * return files and folders in the current directory
+    * */
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws Exception;
+
+    /**
+     * return a file status
+     * */
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
+                                       ResourceType type) throws Exception;
 }

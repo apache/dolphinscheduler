@@ -18,7 +18,7 @@ import { ref, Ref, unref } from 'vue'
 import nodes from './tasks'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import { useTaskNodeStore } from '@/store/project/task-node'
-import { TASK_TYPES_MAP } from '../../constants/task-type'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import type {
   IFormItem,
   IJsonItem,

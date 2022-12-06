@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 public class EmrTaskChannel implements TaskChannel {
+
     @Override
     public void cancelApplication(boolean status) {
         // no need

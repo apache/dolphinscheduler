@@ -54,11 +54,9 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        SparkConnectionParam
-                connectionParams = (SparkConnectionParam) createConnectionParams(connectionJson);
+        SparkConnectionParam connectionParams = (SparkConnectionParam) createConnectionParams(connectionJson);
 
-        SparkDataSourceParamDTO
-                sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
+        SparkDataSourceParamDTO sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
         sparkDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         sparkDatasourceParamDTO.setUserName(connectionParams.getUser());
         sparkDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
@@ -69,7 +67,8 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         StringBuilder hosts = new StringBuilder();
         String[] tmpArray = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
-        Arrays.stream(hostPortArray).forEach(hostPort -> hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA));
+        Arrays.stream(hostPortArray)
+                .forEach(hostPort -> hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA));
         hosts.deleteCharAt(hosts.length() - 1);
 
         sparkDatasourceParamDTO.setHost(hosts.toString());
@@ -90,8 +89,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
         String jdbcUrl = address + "/" + sparkDatasourceParam.getDatabase();
 
-        SparkConnectionParam
-                sparkConnectionParam = new SparkConnectionParam();
+        SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
         sparkConnectionParam.setPassword(PasswordUtils.encodePassword(sparkDatasourceParam.getPassword()));
         sparkConnectionParam.setUser(sparkDatasourceParam.getUserName());
         sparkConnectionParam.setOther(transformOther(sparkDatasourceParam.getOther()));
@@ -129,8 +127,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        SparkConnectionParam
-                sparkConnectionParam = (SparkConnectionParam) connectionParam;
+        SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
         if (!StringUtils.isEmpty(sparkConnectionParam.getOther())) {
             return String.format("%s;%s", sparkConnectionParam.getJdbcUrl(), sparkConnectionParam.getOther());
         }

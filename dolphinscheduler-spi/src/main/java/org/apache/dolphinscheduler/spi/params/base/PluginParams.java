@@ -117,7 +117,8 @@ public class PluginParams {
 
     @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
     public static class Builder {
-        //Must have
+
+        // Must have
         protected String name;
 
         protected FormType formType;
@@ -126,7 +127,7 @@ public class PluginParams {
 
         protected String fieldName;
 
-        //option params
+        // option params
         protected ParamsProps props;
 
         protected Object value;
@@ -153,7 +154,7 @@ public class PluginParams {
             this.fieldName = title;
         }
 
-        //for json deserialize to POJO
+        // for json deserialize to POJO
         @JsonCreator
         public Builder(@JsonProperty("field") String name,
                        @JsonProperty("type") FormType formType,
@@ -165,8 +166,7 @@ public class PluginParams {
                        @JsonProperty("emit") List<String> emit,
                        @JsonProperty("info") String info,
                        @JsonProperty("hidden") Boolean hidden,
-                       @JsonProperty("display") Boolean display
-        ) {
+                       @JsonProperty("display") Boolean display) {
             requireNonNull(name, "name is null");
             requireNonNull(formType, "formType is null");
             requireNonNull(title, "title is null");
@@ -221,5 +221,3 @@ public class PluginParams {
     }
 
 }
-
-

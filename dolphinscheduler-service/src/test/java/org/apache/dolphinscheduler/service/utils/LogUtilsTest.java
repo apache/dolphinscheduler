@@ -26,17 +26,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.sift.SiftingAppender;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LogUtilsTest {
 
     @Test
@@ -47,10 +47,10 @@ public class LogUtilsTest {
         taskExecutionContext.setTaskInstanceId(1000);
         taskExecutionContext.setProcessDefineCode(1L);
         taskExecutionContext.setProcessDefineVersion(1);
-        taskExecutionContext.setFirstSubmitTime(firstSubmitTime);
+        taskExecutionContext.setFirstSubmitTime(firstSubmitTime.getTime());
 
         Logger rootLogger = (Logger) LoggerFactory.getILoggerFactory().getLogger("ROOT");
-        Assert.assertNotNull(rootLogger);
+        Assertions.assertNotNull(rootLogger);
 
         SiftingAppender appender = Mockito.mock(SiftingAppender.class);
         // it's a trick to mock logger.getAppend("TASKLOGFILE")
@@ -67,7 +67,7 @@ public class LogUtilsTest {
                 .resolve(logBase)
                 .resolve(DateUtils.format(firstSubmitTime, DateConstants.YYYYMMDD, null))
                 .resolve("1_1-100-1000.log");
-        Assert.assertEquals(logPath.toString(), LogUtils.getTaskLogPath(taskExecutionContext));
+        Assertions.assertEquals(logPath.toString(), LogUtils.getTaskLogPath(taskExecutionContext));
     }
 
 }

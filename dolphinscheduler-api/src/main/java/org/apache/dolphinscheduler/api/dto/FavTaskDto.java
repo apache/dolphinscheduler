@@ -26,24 +26,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class FavTaskDto {
+public class FavTaskDto implements Cloneable {
 
-    private String taskName;
-    private boolean isCollection;
+    // task type name
     private String taskType;
+    private boolean isCollection;
+    // task category the task type belongs to
+    private String taskCategory;
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof FavTaskDto) {
-            FavTaskDto favDto = (FavTaskDto) obj;
-            return this.taskName.equals(favDto.getTaskName());
-
-        }
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

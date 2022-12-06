@@ -65,8 +65,12 @@ waste time。
 
 ### Pull Request Code Style
 
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (DolphinScheduler使用`Spotless`为您自动修复代码风格和格式问题，)
+[//]: # (详情见[开发手册]&#40;../development-environment-setup.md#代码风格&#41;`代码风格`一栏。)
+
 DolphinScheduler使用`Spotless`为您自动修复代码风格和格式问题，
-详情见[代码风格](../development-environment-setup.md#代码风格)。
+详情见[开发手册](../development-environment-setup.md)`代码风格`一栏。
 
 ### 相关问题
 

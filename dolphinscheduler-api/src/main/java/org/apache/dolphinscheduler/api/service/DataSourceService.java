@@ -69,13 +69,13 @@ public interface DataSourceService {
     Result queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
-     * query data resource list
+     * query online/test data resource list
      *
      * @param loginUser login user
      * @param type      data source type
      * @return data source list page
      */
-    Map<String, Object> queryDataSourceList(User loginUser, Integer type);
+    Map<String, Object> queryDataSourceList(User loginUser, Integer type, int testFlag);
 
     /**
      * verify datasource exists
@@ -142,5 +142,5 @@ public interface DataSourceService {
      * @param tableName
      * @return
      */
-    Map<String, Object> getTableColumns(Integer datasourceId,String tableName);
+    Map<String, Object> getTableColumns(Integer datasourceId, String tableName);
 }

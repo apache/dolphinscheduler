@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -68,6 +67,7 @@ public interface ProcessService {
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
+<<<<<<< HEAD
     void moveToErrorCommand(Command command, String message);
 
     int createCommand(Command command);
@@ -81,6 +81,9 @@ public interface ProcessService {
     Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
     List<TaskDefinition> getTaskNodeListByDefinition(long defineCode);
+=======
+    Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     ProcessInstance findProcessInstanceById(int processId);
 
@@ -96,11 +99,7 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId);
-
     void recurseFindSubProcess(long parentCode, List<Long> ids);
-
-    void createRecoveryWaitingThreadCommand(Command originCommand, ProcessInstance processInstance);
 
     Tenant getTenantForProcess(int tenantId, int userId);
 
@@ -116,44 +115,11 @@ public interface ProcessService {
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
 
-    Map<String, String> getGlobalParamMap(String globalParams);
-
-    Command createSubProcessCommand(ProcessInstance parentProcessInstance,
-                                    ProcessInstance childInstance,
-                                    ProcessInstanceMap instanceMap,
-                                    TaskInstance task);
-
-    TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
-
-    TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance);
-
-    int saveCommand(Command command);
-
-    boolean saveTaskInstance(TaskInstance taskInstance);
-
-    boolean createTaskInstance(TaskInstance taskInstance);
-
-    boolean updateTaskInstance(TaskInstance taskInstance);
-
-    TaskInstance findTaskInstanceById(Integer taskId);
-
-    List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList);
-
     void packageTaskInstance(TaskInstance taskInstance, ProcessInstance processInstance);
 
     void updateTaskDefinitionResources(TaskDefinition taskDefinition);
 
     List<Integer> findTaskIdByInstanceState(int instanceId, TaskExecutionStatus state);
-
-    List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId);
-
-    List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId);
-
-    int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap);
-
-    int createWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap);
-
-    ProcessInstanceMap findWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId);
 
     int deleteWorkProcessMapByParentId(int parentWorkProcessId);
 
@@ -167,8 +133,6 @@ public interface ProcessService {
 
     List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode);
 
-    Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList);
-
     List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(long processDefinitionCode);
 
     List<ProcessInstance> queryNeedFailoverProcessInstances(String host);
@@ -177,8 +141,6 @@ public interface ProcessService {
 
     @Transactional
     void processNeedFailoverProcessInstances(ProcessInstance processInstance);
-
-    List<TaskInstance> queryNeedFailoverTaskInstances(String host);
 
     DataSource findDataSourceById(int id);
 
@@ -190,17 +152,15 @@ public interface ProcessService {
 
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
 
-    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval);
+    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
-    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval);
+    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
-    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime);
+    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag);
 
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
 
     ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId);
-
-    String getTaskWorkerGroup(TaskInstance taskInstance);
 
     List<Project> getProjectListHavePerm(int userId);
 
@@ -236,12 +196,6 @@ public interface ProcessService {
     DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition);
 
     DagData genDagData(ProcessDefinition processDefinition);
-
-    List<TaskDefinitionLog> genTaskDefineList(List<ProcessTaskRelation> processTaskRelations);
-
-    List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations);
-
-    TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion);
 
     List<ProcessTaskRelation> findRelationByCode(long processDefinitionCode, int processDefinitionVersion);
 
@@ -298,4 +252,6 @@ public interface ProcessService {
     public String findConfigYamlByName(String clusterName);
 
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
+
+    Integer queryTestDataSourceId(Integer onlineDataSourceId);
 }

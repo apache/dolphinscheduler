@@ -27,7 +27,14 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 
 ## 任务样例
 
+<<<<<<< HEAD
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 以下是一些MLflow 组件的常用参数
 
@@ -100,6 +107,10 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 配置文件：/dolphinscheduler/conf/env/dolphinscheduler_env.sh。
 
 在文件最后添加内容
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 ```
 # 配置你的conda环境路径
 export PATH=/opt/anaconda3/bin:$PATH
@@ -134,7 +145,10 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 
 ![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 ### 内置算法仓库配置
 
 如果遇到github无法访问的情况，可以修改`commom.properties`配置文件的以下字段，将github地址替换能访问的地址。

@@ -37,6 +37,10 @@ import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.LogUtils;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,8 +119,14 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
             // delay task process
+<<<<<<< HEAD
             long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
                     taskExecutionContext.getDelayTime() * 60L);
+=======
+            long remainTime =
+                    DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                            taskExecutionContext.getDelayTime() * 60L);
+>>>>>>> refs/remotes/origin/3.1.1-release
             if (remainTime > 0) {
                 logger.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
@@ -137,10 +147,21 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             // submit task to manager
             boolean offer = workerManager.offer(workerTaskExecuteRunnable);
             if (!offer) {
+<<<<<<< HEAD
                 logger.warn("submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master", workerManager.getWaitSubmitQueueSize());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress, CommandType.TASK_REJECT);
             } else {
                 logger.info("Submit task to wait queue success, current queue size is {}", workerManager.getWaitSubmitQueueSize());
+=======
+                logger.warn(
+                        "submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master",
+                        workerManager.getWaitSubmitQueueSize());
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress,
+                        CommandType.TASK_REJECT);
+            } else {
+                logger.info("Submit task to wait queue success, current queue size is {}",
+                        workerManager.getWaitSubmitQueueSize());
+>>>>>>> refs/remotes/origin/3.1.1-release
             }
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();

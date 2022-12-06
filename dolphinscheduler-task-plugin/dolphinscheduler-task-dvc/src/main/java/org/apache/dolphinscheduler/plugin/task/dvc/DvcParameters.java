@@ -23,6 +23,11 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import org.apache.commons.lang3.StringUtils;
 
+<<<<<<< HEAD
+=======
+import lombok.Data;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 @Data
 public class DvcParameters extends AbstractParameters {
 
@@ -54,6 +59,7 @@ public class DvcParameters extends AbstractParameters {
         switch (dvcTaskType) {
             case DvcConstants.DVC_TASK_TYPE.UPLOAD:
                 return StringUtils.isNotEmpty(dvcRepository) &&
+<<<<<<< HEAD
                     StringUtils.isNotEmpty(dvcDataLocation) &&
                     StringUtils.isNotEmpty(dvcLoadSaveDataPath) &&
                     StringUtils.isNotEmpty(dvcVersion) &&
@@ -68,10 +74,25 @@ public class DvcParameters extends AbstractParameters {
             case DvcConstants.DVC_TASK_TYPE.INIT:
                 return StringUtils.isNotEmpty(dvcRepository) &&
                     StringUtils.isNotEmpty(dvcStoreUrl);
+=======
+                        StringUtils.isNotEmpty(dvcDataLocation) &&
+                        StringUtils.isNotEmpty(dvcLoadSaveDataPath) &&
+                        StringUtils.isNotEmpty(dvcVersion) &&
+                        StringUtils.isNotEmpty(dvcMessage);
+
+            case DvcConstants.DVC_TASK_TYPE.DOWNLOAD:
+                return StringUtils.isNotEmpty(dvcRepository) &&
+                        StringUtils.isNotEmpty(dvcDataLocation) &&
+                        StringUtils.isNotEmpty(dvcLoadSaveDataPath) &&
+                        StringUtils.isNotEmpty(dvcVersion);
+
+            case DvcConstants.DVC_TASK_TYPE.INIT:
+                return StringUtils.isNotEmpty(dvcRepository) &&
+                        StringUtils.isNotEmpty(dvcStoreUrl);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
             default:
                 return false;
         }
     }
 }
-

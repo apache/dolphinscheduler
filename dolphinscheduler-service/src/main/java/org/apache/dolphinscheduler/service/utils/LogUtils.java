@@ -75,7 +75,12 @@ public class LogUtils {
      * get task log path by TaskExecutionContext
      */
     public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
+<<<<<<< HEAD
         return getTaskLogPath(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getProcessDefineCode(),
+=======
+        return getTaskLogPath(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                taskExecutionContext.getProcessDefineCode(),
+>>>>>>> refs/remotes/origin/3.1.1-release
                 taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId());

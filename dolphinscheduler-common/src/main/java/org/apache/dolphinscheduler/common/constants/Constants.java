@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.constants;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Duration;
@@ -137,8 +136,11 @@ public final class Constants {
      */
     public static final String SUDO_ENABLE = "sudo.enable";
 
+<<<<<<< HEAD
     public static final String SET_TASK_DIR_TO_TENANT_ENABLE = "setTaskDirToTenant.enable";
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
     /**
      * resource storage type
      */
@@ -150,6 +152,15 @@ public final class Constants {
     public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
 
+<<<<<<< HEAD
+=======
+    /**
+     * fetch applicationId way
+     */
+    public static final String APPID_COLLECT = "appId.collect";
+    public static final String DEFAULT_COLLECT_WAY = "log";
+
+>>>>>>> refs/remotes/origin/3.1.1-release
     /**
      * comma ,
      */
@@ -679,9 +690,6 @@ public final class Constants {
      */
     public static final String PSTREE = "pstree";
 
-    public static final boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
-            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
-
     /**
      * dry run flag
      */
@@ -739,6 +747,13 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
+
+    /**
+     * test flag
+     */
+    public static final int TEST_FLAG_NO = 0;
+    public static final int TEST_FLAG_YES = 1;
+
     /**
      * Task Types
      */
@@ -795,4 +810,12 @@ public final class Constants {
     public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
     public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
     public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
+<<<<<<< HEAD
+=======
+
+    public static final Integer QUERY_ALL_ON_SYSTEM = 0;
+    public static final Integer QUERY_ALL_ON_PROJECT = 1;
+    public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
+    public static final Integer QUERY_ALL_ON_TASK = 3;
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

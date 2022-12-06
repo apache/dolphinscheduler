@@ -26,6 +26,10 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AthenaDataSourceParamDTO extends BaseDataSourceParamDTO {
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
     protected String awsRegion;
 
     @Override

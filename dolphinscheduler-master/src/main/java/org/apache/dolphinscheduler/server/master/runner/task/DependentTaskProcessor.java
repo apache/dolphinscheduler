@@ -88,6 +88,11 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     DependResult result;
 
+    /**
+     * test flag
+     */
+    private int testFlag;
+
     boolean allDependentItemFinished;
 
     @Override
@@ -109,7 +114,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
             taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
             taskInstance.setStartTime(new Date());
-            processService.updateTaskInstance(taskInstance);
+            taskInstanceDao.updateTaskInstance(taskInstance);
             initDependParameters();
             logger.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
             return true;
@@ -165,6 +170,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         } else {
             this.dependentDate = new Date();
         }
+        this.testFlag = processInstance.getTestFlag();
         // check dependent project is exist
         List<DependentTaskModel> dependTaskList = dependentParameters.getDependTaskList();
         Set<Long> projectCodes = new HashSet<>();
@@ -225,7 +231,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean pauseTask() {
         this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -233,7 +239,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -253,7 +259,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                             entry.getKey(), entry.getValue(), dependentDate);
                 }
             }
-            if (!dependentExecute.finish(dependentDate)) {
+            if (!dependentExecute.finish(dependentDate, testFlag)) {
                 finish = false;
             }
         }
@@ -268,7 +274,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     private DependResult getTaskDependResult() {
         List<DependResult> dependResultList = new ArrayList<>();
         for (DependentExecute dependentExecute : dependentTaskList) {
-            DependResult dependResult = dependentExecute.getModelDependResult(dependentDate);
+            DependResult dependResult = dependentExecute.getModelDependResult(dependentDate, testFlag);
             dependResultList.add(dependResult);
         }
         result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);
@@ -284,7 +290,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         status = (result == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
     }
 
     @Override

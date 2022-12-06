@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+<<<<<<< HEAD
 import lombok.NonNull;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -26,9 +29,12 @@ import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
+
+import lombok.NonNull;
 
 public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRunnable implements Delayed {
 
@@ -39,7 +45,8 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
                                              @NonNull AlertClientService alertClientService,
                                              @NonNull TaskPluginManager taskPluginManager,
                                              @Nullable StorageOperate storageOperate) {
-        super(taskExecutionContext, workerConfig, masterAddress, workerMessageSender, alertClientService, taskPluginManager, storageOperate);
+        super(taskExecutionContext, workerConfig, masterAddress, workerMessageSender, alertClientService,
+                taskPluginManager, storageOperate);
     }
 
     @Override
@@ -47,7 +54,9 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext();
         return unit.convert(
                 DateUtils.getRemainTime(
-                        taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
+                        DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                        taskExecutionContext.getDelayTime() * 60L),
+                TimeUnit.SECONDS);
     }
 
     @Override

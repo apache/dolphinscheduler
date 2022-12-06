@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+<<<<<<< HEAD
+=======
+import static org.apache.dolphinscheduler.plugin.task.api.ProcessUtils.getPidsStr;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
@@ -33,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -135,7 +138,6 @@ public abstract class AbstractCommandExecutor {
             }
         }
         command.add(commandInterpreter());
-        command.addAll(Collections.emptyList());
         command.add(commandFile);
 
         // setting commands
@@ -235,10 +237,18 @@ public abstract class AbstractCommandExecutor {
             ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
+<<<<<<< HEAD
 
         logger.info(
                 "process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
                 taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
+=======
+        int exitCode = process.exitValue();
+        String exitLogMessage = EXIT_CODE_KILL == exitCode ? "process has killed." : "process has exited.";
+        logger.info(exitLogMessage
+                + " execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, exitCode);
+>>>>>>> refs/remotes/origin/3.1.1-release
         return result;
 
     }
@@ -265,16 +275,11 @@ public abstract class AbstractCommandExecutor {
         logger.info("cancel process: {}", processId);
 
         // kill , waiting for completion
-        boolean killed = softKill(processId);
+        boolean alive = softKill(processId);
 
-        if (!killed) {
+        if (alive) {
             // hard kill
             hardKill(processId);
-
-            // destory
-            process.destroy();
-
-            process = null;
         }
     }
 
@@ -310,12 +315,12 @@ public abstract class AbstractCommandExecutor {
     private void hardKill(int processId) {
         if (processId != 0 && process.isAlive()) {
             try {
-                String cmd = String.format("kill -9 %d", processId);
+                String cmd = String.format("kill -9 %s", getPidsStr(processId));
                 cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
                 logger.info("hard kill task:{}, process id:{}, cmd:{}", taskRequest.getTaskAppId(), processId, cmd);
 
-                Runtime.getRuntime().exec(cmd);
-            } catch (IOException e) {
+                OSUtils.exeCmd(cmd);
+            } catch (Exception e) {
                 logger.error("kill attempt failed ", e);
             }
         }
@@ -411,7 +416,7 @@ public abstract class AbstractCommandExecutor {
      * @return remain time
      */
     private long getRemainTime() {
-        long usedTime = (System.currentTimeMillis() - taskRequest.getStartTime().getTime()) / 1000;
+        long usedTime = (System.currentTimeMillis() - taskRequest.getStartTime()) / 1000;
         long remainTime = taskRequest.getTaskTimeout() - usedTime;
 
         if (remainTime < 0) {

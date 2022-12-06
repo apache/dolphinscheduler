@@ -5,12 +5,19 @@
 ## dev
 
 * Remove the spark version of spark task ([#11860](https://github.com/apache/dolphinscheduler/pull/11860)).
+<<<<<<< HEAD
+=======
+* Change the default unix shell executor from sh to bash ([#12180](https://github.com/apache/dolphinscheduler/pull/12180)).
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 ## 3.0.0
 
 * Copy and import workflow without 'copy' suffix [#10607](https://github.com/apache/dolphinscheduler/pull/10607)
 * Use semicolon as default sql segment separator [#10869](https://github.com/apache/dolphinscheduler/pull/10869)
 
+<<<<<<< HEAD
 ## 3.1.1
 
 * Change the default unix shell executor from sh to bash ([#12180](https://github.com/apache/dolphinscheduler/pull/12180)).
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release

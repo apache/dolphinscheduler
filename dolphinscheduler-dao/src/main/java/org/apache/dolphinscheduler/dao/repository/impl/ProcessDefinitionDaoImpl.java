@@ -18,10 +18,24 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+<<<<<<< HEAD
+=======
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 
+<<<<<<< HEAD
+=======
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +47,11 @@ public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+<<<<<<< HEAD
+=======
+    @Autowired
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     @Override
     public PageListingResult<ProcessDefinition> listingProcessDefinition(int pageNumber, int pageSize, String searchVal,
@@ -48,4 +67,28 @@ public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
                 .records(processDefinitions.getRecords())
                 .build();
     }
+<<<<<<< HEAD
+=======
+
+    @Override
+    public List<ProcessDefinition> queryProcessDefinitionsByCodesAndVersions(List<ProcessInstance> processInstances) {
+        if (Objects.isNull(processInstances) || processInstances.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<ProcessDefinitionLog> processDefinitionLogs = processInstances
+                .parallelStream()
+                .map(processInstance -> {
+                    ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                            .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
+                                    processInstance.getProcessDefinitionVersion());
+                    return processDefinitionLog;
+                })
+                .collect(Collectors.toList());
+
+        List<ProcessDefinition> processDefinitions =
+                processDefinitionLogs.stream().map(log -> (ProcessDefinition) log).collect(Collectors.toList());
+
+        return processDefinitions;
+    }
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

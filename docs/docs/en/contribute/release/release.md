@@ -10,8 +10,6 @@ all conditions are met, if any or them are missing, you should install them and 
 java -version
 # Maven requests
 mvn -version
-# Python 3.6 above is requests, and you have to make keyword `python` work in your terminal and version match
-python --version
 ```
 
 ## GPG Settings
@@ -147,8 +145,8 @@ A_USERNAME=<YOUR-APACHE-USERNAME>
 
 > Note: We can use the variable directly in you bash after we set environment, without changing anything. For example, we
 > can use command `git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git` to clone the release branch
-> and it can be success by covert the `"${VERSION}"` to `<THE-VERSION-YOU-RELEASE>`. But you have to change `<VERSION>` manually in
-> some of not bash step like [vote mail](#vote-procedure), we using `<VERSION>` instead of `"${VERSION}"` to notice release
+> and it can be successful by converting the `"${VERSION}"` to `<THE-VERSION-YOU-RELEASE>`. But you have to change `<VERSION>` manually in
+> some of not bash step like [vote mail](#vote-procedure), we are using `<VERSION>` instead of `"${VERSION}"` to notice release
 > manager they have to change by hand.
 
 ### Create Release Branch
@@ -166,13 +164,10 @@ git push origin "${VERSION}"-release
 ### Pre-Release Check
 
 ```shell
-# make gpg command could be run in maven correct
-export GPG_TTY=$(tty)
-
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
-* `-Prelease,python`: choose release and python profile, which will pack all the source codes, jar files and executable binary packages, and Python distribute package.
+* `-Prelease`: choose release profile, which will pack all the source codes, jar files and executable binary packages.
 * `-DautoVersionSubmodules=true`: it can make the version number is inputted only once and not for each sub-module.
 * `-DdryRun=true`: dry run which means not to generate or submit new version number and new tag.
 
@@ -187,12 +182,12 @@ mvn release:clean
 Then, prepare to execute the release.
 
 ```shell
-mvn release:prepare -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 It is basically the same as the previous rehearsal command, but deleting `-DdryRun=true` parameter.
 
-* `-DpushChanges=fals`: do not submit the edited version number and tag to GitHub automatically.
+* `-DpushChanges=false`: do not submit the edited version number and tag to GitHub automatically.
 
 > Note: You have to config your git `user.name` and `user.password` by command `git config --global user.email "you@example.com"`
 > and `git config --global user.name "Your Name"` if you meet some mistake like **Please tell me who you are.**
@@ -219,7 +214,7 @@ git push origin --tags
 ### Deploy the Release
 
 ```shell
-mvn release:perform -Prelease,python -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 After that command is executed, the version to be released will be uploaded to Apache staging repository automatically.
@@ -245,14 +240,21 @@ svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/dev/dolphin
 cd ~/ds_svn/dev/dolphinscheduler
 ```
 
-### Add gpg Public Key
+### Export your new gpg KEYS to release(optional)
 
-Only the account in its first deployment needs to add that.
-It is alright for `KEYS` to only include the public key of the deployed account.
+Only if the first time you release with this gpg KEY, including it is you first release, or you change your KEY. You should
+change working directory to another one because this step need checkout and change KEYS in release directory.
 
 ```shell
+mkdir -p ~/ds_svn/release/
+cd ~/ds_svn/release/
+svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/release/dolphinscheduler
 gpg -a --export <YOUR-GPG-KEY-ID> >> KEYS
+svn add *
+svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 ```
+
+> NOTE: it may take a few minutes to sync to the mirror in your first time checkout, because it will download all the files
 
 ### Add the Release Content to SVN Directory
 
@@ -260,7 +262,6 @@ Create folder by version number.
 
 ```shell
 mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-mkdir -p ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 cd ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 ```
 
@@ -270,9 +271,6 @@ Add source code packages, binary packages and executable binary packages to SVN 
 # Source and binary tarball for main code
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
 cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/*.tar.gz.asc ~/ds_svn/dev/dolphinscheduler/"${VERSION}"
-
-# Source and binary tarball for Python API
-cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolphinscheduler/"${VERSION}"/python
 ```
 
 ### Generate sign files
@@ -280,10 +278,6 @@ cp -f ~/dolphinscheduler/dolphinscheduler-dist/target/python/* ~/ds_svn/dev/dolp
 ```shell
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -a 512 apache-dolphinscheduler-python-"${VERSION}".tar.gz >> apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -b -a 512 apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl >> apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### Commit to Apache SVN
@@ -301,10 +295,6 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```shell
 shasum -c apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -c apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
-cd python
-shasum -c apache-dolphinscheduler-python-"${VERSION}".tar.gz.sha512
-shasum -c apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.sha512
-cd ../
 ```
 
 ### Check gpg Signature
@@ -313,7 +303,7 @@ First, import releaser's public key.
 Import KEYS from SVN repository to local. (The releaser does not need to import again; the checking assistant needs to import it, with the user name filled as the releaser's. )
 
 ```shell
-curl https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS >> KEYS
+curl https://dist.apache.org/repos/dist/release/dolphinscheduler/KEYS >> KEYS
 gpg --import KEYS
 gpg --edit-key "${A_USERNAME}"
   > trust
@@ -338,10 +328,6 @@ Then, check the gpg signature.
 ```shell
 gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
-cd python
-gpg --verify apache-dolphinscheduler-python-"${VERSION}".tar.gz.asc
-gpg --verify apache_dolphinscheduler-python-"${VERSION}"-py3-none-any.whl.asc
-cd ../
 ```
 
 > Note: You have to create gpg signature manually when you can not find your `asc` file, the command
@@ -352,7 +338,7 @@ cd ../
 
 #### Check source package
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dolphinscheduler-python-<VERSION>.tar.gz` then check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` then check the following items:
 
 * Check whether source tarball is oversized for including nonessential files
 * `LICENSE` and `NOTICE` files exist
@@ -365,8 +351,7 @@ Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dol
 
 #### Check binary packages
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` and `python/apache-dolphinscheduler-python-<VERSION>-bin.tar.gz`
-to check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` to check the following items:
 
 - `LICENSE` and `NOTICE` files exist
 - Correct year in `NOTICE` file
@@ -382,8 +367,10 @@ to check the following items:
 
 You should create a release note in GitHub by [new release note](https://github.com/apache/dolphinscheduler/releases/new).
 It should be done before vote mail because we need the release note in the mail. You could use command
-`git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md` to creat the changelog(some log
-maybe not correct, you should filter them by yourself) and classify them and paste them to GitHub release note page
+`python release.py changelog` in directory `tools/release` to creat the changelog.
+
+> NOTE: Or if you prefer to create manually, you can use command `git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md`
+> (some log maybe not correct, you should filter them by yourself) and classify them and paste them to GitHub release note page
 
 ### Vote procedure
 
@@ -414,15 +401,15 @@ Release notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
 The release candidates: https://dist.apache.org/repos/dist/dev/dolphinscheduler/<VERSION>/
 
-Maven 2 staging repository: https://repository.apache.org/content/repositories/<VERSION>/org/apache/dolphinscheduler/
+Maven 2 staging repository: https://repository.apache.org/content/repositories/<STAGING.REPOSITORY>/org/apache/dolphinscheduler/
 
 Git tag for the release: https://github.com/apache/dolphinscheduler/tree/<VERSION>
 
 Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
-Keys to verify the Release Candidate: https://dist.apache.org/repos/dist/dev/dolphinscheduler/KEYS
+Keys to verify the Release Candidate: https://downloads.apache.org/dolphinscheduler/KEYS
 
-Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/community/release.html
+Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/contribute/release/release.html
 
 The vote will be open for at least 72 hours or until necessary number of votes are reached.
 
@@ -467,20 +454,7 @@ Thanks everyone for taking time to check this release and help us.
 ### Move source packages, binary packages from the `dev` directory to `release` directory
 
 ```shell
-svn mv https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
-```
-
-### Export you new gpg KEYS from dev to release(optional)
-
-Only if the first time you release with this gpg KEY, including it is you first release or you change your KEY
-
-```shell
-mkdir -p ~/ds_svn/release/
-cd ~/ds_svn/release/
-svn --username="${A_USERNAME}" co https://dist.apache.org/repos/dist/release/dolphinscheduler
-gpg -a --export <YOUR-GPG-KEY-ID> >> KEYS
-svn add *
-svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
+svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
 ```
 
 ### Update Document
@@ -491,11 +465,10 @@ the release version is `<VERSION>`, the following updates are required(note it w
 - Repository **apache/dolphinscheduler-website**:
   - `download/en-us/download.md` and `download/zh-cn/download.md`: add the download of the `<VERSION>` release package
   - `scripts/conf.sh`: Add new release version `<VERSION>` key-value pair to variable `DEV_RELEASE_DOCS_VERSIONS`
-- Repository **apache/dolphinscheduler**:
+- Repository **apache/dolphinscheduler** (dev branch):
   - `docs/configs/site.js`:
     - `docsLatest`: update to `<VERSION>`
     - `docs0`: The `text` of two places of `en-us/zh-cn` needs to be updated to `latest(<VERSION>)`
-    - `docsxyz`: Add a drop-down menu with `key` as `docsxyz` and `text` as `<VERSION>` in `children` of two places of `en-us/zh-cn`
   - `docs/configs/index.md.jsx`: Add `<VERSION>: docsxyzConfig`
   - `docs/docs/en/history-versions.md` and `docs/docs/zh/history-versions.md`: Add new `<VERSION>` release docs.
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler's GitHub [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml)

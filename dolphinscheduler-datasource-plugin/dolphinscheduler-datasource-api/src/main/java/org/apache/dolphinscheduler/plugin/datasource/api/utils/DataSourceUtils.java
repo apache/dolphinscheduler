@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.databind.JsonNode;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -31,6 +34,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+<<<<<<< HEAD
+=======
+import com.fasterxml.jackson.databind.JsonNode;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 public class DataSourceUtils {
 
     public DataSourceUtils() {
@@ -55,7 +63,7 @@ public class DataSourceUtils {
     public static ConnectionParam buildConnectionParams(BaseDataSourceParamDTO baseDataSourceParamDTO) {
         ConnectionParam connectionParams = getDatasourceProcessor(baseDataSourceParamDTO.getType())
                 .createConnectionParams(baseDataSourceParamDTO);
-        logger.info("parameters map:{}", connectionParams);
+        logger.info("Parameters map:{}", connectionParams);
         return connectionParams;
     }
 
@@ -84,7 +92,8 @@ public class DataSourceUtils {
     }
 
     public static DataSourceProcessor getDatasourceProcessor(DbType dbType) {
-        Map<String, DataSourceProcessor> dataSourceProcessorMap = DataSourceProcessorProvider.getInstance().getDataSourceProcessorMap();
+        Map<String, DataSourceProcessor> dataSourceProcessorMap =
+                DataSourceProcessorProvider.getInstance().getDataSourceProcessorMap();
         if (!dataSourceProcessorMap.containsKey(dbType.name())) {
             throw new IllegalArgumentException("illegal datasource type");
         }

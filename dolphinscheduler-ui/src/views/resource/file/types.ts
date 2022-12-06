@@ -16,8 +16,8 @@
  */
 
 export interface ResourceFileTableData {
-  id: number
   name: string
+  fullName: string
   user_name: string
   directory: string
   file_name: string
@@ -31,14 +31,14 @@ export interface IEmit {
 }
 
 export interface IRenameFile {
-  (id: number, name: string, description: string): void
+  (name: string, description: string, fullName: string, user_name: string): void
 }
 export interface IRtDisb {
   (name: string, size: number): boolean
 }
 
 export interface IResourceListState {
-  (id?: number, searchVal?: string, pageNo?: number, pageSize?: number): any
+  (searchVal?: string, fullName?: string, tenantCode?: string, pageNo?: number, pageSize?: number): any
 }
 
 export interface BasicTableProps {
@@ -68,4 +68,5 @@ export interface ISetPagination {
 export interface BreadcrumbItem {
   id: number
   fullName: string
+  userName: string
 }

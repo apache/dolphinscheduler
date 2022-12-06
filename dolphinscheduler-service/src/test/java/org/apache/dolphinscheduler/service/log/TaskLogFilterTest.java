@@ -18,8 +18,13 @@ package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.LoggingEvent;
@@ -64,7 +69,7 @@ public class TaskLogFilterTest {
             }
         });
 
-        Assert.assertEquals(FilterReply.ACCEPT, filterReply);
+        Assertions.assertEquals(FilterReply.ACCEPT, filterReply);
 
     }
 }

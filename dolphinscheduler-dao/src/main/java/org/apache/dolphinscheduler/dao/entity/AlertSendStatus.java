@@ -21,15 +21,27 @@ import org.apache.dolphinscheduler.common.enums.AlertStatus;
 
 import java.util.Date;
 
+<<<<<<< HEAD
 import lombok.Data;
+=======
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.google.common.base.Objects;
 
 @Data
+<<<<<<< HEAD
+=======
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+>>>>>>> refs/remotes/origin/3.1.1-release
 @TableName("t_ds_alert_send_status")
 public class AlertSendStatus {
 
@@ -69,6 +81,7 @@ public class AlertSendStatus {
     @TableField("create_time")
     private Date createTime;
 
+<<<<<<< HEAD
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -85,4 +98,6 @@ public class AlertSendStatus {
     public int hashCode() {
         return Objects.hashCode(alertId, alertPluginInstanceId);
     }
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

@@ -24,19 +24,18 @@ import org.apache.dolphinscheduler.rpc.client.RpcClient;
 import org.apache.dolphinscheduler.rpc.remote.NettyClient;
 import org.apache.dolphinscheduler.rpc.remote.NettyServer;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public class RpcTest {
+
     private NettyServer nettyServer;
 
     private IUserService userService;
 
     private Host host;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         nettyServer = new NettyServer(new NettyServerConfig());
         IRpcClient rpcClient = new RpcClient();
@@ -44,7 +43,11 @@ public class RpcTest {
         userService = rpcClient.create(IUserService.class, host);
     }
 
+<<<<<<< HEAD
     @After
+=======
+    @AfterEach
+>>>>>>> refs/remotes/origin/3.1.1-release
     public void after() {
         NettyClient.getInstance().close();
         nettyServer.close();

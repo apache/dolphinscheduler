@@ -24,10 +24,10 @@ import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 
 import java.util.ArrayList;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.powermock.api.mockito.PowerMockito;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import io.netty.channel.Channel;
 
@@ -42,10 +42,10 @@ public class TaskKillResponseProcessorTest {
 
     private Channel channel;
 
-    @Before
+    @BeforeEach
     public void before() {
         taskKillResponseProcessor = new TaskKillResponseProcessor();
-        channel = PowerMockito.mock(Channel.class);
+        channel = Mockito.mock(Channel.class);
         taskKillResponseCommand = new TaskKillResponseCommand();
         taskKillResponseCommand.setAppIds(
                 new ArrayList<String>() {
@@ -64,7 +64,7 @@ public class TaskKillResponseProcessorTest {
     @Test
     public void testProcess() {
         Command command = taskKillResponseCommand.convert2Command();
-        Assert.assertEquals(CommandType.TASK_KILL_RESPONSE, command.getType());
+        Assertions.assertEquals(CommandType.TASK_KILL_RESPONSE, command.getType());
         taskKillResponseProcessor.process(channel, command);
     }
 }

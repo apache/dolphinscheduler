@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -47,14 +49,20 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+<<<<<<< HEAD
+=======
+import org.springframework.beans.factory.annotation.Autowired;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.springframework.stereotype.Service;
 
 import io.micrometer.core.annotation.Counted;
@@ -75,12 +83,25 @@ public class MasterFailoverService {
 
     private final LogClient logClient;
 
+<<<<<<< HEAD
+=======
+    private final TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private ProcessDefinitionDao processDefinitionDao;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
                                  @NonNull ProcessService processService,
                                  @NonNull NettyExecutorManager nettyExecutorManager,
                                  @NonNull ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+<<<<<<< HEAD
                                  @NonNull LogClient logClient) {
+=======
+                                 @NonNull LogClient logClient,
+                                 @NonNull TaskInstanceDao taskInstanceDao) {
+>>>>>>> refs/remotes/origin/3.1.1-release
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
@@ -88,7 +109,11 @@ public class MasterFailoverService {
         this.localAddress = masterConfig.getMasterAddress();
         this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.logClient = logClient;
+<<<<<<< HEAD
 
+=======
+        this.taskInstanceDao = taskInstanceDao;
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     /**
@@ -149,6 +174,12 @@ public class MasterFailoverService {
                 needFailoverProcessInstanceList.size(),
                 needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
 
+        List<ProcessDefinition> processDefinitions =
+                processDefinitionDao.queryProcessDefinitionsByCodesAndVersions(needFailoverProcessInstanceList);
+        Map<Long, ProcessDefinition> codeDefinitionMap = processDefinitions
+                .stream()
+                .collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
+
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             try {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
@@ -157,14 +188,15 @@ public class MasterFailoverService {
                     LOGGER.info("WorkflowInstance doesn't need to failover");
                     continue;
                 }
-                // todo: use batch query
-                ProcessDefinition processDefinition =
-                        processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                                processInstance.getProcessDefinitionVersion());
+                ProcessDefinition processDefinition = codeDefinitionMap.get(processInstance.getProcessDefinitionCode());
                 processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
                 List<TaskInstance> taskInstanceList =
+<<<<<<< HEAD
                         processService.findValidTaskListByProcessId(processInstanceId);
+=======
+                        taskInstanceDao.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
+>>>>>>> refs/remotes/origin/3.1.1-release
                 for (TaskInstance taskInstance : taskInstanceList) {
                     try {
                         LoggerUtils.setTaskInstanceIdMDC(taskInstance.getId());
@@ -249,7 +281,11 @@ public class MasterFailoverService {
         }
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
+<<<<<<< HEAD
         processService.saveTaskInstance(taskInstance);
+=======
+        taskInstanceDao.upsertTaskInstance(taskInstance);
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     private void sendKillCommandToWorker(@NonNull TaskInstance taskInstance) {

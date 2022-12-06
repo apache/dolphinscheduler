@@ -21,8 +21,13 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc.UdfFuncDeserializer;
 
 import java.io.IOException;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 public class UdfFuncTest {
 
@@ -36,7 +41,11 @@ public class UdfFuncTest {
 
         // UdfFuncDeserializer.deserializeKey key is null
         UdfFuncDeserializer udfFuncDeserializer = new UdfFuncDeserializer();
+<<<<<<< HEAD
         Assert.assertNull(udfFuncDeserializer.deserializeKey(null, null));
+=======
+        Assertions.assertNull(udfFuncDeserializer.deserializeKey(null, null));
+>>>>>>> refs/remotes/origin/3.1.1-release
 
         //
         UdfFunc udfFunc = new UdfFunc();
@@ -44,7 +53,11 @@ public class UdfFuncTest {
         udfFunc.setResourceId(2);
         udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
 
+<<<<<<< HEAD
         Assert.assertNotNull(udfFuncDeserializer.deserializeKey(udfFunc.toString(), null));
+=======
+        Assertions.assertNotNull(udfFuncDeserializer.deserializeKey(udfFunc.toString(), null));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
 }

@@ -28,6 +28,7 @@ import java.util.Date;
 import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -121,9 +122,19 @@ public class ErrorCommand {
      */
     private int dryRun;
 
+<<<<<<< HEAD
     public ErrorCommand() {
     }
+=======
+    /**
+     * test flag
+     */
+    @TableField("test_flag")
+    private int testFlag;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
+    public ErrorCommand() {
+    }
     public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
@@ -141,5 +152,9 @@ public class ErrorCommand {
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
         this.dryRun = command.getDryRun();
+<<<<<<< HEAD
+=======
+        this.testFlag = command.getTestFlag();
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 }

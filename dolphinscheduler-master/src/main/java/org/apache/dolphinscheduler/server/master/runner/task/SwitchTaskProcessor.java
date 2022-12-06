@@ -80,7 +80,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
 
         if (!this.taskInstance().getState().isFinished()) {
             setSwitchResult();
@@ -104,7 +104,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     protected boolean pauseTask() {
         this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -112,7 +112,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -127,8 +127,8 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     }
 
     private boolean setSwitchResult() {
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId());
+        List<TaskInstance> taskInstances = taskInstanceDao.findValidTaskListByProcessId(
+                taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
         Map<String, TaskExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());
@@ -188,7 +188,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                 (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setEndTime(new Date());
         taskInstance.setState(status);
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
     }
 
     public String setTaskParams(String content, String rgex) {

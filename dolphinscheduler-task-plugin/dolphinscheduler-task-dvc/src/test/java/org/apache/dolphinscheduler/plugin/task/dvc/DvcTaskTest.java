@@ -17,16 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.task.dvc;
 
+<<<<<<< HEAD
 import java.util.Date;
 import java.util.UUID;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+=======
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+<<<<<<< HEAD
 import org.powermock.api.mockito.PowerMockito;
 
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -47,27 +53,17 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 })
 @PowerMockIgnore({"javax.*"})
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.spi.utils.PropertyUtils")
-public class DvcTaskTest {
+=======
+import org.mockito.junit.jupiter.MockitoExtension;
 
-    @Before
-    public void before() throws Exception {
-        PowerMockito.mockStatic(PropertyUtils.class);
-    }
+@ExtendWith(MockitoExtension.class)
+>>>>>>> refs/remotes/origin/3.1.1-release
+public class DvcTaskTest {
 
     public TaskExecutionContext createContext(DvcParameters dvcParameters) {
         String parameters = JSONUtils.toJsonString(dvcParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("DvcTest");
-        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/dolphinscheduler_dvc_test");
-        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
-        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
-        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
-        Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dolphinscheduler_dvc_test/log");
-        Mockito.when(taskExecutionContext.getEnvironmentConfig()).thenReturn("export PATH=$HOME/anaconda3/bin:$PATH");
-
-        String userName = System.getenv().get("USER");
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn(userName);
 
         TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
         return taskExecutionContext;
@@ -83,44 +79,47 @@ public class DvcTaskTest {
     }
 
     @Test
-    public void testDvcUpload() throws Exception{
+    public void testDvcUpload() throws Exception {
         DvcTask dvcTask = initTask(createUploadParameters());
-        Assert.assertEquals(dvcTask.buildCommand(),
-                "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example\n" +
-                "DVC_DATA_PATH=/home/<YOUR-NAME-OR-ORG>/test\n" +
-                "DVC_DATA_LOCATION=test\n" +
-                "DVC_VERSION=iris_v2.3.1\n" +
-                "DVC_MESSAGE=\"add test iris data\"\n" +
-                "git clone $DVC_REPO dvc-repository; cd dvc-repository; pwd\n" +
-                "dvc config core.autostage true --local || exit 1\n" +
-                "dvc add $DVC_DATA_PATH -v -o $DVC_DATA_LOCATION --to-remote || exit 1\n" +
-                "git commit -am \"$DVC_MESSAGE\"\n" +
-                "git tag \"$DVC_VERSION\" -m \"$DVC_MESSAGE\"\n" +
-                "git push --all\n" +
-                "git push --tags");
+        Assertions.assertEquals(dvcTask.buildCommand(),
+                "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example\n"
+                        +
+                        "DVC_DATA_PATH=/home/<YOUR-NAME-OR-ORG>/test\n" +
+                        "DVC_DATA_LOCATION=test\n" +
+                        "DVC_VERSION=iris_v2.3.1\n" +
+                        "DVC_MESSAGE=\"add test iris data\"\n" +
+                        "git clone $DVC_REPO dvc-repository; cd dvc-repository; pwd\n" +
+                        "dvc config core.autostage true --local || exit 1\n" +
+                        "dvc add $DVC_DATA_PATH -v -o $DVC_DATA_LOCATION --to-remote || exit 1\n" +
+                        "git commit -am \"$DVC_MESSAGE\"\n" +
+                        "git tag \"$DVC_VERSION\" -m \"$DVC_MESSAGE\"\n" +
+                        "git push --all\n" +
+                        "git push --tags");
 
     }
 
     @Test
-    public void testDvcDownload() throws Exception{
+    public void testDvcDownload() throws Exception {
         DvcTask dvcTask = initTask(createDownloadParameters());
-        Assert.assertEquals(dvcTask.buildCommand(),
-                "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example\n" +
-                "DVC_DATA_PATH=data\n" +
-                "DVC_DATA_LOCATION=iris\n" +
-                "DVC_VERSION=iris_v2.3.1\n" +
-                "dvc get $DVC_REPO $DVC_DATA_LOCATION -o $DVC_DATA_PATH -v --rev $DVC_VERSION");
+        Assertions.assertEquals(dvcTask.buildCommand(),
+                "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example\n"
+                        +
+                        "DVC_DATA_PATH=data\n" +
+                        "DVC_DATA_LOCATION=iris\n" +
+                        "DVC_VERSION=iris_v2.3.1\n" +
+                        "dvc get $DVC_REPO $DVC_DATA_LOCATION -o $DVC_DATA_PATH -v --rev $DVC_VERSION");
     }
 
     @Test
-    public void testInitDvc() throws Exception{
+    public void testInitDvc() throws Exception {
         DvcTask dvcTask = initTask(createInitDvcParameters());
-        Assert.assertEquals(dvcTask.buildCommand(),
-                "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example\n" +
-                "git clone $DVC_REPO dvc-repository; cd dvc-repository; pwd\n" +
-                "dvc init || exit 1\n" +
-                "dvc remote add origin ~/.dvc_test -d\n" +
-                "git commit -am \"init dvc project and add remote\"; git push");
+        Assertions.assertEquals(dvcTask.buildCommand(),
+                "which dvc || { echo \"dvc does not exist\"; exit 1; }; DVC_REPO=git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example\n"
+                        +
+                        "git clone $DVC_REPO dvc-repository; cd dvc-repository; pwd\n" +
+                        "dvc init || exit 1\n" +
+                        "dvc remote add origin ~/.dvc_test -d\n" +
+                        "git commit -am \"init dvc project and add remote\"; git push");
     }
 
     private DvcParameters createUploadParameters() {

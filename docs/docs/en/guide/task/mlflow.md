@@ -5,7 +5,7 @@
 [MLflow](https://mlflow.org) is an excellent open source platform to manage the ML lifecycle, including experimentation,
 reproducibility, deployment, and a central model registry.
 
-MLflow task plugin used to execute MLflow tasks，Currently contains MLflow Projects and MLflow Models. (Model Registry will soon be rewarded for support)
+MLflow task plugin used to execute MLflow tasks, Currently contains MLflow Projects and MLflow Models. (Model Registry will soon be rewarded for support)
 
 - MLflow Projects: Package data science code in a format to reproduce runs on any platform.
 - MLflow Models: Deploy machine learning models in diverse serving environments.
@@ -28,7 +28,14 @@ The MLflow plugin currently supports and will support the following:
 
 ## Task Parameters and Example
 
+<<<<<<< HEAD
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 |       **Parameter**        |                                                                    **Description**                                                                     |
 |----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -71,6 +78,15 @@ The MLflow plugin currently supports and will support the following:
 ![mlflow-custom-project.png](../../../../img/tasks/demo/mlflow-custom-project.png)
 
 **Task Parameter**
+<<<<<<< HEAD
+
+|  **Parameter**  |                                                                                                                **Description**                                                                                                                |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| parameters      | `--param-list` in `mlflow run`. For example `-P learning_rate=0.2 -P colsample_bytree=0.8 -P subsample=0.9`.                                                                                                                                  |
+| Repository      | Repository url of MLflow Project, Support git address and directory on worker. If it's in a subdirectory, We add `#` to support this (same as `mlflow run`) , for example `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`. |
+| Project Version | Version of the project, default master.                                                                                                                                                                                                       |
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 |  **Parameter**  |                                                                                                                **Description**                                                                                                                |
 |-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -78,8 +94,11 @@ The MLflow plugin currently supports and will support the following:
 | Repository      | Repository url of MLflow Project, Support git address and directory on worker. If it's in a subdirectory, We add `#` to support this (same as `mlflow run`) , for example `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`. |
 | Project Version | Version of the project, default master.                                                                                                                                                                                                       |
 
-You can now use this feature to run all MLFlow projects on Github (For example [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) ). You can also create your own machine learning library to reuse your work, and then use DolphinScheduler to use your library with one click.
+<<<<<<< HEAD
+=======
+You can now use this feature to run all MLFlow projects on GitHub (For example [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) ). You can also create your own machine learning library to reuse your work, and then use DolphinScheduler to use your library with one click.
 
+>>>>>>> refs/remotes/origin/3.1.1-release
 ### MLflow Models
 
 **General Parameters**
@@ -102,6 +121,11 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 ### Conda Environment
 Please install [anaconda](https://docs.continuum.io/anaconda/install/) or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance.
 
+<<<<<<< HEAD
+=======
+Please install [anaconda](https://docs.continuum.io/anaconda/install/) or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance.
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 **Method A:**
 
 Config anaconda environment in `/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
@@ -113,7 +137,10 @@ Add the following content to the file:
 export PATH=/opt/anaconda3/bin:$PATH
 ```
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 **Method B:**
 
 You need to enter the admin account to configure a conda environment variable.
@@ -153,3 +180,7 @@ ml.mlflow.preset_repository=https://github.com/apache/dolphinscheduler-mlflow
 # mlflow task plugin preset repository version
 ml.mlflow.preset_repository_version="main"
 ```
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release

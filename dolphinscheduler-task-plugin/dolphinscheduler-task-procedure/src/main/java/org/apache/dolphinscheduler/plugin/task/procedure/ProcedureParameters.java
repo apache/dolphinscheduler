@@ -135,9 +135,11 @@ public class ProcedureParameters extends AbstractParameters {
     }
 
     public ProcedureTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
-        DataSourceParameters dataSourceParameters = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
-        procedureTaskExecutionContext.setConnectionParams(Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
+        procedureTaskExecutionContext.setConnectionParams(
+                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
         return procedureTaskExecutionContext;
     }
 }

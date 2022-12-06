@@ -36,6 +36,10 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+<<<<<<< HEAD
+=======
+import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -78,6 +82,7 @@ import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeComman
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -123,6 +128,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
+    ProcessDefinitionMapper processDefineMapper;
+
+    @Autowired
     private MonitorService monitorService;
 
     @Autowired
@@ -130,6 +138,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private CommandService commandService;
 
     @Autowired
     private ProcessInstanceDao processInstanceDao;
@@ -145,6 +156,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Autowired
+    private WorkerGroupService workerGroupService;
 
     /**
      * execute process instance
@@ -166,6 +180,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param timeout                   timeout
      * @param startParams               the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @param testFlag testFlag
      * @return execute process instance code
      */
     @Override
@@ -173,11 +188,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    String cronTime, CommandType commandType,
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType,
-                                                   int warningGroupId, RunMode runMode,
+                                                   Integer warningGroupId, RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup,
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
-                                                   int dryRun, ComplementDependentMode complementDependentMode) {
+                                                   int dryRun, int testFlag,
+                                                   ComplementDependentMode complementDependentMode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -187,17 +203,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
+            logger.warn("Parameter timeout is invalid, timeout:{}.", timeout);
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
 
         // check process define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-        result = checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode,
+        this.checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode,
                 processDefinition.getVersion());
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
 
         if (!checkTenantSuitable(processDefinition)) {
             logger.error(
@@ -224,7 +238,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup,
-                        environmentCode, startParams, expectedParallelismNumber, dryRun, complementDependentMode);
+                        environmentCode, startParams, expectedParallelismNumber, dryRun, testFlag,
+                        complementDependentMode);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -252,6 +267,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // no master
         if (masterServers.isEmpty()) {
+            logger.error("Master does not exist.");
             putMsg(result, Status.MASTER_NOT_EXISTS);
             return false;
         }
@@ -274,6 +290,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (cronMap.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
             String[] stringDates = cronMap.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(COMMA);
             if (stringDates.length > SCHEDULE_TIME_MAX_LENGTH) {
+                logger.warn("Parameter cornTime is bigger than {}.", SCHEDULE_TIME_MAX_LENGTH);
                 return false;
             }
         }
@@ -286,14 +303,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param projectCode       project code
      * @param processDefinition process definition
      * @param processDefineCode process definition code
-     * @param version           process instance verison
-     * @return check result code
+     * @param version           process instance version
      */
     @Override
-    public Map<String, Object> checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition,
-                                                           long processDefineCode, Integer version) {
-        Map<String, Object> result = new HashMap<>();
+    public void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition,
+                                            long processDefineCode, Integer version) {
+        // check process definition exists
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+<<<<<<< HEAD
             // check process definition exists
             logger.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
                     processDefineCode);
@@ -310,8 +327,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
+=======
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
         }
-        return result;
+        // check process definition online
+        if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(processDefineCode), version);
+        }
+        // check sub process definition online
+        if (!checkSubProcessDefinitionValid(processDefinition)) {
+            throw new ServiceException(Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
+>>>>>>> refs/remotes/origin/3.1.1-release
+        }
     }
 
     /**
@@ -387,13 +414,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         processInstance.getProcessDefinitionVersion());
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
-            result =
-                    checkProcessDefinitionValid(projectCode, processDefinition,
-                            processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion());
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
+                    processInstance.getProcessDefinitionVersion());
         }
 
         result = checkExecuteType(processInstance, executeType);
@@ -422,18 +444,23 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         switch (executeType) {
             case REPEAT_RUNNING:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams);
+                        processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams,
+                        processInstance.getTestFlag());
                 break;
             case RECOVER_SUSPENDED_PROCESS:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
+                        processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams,
+                        processInstance.getTestFlag());
                 break;
             case START_FAILURE_TASK_PROCESS:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
+                        processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams,
+                        processInstance.getTestFlag());
                 break;
             case STOP:
                 if (processInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
+                    logger.warn("Process instance status is already {}, processInstanceName:{}.",
+                            WorkflowExecutionStatus.READY_STOP.getDesc(), processInstance.getName());
                     putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(),
                             processInstance.getState());
                 } else {
@@ -461,6 +488,25 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         return result;
+    }
+
+    /**
+     * do action to workflow instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
+    
+    
+     *
+     * @param loginUser         login user
+     * @param workflowInstanceId workflow instance id
+     * @param executeType       execute type
+     * @return execute result code
+     */
+    @Override
+    public Map<String, Object> execute(User loginUser, Integer workflowInstanceId, ExecuteType executeType) {
+        ProcessInstance processInstance = processInstanceMapper.selectById(workflowInstanceId);
+        ProcessDefinition processDefinition =
+                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+
+        return execute(loginUser, processDefinition.getProjectCode(), workflowInstanceId, executeType);
     }
 
     @Override
@@ -574,6 +620,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
             putMsg(result, Status.SUCCESS);
         } else {
+            logger.error("Process instance state update error, processInstanceName:{}.", processInstance.getName());
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
         return result;
@@ -588,12 +635,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private Map<String, Object> forceStart(ProcessInstance processInstance, TaskGroupQueue taskGroupQueue) {
         Map<String, Object> result = new HashMap<>();
         if (taskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
+            logger.warn("Task group queue already starts, taskGroupQueueId:{}.", taskGroupQueue.getId());
             putMsg(result, Status.TASK_GROUP_QUEUE_ALREADY_START);
             return result;
         }
 
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         processService.updateTaskGroupQueue(taskGroupQueue);
+        logger.info("Sending force start command to master.");
         processService.sendStartTask2Master(processInstance, taskGroupQueue.getTaskId(),
                 org.apache.dolphinscheduler.remote.command.CommandType.TASK_FORCE_STATE_EVENT_REQUEST);
         putMsg(result, Status.SUCCESS);
@@ -611,7 +660,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode,
-                                              int processVersion, CommandType commandType, String startParams) {
+                                              int processVersion, CommandType commandType, String startParams,
+                                              int testFlag) {
         Map<String, Object> result = new HashMap<>();
 
         // To add startParams only when repeat running is needed
@@ -628,8 +678,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setExecutorId(loginUser.getId());
         command.setProcessDefinitionVersion(processVersion);
         command.setProcessInstanceId(instanceId);
+<<<<<<< HEAD
 
         if (!processService.verifyIsNeedCreateCommand(command)) {
+=======
+        command.setTestFlag(testFlag);
+        if (!commandService.verifyIsNeedCreateCommand(command)) {
+>>>>>>> refs/remotes/origin/3.1.1-release
             logger.warn(
                     "Process instance is executing the command, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}.",
                     processDefinitionCode, processVersion, instanceId);
@@ -637,9 +692,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        int create = processService.createCommand(command);
+        logger.info("Creating command, commandInfo:{}.", command);
+        int create = commandService.createCommand(command);
 
         if (create > 0) {
+            logger.info("Create {} command complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
+                    command.getCommandType().getDescp(), command.getProcessDefinitionCode(), processVersion);
             putMsg(result, Status.SUCCESS);
         } else {
             logger.error(
@@ -665,7 +723,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
 
         if (processDefinition == null) {
-            logger.error("process definition is not found");
+            logger.error("Process definition is not be found, processDefinitionCode:{}.", processDefinitionCode);
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "processDefinitionCode");
             return result;
         }
@@ -684,8 +742,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                 processDefinitionTmp.getName(),
                                 processDefinition.getName(), ReleaseState.ONLINE.getDescp());
                         putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinitionTmp.getName());
-                        logger.info("not release process definition id: {} , name : {}", processDefinitionTmp.getId(),
-                                processDefinitionTmp.getName());
                         return result;
                     }
                 }
@@ -710,15 +766,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode                 runMode
      * @param processInstancePriority processInstancePriority
      * @param workerGroup             workerGroup
+     * @param testFlag                testFlag
      * @param environmentCode         environmentCode
      * @return command id
      */
     private int createCommand(CommandType commandType, long processDefineCode, TaskDependType nodeDep,
                               FailureStrategy failureStrategy, String startNodeList, String schedule,
-                              WarningType warningType, int executorId, int warningGroupId, RunMode runMode,
+                              WarningType warningType, int executorId, Integer warningGroupId, RunMode runMode,
                               Priority processInstancePriority, String workerGroup, Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
-                              ComplementDependentMode complementDependentMode) {
+                              int testFlag, ComplementDependentMode complementDependentMode) {
 
         /**
          * instantiate command schedule instance
@@ -755,6 +812,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setWorkerGroup(workerGroup);
         command.setEnvironmentCode(environmentCode);
         command.setDryRun(dryRun);
+        command.setTestFlag(testFlag);
         ProcessDefinition processDefinition = processService.findProcessDefinitionByCode(processDefineCode);
         if (processDefinition != null) {
             command.setProcessDefinitionVersion(processDefinition.getVersion());
@@ -783,7 +841,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             }
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-            return processService.createCommand(command);
+            logger.info("Creating command, commandInfo:{}.", command);
+            return commandService.createCommand(command);
         }
     }
 
@@ -822,6 +881,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 if (StringUtils.isNotEmpty(dateList)) {
                     cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateList);
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+<<<<<<< HEAD
                     createCount = processService.createCommand(command);
                     if (createCount > 0)
                         logger.info("Create {} command complete, processDefinitionCode:{}",
@@ -829,11 +889,23 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     else
                         logger.error("Create {} command error, processDefinitionCode:{}",
                                 command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+=======
+                    logger.info("Creating command, commandInfo:{}.", command);
+                    createCount = commandService.createCommand(command);
+                    if (createCount > 0) {
+                        logger.info("Create {} command complete, processDefinitionCode:{}",
+                                command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    } else {
+                        logger.error("Create {} command error, processDefinitionCode:{}",
+                                command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    }
+>>>>>>> refs/remotes/origin/3.1.1-release
                 }
                 if (startDate != null && endDate != null) {
                     cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, startDate);
                     cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, endDate);
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+<<<<<<< HEAD
                     createCount = processService.createCommand(command);
                     if (createCount > 0)
                         logger.info("Create {} command complete, processDefinitionCode:{}",
@@ -841,6 +913,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     else
                         logger.error("Create {} command error, processDefinitionCode:{}",
                                 command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+=======
+                    logger.info("Creating command, commandInfo:{}.", command);
+                    createCount = commandService.createCommand(command);
+                    if (createCount > 0) {
+                        logger.info("Create {} command complete, processDefinitionCode:{}",
+                                command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    } else {
+                        logger.error("Create {} command error, processDefinitionCode:{}",
+                                command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    }
+>>>>>>> refs/remotes/origin/3.1.1-release
                     // dependent process definition
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
                             command.getProcessDefinitionCode());
@@ -901,12 +984,22 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                     DateUtils.dateToString(listDate.get(endDateIndex)));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             logger.info("Creating command, commandInfo:{}.", command);
+<<<<<<< HEAD
                             if (processService.createCommand(command) > 0)
                                 logger.info("Create {} command complete, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
                             else
                                 logger.error("Create {} command error, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+=======
+                            if (commandService.createCommand(command) > 0) {
+                                logger.info("Create {} command complete, processDefinitionCode:{}",
+                                        command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            } else {
+                                logger.error("Create {} command error, processDefinitionCode:{}",
+                                        command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            }
+>>>>>>> refs/remotes/origin/3.1.1-release
                             if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
                                 logger.info(
                                         "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, processDefinitionCode:{}.",
@@ -934,12 +1027,22 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                             cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, String.join(COMMA, stringDate));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             logger.info("Creating command, commandInfo:{}.", command);
+<<<<<<< HEAD
                             if (processService.createCommand(command) > 0)
                                 logger.info("Create {} command complete, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
                             else
                                 logger.error("Create {} command error, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+=======
+                            if (commandService.createCommand(command) > 0) {
+                                logger.info("Create {} command complete, processDefinitionCode:{}",
+                                        command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            } else {
+                                logger.error("Create {} command error, processDefinitionCode:{}",
+                                        command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                            }
+>>>>>>> refs/remotes/origin/3.1.1-release
                         }
                     }
                 }
@@ -948,7 +1051,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             default:
                 break;
         }
-        logger.info("create complement command count: {}, create dependent complement command count: {}", createCount,
+        logger.info("Create complement command count:{}, Create dependent complement command count:{}", createCount,
                 dependentProcessDefinitionCreateCount);
         return createCount;
     }
@@ -963,7 +1066,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         try {
             dependentCommand = (Command) BeanUtils.cloneBean(command);
         } catch (Exception e) {
-            logger.error("copy dependent command error: ", e);
+            logger.error("Copy dependent command error.", e);
             return dependentProcessDefinitionCreateCount;
         }
 
@@ -981,7 +1084,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             Map<String, String> cmdParam = JSONUtils.toMap(dependentCommand.getCommandParam());
             cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentProcessDefinition.getTaskDefinitionCode()));
             dependentCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
-            dependentProcessDefinitionCreateCount += processService.createCommand(dependentCommand);
+            logger.info("Creating complement dependent command, commandInfo:{}.", command);
+            dependentProcessDefinitionCreateCount += commandService.createCommand(dependentCommand);
         }
 
         return dependentProcessDefinitionCreateCount;
@@ -1017,7 +1121,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         .collect(Collectors.toList());
 
         Map<Long, String> processDefinitionWorkerGroupMap =
-                processService.queryWorkerGroupByProcessDefinitionCodes(processDefinitionCodeList);
+                workerGroupService.queryWorkerGroupByProcessDefinitionCodes(processDefinitionCodeList);
 
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
             if (dependentProcessDefinition.getDependentCycle(upstreamProcessDefinitionCode) == processDefinitionCycle) {
@@ -1066,7 +1170,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     return false;
                 }
             } catch (Exception ex) {
-                logger.warn("Parse schedule time error, startDate: {}, endDate: {}", startDate, endDate);
+                logger.warn("Parse schedule time error, startDate:{}, endDate:{}.", startDate, endDate);
                 return false;
             }
         }
@@ -1095,6 +1199,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public WorkflowExecuteDto queryExecutingWorkflowByProcessInstanceId(Integer processInstanceId) {
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId).orElse(null);
         if (processInstance == null) {
+            logger.error("Process instance does not exist, processInstanceId:{}.", processInstanceId);
             return null;
         }
         Host host = new Host(processInstance.getHost());
@@ -1149,6 +1254,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         org.apache.dolphinscheduler.remote.command.Command response =
                 stateEventCallbackService.sendSync(host, taskExecuteStartCommand.convert2Command());
         if (response != null) {
+            logger.info("Send task execute start command complete, response is {}.", response);
             putMsg(result, Status.SUCCESS);
         } else {
             logger.error(

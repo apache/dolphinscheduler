@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -32,6 +33,8 @@ import java.io.Serializable;
 public class GetAppIdRequestCommand implements Serializable {
 
     private String logPath;
+
+    private String appInfoPath;
 
     public Command convert2Command() {
         Command command = new Command();

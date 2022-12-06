@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -46,15 +48,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.context.ApplicationContext;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
 public class BlockingTaskTest {
 
     /**
@@ -64,26 +64,35 @@ public class BlockingTaskTest {
 
     private ProcessService processService;
 
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionDao taskDefinitionDao;
+
     private ProcessInstance processInstance;
 
     private MasterConfig config;
 
-    @Before
-    public void before() {
-        // init spring context
-        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
-        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
-        springApplicationContext.setApplicationContext(applicationContext);
+    private MockedStatic<SpringApplicationContext> mockedStaticSpringApplicationContext;
 
+    @BeforeEach
+    public void before() {
         // mock master
         config = new MasterConfig();
-        Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
         config.setTaskCommitRetryTimes(3);
         config.setTaskCommitInterval(Duration.ofSeconds(1));
 
+        mockedStaticSpringApplicationContext = Mockito.mockStatic(SpringApplicationContext.class);
+        Mockito.when(SpringApplicationContext.getBean(MasterConfig.class)).thenReturn(config);
+
         // mock process service
         processService = Mockito.mock(ProcessService.class);
-        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
+
+        taskDefinitionDao = Mockito.mock(TaskDefinitionDao.class);
+        Mockito.when(SpringApplicationContext.getBean(TaskDefinitionDao.class)).thenReturn(taskDefinitionDao);
 
         // mock process instance
         processInstance = getProcessInstance();
@@ -95,8 +104,13 @@ public class BlockingTaskTest {
         taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setTimeout(0);
-        Mockito.when(processService.findTaskDefinition(1L, 1))
+        Mockito.when(taskDefinitionDao.findTaskDefinition(1L, 1))
                 .thenReturn(taskDefinition);
+    }
+
+    @AfterEach
+    public void after() {
+        mockedStaticSpringApplicationContext.close();
     }
 
     private ProcessInstance getProcessInstance() {
@@ -184,23 +198,23 @@ public class BlockingTaskTest {
                 .submitTask(processInstance, taskInstance))
                 .thenReturn(taskInstance);
 
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .findTaskInstanceById(taskInstance.getId()))
                 .thenReturn(taskInstance);
 
         // for BlockingTaskExecThread.initTaskParameters
-        Mockito.when(processService
-                .saveTaskInstance(taskInstance))
+        Mockito.when(taskInstanceDao.upsertTaskInstance(taskInstance))
                 .thenReturn(true);
 
         // for BlockingTaskExecThread.updateTaskState
-        Mockito.when(processService
+        Mockito.when(taskInstanceDao
                 .updateTaskInstance(taskInstance))
                 .thenReturn(true);
 
         // for BlockingTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = getTaskInstanceForValidTaskList(expectResults);
-        Mockito.when(processService.findValidTaskListByProcessId(processInstance.getId()))
+        Mockito.when(
+                taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(conditions);
         return taskInstance;
     }
@@ -227,7 +241,7 @@ public class BlockingTaskTest {
         BlockingTaskProcessor blockingTaskProcessor = new BlockingTaskProcessor();
         blockingTaskProcessor.init(taskInstance, processInstance);
         boolean res = blockingTaskProcessor.action(TaskAction.SUBMIT);
-        Assert.assertEquals(true, res);
+        Assertions.assertTrue(res);
     }
 
     @Test
@@ -239,7 +253,7 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.PAUSE);
         TaskExecutionStatus status = taskInstance.getState();
-        Assert.assertEquals(TaskExecutionStatus.PAUSE, status);
+        Assertions.assertEquals(TaskExecutionStatus.PAUSE, status);
     }
 
     @Test
@@ -251,7 +265,7 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.RUN);
         WorkflowExecutionStatus status = processInstance.getState();
-        Assert.assertEquals(WorkflowExecutionStatus.READY_BLOCK, status);
+        Assertions.assertEquals(WorkflowExecutionStatus.READY_BLOCK, status);
     }
 
     @Test
@@ -263,6 +277,6 @@ public class BlockingTaskTest {
         blockingTaskProcessor.action(TaskAction.SUBMIT);
         blockingTaskProcessor.action(TaskAction.RUN);
         WorkflowExecutionStatus status = processInstance.getState();
-        Assert.assertEquals(WorkflowExecutionStatus.RUNNING_EXECUTION, status);
+        Assertions.assertEquals(WorkflowExecutionStatus.RUNNING_EXECUTION, status);
     }
 }

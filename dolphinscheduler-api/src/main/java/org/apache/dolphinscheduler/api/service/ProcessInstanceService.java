@@ -18,15 +18,16 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * process instance service
@@ -53,6 +54,16 @@ public interface ProcessInstanceService {
      */
     Map<String, Object> queryProcessInstanceById(User loginUser,
                                                  long projectCode,
+                                                 Integer processId);
+
+    /**
+     * query process instance by id
+     *
+     * @param loginUser login user
+     * @param processId process instance id
+     * @return process instance detail
+     */
+    Map<String, Object> queryProcessInstanceById(User loginUser,
                                                  Integer processId);
 
     /**
@@ -83,6 +94,16 @@ public interface ProcessInstanceService {
                                     String otherParamsJson,
                                     Integer pageNo,
                                     Integer pageSize);
+
+    /**
+     * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
+     *
+     * @param loginUser login user
+     * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
+     * @return process instance list
+     */
+    Result queryProcessInstanceList(User loginUser,
+                                    WorkflowInstanceQueryRequest workflowInstanceQueryRequest);
 
     /**
      * query task list by process instance id
@@ -162,6 +183,16 @@ public interface ProcessInstanceService {
     Map<String, Object> deleteProcessInstanceById(User loginUser,
                                                   long projectCode,
                                                   Integer processInstanceId);
+
+    /**
+     * delete process instance by id, at the same time，delete task instance and their mapping relation data
+     *
+     * @param loginUser login user
+     * @param workflowInstanceId work instance id
+     * @return delete result code
+     */
+    Map<String, Object> deleteProcessInstanceById(User loginUser,
+                                                  Integer workflowInstanceId);
 
     /**
      * view process instance variables

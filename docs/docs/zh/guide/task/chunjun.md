@@ -11,7 +11,14 @@ ChunJun 任务类型，用于执行 ChunJun 程序。对于 ChunJun 节点，wor
 
 ## 任务参数
 
+<<<<<<< HEAD
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 | **任务参数** |                           **描述**                           |
 |----------|------------------------------------------------------------|

@@ -37,19 +37,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * process definition controller test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class DataQualityControllerTest {
 
     @InjectMocks
@@ -63,7 +63,7 @@ public class DataQualityControllerTest {
 
     protected User user;
 
-    @Before
+    @BeforeEach
     public void before() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -83,7 +83,7 @@ public class DataQualityControllerTest {
         Mockito.when(dqRuleService.getRuleFormCreateJsonById(1)).thenReturn(result);
 
         Result response = dataQualityController.getRuleFormCreateJsonById(1);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
@@ -128,7 +128,7 @@ public class DataQualityControllerTest {
         String start = "2020-01-01 00:00:00";
         String end = "2020-01-02 00:00:00";
 
-        PageInfo<DqRule> pageInfo = new PageInfo<>(1,10);
+        PageInfo<DqRule> pageInfo = new PageInfo<>(1, 10);
         pageInfo.setTotal(10);
         pageInfo.setTotalList(getRuleList());
 
@@ -137,10 +137,10 @@ public class DataQualityControllerTest {
         putMsg(result, Status.SUCCESS);
 
         when(dqRuleService.queryRuleListPaging(
-                user, searchVal, ruleType, start, end,1, 10)).thenReturn(result);
+                user, searchVal, ruleType, start, end, 1, 10)).thenReturn(result);
 
-        Result response = dataQualityController.queryRuleListPaging(user, searchVal, ruleType,start,end,1,10);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Result response = dataQualityController.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class DataQualityControllerTest {
         when(dqRuleService.queryAllRuleList()).thenReturn(result);
 
         Result response = dataQualityController.queryRuleList();
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class DataQualityControllerTest {
         String start = "2020-01-01 00:00:00";
         String end = "2020-01-02 00:00:00";
 
-        PageInfo<DqRule> pageInfo = new PageInfo<>(1,10);
+        PageInfo<DqRule> pageInfo = new PageInfo<>(1, 10);
         pageInfo.setTotal(10);
 
         Result result = new Result();
@@ -172,9 +172,10 @@ public class DataQualityControllerTest {
         putMsg(result, Status.SUCCESS);
 
         when(dqExecuteResultService.queryResultListPaging(
-                user, searchVal, 0,ruleType, start, end,1, 10)).thenReturn(result);
+                user, searchVal, 0, ruleType, start, end, 1, 10)).thenReturn(result);
 
-        Result response = dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType,0,start,end,1,10);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Result response =
+                dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType, 0, start, end, 1, 10);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 }

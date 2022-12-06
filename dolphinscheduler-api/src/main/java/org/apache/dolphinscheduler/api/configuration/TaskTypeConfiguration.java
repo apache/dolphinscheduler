@@ -17,8 +17,18 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
+import org.apache.dolphinscheduler.api.dto.FavTaskDto;
+import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
+import org.apache.dolphinscheduler.common.constants.Constants;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -32,6 +42,8 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +51,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Component
 @EnableConfigurationProperties
@@ -52,15 +60,17 @@ import java.util.Set;
 @Setter
 public class TaskTypeConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(TaskTypeConfiguration.class);
+
     private List<String> universal;
     private List<String> cloud;
     private List<String> logic;
     private List<String> dataIntegration;
     private List<String> dataQuality;
     private List<String> other;
-
     private List<String> machineLearning;
 
+<<<<<<< HEAD
     public Set<FavTaskDto> getDefaultTaskTypes() {
         Set<FavTaskDto> defaultTaskTypes = new HashSet<>();
         if (CollectionUtils.isNotEmpty(defaultTaskTypes)) {
@@ -74,6 +84,34 @@ public class TaskTypeConfiguration {
         machineLearning.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
         other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
 
+=======
+    private static final List<FavTaskDto> defaultTaskTypes = new ArrayList<>();
+
+    public List<FavTaskDto> getDefaultTaskTypes() {
+        if (CollectionUtils.isNotEmpty(defaultTaskTypes)) {
+            return defaultTaskTypes;
+        }
+        printDefaultTypes();
+        universal.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_UNIVERSAL)));
+        cloud.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_CLOUD)));
+        logic.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_LOGIC)));
+        dataIntegration
+                .forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_INTEGRATION)));
+        dataQuality.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_QUALITY)));
+        machineLearning
+                .forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
+        other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
+>>>>>>> refs/remotes/origin/3.1.1-release
         return defaultTaskTypes;
+    }
+
+    public void printDefaultTypes() {
+        logger.info("support default universal task types: {}", universal);
+        logger.info("support default cloud task types: {}", cloud);
+        logger.info("support default logic task types: {}", logic);
+        logger.info("support default dataIntegration task types: {}", dataIntegration);
+        logger.info("support default dataQuality task types: {}", dataQuality);
+        logger.info("support default machineLearning task types: {}", machineLearning);
+        logger.info("support default other task types: {}", other);
     }
 }

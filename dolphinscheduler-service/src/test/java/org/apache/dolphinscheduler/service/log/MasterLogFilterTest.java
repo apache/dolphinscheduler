@@ -18,8 +18,13 @@ package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.LoggingEvent;
@@ -50,7 +55,11 @@ public class MasterLogFilterTest {
 
         });
 
+<<<<<<< HEAD
         Assert.assertEquals(FilterReply.ACCEPT, filterReply);
+=======
+        Assertions.assertEquals(FilterReply.ACCEPT, filterReply);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.utils;
 
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -23,10 +24,24 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import java.util.List;
+=======
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.service.model.TaskNode;
+
+import java.util.List;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 @Data
 @NoArgsConstructor
 public class ProcessData {
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
     @EqualsAndHashCode.Include
     private List<TaskNode> tasks;
 

@@ -114,6 +114,19 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
                                                    @Param("searchVal") String searchVal,
                                                    @Param("userId") int userId,
                                                    @Param("projectCode") long projectCode);
+<<<<<<< HEAD
+=======
+
+    /**
+     * Filter process definitions
+     *
+     * @param page page
+     * @param processDefinition process definition object
+     * @return process definition IPage
+     */
+    IPage<ProcessDefinition> filterProcessDefinition(IPage<ProcessDefinition> page,
+                                                     @Param("pd") ProcessDefinition processDefinition);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     /**
      * query all process definition list
@@ -157,6 +170,20 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return definition group by user
      */
     List<DefinitionGroupByUser> countDefinitionByProjectCodes(@Param("projectCodes") Long[] projectCodes);
+
+    /**
+     * Statistics process definition group by project codes list
+     * <p>
+     * We only need project codes to determine whether the definition belongs to the user or not.
+     *
+     * @param projectCodes projectCodes
+     * @param userId userId
+     * @param releaseState releaseState
+     * @return definition group by user
+     */
+    List<DefinitionGroupByUser> countDefinitionByProjectCodesV2(@Param("projectCodes") Long[] projectCodes,
+                                                                @Param("userId") Integer userId,
+                                                                @Param("releaseState") Integer releaseState);
 
     /**
      * list all resource ids

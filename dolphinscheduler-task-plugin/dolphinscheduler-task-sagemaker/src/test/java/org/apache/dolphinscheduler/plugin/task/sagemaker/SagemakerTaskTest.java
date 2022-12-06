@@ -18,40 +18,45 @@
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+<<<<<<< HEAD
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+=======
+import org.mockito.junit.jupiter.MockitoExtension;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
 import com.amazonaws.services.sagemaker.model.DescribePipelineExecutionResult;
-import com.amazonaws.services.sagemaker.model.ListPipelineExecutionStepsResult;
-import com.amazonaws.services.sagemaker.model.PipelineExecutionStep;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionResult;
 import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
 
+<<<<<<< HEAD
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({JSONUtils.class, PropertyUtils.class,})
 @PowerMockIgnore({"javax.*"})
+=======
+@ExtendWith(MockitoExtension.class)
+>>>>>>> refs/remotes/origin/3.1.1-release
 public class SagemakerTaskTest {
 
     private final String pipelineExecutionArn = "test-pipeline-arn";
@@ -60,22 +65,27 @@ public class SagemakerTaskTest {
     private AmazonSageMaker client;
     private PipelineUtils pipelineUtils = new PipelineUtils();
 
-    @Before
+    @BeforeEach
     public void before() {
         String parameters = buildParameters();
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
 
+<<<<<<< HEAD
         client = mock(AmazonSageMaker.class);
+=======
+        client = Mockito.mock(AmazonSageMaker.class);
+>>>>>>> refs/remotes/origin/3.1.1-release
         sagemakerTask = new SagemakerTask(taskExecutionContext);
         sagemakerTask.init();
 
-        StartPipelineExecutionResult startPipelineExecutionResult = mock(StartPipelineExecutionResult.class);
-        when(startPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
+        StartPipelineExecutionResult startPipelineExecutionResult = Mockito.mock(StartPipelineExecutionResult.class);
+        Mockito.lenient().when(startPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
 
-        StopPipelineExecutionResult stopPipelineExecutionResult = mock(StopPipelineExecutionResult.class);
-        when(stopPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
+        StopPipelineExecutionResult stopPipelineExecutionResult = Mockito.mock(StopPipelineExecutionResult.class);
+        Mockito.lenient().when(stopPipelineExecutionResult.getPipelineExecutionArn()).thenReturn(pipelineExecutionArn);
 
+<<<<<<< HEAD
         DescribePipelineExecutionResult describePipelineExecutionResult = mock(DescribePipelineExecutionResult.class);
         when(describePipelineExecutionResult.getPipelineExecutionStatus()).thenReturn("Executing", "Succeeded");
 
@@ -93,25 +103,40 @@ public class SagemakerTaskTest {
         when(client.stopPipelineExecution(any())).thenReturn(stopPipelineExecutionResult);
         when(client.describePipelineExecution(any())).thenReturn(describePipelineExecutionResult);
         when(client.listPipelineExecutionSteps(any())).thenReturn(listPipelineExecutionStepsResult);
+=======
+        DescribePipelineExecutionResult describePipelineExecutionResult =
+                Mockito.mock(DescribePipelineExecutionResult.class);
+        Mockito.lenient().when(describePipelineExecutionResult.getPipelineExecutionStatus()).thenReturn("Executing",
+                "Succeeded");
+>>>>>>> refs/remotes/origin/3.1.1-release
 
+        Mockito.lenient().when(client.startPipelineExecution(any())).thenReturn(startPipelineExecutionResult);
+        Mockito.lenient().when(client.stopPipelineExecution(any())).thenReturn(stopPipelineExecutionResult);
+        Mockito.lenient().when(client.describePipelineExecution(any())).thenReturn(describePipelineExecutionResult);
     }
 
     @Test
     public void testStartPipelineRequest() throws Exception {
         StartPipelineExecutionRequest request = sagemakerTask.createStartPipelineRequest();
-        Assert.assertEquals("AbalonePipeline", request.getPipelineName());
-        Assert.assertEquals("test Pipeline", request.getPipelineExecutionDescription());
-        Assert.assertEquals("AbalonePipeline", request.getPipelineExecutionDisplayName());
-        Assert.assertEquals("AbalonePipeline", request.getPipelineName());
-        Assert.assertEquals(new Integer(1), request.getParallelismConfiguration().getMaxParallelExecutionSteps());
+        Assertions.assertEquals("AbalonePipeline", request.getPipelineName());
+        Assertions.assertEquals("test Pipeline", request.getPipelineExecutionDescription());
+        Assertions.assertEquals("AbalonePipeline", request.getPipelineExecutionDisplayName());
+        Assertions.assertEquals("AbalonePipeline", request.getPipelineName());
+        Assertions.assertEquals(Integer.valueOf(1),
+                request.getParallelismConfiguration().getMaxParallelExecutionSteps());
     }
 
     @Test
     public void testPipelineExecution() throws Exception {
         PipelineUtils.PipelineId pipelineId =
                 pipelineUtils.startPipelineExecution(client, sagemakerTask.createStartPipelineRequest());
+<<<<<<< HEAD
         Assert.assertEquals(pipelineExecutionArn, pipelineId.getPipelineExecutionArn());
         Assert.assertEquals(0, pipelineUtils.checkPipelineExecutionStatus(client, pipelineId));
+=======
+        Assertions.assertEquals(pipelineExecutionArn, pipelineId.getPipelineExecutionArn());
+        Assertions.assertEquals(0, pipelineUtils.checkPipelineExecutionStatus(client, pipelineId));
+>>>>>>> refs/remotes/origin/3.1.1-release
         pipelineUtils.stopPipelineExecution(client, pipelineId);
     }
 

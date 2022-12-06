@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -38,9 +40,14 @@ import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -66,7 +73,16 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private ProcessService processService;
 
     @Autowired
+    private CommandService commandService;
+
+    @Autowired
     private ProcessInstanceDao processInstanceDao;
+
+    @Autowired
+    private TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Autowired
     private MasterConfig masterConfig;
@@ -138,7 +154,12 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
                     // the current server is not at running status, cannot consume command.
+<<<<<<< HEAD
                     logger.warn("The current server {} is not at running status, cannot consumes commands.", this.masterAddress);
+=======
+                    logger.warn("The current server {} is not at running status, cannot consumes commands.",
+                            this.masterAddress);
+>>>>>>> refs/remotes/origin/3.1.1-release
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
@@ -173,13 +194,23 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                                     "The workflow instance is already been cached, this case shouldn't be happened");
                         }
                         WorkflowExecuteRunnable workflowRunnable = new WorkflowExecuteRunnable(processInstance,
+<<<<<<< HEAD
+=======
+                                commandService,
+>>>>>>> refs/remotes/origin/3.1.1-release
                                 processService,
                                 processInstanceDao,
                                 nettyExecutorManager,
                                 processAlertManager,
                                 masterConfig,
                                 stateWheelExecuteThread,
+<<<<<<< HEAD
                                 curingGlobalParamsService);
+=======
+                                curingGlobalParamsService,
+                                taskInstanceDao,
+                                taskDefinitionLogDao);
+>>>>>>> refs/remotes/origin/3.1.1-release
                         processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
                                 processInstance.getId()));
@@ -226,7 +257,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     }
                 } catch (Exception e) {
                     logger.error("Master handle command {} error ", command.getId(), e);
-                    processService.moveToErrorCommand(command, e.toString());
+                    commandService.moveToErrorCommand(command, e.toString());
                 } finally {
                     latch.countDown();
                 }
@@ -252,16 +283,25 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 logger.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
                 return Collections.emptyList();
             }
-            int pageNumber = 0;
             int pageSize = masterConfig.getFetchCommandNum();
             final List<Command> result =
+<<<<<<< HEAD
                     processService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+=======
+                    commandService.findCommandPageBySlot(pageSize, masterCount, thisMasterSlot);
+>>>>>>> refs/remotes/origin/3.1.1-release
             if (CollectionUtils.isNotEmpty(result)) {
+                long cost = System.currentTimeMillis() - scheduleStartTime;
                 logger.info(
+<<<<<<< HEAD
                         "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
                         result.size(), thisMasterSlot, masterCount);
+=======
+                        "Master schedule bootstrap loop command success, fetch command size: {}, cost: {}ms, current slot: {}, total slot size: {}",
+                        result.size(), cost, thisMasterSlot, masterCount);
+                ProcessInstanceMetrics.recordCommandQueryTime(cost);
+>>>>>>> refs/remotes/origin/3.1.1-release
             }
-            ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
             return result;
         } catch (Exception ex) {
             throw new MasterException("Master loop command from database error", ex);

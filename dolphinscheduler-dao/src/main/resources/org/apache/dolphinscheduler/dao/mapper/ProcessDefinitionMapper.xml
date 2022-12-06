@@ -82,6 +82,29 @@
                 )
         </if>
         order by update_time desc
+<<<<<<< HEAD
+=======
+    </select>
+    <select id="filterProcessDefinition"
+            parameterType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
+    >
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_process_definition
+        <where>
+            <if test=" pd.projectCode != 0">
+                and project_code = #{pd.projectCode}
+            </if>
+            <if test=" pd.name != null and pd.name != ''">
+                and name like concat('%', #{pd.name}, '%')
+            </if>
+            <if test=" pd.releaseState != null and pd.releaseState != ''">
+                and release_state = #{pd.releaseState}
+            </if>
+        </where>
+        order by update_time desc, id asc
+>>>>>>> refs/remotes/origin/3.1.1-release
     </select>
 
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
@@ -131,6 +154,24 @@
             </foreach>
         </if>
         group by td.user_id,tu.user_name
+    </select><select id="countDefinitionByProjectCodesV2" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
+        SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
+        FROM t_ds_process_definition td
+        JOIN t_ds_user tu on tu.id=td.user_id
+        where 1 = 1
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and td.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="userId != null">
+            and td.user_id = #{userId}
+        </if>
+        <if test="releaseState != null">
+            and td.release_state = #{releaseState}
+        </if>
+        group by td.user_id,tu.user_name
     </select>
 
     <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
@@ -148,7 +189,7 @@
     </select>
 
     <select id="listResources" resultType="java.util.HashMap">
-        SELECT distinct pd.code,td.resource_ids
+        SELECT distinct pd.code, td.id as td_id, td.resource_ids
         FROM t_ds_process_task_relation ptr
         join t_ds_process_definition pd
             on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
@@ -160,7 +201,7 @@
     </select>
 
     <select id="listResourcesByUser" resultType="java.util.HashMap">
-        SELECT distinct pd.code,td.resource_ids
+        SELECT distinct pd.code, td.id as td_id, td.resource_ids
         FROM t_ds_process_task_relation ptr
         join t_ds_process_definition pd
             on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version

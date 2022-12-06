@@ -11,7 +11,14 @@ Dependent 节点，就是**依赖检查节点**。比如 A 流程依赖昨天的
 
 ## 任务参数
 
+<<<<<<< HEAD
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+>>>>>>> refs/remotes/origin/3.1.1-release
 - 此任务除上述链接中的默认参数外无其他参数。
 
 ## 任务样例

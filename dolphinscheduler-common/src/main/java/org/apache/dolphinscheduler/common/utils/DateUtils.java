@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -33,6 +31,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,7 +125,8 @@ public final class DateUtils {
 
     public static String format(Date date, DateTimeFormatter dateTimeFormatter, String timezone) {
         LocalDateTime localDateTime =
-            StringUtils.isEmpty(timezone) ? date2LocalDateTime(date) : date2LocalDateTime(date, ZoneId.of(timezone));
+                StringUtils.isEmpty(timezone) ? date2LocalDateTime(date)
+                        : date2LocalDateTime(date, ZoneId.of(timezone));
         return format(localDateTime, dateTimeFormatter);
     }
 
@@ -244,8 +246,8 @@ public final class DateUtils {
         Date d = stringToDate(date);
         if (d == null) {
             throw new IllegalArgumentException(String.format(
-                "data: %s should be a validate data string - yyyy-MM-dd HH:mm:ss ",
-                date));
+                    "data: %s should be a validate data string - yyyy-MM-dd HH:mm:ss ",
+                    date));
         }
         return ZonedDateTime.ofInstant(d.toInstant(), ZoneId.systemDefault());
     }
@@ -353,6 +355,10 @@ public final class DateUtils {
         }
         if (end == null) {
             end = new Date();
+        }
+        if (start.after(end)) {
+            logger.warn("start Time {} is later than end Time {}", start, end);
+            return null;
         }
         return format2Duration(differMs(start, end));
     }
@@ -611,7 +617,7 @@ public final class DateUtils {
         LocalDateTime localDateTime =
                 LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(DateConstants.YYYY_MM_DD_HH_MM_SS));
         ZonedDateTime zonedDateTime =
-            ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
+                ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
         return Date.from(zonedDateTime.toInstant());
     }
 
@@ -629,6 +635,7 @@ public final class DateUtils {
      * Time unit representing one thousandth of a second
      */
     public static class MILLISECONDS {
+
         public static long toDays(long d) {
             return d / (C6 / C2);
         }

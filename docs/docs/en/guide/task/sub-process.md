@@ -11,7 +11,14 @@ The sub-process node is to execute an external workflow definition as a task nod
 
 ## Task Parameter
 
+<<<<<<< HEAD
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 | **Parameter** |                                                                              **Description**                                                                              |
 |---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -29,7 +36,7 @@ Create a shell task to print "hello" and define the workflow as `test_dag01`.
 
 ## Create the Sub_process task
 
-To use the sub_process, you need to create the sub-node task, which is the shell task we created in the first step. After that, as shown in the diagram below, select the corresponding sub-node in position ⑤.
+To use the sub_process, you need to create the sub-node task, which is the workflow `test_dag01` we created in the first step. After that, as shown in the diagram below, select the corresponding sub-node in position ⑤.
 
 ![subprocess_task02](../../../../img/tasks/demo/subprocess_task02.png)
 

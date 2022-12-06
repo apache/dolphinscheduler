@@ -152,7 +152,11 @@ export DOLPHINSCHEDULER_OPTS="
 |spring.datasource.hikari.leak-detection-threshold|0|连接泄露检测阈值|
 |spring.datasource.hikari.initialization-fail-timeout|1|连接池初始化失败timeout|
 
+<<<<<<< HEAD
 DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行数据库连接相关的配置。
+=======
+DolphinScheduler同样可以通过设置环境变量进行数据库连接相关的配置, 将以上小写字母转成大写并把`.`换成`_`作为环境变量名, 设置值即可。
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 ## Zookeeper相关配置
 
@@ -181,7 +185,11 @@ DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeep
 
 ## common.properties [hadoop、s3、yarn配置]
 
+<<<<<<< HEAD
 common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置，配置文件位置：
+=======
+common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId收集相关的配置，配置文件位置：
+>>>>>>> refs/remotes/origin/3.1.1-release
 |服务名称| 配置文件 |
 |--|--|
 |Master Server | `master-server/conf/common.properties`|
@@ -221,6 +229,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |sudo.enable | true | 是否开启sudo|
 |alert.rpc.port | 50052 | Alert Server的RPC端口|
 |zeppelin.rest.url | http://localhost:8080 | zeppelin RESTful API 接口地址|
+|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop，并将`bin/env/dolphinscheduler_env.sh`自动收集applicationId相关环境变量配置的注释取消掉，注意：aop不支持远程主机提交yarn作业的方式比如Beeline客户端提交，且如果用户环境覆盖了dolphinscheduler_env.sh收集applicationId相关环境变量配置，aop方法会失效|
 
 ## Api-server相关配置
 
@@ -331,39 +340,29 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 
 ## dolphinscheduler_env.sh [环境变量配置]
 
-通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME`、元数据库、注册中心和任务类型配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
+通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME` 任务类型的环境配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
 
 ```bash
 # JAVA_HOME, will use it to start DolphinScheduler server
 export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
-# Database related configuration, set database type, username and password
-export DATABASE=${DATABASE:-postgresql}
-export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL
-export SPRING_DATASOURCE_USERNAME
-export SPRING_DATASOURCE_PASSWORD
-
-# DolphinScheduler server related configuration
-export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
-export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
-export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
-
-# Registry center configuration, determines the type and link of the registry center
-export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}
-export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-localhost:2181}
-
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
-export SPARK_HOME1=${SPARK_HOME1:-/opt/soft/spark1}
-export SPARK_HOME2=${SPARK_HOME2:-/opt/soft/spark2}
+export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
 export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+
+# applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
+export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
+export SPARK_DIST_CLASSPATH=$HADOOP_CLASSPATH:$SPARK_DIST_CLASS_PATH
+export HADOOP_CLIENT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$HADOOP_CLIENT_OPTS
+export SPARK_SUBMIT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$SPARK_SUBMIT_OPTS
+export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$FLINK_ENV_JAVA_OPTS
 ```
 
 ## 日志相关配置

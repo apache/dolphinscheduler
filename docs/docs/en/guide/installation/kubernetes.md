@@ -360,7 +360,7 @@ kubectl cp -n test spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/
 
 Because the volume `sharedStoragePersistence` is mounted on `/opt/soft`, all files in `/opt/soft` will not be lost.
 
-5. Attach the container and ensure that `SPARK_HOME2` exists.
+5. Attach the container and ensure that `SPARK_HOME` exists.
 
 ```bash
 kubectl exec -it dolphinscheduler-worker-0 bash
@@ -369,7 +369,7 @@ cd /opt/soft
 tar zxf spark-2.4.7-bin-hadoop2.7.tgz
 rm -f spark-2.4.7-bin-hadoop2.7.tgz
 ln -s spark-2.4.7-bin-hadoop2.7 spark2 # or just mv
-$SPARK_HOME2/bin/spark-submit --version
+$SPARK_HOME/bin/spark-submit --version
 ```
 
 The last command will print the Spark version if everything goes well.
@@ -377,7 +377,7 @@ The last command will print the Spark version if everything goes well.
 6. Verify Spark under a Shell task.
 
 ```
-$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.11-2.4.7.jar
+$SPARK_HOME/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME/examples/jars/spark-examples_2.11-2.4.7.jar
 ```
 
 Check whether the task log contains the output like `Pi is roughly 3.146015`.
@@ -386,7 +386,6 @@ Check whether the task log contains the output like `Pi is roughly 3.146015`.
 
 The file `spark-examples_2.11-2.4.7.jar` needs to be uploaded to the resources first, and then create a Spark task with:
 
-- Spark Version: `SPARK2`
 - Main Class: `org.apache.spark.examples.SparkPi`
 - Main Package: `spark-examples_2.11-2.4.7.jar`
 - Deploy Mode: `local`
@@ -398,47 +397,6 @@ Similarly, check whether the task log contains the output like `Pi is roughly 3.
 Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Similar to Spark support, the operation of supporting Hadoop is almost the same as the previous steps.
 
 Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists.
-
-### How to Support Spark 3?
-
-In fact, the way to submit applications with `spark-submit` is the same, regardless of Spark 1, 2 or 3. In other words, the semantics of `SPARK_HOME2` is the second `SPARK_HOME` instead of `SPARK2`'s `HOME`, so just set `SPARK_HOME2=/path/to/spark3`.
-
-Take Spark 3.1.1 as an example:
-
-1. Download the Spark 3.1.1 release binary `spark-3.1.1-bin-hadoop2.7.tgz`.
-
-2. Ensure that `common.sharedStoragePersistence.enabled` is turned on.
-
-3. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
-
-4. Copy the Spark 3.1.1 release binary into the Docker container.
-
-```bash
-kubectl cp spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft
-kubectl cp -n test spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft # with test namespace
-```
-
-5. Attach the container and ensure that `SPARK_HOME2` exists.
-
-```bash
-kubectl exec -it dolphinscheduler-worker-0 bash
-kubectl exec -n test -it dolphinscheduler-worker-0 bash # with test namespace
-cd /opt/soft
-tar zxf spark-3.1.1-bin-hadoop2.7.tgz
-rm -f spark-3.1.1-bin-hadoop2.7.tgz
-ln -s spark-3.1.1-bin-hadoop2.7 spark2 # or just mv
-$SPARK_HOME2/bin/spark-submit --version
-```
-
-The last command will print the Spark version if everything goes well.
-
-6. Verify Spark under a Shell task.
-
-```
-$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.12-3.1.1.jar
-```
-
-Check whether the task log contains the output like `Pi is roughly 3.146015`.
 
 ### How to Support Shared Storage Between Master, Worker and Api Server?
 
@@ -537,6 +495,10 @@ common:
 | `postgresql.persistence.enabled`                                     | Set `postgresql.persistence.enabled` to `true` to mount a new volume for internal PostgreSQL                                  | `false`                               |
 | `postgresql.persistence.size`                                        | `PersistentVolumeClaim` size                                                                                                  | `20Gi`                                |
 | `postgresql.persistence.storageClass`                                | PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning     | `-`                                   |
+<<<<<<< HEAD
+=======
+| `minio.enabled`                                                      | Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production.    | `false`                               |
+>>>>>>> refs/remotes/origin/3.1.1-release
 | `externalDatabase.type`                                              | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database type will use it      | `postgresql`                          |
 | `externalDatabase.driver`                                            | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database driver will use it    | `org.postgresql.Driver`               |
 | `externalDatabase.host`                                              | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database host will use it      | `localhost`                           |
@@ -579,10 +541,16 @@ common:
 | `common.configmap.SW_GRPC_LOG_SERVER_PORT`                           | Set grpc log server port for skywalking                                                                                       | `11800`                               |
 | `common.configmap.HADOOP_HOME`                                       | Set `HADOOP_HOME` for DolphinScheduler's task environment                                                                     | `/opt/soft/hadoop`                    |
 | `common.configmap.HADOOP_CONF_DIR`                                   | Set `HADOOP_CONF_DIR` for DolphinScheduler's task environment                                                                 | `/opt/soft/hadoop/etc/hadoop`         |
+<<<<<<< HEAD
 | `common.configmap.SPARK_HOME1`                                       | Set `SPARK_HOME1` for DolphinScheduler's task environment                                                                     | `/opt/soft/spark1`                    |
 | `common.configmap.SPARK_HOME2`                                       | Set `SPARK_HOME2` for DolphinScheduler's task environment                                                                     | `/opt/soft/spark2`                    |
 | `common.configmap.PYTHON_HOME`                                       | Set `PYTHON_HOME` for DolphinScheduler's task environment                                                                     | `/usr/bin/python`                     |
 | `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/usr/local/openjdk-8`                |
+=======
+| `common.configmap.SPARK_HOME`                                        | Set `SPARK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/spark`                     |
+| `common.configmap.PYTHON_HOME`                                       | Set `PYTHON_HOME` for DolphinScheduler's task environment                                                                     | `/usr/bin/python`                     |
+| `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/opt/java/openjdk`                   |
+>>>>>>> refs/remotes/origin/3.1.1-release
 | `common.configmap.HIVE_HOME`                                         | Set `HIVE_HOME` for DolphinScheduler's task environment                                                                       | `/opt/soft/hive`                      |
 | `common.configmap.FLINK_HOME`                                        | Set `FLINK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/flink`                     |
 | `common.configmap.DATAX_HOME`                                        | Set `DATAX_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/datax`                     |

@@ -26,7 +26,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.service.utils.CommonUtils;
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -88,7 +92,13 @@ public class TaskExecutionCheckerUtils {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             taskExecutionContext.setExecutePath(execLocalPath);
+<<<<<<< HEAD
             createDirectoryWithOwner(Paths.get(execLocalPath), taskExecutionContext.getTenantCode());
+=======
+            taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
+            createDirectoryWithOwner(Paths.get(taskExecutionContext.getExecutePath()),
+                    taskExecutionContext.getTenantCode());
+>>>>>>> refs/remotes/origin/3.1.1-release
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }
@@ -118,18 +128,24 @@ public class TaskExecutionCheckerUtils {
         if (CollectionUtils.isNotEmpty(downloadFiles)) {
             for (Pair<String, String> fileDownload : downloadFiles) {
                 try {
-                    // query the tenant code of the resource according to the name of the resource
                     String fullName = fileDownload.getLeft();
+                    // we do not actually get & need tenantCode with this implementation right now.
                     String tenantCode = fileDownload.getRight();
-                    String resPath = storageOperate.getResourceFileName(tenantCode, fullName);
-                    logger.info("get resource file from path:{}", resPath);
+                    // TODO: Need a better way to get fileName because this implementation is tricky.
+                    String fileName = storageOperate.getResourceFileName(fullName);
+                    logger.info("get resource file from path:{}", fullName);
+
                     long resourceDownloadStartTime = System.currentTimeMillis();
+<<<<<<< HEAD
                     storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false,
+=======
+                    storageOperate.download(tenantCode, fullName, execLocalPath + File.separator + fileName, false,
+>>>>>>> refs/remotes/origin/3.1.1-release
                             true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(
-                            Files.size(Paths.get(execLocalPath, fullName)));
+                            Files.size(Paths.get(execLocalPath, fileName)));
                     WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
                 } catch (Exception e) {
                     WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
@@ -145,7 +161,11 @@ public class TaskExecutionCheckerUtils {
         }
         try {
             Files.createDirectories(filePath);
+<<<<<<< HEAD
             if (!CommonUtils.isSetTaskDirToTenantEnable()) {
+=======
+            if (!OSUtils.isSudoEnable()) {
+>>>>>>> refs/remotes/origin/3.1.1-release
                 // we need to open sudo, then we can change the owner.
                 return;
             }

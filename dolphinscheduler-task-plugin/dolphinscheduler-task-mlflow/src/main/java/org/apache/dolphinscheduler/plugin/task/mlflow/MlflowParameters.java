@@ -25,6 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 
+<<<<<<< HEAD
+=======
+import lombok.Data;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 @Data
 public class MlflowParameters extends AbstractParameters {
 
@@ -47,7 +52,6 @@ public class MlflowParameters extends AbstractParameters {
      * AutoML parameters
      */
     private String automlTool = "FLAML";
-
 
     /**
      * basic algorithm parameters
@@ -94,7 +98,11 @@ public class MlflowParameters extends AbstractParameters {
         paramsMap.put("experiment_name", experimentName);
         paramsMap.put("model_name", modelName);
         paramsMap.put("MLFLOW_TRACKING_URI", mlflowTrackingUri);
+<<<<<<< HEAD
         switch (mlflowJobType){
+=======
+        switch (mlflowJobType) {
+>>>>>>> refs/remotes/origin/3.1.1-release
             case MlflowConstants.JOB_TYPE_BASIC_ALGORITHM:
                 addParamsMapForBasicAlgorithm(paramsMap);
                 break;
@@ -135,6 +143,7 @@ public class MlflowParameters extends AbstractParameters {
         return imageName;
     }
 
+<<<<<<< HEAD
     public String getContainerName(){
         return "ds-mlflow-" + getModelKeyName("-");
     }
@@ -145,4 +154,16 @@ public class MlflowParameters extends AbstractParameters {
         }
         return deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER);
     }
+=======
+    public String getContainerName() {
+        return "ds-mlflow-" + getModelKeyName("-");
+    }
+
+    public boolean getIsDeployDocker() {
+        if (StringUtils.isEmpty(deployType)) {
+            return false;
+        }
+        return deployType.equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER);
+    }
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

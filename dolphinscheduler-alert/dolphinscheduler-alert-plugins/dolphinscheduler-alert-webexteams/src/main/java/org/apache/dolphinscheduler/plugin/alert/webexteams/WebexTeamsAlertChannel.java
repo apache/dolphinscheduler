@@ -27,6 +27,7 @@ import org.apache.commons.collections.MapUtils;
 import java.util.Map;
 
 public final class WebexTeamsAlertChannel implements AlertChannel {
+
     @Override
     public AlertResult process(AlertInfo alertInfo) {
         AlertData alertData = alertInfo.getAlertData();

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import java.sql.SQLException;
-import java.util.Objects;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,9 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +40,7 @@ import com.google.common.base.Strings;
  * resource dao
  */
 public class ResourceDao {
+
     public static final Logger logger = LoggerFactory.getLogger(ResourceDao.class);
 
     /**
@@ -83,7 +84,8 @@ public class ResourceDao {
     private Map<String, Long> listAllResourcesByFileType(Connection conn, int type) {
         Map<String, Long> resourceSizeMap = new HashMap<>();
 
-        String sql = String.format("SELECT full_name, type, size, is_directory FROM t_ds_resources where type = %d", type);
+        String sql =
+                String.format("SELECT full_name, type, size, is_directory FROM t_ds_resources where type = %d", type);
         ResultSet rs = null;
         PreparedStatement pstmt = null;
         try {
@@ -98,7 +100,7 @@ public class ResourceDao {
                 if (StringUtils.isNotBlank(fullName) && !isDirectory) {
                     String[] splits = fullName.split("/");
                     for (int i = 1; i < splits.length; i++) {
-                        String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits,0, splits.length - i));
+                        String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits, 0, splits.length - i));
                         if (!Strings.isNullOrEmpty(parentFullName)) {
                             long size = resourceSizeMap.getOrDefault(parentFullName, 0L);
                             resourceSizeMap.put(parentFullName, size + fileSize);

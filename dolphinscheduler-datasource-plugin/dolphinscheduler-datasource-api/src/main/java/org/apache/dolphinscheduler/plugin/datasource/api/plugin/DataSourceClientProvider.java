@@ -39,18 +39,19 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
 public class DataSourceClientProvider {
+
     private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
     private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(duration, TimeUnit.HOURS)
-        .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
-            try (DataSourceClient closedClient = notification.getValue()) {
-                logger.info("Datasource: {} is removed from cache due to expire", notification.getKey());
-            }
-        })
-        .maximumSize(100)
-        .build();
+            .expireAfterWrite(duration, TimeUnit.HOURS)
+            .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
+                try (DataSourceClient closedClient = notification.getValue()) {
+                    logger.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                }
+            })
+            .maximumSize(100)
+            .build();
     private DataSourcePluginManager dataSourcePluginManager;
 
     private DataSourceClientProvider() {
@@ -58,6 +59,7 @@ public class DataSourceClientProvider {
     }
 
     private static class DataSourceClientProviderHolder {
+
         private static final DataSourceClientProvider INSTANCE = new DataSourceClientProvider();
     }
 

@@ -169,7 +169,7 @@ public class ProcessDefinition {
      * warningGroupId
      */
     @TableField(exist = false)
-    private int warningGroupId;
+    private Integer warningGroupId;
 
     /**
      * execution type
@@ -226,5 +226,8 @@ public class ProcessDefinition {
 
         return globalParamMap;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

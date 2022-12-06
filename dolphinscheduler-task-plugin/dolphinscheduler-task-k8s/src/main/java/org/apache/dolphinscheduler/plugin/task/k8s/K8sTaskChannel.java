@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 public class K8sTaskChannel implements TaskChannel {
+
     @Override
     public void cancelApplication(boolean status) {
 

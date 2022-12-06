@@ -35,11 +35,19 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
+<<<<<<< HEAD
 version: 3.1.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
 appVersion: 3.1.1
+=======
+version: 3.1.0
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application.
+appVersion: 3.1.0
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 dependencies:
 - name: postgresql
@@ -60,3 +68,10 @@ dependencies:
   version: 9.4.1
   repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   condition: mysql.enabled
+<<<<<<< HEAD
+=======
+- name: minio
+  version: 2022.10.29
+  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  condition: minio.enabled
+>>>>>>> refs/remotes/origin/3.1.1-release

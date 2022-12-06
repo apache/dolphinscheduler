@@ -23,7 +23,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 public class MlflowTaskChannel implements TaskChannel {
 

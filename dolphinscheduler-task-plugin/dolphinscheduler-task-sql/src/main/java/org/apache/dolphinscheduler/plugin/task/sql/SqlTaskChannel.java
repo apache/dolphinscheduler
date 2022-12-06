@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 public class SqlTaskChannel implements TaskChannel {
+
     @Override
     public void cancelApplication(boolean status) {
 

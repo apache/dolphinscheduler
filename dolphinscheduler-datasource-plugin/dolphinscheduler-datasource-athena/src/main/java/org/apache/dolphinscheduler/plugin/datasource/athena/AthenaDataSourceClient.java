@@ -22,6 +22,10 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class AthenaDataSourceClient extends CommonDataSourceClient {
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
     public AthenaDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }

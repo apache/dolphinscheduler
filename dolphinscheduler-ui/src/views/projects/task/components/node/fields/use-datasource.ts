@@ -29,6 +29,7 @@ export function useDatasource(
     typeField?: string
     sourceField?: string
     span?: Ref | number
+    testFlag?: Ref | number
   } = {}
 ): IJsonItem[] {
   const { t } = useI18n()
@@ -91,6 +92,14 @@ export function useDatasource(
       id: 10,
       code: 'ATHENA',
       disabled: false
+<<<<<<< HEAD
+=======
+    },
+    {
+      id: 12,
+      code: 'TRINO',
+      disabled: false
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
   ]
 
@@ -109,7 +118,10 @@ export function useDatasource(
   }
 
   const refreshOptions = async () => {
-    const parameters = { type: model[params.typeField || 'type'] } as TypeReq
+    const parameters = {
+      type: model[params.typeField || 'type'],
+      testFlag: 0
+    } as TypeReq
     const res = await queryDataSourceList(parameters)
     datasourceOptions.value = res.map((item: any) => ({
       label: item.name,

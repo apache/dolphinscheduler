@@ -31,6 +31,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * process task relation mapper interface
@@ -87,7 +88,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskRelationList taskRelationList
      * @return int
      */
-    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelationLog> taskRelationList);
+    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelation> taskRelationList);
 
     /**
      * query downstream process task relation by taskCode
@@ -104,7 +105,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+    List<ProcessTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode,
+                                                  @Param("taskCode") long taskCode);
 
     /**
      * query downstream process task relation by taskCode
@@ -113,7 +115,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode);
+    List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode,
+                                                    @Param("taskCode") long taskCode);
 
     /**
      * query task relation by codes
@@ -123,7 +126,9 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param preTaskCodes preTaskCode list
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode, @Param("taskCode") long taskCode, @Param("preTaskCodes") Long[] preTaskCodes);
+    List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode,
+                                                   @Param("taskCode") long taskCode,
+                                                   @Param("preTaskCodes") Long[] preTaskCodes);
 
     /**
      * query process task relation by process definition code
@@ -215,4 +220,10 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @return update num
      */
     int updateProcessTaskRelationTaskVersion(@Param("processTaskRelation") ProcessTaskRelation processTaskRelationList);
+<<<<<<< HEAD
+=======
+
+    Long queryTaskCodeByTaskName(@Param("workflowCode") Long workflowCode,
+                                 @Param("taskName") String taskName);
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

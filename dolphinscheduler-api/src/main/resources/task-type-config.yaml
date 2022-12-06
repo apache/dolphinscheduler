@@ -18,6 +18,7 @@
 task:
   universal:
     - 'SHELL'
+    - 'JAVA'
     - 'PYTHON'
     - 'PROCEDURE'
     - 'SQL'
@@ -31,13 +32,12 @@ task:
   cloud:
     - 'EMR'
     - 'K8S'
+    - 'DMS'
   logic:
     - 'SUB_PROCESS'
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'
-    - 'NEXT_LOOP'
-    - 'SURVEIL'
   dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'
@@ -51,7 +51,10 @@ task:
     - 'DVC'
     - 'SAGEMAKER'
     - 'PYTORCH'
+    - 'KUBEFLOW'
   other:
     - 'PIGEON'
     - 'ZEPPELIN'
     - 'CHUNJUN'
+    - 'DATASYNC'
+    - 'LINKIS'

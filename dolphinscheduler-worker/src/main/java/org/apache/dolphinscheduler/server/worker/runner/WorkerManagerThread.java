@@ -24,13 +24,15 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.server.worker.config.TaskExecuteThreadsFullPolicy;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.DelayQueue;
+
+import javax.annotation.Nullable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nullable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.DelayQueue;
 
 /**
  * Manage tasks
@@ -49,7 +51,8 @@ public class WorkerManagerThread implements Runnable {
     /**
      * running task
      */
-    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap =
+            new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
         this.workerConfig = workerConfig;

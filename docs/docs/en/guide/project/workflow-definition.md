@@ -75,8 +75,15 @@ Workflow running parameter description:
 * **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker.
 * **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group.
 * **Startup parameters**: Set or override the value of global parameters when starting a new process instance.
+<<<<<<< HEAD
 * **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement. 
   > You could select the time period or fill in it manually in UI. The date range is left closed and right closed time interval (startDate <= N <= endDate)
+=======
+* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement.
+
+  > You could select the time period or fill in it manually in UI. The date range is left closed and right closed time interval (startDate <= N <= endDate)
+
+>>>>>>> refs/remotes/origin/3.1.1-release
   * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
 
   ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
@@ -143,7 +150,11 @@ The following are the operation functions of the workflow definition list:
 Description of workflow operating parameters:
 
 * Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, other task nodes execute normally; "End" means: terminate all tasks execution, and terminate the entire process.
+<<<<<<< HEAD
 * Notification strategy: When the process is over, send the process execution result notification email according to the process status, options including no send, send if sucess, send of failure, send whatever result.
+=======
+* Notification strategy: When the process is over, send the process execution result notification email according to the process status, options including no send, send if success, send of failure, send whatever result.
+>>>>>>> refs/remotes/origin/3.1.1-release
 * Process priority: The priority of process operation, divide into five levels: highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), and lowest (LOWEST). When the number of master threads is insufficient, high priority processes will execute first in the execution queue, and processes with the same priority will execute in the order of first in, first out.
 * Worker group: The process can only be executed in the specified worker machine group. The default is `Default`, which can execute on any worker.
 * Notification group: select notification strategy||timeout alarm||when fault tolerance occurs, process result information or email will send to all members in the notification group.

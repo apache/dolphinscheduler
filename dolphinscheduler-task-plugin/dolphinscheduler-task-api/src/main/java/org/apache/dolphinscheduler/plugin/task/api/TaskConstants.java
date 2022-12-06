@@ -18,8 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 public class TaskConstants {
 
@@ -53,6 +54,11 @@ public class TaskConstants {
      * comma ,
      */
     public static final String COMMA = ",";
+
+    /**
+     * hyphen
+     */
+    public static final String HYPHEN = "-";
 
     /**
      * slash /
@@ -231,6 +237,40 @@ public class TaskConstants {
      */
     public static final String WEEK_END = "week_end";
     /**
+     * this_day
+     */
+    public static final String THIS_DAY = "this_day";
+    /**
+     * last_day
+     */
+    public static final String LAST_DAY = "last_day";
+
+    /**
+     * month_first_day
+     */
+    public static final String MONTH_FIRST_DAY = "month_first_day";
+
+    /**
+     * month_last_day
+     */
+    public static final String MONTH_LAST_DAY = "month_last_day";
+
+    /**
+     * week_first_day
+     */
+    public static final String WEEK_FIRST_DAY = "week_first_day";
+
+    /**
+     * week_last_day
+     */
+    public static final String WEEK_LAST_DAY = "week_last_day";
+
+    /**
+     * year_week
+     *
+     */
+    public static final String YEAR_WEEK = "year_week";
+    /**
      * timestamp
      */
     public static final String TIMESTAMP = "timestamp";
@@ -302,7 +342,7 @@ public class TaskConstants {
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
     public static final String COM_MYSQL_CJ_JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
+    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "com.clickhouse.jdbc.ClickHouseDriver";
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
@@ -396,6 +436,8 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_K8S = "K8S";
 
+    public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
+
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
     public static final String TASK_TYPE_STREAM = "STREAM";
@@ -431,6 +473,7 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
+    public static final String COMMAND_SPLIT_REGEX = "[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`";
 
     /**
      * conda config used by jupyter task plugin

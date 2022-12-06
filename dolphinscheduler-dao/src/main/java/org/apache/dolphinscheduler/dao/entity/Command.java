@@ -93,6 +93,12 @@ public class Command {
     @TableField("process_definition_version")
     private int processDefinitionVersion;
 
+    /**
+     * test flag
+     */
+    @TableField("test_flag")
+    private int testFlag;
+
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -115,7 +121,12 @@ public class Command {
                    Priority processInstancePriority,
                    int dryRun,
                    int processInstanceId,
+<<<<<<< HEAD
                    int processDefinitionVersion) {
+=======
+                   int processDefinitionVersion,
+                   int testFlag) {
+>>>>>>> refs/remotes/origin/3.1.1-release
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -133,6 +144,10 @@ public class Command {
         this.dryRun = dryRun;
         this.processInstanceId = processInstanceId;
         this.processDefinitionVersion = processDefinitionVersion;
+        this.testFlag = testFlag;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

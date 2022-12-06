@@ -19,75 +19,19 @@ package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
 import java.util.Map;
 
+import lombok.Data;
+
 /**
  * k8s task parameters
  */
+@Data
 public class K8sTaskMainParameters {
 
     private String image;
+    private String command;
     private String namespaceName;
     private String clusterName;
     private double minCpuCores;
     private double minMemorySpace;
     private Map<String, String> paramsMap;
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public double getMinCpuCores() {
-        return minCpuCores;
-    }
-
-    public void setMinCpuCores(double minCpuCores) {
-        this.minCpuCores = minCpuCores;
-    }
-
-    public double getMinMemorySpace() {
-        return minMemorySpace;
-    }
-
-    public void setMinMemorySpace(double minMemorySpace) {
-        this.minMemorySpace = minMemorySpace;
-    }
-
-    public String getNamespaceName() {
-        return namespaceName;
-    }
-
-    public void setNamespaceName(String namespaceName) {
-        this.namespaceName = namespaceName;
-    }
-
-    public String getClusterName() {
-        return clusterName;
-    }
-
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
-
-    public Map<String, String> getParamsMap() {
-        return paramsMap;
-    }
-
-    public void setParamsMap(Map<String, String> paramsMap) {
-        this.paramsMap = paramsMap;
-    }
-
-    @Override
-    public String toString() {
-        return "K8sTaskMainParameters{"
-             + "image='" + image + '\''
-             + ", namespaceName='" + namespaceName + '\''
-             + ", clusterName='" + clusterName + '\''
-             + ", minCpuCores=" + minCpuCores
-             + ", minMemorySpace=" + minMemorySpace
-             + ", paramsMap=" + paramsMap
-             + '}';
-    }
 }

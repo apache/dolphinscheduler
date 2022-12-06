@@ -19,17 +19,29 @@ package org.apache.dolphinscheduler.plugin.registry.etcd;
 
 import java.time.Duration;
 
+<<<<<<< HEAD
+=======
+import lombok.Data;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+<<<<<<< HEAD
 import lombok.Data;
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 @Data
 @Configuration
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "etcd")
 @ConfigurationProperties(prefix = "registry")
 public class EtcdRegistryProperties {
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
     private String endpoints;
     private String namespace = "dolphinscheduler";
     private Duration connectionTimeout = Duration.ofSeconds(9);

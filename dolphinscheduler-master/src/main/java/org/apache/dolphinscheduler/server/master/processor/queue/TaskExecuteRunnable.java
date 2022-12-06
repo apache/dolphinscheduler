@@ -22,6 +22,10 @@ import org.apache.dolphinscheduler.server.master.event.TaskEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandleException;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -60,14 +64,14 @@ public class TaskExecuteRunnable implements Runnable {
             } catch (TaskEventHandleException taskEventHandleException) {
                 // we don't need to resubmit this event, since the worker will resubmit this event
                 logger.error("Handle task event failed, this event will be retry later, event: {}", event,
-                    taskEventHandleException);
+                        taskEventHandleException);
             } catch (TaskEventHandleError taskEventHandleError) {
                 logger.error("Handle task event error, this event will be removed, event: {}", event,
-                    taskEventHandleError);
+                        taskEventHandleError);
                 events.remove(event);
             } catch (Exception unknownException) {
                 logger.error("Handle task event error, get a unknown exception, this event will be removed, event: {}",
-                    event, unknownException);
+                        event, unknownException);
                 events.remove(event);
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
@@ -93,7 +97,8 @@ public class TaskExecuteRunnable implements Runnable {
 
     public boolean addEvent(TaskEvent event) {
         if (event.getProcessInstanceId() != this.processInstanceId) {
-            logger.warn("event would be abounded, task instance id:{}, process instance id:{}, this.processInstanceId:{}",
+            logger.warn(
+                    "event would be abounded, task instance id:{}, process instance id:{}, this.processInstanceId:{}",
                     event.getTaskInstanceId(), event.getProcessInstanceId(), this.processInstanceId);
             return false;
         }

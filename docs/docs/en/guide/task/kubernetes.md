@@ -11,14 +11,26 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 
 ## Task Parameters
 
+<<<<<<< HEAD
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
 
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 |  **Parameter**   |                                                 **Description**                                                  |
 |------------------|------------------------------------------------------------------------------------------------------------------|
 | Namespace        | The namespace for running k8s task.                                                                              |
 | Min CPU          | Minimum CPU requirement for running k8s task.                                                                    |
 | Min Memory       | Minimum memory requirement for running k8s task.                                                                 |
 | Image            | The registry url for image.                                                                                      |
+<<<<<<< HEAD
+=======
+| Command          | The container execution command, for example: /bin/echo hello world                                              |
+>>>>>>> refs/remotes/origin/3.1.1-release
 | Custom parameter | It is a local user-defined parameter for K8S task, these params will pass to container as environment variables. |
 
 ## Task Example

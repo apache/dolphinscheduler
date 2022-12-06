@@ -23,10 +23,10 @@ Stop all services of dolphinscheduler according to your deployment method. If yo
 
 ### Upgrade Database
 
-Change configuration in `./bin/env/dolphinscheduler_env.sh` ({user} and {password} are changed to your database username and password), and then run the upgrade script.
+Set the following environment variables ({user} and {password} are changed to your database username and password), and then run the upgrade script.
 
 Using MySQL as an example, change the value if you use other databases. Please manually download the [mysql-connector-java driver jar](https://downloads.MySQL.com/archives/c-j/)
-jar package and add it to the `./tools/libs` directory, then change `./bin/ env/dolphinscheduler_env.sh` file
+jar package and add it to the `./tools/libs` directory, then export the following environment variables
 
         ```shell
         export DATABASE=${DATABASE:-mysql}
@@ -67,7 +67,7 @@ The architecture of worker group is different between version before version 1.3
 
 * Modify worker related configuration in `bin/env/install_config.conf`.
 
-Assume bellow are the machine worker service to be deployed:
+Assume below are the machine worker service to be deployed:
 
 | hostname |      ip       |
 |:---------|:-------------:|
@@ -78,7 +78,7 @@ Assume bellow are the machine worker service to be deployed:
 To keep worker group config consistent with the previous version, we need to modify workers configuration as below:
 
 ```shell
-#worker service is deployed on which machine, and also specify which worker group this worker belongs to. 
+#worker service is deployed on which machine, and also specify which worker group this worker belongs to.
 workers="ds1:service1,ds2:service2,ds3:service2"
 ```
 

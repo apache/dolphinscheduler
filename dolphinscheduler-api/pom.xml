@@ -74,7 +74,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
+            <artifactId>dolphinscheduler-scheduler-all</artifactId>
         </dependency>
 
         <dependency>
@@ -134,11 +134,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
@@ -173,15 +168,15 @@
             </exclusions>
         </dependency>
 
-        <!-- Python -->
+        <!-- Python API's Gateway server -->
         <dependency>
             <groupId>net.sf.py4j</groupId>
             <artifactId>py4j</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-ldap</artifactId>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
         </dependency>
 
         <dependency>
@@ -199,6 +194,14 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+<<<<<<< HEAD
+=======
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+        </dependency>
+>>>>>>> refs/remotes/origin/3.1.1-release
     </dependencies>
     <build>
         <testResources>

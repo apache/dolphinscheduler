@@ -75,7 +75,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
         }
 
         String ip = BaseController.getClientIpAddress(request);
-        logger.debug("get session: {}, ip: {}", sessionId, ip);
+        logger.debug("Get session: {}, ip: {}.", sessionId, ip);
 
         return sessionMapper.selectById(sessionId);
     }
@@ -153,10 +153,10 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
              */
             Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(), ip);
 
-            //delete session
+            // delete session
             sessionMapper.deleteById(session.getId());
         } catch (Exception e) {
-            logger.warn("userId : {} , ip : {} , find more one session", loginUser.getId(), ip);
+            logger.warn("userId : {} , ip : {} , find more one session", loginUser.getId(), ip, e);
         }
     }
 

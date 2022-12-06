@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.athena.param;
 
+<<<<<<< HEAD
 import com.google.auto.service.AutoService;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -40,6 +43,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+<<<<<<< HEAD
+=======
+import com.google.auto.service.AutoService;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 @AutoService(DataSourceProcessor.class)
 public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -50,11 +58,17 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+<<<<<<< HEAD
         AthenaConnectionParam
             connectionParams = (AthenaConnectionParam) this.createConnectionParams(connectionJson);
 
         AthenaDataSourceParamDTO
             athenaDatasourceParamDTO = new AthenaDataSourceParamDTO();
+=======
+        AthenaConnectionParam connectionParams = (AthenaConnectionParam) this.createConnectionParams(connectionJson);
+
+        AthenaDataSourceParamDTO athenaDatasourceParamDTO = new AthenaDataSourceParamDTO();
+>>>>>>> refs/remotes/origin/3.1.1-release
         athenaDatasourceParamDTO.setAwsRegion(connectionParams.getAwsRegion());
         athenaDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         athenaDatasourceParamDTO.setUserName(connectionParams.getUser());
@@ -69,8 +83,12 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
         String address =
                 String.format("%s%s=%s;", DataSourceConstants.JDBC_ATHENA, "AwsRegion", athenaParam.getAwsRegion());
 
+<<<<<<< HEAD
         AthenaConnectionParam
             athenaConnectionParam = new AthenaConnectionParam();
+=======
+        AthenaConnectionParam athenaConnectionParam = new AthenaConnectionParam();
+>>>>>>> refs/remotes/origin/3.1.1-release
         athenaConnectionParam.setUser(athenaParam.getUserName());
         athenaConnectionParam.setPassword(PasswordUtils.encodePassword(athenaParam.getPassword()));
         athenaConnectionParam.setAwsRegion(athenaParam.getAwsRegion());
@@ -102,8 +120,12 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
+<<<<<<< HEAD
         AthenaConnectionParam
             athenaConnectionParam = (AthenaConnectionParam) connectionParam;
+=======
+        AthenaConnectionParam athenaConnectionParam = (AthenaConnectionParam) connectionParam;
+>>>>>>> refs/remotes/origin/3.1.1-release
         if (!StringUtils.isEmpty(athenaConnectionParam.getOther())) {
             return String.format("%s%s", athenaConnectionParam.getJdbcUrl(), athenaConnectionParam.getOther());
         }
@@ -115,7 +137,11 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
         AthenaConnectionParam athenaConnectionParam = (AthenaConnectionParam) connectionParam;
         Class.forName(this.getDatasourceDriver());
         return DriverManager.getConnection(this.getJdbcUrl(connectionParam),
+<<<<<<< HEAD
             athenaConnectionParam.getUser(), PasswordUtils.decodePassword(athenaConnectionParam.getPassword()));
+=======
+                athenaConnectionParam.getUser(), PasswordUtils.decodePassword(athenaConnectionParam.getPassword()));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Override

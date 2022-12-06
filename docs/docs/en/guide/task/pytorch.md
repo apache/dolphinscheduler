@@ -19,7 +19,14 @@ The task plugin picture is as follows
 
 ![pytorch](../../../../img/tasks/demo/pytorch_en.png)
 
+<<<<<<< HEAD
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 #### Run time parameters
 
@@ -45,7 +52,11 @@ The preceding two parameters are used to minimize the running of the configurati
 - **Python Environment Manager Tool** ：You can choose `virtualenv` or `conda`.
   - if choose `virtualenv`，that may use `virtualenv` to create a new environment. Use command `virtualenv -p ${PYTHON_HOME} venv`.
   - if choose `conda`, ，that may use `conda` to create a new environment，And you need to specify the Python version.
+<<<<<<< HEAD
 - **Requirement File** ：The defualt is requirements.txt。
+=======
+- **Requirement File** ：The default is requirements.txt。
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 We can use relative paths of `Python Script` and `Requirement File` if we set `Project Path` which contains the python script or required requirement file.
 

@@ -10,6 +10,7 @@ This node is for executing java-type tasks and supports using files and jar pack
 
 # Task Parameters
 
+<<<<<<< HEAD
 |      **Parameter**       |                                                                              **Description**                                                                               |
 |--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Node Name                | The name of the set task. The node name in a workflow definition is unique.                                                                                                |
@@ -29,6 +30,20 @@ This node is for executing java-type tasks and supports using files and jar pack
 | Resources                | External JAR packages or other resource files that are added to the classpath or module path and can be easily retrieved in your JAVA script.                              |
 | Custom parameter         | A user-defined parameter that is part of HTTP and replaces `${ variable }` in the script .                                                                                 |
 | Pre Tasks                | Selects a pre-task for the current task and sets the pre-task as the upstream of the current task.                                                                         |
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+
+|   **Parameter**    |                                                                **Description**                                                                |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| Module Path        | pick Java 9 + 's modularity feature, put all resources into-module-path, and require that the JDK version in your worker supports modularity. |
+| Main Parameter     | Java program main method entry parameter.                                                                                                     |
+| Java VM Parameters | JVM startup parameters.                                                                                                                       |
+| Script             | You need to write Java code if you use the Java run type. The public class must exist in the code without writing a package statement.        |
+| Resources          | External JAR packages or other resource files that are added to the classpath or module path and can be easily retrieved in your JAVA script. |
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 ## Example
 

@@ -126,4 +126,8 @@ $ docker run -d --name dolphinscheduler-alert-server \
 ## 环境变量
 
 可以通过环境变量来修改 Docker 运行的配置，我们在沿用已有的 PostgreSQL 和 ZooKeeper 服务中就通过环境变量修改了 Docker 的数据库配置和
+<<<<<<< HEAD
 注册中心配置，关于全部的配置环境可以查看[全部的配置文件](https://github.com/apache/dolphinscheduler/blob/3.1.1/script/env/dolphinscheduler_env.sh) 了解 <!-- markdown-link-check-disable-line -->
+=======
+注册中心配置，关于全部的配置环境可以查看对应组件的 application.yaml 文件了解 <!-- markdown-link-check-disable-line -->
+>>>>>>> refs/remotes/origin/3.1.1-release

@@ -1,6 +1,6 @@
 # 发版后续
 
-发送公告邮件后，我们还有一些发布任务要做，目前我们必须将 Docker 镜像发布到 Docker Hub 和 并且需要将 pydolphinscheduler 发布到 PyPI。
+发送公告邮件后，我们还有一些发布任务要做，目前我们必须将 Docker 镜像发布到 Docker Hub。
 
 ## 发布 Docker 镜像
 
@@ -19,6 +19,7 @@
     -Pdocker,release
 ```
 
+<<<<<<< HEAD
 ## 发布 pydolphinscheduler 到 PyPI
 
 需要将 Python API 发布到 PyPI，请参考 [Python API release](https://github.com/apache/dolphinscheduler/blob/3.1.1/dolphinscheduler-python/pydolphinscheduler/RELEASE.md#to-pypi)
@@ -28,3 +29,8 @@
 
 当您想要发布新版本的新闻或公告时，您可能需要当前版本的所有贡献者，您可以使用 git 命令 `git log --pretty="%an" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> | sort | uniq`
 （将对应的版本改成两个版本的 tag 值）自动生成 git 作者姓名。
+=======
+## 获取全部的贡献者
+
+当您想要发布新版本的新闻或公告时，您可能需要当前版本的所有贡献者，您可以在 `tools/release` 中使用命令 `python release.py contributor` 自动生成贡献者 Github id。
+>>>>>>> refs/remotes/origin/3.1.1-release

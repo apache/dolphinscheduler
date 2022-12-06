@@ -18,6 +18,11 @@
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+<<<<<<< HEAD
+=======
+
+import org.apache.commons.lang3.StringUtils;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import java.io.File;
 import java.io.IOException;
@@ -44,8 +49,29 @@ public class LogUtils {
 
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
-    public List<String> getAppIdsFromLogFile(@NonNull String logPath) {
-        return getAppIdsFromLogFile(logPath, log);
+    public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
+        if (!StringUtils.isEmpty(fetchWay) && fetchWay.equals("aop")) {
+            log.info("Start finding appId in {}, fetch way: {} ", appInfoPath);
+            return getAppIdsFromAppInfoFile(appInfoPath, log);
+        } else {
+            log.info("Start finding appId in {}, fetch way: {} ", logPath);
+            return getAppIdsFromLogFile(logPath, log);
+        }
+    }
+
+    public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath, Logger logger) {
+        File appInfoFile = new File(appInfoPath);
+        if (!appInfoFile.exists() || !appInfoFile.isFile()) {
+            return Collections.emptyList();
+        }
+        List<String> appIds = new ArrayList<>();
+        try (Stream<String> stream = Files.lines(Paths.get(appInfoPath))) {
+            stream.forEach(appIds::add);
+            return new ArrayList<>(appIds);
+        } catch (IOException e) {
+            logger.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
+            return Collections.emptyList();
+        }
     }
 
     public List<String> getAppIdsFromLogFile(@NonNull String logPath, Logger logger) {
@@ -69,7 +95,7 @@ public class LogUtils {
             });
             return new ArrayList<>(appIds);
         } catch (IOException e) {
-            logger.error("Get appId from log file erro, logPath: {}", logPath, e);
+            logger.error("Get appId from log file error, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
     }

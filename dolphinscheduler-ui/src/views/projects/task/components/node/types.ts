@@ -17,10 +17,7 @@
 
 import { VNode } from 'vue'
 import type { SelectOption } from 'naive-ui'
-import type {
-  TaskExecuteType,
-  TaskType
-} from '@/views/projects/task/constants/task-type'
+import type { TaskExecuteType, TaskType } from '@/store/project/types'
 import type { IDataBase } from '@/service/modules/data-source/types'
 import type {
   IFormItem,
@@ -69,12 +66,19 @@ interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
   emit: 'change'[]
 }
 
-interface IDependpendItem {
-  depTaskCode?: number
-  status?: 'SUCCESS' | 'FAILURE'
+interface IDependentItemOptions {
   definitionCodeOptions?: IOption[]
   depTaskCodeOptions?: IOption[]
   dateOptions?: IOption[]
+}
+
+interface IDependTaskOptions {
+  dependItemList: IDependentItemOptions[]
+}
+
+interface IDependentItem {
+  depTaskCode?: number
+  status?: 'SUCCESS' | 'FAILURE'
   projectCode?: number
   definitionCode?: number
   cycle?: 'month' | 'week' | 'day' | 'hour'
@@ -85,7 +89,7 @@ interface IDependTask {
   condition?: string
   nextNode?: number
   relation?: RelationType
-  dependItemList?: IDependpendItem[]
+  dependItemList?: IDependentItem[]
 }
 
 interface ISwitchResult {
@@ -93,8 +97,14 @@ interface ISwitchResult {
   nextNode?: number
 }
 
+/*
+ * resourceName: resource full name
+ * res: resource file name
+ */
 interface ISourceItem {
-  id: number
+  id?: number,
+  resourceName: string,
+  res?: string
 }
 
 interface ISqoopTargetData {
@@ -223,10 +233,12 @@ interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
   localParams?: ILocalParam[]
+  runType?: string
+  jvmArgs?: string
+  isModulePath?: boolean
   rawScript?: string
   initScript?: string
   programType?: string
-  sparkVersion?: string
   flinkVersion?: string
   jobManagerMemory?: string
   taskManagerMemory?: string
@@ -254,7 +266,6 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
-  segmentSeparator?: string
   sendEmail?: boolean
   displayRows?: number
   title?: string
@@ -333,6 +344,7 @@ interface ITaskParams {
   minCpuCores?: string
   minMemorySpace?: string
   image?: string
+  command?: string
   algorithm?: string
   params?: string
   searchParams?: string
@@ -375,6 +387,23 @@ interface ITaskParams {
   pythonEnvTool?: string
   requirements?: string
   condaPythonVersion?: string
+  isRestartTask?: boolean
+  isJsonFormat?: boolean
+  jsonData?: string
+  migrationType?: string
+  replicationTaskIdentifier?: string
+  sourceEndpointArn?: string
+  targetEndpointArn?: string
+  replicationInstanceArn?: string
+  tableMappings?: string
+  replicationTaskArn?: string
+  jsonFormat?: boolean
+  destinationLocationArn?: string
+  sourceLocationArn?: string
+  name?: string
+  cloudWatchLogGroupArn?: string
+  yamlContent?: string
+  paramScript?: ILocalParam[]
 }
 
 interface INodeData
@@ -416,8 +445,8 @@ interface INodeData
   preTasks?: number[]
   preTaskOptions?: []
   postTaskOptions?: []
-  resourceList?: number[]
-  mainJar?: number
+  resourceList?: string[]
+  mainJar?: string
   timeoutSetting?: boolean
   isCustomTask?: boolean
   method?: string
@@ -459,7 +488,9 @@ export {
   ISqoopSourceParams,
   ISqoopTargetParams,
   IDependTask,
-  IDependpendItem,
+  IDependentItem,
+  IDependentItemOptions,
+  IDependTaskOptions,
   IFormItem,
   IJsonItem,
   FormRules,

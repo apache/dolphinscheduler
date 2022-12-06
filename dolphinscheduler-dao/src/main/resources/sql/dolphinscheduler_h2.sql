@@ -337,6 +337,7 @@ CREATE TABLE t_ds_command
     dry_run                    int NULL DEFAULT 0,
     process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id),
     KEY                        priority_id_index (process_instance_priority, id)
 );
@@ -359,6 +360,8 @@ CREATE TABLE t_ds_datasource
     connection_params text        NOT NULL,
     create_time       datetime    NOT NULL,
     update_time       datetime     DEFAULT NULL,
+    test_flag           int DEFAULT NULL,
+    bind_test_id        int DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_datasource_name_un (name, type)
 );
@@ -392,6 +395,7 @@ CREATE TABLE t_ds_error_command
     dry_run                    int NULL DEFAULT 0,
     process_instance_id        int(11) DEFAULT 0,
     process_definition_version int(11) DEFAULT 0,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -456,7 +460,8 @@ CREATE TABLE t_ds_process_definition_log
     operate_time     datetime     DEFAULT NULL,
     create_time      datetime NOT NULL,
     update_time      datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_idx_code_version (code, version) USING BTREE
 );
 
 -- ----------------------------
@@ -620,6 +625,7 @@ CREATE TABLE t_ds_process_instance
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
+    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -788,6 +794,24 @@ CREATE TABLE t_ds_resources
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_relation_resources_task
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_relation_resources_task CASCADE;
+CREATE TABLE t_ds_relation_resources_task
+(
+  id                        int(11) NOT NULL AUTO_INCREMENT,
+  task_id                   int(11) DEFAULT NULL,
+  full_name                 varchar(255) DEFAULT NULL,
+  type                      tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY t_ds_relation_resources_task_un (task_id, full_name)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_relation_resources_task
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_schedules
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_schedules CASCADE;
@@ -873,6 +897,7 @@ CREATE TABLE t_ds_task_instance
     dry_run                 int NULL DEFAULT 0,
     cpu_quota               int(11) DEFAULT '-1' NOT NULL,
     memory_max              int(11) DEFAULT '-1' NOT NULL,
+    test_flag               int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -1997,13 +2022,13 @@ INSERT INTO `t_ds_cluster`
 VALUES (100, 0, 'ds_null_k8s', '{"k8s":"ds_null_k8s"}', 'test', 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 
 --
--- Table structure for t_ds_fav
+-- Table structure for t_ds_fav_task
 --
-DROP TABLE IF EXISTS t_ds_fav CASCADE;
-CREATE TABLE t_ds_fav
+DROP TABLE IF EXISTS t_ds_fav_task CASCADE;
+CREATE TABLE t_ds_fav_task
 (
     id        bigint(20) NOT NULL AUTO_INCREMENT,
-    task_name varchar(64) NOT NULL,
+    task_type varchar(64) NOT NULL,
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );

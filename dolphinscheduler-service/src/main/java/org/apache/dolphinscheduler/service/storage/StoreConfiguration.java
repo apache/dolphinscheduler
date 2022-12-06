@@ -41,7 +41,11 @@ public class StoreConfiguration {
 
     @Bean
     public StorageOperate storageOperate() {
+<<<<<<< HEAD
         switch (PropertyUtils.getString(RESOURCE_STORAGE_TYPE)) {
+=======
+        switch (PropertyUtils.getUpperCaseString(RESOURCE_STORAGE_TYPE)) {
+>>>>>>> refs/remotes/origin/3.1.1-release
             case STORAGE_OSS:
                 OssOperator ossOperator = new OssOperator();
                 // TODO: change to use ossOperator.init(ossConnection) after DS supports Configuration / Connection

@@ -25,6 +25,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -55,6 +56,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     /**
      * query process instance host by stateArray
+     *
      * @param stateArray
      * @return
      */
@@ -187,11 +189,13 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param definitionCode definitionCode
      * @param startTime      startTime
      * @param endTime        endTime
+     * @param testFlag       testFlag
      * @return process instance
      */
     ProcessInstance queryLastSchedulerProcess(@Param("processDefinitionCode") Long definitionCode,
                                               @Param("startTime") Date startTime,
-                                              @Param("endTime") Date endTime);
+                                              @Param("endTime") Date endTime,
+                                              @Param("testFlag") int testFlag);
 
     /**
      * query last running process instance
@@ -199,12 +203,14 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param definitionCode definitionCode
      * @param startTime      startTime
      * @param endTime        endTime
+     * @param testFlag       testFlag
      * @param stateArray     stateArray
      * @return process instance
      */
     ProcessInstance queryLastRunningProcess(@Param("processDefinitionCode") Long definitionCode,
                                             @Param("startTime") Date startTime,
                                             @Param("endTime") Date endTime,
+                                            @Param("testFlag") int testFlag,
                                             @Param("states") int[] stateArray);
 
     /**
@@ -213,19 +219,21 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param definitionCode definitionCode
      * @param startTime      startTime
      * @param endTime        endTime
+     * @param testFlag       testFlag
      * @return process instance
      */
     ProcessInstance queryLastManualProcess(@Param("processDefinitionCode") Long definitionCode,
                                            @Param("startTime") Date startTime,
-                                           @Param("endTime") Date endTime);
+                                           @Param("endTime") Date endTime,
+                                           @Param("testFlag") int testFlag);
 
     /**
      * query top n process instance order by running duration
      *
-     * @param size size
-     * @param startTime start time
-     * @param startTime end time
-     * @param status process instance status
+     * @param size        size
+     * @param startTime   start time
+     * @param startTime   end time
+     * @param status      process instance status
      * @param projectCode project code
      * @return ProcessInstance list
      */
@@ -260,4 +268,45 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     ProcessInstance loadNextProcess4Serial(@Param("processDefinitionCode") Long processDefinitionCode,
                                            @Param("state") int state, @Param("id") int id);
+
+    /**
+     * Filter process instance
+     *
+     * @param page                  page
+     * @param processDefinitionCode processDefinitionCode
+     * @param name                  name
+     * @param host                  host
+     * @param startTime             startTime
+     * @param endTime               endTime
+     * @return process instance IPage
+     */
+    IPage<ProcessInstance> queryProcessInstanceListV2Paging(Page<ProcessInstance> page,
+                                                            @Param("processDefinitionCode") Long processDefinitionCode,
+                                                            @Param("name") String name,
+                                                            @Param("startTime") String startTime,
+                                                            @Param("endTime") String endTime,
+                                                            @Param("state") Integer state,
+                                                            @Param("host") String host);
+
+    /**
+     * Statistics process instance state v2
+     * <p>
+     * We only need project codes to determine whether the process instance belongs to the user or not.
+     *
+     * @param startTime    startTime
+     * @param endTime      endTime
+     * @param projectCode  projectCode
+     * @param workflowCode workflowCode
+     * @param model model
+     * @param projectIds projectIds
+     * @return ExecuteStatusCount list
+     */
+    List<ExecuteStatusCount> countInstanceStateV2(
+                                                  @Param("startTime") Date startTime,
+                                                  @Param("endTime") Date endTime,
+                                                  @Param("projectCode") Long projectCode,
+                                                  @Param("workflowCode") Long workflowCode,
+                                                  @Param("model") Integer model,
+                                                  @Param("projectIds") Set<Integer> projectIds);
+
 }

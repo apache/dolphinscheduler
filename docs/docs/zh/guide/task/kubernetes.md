@@ -11,7 +11,14 @@ kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的
 
 ## 任务参数
 
+<<<<<<< HEAD
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 | **任务参数** |                             **描述**                              |
 |----------|-----------------------------------------------------------------|
@@ -19,6 +26,10 @@ kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的
 | 最小CPU    | 任务在kubernetes上运行所需的最小CPU                                        |
 | 最小内存     | 任务在kubernetes上运行所需的最小内存                                         |
 | 镜像       | 镜像地址                                                            |
+<<<<<<< HEAD
+=======
+| 容器执行命令   | 容器执行命令，例如：/bin/echo hello world                                 |
+>>>>>>> refs/remotes/origin/3.1.1-release
 | 自定义参数    | kubernetes任务局部的用户自定义参数，自定义参数最终会通过环境变量形式存在于容器中，提供给kubernetes任务使用 |
 
 ## 任务样例

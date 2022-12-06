@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
+<<<<<<< HEAD
 import lombok.NonNull;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -31,8 +34,15 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+<<<<<<< HEAD
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+=======
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -42,6 +52,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
+
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * mainly used to get the start command line of a process.
@@ -166,7 +183,9 @@ public class ProcessUtils {
             }
         } else {
             String pids = OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId));
-            mat = WINDOWSATTERN.matcher(pids);
+            if (null != pids) {
+                mat = WINDOWSATTERN.matcher(pids);
+            }
         }
 
         if (null != mat) {
@@ -195,7 +214,12 @@ public class ProcessUtils {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             Host host = Host.of(taskExecutionContext.getHost());
+<<<<<<< HEAD
             List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
+=======
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
+                    taskExecutionContext.getAppInfoPath());
+>>>>>>> refs/remotes/origin/3.1.1-release
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
@@ -208,10 +232,12 @@ public class ProcessUtils {
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
+                        taskExecutionContext.getExecutePath());
                 return appIds;
             } else {
-                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId());
+                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",
+                        taskExecutionContext.getTaskInstanceId());
             }
         } catch (Exception e) {
             logger.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);

@@ -65,7 +65,8 @@ public class MySQLSourceGenerator implements ISourceGenerator {
         StringBuilder mysqlSourceSb = new StringBuilder();
 
         try {
-            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
+            SourceMysqlParameter sourceMysqlParameter =
+                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
 
             if (null != sourceMysqlParameter) {
                 BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
@@ -77,29 +78,29 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                     mysqlSourceSb.append(SPACE).append(DB_CONNECT)
                             .append(SPACE).append(DOUBLE_QUOTES)
                             .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
-                        .append(SPACE).append(DB_USERNAME)
-                        .append(SPACE).append(baseDataSource.getUser())
-                        .append(SPACE).append(DB_PWD)
-                        .append(SPACE).append(DOUBLE_QUOTES)
+                            .append(SPACE).append(DB_USERNAME)
+                            .append(SPACE).append(baseDataSource.getUser())
+                            .append(SPACE).append(DB_PWD)
+                            .append(SPACE).append(DOUBLE_QUOTES)
                             .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES);
 
-                    //sqoop table & sql query
+                    // sqoop table & sql query
                     if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
                         if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcTable())) {
                             mysqlSourceSb.append(SPACE).append(TABLE)
-                                .append(SPACE).append(sourceMysqlParameter.getSrcTable());
+                                    .append(SPACE).append(sourceMysqlParameter.getSrcTable());
                         }
 
                         if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
                             mysqlSourceSb.append(SPACE).append(COLUMNS)
-                                .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
+                                    .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
                         }
                     } else if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
-                        && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
+                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
 
                         String srcQuery = sourceMysqlParameter.getSrcQuerySql();
                         mysqlSourceSb.append(SPACE).append(QUERY)
-                            .append(SPACE).append(DOUBLE_QUOTES).append(srcQuery);
+                                .append(SPACE).append(DOUBLE_QUOTES).append(srcQuery);
 
                         if (srcQuery.toLowerCase().contains(QUERY_WHERE)) {
                             mysqlSourceSb.append(SPACE).append(QUERY_CONDITION).append(DOUBLE_QUOTES);
@@ -108,7 +109,7 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                         }
                     }
 
-                    //sqoop hive map column
+                    // sqoop hive map column
                     List<Property> mapColumnHive = sourceMysqlParameter.getMapColumnHive();
 
                     if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
@@ -119,11 +120,11 @@ public class MySQLSourceGenerator implements ISourceGenerator {
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
                             mysqlSourceSb.append(SPACE).append(MAP_COLUMN_HIVE)
-                                .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
+                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
 
-                    //sqoop map column java
+                    // sqoop map column java
                     List<Property> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
 
                     if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
@@ -134,7 +135,7 @@ public class MySQLSourceGenerator implements ISourceGenerator {
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
                             mysqlSourceSb.append(SPACE).append(MAP_COLUMN_JAVA)
-                                .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
+                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
                 }

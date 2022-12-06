@@ -73,10 +73,13 @@ public class CommonUtils {
         return PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
     }
 
+<<<<<<< HEAD
     public static boolean isSetTaskDirToTenantEnable() {
         return PropertyUtils.getBoolean(Constants.SET_TASK_DIR_TO_TENANT_ENABLE, false);
     }
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
     /**
      * if upload resource is HDFS and kerberos startup is true , else false
      *

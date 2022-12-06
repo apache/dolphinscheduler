@@ -27,6 +27,7 @@ import org.apache.commons.collections.MapUtils;
 import java.util.Map;
 
 public final class ScriptAlertChannel implements AlertChannel {
+
     @Override
     public AlertResult process(AlertInfo alertinfo) {
         AlertData alertData = alertinfo.getAlertData();

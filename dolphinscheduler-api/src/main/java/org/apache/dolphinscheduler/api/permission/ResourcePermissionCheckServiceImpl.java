@@ -35,7 +35,6 @@ package org.apache.dolphinscheduler.api.permission;
 
 import static java.util.stream.Collectors.toSet;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
@@ -54,9 +53,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -68,6 +65,8 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,39 +87,54 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ResourcePermissionCheckServiceImpl implements ResourcePermissionCheckService<Object>, ApplicationContextAware {
+public class ResourcePermissionCheckServiceImpl
+        implements
+            ResourcePermissionCheckService<Object>,
+            ApplicationContextAware {
 
     @Autowired
     private ProcessService processService;
 
-    public static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP = new ConcurrentHashMap<>();
+    public static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP =
+            new ConcurrentHashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        for (ResourceAcquisitionAndPermissionCheck<?> authorizedResourceList : applicationContext.getBeansOfType(ResourceAcquisitionAndPermissionCheck.class).values()) {
+        for (ResourceAcquisitionAndPermissionCheck<?> authorizedResourceList : applicationContext
+                .getBeansOfType(ResourceAcquisitionAndPermissionCheck.class).values()) {
             List<AuthorizationType> authorizationTypes = authorizedResourceList.authorizationTypes();
             authorizationTypes.forEach(auth -> RESOURCE_LIST_MAP.put(auth, authorizedResourceList));
         }
-     }
+    }
 
     @Override
-    public boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId, Logger logger) {
+    public boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId,
+                                           Logger logger) {
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
+<<<<<<< HEAD
             originResSet.removeAll(ownResSets);
             if (CollectionUtils.isNotEmpty(originResSet))
                 logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
             return CollectionUtils.isEmpty(originResSet);
+=======
+            boolean checkResult = ownResSets != null && ownResSets.containsAll(originResSet);
+            if (!checkResult) {
+                logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
+            }
+            return checkResult;
+>>>>>>> refs/remotes/origin/3.1.1-release
         }
         return true;
     }
 
     @Override
-    public boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId, String permissionKey, Logger logger) {
+    public boolean operationPermissionCheck(Object authorizationType, Integer userId,
+                                            String permissionKey, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
-            logger.error("user id {} doesn't exist", userId);
+            logger.error("User does not exist, userId:{}.", userId);
             return false;
         }
         if (user.getUserType().equals(UserType.ADMIN_USER)) {
@@ -143,7 +157,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
     public Set<Object> userOwnedResourceIdsAcquisition(Object authorizationType, Integer userId, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
-            logger.error("user id {} doesn't exist", userId);
+            logger.error("User does not exist, userId:{}.", userId);
             return Collections.emptySet();
         }
         return (Set<Object>) RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(
@@ -231,11 +245,12 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             } else {
                 // query resource relation
                 List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-                relationResources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
+                relationResources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>()
+                        : resourceMapper.queryResourceListById(resIds);
             }
             List<Resource> ownResourceList = resourceMapper.queryResourceListAuthored(userId, -1);
             relationResources.addAll(ownResourceList);
-            return ownResourceList.stream().map(Resource::getId).collect(toSet());
+            return relationResources.stream().map(Resource::getId).collect(toSet());
         }
 
         @Override
@@ -322,7 +337,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         }
     }
 
-
     @Component
     public static class EnvironmentResourceList implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
@@ -339,7 +353,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-           return true;
+            return true;
         }
 
         @Override
@@ -367,7 +381,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
         public boolean permissionCheck(int userId, String url, Logger logger) {
             return false;
         }
-
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
@@ -398,7 +411,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             return false;
         }
 
-
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             return Collections.emptySet();
@@ -424,9 +436,8 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-           return false;
+            return false;
         }
-
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
@@ -457,7 +468,6 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             return false;
         }
 
-
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<Tenant> tenantList = tenantMapper.queryAll();
@@ -487,10 +497,10 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             return true;
         }
 
-
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return dataSourceMapper.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId).collect(toSet());
+            return dataSourceMapper.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId)
+                    .collect(toSet());
         }
     }
 
@@ -518,10 +528,10 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return accessTokenMapper.listAuthorizedAccessToken(userId, null).stream().map(AccessToken::getId).collect(toSet());
+            return accessTokenMapper.listAuthorizedAccessToken(userId, null).stream().map(AccessToken::getId)
+                    .collect(toSet());
         }
     }
-
 
     interface ResourceAcquisitionAndPermissionCheck<T> {
 

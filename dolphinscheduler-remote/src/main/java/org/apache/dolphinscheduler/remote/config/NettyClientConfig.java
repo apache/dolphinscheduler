@@ -23,6 +23,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 
+<<<<<<< HEAD
+=======
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 @Data
 @Builder
 @NoArgsConstructor

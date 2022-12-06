@@ -77,7 +77,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         this.taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         this.taskInstance.setStartTime(new Date());
-        this.processService.saveTaskInstance(taskInstance);
+        this.taskInstanceDao.upsertTaskInstance(taskInstance);
         this.dependentParameters = taskInstance.getDependency();
         this.blockingParam = JSONUtils.parseObject(taskInstance.getTaskParams(), BlockingParameters.class);
     }
@@ -87,7 +87,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         // todo: task cannot be pause
         taskInstance.setState(TaskExecutionStatus.PAUSE);
         taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         logger.info("blocking task has been paused");
         return true;
     }
@@ -96,7 +96,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
     protected boolean killTask() {
         taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         logger.info("blocking task has been killed");
         return true;
     }
@@ -171,8 +171,8 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
 
     private void setConditionResult() {
 
-        List<TaskInstance> taskInstances = processService
-                .findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
+        List<TaskInstance> taskInstances = taskInstanceDao
+                .findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getTaskCode(), task.getState());
         }
@@ -204,7 +204,7 @@ public class BlockingTaskProcessor extends BaseTaskProcessor {
         }
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setEndTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
         logger.info("blocking task execute complete, blocking:{}", isBlocked);
     }
 }

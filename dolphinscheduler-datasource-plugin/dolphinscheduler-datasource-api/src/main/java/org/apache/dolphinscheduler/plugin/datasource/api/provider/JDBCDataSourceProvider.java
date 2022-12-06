@@ -46,7 +46,7 @@ public class JDBCDataSourceProvider {
                 PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         HikariDataSource dataSource = new HikariDataSource();
 
-        //TODO Support multiple versions of data sources
+        // TODO Support multiple versions of data sources
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         loaderJdbcDriver(classLoader, properties, dbType);
 
@@ -97,7 +97,9 @@ public class JDBCDataSourceProvider {
     }
 
     protected static void loaderJdbcDriver(ClassLoader classLoader, BaseConnectionParam properties, DbType dbType) {
-        String drv = StringUtils.isBlank(properties.getDriverClassName()) ? DataSourceUtils.getDatasourceProcessor(dbType).getDatasourceDriver() : properties.getDriverClassName();
+        String drv = StringUtils.isBlank(properties.getDriverClassName())
+                ? DataSourceUtils.getDatasourceProcessor(dbType).getDatasourceDriver()
+                : properties.getDriverClassName();
         try {
             final Class<?> clazz = Class.forName(drv, true, classLoader);
             final Driver driver = (Driver) clazz.newInstance();

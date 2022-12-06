@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.util.Date;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -57,7 +55,7 @@ public class TaskExecuteResultCommand extends BaseCommand {
     /**
      * startTime
      */
-    private Date startTime;
+    private long startTime;
 
     /**
      * host
@@ -74,12 +72,10 @@ public class TaskExecuteResultCommand extends BaseCommand {
      */
     private String executePath;
 
-
     /**
      * end time
      */
-    private Date endTime;
-
+    private long endTime;
 
     /**
      * processId

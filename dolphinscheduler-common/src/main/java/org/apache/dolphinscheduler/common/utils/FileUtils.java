@@ -46,6 +46,8 @@ public class FileUtils {
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
+    public static final String APPINFO_PATH = "appInfo.log";
+
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
     }
@@ -57,7 +59,8 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        String fileName = String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName =
+                String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
 
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
@@ -110,6 +113,19 @@ public class FileUtils {
                 processDefineVersion,
                 processInstanceId,
                 taskInstanceId);
+<<<<<<< HEAD
+=======
+    }
+
+    /**
+     * absolute path of appInfo file
+     *
+     * @param execPath  directory of process execution
+     * @return
+     */
+    public static String getAppInfoPath(String execPath) {
+        return String.format("%s/%s", execPath, APPINFO_PATH);
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     /**
@@ -126,7 +142,7 @@ public class FileUtils {
      * @throws IOException errors
      */
     public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        //if work dir exists, first delete
+        // if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
         if (execLocalPathFile.exists()) {
@@ -141,7 +157,7 @@ public class FileUtils {
             }
         }
 
-        //create work dir
+        // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
         logger.info(mkdirLog);
@@ -237,7 +253,7 @@ public class FileUtils {
      * @param filename String type of filename
      * @return whether file path could be traversal or not
      */
-    public static boolean directoryTraversal(String filename){
+    public static boolean directoryTraversal(String filename) {
         if (filename.contains(FOLDER_SEPARATOR)) {
             return true;
         }

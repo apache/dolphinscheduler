@@ -33,6 +33,7 @@ import java.util.Map;
  * business time utils
  */
 public class BusinessTimeUtils {
+
     private BusinessTimeUtils() {
         throw new IllegalStateException("BusinessTimeUtils class");
     }

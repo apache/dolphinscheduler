@@ -67,9 +67,9 @@ import java.util.Map;
 public class DataQualityTask extends AbstractYarnTask {
 
     /**
-     * spark2 command
+     * spark command
      */
-    private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark-submit";
+    private static final String SPARK_COMMAND = "${SPARK_HOME}/bin/spark-submit";
 
     private DataQualityParameters dataQualityParameters;
 
@@ -84,7 +84,8 @@ public class DataQualityTask extends AbstractYarnTask {
     public void init() {
         logger.info("data quality task params {}", dqTaskExecutionContext.getTaskParams());
 
-        dataQualityParameters = JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
+        dataQualityParameters =
+                JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
 
         if (null == dataQualityParameters) {
             logger.error("data quality params is null");
@@ -95,15 +96,15 @@ public class DataQualityTask extends AbstractYarnTask {
             throw new RuntimeException("data quality task params is not valid");
         }
 
-        Map<String,String> inputParameter = dataQualityParameters.getRuleInputParameter();
-        for (Map.Entry<String,String> entry: inputParameter.entrySet()) {
+        Map<String, String> inputParameter = dataQualityParameters.getRuleInputParameter();
+        for (Map.Entry<String, String> entry : inputParameter.entrySet()) {
             if (entry != null && entry.getValue() != null) {
                 entry.setValue(entry.getValue().trim());
             }
         }
 
-        DataQualityTaskExecutionContext dataQualityTaskExecutionContext
-                        = dqTaskExecutionContext.getDataQualityTaskExecutionContext();
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext =
+                dqTaskExecutionContext.getDataQualityTaskExecutionContext();
 
         operateInputParameter(inputParameter, dataQualityTaskExecutionContext);
 
@@ -128,7 +129,8 @@ public class DataQualityTask extends AbstractYarnTask {
         setMainJarName();
     }
 
-    private void operateInputParameter(Map<String, String> inputParameter, DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+    private void operateInputParameter(Map<String, String> inputParameter,
+                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS);
         LocalDateTime time = LocalDateTime.now();
         String now = df.format(time);
@@ -143,7 +145,7 @@ public class DataQualityTask extends AbstractYarnTask {
         inputParameter.put(TASK_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
 
         if (StringUtils.isEmpty(inputParameter.get(DATA_TIME))) {
-            inputParameter.put(DATA_TIME,ArgsUtils.wrapperSingleQuotes(now));
+            inputParameter.put(DATA_TIME, ArgsUtils.wrapperSingleQuotes(now));
         }
 
         if (StringUtils.isNotEmpty(inputParameter.get(REGEXP_PATTERN))) {
@@ -158,7 +160,7 @@ public class DataQualityTask extends AbstractYarnTask {
                             + UNDERLINE + dqTaskExecutionContext.getProcessInstanceId()
                             + UNDERLINE + dqTaskExecutionContext.getTaskName());
         } else {
-            inputParameter.put(ERROR_OUTPUT_PATH,"");
+            inputParameter.put(ERROR_OUTPUT_PATH, "");
         }
     }
 
@@ -166,12 +168,13 @@ public class DataQualityTask extends AbstractYarnTask {
     protected String buildCommand() {
         List<String> args = new ArrayList<>();
 
-        args.add(SPARK2_COMMAND);
+        args.add(SPARK_COMMAND);
         args.addAll(SparkArgsUtils.buildArgs(dataQualityParameters.getSparkParameters()));
 
         // replace placeholder
         Map<String, Property> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        String command =
+                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
         logger.info("data quality task command: {}", command);
 
         return command;

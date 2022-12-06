@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+<<<<<<< HEAD
 import lombok.NonNull;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -35,15 +38,22 @@ import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+<<<<<<< HEAD
+=======
+
+import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.annotation.PostConstruct;
+
+import lombok.NonNull;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Check thread
@@ -208,8 +218,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             return;
         }
         taskInstanceRetryCheckList.add(taskInstanceKey);
-        logger.info("[WorkflowInstance-{}][TaskInstance-{}] Added task instance into retry check list",
-                processInstance.getId(), taskInstance.getId());
+        logger.info("[WorkflowInstance-{}][TaskInstanceKey-{}:{}] Added task instance into retry check list",
+                processInstance.getId(), taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
     }
 
     public void removeTask4RetryCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
@@ -341,8 +351,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                     // reset taskInstance endTime and state
                     // todo relative funtion: TaskInstance.retryTaskIntervalOverTime,
                     // WorkflowExecuteThread.cloneRetryTaskInstance
-                    logger.info("[TaskInstance-{}]The task instance can retry, will retry this task instance",
-                            taskInstance.getId());
+                    logger.info("[TaskInstanceKey-{}:{}]The task instance can retry, will retry this task instance",
+                            taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
                     taskInstance.setEndTime(null);
                     taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
 
@@ -419,7 +429,6 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
     private void addTaskRetryEvent(TaskInstance taskInstance) {
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(taskInstance.getProcessInstanceId())
-                .taskInstanceId(taskInstance.getId())
                 .taskCode(taskInstance.getTaskCode())
                 .status(TaskExecutionStatus.RUNNING_EXECUTION)
                 .type(StateEventType.TASK_RETRY)

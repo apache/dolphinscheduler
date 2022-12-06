@@ -56,10 +56,11 @@ public class EmrParameters extends AbstractParameters {
     public boolean checkParameters() {
         /*
          * When saving a task, the programType cannot be empty and jobFlowDefineJson or stepsDefineJson cannot be empty:
-         * (1) When ProgramType is RUN_JOB_FLOW, jobFlowDefineJson cannot be empty.
-         * (2) When ProgramType is ADD_JOB_FLOW_STEPS, stepsDefineJson cannot be empty.
+         * (1) When ProgramType is RUN_JOB_FLOW, jobFlowDefineJson cannot be empty. (2) When ProgramType is
+         * ADD_JOB_FLOW_STEPS, stepsDefineJson cannot be empty.
          */
-        return programType != null && (StringUtils.isNotEmpty(jobFlowDefineJson) || StringUtils.isNotEmpty(stepsDefineJson));
+        return programType != null
+                && (StringUtils.isNotEmpty(jobFlowDefineJson) || StringUtils.isNotEmpty(stepsDefineJson));
     }
 
     @Override
@@ -71,9 +72,9 @@ public class EmrParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "EmrParameters{"
-            + "programType=" + programType
-            + ", jobFlowDefineJson='" + jobFlowDefineJson + '\''
-            + ", stepsDefineJson='" + stepsDefineJson + '\''
-            + '}';
+                + "programType=" + programType
+                + ", jobFlowDefineJson='" + jobFlowDefineJson + '\''
+                + ", stepsDefineJson='" + stepsDefineJson + '\''
+                + '}';
     }
 }

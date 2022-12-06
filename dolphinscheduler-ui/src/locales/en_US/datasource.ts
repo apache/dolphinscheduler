@@ -18,6 +18,8 @@
 export default {
   datasource: 'DataSource',
   create_datasource: 'Create DataSource',
+  choose_datasource_type: 'Choose DataSource Type',
+  select: 'Select',
   search_input_tips: 'Please input the keywords',
   datasource_name: 'Datasource Name',
   datasource_name_tips: 'Please enter datasource name',
@@ -26,15 +28,21 @@ export default {
   datasource_parameter: 'Datasource Parameter',
   description: 'Description',
   description_tips: 'Please enter description',
+  test_datasource: 'Test data source',
+  online_datasource: 'Online data source',
+  bind_test_datasource: 'Bind test data source',
   create_time: 'Create Time',
   update_time: 'Update Time',
   operation: 'Operation',
+  datasource_definition: 'Datasource Definition',
   click_to_view: 'Click to view',
   delete: 'Delete',
   confirm: 'Confirm',
   delete_confirm: 'Delete?',
   cancel: 'Cancel',
   create: 'Create',
+  on_line: 'Online',
+  test: 'Test',
   edit: 'Edit',
   success: 'Success',
   test_connect: 'Test Connect',
@@ -64,5 +72,11 @@ export default {
   user_password_tips: 'Please enter your password',
   aws_region: 'Aws Region',
   aws_region_tips: 'Please enter AwsRegion',
+<<<<<<< HEAD
   jdbc_format_tips: 'jdbc connection parameters is not a correct JSON format'
+=======
+  jdbc_format_tips: 'jdbc connection parameters is not a correct JSON format',
+  datasource_test_flag_tips: 'Please select a data source definition',
+  datasource_bind_test_id_tips: 'Please bind the test data source'
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

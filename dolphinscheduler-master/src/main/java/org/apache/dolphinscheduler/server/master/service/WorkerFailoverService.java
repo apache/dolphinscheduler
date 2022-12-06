@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
@@ -73,12 +74,19 @@ public class WorkerFailoverService {
     private final LogClient logClient;
     private final String localAddress;
 
+    private final TaskInstanceDao taskInstanceDao;
+
     public WorkerFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
                                  @NonNull ProcessService processService,
                                  @NonNull WorkflowExecuteThreadPool workflowExecuteThreadPool,
                                  @NonNull ProcessInstanceExecCacheManager cacheManager,
+<<<<<<< HEAD
                                  @NonNull LogClient logClient) {
+=======
+                                 @NonNull LogClient logClient,
+                                 @NonNull TaskInstanceDao taskInstanceDao) {
+>>>>>>> refs/remotes/origin/3.1.1-release
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
@@ -86,6 +94,10 @@ public class WorkerFailoverService {
         this.cacheManager = cacheManager;
         this.logClient = logClient;
         this.localAddress = masterConfig.getMasterAddress();
+<<<<<<< HEAD
+=======
+        this.taskInstanceDao = taskInstanceDao;
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     /**
@@ -183,7 +195,7 @@ public class WorkerFailoverService {
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
         taskInstance.setFlag(Flag.NO);
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
 
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(processInstance.getId())

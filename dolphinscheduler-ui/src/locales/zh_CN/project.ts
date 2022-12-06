@@ -36,11 +36,19 @@ export default {
     delete: '删除',
     confirm: '确定',
     cancel: '取消',
-    delete_confirm: '确定删除吗?'
+    delete_confirm: '确定删除吗?',
+    authorize_level:'权限等级',
+    no_permission: '无权限',
+    read_permission: '读权限',
+    all_permission: '所有权限',
   },
   workflow: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     workflow_relation: '工作流关系',
     create_workflow: '创建工作流',
+    create_workflow_dynamic: '创建工作流 (动态)',
     import_workflow: '导入工作流',
     workflow_name: '工作流名称',
     workflow_instance_name: '工作流实例名称',
@@ -105,6 +113,7 @@ export default {
     complement_data: '补数',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
+    whether_test: '是否测试',
     continue: '继续',
     end: '结束',
     none_send: '都不发',
@@ -203,6 +212,9 @@ export default {
       '目前没有任何工作流，请先创建工作流，再访问该页面'
   },
   task: {
+    on_line: '线上',
+    test: '测试',
+    operating_environment: '运行环境',
     cancel_full_screen: '取消全屏',
     enter_full_screen: '全屏',
     current_task_settings: '当前任务设置',
@@ -310,6 +322,10 @@ export default {
     online: '已上线'
   },
   node: {
+    is_module_path: '使用模块路径',
+    run_type: '运行类型',
+    jvm_args: '虚拟机参数',
+    jvm_args_tips: '请输入虚拟机参数',
     return_back: '返回上一节点',
     current_node_settings: '当前节点设置',
     instructions: '使用说明',
@@ -351,6 +367,8 @@ export default {
     mb: 'MB',
     image: '镜像',
     image_tips: '请输入镜像',
+    command: '容器执行命令',
+    command_tips: '请输入容器执行命令，例如：/bin/echo hello world',
     min_memory_tips: '请输入最小内存',
     state: '状态',
     branch_flow: '分支流转',
@@ -385,7 +403,6 @@ export default {
     value_required_tips: 'value(必填)',
     pre_tasks: '前置任务',
     program_type: '程序类型',
-    spark_version: 'Spark版本',
     main_class: '主函数的Class',
     main_class_tips: '请填写主函数的Class',
     main_package: '主程序包',
@@ -632,8 +649,6 @@ export default {
     emr_flow_define_json_tips: '请输入工作流定义',
     emr_steps_define_json: 'stepsDefineJson',
     emr_steps_define_json_tips: '请输入EMR步骤定义',
-    segment_separator: '分段执行符号',
-    segment_separator_tips: '请输入分段执行符号',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
@@ -755,5 +770,15 @@ export default {
     pytorch_requirements: '依赖文件',
     pytorch_conda_python_version: 'python版本',
     pytorch_conda_python_version_tips: '请输入版本号，如 3.6, 3.7, 3.x等'
+  },
+  menu: {
+    fav: '收藏组件',
+    universal: '通用组件',
+    cloud: '云',
+    logic: '逻辑节点',
+    di: '数据集成',
+    dq: '数据质量',
+    ml: '机器学习',
+    other: '其他',
   }
 }

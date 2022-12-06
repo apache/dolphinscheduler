@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
@@ -34,21 +32,32 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import javax.annotation.Nullable;
+=======
+import org.apache.commons.collections.CollectionUtils;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.commons.collections.MapUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Lists;
 
 @Service
 public final class AlertSenderService extends Thread {
@@ -73,23 +82,29 @@ public final class AlertSenderService extends Thread {
 
     @Override
     public void run() {
-        logger.info("alert sender started");
+        logger.info("Alert sender thread started");
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 List<Alert> alerts = alertDao.listPendingAlerts();
+                if (CollectionUtils.isEmpty(alerts)) {
+                    logger.debug("There is not waiting alerts");
+                    continue;
+                }
                 AlertServerMetrics.registerPendingAlertGauge(alerts::size);
                 this.send(alerts);
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
             } catch (Exception e) {
-                logger.error("alert sender thread error", e);
+                logger.error("Alert sender thread meet an exception", e);
+            } finally {
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
             }
         }
+        logger.info("Alert sender thread stopped");
     }
 
     public void send(List<Alert> alerts) {
         for (Alert alert : alerts) {
             // get alert group from alert
-            int alertId = Optional.ofNullable(alert.getId()).orElse(0);
+            int alertId = alert.getId();
             int alertGroupId = Optional.ofNullable(alert.getAlertGroupId()).orElse(0);
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
@@ -109,16 +124,23 @@ public final class AlertSenderService extends Thread {
                     .build();
 
             int sendSuccessCount = 0;
+            List<AlertSendStatus> alertSendStatuses = new ArrayList<>();
             List<AlertResult> alertResults = new ArrayList<>();
             for (AlertPluginInstance instance : alertInstanceList) {
                 AlertResult alertResult = this.alertResultHandler(instance, alertData);
                 if (alertResult != null) {
-                    AlertStatus sendStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))
+                    AlertStatus sendStatus = Boolean.parseBoolean(alertResult.getStatus())
                             ? AlertStatus.EXECUTION_SUCCESS
                             : AlertStatus.EXECUTION_FAILURE;
-                    alertDao.addAlertSendStatus(sendStatus, JSONUtils.toJsonString(alertResult), alertId,
-                            instance.getId());
-                    if (sendStatus.equals(AlertStatus.EXECUTION_SUCCESS)) {
+                    AlertSendStatus alertSendStatus = AlertSendStatus.builder()
+                            .alertId(alertId)
+                            .alertPluginInstanceId(instance.getId())
+                            .sendStatus(sendStatus)
+                            .log(JSONUtils.toJsonString(alertResult))
+                            .createTime(new Date())
+                            .build();
+                    alertSendStatuses.add(alertSendStatus);
+                    if (AlertStatus.EXECUTION_SUCCESS.equals(sendStatus)) {
                         sendSuccessCount++;
                         AlertServerMetrics.incAlertSuccessCount();
                     } else {
@@ -133,7 +155,11 @@ public final class AlertSenderService extends Thread {
             } else if (sendSuccessCount < alertInstanceList.size()) {
                 alertStatus = AlertStatus.EXECUTION_PARTIAL_SUCCESS;
             }
+            // we update the alert first to avoid duplicate key in alertSendStatus
+            // this may loss the alertSendStatus if the server restart
+            // todo: use transaction to update these two table
             alertDao.updateAlert(alertStatus, JSONUtils.toJsonString(alertResults), alertId);
+            alertDao.insertAlertSendStatus(alertSendStatuses);
         }
     }
 
@@ -233,10 +259,13 @@ public final class AlertSenderService extends Thread {
         }
 
         if (!sendWarning) {
+            String message = String.format(
+                    "Alert Plugin %s send ignore warning type not match: plugin warning type is %s, alert data warning type is %s",
+                    pluginInstanceName, warningType.getCode(), alertData.getWarnType());
             logger.info(
                     "Alert Plugin {} send ignore warning type not match: plugin warning type is {}, alert data warning type is {}",
                     pluginInstanceName, warningType.getCode(), alertData.getWarnType());
-            return null;
+            return new AlertResult("false", message);
         }
 
         AlertInfo alertInfo = AlertInfo.builder()

@@ -18,65 +18,68 @@
 package org.apache.dolphinscheduler.service.utils;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 
 import org.apache.hadoop.security.UserGroupInformation;
+=======
+import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * configuration test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {PropertyUtils.class, UserGroupInformation.class})
+@ExtendWith(MockitoExtension.class)
 public class CommonUtilsTest {
+
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
 
     @Test
     public void getSystemEnvPath() {
         String envPath;
         envPath = CommonUtils.getSystemEnvPath();
-        Assert.assertEquals("/etc/profile", envPath);
+        Assertions.assertEquals("/etc/profile", envPath);
     }
 
     @Test
     public void isDevelopMode() {
         logger.info("develop mode: {}", CommonUtils.isDevelopMode());
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsDataBasePath() {
         logger.info(HadoopUtils.getHdfsDataBasePath());
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getDownloadFilename() {
         logger.info(FileUtils.getDownloadFilename("a.txt"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getUploadFilename() {
         logger.info(FileUtils.getUploadFilename("1234", "a.txt"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsDir() {
         logger.info(HadoopUtils.getHdfsResDir("1234"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
@@ -88,7 +91,7 @@ public class CommonUtilsTest {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
 }

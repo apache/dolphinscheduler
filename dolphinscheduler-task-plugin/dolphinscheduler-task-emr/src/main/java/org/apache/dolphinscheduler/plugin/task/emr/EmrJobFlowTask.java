@@ -114,7 +114,7 @@ public class EmrJobFlowTask extends AbstractEmrTask {
      *
      * @return RunJobFlowRequest
      */
-    private RunJobFlowRequest createRunJobFlowRequest() {
+    protected RunJobFlowRequest createRunJobFlowRequest() {
 
         final RunJobFlowRequest runJobFlowRequest;
         try {

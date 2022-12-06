@@ -30,8 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -59,7 +64,11 @@ public class JSONUtilsTest {
 
         ArrayNode jsonNodes = arrayNode.addAll(objects);
         String s = JSONUtils.toJsonString(jsonNodes);
+<<<<<<< HEAD
         Assert.assertEquals(s, str);
+=======
+        Assertions.assertEquals(s, str);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     }
 
@@ -74,7 +83,11 @@ public class JSONUtilsTest {
 
         JsonNode jsonNodes = JSONUtils.toJsonNode(property);
         String s = JSONUtils.toJsonString(jsonNodes);
+<<<<<<< HEAD
         Assert.assertEquals(s, str);
+=======
+        Assertions.assertEquals(s, str);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     }
 
@@ -86,7 +99,11 @@ public class JSONUtilsTest {
         objectNode.put("a", "b");
         objectNode.put("b", "d");
         String s = JSONUtils.toJsonString(objectNode);
+<<<<<<< HEAD
         Assert.assertEquals(s, jsonStr);
+=======
+        Assertions.assertEquals(s, jsonStr);
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -95,8 +112,13 @@ public class JSONUtilsTest {
         String jsonStr = "{\"id\":\"1001\",\"name\":\"Jobs\"}";
 
         Map<String, String> models = JSONUtils.toMap(jsonStr);
+<<<<<<< HEAD
         Assert.assertEquals("1001", models.get("id"));
         Assert.assertEquals("Jobs", models.get("name"));
+=======
+        Assertions.assertEquals("1001", models.get("id"));
+        Assertions.assertEquals("Jobs", models.get("name"));
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     }
 
@@ -110,7 +132,11 @@ public class JSONUtilsTest {
         String str = "{\"direct\":\"IN\",\"prop\":\"ds\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
         Property property1 = JSONUtils.parseObject(str, Property.class);
         Direct direct = property1.getDirect();
+<<<<<<< HEAD
         Assert.assertEquals(Direct.IN, direct);
+=======
+        Assertions.assertEquals(Direct.IN, direct);
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -120,12 +146,21 @@ public class JSONUtilsTest {
         List<LinkedHashMap> maps = JSONUtils.toList(str,
                 LinkedHashMap.class);
 
+<<<<<<< HEAD
         Assert.assertEquals(1, maps.size());
         Assert.assertEquals("mysql200", maps.get(0).get("mysql service name"));
         Assert.assertEquals("192.168.xx.xx", maps.get(0).get("mysql address"));
         Assert.assertEquals("3306", maps.get(0).get("port"));
         Assert.assertEquals("80", maps.get(0).get("no index of number"));
         Assert.assertEquals("190", maps.get(0).get("database client connections"));
+=======
+        Assertions.assertEquals(1, maps.size());
+        Assertions.assertEquals("mysql200", maps.get(0).get("mysql service name"));
+        Assertions.assertEquals("192.168.xx.xx", maps.get(0).get("mysql address"));
+        Assertions.assertEquals("3306", maps.get(0).get("port"));
+        Assertions.assertEquals("80", maps.get(0).get("no index of number"));
+        Assertions.assertEquals("190", maps.get(0).get("database client connections"));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     public String list2String() {
@@ -145,18 +180,32 @@ public class JSONUtilsTest {
 
     @Test
     public void testParseObject() {
+<<<<<<< HEAD
         Assert.assertNull(JSONUtils.parseObject(""));
         Assert.assertNull(JSONUtils.parseObject("foo", String.class));
+=======
+        Assertions.assertNull(JSONUtils.parseObject(""));
+        Assertions.assertNull(JSONUtils.parseObject("foo", String.class));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testNodeString() {
+<<<<<<< HEAD
         Assert.assertEquals("", JSONUtils.getNodeString("", "key"));
         Assert.assertEquals("", JSONUtils.getNodeString("abc", "key"));
         Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
         Assert.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
         Assert.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
         Assert.assertEquals("{\"1\":\"2\",\"2\":3}",
+=======
+        Assertions.assertEquals("", JSONUtils.getNodeString("", "key"));
+        Assertions.assertEquals("", JSONUtils.getNodeString("abc", "key"));
+        Assertions.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
+        Assertions.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+        Assertions.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
+        Assertions.assertEquals("{\"1\":\"2\",\"2\":3}",
+>>>>>>> refs/remotes/origin/3.1.1-release
                 JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
     }
 
@@ -165,30 +214,52 @@ public class JSONUtilsTest {
         String str = "foo";
         byte[] serializeByte = JSONUtils.toJsonByteArray(str);
         String deserialize = JSONUtils.parseObject(serializeByte, String.class);
+<<<<<<< HEAD
         Assert.assertEquals(str, deserialize);
         str = null;
         serializeByte = JSONUtils.toJsonByteArray(str);
         deserialize = JSONUtils.parseObject(serializeByte, String.class);
         Assert.assertNull(deserialize);
+=======
+        Assertions.assertEquals(str, deserialize);
+        str = null;
+        serializeByte = JSONUtils.toJsonByteArray(str);
+        deserialize = JSONUtils.parseObject(serializeByte, String.class);
+        Assertions.assertNull(deserialize);
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testToList() {
+<<<<<<< HEAD
         Assert.assertEquals(new ArrayList(),
                 JSONUtils.toList("A1B2C3", null));
         Assert.assertEquals(new ArrayList(),
                 JSONUtils.toList("", null));
+=======
+        Assertions.assertEquals(new ArrayList(), JSONUtils.toList("A1B2C3", null));
+        Assertions.assertEquals(new ArrayList(), JSONUtils.toList("", null));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testCheckJsonValid() {
+<<<<<<< HEAD
         Assert.assertTrue(JSONUtils.checkJsonValid("3"));
         Assert.assertFalse(JSONUtils.checkJsonValid(""));
+=======
+        Assertions.assertTrue(JSONUtils.checkJsonValid("3"));
+        Assertions.assertFalse(JSONUtils.checkJsonValid(""));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testFindValue() {
+<<<<<<< HEAD
         Assert.assertNull(JSONUtils.findValue(
+=======
+        Assertions.assertNull(JSONUtils.findValue(
+>>>>>>> refs/remotes/origin/3.1.1-release
                 new ArrayNode(new JsonNodeFactory(true)), null));
     }
 
@@ -197,6 +268,7 @@ public class JSONUtilsTest {
         Map<String, String> map = new HashMap<>();
         map.put("foo", "bar");
 
+<<<<<<< HEAD
         Assert.assertTrue(map.equals(JSONUtils.toMap(
                 "{\n" + "\"foo\": \"bar\"\n" + "}")));
 
@@ -209,6 +281,20 @@ public class JSONUtilsTest {
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
         Map<String, String> m = JSONUtils.toMap(str);
         Assert.assertNotNull(m);
+=======
+        Assertions.assertTrue(map.equals(JSONUtils.toMap(
+                "{\n" + "\"foo\": \"bar\"\n" + "}")));
+
+        Assertions.assertFalse(map.equals(JSONUtils.toMap(
+                "{\n" + "\"bar\": \"foo\"\n" + "}")));
+
+        Assertions.assertNull(JSONUtils.toMap("3"));
+        Assertions.assertNull(JSONUtils.toMap(null));
+
+        String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
+        Map<String, String> m = JSONUtils.toMap(str);
+        Assertions.assertNotNull(m);
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -216,12 +302,19 @@ public class JSONUtilsTest {
         Map<String, Object> map = new HashMap<>();
         map.put("foo", "bar");
 
+<<<<<<< HEAD
         Assert.assertEquals("{\"foo\":\"bar\"}",
                 JSONUtils.toJsonString(map));
         Assert.assertEquals(String.valueOf((Object) null),
                 JSONUtils.toJsonString(null));
 
         Assert.assertEquals("{\"foo\":\"bar\"}",
+=======
+        Assertions.assertEquals("{\"foo\":\"bar\"}", JSONUtils.toJsonString(map));
+        Assertions.assertEquals(String.valueOf((Object) null), JSONUtils.toJsonString(null));
+
+        Assertions.assertEquals("{\"foo\":\"bar\"}",
+>>>>>>> refs/remotes/origin/3.1.1-release
                 JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
     }
 
@@ -230,6 +323,7 @@ public class JSONUtilsTest {
         String str = "{\"color\":\"yellow\",\"type\":\"renault\"}";
         ObjectNode node = JSONUtils.parseObject(str);
 
+<<<<<<< HEAD
         Assert.assertEquals("yellow", node.path("color").asText());
 
         node.put("price", 100);
@@ -237,6 +331,15 @@ public class JSONUtilsTest {
 
         node.put("color", "red");
         Assert.assertEquals("red", node.path("color").asText());
+=======
+        Assertions.assertEquals("yellow", node.path("color").asText());
+
+        node.put("price", 100);
+        Assertions.assertEquals(100, node.path("price").asInt());
+
+        node.put("color", "red");
+        Assertions.assertEquals("red", node.path("color").asText());
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -244,7 +347,11 @@ public class JSONUtilsTest {
         String str = "[{\"color\":\"yellow\",\"type\":\"renault\"}]";
         ArrayNode node = JSONUtils.parseArray(str);
 
+<<<<<<< HEAD
         Assert.assertEquals("yellow", node.path(0).path("color").asText());
+=======
+        Assertions.assertEquals("yellow", node.path(0).path("color").asText());
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -256,10 +363,17 @@ public class JSONUtilsTest {
         String time = "2022-02-22 13:38:24";
         Date date = DateUtils.stringToDate(time);
         String json = JSONUtils.toJsonString(date);
+<<<<<<< HEAD
         Assert.assertEquals("\"" + time + "\"", json);
 
         String errorFormatTime = "Tue Feb 22 03:50:00 UTC 2022";
         Assert.assertNull(DateUtils.stringToDate(errorFormatTime));
+=======
+        Assertions.assertEquals("\"" + time + "\"", json);
+
+        String errorFormatTime = "Tue Feb 22 03:50:00 UTC 2022";
+        Assertions.assertNull(DateUtils.stringToDate(errorFormatTime));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -270,7 +384,11 @@ public class JSONUtilsTest {
 
         String json = "\"2022-02-22 13:38:24\"";
         Date date = JSONUtils.parseObject(json, Date.class);
+<<<<<<< HEAD
         Assert.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
+=======
+        Assertions.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     }
 

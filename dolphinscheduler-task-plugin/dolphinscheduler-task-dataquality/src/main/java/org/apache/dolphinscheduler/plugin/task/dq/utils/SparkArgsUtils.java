@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.ProgramType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkConstants;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -104,7 +104,8 @@ public class SparkArgsUtils {
         }
 
         String others = param.getOthers();
-        if (!SPARK_LOCAL.equals(deployMode) && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
+        if (!SPARK_LOCAL.equals(deployMode)
+                && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
             String queue = param.getQueue();
             if (StringUtils.isNotEmpty(queue)) {
                 args.add(SparkConstants.SPARK_QUEUE);

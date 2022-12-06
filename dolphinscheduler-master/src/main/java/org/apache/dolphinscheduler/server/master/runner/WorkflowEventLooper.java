@@ -28,15 +28,20 @@ import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandler;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+<<<<<<< HEAD
+=======
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class WorkflowEventLooper extends BaseDaemonThread {

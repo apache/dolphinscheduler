@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, PropType, toRefs, h, unref } from 'vue'
-import { NSpin, NGrid, NForm, NFormItemGi } from 'naive-ui'
+import { NSpin, NGrid, NForm, NFormItemGi, FormRules } from 'naive-ui'
 import { useForm } from './use-form'
 import type { GridProps, IMeta } from './types'
 
@@ -50,7 +50,7 @@ const Form = defineComponent({
     const { elements = [], ...restFormProps } = meta
     return (
       <NSpin show={loading}>
-        <NForm {...restFormProps} ref='formRef'>
+        <NForm {...restFormProps} rules={meta.rules as FormRules} ref='formRef'>
           <NGrid {...layout}>
             {elements.map((element) => {
               const { span = 24, path, widget, ...formItemProps } = element

@@ -43,7 +43,8 @@ public class DependentTaskChannel implements TaskChannel {
     @Override
     public AbstractParameters parseParameters(ParametersNode parametersNode) {
         return JSONUtils.parseObject(StringUtils.isEmpty(parametersNode.getDependence())
-                ? parametersNode.getTaskParams() : parametersNode.getDependence(), DependentParameters.class);
+                ? parametersNode.getTaskParams()
+                : parametersNode.getDependence(), DependentParameters.class);
     }
 
     @Override

@@ -17,8 +17,17 @@
 
 package org.apache.dolphinscheduler.service.log;
 
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+=======
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -32,8 +41,13 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+=======
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
@@ -59,9 +73,13 @@ public class LogClient implements AutoCloseable {
     private static final long LOG_REQUEST_TIMEOUT = 10 * 1000L;
 
     public LogClient() {
+<<<<<<< HEAD
         NettyClientConfig nettyClientConfig = new NettyClientConfig();
         this.client = new NettyRemotingClient(nettyClientConfig);
         logger.info("Initialized LogClientService with config: {}", nettyClientConfig);
+=======
+        client = NettyRemotingClientFactory.buildNettyRemotingClient();
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     /**
@@ -174,6 +192,7 @@ public class LogClient implements AutoCloseable {
      * remove task log
      *
      * @param host host
+<<<<<<< HEAD
      * @param port port
      * @param path path
      * @return remove task status
@@ -185,6 +204,17 @@ public class LogClient implements AutoCloseable {
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+=======
+     * @param path path
+     * @return remove task status
+     */
+    public Boolean removeTaskLog(@NonNull Host host, String path) {
+        logger.info("Remove task log from host: {} logPath {}", host, path);
+        RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
+        try {
+            Command command = request.convert2Command();
+            Command response = this.client.sendSync(host, command, LOG_REQUEST_TIMEOUT);
+>>>>>>> refs/remotes/origin/3.1.1-release
             if (response != null) {
                 RemoveTaskLogResponseCommand taskLogResponse =
                         JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
@@ -194,15 +224,24 @@ public class LogClient implements AutoCloseable {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             logger.error(
+<<<<<<< HEAD
                     "Remove task log from host: {}, port: {} logPath: {} error, the current thread has been interrupted",
                     host, port, path, ex);
             return false;
         } catch (Exception e) {
             logger.error("Remove task log from host: {}, port: {} logPath: {} error", host, port, path, e);
+=======
+                    "Remove task log from host: {}, logPath: {} error, the current thread has been interrupted",
+                    host, path, ex);
+            return false;
+        } catch (Exception e) {
+            logger.error("Remove task log from host: {},  logPath: {} error", host, path, e);
+>>>>>>> refs/remotes/origin/3.1.1-release
             return false;
         }
     }
 
+<<<<<<< HEAD
     public @Nullable List<String> getAppIds(@NonNull String host, int port,
                                             @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
         logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}", host, port, taskLogFilePath);
@@ -212,6 +251,19 @@ public class LogClient implements AutoCloseable {
             appIds = LogUtils.getAppIdsFromLogFile(taskLogFilePath);
         } else {
             final Command command = new GetAppIdRequestCommand(taskLogFilePath).convert2Command();
+=======
+    public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath,
+                                            @NonNull String taskAppInfoPath) throws RemotingException, InterruptedException {
+        logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", host, port,
+                taskLogFilePath, taskAppInfoPath);
+        final Host workerAddress = new Host(host, port);
+        List<String> appIds = null;
+        if (NetUtils.getHost().equals(host)) {
+            appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath,
+                    PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
+        } else {
+            final Command command = new GetAppIdRequestCommand(taskLogFilePath, taskAppInfoPath).convert2Command();
+>>>>>>> refs/remotes/origin/3.1.1-release
             Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetAppIdResponseCommand responseCommand =
@@ -219,7 +271,12 @@ public class LogClient implements AutoCloseable {
                 appIds = responseCommand.getAppIds();
             }
         }
+<<<<<<< HEAD
         logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}", appIds, host, port, taskLogFilePath);
+=======
+        logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", appIds, host, port,
+                taskLogFilePath, taskAppInfoPath);
+>>>>>>> refs/remotes/origin/3.1.1-release
         return appIds;
     }
 

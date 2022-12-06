@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.google.common.base.Strings;
-import lombok.NonNull;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -34,6 +32,17 @@ import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+<<<<<<< HEAD
+=======
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+
+import lombok.NonNull;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +51,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import javax.annotation.PostConstruct;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.base.Strings;
 
 /**
  * Used to execute {@link WorkflowExecuteRunnable}.
@@ -118,6 +125,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
                 try {
                     logger.error("Workflow instance events handle failed", ex);
+                    notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
                 } finally {
                     LoggerUtils.removeWorkflowInstanceIdMDC();

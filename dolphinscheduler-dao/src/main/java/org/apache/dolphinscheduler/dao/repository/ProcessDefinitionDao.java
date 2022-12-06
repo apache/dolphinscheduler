@@ -18,8 +18,16 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 
+=======
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.model.PageListingResult;
+
+import java.util.List;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import javax.annotation.Nullable;
 
 public interface ProcessDefinitionDao {
@@ -37,4 +45,13 @@ public interface ProcessDefinitionDao {
                                                                   int userId,
                                                                   long projectCode);
 
+<<<<<<< HEAD
+=======
+    /**
+     * query process definitions by definition codes and versions
+     * @param processInstances process instances where codes and version come from
+     * @return
+     */
+    List<ProcessDefinition> queryProcessDefinitionsByCodesAndVersions(List<ProcessInstance> processInstances);
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

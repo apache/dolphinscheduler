@@ -20,6 +20,14 @@
       "replacement": "https://dolphinscheduler.apache.org/zh-cn/download/download.html"
     }
   ],
+  "httpHeaders": [
+    {
+      "urls": ["https://docs.github.com/"],
+      "headers": {
+        "Accept-Encoding": "zstd, br, gzip, deflate"
+      }
+    }
+  ],
   "timeout": "10s",
   "retryOn429": true,
   "retryCount": 10,

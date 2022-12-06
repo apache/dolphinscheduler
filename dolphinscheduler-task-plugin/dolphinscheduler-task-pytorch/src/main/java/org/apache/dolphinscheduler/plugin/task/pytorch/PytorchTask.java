@@ -46,8 +46,8 @@ public class PytorchTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext,
-            logger);
+                taskExecutionContext,
+                logger);
     }
 
     @Override
@@ -88,7 +88,10 @@ public class PytorchTask extends AbstractTask {
     public void cancel() throws TaskException {
 
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     public String buildPythonExecuteCommand() throws Exception {
         List<String> args = new ArrayList<>();
@@ -112,7 +115,8 @@ public class PytorchTask extends AbstractTask {
 
         String scriptParams = pytorchParameters.getScriptParams();
         if (scriptParams != null && !scriptParams.isEmpty()) {
-            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(), pytorchParameters.getScriptParams()));
+            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(),
+                    pytorchParameters.getScriptParams()));
         } else {
             args.add(String.format("%s %s", getPythonCommand(), pytorchParameters.getScriptPath()));
 
@@ -133,10 +137,8 @@ public class PytorchTask extends AbstractTask {
 
     }
 
-
     @Override
     public AbstractParameters getParameters() {
         return pytorchParameters;
     }
 }
-

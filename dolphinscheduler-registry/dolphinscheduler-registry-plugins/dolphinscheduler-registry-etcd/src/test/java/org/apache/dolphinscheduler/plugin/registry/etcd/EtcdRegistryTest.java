@@ -27,17 +27,25 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+<<<<<<< HEAD
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+=======
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.etcd.jetcd.test.EtcdClusterExtension;
 
 public class EtcdRegistryTest {
+<<<<<<< HEAD
     private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
 
     @RegisterExtension
@@ -49,6 +57,19 @@ public class EtcdRegistryTest {
 
     @BeforeClass
     public static void before() throws Exception {
+=======
+
+    private static final Logger logger = LoggerFactory.getLogger(EtcdRegistryTest.class);
+
+    public static EtcdRegistry registry;
+
+    @BeforeAll
+    public static void before() throws Exception {
+        EtcdClusterExtension server = EtcdClusterExtension.builder()
+                .withNodes(1)
+                .withImage("ibmcom/etcd:3.2.24")
+                .build();
+>>>>>>> refs/remotes/origin/3.1.1-release
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
         server.restart();
         properties.setEndpoints(String.valueOf(server.clientEndpoints().get(0)));
@@ -60,12 +81,21 @@ public class EtcdRegistryTest {
     public void persistTest() {
         registry.put("/nodes/m1", "", false);
         registry.put("/nodes/m2", "", false);
+<<<<<<< HEAD
         Assert.assertEquals(Arrays.asList("m1", "m2"), registry.children("/nodes"));
         Assert.assertTrue(registry.exists("/nodes/m1"));
         registry.delete("/nodes/m2");
         Assert.assertFalse(registry.exists("/nodes/m2"));
         registry.delete("/nodes");
         Assert.assertFalse(registry.exists("/nodes/m1"));
+=======
+        Assertions.assertEquals(Arrays.asList("m1", "m2"), registry.children("/nodes"));
+        Assertions.assertTrue(registry.exists("/nodes/m1"));
+        registry.delete("/nodes/m2");
+        Assertions.assertFalse(registry.exists("/nodes/m2"));
+        registry.delete("/nodes");
+        Assertions.assertFalse(registry.exists("/nodes/m1"));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -76,7 +106,12 @@ public class EtcdRegistryTest {
         new Thread(() -> {
             registry.acquireLock("/lock");
             preCountDownLatch.countDown();
+<<<<<<< HEAD
             logger.info(Thread.currentThread().getName() + " :I got the lock, but I don't want to work. I want to rest for a while");
+=======
+            logger.info(Thread.currentThread().getName()
+                    + " :I got the lock, but I don't want to work. I want to rest for a while");
+>>>>>>> refs/remotes/origin/3.1.1-release
             try {
                 Thread.sleep(1000);
                 logger.info(Thread.currentThread().getName() + " :I'm going to start working");
@@ -91,7 +126,11 @@ public class EtcdRegistryTest {
             }
         }).start();
         try {
+<<<<<<< HEAD
             preCountDownLatch.await(5,TimeUnit.SECONDS);
+=======
+            preCountDownLatch.await(5, TimeUnit.SECONDS);
+>>>>>>> refs/remotes/origin/3.1.1-release
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +152,11 @@ public class EtcdRegistryTest {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+<<<<<<< HEAD
         Assert.assertEquals(testData, Arrays.asList("thread1", "thread2"));
+=======
+        Assertions.assertEquals(testData, Arrays.asList("thread1", "thread2"));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -124,18 +167,30 @@ public class EtcdRegistryTest {
         registry.put("/sub/m2", "tt", false);
         registry.delete("/sub/m2");
         registry.delete("/sub");
+<<<<<<< HEAD
         Assert.assertTrue(status);
+=======
+        Assertions.assertTrue(status);
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     }
 
     static class TestListener implements SubscribeListener {
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
         @Override
         public void notify(Event event) {
             logger.info("I'm test listener");
         }
     }
 
+<<<<<<< HEAD
     @AfterClass
+=======
+    @AfterAll
+>>>>>>> refs/remotes/origin/3.1.1-release
     public static void after() throws IOException {
         registry.close();
     }

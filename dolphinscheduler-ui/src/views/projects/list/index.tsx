@@ -20,7 +20,6 @@ import {
   NButton,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -34,6 +33,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'
+import Search from "@/components/input-search";
 import ProjectModal from './components/project-modal'
 
 const list = defineComponent({
@@ -121,6 +121,7 @@ const list = defineComponent({
               {t('project.list.create_project')}
             </NButton>
             <NSpace>
+<<<<<<< HEAD
               <NInput
                 allowInput={this.trim}
                 size='small'
@@ -128,7 +129,15 @@ const list = defineComponent({
                 placeholder={t('project.list.project_tips')}
                 clearable
                 onClear={this.onClearSearch}
+=======
+              <Search
+                  v-model:value = {this.searchVal}
+                  placeholder={t('project.list.project_tips')}
+                  onSearch={this.handleSearch}
+                  onClear={this.onClearSearch}
+>>>>>>> refs/remotes/origin/3.1.1-release
               />
+
               <NButton size='small' type='primary' onClick={this.handleSearch}>
                 <NIcon>
                   <SearchOutlined />

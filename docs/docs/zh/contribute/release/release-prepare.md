@@ -23,11 +23,14 @@
   - `deploy/kubernetes/dolphinscheduler`:
     - `Chart.yaml`: `appVersion` 版本更新为 x.y.z (`version` 为 helm chart 版本, 增量更新但不要设置为 x.y.z)
     - `values.yaml`: `image.tag` 版本更新为 x.y.z
-  - `dolphinscheduler-python/pydolphinscheduler/setup.py`: 修改其中的 `version` 为 x.y.z
 - 修改文档（docs模块）中的版本号:
   - 将 `docs` 文件夹下文件的占位符 `<version>` (除了 pom.xml 相关的) 修改成 `x.y.z`
   - 新增历史版本
     - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的历史版本为 `x.y.z`
   - 修改文档 sidebar
+<<<<<<< HEAD
     - `docs/configs/docsdev.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`
+=======
+    - `docs/configs/docsdev.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`，**不要**修改文件名称，website 仓库的 shell 脚本会对他进行修改
+>>>>>>> refs/remotes/origin/3.1.1-release
 

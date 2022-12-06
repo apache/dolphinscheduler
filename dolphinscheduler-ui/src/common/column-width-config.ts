@@ -95,6 +95,12 @@ export const COLUMN_WIDTH_CONFIG = {
   tag: {
     width: 160
   },
+<<<<<<< HEAD
+=======
+  checkbox:{
+    width: 20
+  },
+>>>>>>> refs/remotes/origin/3.1.1-release
   copy: {
     width: 50
   }

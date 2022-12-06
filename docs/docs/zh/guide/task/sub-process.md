@@ -12,7 +12,14 @@
 
 ## 任务参数
 
+<<<<<<< HEAD
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 | **任务参数** |                 **描述**                 |
 |----------|----------------------------------------|
@@ -30,7 +37,7 @@
 
 ### 创建 sub_process 任务
 
-在使用 sub_process 的过程中，需要创建所需的子结点任务，也就是我们第一步所创建的 shell 任务。然后如下图所示，在 ⑤ 的位置选择对应的子结点即可。
+在使用 sub_process 的过程中，需要创建所需的子结点任务，也就是我们第一步所创建的 test_dag01 工作流。然后如下图所示，在 ⑤ 的位置选择对应的子结点即可。
 
 ![subprocess_task02](../../../../img/tasks/demo/subprocess_task02.png)
 

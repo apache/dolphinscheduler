@@ -35,7 +35,8 @@ public class SeatunnelTaskChannel implements TaskChannel {
 
     @Override
     public SeatunnelTask createTask(TaskExecutionContext taskRequest) {
-        SeatunnelParameters seatunnelParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SeatunnelParameters.class);
+        SeatunnelParameters seatunnelParameters =
+                JSONUtils.parseObject(taskRequest.getTaskParams(), SeatunnelParameters.class);
         if (EngineEnum.FLINK == seatunnelParameters.getEngine()) {
             return new SeatunnelFlinkTask(taskRequest);
         } else if (EngineEnum.SPARK == seatunnelParameters.getEngine()) {

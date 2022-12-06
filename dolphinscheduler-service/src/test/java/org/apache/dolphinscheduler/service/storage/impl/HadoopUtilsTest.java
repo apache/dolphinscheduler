@@ -17,48 +17,71 @@
 
 package org.apache.dolphinscheduler.service.storage.impl;
 
+import org.apache.dolphinscheduler.common.utils.HttpUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * hadoop utils test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {HadoopUtils.class})
-@SuppressStaticInitializationFor("org.apache.dolphinscheduler.common.utils.HttpUtils")
+@ExtendWith(MockitoExtension.class)
 public class HadoopUtilsTest {
+
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtilsTest.class);
 
     @Test
     public void getHdfsTenantDir() {
         logger.info(HadoopUtils.getHdfsTenantDir("1234"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsUdfFileName() {
         logger.info(HadoopUtils.getHdfsUdfFileName("admin", "file_name"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsResourceFileName() {
         logger.info(HadoopUtils.getHdfsResourceFileName("admin", "file_name"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsFileName() {
         logger.info(HadoopUtils.getHdfsFileName(ResourceType.FILE, "admin", "file_name"));
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
+    }
+
+<<<<<<< HEAD
+}
+=======
+    @Test
+    public void getAppAddress() {
+        try (MockedStatic<HttpUtils> mockedHttpUtils = Mockito.mockStatic(HttpUtils.class)) {
+            mockedHttpUtils.when(() -> HttpUtils.get("http://ds1:8088/ws/v1/cluster/info"))
+                    .thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
+            logger.info(HadoopUtils.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
+            Assertions.assertTrue(true);
+        }
     }
 
 }
+>>>>>>> refs/remotes/origin/3.1.1-release

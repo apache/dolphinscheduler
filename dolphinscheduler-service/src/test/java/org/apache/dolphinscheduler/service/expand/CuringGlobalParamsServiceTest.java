@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -24,14 +23,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,7 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
 public class CuringGlobalParamsServiceTest {
 
     private static final String placeHolderName = "$[yyyy-MM-dd-1]";
@@ -58,62 +58,69 @@ public class CuringGlobalParamsServiceTest {
 
     private final Map<String, String> globalParamMap = new HashMap<>();
 
-    @Before
+    @BeforeEach
     public void init() {
         globalParamMap.put("globalParams1", "Params1");
     }
 
     @Test
     public void testConvertParameterPlaceholders() {
-        Mockito.when(curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, globalParamMap)).thenReturn("2022-06-26");
+        Mockito.when(curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, globalParamMap))
+                .thenReturn("2022-06-26");
         String result = curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, globalParamMap);
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
     @Test
     public void testTimeFunctionNeedExpand() {
         boolean result = curingGlobalParamsService.timeFunctionNeedExpand(placeHolderName);
-        Assert.assertFalse(result);
+        Assertions.assertFalse(result);
     }
 
     @Test
     public void testTimeFunctionExtension() {
         String result = curingGlobalParamsService.timeFunctionExtension(1, "", placeHolderName);
-        Assert.assertNull(result);
+        Assertions.assertNull(result);
     }
 
     @Test
     public void testCuringGlobalParams() {
-        //define globalMap
+        // define globalMap
         Map<String, String> globalParamMap = new HashMap<>();
         globalParamMap.put("globalParams1", "Params1");
 
-        //define globalParamList
+        // define globalParamList
         List<Property> globalParamList = new ArrayList<>();
 
-        //define scheduleTime
+        // define scheduleTime
         Date scheduleTime = DateUtils.stringToDate("2019-12-20 00:00:00");
 
-        //test globalParamList is null
-        String result = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assert.assertNull(result);
-        Assert.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, null, CommandType.START_CURRENT_TASK_PROCESS, null, null));
-        Assert.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, null, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null));
+        // test globalParamList is null
+        String result = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+        Assertions.assertNull(result);
+        Assertions.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, null,
+                CommandType.START_CURRENT_TASK_PROCESS, null, null));
+        Assertions.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, null,
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null));
 
-        //test globalParamList is not null
+        // test globalParamList is not null
         Property property = new Property("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
         globalParamList.add(property);
 
-        String result2 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assert.assertEquals(result2, JSONUtils.toJsonString(globalParamList));
+        String result2 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, globalParamList,
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+        Assertions.assertEquals(result2, JSONUtils.toJsonString(globalParamList));
 
-        String result3 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, null, null);
-        Assert.assertEquals(result3, JSONUtils.toJsonString(globalParamList));
+        String result3 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
+                CommandType.START_CURRENT_TASK_PROCESS, null, null);
+        Assertions.assertEquals(result3, JSONUtils.toJsonString(globalParamList));
 
-        String result4 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assert.assertEquals(result4, JSONUtils.toJsonString(globalParamList));
+        String result4 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+        Assertions.assertEquals(result4, JSONUtils.toJsonString(globalParamList));
 
-        //test var $ startsWith
+        // test var $ startsWith
         globalParamMap.put("bizDate", "${system.biz.date}");
         globalParamMap.put("b1zCurdate", "${system.biz.curdate}");
 
@@ -125,12 +132,14 @@ public class CuringGlobalParamsServiceTest {
         globalParamList.add(property3);
         globalParamList.add(property4);
 
-        String result5 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assert.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
+        String result5 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+        Assertions.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
 
         Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
         globalParamList.add(testStartParamProperty);
-        Property testStartParam2Property = new Property("testStartParam2", Direct.IN, DataType.VARCHAR, "$[yyyy-MM-dd+1]");
+        Property testStartParam2Property =
+                new Property("testStartParam2", Direct.IN, DataType.VARCHAR, "$[yyyy-MM-dd+1]");
         globalParamList.add(testStartParam2Property);
         globalParamMap.put("testStartParam", "");
         globalParamMap.put("testStartParam2", "$[yyyy-MM-dd+1]");
@@ -145,7 +154,8 @@ public class CuringGlobalParamsServiceTest {
             }
         }
 
-        String result6 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assert.assertTrue(result6.contains("20191220"));
+        String result6 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+        Assertions.assertTrue(result6.contains("20191220"));
     }
 }

@@ -67,10 +67,8 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String buildCommandFilePath() {
         // command file
-        return String.format("%s/%s.%s"
-                , taskRequest.getExecutePath()
-                , taskRequest.getTaskAppId()
-                , SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
+        return String.format("%s/%s.%s", taskRequest.getExecutePath(), taskRequest.getTaskAppId(),
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "command");
     }
 
     /**
@@ -89,6 +87,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         if (Files.exists(commandFilePath)) {
             logger.warn("The command file: {} is already exist, will not create a again", commandFile);
             return;
+<<<<<<< HEAD
         }
 
         StringBuilder sb = new StringBuilder();
@@ -114,6 +113,25 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
                 }
             }
         }
+=======
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            sb.append("@echo off").append(System.lineSeparator());
+            sb.append("cd /d %~dp0").append(System.lineSeparator());
+            if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
+            }
+        } else {
+            sb.append("#!/bin/bash").append(System.lineSeparator());
+            sb.append("BASEDIR=$(cd `dirname $0`; pwd)").append(System.lineSeparator());
+            sb.append("cd $BASEDIR").append(System.lineSeparator());
+            if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
+            }
+        }
+>>>>>>> refs/remotes/origin/3.1.1-release
         sb.append(execCommand);
         String commandContent = sb.toString();
 

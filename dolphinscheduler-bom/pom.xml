@@ -29,7 +29,7 @@
     <properties>
         <netty.version>4.1.53.Final</netty.version>
         <spring-boot.version>2.7.3</spring-boot.version>
-        <spring.version>5.3.19</spring.version>
+        <spring-ldap.version>2.4.1</spring-ldap.version>
         <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
@@ -69,21 +69,24 @@
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
-        <clickhouse-jdbc.version>0.1.52</clickhouse-jdbc.version>
+        <clickhouse-jdbc.version>0.3.2-patch11</clickhouse-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
         <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
-        <springfox.version>3.0.0</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
-        <reflections.version>0.9.12</reflections.version>
+        <reflections.version>0.10.2</reflections.version>
         <py4j.version>0.10.9</py4j.version>
         <jsr305.version>3.0.0</jsr305.version>
         <commons-compress.version>1.21</commons-compress.version>
         <commons-math3.version>3.1.1</commons-math3.version>
         <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <hibernate-validator.version>6.2.2.Final</hibernate-validator.version>
+<<<<<<< HEAD
         <aws-sdk.version>1.12.160</aws-sdk.version>
+=======
+        <aws-sdk.version>1.12.300</aws-sdk.version>
+>>>>>>> refs/remotes/origin/3.1.1-release
         <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
         <joda-time.version>2.10.13</joda-time.version>
         <okhttp.version>3.14.9</okhttp.version>
@@ -94,12 +97,34 @@
         <snappy.version>1.1.8.4</snappy.version>
         <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
+<<<<<<< HEAD
         <snakeyaml.version>1.31</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
+=======
+        <snakeyaml.version>1.33</snakeyaml.version>
+        <htrace.version>4.1.1</htrace.version>
+        <datasync.version>2.17.282</datasync.version>
+        <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
+        <aspectj.version>1.9.7</aspectj.version>
+        <zt-zip.version>1.15</zt-zip.version>
+        <trino-jdbc.version>402</trino-jdbc.version>
+>>>>>>> refs/remotes/origin/3.1.1-release
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- aspectj -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+
             <!-- netty -->
             <dependency>
                 <groupId>io.netty</groupId>
@@ -124,33 +149,7 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-tx</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>${spring.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -186,6 +185,12 @@
                 <groupId>com.cronutils</groupId>
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -479,6 +484,24 @@
                 <artifactId>hadoop-yarn-common</artifactId>
                 <version>${hadoop.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-client</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.htrace</groupId>
+                <artifactId>htrace-core4</artifactId>
+                <scope>provided</scope>
+                <!-- set to provided to exclude from all hadoop-* transitive dependencies -->
+            </dependency>
+
+            <!-- replace htrace-core with hbase-noop-htrace for CVE -->
+            <dependency>
+                <groupId>org.apache.hbase.thirdparty</groupId>
+                <artifactId>hbase-noop-htrace</artifactId>
+                <version>${htrace.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.htrace</groupId>
@@ -551,7 +574,7 @@
             </dependency>
 
             <dependency>
-                <groupId>ru.yandex.clickhouse</groupId>
+                <groupId>com.clickhouse</groupId>
                 <artifactId>clickhouse-jdbc</artifactId>
                 <version>${clickhouse-jdbc.version}</version>
             </dependency>
@@ -578,11 +601,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${javax.servlet-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
-                <version>${springfox.version}</version>
             </dependency>
 
             <dependency>
@@ -643,12 +661,35 @@
                 <version>${aws-sdk.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-sagemaker</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-dms</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun-sdk-oss.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
             </dependency>
 
             <dependency>
+<<<<<<< HEAD
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-sdk.version}</version>
@@ -667,6 +708,8 @@
             </dependency>
 
             <dependency>
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
@@ -681,26 +724,27 @@
             </dependency>
 
             <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>3.12.4</version>
-                <!-- TODO: remove this dependency management after removing powermock -->
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.lz4</groupId>
                 <artifactId>lz4-java</artifactId>
                 <version>${lz4-java.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-ldap</artifactId>
-                <version>1.1.2</version>
+                <groupId>org.springframework.ldap</groupId>
+                <artifactId>spring-ldap-core</artifactId>
+                <version>${spring-ldap.version}</version>
             </dependency>
 
             <dependency>
+<<<<<<< HEAD
+=======
+                <groupId>io.trino</groupId>
+                <artifactId>trino-jdbc</artifactId>
+                <version>${trino-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+>>>>>>> refs/remotes/origin/3.1.1-release
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>
@@ -769,6 +813,28 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
             </dependency>
+<<<<<<< HEAD
+=======
+            <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/datasync -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>datasync</artifactId>
+                <version>${datasync.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi-ui.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-zip</artifactId>
+                <version>${zt-zip.version}</version>
+            </dependency>
+
+>>>>>>> refs/remotes/origin/3.1.1-release
         </dependencies>
     </dependencyManagement>
 </project>

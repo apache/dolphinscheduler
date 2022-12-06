@@ -27,10 +27,29 @@ type IDataBase =
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'
+<<<<<<< HEAD
+=======
+  | 'TRINO'
+
+type IDataBaseLabel =
+| 'MYSQL'
+| 'POSTGRESQL'
+| 'HIVE'
+| 'SPARK'
+| 'CLICKHOUSE'
+| 'ORACLE'
+| 'SQLSERVER'
+| 'DB2'
+| 'PRESTO'
+| 'REDSHIFT'
+| 'ATHENA'
+| 'TRINO'
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 interface IDataSource {
   id?: number
   type?: IDataBase
+  label?: IDataBaseLabel
   name?: string
   note?: string
   host?: string
@@ -45,6 +64,8 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
+  testFlag?: number
+  bindTestId?: number
 }
 
 interface ListReq {

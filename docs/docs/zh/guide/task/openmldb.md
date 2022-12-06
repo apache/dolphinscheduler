@@ -13,8 +13,16 @@ OpenMLDB任务组件可以连接OpenMLDB集群执行任务。
 
 ## 任务样例
 
+<<<<<<< HEAD
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
 
+=======
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 |  **任务参数**   |                      **描述**                      |
 |-------------|--------------------------------------------------|
 | zookeeper地址 | OpenMLDB集群连接地址中的zookeeper地址, e.g. 127.0.0.1:2181 |

@@ -129,8 +129,12 @@ public class ServerNodeManager implements InitializingBean {
 
         // load nodes from zookeeper
         updateMasterNodes();
+<<<<<<< HEAD
         updateWorkerNodes();
         updateWorkerGroupMappings();
+=======
+        refreshWorkerNodesAndGroupMappings();
+>>>>>>> refs/remotes/origin/3.1.1-release
 
         // init executor service
         executorService =
@@ -155,15 +159,20 @@ public class ServerNodeManager implements InitializingBean {
             try {
 
                 // sync worker node info
+<<<<<<< HEAD
                 updateWorkerNodes();
                 updateWorkerGroupMappings();
                 notifyWorkerInfoChangeListeners();
+=======
+                refreshWorkerNodesAndGroupMappings();
+>>>>>>> refs/remotes/origin/3.1.1-release
             } catch (Exception e) {
                 logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
     }
 
+<<<<<<< HEAD
     protected Set<String> getWorkerAddressByWorkerGroup(Map<String, String> newWorkerNodeInfo,
                                                         WorkerGroup wg) {
         Set<String> nodes = new HashSet<>();
@@ -174,6 +183,15 @@ public class ServerNodeManager implements InitializingBean {
             }
         }
         return nodes;
+=======
+    /**
+     * Refresh worker nodes and worker group mapping information
+     */
+    private void refreshWorkerNodesAndGroupMappings() {
+        updateWorkerNodes();
+        updateWorkerGroupMappings();
+        notifyWorkerInfoChangeListeners();
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     /**
@@ -204,7 +222,15 @@ public class ServerNodeManager implements InitializingBean {
                 } catch (Exception ex) {
                     logger.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
+            }
+        }
 
+        private void syncSingleWorkerNodeInfo(String workerAddress, WorkerHeartBeat info) {
+            workerNodeInfoWriteLock.lock();
+            try {
+                workerNodeInfo.put(workerAddress, info);
+            } finally {
+                workerNodeInfoWriteLock.unlock();
             }
         }
     }
@@ -241,8 +267,8 @@ public class ServerNodeManager implements InitializingBean {
         try {
             registryClient.getLock(nodeLock);
             Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
-            List<Server> masterNodes = registryClient.getServerList(NodeType.MASTER);
-            syncMasterNodes(currentNodes, masterNodes);
+            List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
+            syncMasterNodes(currentNodes, masterNodeList);
         } catch (Exception e) {
             logger.error("update master nodes error", e);
         } finally {
@@ -289,7 +315,10 @@ public class ServerNodeManager implements InitializingBean {
         try {
             workerGroupNodes.clear();
             workerGroupNodes.putAll(tmpWorkerGroupMappings);
+<<<<<<< HEAD
             notifyWorkerInfoChangeListeners();
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
         } finally {
             workerGroupWriteLock.unlock();
         }
@@ -363,6 +392,7 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
+<<<<<<< HEAD
     private void syncSingleWorkerNodeInfo(String workerAddress, WorkerHeartBeat info) {
         workerNodeInfoWriteLock.lock();
         try {
@@ -372,6 +402,8 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
     /**
      * Add the resource change listener, when the resource changed, the listener will be notified.
      *
@@ -382,10 +414,10 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void notifyWorkerInfoChangeListeners() {
-        Map<String, Set<String>> workerGroupNodes = getWorkerGroupNodes();
-        Map<String, WorkerHeartBeat> workerNodeInfo = getWorkerNodeInfo();
+        Map<String, Set<String>> workerGroupNodeMap = getWorkerGroupNodes();
+        Map<String, WorkerHeartBeat> workerNodeInfoMap = getWorkerNodeInfo();
         for (WorkerInfoChangeListener listener : workerInfoChangeListeners) {
-            listener.notify(workerGroupNodes, workerNodeInfo);
+            listener.notify(workerGroupNodeMap, workerNodeInfoMap);
         }
     }
 

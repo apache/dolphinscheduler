@@ -17,14 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
+<<<<<<< HEAD
 import org.apache.commons.lang3.SystemUtils;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -33,15 +39,23 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+<<<<<<< HEAD
+=======
+
+import org.apache.commons.lang3.SystemUtils;
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
+<<<<<<< HEAD
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 /**
  * shell task
@@ -140,7 +154,7 @@ public class ShellTask extends AbstractTask {
             return fileName;
         }
 
-        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = shellParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         shellParameters.setRawScript(script);
 

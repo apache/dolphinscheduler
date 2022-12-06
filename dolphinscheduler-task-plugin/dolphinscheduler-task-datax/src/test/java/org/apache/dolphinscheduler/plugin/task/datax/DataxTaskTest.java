@@ -56,7 +56,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+<<<<<<< HEAD
 import org.junit.jupiter.api.Disabled;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
@@ -200,7 +203,10 @@ public class DataxTaskTest {
     }
 
     @Test
+<<<<<<< HEAD
     @Disabled
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
     public void testTryExecuteSqlResolveColumnNames() throws Exception {
         BaseConnectionParam baseConnectionParam = mock(BaseConnectionParam.class);
         try (

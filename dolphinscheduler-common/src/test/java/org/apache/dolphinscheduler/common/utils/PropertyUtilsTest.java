@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+<<<<<<< HEAD
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -24,15 +25,26 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.junit.Assert;
 import org.junit.Test;
 
+=======
+import org.apache.dolphinscheduler.common.constants.Constants;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 public class PropertyUtilsTest {
 
     @Test
     public void getString() {
-        assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
+        Assertions.assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
     }
 
     @Test
     public void getResUploadStartupState() {
+<<<<<<< HEAD
         Assert.assertFalse(PropertyUtils.getResUploadStartupState());
+=======
+        Assertions.assertFalse(PropertyUtils.getResUploadStartupState());
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 }

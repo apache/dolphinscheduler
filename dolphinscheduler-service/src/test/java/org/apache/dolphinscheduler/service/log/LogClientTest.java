@@ -25,11 +25,16 @@ import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
+<<<<<<< HEAD
+=======
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.nio.charset.StandardCharsets;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Test.None;
@@ -41,10 +46,21 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LogClient.class, NetUtils.class, LoggerUtils.class, NettyRemotingClient.class})
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+>>>>>>> refs/remotes/origin/3.1.1-release
 public class LogClientTest {
 
     @Test
     public void testViewLogFromLocal() {
+<<<<<<< HEAD
 //        String localMachine = "LOCAL_MACHINE";
 //        int port = 1234;
 //        String path = "/tmp/log";
@@ -57,10 +73,28 @@ public class LogClientTest {
 //        LogClient logClient = new LogClient();
 //        String log = logClient.viewLog(localMachine, port, path);
 //        Assert.assertNotNull(log);
+=======
+        String localMachine = "LOCAL_MACHINE";
+        int port = 1234;
+        String path = "/tmp/log";
+
+        try (
+                MockedStatic<NetUtils> mockedNetUtils = Mockito.mockStatic(NetUtils.class);
+                MockedStatic<LoggerUtils> mockedLoggerUtils = Mockito.mockStatic(LoggerUtils.class)) {
+            mockedNetUtils.when(NetUtils::getHost)
+                    .thenReturn(localMachine);
+            mockedLoggerUtils.when(() -> LoggerUtils.readWholeFileContent(Mockito.anyString()))
+                    .thenReturn("application_xx_11");
+            LogClient logClient = new LogClient();
+            String log = logClient.viewLog(localMachine, port, path);
+            Assertions.assertNotNull(log);
+        }
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testViewLogFromRemote() throws Exception {
+<<<<<<< HEAD
 //        String localMachine = "127.0.0.1";
 //        int port = 1234;
 //        String path = "/tmp/log";
@@ -88,10 +122,43 @@ public class LogClientTest {
 
         LogClient logClient = new LogClient();
         logClient.close();
+=======
+        String localMachine = "127.0.0.1";
+        int port = 1234;
+        String path = "/tmp/log";
+
+        try (MockedStatic<NetUtils> mockedNetUtils = Mockito.mockStatic(NetUtils.class)) {
+            mockedNetUtils.when(NetUtils::getHost)
+                    .thenReturn(localMachine + "1");
+            LogClient logClient = new LogClient();
+            String log = logClient.viewLog(localMachine, port, path);
+            Assertions.assertNotNull(log);
+        }
+
+        Command command = new Command();
+        command.setBody(JSONUtils.toJsonString(new ViewLogResponseCommand("")).getBytes(StandardCharsets.UTF_8));
+        LogClient logClient = new LogClient();
+        String log = logClient.viewLog(localMachine, port, path);
+        Assertions.assertNotNull(log);
+    }
+
+    @Test
+    public void testClose() {
+        try (
+                MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory =
+                        Mockito.mockStatic(NettyRemotingClientFactory.class)) {
+            NettyRemotingClient remotingClient = Mockito.mock(NettyRemotingClient.class);
+            mockedNettyRemotingClientFactory.when(NettyRemotingClientFactory::buildNettyRemotingClient)
+                    .thenReturn(remotingClient);
+            LogClient logClient = new LogClient();
+            logClient.close();
+        }
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testRollViewLog() throws Exception {
+<<<<<<< HEAD
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
         PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
@@ -103,10 +170,29 @@ public class LogClientTest {
         LogClient logClient = new LogClient();
         String msg = logClient.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
         Assert.assertNotNull(msg);
+=======
+        try (
+                MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory =
+                        Mockito.mockStatic(NettyRemotingClientFactory.class)) {
+            NettyRemotingClient remotingClient = Mockito.mock(NettyRemotingClient.class);
+            mockedNettyRemotingClientFactory.when(NettyRemotingClientFactory::buildNettyRemotingClient)
+                    .thenReturn(remotingClient);
+            Command command = new Command();
+            command.setBody(JSONUtils.toJsonByteArray(new RollViewLogResponseCommand("success")));
+            Mockito.when(
+                    remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+                    .thenReturn(command);
+
+            LogClient logClient = new LogClient();
+            String msg = logClient.rollViewLog("localhost", 1234, "/tmp/log", 0, 10);
+            Assertions.assertNotNull(msg);
+        }
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testGetLogBytes() throws Exception {
+<<<<<<< HEAD
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
         PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
@@ -118,10 +204,30 @@ public class LogClientTest {
         LogClient logClient = new LogClient();
         byte[] logBytes = logClient.getLogBytes("localhost", 1234, "/tmp/log");
         Assert.assertNotNull(logBytes);
+=======
+        try (
+                MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory =
+                        Mockito.mockStatic(NettyRemotingClientFactory.class)) {
+            NettyRemotingClient remotingClient = Mockito.mock(NettyRemotingClient.class);
+            mockedNettyRemotingClientFactory.when(NettyRemotingClientFactory::buildNettyRemotingClient)
+                    .thenReturn(remotingClient);
+            Command command = new Command();
+            command.setBody(
+                    JSONUtils.toJsonByteArray(new GetLogBytesResponseCommand("log".getBytes(StandardCharsets.UTF_8))));
+            Mockito.when(
+                    remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+                    .thenReturn(command);
+
+            LogClient logClient = new LogClient();
+            byte[] logBytes = logClient.getLogBytes("localhost", 1234, "/tmp/log");
+            Assertions.assertNotNull(logBytes);
+        }
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testRemoveTaskLog() throws Exception {
+<<<<<<< HEAD
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
         PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);
 
@@ -135,4 +241,24 @@ public class LogClientTest {
         Assert.assertTrue(status);
     }
 
+=======
+
+        try (
+                MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory =
+                        Mockito.mockStatic(NettyRemotingClientFactory.class)) {
+            NettyRemotingClient remotingClient = Mockito.mock(NettyRemotingClient.class);
+            mockedNettyRemotingClientFactory.when(NettyRemotingClientFactory::buildNettyRemotingClient)
+                    .thenReturn(remotingClient);
+            Command command = new Command();
+            command.setBody(JSONUtils.toJsonByteArray(new RemoveTaskLogResponseCommand(true)));
+            Mockito.when(
+                    remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
+                    .thenReturn(command);
+
+            LogClient logClient = new LogClient();
+            Boolean status = logClient.removeTaskLog(Host.of("localhost:1234"), "/log/path");
+            Assertions.assertTrue(status);
+        }
+    }
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

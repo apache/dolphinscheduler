@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-import { omit, cloneDeep } from 'lodash'
+import { omit } from 'lodash'
 import type {
   INodeData,
   ITaskData,
   ITaskParams,
   ISqoopTargetParams,
   ISqoopSourceParams,
-  ILocalParam,
-  IDependTask
+  ILocalParam
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -35,6 +34,17 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SUB_PROCESS') {
     taskParams.processDefinitionCode = data.processDefinitionCode
   }
+
+  if (data.taskType === 'JAVA') {
+    taskParams.runType = data.runType
+    taskParams.mainArgs = data.mainArgs
+    taskParams.jvmArgs = data.jvmArgs
+    taskParams.isModulePath = data.isModulePath
+    if (data.runType === 'JAR' && data.mainJar) {
+      taskParams.mainJar = { resourceName: data.mainJar }
+    }
+  }
+
   if (
     data.taskType &&
     ['SPARK', 'MR', 'FLINK', 'FLINK_STREAM'].includes(data.taskType)
@@ -42,7 +52,7 @@ export function formatParams(data: INodeData): {
     taskParams.programType = data.programType
     taskParams.mainClass = data.mainClass
     if (data.mainJar) {
-      taskParams.mainJar = { id: data.mainJar }
+      taskParams.mainJar = { resourceName: data.mainJar }
     }
     taskParams.deployMode = data.deployMode
     taskParams.appName = data.appName
@@ -51,7 +61,6 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SPARK') {
-    taskParams.sparkVersion = data.sparkVersion
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
     taskParams.numExecutors = data.numExecutors
@@ -179,7 +188,6 @@ export function formatParams(data: INodeData): {
     taskParams.sqlType = data.sqlType
     taskParams.preStatements = data.preStatements
     taskParams.postStatements = data.postStatements
-    taskParams.segmentSeparator = data.segmentSeparator
     taskParams.sendEmail = data.sendEmail
     taskParams.displayRows = data.displayRows
     if (data.sqlType === '0' && data.sendEmail) {
@@ -261,21 +269,9 @@ export function formatParams(data: INodeData): {
     taskParams.xmx = data.xmx
   }
   if (data.taskType === 'DEPENDENT') {
-    const dependTaskList = cloneDeep(data.dependTaskList)?.map(
-      (taskItem: IDependTask) => {
-        if (taskItem.dependItemList?.length) {
-          taskItem.dependItemList.forEach((dependItem) => {
-            delete dependItem.definitionCodeOptions
-            delete dependItem.depTaskCodeOptions
-            delete dependItem.dateOptions
-          })
-        }
-        return taskItem
-      }
-    )
     taskParams.dependence = {
       relation: data.relation,
-      dependTaskList: dependTaskList
+      dependTaskList: data.dependTaskList
     }
   }
   if (data.taskType === 'DATA_QUALITY') {
@@ -338,6 +334,7 @@ export function formatParams(data: INodeData): {
     taskParams.minCpuCores = data.minCpuCores
     taskParams.minMemorySpace = data.minMemorySpace
     taskParams.image = data.image
+    taskParams.command = data.command
   }
 
   if (data.taskType === 'JUPYTER') {
@@ -424,6 +421,38 @@ export function formatParams(data: INodeData): {
     taskParams.hiveSqlScript = data.hiveSqlScript
     taskParams.hiveCliOptions = data.hiveCliOptions
   }
+  if (data.taskType === 'DMS') {
+    taskParams.isRestartTask = data.isRestartTask
+    taskParams.isJsonFormat = data.isJsonFormat
+    taskParams.jsonData = data.jsonData
+    taskParams.migrationType = data.migrationType
+    taskParams.replicationTaskIdentifier = data.replicationTaskIdentifier
+    taskParams.sourceEndpointArn = data.sourceEndpointArn
+    taskParams.targetEndpointArn = data.targetEndpointArn
+    taskParams.replicationInstanceArn = data.replicationInstanceArn
+    taskParams.tableMappings = data.tableMappings
+    taskParams.replicationTaskArn = data.replicationTaskArn
+  }
+
+  if (data.taskType === 'DATASYNC') {
+    taskParams.jsonFormat = data.jsonFormat
+    taskParams.json = data.json
+    taskParams.destinationLocationArn = data.destinationLocationArn
+    taskParams.sourceLocationArn = data.sourceLocationArn
+    taskParams.name = data.name
+    taskParams.cloudWatchLogGroupArn = data.cloudWatchLogGroupArn
+  }
+
+  if (data.taskType === 'KUBEFLOW') {
+    taskParams.yamlContent = data.yamlContent
+    taskParams.namespace = data.namespace
+  }
+  
+  if (data.taskType === 'LINKIS') {
+    taskParams.useCustom = data.useCustom
+    taskParams.paramScript = data.paramScript
+    taskParams.rawScript = data.rawScript
+  }
 
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
@@ -458,7 +487,7 @@ export function formatParams(data: INodeData): {
         initScript: data.initScript,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
-          ? data.resourceList.map((id: number) => ({ id }))
+          ? data.resourceList.map((fullName: string) => ({ resourceName: `${fullName}` }))
           : [],
         ...taskParams
       },
@@ -481,7 +510,6 @@ export function formatParams(data: INodeData): {
     params.taskDefinitionJsonObj.timeout = 0
     params.taskDefinitionJsonObj.timeoutNotifyStrategy = ''
   }
-
   return params
 }
 
@@ -507,11 +535,11 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
-      (item: { id: number }) => item.id
+      (item: { resourceName: string }) => (`${item.resourceName}`)
     )
   }
   if (data.taskParams?.mainJar) {
-    params.mainJar = data.taskParams?.mainJar.id
+    params.mainJar = data.taskParams?.mainJar.resourceName
   }
 
   if (data.taskParams?.method) {

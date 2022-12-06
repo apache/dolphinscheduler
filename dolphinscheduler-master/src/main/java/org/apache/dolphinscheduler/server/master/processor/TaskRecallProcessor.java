@@ -25,13 +25,16 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
 /**
@@ -53,11 +56,13 @@ public class TaskRecallProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_REJECT == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.TASK_REJECT == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
         TaskRejectCommand recallCommand = JSONUtils.parseObject(command.getBody(), TaskRejectCommand.class);
         TaskEvent taskEvent = TaskEvent.newRecallEvent(recallCommand, channel);
         try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(recallCommand.getProcessInstanceId(), recallCommand.getTaskInstanceId());
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(recallCommand.getProcessInstanceId(),
+                    recallCommand.getTaskInstanceId());
             logger.info("Receive task recall command: {}", recallCommand);
             taskEventService.addEvent(taskEvent);
         } finally {

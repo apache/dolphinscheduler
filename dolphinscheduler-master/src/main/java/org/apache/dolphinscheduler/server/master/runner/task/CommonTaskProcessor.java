@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+<<<<<<< HEAD
 import com.google.auto.service.AutoService;
 import org.apache.commons.lang3.StringUtils;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -36,7 +39,13 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.auto.service.AutoService;
 
 /**
  * common task processor
@@ -50,6 +59,10 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean submitTask() {
+        if (this.taskInstance.getTestFlag() == Constants.TEST_FLAG_YES) {
+            convertExeEnvironmentOnlineToTest();
+        }
+
         this.taskInstance =
                 processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
@@ -138,7 +151,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     public boolean killTask() {
 
         try {
-            taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+            taskInstance = taskInstanceDao.findTaskInstanceById(taskInstance.getId());
             if (taskInstance == null) {
                 return true;
             }
@@ -148,7 +161,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             // we don't wait the kill response
             taskInstance.setState(TaskExecutionStatus.KILL);
             taskInstance.setEndTime(new Date());
-            processService.updateTaskInstance(taskInstance);
+            taskInstanceDao.updateTaskInstance(taskInstance);
             if (StringUtils.isNotEmpty(taskInstance.getHost())) {
                 killRemoteTask();
             }
@@ -173,5 +186,29 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
         executionContext.setHost(host);
 
         nettyExecutorManager.executeDirectly(executionContext);
+    }
+
+    protected void convertExeEnvironmentOnlineToTest() {
+        // SQL taskType
+        if (TaskConstants.TASK_TYPE_SQL.equals(taskInstance.getTaskType())) {
+            // replace test data source
+            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(
+                    taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            Map<String, Object> taskInstanceParams =
+                    JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(DataSourceConstants.DATASOURCE);
+            Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
+            taskDefinitionParams.put(DataSourceConstants.DATASOURCE, testDataSourceId);
+            taskInstanceParams.put(DataSourceConstants.DATASOURCE, testDataSourceId);
+            taskInstance.getTaskDefine().setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
+            taskInstance.setTaskParams(JSONUtils.toJsonString(taskInstanceParams));
+            if (null == testDataSourceId) {
+                logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
+            } else {
+                logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
+            }
+        }
     }
 }

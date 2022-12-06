@@ -33,13 +33,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * project service test
  **/
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TaskGroupQueueServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupQueueServiceTest.class);
@@ -97,9 +97,10 @@ public class TaskGroupQueueServiceTest {
         List<TaskGroupQueue> records = new ArrayList<>();
         records.add(getTaskGroupQueue());
         page.setRecords(records);
-        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class), Mockito.eq(10))).thenReturn(page);
+        Mockito.when(taskGroupQueueMapper.queryTaskGroupQueuePaging(Mockito.any(Page.class), Mockito.eq(10)))
+                .thenReturn(page);
         Map<String, Object> result = taskGroupQueueService.doQuery(user, 1, 1, 10);
         PageInfo<TaskGroupQueue> pageInfo = (PageInfo<TaskGroupQueue>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
 }

@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
+<<<<<<< HEAD
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,16 +35,38 @@ import org.mockito.junit.MockitoJUnitRunner;
 import io.netty.channel.Channel;
 
 @RunWith(MockitoJUnitRunner.class)
+=======
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import io.netty.channel.Channel;
+
+@ExtendWith(MockitoExtension.class)
+>>>>>>> refs/remotes/origin/3.1.1-release
 public class LoggerRequestProcessorTest {
 
     private MockedStatic<LoggerUtils> mockedStaticLoggerUtils;
 
+<<<<<<< HEAD
     @Before
+=======
+    @BeforeEach
+>>>>>>> refs/remotes/origin/3.1.1-release
     public void setUp() {
         mockedStaticLoggerUtils = Mockito.mockStatic(LoggerUtils.class);
     }
 
+<<<<<<< HEAD
     @After
+=======
+    @AfterEach
+>>>>>>> refs/remotes/origin/3.1.1-release
     public void after() {
         mockedStaticLoggerUtils.close();
     }
@@ -65,7 +88,7 @@ public class LoggerRequestProcessorTest {
         loggerRequestProcessor.process(channel, command);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testProcessViewWholeLogRequestError() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
@@ -78,10 +101,12 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        loggerRequestProcessor.process(channel, command);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            loggerRequestProcessor.process(channel, command);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testProcessViewWholeLogRequestErrorRelativePath() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
@@ -94,10 +119,12 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        loggerRequestProcessor.process(channel, command);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            loggerRequestProcessor.process(channel, command);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testProcessViewWholeLogRequestErrorStartWith() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
@@ -109,6 +136,8 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        loggerRequestProcessor.process(channel, command);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            loggerRequestProcessor.process(channel, command);
+        });
     }
 }

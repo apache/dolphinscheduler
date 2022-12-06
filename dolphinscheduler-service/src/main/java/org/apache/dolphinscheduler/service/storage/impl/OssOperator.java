@@ -28,6 +28,10 @@ import org.apache.dolphinscheduler.common.factory.OssClientFactory;
 import org.apache.dolphinscheduler.common.model.OssConnection;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+<<<<<<< HEAD
+=======
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -176,6 +180,14 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
+<<<<<<< HEAD
+=======
+    public String getResourceFileName(String fullName) {
+        return null;
+    }
+
+    @Override
+>>>>>>> refs/remotes/origin/3.1.1-release
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
@@ -184,6 +196,14 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
+<<<<<<< HEAD
+=======
+    public boolean delete(String filePath, List<String> childrenPathArray, boolean recursive) throws IOException {
+        return false;
+    }
+
+    @Override
+>>>>>>> refs/remotes/origin/3.1.1-release
     public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
                          boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
@@ -210,12 +230,20 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
+<<<<<<< HEAD
     public boolean exists(String tenantCode, String fileName) throws IOException {
+=======
+    public boolean exists(String fileName) throws IOException {
+>>>>>>> refs/remotes/origin/3.1.1-release
         return ossClient.doesObjectExist(bucketName, fileName);
     }
 
     @Override
+<<<<<<< HEAD
     public boolean delete(String tenantCode, String filePath, boolean recursive) throws IOException {
+=======
+    public boolean delete(String filePath, boolean recursive) throws IOException {
+>>>>>>> refs/remotes/origin/3.1.1-release
         try {
             ossClient.deleteObject(bucketName, filePath);
             return true;
@@ -275,6 +303,27 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
+<<<<<<< HEAD
+=======
+    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
+                                                          ResourceType type) {
+        return null;
+    }
+
+    @Override
+    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
+                                               ResourceType type) throws Exception {
+        return null;
+    }
+
+    @Override
+    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
+                                       ResourceType type) throws Exception {
+        return null;
+    }
+
+    @Override
+>>>>>>> refs/remotes/origin/3.1.1-release
     public void deleteTenant(String tenantCode) throws Exception {
         deleteTenantCode(tenantCode);
     }

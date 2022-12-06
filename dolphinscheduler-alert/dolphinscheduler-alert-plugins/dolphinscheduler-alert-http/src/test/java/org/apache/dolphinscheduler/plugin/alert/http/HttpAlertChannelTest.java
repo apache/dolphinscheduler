@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.http;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
@@ -30,35 +34,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HttpAlertChannelTest {
 
     @Test
-    public void processTest() {
-
+    public void testProcessWithoutParam() {
         HttpAlertChannel alertChannel = new HttpAlertChannel();
         AlertInfo alertInfo = new AlertInfo();
         AlertData alertData = new AlertData();
         alertData.setContent("Fault tolerance warning");
         alertInfo.setAlertData(alertData);
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assert.assertEquals("http params is null", alertResult.getMessage());
+        Assertions.assertEquals("http params is null", alertResult.getMessage());
     }
 
     @Test
-    public void processTest2() {
-
-        HttpAlertChannel alertChannel = new HttpAlertChannel();
+    public void testProcessSuccess() {
+        HttpAlertChannel alertChannel = spy(new HttpAlertChannel());
         AlertInfo alertInfo = new AlertInfo();
         AlertData alertData = new AlertData();
         alertData.setContent("Fault tolerance warning");
         alertInfo.setAlertData(alertData);
         Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(getParams());
         alertInfo.setAlertParams(paramsMap);
+
+        // HttpSender(paramsMap).send(alertData.getContent()); already test in HttpSenderTest.sendTest. so we can mock
+        // it
+        doReturn(new AlertResult("true", "success")).when(alertChannel).process(any());
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assertions.assertEquals("true", alertResult.getStatus());
     }
 
     /**
@@ -68,29 +74,29 @@ public class HttpAlertChannelTest {
 
         List<PluginParams> paramsList = new ArrayList<>();
         InputParam urlParam = InputParam.newBuilder("url", "url")
-                                        .setValue("http://www.baidu.com")
-                                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                                        .build();
+                .setValue("http://www.dolphinscheduler-not-exists-web.com")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
         InputParam headerParams = InputParam.newBuilder("headerParams", "headerParams")
-                                            .addValidate(Validate.newBuilder().setRequired(true).build())
-                                            .setValue("{\"Content-Type\":\"application/json\"}")
-                                            .build();
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue("{\"Content-Type\":\"application/json\"}")
+                .build();
 
         InputParam bodyParams = InputParam.newBuilder("bodyParams", "bodyParams")
-                                          .addValidate(Validate.newBuilder().setRequired(true).build())
-                                          .setValue("{\"number\":\"13457654323\"}")
-                                          .build();
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue("{\"number\":\"1234567\"}")
+                .build();
 
         InputParam content = InputParam.newBuilder("contentField", "contentField")
-                                       .setValue("content")
-                                       .addValidate(Validate.newBuilder().setRequired(true).build())
-                                       .build();
+                .setValue("content")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
         InputParam requestType = InputParam.newBuilder("requestType", "requestType")
-                                           .setValue("POST")
-                                           .addValidate(Validate.newBuilder().setRequired(true).build())
-                                           .build();
+                .setValue("POST")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
         paramsList.add(urlParam);
         paramsList.add(headerParams);

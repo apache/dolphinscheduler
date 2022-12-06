@@ -73,4 +73,8 @@ ALTER TABLE t_ds_task_instance DROP CONSTRAINT IF EXISTS foreign_key_instance_id
 ALTER TABLE t_ds_project alter COLUMN description type varchar(255);
 ALTER TABLE t_ds_task_group alter COLUMN description type varchar(255);
 ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS other_params_json text DEFAULT NULL;
+<<<<<<< HEAD
 ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL;
+=======
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS state_history text DEFAULT NULL;
+>>>>>>> refs/remotes/origin/3.1.1-release

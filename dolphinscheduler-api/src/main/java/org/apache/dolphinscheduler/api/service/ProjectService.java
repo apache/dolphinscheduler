@@ -81,6 +81,10 @@ public interface ProjectService {
      */
     boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission);
 
+    boolean hasProjectAndWritePerm(User loginUser, Project project, Result result);
+
+    boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result);
+
     /**
      * admin can view all projects
      *
@@ -91,6 +95,19 @@ public interface ProjectService {
      * @return project list which the login user have permission to see
      */
     Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
+
+    /**
+     * admin can view all projects
+     *
+     * @param userId user id
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which with the login user's authorized level
+     */
+    Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize, Integer pageNo,
+                                                     String searchVal);
 
     /**
      * delete project by code
@@ -130,6 +147,13 @@ public interface ProjectService {
      * @return projects which the user have permission to see, Except for items created by this user
      */
     Result queryAuthorizedProject(User loginUser, Integer userId);
+
+    /**
+     * query all project with authorized level
+     * @param loginUser login user
+     * @return project list
+     */
+    Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId);
 
     /**
      * query authorized user
@@ -179,5 +203,8 @@ public interface ProjectService {
      * @return project list
      */
     Result queryAllProjectListForDependent();
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 }

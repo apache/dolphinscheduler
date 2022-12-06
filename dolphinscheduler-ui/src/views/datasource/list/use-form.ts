@@ -17,7 +17,10 @@
 
 import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getKerberosStartupState } from '@/service/modules/data-source'
+import {
+  getKerberosStartupState,
+  queryDataSourceList
+} from '@/service/modules/data-source'
 import type { FormRules } from 'naive-ui'
 import type {
   IDataSourceDetail,
@@ -27,12 +30,13 @@ import type {
   IDataSource
 } from './types'
 import utils from '@/utils'
-
+import type { TypeReq } from '@/service/modules/data-source/types'
 export function useForm(id?: number) {
   const { t } = useI18n()
 
   const initialValues = {
     type: 'MYSQL',
+    label: 'MYSQL',
     name: '',
     note: '',
     host: '',
@@ -45,7 +49,9 @@ export function useForm(id?: number) {
     password: '',
     database: '',
     connectType: '',
-    other: ''
+    other: '',
+    testFlag: -1,
+    bindTestId: undefined
   } as IDataSourceDetail
 
   const state = reactive({
@@ -57,6 +63,7 @@ export function useForm(id?: number) {
     showAwsRegion: false,
     showConnectType: false,
     showPrincipal: false,
+    bindTestDataSourceExample: [] as { label: string; value: number }[],
     rules: {
       name: {
         trigger: ['input'],
@@ -129,6 +136,22 @@ export function useForm(id?: number) {
             return new Error(t('datasource.jdbc_format_tips'))
           }
         }
+      },
+      testFlag: {
+        trigger: ['input'],
+        validator() {
+          if (-1 === state.detailForm.testFlag) {
+            return new Error(t('datasource.datasource_test_flag_tips'))
+          }
+        }
+      },
+      bindTestId: {
+        trigger: ['input'],
+        validator() {
+          if (0 === state.detailForm.testFlag && !state.detailForm.bindTestId) {
+            return new Error(t('datasource.datasource_bind_test_id_tips'))
+          }
+        }
       }
     } as FormRules
   })
@@ -153,12 +176,40 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
+    if (state.detailForm.id === undefined) {
+      await getSameTypeTestDataSource()
+    }
   }
 
   const changePort = async () => {
     if (!state.detailForm.type) return
     const currentDataBaseOption = datasourceType[state.detailForm.type]
     currentDataBaseOption.previousPort = state.detailForm.port
+  }
+  const changeTestFlag = async (testFlag: IDataBase) => {
+    if (testFlag) {
+      state.detailForm.bindTestId = undefined
+    }
+    // @ts-ignore
+    if (state.detailForm.id !== undefined && testFlag === 0) {
+      await getSameTypeTestDataSource()
+    }
+  }
+
+  const getSameTypeTestDataSource = async () => {
+    const params = { type: state.detailForm.type, testFlag: 1 } as TypeReq
+    const result = await queryDataSourceList(params)
+    state.bindTestDataSourceExample = result
+        .filter((value: { label: string; value: string }) => {
+          // @ts-ignore
+          if (state.detailForm.id && state.detailForm.id === value.id)
+            return false
+          return true
+        })
+        .map((TestDataSourceExample: { name: string; id: number }) => ({
+        label: TestDataSourceExample.name,
+        value: TestDataSourceExample.id
+      }))
   }
 
   const resetFieldsValue = () => {
@@ -179,7 +230,9 @@ export function useForm(id?: number) {
     state,
     changeType,
     changePort,
+    changeTestFlag,
     resetFieldsValue,
+    getSameTypeTestDataSource,
     setFieldsValue,
     getFieldsValue
   }
@@ -240,6 +293,14 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'ATHENA',
     label: 'ATHENA',
     defaultPort: 0
+<<<<<<< HEAD
+=======
+  },
+  TRINO: {
+    value: 'TRINO',
+    label: 'TRINO',
+    defaultPort: 8080
+>>>>>>> refs/remotes/origin/3.1.1-release
   }
 }
 

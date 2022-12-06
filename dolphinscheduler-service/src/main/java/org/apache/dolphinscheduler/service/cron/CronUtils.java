@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.service.cron;
 
+<<<<<<< HEAD
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
 import lombok.NonNull;
 
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import static com.cronutils.model.CronType.QUARTZ;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
@@ -42,8 +45,11 @@ import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+<<<<<<< HEAD
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -56,6 +62,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
+=======
+import lombok.NonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.cronutils.model.Cron;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.model.time.ExecutionTime;
+import com.cronutils.parser.CronParser;
+
+>>>>>>> refs/remotes/origin/3.1.1-release
 /**
  * // todo: this utils is heavy, it rely on quartz and corn-utils.
  * cron utils

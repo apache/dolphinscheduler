@@ -17,28 +17,34 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql.param;
 
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
+@ExtendWith(MockitoExtension.class)
 public class MySQLDataSourceProcessorTest {
 
     private MySQLDataSourceProcessor mysqlDatasourceProcessor = new MySQLDataSourceProcessor();
@@ -54,12 +60,13 @@ public class MySQLDataSourceProcessorTest {
         mysqlDatasourceParamDTO.setPort(3306);
         mysqlDatasourceParamDTO.setDatabase("default");
         mysqlDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
-                .createConnectionParams(mysqlDatasourceParamDTO);
-        Assert.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
+        try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
+                    .createConnectionParams(mysqlDatasourceParamDTO);
+            Assertions.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test
@@ -68,8 +75,8 @@ public class MySQLDataSourceProcessorTest {
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/default\"}";
         MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
                 .createConnectionParams(connectionJson);
-        Assert.assertNotNull(connectionJson);
-        Assert.assertEquals("root", connectionParams.getUser());
+        Assertions.assertNotNull(connectionJson);
+        Assertions.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
@@ -82,13 +89,14 @@ public class MySQLDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
-        Assert.assertEquals("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
+        Assertions.assertEquals(
+                "jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
                 mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
+        Assertions.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
     }
 
     @Test
@@ -103,8 +111,10 @@ public class MySQLDataSourceProcessorTest {
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         mysqlConnectionParam.setUser("root");
         mysqlConnectionParam.setPassword("123456");
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
-        Assert.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default", mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
+        try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
+            Assertions.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default",
+                    mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
+        }
     }
 }

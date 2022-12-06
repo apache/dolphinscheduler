@@ -23,16 +23,15 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FeiShuSenderTest {
 
-
     private static Map<String, String> feiShuConfig = new HashMap<>();
 
-    @Before
+    @BeforeEach
     public void initFeiShuConfig() {
         feiShuConfig.put(FeiShuParamsConstants.WEB_HOOK, "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxx");
     }
@@ -44,33 +43,33 @@ public class FeiShuSenderTest {
         alertData.setContent("feishu test content");
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
         AlertResult alertResult = feiShuSender.sendFeiShuMsg(alertData);
-        Assert.assertEquals("false", alertResult.getStatus());
+        Assertions.assertEquals("false", alertResult.getStatus());
     }
 
     @Test
     public void testFormatContent() {
         String alertMsg = "[\n"
-            + "  {\n"
-            + "    \"owner\": \"dolphinscheduler\",\n"
-            + "    \"processEndTime\": \"2021-01-29 19:01:11\",\n"
-            + "    \"processHost\": \"10.81.129.4:5678\",\n"
-            + "    \"processId\": 2926,\n"
-            + "    \"processName\": \"3-20210129190038108\",\n"
-            + "    \"processStartTime\": \"2021-01-29 19:00:38\",\n"
-            + "    \"processState\": \"SUCCESS\",\n"
-            + "    \"processType\": \"START_PROCESS\",\n"
-            + "    \"projectId\": 2,\n"
-            + "    \"projectName\": \"testdelproject\",\n"
-            + "    \"recovery\": \"NO\",\n"
-            + "    \"retryTimes\": 0,\n"
-            + "    \"runTimes\": 1,\n"
-            + "    \"taskId\": 0\n"
-            + "  }\n"
-            + "]";
+                + "  {\n"
+                + "    \"owner\": \"dolphinscheduler\",\n"
+                + "    \"processEndTime\": \"2021-01-29 19:01:11\",\n"
+                + "    \"processHost\": \"10.81.129.4:5678\",\n"
+                + "    \"processId\": 2926,\n"
+                + "    \"processName\": \"3-20210129190038108\",\n"
+                + "    \"processStartTime\": \"2021-01-29 19:00:38\",\n"
+                + "    \"processState\": \"SUCCESS\",\n"
+                + "    \"processType\": \"START_PROCESS\",\n"
+                + "    \"projectId\": 2,\n"
+                + "    \"projectName\": \"testdelproject\",\n"
+                + "    \"recovery\": \"NO\",\n"
+                + "    \"retryTimes\": 0,\n"
+                + "    \"runTimes\": 1,\n"
+                + "    \"taskId\": 0\n"
+                + "  }\n"
+                + "]";
         AlertData alertData = new AlertData();
         alertData.setTitle("");
         alertData.setContent(alertMsg);
-        Assert.assertNotNull(FeiShuSender.formatContent(alertData));
+        Assertions.assertNotNull(FeiShuSender.formatContent(alertData));
     }
 
     @Test
@@ -80,7 +79,7 @@ public class FeiShuSenderTest {
         alertData.setContent("feishu test content");
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
         String alertResult = feiShuSender.formatContent(alertData);
-        Assert.assertEquals(alertResult, alertData.getTitle() + alertData.getContent());
+        Assertions.assertEquals(alertResult, alertData.getTitle() + alertData.getContent());
     }
 
     @Test
@@ -88,12 +87,12 @@ public class FeiShuSenderTest {
 
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
         AlertResult alertResult = feiShuSender.checkSendFeiShuSendMsgResult("");
-        Assert.assertFalse(Boolean.valueOf(alertResult.getStatus()));
+        Assertions.assertFalse(Boolean.valueOf(alertResult.getStatus()));
         AlertResult alertResult2 = feiShuSender.checkSendFeiShuSendMsgResult("123");
-        Assert.assertEquals("send fei shu msg fail", alertResult2.getMessage());
+        Assertions.assertEquals("send fei shu msg fail", alertResult2.getMessage());
 
         String response = "{\"StatusCode\":\"0\",\"extra\":\"extra\",\"StatusMessage\":\"StatusMessage\"}";
         AlertResult alertResult3 = feiShuSender.checkSendFeiShuSendMsgResult(response);
-        Assert.assertTrue(Boolean.valueOf(alertResult3.getStatus()));
+        Assertions.assertTrue(Boolean.valueOf(alertResult3.getStatus()));
     }
 }

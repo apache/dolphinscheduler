@@ -53,13 +53,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,7 +70,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DqRuleServiceTest {
 
@@ -107,21 +110,33 @@ public class DqRuleServiceTest {
                 + "\"统计值计算SQL\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
         Map<String, Object> result = dqRuleService.getRuleFormCreateJsonById(1);
+<<<<<<< HEAD
         Assert.assertEquals(json, result.get(Constants.DATA_LIST));
+=======
+        Assertions.assertEquals(json, result.get(Constants.DATA_LIST));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testQueryAllRuleList() {
         when(dqRuleMapper.selectList(new QueryWrapper<>())).thenReturn(getRuleList());
         Map<String, Object> result = dqRuleService.queryAllRuleList();
+<<<<<<< HEAD
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+=======
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
     public void testGetDatasourceOptionsById() {
         when(dataSourceMapper.listAllDataSourceByType(DbType.MYSQL.getCode())).thenReturn(dataSourceList());
         Map<String, Object> result = dqRuleService.queryAllRuleList();
+<<<<<<< HEAD
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+=======
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     @Test
@@ -135,7 +150,11 @@ public class DqRuleServiceTest {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
+<<<<<<< HEAD
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY, null,
+=======
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATA_QUALITY,
+>>>>>>> refs/remotes/origin/3.1.1-release
                 loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATA_QUALITY, null, 0,
                 baseServiceLogger)).thenReturn(true);
@@ -151,7 +170,11 @@ public class DqRuleServiceTest {
 
         Result result = dqRuleService.queryRuleListPaging(
                 loginUser, searchVal, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
+<<<<<<< HEAD
         Assert.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
+=======
+        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
+>>>>>>> refs/remotes/origin/3.1.1-release
     }
 
     private List<DataSource> dataSourceList() {

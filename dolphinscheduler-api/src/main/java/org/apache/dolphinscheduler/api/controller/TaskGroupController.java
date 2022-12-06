@@ -32,8 +32,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import springfox.documentation.annotations.ApiIgnore;
-
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,15 +44,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * task group controller
  */
-@Api(tags = "task group")
+@Tag(name = "TASK_GROUP_TAG")
 @RestController
 @RequestMapping("/task-group")
 public class TaskGroupController extends BaseController {
@@ -72,18 +71,28 @@ public class TaskGroupController extends BaseController {
      * @param name        project id
      * @return result and msg code
      */
+<<<<<<< HEAD
     @ApiOperation(value = "create", notes = "CREATE_TASK_GROUP_NOTE")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "NAME", dataTypeClass = String.class),
             @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataTypeClass = long.class),
             @ApiImplicitParam(name = "description", value = "TASK_GROUP_DESCRIPTION", dataTypeClass = String.class),
             @ApiImplicitParam(name = "groupSize", value = "GROUP_SIZE", dataTypeClass = int.class)
+=======
+    @Operation(summary = "create", description = "CREATE_TASK_GROUP_NOTE")
+    @Parameters({
+            @Parameter(name = "name", description = "NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class)),
+            @Parameter(name = "description", description = "TASK_GROUP_DESCRIPTION", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "groupSize", description = "GROUP_SIZE", schema = @Schema(implementation = int.class)),
+
+>>>>>>> refs/remotes/origin/3.1.1-release
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result createTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("name") String name,
                                   @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectcode,
                                   @RequestParam("description") String description,
@@ -103,19 +112,28 @@ public class TaskGroupController extends BaseController {
      * @param name        project id
      * @return result and msg code
      */
+<<<<<<< HEAD
     @ApiOperation(value = "update", notes = "UPDATE_TASK_GROUP_NOTE")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "TASK_GROUP_ID", dataTypeClass = int.class),
             @ApiImplicitParam(name = "name", value = "TASK_GROUP_NAME", dataTypeClass = String.class),
             @ApiImplicitParam(name = "description", value = "TASK_GROUP_DESCRIPTION", dataTypeClass = String.class),
             @ApiImplicitParam(name = "groupSize", value = "GROUP_SIZE", dataTypeClass = int.class)
+=======
+    @Operation(summary = "update", description = "UPDATE_TASK_GROUP_NOTE")
+    @Parameters({
+            @Parameter(name = "id", description = "TASK_GROUP_ID", schema = @Schema(implementation = int.class)),
+            @Parameter(name = "name", description = "TASK_GROUP_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "TASK_GROUP_DESCRIPTION", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "groupSize", description = "GROUP_SIZE", schema = @Schema(implementation = int.class)),
+>>>>>>> refs/remotes/origin/3.1.1-release
 
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result updateTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("id") Integer id,
                                   @RequestParam("name") String name,
                                   @RequestParam("description") String description,
@@ -132,17 +150,25 @@ public class TaskGroupController extends BaseController {
      * @param pageSize  page size
      * @return queue list
      */
+<<<<<<< HEAD
     @ApiOperation(value = "list-paging", notes = "QUERY_ALL_TASK_GROUP_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "name", value = "TASK_GROUP_NAME", required = false, dataTypeClass = String.class),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
+=======
+    @Operation(summary = "list-paging", description = "QUERY_ALL_TASK_GROUP_NOTES")
+    @Parameters({
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "name", description = "TASK_GROUP_NAME", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
+>>>>>>> refs/remotes/origin/3.1.1-release
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAllTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryAllTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "name", required = false) String name,
                                     @RequestParam(value = "status", required = false) Integer status,
                                     @RequestParam("pageNo") Integer pageNo,
@@ -160,17 +186,25 @@ public class TaskGroupController extends BaseController {
      * @param pageSize  page size
      * @return queue list
      */
+<<<<<<< HEAD
     @ApiOperation(value = "queryTaskGroupByStatus", notes = "QUERY_TASK_GROUP_LIST_BY_STATUS_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20"),
             @ApiImplicitParam(name = "status", value = "TASK_GROUP_STATUS", required = true, dataTypeClass = int.class)
+=======
+    @Operation(summary = "queryTaskGroupByStatus", description = "QUERY_TASK_GROUP_LIST_BY_STATUS_NOTES")
+    @Parameters({
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20")),
+            @Parameter(name = "status", description = "TASK_GROUP_STATUS", required = true, schema = @Schema(implementation = int.class))
+>>>>>>> refs/remotes/origin/3.1.1-release
     })
     @GetMapping(value = "/query-list-by-status")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryTaskGroupByStatus(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryTaskGroupByStatus(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("pageNo") Integer pageNo,
                                          @RequestParam(value = "status", required = false) Integer status,
                                          @RequestParam("pageSize") Integer pageSize) {
@@ -187,17 +221,17 @@ public class TaskGroupController extends BaseController {
      * @param pageSize    page size
      * @return queue list
      */
-    @ApiOperation(value = "queryTaskGroupByName", notes = "QUERY_TASK_GROUP_LIST_BY_PROJECT_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20"),
-            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = String.class)
+    @Operation(summary = "queryTaskGroupByName", description = "QUERY_TASK_GROUP_LIST_BY_PROJECT_ID_NOTES")
+    @Parameters({
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20")),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = String.class))
     })
     @GetMapping(value = "/query-list-by-projectCode")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryTaskGroupByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryTaskGroupByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "projectCode", required = false) Long projectCode,
                                        @RequestParam("pageSize") Integer pageSize) {
@@ -213,15 +247,15 @@ public class TaskGroupController extends BaseController {
      * @param id        id
      * @return result
      */
-    @ApiOperation(value = "closeTaskGroup", notes = "CLOSE_TASK_GROUP_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ID", required = true, dataTypeClass = int.class)
+    @Operation(summary = "closeTaskGroup", description = "CLOSE_TASK_GROUP_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "ID", required = true, schema = @Schema(implementation = int.class))
     })
     @PostMapping(value = "/close-task-group")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CLOSE_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result closeTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result closeTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "id", required = false) Integer id) {
 
         Map<String, Object> result = taskGroupService.closeTaskGroup(loginUser, id);
@@ -235,15 +269,21 @@ public class TaskGroupController extends BaseController {
      * @param id        id
      * @return result
      */
+<<<<<<< HEAD
     @ApiOperation(value = "startTaskGroup", notes = "START_TASK_GROUP_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "TASK_GROUP_ID", required = true, dataTypeClass = int.class)
+=======
+    @Operation(summary = "startTaskGroup", description = "START_TASK_GROUP_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "TASK_GROUP_ID", required = true, schema = @Schema(implementation = int.class))
+>>>>>>> refs/remotes/origin/3.1.1-release
     })
     @PostMapping(value = "/start-task-group")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result startTaskGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result startTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "id", required = false) Integer id) {
         Map<String, Object> result = taskGroupService.startTaskGroup(loginUser, id);
         return returnDataList(result);
@@ -256,15 +296,21 @@ public class TaskGroupController extends BaseController {
      * @param queueId   task group queue id
      * @return result
      */
+<<<<<<< HEAD
     @ApiOperation(value = "forceStart", notes = "FORCE_START_TASK_GROUP")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUE_ID", required = true, dataTypeClass = int.class)
+=======
+    @Operation(summary = "forceStart", description = "FORCE_START_TASK_GROUP")
+    @Parameters({
+            @Parameter(name = "queueId", description = "TASK_GROUP_QUEUE_ID", required = true, schema = @Schema(implementation = int.class))
+>>>>>>> refs/remotes/origin/3.1.1-release
     })
     @PostMapping(value = "/forceStart")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result forceStart(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result forceStart(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "queueId") Integer queueId) {
         Map<String, Object> result = taskGroupService.forceStartTask(loginUser, queueId);
         return returnDataList(result);
@@ -277,16 +323,23 @@ public class TaskGroupController extends BaseController {
      * @param queueId   task group queue id
      * @return result
      */
+<<<<<<< HEAD
     @ApiOperation(value = "modifyPriority", notes = "MODIFY_TASK_GROUP_PRIORITY")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "queueId", value = "TASK_GROUP_QUEUE_ID", required = true, dataTypeClass = int.class),
             @ApiImplicitParam(name = "priority", value = "TASK_GROUP_QUEUE_PRIORITY", required = true, dataTypeClass = int.class)
+=======
+    @Operation(summary = "modifyPriority", description = "MODIFY_TASK_GROUP_PRIORITY")
+    @Parameters({
+            @Parameter(name = "queueId", description = "TASK_GROUP_QUEUE_ID", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "priority", description = "TASK_GROUP_QUEUE_PRIORITY", required = true, schema = @Schema(implementation = int.class))
+>>>>>>> refs/remotes/origin/3.1.1-release
     })
     @PostMapping(value = "/modifyPriority")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result modifyPriority(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result modifyPriority(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "queueId") Integer queueId,
                                  @RequestParam(value = "priority") Integer priority) {
         Map<String, Object> result = taskGroupService.modifyPriority(loginUser, queueId, priority);
@@ -308,6 +361,7 @@ public class TaskGroupController extends BaseController {
      * @param pageSize    page size
      * @return queue list
      */
+<<<<<<< HEAD
     @ApiOperation(value = "queryTasksByGroupId", notes = "QUERY_ALL_TASKS_GROUP_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupId", value = "GROUP_ID", required = false, dataTypeClass = int.class, example = "1", defaultValue = "-1"),
@@ -316,12 +370,22 @@ public class TaskGroupController extends BaseController {
             @ApiImplicitParam(name = "status", value = "TASK_GROUP_STATUS", required = false, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataTypeClass = int.class, example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataTypeClass = int.class, example = "20")
+=======
+    @Operation(summary = "queryTasksByGroupId", description = "QUERY_ALL_TASKS_GROUP_NOTES")
+    @Parameters({
+            @Parameter(name = "groupId", description = "GROUP_ID", required = false, schema = @Schema(implementation = int.class, example = "1", defaultValue = "-1")),
+            @Parameter(name = "taskInstanceName", description = "TASK_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "taskName")),
+            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "processName")),
+            @Parameter(name = "status", description = "TASK_GROUP_STATUS", required = false, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
+>>>>>>> refs/remotes/origin/3.1.1-release
     })
     @GetMapping(value = "/query-list-by-group-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_QUEUE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryTasksByGroupId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryTasksByGroupId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
                                       @RequestParam(value = "taskInstanceName", required = false) String taskName,
                                       @RequestParam(value = "processInstanceName", required = false) String processName,

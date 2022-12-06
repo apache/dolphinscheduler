@@ -18,28 +18,39 @@
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+=======
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
+<<<<<<< HEAD
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
+=======
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+>>>>>>> refs/remotes/origin/3.1.1-release
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+<<<<<<< HEAD
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class,
         DataSourceClientProvider.class, PasswordUtils.class})
+=======
+@ExtendWith(MockitoExtension.class)
+>>>>>>> refs/remotes/origin/3.1.1-release
 public class PrestoDataSourceProcessorTest {
 
     private PrestoDataSourceProcessor prestoDatasourceProcessor = new PrestoDataSourceProcessor();
@@ -55,12 +66,13 @@ public class PrestoDataSourceProcessorTest {
         prestoDatasourceParamDTO.setUserName("root");
         prestoDatasourceParamDTO.setPassword("123456");
         prestoDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
-                .createConnectionParams(prestoDatasourceParamDTO);
-        Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
+        try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
+                    .createConnectionParams(prestoDatasourceParamDTO);
+            Assertions.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
+        }
     }
 
     @Test
@@ -70,8 +82,8 @@ public class PrestoDataSourceProcessorTest {
                         + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
                 .createConnectionParams(connectionJson);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("root", connectionParams.getUser());
+        Assertions.assertNotNull(connectionParams);
+        Assertions.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
@@ -85,14 +97,14 @@ public class PrestoDataSourceProcessorTest {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
         prestoConnectionParam.setOther("other");
-        Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
+        Assertions.assertEquals("jdbc:postgresql://localhost:1234/default?other",
                 prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
 
     }
 
     @Test
     public void testGetDbType() {
-        Assert.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
+        Assertions.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
     }
 
     @Test
