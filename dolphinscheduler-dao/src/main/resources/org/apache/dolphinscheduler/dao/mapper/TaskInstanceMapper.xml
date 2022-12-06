@@ -57,6 +57,12 @@
         and test_flag=#{testFlag}
         order by start_time desc
     </select>
+    <select id="findByWorkflowInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        WHERE process_instance_id = #{workflowInstanceId}
+    </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>

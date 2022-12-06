@@ -176,17 +176,15 @@ public class LogClient implements AutoCloseable {
      * remove task log
      *
      * @param host host
-     * @param port port
      * @param path path
      * @return remove task status
      */
-    public Boolean removeTaskLog(String host, int port, String path) {
-        logger.info("Remove task log from host: {}, port: {}, logPath {}", host, port, path);
+    public Boolean removeTaskLog(@NonNull Host host, String path) {
+        logger.info("Remove task log from host: {} logPath {}", host, path);
         RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
-        final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            Command response = this.client.sendSync(host, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 RemoveTaskLogResponseCommand taskLogResponse =
                         JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
@@ -196,11 +194,11 @@ public class LogClient implements AutoCloseable {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             logger.error(
-                    "Remove task log from host: {}, port: {} logPath: {} error, the current thread has been interrupted",
-                    host, port, path, ex);
+                    "Remove task log from host: {}, logPath: {} error, the current thread has been interrupted",
+                    host, path, ex);
             return false;
         } catch (Exception e) {
-            logger.error("Remove task log from host: {}, port: {} logPath: {} error", host, port, path, e);
+            logger.error("Remove task log from host: {},  logPath: {} error", host, path, e);
             return false;
         }
     }
