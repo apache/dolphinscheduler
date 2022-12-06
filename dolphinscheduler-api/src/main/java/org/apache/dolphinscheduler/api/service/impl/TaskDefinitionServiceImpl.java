@@ -1062,9 +1062,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         taskType = taskType == null ? StringUtils.EMPTY : taskType;
         Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
-        IPage<TaskMainInfo> taskMainInfoIPage =
-                taskDefinitionMapper.queryDefineListPaging(page, projectCode,
-                        searchTaskName, taskType, taskExecuteType);
+        // first, query task code by page size
+        IPage<TaskMainInfo> taskMainInfoIPage = taskDefinitionMapper.queryDefineListPaging(page, projectCode,
+                searchTaskName, taskType, taskExecuteType);
+        // then, query task relevant info by task code
         fillRecords(projectCode, taskMainInfoIPage);
         PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
@@ -1077,13 +1078,17 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private void fillRecords(long projectCode, IPage<TaskMainInfo> taskMainInfoIPage) {
         List<TaskMainInfo> records = Collections.emptyList();
         if (CollectionUtils.isNotEmpty(taskMainInfoIPage.getRecords())) {
+            // query task relevant info by task code
             records = taskDefinitionMapper.queryDefineListByCodeList(projectCode,
                     taskMainInfoIPage.getRecords().stream().map(TaskMainInfo::getTaskCode)
                             .collect(Collectors.toList()));
         }
+        // because first step, so need init records
         taskMainInfoIPage.setRecords(Collections.emptyList());
         if (CollectionUtils.isNotEmpty(records)) {
+            // task code and task info map
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
+            // construct task code and relevant upstream task list map
             for (TaskMainInfo info : records) {
                 taskMainInfoMap.compute(info.getTaskCode(), (k, v) -> {
                     if (v == null) {
@@ -1102,6 +1107,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     return v;
                 });
             }
+            // because taskMainInfoMap's value is TaskMainInfo,
+            // TaskMainInfo have task code info, so only need gain taskMainInfoMap's values
             taskMainInfoIPage.setRecords(Lists.newArrayList(taskMainInfoMap.values()));
         }
     }
