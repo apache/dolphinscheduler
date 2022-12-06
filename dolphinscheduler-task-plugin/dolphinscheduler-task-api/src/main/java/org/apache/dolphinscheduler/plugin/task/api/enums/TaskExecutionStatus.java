@@ -21,13 +21,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 
 public enum TaskExecutionStatus {
 
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXECUTION(1, "running"),
     PAUSE(3, "pause"),
-    STOP(5, "stop"),
     FAILURE(6, "failure"),
     SUCCESS(7, "success"),
     NEED_FAULT_TOLERANCE(8, "need fault tolerance"),
@@ -50,6 +50,7 @@ public enum TaskExecutionStatus {
         for (TaskExecutionStatus executionStatus : TaskExecutionStatus.values()) {
             CODE_MAP.put(executionStatus.getCode(), executionStatus);
         }
+        CODE_MAP.put(WorkflowExecutionStatus.STOP.getCode(), KILL);
     }
 
     /**

@@ -148,7 +148,7 @@ public class SubProcessTaskTest {
         subTaskProcessor.init(taskInstance, processInstance);
         subTaskProcessor.action(TaskAction.RUN);
         TaskExecutionStatus status = taskInstance.getState();
-        Assertions.assertEquals(TaskExecutionStatus.STOP, status);
+        Assertions.assertEquals(TaskExecutionStatus.KILL, status);
     }
 
     private String getProperty() {
