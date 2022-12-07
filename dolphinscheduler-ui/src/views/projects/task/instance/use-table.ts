@@ -95,12 +95,18 @@ export function useTable() {
       {
         title: t('project.task.task_name'),
         key: 'name',
-        ...COLUMN_WIDTH_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name'],
+        resizable: true,
+        minWidth: 200,
+        maxWidth: 600,
       },
       {
         title: t('project.task.workflow_instance'),
         key: 'processInstanceName',
         ...COLUMN_WIDTH_CONFIG['linkName'],
+        resizable: true,
+        minWidth: 300,
+        maxWidth: 600,
         render: (row: {
           processInstanceId: number
           processInstanceName: string
@@ -119,7 +125,9 @@ export function useTable() {
               default: () =>
                 h(
                   NEllipsis,
-                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                    {
+                      style: 'max-width: 580px;line-height: 1.5'
+                    },
                   () => row.processInstanceName
                 )
             }
