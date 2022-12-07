@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -191,10 +192,10 @@ public class TaskInstanceV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public TaskInstanceSuccessResponse queryTaskInstanceByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public TaskInstance queryTaskInstanceByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                @PathVariable(value = "taskCode") Long taskCode) {
-        Result result = taskInstanceService.queryTaskInstanceByCode(loginUser, projectCode, taskCode);
-        return new TaskInstanceSuccessResponse(result);
+        TaskInstance taskInstance = taskInstanceService.queryTaskInstanceByCode(loginUser, projectCode, taskCode);
+        return taskInstance;
     }
 }

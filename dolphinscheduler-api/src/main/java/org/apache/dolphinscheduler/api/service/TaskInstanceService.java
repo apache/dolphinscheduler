@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -98,5 +99,5 @@ public interface TaskInstanceService {
      * @param taskCode          task instance code
      * @return the result code and msg
      */
-    Result queryTaskInstanceByCode(User loginUser, long projectCode, Long taskCode);
+    TaskInstance queryTaskInstanceByCode(User loginUser, long projectCode, Long taskCode);
 }
