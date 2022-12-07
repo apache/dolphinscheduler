@@ -308,7 +308,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     }
 
     @Override
-    public TaskInstance queryTaskInstanceByCode(User loginUser, long projectCode, Long taskCode) {
+    public TaskInstance queryTaskInstanceByCode(User loginUser, long projectCode, Long taskInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> checkResult =
@@ -317,10 +317,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (status != Status.SUCCESS) {
             return null;
         }
-        TaskInstance taskInstance = taskInstanceMapper.selectByCode(taskCode);
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
         if (taskInstance == null) {
-            logger.error("Task definition can not be found, projectCode:{}, taskInstanceCode:{}.", projectCode,
-                    taskCode);
+            logger.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
         }
         return taskInstance;
     }

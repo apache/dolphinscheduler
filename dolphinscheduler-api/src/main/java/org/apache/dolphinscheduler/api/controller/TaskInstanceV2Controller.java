@@ -186,16 +186,16 @@ public class TaskInstanceV2Controller extends BaseController {
      */
     @Operation(summary = "queryOneTaskInstance", description = "QUERY_ONE_TASK_INSTANCE")
     @Parameters({
-            @Parameter(name = "taskCode", description = "TASK_INSTANCE_CODE", required = true, schema = @Schema(implementation = Long.class), example = "1234567890")
+            @Parameter(name = "taskInstanceId", description = "TASK_INSTANCE_ID", required = true, schema = @Schema(implementation = Long.class), example = "1234567890")
     })
-    @PostMapping(value = "/{taskCode}", consumes = {"application/json"})
+    @PostMapping(value = "/{taskInstanceId}", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public TaskInstance queryTaskInstanceByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                               @PathVariable(value = "taskCode") Long taskCode) {
-        TaskInstance taskInstance = taskInstanceService.queryTaskInstanceByCode(loginUser, projectCode, taskCode);
+                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                @PathVariable(value = "taskInstanceId") Long taskInstanceId) {
+        TaskInstance taskInstance = taskInstanceService.queryTaskInstanceByCode(loginUser, projectCode, taskInstanceId);
         return taskInstance;
     }
 }

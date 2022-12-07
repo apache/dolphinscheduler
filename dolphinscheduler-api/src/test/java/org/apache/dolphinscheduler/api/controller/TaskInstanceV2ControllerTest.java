@@ -121,15 +121,13 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryTaskInstanceById() {
-
-        Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
+        TaskInstance taskInstance = new TaskInstance();
 
         when(taskInstanceService.queryTaskInstanceByCode(any(), Mockito.anyLong(), Mockito.anyLong()))
-                .thenReturn(mockResult);
+                .thenReturn(taskInstance);
 
-        Result taskResult = taskInstanceV2Controller.queryTaskInstanceByCode(null, 1L, 1L);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        TaskInstance taskResult = taskInstanceV2Controller.queryTaskInstanceByCode(null, 1L, 1L);
+        Assertions.assertNotNull(taskResult);
 
     }
 
