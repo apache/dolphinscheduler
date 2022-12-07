@@ -349,7 +349,6 @@ public class TaskDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskDefinitionListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @RequestParam(value = "searchWorkflowName", required = false) String searchWorkflowName,
                                                 @RequestParam(value = "searchTaskName", required = false) String searchTaskName,
                                                 @RequestParam(value = "taskType", required = false) String taskType,
                                                 @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
@@ -359,9 +358,8 @@ public class TaskDefinitionController extends BaseController {
         if (!result.checkResult()) {
             return result;
         }
-        searchWorkflowName = ParameterUtils.handleEscapes(searchWorkflowName);
         searchTaskName = ParameterUtils.handleEscapes(searchTaskName);
-        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode, searchWorkflowName,
+        return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode,
                 searchTaskName, taskType, taskExecuteType, pageNo, pageSize);
     }
 
