@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.params;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -33,6 +31,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 /**
  * PluginParamsTransfer Tester.
