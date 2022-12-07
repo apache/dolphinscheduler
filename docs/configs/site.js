@@ -45,7 +45,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.1.1)',
+            text: 'latest(3.1.2)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {

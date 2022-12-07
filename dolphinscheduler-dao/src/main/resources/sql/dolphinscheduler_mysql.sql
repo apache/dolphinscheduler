@@ -980,7 +980,7 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT IGNORE INTO `t_ds_version` VALUES ('1', '3.1.1');
+INSERT IGNORE INTO `t_ds_version` VALUES ('1', '3.1.2');
 
 
 -- ----------------------------
