@@ -15,19 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm;
+package org.apache.dolphinscheduler.plugin.datasource.dameng.param;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+public class DamengConnectionParam extends BaseConnectionParam {
 
-public class DmDataSourceChannelFactoryTest {
-
-    @Test
-    public void testCreate() {
-        DmDataSourceChannelFactory sourceChannelFactory = new DmDataSourceChannelFactory();
-        DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
-        Assertions.assertNotNull(dataSourceChannel);
+    @Override
+    public String toString() {
+        return "DamengConnectionParam{"
+                + "user='" + user + '\''
+                + ", address='" + address + '\''
+                + ", database='" + database + '\''
+                + ", jdbcUrl='" + jdbcUrl + '\''
+                + ", driverLocation='" + driverLocation + '\''
+                + ", driverClassName='" + driverClassName + '\''
+                + ", validationQuery='" + validationQuery + '\''
+                + ", other='" + other + '\''
+                + '}';
     }
 }

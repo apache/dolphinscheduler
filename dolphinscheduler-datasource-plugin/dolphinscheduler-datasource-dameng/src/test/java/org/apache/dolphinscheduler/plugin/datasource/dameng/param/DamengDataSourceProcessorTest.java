@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm.param;
+package org.apache.dolphinscheduler.plugin.datasource.dameng.param;
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -29,23 +29,23 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class DmDataSourceProcessorTest {
+public class DamengDataSourceProcessorTest {
 
-    private DmDataSourceProcessor dmDatasourceProcessor = new DmDataSourceProcessor();
+    private DamengDataSourceProcessor damengDatasourceProcessor = new DamengDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
-        DmDataSourceParamDTO dmDatasourceParamDTO = new DmDataSourceParamDTO();
-        dmDatasourceParamDTO.setUserName("SYSDBA");
-        dmDatasourceParamDTO.setPassword("SYSDBA");
-        dmDatasourceParamDTO.setHost("localhost");
-        dmDatasourceParamDTO.setPort(5236);
-        dmDatasourceParamDTO.setDatabase("PERSON");
+        DamengDataSourceParamDTO damengDatasourceParamDTO = new DamengDataSourceParamDTO();
+        damengDatasourceParamDTO.setUserName("SYSDBA");
+        damengDatasourceParamDTO.setPassword("SYSDBA");
+        damengDatasourceParamDTO.setHost("localhost");
+        damengDatasourceParamDTO.setPort(5236);
+        damengDatasourceParamDTO.setDatabase("PERSON");
 
         try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
             Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-            DmConnectionParam connectionParams = (DmConnectionParam) dmDatasourceProcessor
-                    .createConnectionParams(dmDatasourceParamDTO);
+            DamengConnectionParam connectionParams = (DamengConnectionParam) damengDatasourceProcessor
+                    .createConnectionParams(damengDatasourceParamDTO);
             Assertions.assertEquals("jdbc:dm://localhost:5236", connectionParams.getAddress());
             Assertions.assertEquals("jdbc:dm://localhost:5236/PERSON", connectionParams.getJdbcUrl());
         }
@@ -56,7 +56,7 @@ public class DmDataSourceProcessorTest {
         String connectionJson = "{\"user\":\"SYSDBA\",\"password\":\"SYSDBA\","
                 + "\"address\":\"jdbc:dm://localhost:5236\""
                 + ",\"database\":\"PERSON\",\"jdbcUrl\":\"jdbc:dm://localhost:5236/PERSON\"}";
-        DmConnectionParam connectionParams = (DmConnectionParam) dmDatasourceProcessor
+        DamengConnectionParam connectionParams = (DamengConnectionParam) damengDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assertions.assertNotNull(connectionJson);
         Assertions.assertEquals("SYSDBA", connectionParams.getUser());
@@ -64,28 +64,28 @@ public class DmDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_DM_JDBC_DRIVER,
-                dmDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_DAMENG_JDBC_DRIVER,
+                damengDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
-        DmConnectionParam dmConnectionParam = new DmConnectionParam();
-        dmConnectionParam.setJdbcUrl("jdbc:dm://localhost:5236/PERSON");
+        DamengConnectionParam damengConnectionParam = new DamengConnectionParam();
+        damengConnectionParam.setJdbcUrl("jdbc:dm://localhost:5236/PERSON");
         Assertions.assertEquals(
                 "jdbc:dm://localhost:5236/PERSON",
-                dmDatasourceProcessor.getJdbcUrl(dmConnectionParam));
+                damengDatasourceProcessor.getJdbcUrl(damengConnectionParam));
     }
 
     @Test
     public void testGetDbType() {
-        Assertions.assertEquals(DbType.DM, dmDatasourceProcessor.getDbType());
+        Assertions.assertEquals(DbType.DAMENG, damengDatasourceProcessor.getDbType());
     }
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.DM_VALIDATION_QUERY,
-                dmDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.DAMENG_VALIDATION_QUERY,
+                damengDatasourceProcessor.getValidationQuery());
     }
 
 }

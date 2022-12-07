@@ -89,7 +89,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-dm</artifactId>
+            <artifactId>dolphinscheduler-datasource-dameng</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

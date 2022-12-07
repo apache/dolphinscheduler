@@ -42,7 +42,7 @@
         <module>dolphinscheduler-datasource-redshift</module>
         <module>dolphinscheduler-datasource-athena</module>
         <module>dolphinscheduler-datasource-trino</module>
-        <module>dolphinscheduler-datasource-dm</module>
+        <module>dolphinscheduler-datasource-dameng</module>
     </modules>
 
     <dependencyManagement>

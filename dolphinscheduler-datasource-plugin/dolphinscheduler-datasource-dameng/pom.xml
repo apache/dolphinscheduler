@@ -24,7 +24,7 @@
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dolphinscheduler-datasource-dm</artifactId>
+    <artifactId>dolphinscheduler-datasource-dameng</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
 

@@ -15,28 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm.param;
+package org.apache.dolphinscheduler.plugin.datasource.dameng;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 
-public class DmDataSourceParamDTO extends BaseDataSourceParamDTO {
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-    @Override
-    public String toString() {
-        return "DmDatasourceParamDTO{"
-                + "name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", other='" + other + '\''
-                + '}';
-    }
+public class DamengDataSourceChannelFactoryTest {
 
-    @Override
-    public DbType getType() {
-        return DbType.DM;
+    @Test
+    public void testCreate() {
+        DamengDataSourceChannelFactory sourceChannelFactory = new DamengDataSourceChannelFactory();
+        DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
+        Assertions.assertNotNull(dataSourceChannel);
     }
 }

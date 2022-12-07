@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm;
+package org.apache.dolphinscheduler.plugin.datasource.dameng;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceChannelFactory.class)
-public class DmDataSourceChannelFactory implements DataSourceChannelFactory {
+public class DamengDataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override
     public String getName() {
-        return "dm";
+        return DbType.DAMENG.getDescp();
     }
 
     @Override
     public DataSourceChannel create() {
-        return new DmDataSourceChannel();
+        return new DamengDataSourceChannel();
     }
 }

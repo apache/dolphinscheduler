@@ -69,7 +69,7 @@ public class JDBCDataSourceProvider {
     }
 
     /**
-     * Create druid connection pool for DM
+     * Create druid connection pool for Dameng
      * @param properties jdbc connection param
      * @param dbType  database type
      * @return

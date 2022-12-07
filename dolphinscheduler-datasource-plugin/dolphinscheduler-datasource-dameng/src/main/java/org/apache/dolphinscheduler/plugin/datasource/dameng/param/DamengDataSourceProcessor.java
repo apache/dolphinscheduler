@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm.param;
+package org.apache.dolphinscheduler.plugin.datasource.dameng.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
@@ -43,98 +43,98 @@ import org.slf4j.LoggerFactory;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
-public class DmDataSourceProcessor extends AbstractDataSourceProcessor {
+public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(DmDataSourceProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(DamengDataSourceProcessor.class);
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
-        return JSONUtils.parseObject(paramJson, DmDataSourceParamDTO.class);
+        return JSONUtils.parseObject(paramJson, DamengDataSourceParamDTO.class);
     }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        DmConnectionParam connectionParams = (DmConnectionParam) createConnectionParams(connectionJson);
-        DmDataSourceParamDTO dmDatasourceParamDTO = new DmDataSourceParamDTO();
+        DamengConnectionParam connectionParams = (DamengConnectionParam) createConnectionParams(connectionJson);
+        DamengDataSourceParamDTO damengDatasourceParamDTO = new DamengDataSourceParamDTO();
 
-        dmDatasourceParamDTO.setUserName(connectionParams.getUser());
-        dmDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        dmDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        damengDatasourceParamDTO.setUserName(connectionParams.getUser());
+        damengDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
+        damengDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        dmDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        dmDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        damengDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        damengDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
 
-        return dmDatasourceParamDTO;
+        return damengDatasourceParamDTO;
     }
 
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
-        DmDataSourceParamDTO dmDatasourceParam = (DmDataSourceParamDTO) dataSourceParam;
+        DamengDataSourceParamDTO dmDatasourceParam = (DamengDataSourceParamDTO) dataSourceParam;
         String address = String
-                .format("%s%s:%s", DataSourceConstants.JDBC_DM, dmDatasourceParam.getHost(),
+                .format("%s%s:%s", DataSourceConstants.JDBC_DAMENG, dmDatasourceParam.getHost(),
                         dmDatasourceParam.getPort());
         String jdbcUrl = StringUtils.isEmpty(dmDatasourceParam.getDatabase()) ? address
                 : String.format("%s/%s", address,
                         dmDatasourceParam.getDatabase());
 
-        DmConnectionParam dmConnectionParam = new DmConnectionParam();
-        dmConnectionParam.setJdbcUrl(jdbcUrl);
-        dmConnectionParam.setDatabase(dmConnectionParam.getDatabase());
-        dmConnectionParam.setAddress(address);
-        dmConnectionParam.setUser(dmDatasourceParam.getUserName());
-        dmConnectionParam.setPassword(PasswordUtils.encodePassword(dmDatasourceParam.getPassword()));
-        dmConnectionParam.setDriverClassName(getDatasourceDriver());
-        dmConnectionParam.setValidationQuery(getValidationQuery());
-        dmConnectionParam.setOther(transformOther(dmDatasourceParam.getOther()));
-        dmConnectionParam.setProps(dmDatasourceParam.getOther());
+        DamengConnectionParam damengConnectionParam = new DamengConnectionParam();
+        damengConnectionParam.setJdbcUrl(jdbcUrl);
+        damengConnectionParam.setDatabase(damengConnectionParam.getDatabase());
+        damengConnectionParam.setAddress(address);
+        damengConnectionParam.setUser(dmDatasourceParam.getUserName());
+        damengConnectionParam.setPassword(PasswordUtils.encodePassword(dmDatasourceParam.getPassword()));
+        damengConnectionParam.setDriverClassName(getDatasourceDriver());
+        damengConnectionParam.setValidationQuery(getValidationQuery());
+        damengConnectionParam.setOther(transformOther(dmDatasourceParam.getOther()));
+        damengConnectionParam.setProps(dmDatasourceParam.getOther());
 
-        return dmConnectionParam;
+        return damengConnectionParam;
     }
 
     @Override
     public ConnectionParam createConnectionParams(String connectionJson) {
-        return JSONUtils.parseObject(connectionJson, DmConnectionParam.class);
+        return JSONUtils.parseObject(connectionJson, DamengConnectionParam.class);
     }
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_DM_JDBC_DRIVER;
+        return DataSourceConstants.COM_DAMENG_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.DM_VALIDATION_QUERY;
+        return DataSourceConstants.DAMENG_VALIDATION_QUERY;
     }
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        DmConnectionParam dmConnectionParam = (DmConnectionParam) connectionParam;
-        String jdbcUrl = dmConnectionParam.getJdbcUrl();
-        if (!StringUtils.isEmpty(dmConnectionParam.getOther())) {
-            return String.format("%s?%s", jdbcUrl, dmConnectionParam.getOther());
+        DamengConnectionParam damengConnectionParam = (DamengConnectionParam) connectionParam;
+        String jdbcUrl = damengConnectionParam.getJdbcUrl();
+        if (!StringUtils.isEmpty(damengConnectionParam.getOther())) {
+            return String.format("%s?%s", jdbcUrl, damengConnectionParam.getOther());
         }
         return jdbcUrl;
     }
 
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
-        DmConnectionParam dmConnectionParam = (DmConnectionParam) connectionParam;
+        DamengConnectionParam damengConnectionParam = (DamengConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(dmConnectionParam), dmConnectionParam.getUser(),
-                PasswordUtils.decodePassword(dmConnectionParam.getPassword()));
+        return DriverManager.getConnection(getJdbcUrl(damengConnectionParam), damengConnectionParam.getUser(),
+                PasswordUtils.decodePassword(damengConnectionParam.getPassword()));
     }
 
     @Override
     public DbType getDbType() {
-        return DbType.DM;
+        return DbType.DAMENG;
     }
 
     @Override
     public DataSourceProcessor create() {
-        return new DmDataSourceProcessor();
+        return new DamengDataSourceProcessor();
     }
 
     private String transformOther(Map<String, String> otherMap) {

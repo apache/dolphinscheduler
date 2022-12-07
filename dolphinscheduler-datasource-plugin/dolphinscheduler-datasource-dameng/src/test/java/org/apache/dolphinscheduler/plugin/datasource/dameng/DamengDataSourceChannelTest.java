@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm;
+package org.apache.dolphinscheduler.plugin.datasource.dameng;
 
-import org.apache.dolphinscheduler.plugin.datasource.dm.param.DmConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.dameng.param.DamengConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.jupiter.api.Assertions;
@@ -27,14 +27,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class DmDataSourceChannelTest {
+public class DamengDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        DmDataSourceChannel sourceChannel = Mockito.mock(DmDataSourceChannel.class);
-        DmDataSourceClient dataSourceClient = Mockito.mock(DmDataSourceClient.class);
+        DamengDataSourceChannel sourceChannel = Mockito.mock(DamengDataSourceChannel.class);
+        DamengDataSourceClient dataSourceClient = Mockito.mock(DamengDataSourceClient.class);
         Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new DmConnectionParam(), DbType.DM));
+        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new DamengConnectionParam(), DbType.DAMENG));
     }
 
 }

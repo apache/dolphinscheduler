@@ -299,9 +299,9 @@ export const datasourceType: IDataBaseOptionKeys = {
     label: 'TRINO',
     defaultPort: 8080
   },
-  DM: {
-    value: 'DM',
-    label: 'DM',
+  DAMENG: {
+    value: 'DAMENG',
+    label: 'DAMENG',
     defaultPort: 5236
   }
 }

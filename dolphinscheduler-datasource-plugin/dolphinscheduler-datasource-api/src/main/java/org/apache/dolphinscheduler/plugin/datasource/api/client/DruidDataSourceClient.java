@@ -64,7 +64,7 @@ public class DruidDataSourceClient implements DataSourceClient {
     }
 
     /**
-     * HikariCP does not support DM, druid supports DM
+     * HikariCP does not support Dameng, druid supports Dameng
      * @param baseConnectionParam
      * @param dbType
      */

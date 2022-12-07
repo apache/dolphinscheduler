@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm;
+package org.apache.dolphinscheduler.plugin.datasource.dameng;
 
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class DmDataSourceChannel implements DataSourceChannel {
+public class DamengDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new DmDataSourceClient(baseConnectionParam, dbType);
+        return new DamengDataSourceClient(baseConnectionParam, dbType);
     }
 }

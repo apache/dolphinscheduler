@@ -41,7 +41,7 @@ public enum DbType {
     REDSHIFT(10, "redshift"),
     ATHENA(11, "athena"),
     TRINO(12, "trino"),
-    DM(13, "dm");
+    DAMENG(13, "dameng");
 
     @EnumValue
     private final int code;

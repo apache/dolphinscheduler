@@ -15,16 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.dm;
+package org.apache.dolphinscheduler.plugin.datasource.dameng.param;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.DruidDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class DmDataSourceClient extends DruidDataSourceClient {
+public class DamengDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-    public DmDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
+    @Override
+    public String toString() {
+        return "DamengDatasourceParamDTO{"
+                + "name='" + name + '\''
+                + ", note='" + note + '\''
+                + ", host='" + host + '\''
+                + ", port=" + port
+                + ", database='" + database + '\''
+                + ", userName='" + userName + '\''
+                + ", other='" + other + '\''
+                + '}';
     }
 
+    @Override
+    public DbType getType() {
+        return DbType.DAMENG;
+    }
 }
