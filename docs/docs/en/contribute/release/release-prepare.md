@@ -21,7 +21,7 @@ For example, to release `x.y.z`, the following updates are required:
     - `soft_version`: need to be updated to x.y.z
   - `deploy/docker/.env`: `HUB` change to `apache`，`TAG` change to `x.y.z`
   - `deploy/kubernetes/dolphinscheduler`:
-    - `Chart.yaml`: `appVersion` needs to be updated to x.y.z (`version` is helm chart version，incremented and different from x.y.z)
+    - `Chart.yaml`: `appVersion` and `version` needs to be updated to x.y.z
     - `values.yaml`: `image.tag` needs to be updated to x.y.z
 - Version in the docs:
   - Change the placeholder `<version>`(except `pom`)  to the `x.y.z` in directory `docs`

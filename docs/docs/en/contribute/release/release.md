@@ -469,10 +469,10 @@ the release version is `<VERSION>`, the following updates are required(note it w
   - `docs/configs/site.js`:
     - `docsLatest`: update to `<VERSION>`
     - `docs0`: The `text` of two places of `en-us/zh-cn` needs to be updated to `latest(<VERSION>)`
-  - `docs/configs/index.md.jsx`: Add `<VERSION>: docsxyzConfig`
+  - `docs/configs/index.md.jsx`: Add `<VERSION>: docsxyzConfig` and add new `import` for the new `docsxyzConfig`
   - `docs/docs/en/history-versions.md` and `docs/docs/zh/history-versions.md`: Add new `<VERSION>` release docs.
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler's GitHub [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml)
-    issue template have **Version** selection bottom. So after we release DolphinScheduler we should and the new `<VERSION>` to
+    issue template have **Version** selection bottom. So after released we should and the new `<VERSION>` to
     bug-report.yml
 
 ### Find DolphinScheduler in [apache staging repositories](https://repository.apache.org/#stagingRepositories) and click `Release`

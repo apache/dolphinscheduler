@@ -135,7 +135,9 @@ def dev_syntax() -> None:
     for path in dev_files_path:
         content = path.read_text()
         find = pattern.findall(content)
-        assert not find, f"File {str(path)} contain temporary not support syntax: {find}."
+        assert (
+            not find
+        ), f"File {str(path)} contain temporary not support syntax: {find}."
 
 
 def build_argparse() -> argparse.ArgumentParser:
@@ -167,7 +169,8 @@ def build_argparse() -> argparse.ArgumentParser:
     parser_prune.set_defaults(func=prune)
 
     parser_prune = subparsers.add_parser(
-        "dev-syntax", help="Check whether temporary does not support syntax in development directory."
+        "dev-syntax",
+        help="Check whether temporary does not support syntax in development directory.",
     )
     parser_prune.set_defaults(func=dev_syntax)
 

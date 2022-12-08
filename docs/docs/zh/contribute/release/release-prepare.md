@@ -21,7 +21,7 @@
     - `soft_version`: 版本更新为 x.y.z
   - `deploy/docker/.env`: `HUB` 改为 `apache`，`TAG` 改为 `x.y.z`
   - `deploy/kubernetes/dolphinscheduler`:
-    - `Chart.yaml`: `appVersion` 版本更新为 x.y.z (`version` 为 helm chart 版本, 增量更新但不要设置为 x.y.z)
+    - `Chart.yaml`: `appVersion` 和 `version` 版本更新为 x.y.z
     - `values.yaml`: `image.tag` 版本更新为 x.y.z
 - 修改文档（docs模块）中的版本号:
   - 将 `docs` 文件夹下文件的占位符 `<version>` (除了 pom.xml 相关的) 修改成 `x.y.z`
