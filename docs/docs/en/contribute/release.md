@@ -240,8 +240,8 @@ It is basically the same as the previous rehearsal command, but deleting `-DdryR
 After making sure there is no mistake in local files, submit them to GitHub.
 
 ```shell
-git push -u origin "${VERSION}"-release
-git push origin --tags
+git push -u "${GH_REMOTE}" "${VERSION}"-release
+git push "${GH_REMOTE}" --tags
 ```
 
 <!-- markdown-link-check-disable -->
@@ -458,10 +458,18 @@ Thanks everyone for taking time to check this release and help us.
 
 ## Announce
 
-### Move Packages to Release
+### Handle Release Tarball and Remove Release Branch
 
 ```shell
+# move to release directory
 svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
+
+# remove old release directory
+svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/dolphinscheduler/<PREVIOUS-RELEASE-VERSION>
+
+# Remove prepare branch 
+cd "${SOURCE_CODE_DIR}"
+git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 and then find DolphinScheduler in [apache staging repositories](https://repository.apache.org/#stagingRepositories) and click `Release`

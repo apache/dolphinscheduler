@@ -246,8 +246,8 @@ mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.s
 将本地文件检查无误后，提交至github。
 
 ```shell
-git push -u origin "${VERSION}"-release
-git push origin --tags
+git push -u "${GH_REMOTE}" "${VERSION}"-release
+git push "${GH_REMOTE}" --tags
 ```
 
 <!-- markdown-link-check-disable -->
@@ -464,7 +464,15 @@ Thanks everyone for taking time to check this release and help us.
 ### Move Packages to Release
 
 ```shell
+# move to release directory
 svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinscheduler/"${VERSION}" https://dist.apache.org/repos/dist/release/dolphinscheduler/
+
+# remove old release directory
+svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/dolphinscheduler/<PREVIOUS-RELEASE-VERSION>
+
+# Remove prepare branch 
+cd "${SOURCE_CODE_DIR}"
+git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 在 [apache staging repositories](https://repository.apache.org/#stagingRepositories) 仓库找到 DolphinScheduler 并点击`Release`
