@@ -251,7 +251,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -274,7 +274,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -295,7 +295,7 @@ public class ExecutorServiceTest {
                     RunMode.RUN_MODE_SERIAL,
                     Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                     Constants.TEST_FLAG_NO,
-                    ComplementDependentMode.OFF_MODE);
+                    ComplementDependentMode.OFF_MODE, null);
         } catch (ServiceException e) {
             Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
         }
@@ -362,7 +362,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(commandService, times(0)).createCommand(any(Command.class));
     }
@@ -384,7 +384,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
     }
@@ -406,7 +406,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(31)).createCommand(any(Command.class));
 
@@ -429,7 +429,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(15)).createCommand(any(Command.class));
 
@@ -448,7 +448,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
 
     }
@@ -477,7 +477,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_YES,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 

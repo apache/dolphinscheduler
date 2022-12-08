@@ -147,7 +147,8 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
                                        @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
-                                       @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
+                                       @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
+                                       @RequestParam(value = "version") Integer version) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -165,7 +166,7 @@ public class ExecutorController extends BaseController {
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                 workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
-                complementDependentMode);
+                complementDependentMode,version);
         return returnDataList(result);
     }
 
@@ -264,7 +265,7 @@ public class ExecutorController extends BaseController {
                     execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                     workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
-                    complementDependentMode);
+                    complementDependentMode,null);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
                 logger.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,

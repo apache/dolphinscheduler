@@ -190,7 +190,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
                                                    int dryRun, int testFlag,
-                                                   ComplementDependentMode complementDependentMode) {
+                                                   ComplementDependentMode complementDependentMode,Integer version) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -204,12 +204,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
-
+        ProcessDefinition processDefinition;
+        if(null != version){
+            processDefinition = processService.findProcessDefinition(processDefinitionCode,version);
+        }else {
+            processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        }
         // check process define release state
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         this.checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode,
                 processDefinition.getVersion());
-
+        //check current version whether include startNodeList
         checkStartNodeList(startNodeList, processDefinitionCode, processDefinition.getVersion());
         if (!checkTenantSuitable(processDefinition)) {
             logger.error(

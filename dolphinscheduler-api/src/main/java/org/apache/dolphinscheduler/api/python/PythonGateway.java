@@ -385,7 +385,8 @@ public class PythonGateway {
                 null,
                 DEFAULT_DRY_RUN,
                 DEFAULT_TEST_FLAG,
-                COMPLEMENT_DEPENDENT_MODE);
+                COMPLEMENT_DEPENDENT_MODE,
+                processDefinition.getVersion());
     }
 
     // side object
