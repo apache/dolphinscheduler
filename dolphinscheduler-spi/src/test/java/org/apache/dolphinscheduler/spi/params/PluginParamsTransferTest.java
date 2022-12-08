@@ -32,6 +32,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 /**
  * PluginParamsTransfer Tester.
  */
@@ -178,7 +181,9 @@ public class PluginParamsTransferTest {
                 + ",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\""
                 + ":\"attachment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"tableattachment\""
                 + ",\"value\":\"tableattachment\",\"disabled\":false}]}]";
-        Assertions.assertEquals(paramsJsonAssert, paramsJson);
+        JsonElement paramsJsonElement = JsonParser.parseString(paramsJson);
+        JsonElement paramsAssertJsonElement = JsonParser.parseString(paramsJsonAssert);
+        Assertions.assertEquals(paramsAssertJsonElement, paramsJsonElement);
     }
 
     @Test
