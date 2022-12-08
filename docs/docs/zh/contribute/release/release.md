@@ -468,11 +468,10 @@ svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinsch
   - `docs/configs/site.js`:
     - `docsLatest`: 更新为 `<VERSION>`
     - `docs0`: 两处 `en-us/zh-cn` 的 `text` 更新为 `latest(<VERSION>)`
-  - `docs/configs/index.md.jsx`: 增加 `'<VERSION>': docsxyzConfig,`
+  - `docs/configs/index.md.jsx`: 增加 `'<VERSION>': docsxyzConfig,` 以及新的 `import`
   - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的发版版本 `<VERSION>` 的链接
-  - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler 在 GitHub issue 中有版本选择的部分，当有新版本发版后，需要更新这部分的内容。目前与版本关联的是
-    [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml)，发版的时候需要
-    向其中的 **Version** 部分增加内容。
+  - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler 在 GitHub bug report 的 issue 中有版本选择，当有新的版本发版后，需要更新
+    [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml) 中的 **Version** 部分。
 
 ### 在 [apache staging repositories](https://repository.apache.org/#stagingRepositories) 仓库找到 DolphinScheduler 并点击`Release`
 
