@@ -510,9 +510,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public void removeTaskLogFile(Integer processInstanceId) {
-        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
-        List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
+        List<TaskInstance> taskInstanceList = taskInstanceDao.findTaskInstanceByWorkflowInstanceId(processInstanceId);
         if (CollectionUtils.isEmpty(taskInstanceList)) {
             return;
         }
@@ -521,31 +519,15 @@ public class ProcessServiceImpl implements ProcessService {
             if (Strings.isNullOrEmpty(taskInstance.getHost())) {
                 continue;
             }
-            Host host = Host.of(taskInstance.getHost());
-            // remove task log from loggerserver
-            logClient.removeTaskLog(host.getIp(), host.getPort(), taskLogPath);
+            try {
+                Host host = Host.of(taskInstance.getHost());
+                logClient.removeTaskLog(host, taskLogPath);
+            } catch (Exception e) {
+                logger.error(
+                        "Remove task log error, meet an unknown exception, taskInstanceId: {}, host: {}, logPath: {}",
+                        taskInstance.getId(), taskInstance.getHost(), taskInstance.getLogPath(), e);
+            }
         }
-    }
-
-    /**
-     * recursive delete all task instance by process instance id
-     */
-    @Override
-    public void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId) {
-        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
-        List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
-        if (CollectionUtils.isEmpty(taskInstanceList)) {
-            return;
-        }
-
-        List<Integer> taskInstanceIdList = new ArrayList<>();
-
-        for (TaskInstance taskInstance : taskInstanceList) {
-            taskInstanceIdList.add(taskInstance.getId());
-        }
-
-        taskInstanceMapper.deleteBatchIds(taskInstanceIdList);
     }
 
     /**

@@ -1011,7 +1011,7 @@ INSERT IGNORE INTO `t_ds_version` VALUES ('1', '2.0.2');
 -- Records of t_ds_alertgroup
 -- ----------------------------
 INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', current_timestamp, current_timestamp);
+VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', current_timestamp, current_timestamp);
 
 -- ----------------------------
 -- Records of t_ds_user

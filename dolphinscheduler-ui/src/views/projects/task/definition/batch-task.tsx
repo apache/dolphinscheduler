@@ -60,7 +60,6 @@ const BatchTaskDefinition = defineComponent({
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchTaskName: variables.searchTaskName,
-        searchWorkflowName: variables.searchWorkflowName,
         taskType: variables.taskType
       })
     }
@@ -77,11 +76,6 @@ const BatchTaskDefinition = defineComponent({
 
     const onClearSearchTaskName = () => {
       variables.searchTaskName = null
-      onSearch()
-    }
-
-    const onClearSearchWorkflowName = () => {
-      variables.searchWorkflowName = null
       onSearch()
     }
 
@@ -126,7 +120,6 @@ const BatchTaskDefinition = defineComponent({
       ...toRefs(task),
       onSearch,
       onClearSearchTaskName,
-      onClearSearchWorkflowName,
       onClearSearchTaskType,
       requestData,
       onUpdatePageSize,
@@ -164,14 +157,6 @@ const BatchTaskDefinition = defineComponent({
                 v-model={[this.searchTaskName, 'value']}
                 placeholder={t('project.task.task_name')}
                 onClear={this.onClearSearchTaskName}
-              />
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                clearable
-                v-model={[this.searchWorkflowName, 'value']}
-                placeholder={t('project.task.workflow_name')}
-                onClear={this.onClearSearchWorkflowName}
               />
               <NSelect
                 v-model={[this.taskType, 'value']}

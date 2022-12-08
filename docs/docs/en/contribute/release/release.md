@@ -145,8 +145,8 @@ A_USERNAME=<YOUR-APACHE-USERNAME>
 
 > Note: We can use the variable directly in you bash after we set environment, without changing anything. For example, we
 > can use command `git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git` to clone the release branch
-> and it can be success by covert the `"${VERSION}"` to `<THE-VERSION-YOU-RELEASE>`. But you have to change `<VERSION>` manually in
-> some of not bash step like [vote mail](#vote-procedure), we using `<VERSION>` instead of `"${VERSION}"` to notice release
+> and it can be successful by converting the `"${VERSION}"` to `<THE-VERSION-YOU-RELEASE>`. But you have to change `<VERSION>` manually in
+> some of not bash step like [vote mail](#vote-procedure), we are using `<VERSION>` instead of `"${VERSION}"` to notice release
 > manager they have to change by hand.
 
 ### Create Release Branch
@@ -469,10 +469,10 @@ the release version is `<VERSION>`, the following updates are required(note it w
   - `docs/configs/site.js`:
     - `docsLatest`: update to `<VERSION>`
     - `docs0`: The `text` of two places of `en-us/zh-cn` needs to be updated to `latest(<VERSION>)`
-  - `docs/configs/index.md.jsx`: Add `<VERSION>: docsxyzConfig`
+  - `docs/configs/index.md.jsx`: Add `<VERSION>: docsxyzConfig` and add new `import` for the new `docsxyzConfig`
   - `docs/docs/en/history-versions.md` and `docs/docs/zh/history-versions.md`: Add new `<VERSION>` release docs.
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler's GitHub [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml)
-    issue template have **Version** selection bottom. So after we release DolphinScheduler we should and the new `<VERSION>` to
+    issue template have **Version** selection bottom. So after released we should and the new `<VERSION>` to
     bug-report.yml
 
 ### Find DolphinScheduler in [apache staging repositories](https://repository.apache.org/#stagingRepositories) and click `Release`
