@@ -308,7 +308,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     }
 
     @Override
-    public TaskInstance queryTaskInstanceByCode(User loginUser, long projectCode, Long taskInstanceId) {
+    public TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> checkResult =
