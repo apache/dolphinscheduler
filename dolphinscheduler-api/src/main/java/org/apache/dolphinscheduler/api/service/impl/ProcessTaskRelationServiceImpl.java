@@ -412,10 +412,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     @Transactional
-    public List<ProcessTaskRelation> updateUpstreamTaskDefinition(User loginUser,
-                                                                  long taskCode,
-                                                                  boolean needSyncDag,
-                                                                  TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
+    public List<ProcessTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
+                                                                             long taskCode,
+                                                                             boolean needSyncDag,
+                                                                             TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
         TaskDefinition downstreamTask = taskDefinitionMapper.queryByCode(taskCode);
         if (downstreamTask == null) {
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
@@ -477,6 +477,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             long upstreamCode = 0L;
             int version = 0;
             if (createCode != 0L) {
+                // 0 for DAG root, should not, it may already exists and skip to create anymore
                 TaskDefinition upstreamTask = taskDefinitionMapper.queryByCode(createCode);
                 if (upstreamTask == null) {
                     throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, createCode);
@@ -496,15 +497,14 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
 
         // batch sync to process task relation log
-        int saveTaskRelation = saveTaskRelation(loginUser, processDefinition, insertVersion);
-        if (saveTaskRelation != Constants.EXIT_CODE_SUCCESS) {
+        int saveTaskRelationResult = saveTaskRelation(loginUser, processDefinition, insertVersion);
+        if (saveTaskRelationResult != Constants.EXIT_CODE_SUCCESS) {
             logger.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-        } else {
-            logger.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
-                    processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
         }
+        logger.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+                processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
         processTaskRelations.get(0).setProcessDefinitionVersion(insertVersion);
         return processTaskRelations;
     }
@@ -555,7 +555,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             processTaskRelationLog.setOperator(loginUser.getId());
             processTaskRelationLog.setOperateTime(now);
         }
-        if (!taskRelations.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(taskRelations)) {
             Set<Integer> processTaskRelationSet =
                     taskRelations.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
             Set<Integer> taskRelationSet =

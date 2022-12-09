@@ -2789,10 +2789,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             logger.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-        } else {
-            logger.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
-                    processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
         }
+        logger.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+                processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
         processDefinitionUpdate.setVersion(insertVersion);
         return processDefinitionUpdate;
     }
@@ -2830,7 +2829,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return Constants.EXIT_CODE_SUCCESS;
         }
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = null;
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
+        if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
             taskDefinitionLogMap = taskDefinitionLogs
                     .stream()
                     .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinitionLog -> taskDefinitionLog));
@@ -2862,9 +2861,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     taskRelations.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
             Set<Integer> taskRelationSet =
                     taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
-            boolean result = org.apache.commons.collections.CollectionUtils.isEqualCollection(processTaskRelationSet,
+            boolean result = CollectionUtils.isEqualCollection(processTaskRelationSet,
                     taskRelationSet);
             if (result) {
+                logger.info("process task relations is non-existent, projectCode:{}, processCode:{}.",
+                        processDefinition.getProjectCode(), processDefinition.getCode());
                 return Constants.EXIT_CODE_SUCCESS;
             }
             processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
