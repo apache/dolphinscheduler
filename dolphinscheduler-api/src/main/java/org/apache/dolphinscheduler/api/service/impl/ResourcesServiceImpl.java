@@ -72,7 +72,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -1739,7 +1738,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } catch (IOException e) {
             logger.error("Download resource error, the path is {}, and local filename is {}, the error message is {}",
                     fullName, localFileName, e.getMessage());
-            throw new ServerException("Download the resource file failed ,it may be related to your storage");
+            throw new ServiceException("Download the resource file failed ,it may be related to your storage");
         }
     }
 
