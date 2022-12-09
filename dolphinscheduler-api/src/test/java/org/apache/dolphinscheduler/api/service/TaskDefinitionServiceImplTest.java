@@ -396,12 +396,14 @@ public class TaskDefinitionServiceImplTest {
         // success
         Mockito.when(taskDefinitionLogMapper.insert(isA(TaskDefinitionLog.class))).thenReturn(1);
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
-        Mockito.when(processTaskRelationService.updateUpstreamTaskDefinition(isA(User.class), isA(Long.class),
+        Mockito.when(processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
                 isA(Boolean.class),
                 isA(TaskRelationUpdateUpstreamRequest.class))).thenReturn(getProcessTaskRelationList());
         Mockito.when(processDefinitionService.updateSingleProcessDefinition(isA(User.class), isA(Long.class),
                 isA(WorkflowUpdateRequest.class))).thenReturn(getProcessDefinition());
         Assertions.assertDoesNotThrow(() -> taskDefinitionService.createTaskDefinitionV2(user, taskCreateRequest));
+
+
     }
 
     @Test
@@ -468,11 +470,14 @@ public class TaskDefinitionServiceImplTest {
         // success
         Mockito.when(taskDefinitionLogMapper.insert(isA(TaskDefinitionLog.class))).thenReturn(1);
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
-        Mockito.when(processTaskRelationService.updateUpstreamTaskDefinition(isA(User.class), isA(Long.class),
+        Mockito.when(processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
                 isA(Boolean.class),
                 isA(TaskRelationUpdateUpstreamRequest.class))).thenReturn(getProcessTaskRelationList());
         Assertions.assertDoesNotThrow(
                 () -> taskDefinitionService.updateTaskDefinitionV2(user, TASK_CODE, taskUpdateRequest));
+
+        TaskDefinition taskDefinition = taskDefinitionService.updateTaskDefinitionV2(user, TASK_CODE, taskUpdateRequest);
+        Assertions.assertEquals(getTaskDefinition().getVersion()+1, taskDefinition.getVersion());
     }
 
     @Test
