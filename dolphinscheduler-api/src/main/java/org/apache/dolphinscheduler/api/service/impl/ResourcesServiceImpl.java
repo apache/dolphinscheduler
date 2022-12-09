@@ -64,7 +64,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1326,7 +1325,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
         } catch (IOException e) {
             logger.error("download resource error, the path is {}, and local filename is {}, the error message is {}", fileName, localFileName, e.getMessage());
-            throw new ServerException("download the resource file failed ,it may be related to your storage");
+            throw new ServiceException("download the resource file failed ,it may be related to your storage");
         }
 
 
