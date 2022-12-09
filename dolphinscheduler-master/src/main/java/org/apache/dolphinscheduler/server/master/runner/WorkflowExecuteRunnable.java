@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.IsCache;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -403,6 +404,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 // todo: merge the last taskInstance
                 processInstance.setVarPool(taskInstance.getVarPool());
                 processInstanceDao.upsertProcessInstance(processInstance);
+                // check if the task is will be cached, and set the cache task instance id
+                if (taskInstance.getIsCache().equals(IsCache.YES) && taskInstance.getTmpCacheKey() != null) {
+                    taskInstance.setCacheKey(taskInstance.getTmpCacheKey());
+                    taskInstanceDao.updateTaskInstance(taskInstance);
+                }
                 if (!processInstance.isBlocked()) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
                 }
@@ -1187,6 +1193,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         // set task cpu quota and max memory
         taskInstance.setCpuQuota(taskNode.getCpuQuota());
         taskInstance.setMemoryMax(taskNode.getMemoryMax());
+
+        taskInstance.setIsCache(taskNode.getIsCache() == IsCache.YES.getCode() ? IsCache.YES : IsCache.NO);
 
         // task instance priority
         if (taskNode.getTaskInstancePriority() == null) {

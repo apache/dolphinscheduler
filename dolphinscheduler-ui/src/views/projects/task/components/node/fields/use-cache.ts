@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-public enum TaskEventType {
-    DISPATCH,
-    DELAY,
-    RUNNING,
-    RESULT,
-    WORKER_REJECT,
-
-    CACHE,
+export function useCache(): IJsonItem {
+    const { t } = useI18n()
+    return {
+        type: 'switch',
+        field: 'isCache',
+        name: t('Use Cache'),
+        span: 12
+    }
 }

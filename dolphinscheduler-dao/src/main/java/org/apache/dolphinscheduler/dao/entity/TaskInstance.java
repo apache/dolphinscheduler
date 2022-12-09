@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.IsCache;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -40,6 +41,7 @@ import java.util.Map;
 
 import lombok.Data;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -187,6 +189,19 @@ public class TaskInstance implements Serializable {
      */
     private Flag flag;
 
+    /**
+     * task is cache: yes/no
+     */
+    private IsCache isCache;
+
+    /**
+     * task is cache: yes/no
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String cacheKey;
+
+    @TableField(exist = false)
+    private String tmpCacheKey;
     /**
      * dependency
      */
@@ -409,4 +424,5 @@ public class TaskInstance implements Serializable {
         // task retry does not over time, return false
         return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
+
 }

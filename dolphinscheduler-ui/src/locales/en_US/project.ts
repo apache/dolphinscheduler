@@ -277,7 +277,8 @@ export default {
     alarm_group: 'Alarm group',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
-    please_choose: 'Please Choose'
+    please_choose: 'Please Choose',
+    remove_task_cache: 'Remove Cache'
   },
   dag: {
     create: 'Create Workflow',

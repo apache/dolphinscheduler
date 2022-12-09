@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
+import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -38,6 +41,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
@@ -45,6 +50,7 @@ import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -80,6 +86,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     TaskInstanceMapper taskInstanceMapper;
+
+    @Autowired
+    TaskInstanceDao taskInstanceDao;
 
     @Autowired
     ProcessInstanceService processInstanceService;
@@ -319,4 +328,39 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
         return taskInstance;
     }
+
+    @Override
+    public TaskInstanceRemoveCacheResponse removeTaskInstanceCache(User loginUser, long projectCode,
+                                                                   Integer taskInstanceId) {
+        Result result = new Result();
+
+        Project project = projectMapper.queryByCode(projectCode);
+        projectService.checkProjectAndAuthThrowException(loginUser, project,
+                ApiFuncIdentificationConstant.map.get(INSTANCE_UPDATE));
+
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        if (taskInstance == null) {
+            logger.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            return new TaskInstanceRemoveCacheResponse(result);
+        }
+        String tagCacheKey = taskInstance.getCacheKey();
+        String cacheKey = TaskCacheUtils.revertCacheKey(tagCacheKey);
+        List<Integer> cacheTaskInstanceIds = new ArrayList<>();
+        while (true) {
+            TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceByCacheKey(cacheKey);
+            if (cacheTaskInstance == null) {
+                break;
+            }
+            cacheTaskInstance.setCacheKey(null);
+            boolean r = taskInstanceDao.updateTaskInstance(cacheTaskInstance);
+            logger.info("remove task instance cache, taskInstanceId:{}, cacheKey:{}, result:{}",
+                    cacheTaskInstance.getId(), cacheKey, r);
+            cacheTaskInstanceIds.add(cacheTaskInstance.getId());
+        }
+        putMsg(result, Status.SUCCESS);
+        return new TaskInstanceRemoveCacheResponse(result, cacheTaskInstanceIds, cacheKey);
+    }
+
 }

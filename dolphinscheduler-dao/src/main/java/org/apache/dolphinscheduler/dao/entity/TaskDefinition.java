@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.IsCache;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
@@ -114,6 +115,11 @@ public class TaskDefinition {
      * task is valid: yes/no
      */
     private Flag flag;
+
+    /**
+     * task is cache: yes/no
+     */
+    private IsCache isCache;
 
     /**
      * task priority
