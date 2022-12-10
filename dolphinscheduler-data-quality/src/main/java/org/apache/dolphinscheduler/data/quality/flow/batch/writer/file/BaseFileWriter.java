@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironmen
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
 import org.apache.dolphinscheduler.data.quality.utils.ConfigUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.spark.sql.DataFrameWriter;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;

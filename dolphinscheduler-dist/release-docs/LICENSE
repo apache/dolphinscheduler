@@ -229,7 +229,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-beanutils 1.9.4 https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils/1.9.4, Apache 2.0
     commons-cli 1.2: https://mvnrepository.com/artifact/commons-cli/commons-cli/1.2, Apache 2.0
     commons-codec 1.11: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11, Apache 2.0
-    commons-collections4 4.1: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.1, Apache 2.0
+    commons-collections4 4.3: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.3, Apache 2.0
     commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
     commons-configuration2 2.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2/2.1.1, Apache 2.0
     commons-daemon 1.0.13: https://github.com/apache/commons-daemon, Apache 2.0

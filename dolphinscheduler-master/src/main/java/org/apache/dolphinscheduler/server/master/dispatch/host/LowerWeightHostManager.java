@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
 import org.apache.dolphinscheduler.server.master.registry.WorkerInfoChangeListener;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 import java.util.HashMap;

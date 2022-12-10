@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProce
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Collections;
