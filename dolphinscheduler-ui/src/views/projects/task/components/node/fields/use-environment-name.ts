@@ -49,7 +49,6 @@ export function useEnvironmentName(
     if (options.value.length === 0) {
       model.environmentCode = null
     } else {
-      debugger
       (isCreate && !model.environmentCode)  && (model.environmentCode = options.value[0].value)
     }
   }
