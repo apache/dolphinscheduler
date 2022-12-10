@@ -85,6 +85,6 @@ export function useEnvironmentName(
       loading: loading,
       clearable: true
     },
-    options: options,
+    options: options
   }
 }
