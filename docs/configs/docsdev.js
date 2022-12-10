@@ -622,21 +622,8 @@ export default {
                         ],
                     },
                     {
-                        title: 'Release Guide',
-                        children: [
-                            {
-                                title: 'Release Preparation',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release-prepare.html',
-                            },
-                            {
-                                title: 'Release Guide',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release.html',
-                            },
-                            {
-                                title: 'Release Post',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release-post.html',
-                            },
-                        ],
+                        title: 'Releasing',
+                        link: '/en-us/docs/dev/user_doc/contribute/release.html',
                     },
                     {
                         title: 'Questions & Communications',
@@ -1262,21 +1249,8 @@ export default {
                         ],
                     },
                     {
-                        title: '发版指南',
-                        children: [
-                            {
-                                title: '发版准备',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-prepare.html',
-                            },
-                            {
-                                title: '发版指南',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release.html',
-                            },
-                            {
-                                title: '发版后续',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-post.html',
-                            },
-                        ],
+                        title: '发版',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/release.html',
                     },
                     {
                         title: '问题与交流',
