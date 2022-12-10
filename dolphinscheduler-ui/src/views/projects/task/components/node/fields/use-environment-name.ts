@@ -48,7 +48,9 @@ export function useEnvironmentName(
     loading.value = false
     if (options.value.length === 0) {
       model.environmentCode = null
-    } 
+    } else {
+      isCreate && (model.environmentCode = options.value[0].value)
+    }
   }
 
   const filterByWorkerGroup = (option: IEnvironmentNameOption) => {
