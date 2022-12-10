@@ -49,7 +49,8 @@ export function useEnvironmentName(
     if (options.value.length === 0) {
       model.environmentCode = null
     } else {
-      isCreate && (model.environmentCode = options.value[0].value)
+      debugger
+      (isCreate && !model.environmentCode)  && (model.environmentCode = options.value[0].value)
     }
   }
 
@@ -85,6 +86,6 @@ export function useEnvironmentName(
       loading: loading,
       clearable: true
     },
-    options: options
+    options: options,
   }
 }
