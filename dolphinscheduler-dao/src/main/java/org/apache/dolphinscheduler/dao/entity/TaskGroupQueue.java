@@ -22,7 +22,10 @@ import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -30,6 +33,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("t_ds_task_group_queue")
 public class TaskGroupQueue implements Serializable {
 
@@ -95,18 +101,4 @@ public class TaskGroupQueue implements Serializable {
      * update time
      */
     private Date updateTime;
-
-    public TaskGroupQueue() {
-
-    }
-
-    public TaskGroupQueue(int taskId, String taskName, int groupId, int processId, int priority,
-                          TaskGroupQueueStatus status) {
-        this.taskId = taskId;
-        this.taskName = taskName;
-        this.groupId = groupId;
-        this.processId = processId;
-        this.priority = priority;
-        this.status = status;
-    }
 }

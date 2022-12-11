@@ -74,11 +74,13 @@
     </select>
 
     <!--modify data by id-->
-    <update id="updateTaskGroupResource">
+    <update id="robTaskGroupResource">
         update t_ds_task_group
-           set use_size = use_size+1
-        where id = #{id} and use_size  &lt; group_size and
-         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
+        set use_size = use_size + 1
+        where id = #{id}
+          and use_size &lt; group_size
+          and use_size = #{currentUseSize}
+          and (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus}) = 1
     </update>
 
     <!--modify data by id-->
