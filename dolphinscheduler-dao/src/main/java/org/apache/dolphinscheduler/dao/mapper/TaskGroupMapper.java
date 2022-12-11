@@ -35,14 +35,10 @@ import java.util.List;
  */
 public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
-    /**
-     * compard and set to update table of task group
-     *
-     * @param id primary key
-     * @return affected rows
-     */
-    int updateTaskGroupResource(@Param("id") int id, @Param("queueId") int queueId,
-                                @Param("queueStatus") int queueStatus);
+    int robTaskGroupResource(@Param("id") int id,
+                             @Param("currentUseSize") int currentUseSize,
+                             @Param("queueId") int queueId,
+                             @Param("queueStatus") int queueStatus);
 
     /**
      * update table of task group

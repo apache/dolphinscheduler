@@ -100,8 +100,14 @@ public class TaskGroupServiceTest {
     }
 
     private TaskGroup getTaskGroup() {
-        TaskGroup taskGroup = new TaskGroup(taskGroupName,0, taskGroupDesc,
-            100, 1,1);
+        TaskGroup taskGroup = TaskGroup.builder()
+                .name(taskGroupName)
+                .projectCode(0)
+                .description(taskGroupDesc)
+                .groupSize(100)
+                .userId(1)
+                .status(Flag.YES.getCode())
+                .build();
         return taskGroup;
     }
 

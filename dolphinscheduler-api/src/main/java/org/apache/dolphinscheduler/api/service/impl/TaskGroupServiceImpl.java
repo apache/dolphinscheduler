@@ -108,11 +108,18 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        TaskGroup taskGroup = new TaskGroup(name, projectCode, description,
-                groupSize, loginUser.getId(), Flag.YES.getCode());
+        Date now = new Date();
+        TaskGroup taskGroup = TaskGroup.builder()
+                .name(name)
+                .projectCode(projectCode)
+                .description(description)
+                .groupSize(groupSize)
+                .userId(loginUser.getId())
+                .status(Flag.YES.getCode())
+                .createTime(now)
+                .updateTime(now)
+                .build();
 
-        taskGroup.setCreateTime(new Date());
-        taskGroup.setUpdateTime(new Date());
         if (taskGroupMapper.insert(taskGroup) > 0) {
             permissionPostHandle(AuthorizationType.TASK_GROUP, loginUser.getId(),
                     Collections.singletonList(taskGroup.getId()), logger);
