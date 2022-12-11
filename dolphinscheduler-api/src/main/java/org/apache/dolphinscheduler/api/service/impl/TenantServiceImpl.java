@@ -215,18 +215,14 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @throws Exception exception
      */
     @Override
-    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
+    public Tenant updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
-
-        Map<String, Object> result = new HashMap<>();
-
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         if (checkDescriptionLength(desc)) {
             logger.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
         Tenant existsTenant = tenantMapper.queryById(id);
@@ -239,14 +235,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
         int update = tenantMapper.updateById(updateTenant);
-        if (update > 0) {
-            logger.info("Tenant is updated and id is {}.", updateTenant.getId());
-            putMsg(result, Status.SUCCESS);
-        } else {
+        if (update <= 0) {
             logger.error("Tenant update error, id:{}.", updateTenant.getId());
-            putMsg(result, Status.UPDATE_TENANT_ERROR);
+            throw new ServiceException(Status.UPDATE_TENANT_ERROR);
         }
-        return result;
+        return updateTenant;
     }
 
     /**

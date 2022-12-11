@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -168,8 +169,8 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
-        return returnDataList(result);
+        Tenant tenant = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
+        return Result.success(tenant);
     }
 
     /**

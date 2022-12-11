@@ -180,7 +180,7 @@ public class TenantServiceTest {
     }
 
     @Test
-    public void testUpdateTenant() throws Exception {
+    public void testUpdateTenant() {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT,
                 getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
@@ -194,12 +194,9 @@ public class TenantServiceTest {
         Assertions.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), exception.getMessage());
 
         // success
-        Map<String, Object> result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
+        Assertions.assertDoesNotThrow(() -> tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc));
         // success update with same tenant code
-        result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertDoesNotThrow(() -> tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc));
     }
 
     @Test
