@@ -210,16 +210,24 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR.getCode(),
                 ((ServiceException) exception).getCode());
 
+        // error schedule parameter start time before current time
+        String badStartTime = "2020-01-01 12:13:14";
+        scheduleCreateRequest.setStartTime(badStartTime);
+        Mockito.when(environmentMapper.queryByEnvironmentCode(environmentCode)).thenReturn(this.getEnvironment());
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
+        Assertions.assertEquals(Status.START_TIME_BEFORE_CURRENT_TIME_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+
         // error schedule parameter same start time and end time
         scheduleCreateRequest.setStartTime(endTime);
-        Mockito.when(environmentMapper.queryByEnvironmentCode(environmentCode)).thenReturn(this.getEnvironment());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
         Assertions.assertEquals(Status.SCHEDULE_START_TIME_END_TIME_SAME.getCode(),
                 ((ServiceException) exception).getCode());
 
-        // error schedule parameter same start time after than end time
-        String badStartTime = "2222-01-01 12:13:14";
+        // error schedule parameter start time after than end time
+        badStartTime = "2222-01-01 12:13:14";
         scheduleCreateRequest.setStartTime(badStartTime);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
@@ -363,17 +371,25 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
         Assertions.assertEquals(Status.SCHEDULE_NOT_EXISTS.getCode(), ((ServiceException) exception).getCode());
 
-        // error schedule parameter same start time and end time
+        // error schedule parameter start time before current time
+        String badStartTime = "2020-01-01 12:13:14";
+        scheduleUpdateRequest.setStartTime(badStartTime);
         scheduleUpdateRequest.setEndTime(endTime);
-        scheduleUpdateRequest.setStartTime(endTime);
         Mockito.when(scheduleMapper.selectById(scheduleId)).thenReturn(this.getSchedule());
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
+        Assertions.assertEquals(Status.START_TIME_BEFORE_CURRENT_TIME_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+
+        // error schedule parameter same start time and end time
+        scheduleUpdateRequest.setStartTime(endTime);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
         Assertions.assertEquals(Status.SCHEDULE_START_TIME_END_TIME_SAME.getCode(),
                 ((ServiceException) exception).getCode());
 
-        // error schedule parameter same start time after than end time
-        String badStartTime = "2222-01-01 12:13:14";
+        // error schedule parameter start time after than end time
+        badStartTime = "2222-01-01 12:13:14";
         scheduleUpdateRequest.setStartTime(badStartTime);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));

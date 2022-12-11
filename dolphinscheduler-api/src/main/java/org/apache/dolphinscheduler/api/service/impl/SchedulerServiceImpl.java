@@ -172,7 +172,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         if (now.after(scheduleParam.getStartTime())) {
-            scheduleParam.setStartTime(now);
+            logger.warn("The start time must be later than current time.");
+            putMsg(result, Status.START_TIME_BEFORE_CURRENT_TIME_ERROR);
+            return result;
         }
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
             logger.warn("The start time must not be the same as the end or time can not be null.");
@@ -180,7 +182,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
-            logger.warn("The start time must smaller than end time");
+            logger.warn("The start time must be smaller than end time.");
             putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
             return result;
         }
@@ -239,7 +241,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         Date now = new Date();
         if (now.after(scheduleParam.getStartTime())) {
-            scheduleParam.setStartTime(now);
+            throw new ServiceException(Status.START_TIME_BEFORE_CURRENT_TIME_ERROR);
         }
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
             throw new ServiceException(Status.SCHEDULE_START_TIME_END_TIME_SAME);
@@ -841,7 +843,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 return;
             }
             if (now.after(scheduleParam.getStartTime())) {
-                scheduleParam.setStartTime(now);
+                logger.warn("The start time must be later than current time.");
+                putMsg(result, Status.START_TIME_BEFORE_CURRENT_TIME_ERROR);
+                return;
             }
             if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
                 logger.warn("The start time must not be the same as the end or time can not be null.");
@@ -849,7 +853,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 return;
             }
             if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
-                logger.warn("The start time must smaller than end time");
+                logger.warn("The start time must be smaller than end time.");
                 putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
                 return;
             }
