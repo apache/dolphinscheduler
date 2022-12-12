@@ -1983,3 +1983,34 @@ CREATE TABLE t_ds_fav_task
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );
+
+-- ----------------------------
+-- Table structure for t_ds_alert_send_status
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_alert_send_status;
+CREATE TABLE t_ds_alert_send_status (
+                                        id                           serial NOT NULL,
+                                        alert_id                     int NOT NULL,
+                                        alert_plugin_instance_id     int NOT NULL,
+                                        send_status                  int DEFAULT '0',
+                                        log                          text,
+                                        create_time                  timestamp DEFAULT NULL,
+                                        PRIMARY KEY (id),
+                                        CONSTRAINT alert_send_status_unique UNIQUE (alert_id,alert_plugin_instance_id)
+);
+
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_relation
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_trigger_relation;
+CREATE TABLE t_ds_trigger_relation (
+    id        serial      NOT NULL,
+    trigger_type int NOT NULL,,
+    trigger_code bigint NOT NULL,
+    job_id bigint NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
+);

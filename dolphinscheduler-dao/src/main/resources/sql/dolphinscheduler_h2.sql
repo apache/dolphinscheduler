@@ -2032,3 +2032,19 @@ CREATE TABLE t_ds_fav_task
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );
+
+--
+-- Table structure for t_ds_trigger_relation
+--
+DROP TABLE IF EXISTS `t_ds_trigger_relation`;
+CREATE TABLE t_ds_trigger_relation
+(
+    id              bigint(20) NOT NULL AUTO_INCREMENT,
+    trigger_type    int         NOT NULL,
+    job_id          int         NOT NULL,
+    trigger_code    int         NOT NULL,
+    create_time     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY t_ds_trigger_relation_UN(trigger_type,job_id,trigger_code)
+);
