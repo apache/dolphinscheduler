@@ -77,8 +77,7 @@ public class TrinoDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         TrinoConnectionParam TrinoConnectionParam = new TrinoConnectionParam();
         TrinoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:8080/default");
-        TrinoConnectionParam.setOther("other");
-        Assertions.assertEquals("jdbc:postgresql://localhost:8080/default?other",
+        Assertions.assertEquals("jdbc:postgresql://localhost:8080/default",
                 TrinoDatasourceProcessor.getJdbcUrl(TrinoConnectionParam));
 
     }

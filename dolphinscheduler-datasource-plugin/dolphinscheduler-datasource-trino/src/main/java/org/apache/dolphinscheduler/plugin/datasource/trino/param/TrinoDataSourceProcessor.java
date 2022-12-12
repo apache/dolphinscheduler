@@ -29,13 +29,11 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +60,7 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
         TrinoDatasourceParamDTO.setPort(Integer.valueOf(split[1]));
         TrinoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         TrinoDatasourceParamDTO.setUserName(connectionParams.getUser());
-        TrinoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        TrinoDatasourceParamDTO.setOther(connectionParams.getOther());
 
         return TrinoDatasourceParamDTO;
     }
@@ -77,13 +75,12 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
         TrinoConnectionParam TrinoConnectionParam = new TrinoConnectionParam();
         TrinoConnectionParam.setUser(TrinoParam.getUserName());
         TrinoConnectionParam.setPassword(PasswordUtils.encodePassword(TrinoParam.getPassword()));
-        TrinoConnectionParam.setOther(transformOther(TrinoParam.getOther()));
+        TrinoConnectionParam.setOther(TrinoParam.getOther());
         TrinoConnectionParam.setAddress(address);
         TrinoConnectionParam.setJdbcUrl(jdbcUrl);
         TrinoConnectionParam.setDatabase(TrinoParam.getDatabase());
         TrinoConnectionParam.setDriverClassName(getDatasourceDriver());
         TrinoConnectionParam.setValidationQuery(getValidationQuery());
-        TrinoConnectionParam.setProps(TrinoParam.getOther());
 
         return TrinoConnectionParam;
     }
@@ -106,8 +103,9 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         TrinoConnectionParam TrinoConnectionParam = (TrinoConnectionParam) connectionParam;
-        if (StringUtils.isNotEmpty(TrinoConnectionParam.getOther())) {
-            return String.format("%s?%s", TrinoConnectionParam.getJdbcUrl(), TrinoConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(TrinoConnectionParam.getOther())) {
+            return String.format("%s?%s", TrinoConnectionParam.getJdbcUrl(),
+                    transformOther(TrinoConnectionParam.getOther()));
         }
         return TrinoConnectionParam.getJdbcUrl();
     }
@@ -139,15 +137,4 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
         return null;
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

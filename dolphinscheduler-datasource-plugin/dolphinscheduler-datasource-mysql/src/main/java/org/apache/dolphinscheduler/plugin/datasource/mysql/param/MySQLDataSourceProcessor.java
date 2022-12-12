@@ -29,13 +29,13 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        mysqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        mysqlDatasourceParamDTO.setOther(connectionParams.getOther());
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -97,8 +97,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         mysqlConnectionParam.setPassword(PasswordUtils.encodePassword(mysqlDatasourceParam.getPassword()));
         mysqlConnectionParam.setDriverClassName(getDatasourceDriver());
         mysqlConnectionParam.setValidationQuery(getValidationQuery());
-        mysqlConnectionParam.setOther(transformOther(mysqlDatasourceParam.getOther()));
-        mysqlConnectionParam.setProps(mysqlDatasourceParam.getOther());
+        mysqlConnectionParam.setOther(mysqlDatasourceParam.getOther());
 
         return mysqlConnectionParam;
     }
@@ -122,8 +121,8 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
         String jdbcUrl = mysqlConnectionParam.getJdbcUrl();
-        if (!StringUtils.isEmpty(mysqlConnectionParam.getOther())) {
-            return String.format("%s?%s&%s", jdbcUrl, mysqlConnectionParam.getOther(), APPEND_PARAMS);
+        if (MapUtils.isNotEmpty(mysqlConnectionParam.getOther())) {
+            return String.format("%s?%s&%s", jdbcUrl, transformOther(mysqlConnectionParam.getOther()), APPEND_PARAMS);
         }
         return String.format("%s?%s", jdbcUrl, APPEND_PARAMS);
     }
@@ -169,9 +168,9 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s&", key, value)));
-        return stringBuilder.toString();
+        List<String> otherList = new ArrayList<>();
+        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join("&", otherList);
     }
 
     private static boolean checkKeyIsLegitimate(String key) {
@@ -179,17 +178,6 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
                 && !key.contains(AUTO_DESERIALIZE)
                 && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
                 && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
     }
 
 }

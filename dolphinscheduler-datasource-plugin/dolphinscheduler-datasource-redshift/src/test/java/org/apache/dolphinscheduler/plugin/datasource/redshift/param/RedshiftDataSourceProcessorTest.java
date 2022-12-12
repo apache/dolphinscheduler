@@ -31,6 +31,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.ImmutableMap;
+
 @ExtendWith(MockitoExtension.class)
 public class RedshiftDataSourceProcessorTest {
 
@@ -78,7 +80,11 @@ public class RedshiftDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         RedshiftConnectionParam redshiftConnectionParam = new RedshiftConnectionParam();
         redshiftConnectionParam.setJdbcUrl("jdbc:redshift://localhost:5439/default");
-        redshiftConnectionParam.setOther("DSILogLevel=6;defaultRowFetchSize=100");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("DSILogLevel", "6")
+                .put("defaultRowFetchSize", "100")
+                .build();
+        redshiftConnectionParam.setOther(map);
         Assertions.assertEquals("jdbc:redshift://localhost:5439/default?DSILogLevel=6;defaultRowFetchSize=100",
                 redshiftDatasourceProcessor.getJdbcUrl(redshiftConnectionParam));
 
