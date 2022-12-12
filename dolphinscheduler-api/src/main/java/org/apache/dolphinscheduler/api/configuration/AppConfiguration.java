@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
+import org.apache.dolphinscheduler.api.interceptor.CsrfInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
@@ -68,6 +69,11 @@ public class AppConfiguration implements WebMvcConfigurer {
         return new LoginHandlerInterceptor();
     }
 
+    @Bean
+    public CsrfInterceptor csrfInterceptor() {
+        return new CsrfInterceptor();
+    }
+
     /**
      * Cookie
      * @return local resolver
@@ -104,6 +110,12 @@ public class AppConfiguration implements WebMvcConfigurer {
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
                         "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
+
+        registry.addInterceptor(csrfInterceptor())
+                .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
+                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, "/swagger-resources/**", "/webjars/**",
+                        "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
                         "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
     }
 

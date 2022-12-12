@@ -74,9 +74,12 @@ const err = (err: AxiosError): Promise<AxiosError> => {
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
   config.headers && (config.headers.sessionId = userStore.getSessionId)
   const language = cookies.get('language')
+  const sessionId = cookies.get('sessionId')
   config.headers = config.headers || {}
   if (language) config.headers.language = language
-
+  if (sessionId) {
+    config.headers['X-CSRF-TOKEN'] = sessionId.split('').reverse().join('')
+  }
   return config
 }, err)
 
