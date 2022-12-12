@@ -480,6 +480,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         if (scheduleStatus == ReleaseState.ONLINE) {
+            // check schedule start time
+            Date now = new Date();
+            if (now.after(scheduleObj.getStartTime())) {
+                logger.warn("The start time must be later than current time.");
+                putMsg(result, Status.START_TIME_BEFORE_CURRENT_TIME_ERROR);
+                return result;
+            }
             // check process definition release state
             if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
                 logger.warn("Only process definition state is {} can change schedule state, processDefinitionCode:{}.",
