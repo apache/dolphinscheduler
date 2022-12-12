@@ -37,6 +37,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.google.common.collect.ImmutableMap;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class OracleDataSourceProcessorTest {
@@ -83,8 +85,11 @@ public class OracleDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308:default");
-        oracleConnectionParam.setOther("other=other");
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default?other=other",
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("other", "other")
+                .build();
+        oracleConnectionParam.setOther(map);
+        Assertions.assertEquals("jdbc:oracle:thin:@localhost:3308:default?other=other",
                 oracleDatasourceProcessor.getJdbcUrl(oracleConnectionParam));
     }
 

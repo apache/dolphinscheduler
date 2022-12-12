@@ -32,7 +32,8 @@ import org.apache.commons.collections4.MapUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
@@ -43,7 +44,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
 
         Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        db2DatasourceParamDTO.setOther(connectionParams.getOther());
         db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
@@ -68,8 +69,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         db2ConnectionParam.setPassword(PasswordUtils.encodePassword(db2Param.getPassword()));
         db2ConnectionParam.setDriverClassName(getDatasourceDriver());
         db2ConnectionParam.setValidationQuery(getValidationQuery());
-        db2ConnectionParam.setOther(transformOther(db2Param.getOther()));
-        db2ConnectionParam.setProps(db2Param.getOther());
+        db2ConnectionParam.setOther(db2Param.getOther());
 
         return db2ConnectionParam;
     }
@@ -87,8 +87,9 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(db2ConnectionParam.getOther())) {
-            return String.format("%s;%s", db2ConnectionParam.getJdbcUrl(), db2ConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(db2ConnectionParam.getOther())) {
+            return String.format("%s;%s", db2ConnectionParam.getJdbcUrl(),
+                    transformOther(db2ConnectionParam.getOther()));
         }
         return db2ConnectionParam.getJdbcUrl();
     }
@@ -115,20 +116,9 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s%s", key, value, ";")));
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        return stringBuilder.toString();
+        List<String> otherList = new ArrayList<>();
+        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join(";", otherList);
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (other == null) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

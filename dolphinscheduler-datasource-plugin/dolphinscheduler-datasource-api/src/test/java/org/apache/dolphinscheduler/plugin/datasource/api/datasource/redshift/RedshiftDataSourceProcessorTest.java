@@ -36,6 +36,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.google.common.collect.ImmutableMap;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class RedshiftDataSourceProcessorTest {
@@ -80,9 +82,13 @@ public class RedshiftDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         RedshiftConnectionParam redshiftConnectionParam = new RedshiftConnectionParam();
         redshiftConnectionParam.setJdbcUrl("jdbc:redshift://localhost:5439/default");
-        redshiftConnectionParam.setOther("DSILogLevel=6;defaultRowFetchSize=100");
-        Assert.assertEquals("jdbc:redshift://localhost:5439/default?DSILogLevel=6;defaultRowFetchSize=100",
-            redshiftDatasourceProcessor.getJdbcUrl(redshiftConnectionParam));
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("DSILogLevel", "6")
+                .put("defaultRowFetchSize", "100")
+                .build();
+        redshiftConnectionParam.setOther(map);
+        Assertions.assertEquals("jdbc:redshift://localhost:5439/default?DSILogLevel=6;defaultRowFetchSize=100",
+                redshiftDatasourceProcessor.getJdbcUrl(redshiftConnectionParam));
 
     }
 

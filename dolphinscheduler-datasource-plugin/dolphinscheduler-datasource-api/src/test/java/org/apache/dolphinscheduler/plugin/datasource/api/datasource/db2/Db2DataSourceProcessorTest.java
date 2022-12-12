@@ -36,6 +36,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.google.common.collect.ImmutableMap;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class Db2DataSourceProcessorTest {
@@ -83,7 +85,10 @@ public class Db2DataSourceProcessorTest {
     public void testGetJdbcUrl() {
         Db2ConnectionParam db2ConnectionParam = new Db2ConnectionParam();
         db2ConnectionParam.setJdbcUrl("jdbc:db2://localhost:5142/default");
-        db2ConnectionParam.setOther("other=other");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("other", "other")
+                .build();
+        db2ConnectionParam.setOther(map);
         String jdbcUrl = db2DatasourceProcessor.getJdbcUrl(db2ConnectionParam);
         Assert.assertEquals("jdbc:db2://localhost:5142/default;other=other", jdbcUrl);
     }

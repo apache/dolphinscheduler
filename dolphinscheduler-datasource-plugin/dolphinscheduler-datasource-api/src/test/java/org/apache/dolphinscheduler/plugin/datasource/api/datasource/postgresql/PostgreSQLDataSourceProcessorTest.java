@@ -36,6 +36,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.google.common.collect.ImmutableMap;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Class.class, DriverManager.class, DataSourceUtils.class, CommonUtils.class, DataSourceClientProvider.class, PasswordUtils.class})
 public class PostgreSQLDataSourceProcessorTest {
@@ -81,10 +83,13 @@ public class PostgreSQLDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         PostgreSQLConnectionParam postgreSqlConnectionParam = new PostgreSQLConnectionParam();
         postgreSqlConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:3308/default");
-        postgreSqlConnectionParam.setOther("other");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("other", "other")
+                .build();
+        postgreSqlConnectionParam.setOther(map);
 
         String jdbcUrl = postgreSqlDatasourceProcessor.getJdbcUrl(postgreSqlConnectionParam);
-        Assert.assertEquals("jdbc:postgresql://localhost:3308/default?other", jdbcUrl);
+        Assertions.assertEquals("jdbc:postgresql://localhost:3308/default?other=other", jdbcUrl);
 
     }
 
