@@ -138,7 +138,7 @@ public abstract class AbstractParameters implements IParameters {
             return;
         }
         if (StringUtils.isEmpty(result)) {
-            varPool.addAll(outProperty);
+            outProperty.forEach(this::addPropertyToValPool);
             return;
         }
         Map<String, String> taskResult = getMapByString(result);
