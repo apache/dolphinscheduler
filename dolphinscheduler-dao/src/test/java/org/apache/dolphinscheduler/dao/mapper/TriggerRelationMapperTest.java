@@ -17,86 +17,126 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
+import java.util.List;
 import org.apache.dolphinscheduler.common.enums.TriggerType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
+
 
 /**
  * trigger mapper test
  */
 public class TriggerRelationMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private TriggerRelationMapper triggerRelationMapper;
+  @Autowired
+  TriggerRelationMapper triggerRelationMapper;
 
-    /**
-     * test insert
-     *
-     * @return
-     */
-    @Test
-    public void testInsert() {
-        TriggerRelation expectedObj = createTriggerRelation();
-        assertThat(expectedObj.getId(), greaterThan(0));
-    }
+  /**
+   * test insert
+   *
+   * @return
+   */
+  @Test
+  public void testInsert() {
+    TriggerRelation expectedObj = createTriggerRelation();
+    Assertions.assertTrue(expectedObj.getId() > 0);
+  }
 
-    /**
-     * test select by id
-     *
-     * @return
-     */
-    @Test
-    public void testSelectById() {
-        TriggerRelation expectedAlert = createTriggerRelation();
-        TriggerRelation actualAlert = triggerRelationMapper.selectById(expectedAlert.getId());
-        assertEquals(expectedAlert, actualAlert);
-    }
-
-
-    /**
-     * test delete
-     */
-    @Test
-    public void testDelete() {
-        TriggerRelation expectedAlert = createTriggerRelation();
-
-        triggerRelationMapper.deleteById(expectedAlert.getId());
-
-        TriggerRelation actualAlert = triggerRelationMapper.selectById(expectedAlert.getId());
-
-        assertNull(actualAlert);
-    }
+  /**
+   * test select by id
+   *
+   * @return
+   */
+  @Test
+  public void testSelectById() {
+    TriggerRelation expectRelation = createTriggerRelation();
+    TriggerRelation actualRelation = triggerRelationMapper.selectById(expectRelation.getId());
+    Assertions.assertEquals(expectRelation, actualRelation);
+  }
 
 
-    /**
-     * create alert
-     *
-     * @return alert
-     * @throws Exception
-     */
-    private TriggerRelation createTriggerRelation() {
-        TriggerRelation triggerRelation = new TriggerRelation();
-        triggerRelation.setTriggerCode(4567890);
-        triggerRelation.setTriggerType(TriggerType.COMMAND.getCode());
-        triggerRelation.setJobId(99);
-        triggerRelation.setCreateTime(DateUtils.getCurrentDate());
-        triggerRelation.setUpdateTime(DateUtils.getCurrentDate());
+  /**
+   * test select by type and job id
+   *
+   * @return
+   */
+  @Test
+  public void testQueryByTypeAndJobId() {
+    TriggerRelation expectRelation = createTriggerRelation();
+    TriggerRelation actualRelation = triggerRelationMapper.queryByTypeAndJobId(
+        expectRelation.getTriggerType(), expectRelation.getJobId());
+    Assertions.assertEquals(expectRelation, actualRelation);
+  }
 
-        triggerRelationMapper.insert(triggerRelation);
-        return triggerRelation;
-    }
+
+  /**
+   * test select by trigger code
+   *
+   * @return
+   */
+  @Test
+  public void testQueryByTriggerRelationCode() {
+    TriggerRelation expectRelation = createTriggerRelation();
+    List<TriggerRelation> actualRelations = triggerRelationMapper.queryByTriggerRelationCode(
+        expectRelation.getTriggerCode());
+    Assertions.assertEquals(actualRelations.size(), 1);
+  }
+
+  /**
+   * test select by type and trigger code
+   *
+   * @return
+   */
+  @Test
+  public void testQueryByTriggerRelationCodeAndType() {
+    TriggerRelation expectRelation = createTriggerRelation();
+    List<TriggerRelation> actualRelations = triggerRelationMapper.queryByTriggerRelationCodeAndType(
+        expectRelation.getTriggerCode(), expectRelation.getTriggerType());
+    Assertions.assertEquals(actualRelations.size(), 1);
+  }
+
+
+  @Test
+  public void testUpsert() {
+    TriggerRelation expectRelation = createTriggerRelation();
+    triggerRelationMapper.upsert(expectRelation);
+    TriggerRelation actualRelation = triggerRelationMapper.selectById(expectRelation.getId());
+    Assertions.assertEquals(expectRelation, actualRelation);
+  }
+
+  /**
+   * test delete
+   */
+  @Test
+  public void testDelete() {
+    TriggerRelation expectRelation = createTriggerRelation();
+    triggerRelationMapper.deleteById(expectRelation.getId());
+    TriggerRelation actualRelation = triggerRelationMapper.selectById(expectRelation.getId());
+    Assertions.assertNull(actualRelation);
+  }
+
+
+  /**
+   * create TriggerRelation and insert
+   *
+   * @return TriggerRelation
+   * @throws Exception
+   */
+  private TriggerRelation createTriggerRelation() {
+    TriggerRelation triggerRelation = new TriggerRelation();
+    triggerRelation.setTriggerCode(4567890);
+    triggerRelation.setTriggerType(TriggerType.COMMAND.getCode());
+    triggerRelation.setJobId(99);
+    triggerRelation.setCreateTime(DateUtils.getCurrentDate());
+    triggerRelation.setUpdateTime(DateUtils.getCurrentDate());
+
+    triggerRelationMapper.insert(triggerRelation);
+    return triggerRelation;
+  }
 
 }

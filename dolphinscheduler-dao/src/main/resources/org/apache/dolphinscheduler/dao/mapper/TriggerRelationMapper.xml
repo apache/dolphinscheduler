@@ -33,7 +33,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_trigger_relation
-        WHERE trigger_code = #{trigger_code}
+        WHERE trigger_code = #{triggerCode}
     </select>
 
     <select id="queryByTriggerRelationCodeAndType" resultType="org.apache.dolphinscheduler.dao.entity.TriggerRelation">
