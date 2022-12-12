@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
@@ -108,7 +107,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
                 noteId = this.zClient.cloneNote(noteId, cloneNotePath);
             }
 
-            if (StringUtils.isEmpty(paragraphId)) {
+            if (paragraphId == null || paragraphId.trim().length() == 0) {
                 final NoteResult noteResult = this.zClient.executeNote(noteId, zeppelinParamsMap);
                 final List<ParagraphResult> paragraphResultList = noteResult.getParagraphResultList();
                 StringBuilder resultContentBuilder = new StringBuilder();
