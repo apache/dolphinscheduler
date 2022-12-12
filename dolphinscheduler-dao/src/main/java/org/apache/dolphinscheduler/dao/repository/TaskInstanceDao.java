@@ -87,4 +87,7 @@ public interface TaskInstanceDao {
      */
     List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList);
 
+    void deleteByWorkflowInstanceId(int workflowInstanceId);
+
+    List<TaskInstance> findTaskInstanceByWorkflowInstanceId(Integer processInstanceId);
 }

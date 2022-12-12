@@ -28,6 +28,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-api</module>
         <module>dolphinscheduler-task-shell</module>
         <module>dolphinscheduler-task-datax</module>
@@ -46,7 +47,6 @@
         <module>dolphinscheduler-task-dependent</module>
         <module>dolphinscheduler-task-subprocess</module>
         <module>dolphinscheduler-task-switch</module>
-        <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-emr</module>
         <module>dolphinscheduler-task-blocking</module>
         <module>dolphinscheduler-task-k8s</module>
@@ -65,6 +65,7 @@
         <module>dolphinscheduler-task-dms</module>
         <module>dolphinscheduler-task-datasync</module>
         <module>dolphinscheduler-task-kubeflow</module>
+        <module>dolphinscheduler-task-linkis</module>
     </modules>
 
     <dependencyManagement>

@@ -43,7 +43,7 @@ commons-beanutils-1.9.4.jar
 commons-cli-1.2.jar
 commons-codec-1.11.jar
 commons-collections-3.2.2.jar
-commons-collections4-4.1.jar
+commons-collections4-4.3.jar
 commons-compiler-3.1.7.jar
 commons-compress-1.21.jar
 commons-configuration2-2.1.1.jar
@@ -371,3 +371,4 @@ opentracing-util-0.33.0.jar
 jdom2-2.0.6.1.jar
 jettison-1.1.jar
 stax-api-1.0.1.jar
+trino-jdbc-402.jar

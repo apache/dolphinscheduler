@@ -172,7 +172,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     private String buildCustomConfigContent() {
         logger.info("raw custom config content : {}", seatunnelParameters.getRawScript());
-        String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         return script;
     }

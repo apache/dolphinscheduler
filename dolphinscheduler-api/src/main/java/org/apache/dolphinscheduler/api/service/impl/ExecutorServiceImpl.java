@@ -85,8 +85,8 @@ import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZonedDateTime;
@@ -123,6 +123,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    ProcessDefinitionMapper processDefineMapper;
 
     @Autowired
     private MonitorService monitorService;
@@ -463,6 +466,25 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         return result;
+    }
+
+    /**
+     * do action to workflow instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
+    
+    
+     *
+     * @param loginUser         login user
+     * @param workflowInstanceId workflow instance id
+     * @param executeType       execute type
+     * @return execute result code
+     */
+    @Override
+    public Map<String, Object> execute(User loginUser, Integer workflowInstanceId, ExecuteType executeType) {
+        ProcessInstance processInstance = processInstanceMapper.selectById(workflowInstanceId);
+        ProcessDefinition processDefinition =
+                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+
+        return execute(loginUser, processDefinition.getProjectCode(), workflowInstanceId, executeType);
     }
 
     @Override

@@ -19,6 +19,7 @@ import crontab from '@/locales/en_US/crontab'
 import data_quality from '@/locales/en_US/data-quality'
 import datasource from '@/locales/en_US/datasource'
 import home from '@/locales/en_US/home'
+import input_search from '@/locales/en_US/input-search'
 import login from '@/locales/en_US/login'
 import menu from '@/locales/en_US/menu'
 import modal from '@/locales/en_US/modal'
@@ -48,5 +49,6 @@ export default {
   datasource,
   data_quality,
   crontab,
-  ui_setting
+  ui_setting,
+  input_search
 }

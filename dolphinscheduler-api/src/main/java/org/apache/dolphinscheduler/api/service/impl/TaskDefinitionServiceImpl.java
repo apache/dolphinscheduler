@@ -67,8 +67,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -1045,7 +1045,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public Result queryTaskDefinitionListPaging(User loginUser,
                                                 long projectCode,
-                                                String searchWorkflowName,
                                                 String searchTaskName,
                                                 String taskType,
                                                 TaskExecuteType taskExecuteType,
@@ -1063,12 +1062,33 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         taskType = taskType == null ? StringUtils.EMPTY : taskType;
         Page<TaskMainInfo> page = new Page<>(pageNo, pageSize);
-        IPage<TaskMainInfo> taskMainInfoIPage =
-                taskDefinitionMapper.queryDefineListPaging(page, projectCode, searchWorkflowName,
-                        searchTaskName, taskType, taskExecuteType);
-        List<TaskMainInfo> records = taskMainInfoIPage.getRecords();
+        // first, query task code by page size
+        IPage<TaskMainInfo> taskMainInfoIPage = taskDefinitionMapper.queryDefineListPaging(page, projectCode,
+                searchTaskName, taskType, taskExecuteType);
+        // then, query task relevant info by task code
+        fillRecords(projectCode, taskMainInfoIPage);
+        PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
+        pageInfo.setTotalList(taskMainInfoIPage.getRecords());
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    private void fillRecords(long projectCode, IPage<TaskMainInfo> taskMainInfoIPage) {
+        List<TaskMainInfo> records = Collections.emptyList();
+        if (CollectionUtils.isNotEmpty(taskMainInfoIPage.getRecords())) {
+            // query task relevant info by task code
+            records = taskDefinitionMapper.queryDefineListByCodeList(projectCode,
+                    taskMainInfoIPage.getRecords().stream().map(TaskMainInfo::getTaskCode)
+                            .collect(Collectors.toList()));
+        }
+        // because first step, so need init records
+        taskMainInfoIPage.setRecords(Collections.emptyList());
         if (CollectionUtils.isNotEmpty(records)) {
+            // task code and task info map
             Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
+            // construct task code and relevant upstream task list map
             for (TaskMainInfo info : records) {
                 taskMainInfoMap.compute(info.getTaskCode(), (k, v) -> {
                     if (v == null) {
@@ -1087,16 +1107,17 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     return v;
                 });
             }
+
+            // because taskMainInfoMap's value is TaskMainInfo,
+            // TaskMainInfo have task code info, so only need gain taskMainInfoMap's values
             List<TaskMainInfo> resultRecords = Lists.newArrayList(taskMainInfoMap.values());
             resultRecords.sort((o1, o2) -> o2.getTaskUpdateTime().compareTo(o1.getTaskUpdateTime()));
             taskMainInfoIPage.setRecords(resultRecords);
         }
-        PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
-        pageInfo.setTotalList(taskMainInfoIPage.getRecords());
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+    }
+
+    private void fillWorkflowInfo(long projectCode, IPage<TaskMainInfo> taskMainInfoIPage) {
+
     }
 
     @Override
