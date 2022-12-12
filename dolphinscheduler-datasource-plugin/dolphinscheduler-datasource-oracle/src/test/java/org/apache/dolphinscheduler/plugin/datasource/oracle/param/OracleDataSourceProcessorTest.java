@@ -32,6 +32,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.ImmutableMap;
+
 @ExtendWith(MockitoExtension.class)
 public class OracleDataSourceProcessorTest {
 
@@ -81,7 +83,10 @@ public class OracleDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308:default");
-        oracleConnectionParam.setOther("other=other");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("other", "other")
+                .build();
+        oracleConnectionParam.setOther(map);
         Assertions.assertEquals("jdbc:oracle:thin:@localhost:3308:default?other=other",
                 oracleDatasourceProcessor.getJdbcUrl(oracleConnectionParam));
     }
