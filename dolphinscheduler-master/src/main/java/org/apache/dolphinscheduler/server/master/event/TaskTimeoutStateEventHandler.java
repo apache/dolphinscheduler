@@ -43,7 +43,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
                                     StateEvent stateEvent) throws StateEventHandleError {
         TaskStateEvent taskStateEvent = (TaskStateEvent) stateEvent;
 
-        TaskMetrics.incTaskInstanceByState("timeout");
+        TaskMetrics.incTaskInstanceByState("timeout", taskStateEvent.getTaskInstanceId());
         workflowExecuteRunnable.checkTaskInstanceByStateEvent(taskStateEvent);
 
         TaskInstance taskInstance =

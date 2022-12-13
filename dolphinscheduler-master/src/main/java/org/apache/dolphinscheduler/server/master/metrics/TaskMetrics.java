@@ -29,23 +29,25 @@ import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 @UtilityClass
 public class TaskMetrics {
 
-    private final Map<String, Counter> taskInstanceCounters = new HashMap<>();
+    private final Map<String, Counter.Builder> taskInstanceCountersBuild = new HashMap<>();
 
     private final Set<String> taskInstanceStates = ImmutableSet.of(
             "submit", "timeout", "finish", "failover", "retry", "dispatch", "success", "kill", "fail", "stop");
 
     static {
         for (final String state : taskInstanceStates) {
-            taskInstanceCounters.put(
+            taskInstanceCountersBuild.put(
                     state,
                     Counter.builder("ds.task.instance.count")
                             .tags("state", state)
-                            .description(String.format("Process instance %s total count", state))
-                            .register(Metrics.globalRegistry));
+                            .description(String.format("Process instance %s total count", state)));
         }
 
     }
@@ -83,11 +85,31 @@ public class TaskMetrics {
         taskDispatchCounter.increment();
     }
 
-    public void incTaskInstanceByState(final String state) {
-        if (taskInstanceCounters.get(state) == null) {
+    public void incTaskInstanceByState(final String state, Integer taskInstanceId) {
+        if (taskInstanceCountersBuild.get(state) == null) {
             return;
         }
-        taskInstanceCounters.get(state).increment();
+        String taskName = "UNKNOW_" + taskInstanceId;
+        TaskInstanceDao taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
+        TaskInstance taskInstanceById = taskInstanceDao.findTaskInstanceById(taskInstanceId);
+        if (taskInstanceById != null){
+            taskName = taskInstanceById.getName();
+        }
+        taskInstanceCountersBuild.get(state)
+                .tag("taskName", taskName)
+                .register(Metrics.globalRegistry)
+                .increment();
     }
+
+    public void incTaskInstanceByStateAndName(final String state, String taskName) {
+        if (taskInstanceCountersBuild.get(state) == null) {
+            return;
+        }
+        taskInstanceCountersBuild.get(state)
+                .tag("taskName", taskName)
+                .register(Metrics.globalRegistry)
+                .increment();
+    }
+
 
 }

@@ -441,17 +441,17 @@ public class StreamTaskExecuteRunnable implements Runnable {
             return;
         }
         if (taskEvent.getState().isFinished()) {
-            TaskMetrics.incTaskInstanceByState("finish");
+            TaskMetrics.incTaskInstanceByState("finish",taskEvent.getTaskInstanceId());
         }
         switch (taskEvent.getState()) {
             case KILL:
-                TaskMetrics.incTaskInstanceByState("stop");
+                TaskMetrics.incTaskInstanceByState("stop",taskEvent.getTaskInstanceId());
                 break;
             case SUCCESS:
-                TaskMetrics.incTaskInstanceByState("success");
+                TaskMetrics.incTaskInstanceByState("success",taskEvent.getTaskInstanceId());
                 break;
             case FAILURE:
-                TaskMetrics.incTaskInstanceByState("fail");
+                TaskMetrics.incTaskInstanceByState("fail",taskEvent.getTaskInstanceId());
                 break;
             default:
                 break;

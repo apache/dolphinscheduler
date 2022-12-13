@@ -41,7 +41,7 @@ public class TaskRetryStateEventHandler implements StateEventHandler {
 
         logger.info("Handle task instance retry event, taskCode: {}", taskStateEvent.getTaskCode());
 
-        TaskMetrics.incTaskInstanceByState("retry");
+        TaskMetrics.incTaskInstanceByState("retry",taskStateEvent.getTaskInstanceId());
         Map<Long, TaskInstance> waitToRetryTaskInstanceMap = workflowExecuteRunnable.getWaitToRetryTaskInstanceMap();
         TaskInstance taskInstance = waitToRetryTaskInstanceMap.get(taskStateEvent.getTaskCode());
         workflowExecuteRunnable.addTaskToStandByList(taskInstance);

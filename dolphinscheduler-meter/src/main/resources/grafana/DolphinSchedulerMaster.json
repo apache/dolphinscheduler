@@ -1685,7 +1685,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"submit\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"submit\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -1771,7 +1771,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"finish\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"finish\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -1857,7 +1857,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"success\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"success\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -1943,7 +1943,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"fail\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"fail\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -2029,7 +2029,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"timeout\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"timeout\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -2115,7 +2115,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"retry\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"retry\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -2201,7 +2201,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"retry\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"retry\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -2287,7 +2287,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "sum(increase(ds_task_instance_count_total{state=\"failover\"}[1m]))",
+          "expr": "sum by(taskName)(increase(ds_task_instance_count_total{state=\"failover\"}[1m]))",
           "refId": "A"
         }
       ],
