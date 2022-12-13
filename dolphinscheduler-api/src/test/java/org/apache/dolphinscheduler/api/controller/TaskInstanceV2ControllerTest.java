@@ -123,7 +123,7 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
     public void testQueryTaskInstanceById() {
         TaskInstance taskInstance = new TaskInstance();
 
-        when(taskInstanceService.queryTaskInstanceByCode(any(), Mockito.anyLong(), Mockito.anyLong()))
+        when(taskInstanceService.queryTaskInstanceById(any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(taskInstance);
 
         TaskInstance taskResult = taskInstanceV2Controller.queryTaskInstanceByCode(null, 1L, 1L);
