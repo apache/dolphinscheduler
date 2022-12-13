@@ -96,7 +96,7 @@ public interface TaskInstanceService {
      *
      * @param loginUser   login user
      * @param projectCode project code
-     * @param taskInstanceId task instance id
+     * @param taskInstanceId taskInstance id
      * @return the result code and msg
      */
     TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId);
