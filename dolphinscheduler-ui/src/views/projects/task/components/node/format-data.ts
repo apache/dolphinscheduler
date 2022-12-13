@@ -627,7 +627,7 @@ export function formatModel(data: ITaskData) {
   }
 
   if (data.taskParams?.dependence) {
-    const dependence: { relation?: RelationType, dependTaskList?: IDependTask[]} = JSON.parse(JSON.stringify(data.taskParams.dependence))
+    const dependence: { relation?: RelationType, dependTaskList?: IDependTask[] } = JSON.parse(JSON.stringify(data.taskParams.dependence))
     params.dependTaskList = dependence.dependTaskList || []
     params.relation = dependence.relation
   }
