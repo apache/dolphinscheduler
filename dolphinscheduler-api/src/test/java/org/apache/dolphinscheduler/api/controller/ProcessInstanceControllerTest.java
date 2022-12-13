@@ -186,7 +186,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/process-instances/query-parent-by-sub", "1113")
-                        .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
+                        .header(SESSION_ID, sessionId)
+                        .header("X-CSRF-TOKEN", csrfToken)
                         .param("subId", "1204"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -223,7 +224,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/process-instances/{id}", "1113", "123")
-                .header(SESSION_ID, sessionId))
+                .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
