@@ -47,13 +47,13 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
     public static final String LOGIN_PATH_PATTERN = "/login";
-    public static final String UI_PATH_PATTERN = "/ui/**";
-    public static final String[] SWAGGER_PATH_PATTERN = {"/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+    protected static final String UI_PATH_PATTERN = "/ui/**";
+    protected static final String[] SWAGGER_PATH_PATTERN = {"/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
             "/swagger-ui/**", "/swagger-resources/**",};
-    public static final String WEBJARS_PATH_PATTERN = "/webjars/**";
-    public static final String DOC_PATH_PATTERN = "/doc.html";
-    public static final String HTML_PATH_PATTERN = "*.html";
-    public static final String ERROR_PATH_PATTERN = "/error";
+    protected static final String WEBJARS_PATH_PATTERN = "/webjars/**";
+    protected static final String DOC_PATH_PATTERN = "/doc.html";
+    protected static final String HTML_PATH_PATTERN = "*.html";
+    protected static final String ERROR_PATH_PATTERN = "/error";
     public static final String REGISTER_PATH_PATTERN = "/users/register";
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
