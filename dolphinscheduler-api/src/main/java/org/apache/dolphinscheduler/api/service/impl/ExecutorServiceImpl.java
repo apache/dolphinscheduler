@@ -30,6 +30,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.MAX_TASK_TI
 import static org.apache.dolphinscheduler.common.constants.Constants.SCHEDULE_TIME_MAX_LENGTH;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -67,6 +68,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
@@ -133,6 +135,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private ProcessInstanceDao processInstanceDao;
+
+    @Autowired
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
@@ -461,6 +466,115 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         return result;
+    }
+
+    /**
+     * do action to execute task in process instance
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processInstanceId process instance id
+     * @param startNodeList start node list
+     * @param taskDependType task depend type
+     * @return execute result code
+     */
+    @Override
+    public WorkflowExecuteResponse executeTask(User loginUser, long projectCode, Integer processInstanceId,
+                                               String startNodeList, TaskDependType taskDependType) {
+
+        WorkflowExecuteResponse response = new WorkflowExecuteResponse();
+
+        Project project = projectMapper.queryByCode(projectCode);
+        // check user access for project
+
+        projectService.checkProjectAndAuthThrowException(loginUser, project,
+                ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
+
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
+                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+
+        if (!processInstance.getState().isFinished()) {
+            logger.error("Can not execute task for process instance which is not finished, processInstanceId:{}.",
+                    processInstanceId);
+            putMsg(response, Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED);
+            return response;
+        }
+
+        ProcessDefinition processDefinition =
+                processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion());
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
+        this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
+
+        if (!checkTenantSuitable(processDefinition)) {
+            logger.error(
+                    "There is not any valid tenant for the process definition, processDefinitionId:{}, processDefinitionCode:{}, ",
+                    processDefinition.getId(), processDefinition.getName());
+            putMsg(response, Status.TENANT_NOT_SUITABLE);
+            return response;
+        }
+
+        // get the startParams user specified at the first starting while repeat running is needed
+
+        long startNodeListLong;
+        try {
+            startNodeListLong = Long.parseLong(startNodeList);
+        } catch (NumberFormatException e) {
+            logger.error("startNodeList is not a number");
+            putMsg(response, Status.REQUEST_PARAMS_NOT_VALID_ERROR, startNodeList);
+            return response;
+        }
+
+        if (taskDefinitionLogMapper.queryMaxVersionForDefinition(startNodeListLong) == null) {
+            putMsg(response, Status.EXECUTE_NOT_DEFINE_TASK);
+            return response;
+        }
+
+        // To add startParams only when repeat running is needed
+        Map<String, Object> cmdParam = new HashMap<>();
+        cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstanceId);
+        // Add StartNodeList
+        cmdParam.put(CMD_PARAM_START_NODES, startNodeList);
+
+        Command command = new Command();
+        command.setCommandType(CommandType.EXECUTE_TASK);
+        command.setProcessDefinitionCode(processDefinition.getCode());
+        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
+        command.setExecutorId(loginUser.getId());
+        command.setProcessDefinitionVersion(processDefinition.getVersion());
+        command.setProcessInstanceId(processInstanceId);
+
+        // Add taskDependType
+        command.setTaskDependType(taskDependType);
+
+        if (!processService.verifyIsNeedCreateCommand(command)) {
+            logger.warn(
+                    "Process instance is executing the command, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}.",
+                    processDefinition.getCode(), processDefinition.getVersion(), processInstanceId);
+            putMsg(response, Status.PROCESS_INSTANCE_EXECUTING_COMMAND,
+                    String.valueOf(processDefinition.getCode()));
+            return response;
+        }
+
+        logger.info("Creating command, commandInfo:{}.", command);
+        int create = processService.createCommand(command);
+
+        if (create > 0) {
+            logger.info("Create {} command complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
+                    command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
+                    processDefinition.getVersion());
+            putMsg(response, Status.SUCCESS);
+        } else {
+            logger.error(
+                    "Execute process instance failed because create {} command error, processDefinitionCode:{}, processDefinitionVersion:{}， processInstanceId:{}.",
+                    command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
+                    processDefinition.getVersion(),
+                    processInstanceId);
+            putMsg(response, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
+        }
+
+        return response;
     }
 
     @Override

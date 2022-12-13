@@ -432,4 +432,36 @@ public class ExecutorController extends BaseController {
                 warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }
+
+    /**
+     * do action to process instance: pause, stop, repeat, recover from pause, recover from stop
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processInstanceId process instance id
+     * @param startNodeList start node list
+     * @param taskDependType task depend type
+     * @return execute result code
+     */
+    @ApiOperation(value = "execute-task", notes = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataTypeClass = int.class, example = "100"),
+            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", required = true, dataTypeClass = String.class),
+            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", required = true, dataTypeClass = TaskDependType.class)
+    })
+    @PostMapping(value = "/execute-task")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result executeTask(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                              @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                              @RequestParam("processInstanceId") Integer processInstanceId,
+                              @RequestParam("startNodeList") String startNodeList,
+                              @RequestParam("taskDependType") TaskDependType taskDependType) {
+        logger.info("Start to execute task in process instance, projectCode:{}, processInstanceId:{}.",
+                projectCode,
+                processInstanceId);
+        return execService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+    }
+
 }

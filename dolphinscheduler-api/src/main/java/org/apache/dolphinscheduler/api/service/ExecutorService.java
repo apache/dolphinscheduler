@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -89,6 +90,21 @@ public interface ExecutorService {
      * @return execute result code
      */
     Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId, ExecuteType executeType);
+
+    /**
+     * do action to execute task in process instance
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processInstanceId process instance id
+     * @param startNodeList start node list
+     * @param taskDependType task depend type
+     * @return execute result code
+     */
+    WorkflowExecuteResponse executeTask(User loginUser, long projectCode, Integer processInstanceId,
+                                        String startNodeList,
+                                        TaskDependType taskDependType);
+
 
     /**
      * check if sub processes are offline before starting process definition

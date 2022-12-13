@@ -125,6 +125,14 @@ public interface ProcessService {
 
     TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
 
+    /**
+     * Query list of task instance by process instance id and task code
+     * @param processInstanceId processInstanceId
+     * @param taskCode task code
+     * @return list of valid task instance
+     */
+    TaskInstance findTaskByInstanceIdAndCode(Integer processInstanceId, Long taskCode);
+
     TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance);
 
     int saveCommand(Command command);

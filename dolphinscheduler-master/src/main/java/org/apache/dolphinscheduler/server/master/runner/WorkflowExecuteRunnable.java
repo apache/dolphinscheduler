@@ -876,6 +876,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
+            clearDataIfExecuteTask();
         } else {
             logger.info("The current workflowInstance is a newly running workflowInstance");
         }
@@ -2039,6 +2040,77 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 }
             }
         }
+    }
+
+    /**
+     * clear related data if command of process instance is EXECUTE_TASK
+     * 1. find all task code from sub dag (only contains related task)
+     * 2. set the flag of tasks to Flag.NO
+     * 3. clear varPool data from re-execute task instance in process instance
+     * 4. remove related task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
+     *
+     * @return task instance
+     */
+    protected void clearDataIfExecuteTask() {
+        // only clear data if command is EXECUTE_TASK
+        if (!processInstance.getCommandType().equals(CommandType.EXECUTE_TASK)) {
+            return;
+        }
+
+        // Records the key of varPool data to be removed
+        Set<String> taskCodesString = dag.getAllNodesList();
+
+        List<TaskInstance> removeTaskInstances = new ArrayList<>();
+
+        for (String taskCodeString : taskCodesString) {
+            long taskCode = Long.parseLong(taskCodeString);
+            TaskInstance taskInstance;
+            if (validTaskMap.containsKey(taskCode)) {
+                taskInstance = taskInstanceMap.get(validTaskMap.get(taskCode));
+            } else {
+                taskInstance = processService.findTaskByInstanceIdAndCode(processInstance.getId(), taskCode);
+            }
+            if (taskInstance == null) {
+                continue;
+            }
+            removeTaskInstances.add(taskInstance);
+        }
+
+        for (TaskInstance taskInstance : removeTaskInstances) {
+            taskInstance.setFlag(Flag.NO);
+            processService.updateTaskInstance(taskInstance);
+        }
+
+        Set<String> removeSet = new HashSet<>();
+        for (TaskInstance taskInstance : removeTaskInstances) {
+            String taskVarPool = taskInstance.getVarPool();
+            if (StringUtils.isNotEmpty(taskVarPool)) {
+                List<Property> properties = JSONUtils.toList(taskVarPool, Property.class);
+                List<String> keys = properties.stream()
+                        .filter(property -> property.getDirect().equals(Direct.OUT))
+                        .map(property -> String.format("%s_%s", property.getProp(), property.getType()))
+                        .collect(Collectors.toList());
+                removeSet.addAll(keys);
+            }
+        }
+
+        // remove varPool data and update process instance
+        // TODO: we can remove this snippet if : we get varPool from pre taskInstance instead of process instance when
+        // task can not get pre task from incomplete dag
+        List<Property> processProperties = JSONUtils.toList(processInstance.getVarPool(), Property.class);
+        processProperties = processProperties.stream()
+                .filter(property -> !(property.getDirect().equals(Direct.IN)
+                        && removeSet.contains(String.format("%s_%s", property.getProp(), property.getType()))))
+                .collect(Collectors.toList());
+
+        processInstance.setVarPool(JSONUtils.toJsonString(processProperties));
+        processInstanceDao.updateProcessInstance(processInstance);
+
+        // remove task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
+        taskInstanceMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getValue().getTaskCode())));
+        completeTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        validTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        errorTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
     }
 
     private enum WorkflowRunnableStatus {
