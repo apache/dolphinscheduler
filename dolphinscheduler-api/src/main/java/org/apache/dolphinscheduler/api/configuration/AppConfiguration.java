@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
 
 import java.util.Locale;
 
+import org.eclipse.jetty.util.ArrayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +47,13 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
     public static final String LOGIN_PATH_PATTERN = "/login";
+    public static final String UI_PATH_PATTERN = "/ui/**";
+    public static final String[] SWAGGER_PATH_PATTERN = {"/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+            "/swagger-ui/**", "/swagger-resources/**",};
+    public static final String WEBJARS_PATH_PATTERN = "/webjars/**";
+    public static final String DOC_PATH_PATTERN = "/doc.html";
+    public static final String HTML_PATH_PATTERN = "*.html";
+    public static final String ERROR_PATH_PATTERN = "/error";
     public static final String REGISTER_PATH_PATTERN = "/users/register";
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
@@ -106,25 +114,30 @@ public class AppConfiguration implements WebMvcConfigurer {
         if (trafficConfiguration.isGlobalSwitch() || trafficConfiguration.isTenantSwitch()) {
             registry.addInterceptor(createRateLimitInterceptor());
         }
-        String[] excludePathPatterns = {LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
-                "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error"};
 
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(excludePathPatterns);
+                .excludePathPatterns(ArrayUtil.add(
+                        new String[]{LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, DOC_PATH_PATTERN,
+                                HTML_PATH_PATTERN, WEBJARS_PATH_PATTERN, UI_PATH_PATTERN, ERROR_PATH_PATTERN},
+                        SWAGGER_PATH_PATTERN));
 
         registry.addInterceptor(csrfInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(excludePathPatterns);
+                .excludePathPatterns(ArrayUtil.add(
+                        new String[]{LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, DOC_PATH_PATTERN,
+                                HTML_PATH_PATTERN, WEBJARS_PATH_PATTERN, UI_PATH_PATTERN, ERROR_PATH_PATTERN},
+                        SWAGGER_PATH_PATTERN));
+
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
         registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-        registry.addResourceHandler("/ui/**").addResourceLocations("file:ui/");
+        registry.addResourceHandler(WEBJARS_PATH_PATTERN)
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler(UI_PATH_PATTERN).addResourceLocations("file:ui/");
     }
 
     @Override
