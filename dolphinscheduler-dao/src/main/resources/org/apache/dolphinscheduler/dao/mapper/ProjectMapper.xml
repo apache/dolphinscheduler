@@ -84,7 +84,8 @@
         select
         <include refid="baseSqlV2">
             <property name="alias" value="p"/>
-        </include>,
+        </include>
+        ,
         u.user_name as user_name,
         count(distinct def.id) AS def_count,
         count(distinct inst.id) as inst_running_count
