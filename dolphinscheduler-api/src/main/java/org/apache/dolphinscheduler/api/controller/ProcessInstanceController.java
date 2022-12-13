@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -413,6 +415,22 @@ public class ProcessInstanceController extends BaseController {
         } else {
             putMsg(result, Status.SUCCESS);
         }
+        return returnDataList(result);
+    }
+
+    @Operation(summary = "queryProcessInstanceListByTrigger", description = "QUERY_PROCESS_INSTANCE_BY_TRIGGER_NOTES")
+    @Parameters({
+        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = Long.class)),
+        @Parameter(name = "triggerCode", description = "TRIGGER_CODE", required = true, schema = @Schema(implementation = Long.class))
+    })
+    @GetMapping("/trigger")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
+    @AccessLogAnnotation()
+    public Result queryProcessInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+        @PathVariable long projectCode,
+        @RequestParam(value = "triggerCode") Long triggerCode) {
+        Map<String, Object> result = processInstanceService.queryByTriggerCode(loginUser,projectCode,triggerCode);
         return returnDataList(result);
     }
 }

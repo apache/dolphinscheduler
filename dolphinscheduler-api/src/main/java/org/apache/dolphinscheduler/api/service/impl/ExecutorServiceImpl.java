@@ -48,9 +48,11 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
+import org.apache.dolphinscheduler.common.enums.TriggerType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -99,6 +101,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +109,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * executor service impl
@@ -157,6 +161,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Autowired
     private WorkerGroupService workerGroupService;
 
+    @Autowired
+    private TriggerRelationService triggerRelationService;
     /**
      * execute process instance
      *
@@ -181,6 +187,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return execute process instance code
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> execProcessInstance(User loginUser, long projectCode, long processDefinitionCode,
                                                    String cronTime, CommandType commandType,
                                                    FailureStrategy failureStrategy, String startNodeList,
@@ -227,11 +234,23 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (!checkMasterExists(result)) {
             return result;
         }
+
+        long triggerCode = 0L;
+        try {
+            triggerCode = CodeGenerateUtils.getInstance().genCode();
+        } catch (CodeGenerateUtils.CodeGenerateException e) {
+            logger.error("Trigger code get error, ", e);
+        }
+        if (triggerCode == 0L) {
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating trigger code");
+            return result;
+        }
+
         /**
          * create command
          */
         int create =
-                this.createCommand(commandType, processDefinition.getCode(), taskDependType, failureStrategy,
+                this.createCommand(triggerCode, commandType, processDefinition.getCode(), taskDependType, failureStrategy,
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup,
@@ -243,6 +262,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             processDefinitionMapper.updateById(processDefinition);
             logger.info("Create command complete, processDefinitionCode:{}, commandCount:{}.",
                     processDefinition.getCode(), create);
+            result.put(Constants.DATA_LIST, triggerCode);
             putMsg(result, Status.SUCCESS);
         } else {
             logger.error("Start process instance failed because create command error, processDefinitionCode:{}.",
@@ -743,7 +763,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param environmentCode         environmentCode
      * @return command id
      */
-    private int createCommand(CommandType commandType, long processDefineCode, TaskDependType nodeDep,
+    private int createCommand(Long triggerCode, CommandType commandType, long processDefineCode, TaskDependType nodeDep,
                               FailureStrategy failureStrategy, String startNodeList, String schedule,
                               WarningType warningType, int executorId, Integer warningGroupId, RunMode runMode,
                               Priority processInstancePriority, String workerGroup, Long environmentCode,
@@ -805,7 +825,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             try {
                 logger.info("Start to create {} command, processDefinitionCode:{}.",
                         command.getCommandType().getDescp(), processDefineCode);
-                return createComplementCommandList(schedule, runMode, command, expectedParallelismNumber,
+                return createComplementCommandList(triggerCode, schedule, runMode, command, expectedParallelismNumber,
                         complementDependentMode);
             } catch (CronParseException cronParseException) {
                 // We catch the exception here just to make compiler happy, since we have already validated the schedule
@@ -814,8 +834,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             }
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-            logger.info("Creating command, commandInfo:{}.", command);
-            return commandService.createCommand(command);
+            int count =  commandService.createCommand(command);
+            if(count > 0) {
+                triggerRelationService.saveTriggerTdoDb(TriggerType.COMMAND,triggerCode,command.getId());
+            }
+            return count;
         }
     }
 
@@ -827,7 +850,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode
      * @return
      */
-    protected int createComplementCommandList(String scheduleTimeParam, RunMode runMode, Command command,
+    protected int createComplementCommandList(Long triggerCode, String scheduleTimeParam, RunMode runMode, Command command,
                                               Integer expectedParallelismNumber,
                                               ComplementDependentMode complementDependentMode) throws CronParseException {
         int createCount = 0;
@@ -892,6 +915,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command);
                     }
                 }
+                if(createCount > 0) {
+                    triggerRelationService.saveTriggerTdoDb(TriggerType.COMMAND,triggerCode,command.getId());
+                }
                 break;
             }
             case RUN_MODE_PARALLEL: {
@@ -940,6 +966,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                             if (commandService.createCommand(command) > 0) {
                                 logger.info("Create {} command complete, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                                triggerRelationService.saveTriggerTdoDb(TriggerType.COMMAND,triggerCode,command.getId());
                             } else {
                                 logger.error("Create {} command error, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());

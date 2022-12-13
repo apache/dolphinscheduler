@@ -178,9 +178,10 @@ public class ProcessServiceTest {
     @Mock
     TaskPluginManager taskPluginManager;
 
+    @Mock
+    private TriggerRelationService triggerRelationService;
     @Test
     public void testHandleCommand() throws CronParseException, CodeGenerateUtils.CodeGenerateException {
-
         // cannot construct process instance, return null;
         String host = "127.0.0.1";
         Command command = new Command();
@@ -233,6 +234,8 @@ public class ProcessServiceTest {
         Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
+        Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
+            .thenReturn(1);
         Assertions.assertNotNull(processService.handleCommand(host, command1));
 
         Command command2 = new Command();
@@ -405,6 +408,8 @@ public class ProcessServiceTest {
         Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
+        Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
+            .thenReturn(1);
 
         Assertions.assertThrows(ServiceException.class, () -> {
             // will throw exception when command id is 0 and delete fail

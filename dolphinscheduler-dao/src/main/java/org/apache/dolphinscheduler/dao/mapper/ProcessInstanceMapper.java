@@ -309,4 +309,11 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                   @Param("model") Integer model,
                                                   @Param("projectIds") Set<Integer> projectIds);
 
+    /**
+     * query process list by triggerCode
+     *
+     * @param triggerCode
+     * @return
+     */
+    List<ProcessInstance> queryByTriggerCode(@Param("triggerCode") Long triggerCode);
 }

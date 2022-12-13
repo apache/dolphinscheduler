@@ -252,4 +252,24 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), result.getCode().intValue());
     }
+
+    @Test
+    public void queryProcessInstancesByTriggerCode() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+
+        Mockito.when(processInstanceService
+                .queryByTriggerCode(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
+            .thenReturn(mockResult);
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances/trigger")
+                .header("sessionId", sessionId)
+                .param("triggerCode", "12051206"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
 }

@@ -343,4 +343,15 @@
         where id = #{runningInstanceId}
           and next_process_instance_id = 0
     </update>
+
+    <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from(
+        select job_id from t_ds_trigger_relation where trigger_type = 0 and trigger_code = #{triggerCode}
+        ) a
+        left join   t_ds_process_instance b
+        on a.job_id  = b.id
+        where b.id is not null
+    </select>
 </mapper>

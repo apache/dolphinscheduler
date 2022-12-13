@@ -674,6 +674,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         command.setTestFlag(processInstance.getTestFlag());
+        processService.saveCommandTrigger(command.getId(),processInstance.getId());
         return commandService.createCommand(command);
     }
 
