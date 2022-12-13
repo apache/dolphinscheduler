@@ -48,7 +48,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
     public static final String LOGIN_PATH_PATTERN = "/login";
     protected static final String UI_PATH_PATTERN = "/ui/**";
-    protected static final String[] SWAGGER_PATH_PATTERN = {"/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+    protected static final String[] SWAGGER_PATH_PATTERNS = {"/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
             "/swagger-ui/**", "/swagger-resources/**",};
     protected static final String WEBJARS_PATH_PATTERN = "/webjars/**";
     protected static final String DOC_PATH_PATTERN = "/doc.html";
@@ -120,14 +120,14 @@ public class AppConfiguration implements WebMvcConfigurer {
                 .excludePathPatterns(ArrayUtil.add(
                         new String[]{LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, DOC_PATH_PATTERN,
                                 HTML_PATH_PATTERN, WEBJARS_PATH_PATTERN, UI_PATH_PATTERN, ERROR_PATH_PATTERN},
-                        SWAGGER_PATH_PATTERN));
+                        SWAGGER_PATH_PATTERNS));
 
         registry.addInterceptor(csrfInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(ArrayUtil.add(
                         new String[]{LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, DOC_PATH_PATTERN,
                                 HTML_PATH_PATTERN, WEBJARS_PATH_PATTERN, UI_PATH_PATTERN, ERROR_PATH_PATTERN},
-                        SWAGGER_PATH_PATTERN));
+                        SWAGGER_PATH_PATTERNS));
 
     }
 
