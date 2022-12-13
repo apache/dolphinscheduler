@@ -61,10 +61,10 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 
 - 查询已备份的数据库，查看 `t_ds_worker_group` 表记录，重点看下 id、name 和 ip_list 三个字段
 
-| id  |   name   |                     ip_list |
-| :-- | :------: | --------------------------: |
-| 1   | service1 |               192.168.xx.10 |
-| 2   | service2 | 192.168.xx.11,192.168.xx.12 |
+| id |   name   |                     ip_list |
+|:---|:--------:|----------------------------:|
+| 1  | service1 |               192.168.xx.10 |
+| 2  | service2 | 192.168.xx.11,192.168.xx.12 |
 
 - 修改 `bin/env/install_config.conf` 中的 workers 参数
 

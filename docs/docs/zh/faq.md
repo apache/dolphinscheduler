@@ -10,13 +10,13 @@ A：DolphinScheduler
 
 A：DolphinScheduler 由 5 个服务组成，MasterServer、WorkerServer、ApiServer、AlertServer、LoggerServer 和 UI。
 
-| 服务                      | 说明                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------ |
-| MasterServer              | 主要负责 **DAG** 的切分和任务状态的监控                                                    |
+|            服务             |                              说明                               |
+|---------------------------|---------------------------------------------------------------|
+| MasterServer              | 主要负责 **DAG** 的切分和任务状态的监控                                      |
 | WorkerServer/LoggerServer | 主要负责任务的提交、执行和任务状态的更新。LoggerServer 用于 Rest Api 通过 **RPC** 查看日志 |
-| ApiServer                 | 提供 Rest Api 服务，供 UI 进行调用                                                         |
-| AlertServer               | 提供告警服务                                                                               |
-| UI                        | 前端页面展示                                                                               |
+| ApiServer                 | 提供 Rest Api 服务，供 UI 进行调用                                      |
+| AlertServer               | 提供告警服务                                                        |
+| UI                        | 前端页面展示                                                        |
 
 注意：**由于服务比较多，建议单机部署最好是 4 核 16G 以上**
 

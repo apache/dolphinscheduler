@@ -93,8 +93,8 @@ The configuration file is `values.yaml`, and the [Appendix-Configuration](#appen
 
 ## Support Matrix
 
-| Type                                                         | Support      | Notes                                 |
-| ------------------------------------------------------------ | ------------ | ------------------------------------- |
+|                             Type                             |   Support    |                 Notes                 |
+|--------------------------------------------------------------|--------------|---------------------------------------|
 | Shell                                                        | Yes          |                                       |
 | Python2                                                      | Yes          |                                       |
 | Python3                                                      | Indirect Yes | Refer to FAQ                          |
@@ -479,8 +479,8 @@ common:
 
 ## Appendix-Configuration
 
-| Parameter                                                            | Description                                                                                                                   | Default                               |
-| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+|                              Parameter                               |                                                          Description                                                          |                Default                |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
 | `timezone`                                                           | World time and date for cities in all time zones                                                                              | `Asia/Shanghai`                       |
 |                                                                      |                                                                                                                               |                                       |
 | `image.repository`                                                   | Docker image repository for the DolphinScheduler                                                                              | `apache/dolphinscheduler`             |
@@ -703,3 +703,4 @@ common:
 | `ingress.path`                                                       | Ingress path                                                                                                                  | `/dolphinscheduler`                   |
 | `ingress.tls.enabled`                                                | Enable ingress tls                                                                                                            | `false`                               |
 | `ingress.tls.secretName`                                             | Ingress tls secret name                                                                                                       | `dolphinscheduler-tls`                |
+

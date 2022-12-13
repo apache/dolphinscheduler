@@ -70,7 +70,6 @@ Before explaining the architecture of the schedule system, let us first understa
     ##### This service contains:
 
     - **FetchTaskThread** is mainly responsible for continuously receiving tasks from **Task Queue** and calling **TaskScheduleThread** corresponding executors according to different task types.
-
   - **ZooKeeper**
 
     The ZooKeeper service, the MasterServer and the WorkerServer nodes in the system all use the ZooKeeper for cluster management and fault tolerance. In addition, the system also performs event monitoring and distributed locking based on ZooKeeper.
@@ -215,9 +214,7 @@ If there is a task failure in the workflow that reaches the maximum number of re
 In the early scheduling design, if there is no priority design and fair scheduling design, it will encounter the situation that the task submitted first may be completed simultaneously with the task submitted subsequently, but the priority of the process or task cannot be set. We have redesigned this, and we are currently designing it as follows:
 
 - According to **different process instance priority** prioritizes **same process instance priority** prioritizes **task priority within the same process** takes precedence over **same process** commit order from high Go to low for task processing.
-
   - The specific implementation is to resolve the priority according to the json of the task instance, and then save the **process instance priority _ process instance id_task priority _ task id** information in the ZooKeeper task queue, when obtained from the task queue, Through string comparison, you can get the task that needs to be executed first.
-
     - The priority of the process definition is that some processes need to be processed before other processes. This can be configured at the start of the process or at the time of scheduled start. There are 5 levels, followed by HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
 
       <p align="center">

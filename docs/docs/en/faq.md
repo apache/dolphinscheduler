@@ -10,8 +10,8 @@ A: DolphinScheduler
 
 A: DolphinScheduler consists of 5 services, MasterServer, WorkerServer, ApiServer, AlertServer, LoggerServer and UI.
 
-| Service                   | Description                                                                                                                            |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+|          Service          |                                                              Description                                                               |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
 | MasterServer              | Mainly responsible for DAG segmentation and task status monitoring                                                                     |
 | WorkerServer/LoggerServer | Mainly responsible for the submission, execution and update of task status. LoggerServer is used for Rest Api to view logs through RPC |
 | ApiServer                 | Provides the Rest Api service for the UI to call                                                                                       |

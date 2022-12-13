@@ -27,8 +27,8 @@ go to section [review Pull Requests](#pull-requests).
 
 Review Issues means discuss [Issues][all-issues] in GitHub and give suggestions on it. Include but are not limited to the following situations
 
-| Situation               | Reason                        | Label                                                | Action                                                              |
-| ----------------------- | ----------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
+|        Situation        |            Reason             |                        Label                         |                               Action                                |
+|-------------------------|-------------------------------|------------------------------------------------------|---------------------------------------------------------------------|
 | wont fix                | Has been fixed in dev branch  | [wontfix][label-wontfix]                             | Close Issue, inform creator the fixed version if it already release |
 | duplicate issue         | Had the same problem before   | [duplicate][label-duplicate]                         | Close issue, inform creator the link of same issue                  |
 | Description not clearly | Without detail reproduce step | [need more information][label-need-more-information] | Inform creator add more description                                 |
@@ -36,8 +36,8 @@ Review Issues means discuss [Issues][all-issues] in GitHub and give suggestions 
 In addition give suggestion, add label for issue is also important during review. The labeled issues can be retrieved
 better, which convenient for further processing. An issue can with more than one label. Common issue categories are:
 
-| Label                                    | Meaning                        |
-| ---------------------------------------- | ------------------------------ |
+|                  Label                   |            Meaning             |
+|------------------------------------------|--------------------------------|
 | [UI][label-ui]                           | UI and front-end related       |
 | [security][label-security]               | Security Issue                 |
 | [user experience][label-user-experience] | User experience Issue          |
@@ -54,8 +54,8 @@ better, which convenient for further processing. An issue can with more than one
 Beside classification, label could also set the priority of Issues. The higher the priority, the more attention pay
 in the community, the easier it is to be fixed or implemented. The priority label are as follows
 
-| Label                                    | priority        |
-| ---------------------------------------- | --------------- |
+|                  Label                   |    priority     |
+|------------------------------------------|-----------------|
 | [priority:high][label-priority-high]     | High priority   |
 | [priority:middle][label-priority-middle] | Middle priority |
 | [priority:low][label-priority-low]       | Low priority    |
@@ -74,8 +74,8 @@ Before reading following content, please make sure you have labeled the Issue.
 
 When an Issue need to create Pull Requests, you could also labeled it from below.
 
-| Label                                      | Mean                                        |
-| ------------------------------------------ | ------------------------------------------- |
+|                   Label                    |                    Mean                     |
+|--------------------------------------------|---------------------------------------------|
 | [Chore][label-chore]                       | Chore for project                           |
 | [Good first issue][label-good-first-issue] | Good first issue for new contributor        |
 | [easy to fix][label-easy-to-fix]           | Easy to fix, harder than `Good first issue` |
@@ -109,8 +109,8 @@ and [priority:high][label-priority-high].
 
 Pull Requests have some unique labels of it own
 
-| Label                                                  | Mean                                                     |
-| ------------------------------------------------------ | -------------------------------------------------------- |
+|                         Label                          |                           Mean                           |
+|--------------------------------------------------------|----------------------------------------------------------|
 | [miss document][label-miss-document]                   | Pull Requests miss document, and should be add           |
 | [first time contributor][label-first-time-contributor] | Pull Requests submit by first time contributor           |
 | [don't merge][label-do-not-merge]                      | Pull Requests have some problem and should not be merged |
@@ -153,3 +153,4 @@ Pull Requests have some unique labels of it own
 [all-issues]: https://github.com/apache/dolphinscheduler/issues
 [all-prs]: https://github.com/apache/dolphinscheduler/pulls
 [gh-review-pr]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews
+

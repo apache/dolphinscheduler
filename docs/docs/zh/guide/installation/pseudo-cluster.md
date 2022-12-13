@@ -191,3 +191,4 @@ bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
 [issue]: https://github.com/apache/dolphinscheduler/issues/6597
+

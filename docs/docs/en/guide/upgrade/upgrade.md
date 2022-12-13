@@ -60,17 +60,17 @@ The architecture of worker group is different between version before version 1.3
 
 - Check the backup database, search records in table `t_ds_worker_group` table and mainly focus on three columns: `id, name and IP`.
 
-| id  |   name   |                     ip_list |
-| :-- | :------: | --------------------------: |
-| 1   | service1 |               192.168.xx.10 |
-| 2   | service2 | 192.168.xx.11,192.168.xx.12 |
+| id |   name   |                     ip_list |
+|:---|:--------:|----------------------------:|
+| 1  | service1 |               192.168.xx.10 |
+| 2  | service2 | 192.168.xx.11,192.168.xx.12 |
 
 - Modify worker related configuration in `bin/env/install_config.conf`.
 
 Assume below are the machine worker service to be deployed:
 
 | hostname |      ip       |
-| :------- | :-----------: |
+|:---------|:-------------:|
 | ds1      | 192.168.xx.10 |
 | ds2      | 192.168.xx.11 |
 | ds3      | 192.168.xx.12 |

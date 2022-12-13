@@ -163,7 +163,6 @@ Download [ZooKeeper](https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3
   dataDir=/data/zookeeper/data
   dataLogDir=/data/zookeeper/datalog
   ```
-
 - Run `./bin/zkServer.sh` in terminal by command `./bin/zkServer.sh start`.
 
 #### Database
