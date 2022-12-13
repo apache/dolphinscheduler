@@ -106,17 +106,17 @@ public class AppConfiguration implements WebMvcConfigurer {
         if (trafficConfiguration.isGlobalSwitch() || trafficConfiguration.isTenantSwitch()) {
             registry.addInterceptor(createRateLimitInterceptor());
         }
+        String[] excludePathPatterns = {LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
+                "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+                "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error"};
+
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                        "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
-                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
+                .excludePathPatterns(excludePathPatterns);
 
         registry.addInterceptor(csrfInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, "/swagger-resources/**", "/webjars/**",
-                        "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
-                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
+                .excludePathPatterns(excludePathPatterns);
     }
 
     @Override
