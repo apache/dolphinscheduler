@@ -148,6 +148,11 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     }
 
     @Override
+    public TaskInstance findTaskByInstanceIdAndCode(Integer processInstanceId, Long taskCode) {
+        return taskInstanceMapper.queryByInstanceIdAndCode(processInstanceId, taskCode);
+    }
+
+    @Override
     public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId) {
         ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
