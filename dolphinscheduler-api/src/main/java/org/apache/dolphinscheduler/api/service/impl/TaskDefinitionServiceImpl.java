@@ -500,9 +500,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
     }
 
-    private void updateDag(User loginUser, long processDefinitionCode,
-                           List<ProcessTaskRelation> processTaskRelationList,
-                           List<TaskDefinitionLog> taskDefinitionLogs) {
+    public void updateDag(User loginUser, long processDefinitionCode,
+                          List<ProcessTaskRelation> processTaskRelationList,
+                          List<TaskDefinitionLog> taskDefinitionLogs) {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
             logger.error("Process definition does not exist, processDefinitionCode:{}.", processDefinitionCode);
