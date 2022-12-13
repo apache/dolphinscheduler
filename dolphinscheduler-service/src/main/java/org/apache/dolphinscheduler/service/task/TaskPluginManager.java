@@ -17,10 +17,17 @@
 
 package org.apache.dolphinscheduler.service.task;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
 import java.util.Collections;
@@ -88,11 +95,24 @@ public class TaskPluginManager {
         if (Objects.isNull(taskType)) {
             return null;
         }
-        TaskChannel taskChannel = this.getTaskChannelMap().get(taskType);
-        if (Objects.isNull(taskChannel)) {
-            return null;
+        switch (taskType) {
+            case TaskConstants.TASK_TYPE_CONDITIONS:
+                return JSONUtils.parseObject(parametersNode.getTaskParams(), ConditionsParameters.class);
+            case TaskConstants.TASK_TYPE_SWITCH:
+                return JSONUtils.parseObject(parametersNode.getTaskParams(), SwitchParameters.class);
+            case TaskConstants.TASK_TYPE_SUB_PROCESS:
+                return JSONUtils.parseObject(parametersNode.getTaskParams(), SubProcessParameters.class);
+            case TaskConstants.TASK_TYPE_DEPENDENT:
+                return JSONUtils.parseObject(parametersNode.getTaskParams(), DependentParameters.class);
+            case TaskConstants.TASK_TYPE_BLOCKING:
+                return JSONUtils.parseObject(parametersNode.getTaskParams(), BlockingParameters.class);
+            default:
+                TaskChannel taskChannel = this.getTaskChannelMap().get(taskType);
+                if (Objects.isNull(taskChannel)) {
+                    return null;
+                }
+                return taskChannel.parseParameters(parametersNode);
         }
-        return taskChannel.parseParameters(parametersNode);
     }
 
 }
