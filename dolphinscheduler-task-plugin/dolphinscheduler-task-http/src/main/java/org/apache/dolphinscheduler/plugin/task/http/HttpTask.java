@@ -80,10 +80,10 @@ public class HttpTask extends AbstractTask {
 
     @Override
     public void init() {
-        logger.info("http task params {}", taskExecutionContext.getTaskParams());
         this.httpParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
+        logger.info("Initialize http task params {}", JSONUtils.toPrettyJsonString(httpParameters));
 
-        if (!httpParameters.checkParameters()) {
+        if (httpParameters == null || !httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");
         }
     }

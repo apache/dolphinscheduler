@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.configuration;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

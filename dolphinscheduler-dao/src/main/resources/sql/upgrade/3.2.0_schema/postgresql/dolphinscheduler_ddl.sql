@@ -119,4 +119,3 @@ d//
 delimiter ;
 select uc_dolphin_T_t_ds_task_instance_R_test_flag();
 DROP FUNCTION uc_dolphin_T_t_ds_task_instance_R_test_flag();
-create index idx_task_instance_process_instance_flag on t_ds_task_instance (process_instance_id, flag);
