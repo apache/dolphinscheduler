@@ -181,7 +181,7 @@ public class TaskInstanceV2Controller extends BaseController {
      *
      * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode          task code
+     * @param taskInstanceId   taskInstance Id
      * @return the result code and msg
      */
     @Operation(summary = "queryOneTaskInstance", description = "QUERY_ONE_TASK_INSTANCE")
@@ -195,7 +195,7 @@ public class TaskInstanceV2Controller extends BaseController {
     public TaskInstance queryTaskInstanceByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @PathVariable(value = "taskInstanceId") Long taskInstanceId) {
-        TaskInstance taskInstance = taskInstanceService.queryTaskInstanceByCode(loginUser, projectCode, taskInstanceId);
+        TaskInstance taskInstance = taskInstanceService.queryTaskInstanceById(loginUser, projectCode, taskInstanceId);
         return taskInstance;
     }
 }
