@@ -1107,9 +1107,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     return v;
                 });
             }
+
             // because taskMainInfoMap's value is TaskMainInfo,
             // TaskMainInfo have task code info, so only need gain taskMainInfoMap's values
-            taskMainInfoIPage.setRecords(Lists.newArrayList(taskMainInfoMap.values()));
+            List<TaskMainInfo> resultRecords = Lists.newArrayList(taskMainInfoMap.values());
+            resultRecords.sort((o1, o2) -> o2.getTaskUpdateTime().compareTo(o1.getTaskUpdateTime()));
+            taskMainInfoIPage.setRecords(resultRecords);
         }
     }
 
