@@ -45,14 +45,14 @@ modify docker-compose's free memory up to 4 GB.
   - Hyper-V mode: Click `Docker Desktop -> Settings -> Resources -> Memory` modified it
   - WSL 2 mode: see [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more detail.
 
-After complete the configuration, we can get the `docker-compose.yaml` file from [download page](/en-us/download/download.html)
+After complete the configuration, we can get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/#/en-us/download)
 form its source package, and make sure you get the right version. After download the package, you can run the commands as below.
 
 ```shell
 $ DOLPHINSCHEDULER_VERSION=<version>
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Going to docker-compose's location
-# For Mac or Linux users 
+# For Mac or Linux users
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
 # For Windows users, you should run command `cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker`
 
@@ -80,7 +80,7 @@ $ docker run -d --name dolphinscheduler-tools \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     --net host \
-    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh 
+    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh
 # Starting DolphinScheduler service
 $ docker run -d --name dolphinscheduler-master \
     -e DATABASE="postgresql" \

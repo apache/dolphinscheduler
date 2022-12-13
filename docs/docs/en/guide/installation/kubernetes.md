@@ -12,7 +12,7 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ## Install DolphinScheduler
 
-Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](/en-us/download/download.html)
+Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](https://dolphinscheduler.apache.org/#/en-us/download)
 
 To publish the release name `dolphinscheduler` version, please execute the following commands:
 
@@ -410,7 +410,7 @@ common:
     enabled: false
     mountPath: "/opt/soft"
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -436,7 +436,7 @@ common:
   fsFileResourcePersistence:
     enabled: true
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -460,7 +460,7 @@ common:
     FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
 ```
 
-Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY`  to actual environment values.
+Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` to actual environment values.
 
 > **Note**: `MINIO_IP` can only use IP instead of the domain name, because DolphinScheduler currently doesn't support S3 path style access.
 

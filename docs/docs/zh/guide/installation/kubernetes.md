@@ -1,6 +1,6 @@
 # 快速试用 Kubernetes 部署
 
-Kubernetes部署目的是在Kubernetes集群中部署 DolphinScheduler 服务，能调度大量任务，可用于在生产中部署。
+Kubernetes 部署目的是在 Kubernetes 集群中部署 DolphinScheduler 服务，能调度大量任务，可用于在生产中部署。
 
 如果你是新手，想要体验 DolphinScheduler 的功能，推荐使用[Standalone](standalone.md)方式体检。如果你想体验更完整的功能，或者更大的任务量，推荐使用[伪集群部署](pseudo-cluster.md)。如果你是在生产中使用，推荐使用[集群部署](cluster.md)或者[kubernetes](kubernetes.md)
 
@@ -12,7 +12,7 @@ Kubernetes部署目的是在Kubernetes集群中部署 DolphinScheduler 服务，
 
 ## 安装 dolphinscheduler
 
-请下载源码包 apache-dolphinscheduler-<version>-src.tar.gz，下载地址: [下载](/zh-cn/download/download.html)
+请下载源码包 apache-dolphinscheduler-<version>-src.tar.gz，下载地址: [下载](https://dolphinscheduler.apache.org/#/zh-cn/download)
 
 发布一个名为 `dolphinscheduler` 的版本(release)，请执行以下命令：
 
@@ -32,7 +32,7 @@ $ helm install dolphinscheduler . -n test
 
 > **提示**: 如果名为 `test` 的命名空间被使用, 选项参数 `-n test` 需要添加到 `helm` 和 `kubectl` 命令中
 
-这些命令以默认配置在 Kubernetes 集群上部署 DolphinScheduler，[附录-配置](#appendix-configuration)部分列出了可以在安装过程中配置的参数  <!-- markdown-link-check-disable-line -->
+这些命令以默认配置在 Kubernetes 集群上部署 DolphinScheduler，[附录-配置](#appendix-configuration)部分列出了可以在安装过程中配置的参数 <!-- markdown-link-check-disable-line -->
 
 > **提示**: 列出所有已发布的版本，使用 `helm list`
 
@@ -67,7 +67,7 @@ echo http://$NODE_IP:$NODE_PORT/dolphinscheduler
 
 默认的用户是`admin`，默认的密码是`dolphinscheduler123`
 
-请参考用户手册章节的[快速上手](../start/quick-start.md)查看如何使用DolphinScheduler
+请参考用户手册章节的[快速上手](../start/quick-start.md)查看如何使用 DolphinScheduler
 
 ## 卸载 dolphinscheduler
 
@@ -77,19 +77,19 @@ echo http://$NODE_IP:$NODE_PORT/dolphinscheduler
 $ helm uninstall dolphinscheduler
 ```
 
-该命令将删除与 `dolphinscheduler` 相关的所有 Kubernetes 组件（但PVC除外），并删除版本(release)
+该命令将删除与 `dolphinscheduler` 相关的所有 Kubernetes 组件（但 PVC 除外），并删除版本(release)
 
-要删除与 `dolphinscheduler` 相关的PVC，请执行：
+要删除与 `dolphinscheduler` 相关的 PVC，请执行：
 
 ```bash
 $ kubectl delete pvc -l app.kubernetes.io/instance=dolphinscheduler
 ```
 
-> **注意**: 删除PVC也会删除所有数据，请谨慎操作！
+> **注意**: 删除 PVC 也会删除所有数据，请谨慎操作！
 
 ## 配置
 
-配置文件为 `values.yaml`，[附录-配置](#appendix-configuration) 表格列出了 DolphinScheduler 的可配置参数及其默认值  <!-- markdown-link-check-disable-line -->
+配置文件为 `values.yaml`，[附录-配置](#appendix-configuration) 表格列出了 DolphinScheduler 的可配置参数及其默认值 <!-- markdown-link-check-disable-line -->
 
 ## 支持矩阵
 
@@ -188,7 +188,7 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 >
 > 如果你要使用 MySQL, 你可以基于官方镜像 `apache/dolphinscheduler-<service>` 进行构建.
 >
-> 从3.0.0版本起，dolphinscheduler已经微服务化，更改元数据存储需要对把所有的服务都替换为 MySQL 驱动包，包括 dolphinscheduler-tools, dolphinscheduler-master, dolphinscheduler-worker, dolphinscheduler-api, dolphinscheduler-alert-server .
+> 从 3.0.0 版本起，dolphinscheduler 已经微服务化，更改元数据存储需要对把所有的服务都替换为 MySQL 驱动包，包括 dolphinscheduler-tools, dolphinscheduler-master, dolphinscheduler-worker, dolphinscheduler-api, dolphinscheduler-alert-server .
 
 1. 下载 MySQL 驱动包 [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)
 
@@ -386,7 +386,7 @@ $SPARK_HOME/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HO
 
 文件 `spark-examples_2.11-2.4.7.jar` 需要先被上传到资源中心，然后创建一个 Spark 任务并设置:
 
-- 主函数的Class: `org.apache.spark.examples.SparkPi`
+- 主函数的 Class: `org.apache.spark.examples.SparkPi`
 - 主程序包: `spark-examples_2.11-2.4.7.jar`
 - 部署方式: `local`
 
@@ -410,7 +410,7 @@ common:
     enabled: false
     mountPath: "/opt/soft"
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -436,7 +436,7 @@ common:
   fsFileResourcePersistence:
     enabled: true
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
