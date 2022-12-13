@@ -27,12 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.WebUtils;
 
-public class CsrfInterceptor implements HandlerInterceptor {
+public class CsrfTokenInterceptor implements HandlerInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(CsrfInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(CsrfTokenInterceptor.class);
 
     private static final String DEFAULT_CSRF_HEADER_NAME = "X-CSRF-TOKEN";
 
@@ -41,7 +42,7 @@ public class CsrfInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = request.getHeader("token");
-        if (token != null) {
+        if (token != null || HttpMethod.GET.matches(request.getMethod())) {
             return true;
         }
         String csrfToken = Optional.ofNullable(request.getHeader(DEFAULT_CSRF_HEADER_NAME))
@@ -51,8 +52,14 @@ public class CsrfInterceptor implements HandlerInterceptor {
             logger.info("csrf token is null");
             return false;
         }
-        String realCsrfToken = Optional.ofNullable(request).map(req -> WebUtils.getCookie(req, "sessionId"))
-                .map(Cookie::getValue).map(e -> new StringBuilder(e).reverse().toString()).orElse(null);
+        String sessionId = Optional.of(request).map(req -> WebUtils.getCookie(req, "sessionId"))
+                .map(Cookie::getValue).orElse(request.getHeader("sessionId"));
+        if (sessionId == null) {
+            response.setStatus(HttpStatus.SC_FORBIDDEN);
+            logger.info("sessionId is null");
+            return false;
+        }
+        String realCsrfToken = new StringBuilder(sessionId).reverse().toString();
         if (!csrfToken.equals(realCsrfToken)) {
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             logger.info("csrf token is error");

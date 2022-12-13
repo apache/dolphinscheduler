@@ -75,6 +75,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/alert-plugin-instances")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -101,6 +102,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc.perform(put("/alert-plugin-instances/{id}", pluginDefineId)
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -126,6 +128,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc.perform(delete("/alert-plugin-instances/{id}", pluginDefineId)
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -149,6 +152,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/{id}", pluginDefineId)
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -168,7 +172,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
 
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/list")
-                .header(SESSION_ID, sessionId))
+                .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -195,6 +200,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/verify-name")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -222,7 +228,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
 
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances/verify-name")
-                .header(SESSION_ID, sessionId)
+                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -252,7 +258,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
 
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances")
-                .header(SESSION_ID, sessionId)
+                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -279,7 +285,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
 
         // When
         final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances")
-                .header(SESSION_ID, sessionId)
+                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

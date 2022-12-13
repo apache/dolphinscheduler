@@ -48,7 +48,7 @@ public class AuditLogControllerTest extends AbstractControllerTest {
         paramsMap.add("pageSize", "10");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/audit/audit-log-list")
-                .header(SESSION_ID, sessionId)
+                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

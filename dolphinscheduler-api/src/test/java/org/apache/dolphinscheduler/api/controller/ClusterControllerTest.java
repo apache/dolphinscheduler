@@ -68,6 +68,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/create")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -94,6 +95,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/update")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -113,6 +115,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/query-by-code")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -136,6 +139,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/list-paging")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -153,6 +157,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/cluster/query-cluster-list")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -172,6 +177,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/verify-cluster")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -192,6 +198,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/cluster/delete")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

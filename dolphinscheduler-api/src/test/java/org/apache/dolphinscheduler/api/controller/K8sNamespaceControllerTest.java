@@ -72,6 +72,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated()) // it can
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -92,6 +93,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(put("/k8s-namespace/{id}", 1)
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -112,6 +114,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -127,6 +130,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterCode", "100");
         mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -144,6 +148,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace/delete")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

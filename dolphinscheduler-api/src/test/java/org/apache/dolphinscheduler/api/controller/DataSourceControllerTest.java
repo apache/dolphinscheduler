@@ -78,6 +78,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -107,6 +108,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", 1);
         MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -139,6 +141,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.add("testFlag", "0");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -156,6 +159,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageSize", "1");
         MvcResult mvcResult = mockMvc.perform(get("/datasources")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -181,6 +185,7 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

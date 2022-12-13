@@ -70,6 +70,7 @@ public class LoginControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/signOut")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

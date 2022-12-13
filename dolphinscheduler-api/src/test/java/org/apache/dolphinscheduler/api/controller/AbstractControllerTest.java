@@ -69,6 +69,8 @@ public abstract class AbstractControllerTest {
 
     protected String sessionId;
 
+    protected String csrfToken;
+
     @BeforeEach
     public void setUp() {
         user = usersService.queryUser(1);
@@ -86,8 +88,12 @@ public abstract class AbstractControllerTest {
 
         String session = sessionService.createSession(loginUser, "127.0.0.1");
         sessionId = session;
-
+        csrfToken = generateCsrfToken(sessionId);
         Assertions.assertFalse(StringUtils.isEmpty(session));
+    }
+
+    private String generateCsrfToken(String sessionId) {
+        return new StringBuilder(sessionId).reverse().toString();
     }
 
     public Map<String, Object> success() {

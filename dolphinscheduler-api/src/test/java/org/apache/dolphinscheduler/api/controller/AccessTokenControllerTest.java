@@ -51,7 +51,8 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         paramsMap.add("expireTime", "2019-12-18 00:00:00");
         paramsMap.add("token", "607f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
-                .header("sessionId", sessionId)
+                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -71,6 +72,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/access-tokens")
                         .header("sessionId", this.sessionId)
+                        .header("X-CSRF-TOKEN", csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -88,7 +90,8 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         paramsMap.add("expireTime", "2019-12-18 00:00:00");
         paramsMap.add("token", "507f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
-                .header("sessionId", sessionId)
+                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -104,7 +107,8 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         paramsMap.add("userId", "4");
         paramsMap.add("expireTime", "2019-12-28 00:00:00");
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens/generate")
-                .header("sessionId", sessionId)
+                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -122,6 +126,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         paramsMap.add("searchVal", "");
         MvcResult mvcResult = mockMvc.perform(get("/access-tokens")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -148,7 +153,8 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     public void testDelAccessTokenById() throws Exception {
         testCreateToken();
         MvcResult mvcResult = mockMvc.perform(delete("/access-tokens/1")
-                .header("sessionId", sessionId))
+                .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -166,6 +172,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         paramsMap.add("token", "cxctoken123update");
         MvcResult mvcResult = mockMvc.perform(put("/access-tokens/1")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -187,6 +194,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(put("/access-tokens/2")
                         .header("sessionId", this.sessionId)
+                        .header("X-CSRF-TOKEN", csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

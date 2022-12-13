@@ -75,6 +75,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("otherParamsJson", "");
         MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -118,7 +119,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void queryWorkerAddressList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
-                .header("sessionId", sessionId))
+                .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -140,7 +142,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
 
         MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")
-                .header("sessionId", sessionId))
+                .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

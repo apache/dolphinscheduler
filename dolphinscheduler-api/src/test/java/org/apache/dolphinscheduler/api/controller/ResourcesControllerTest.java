@@ -154,7 +154,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/view")
-                .header(SESSION_ID, sessionId)
+                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -186,6 +186,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/resources/online-create")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -213,6 +214,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(put("/resources/update-content")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -263,6 +265,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/resources/udf-func")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -317,6 +320,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(put("/resources/udf-func/{id}", "456")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -470,7 +474,8 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Mockito.when(udfFuncService.delete(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(delete("/resources/udf-func/{id}", "123")
-                .header(SESSION_ID, sessionId))
+                .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -493,6 +498,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         paramsMap.add("tenantCode", "123");
         MvcResult mvcResult = mockMvc.perform(delete("/resources")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

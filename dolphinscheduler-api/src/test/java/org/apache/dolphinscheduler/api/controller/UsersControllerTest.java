@@ -58,6 +58,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/create")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -81,6 +82,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/update")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -98,6 +100,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-project")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -153,6 +156,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-file")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -171,6 +175,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-udf-func")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -189,6 +194,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-datasource")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -290,6 +296,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/delete")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -324,6 +331,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/register")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -341,6 +349,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/activate")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -359,6 +368,7 @@ public class UsersControllerTest extends AbstractControllerTest {
         String jsonUserNames = JSONUtils.toJsonString(userNames);
         MvcResult mvcResult = mockMvc.perform(post("/users/batch/activate")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonUserNames))
                 .andExpect(status().isOk())

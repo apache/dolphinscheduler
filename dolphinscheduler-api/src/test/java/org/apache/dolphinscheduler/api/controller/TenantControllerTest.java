@@ -58,6 +58,7 @@ public class TenantControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/tenants")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -98,6 +99,7 @@ public class TenantControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(put("/tenants/{id}", 9)
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -149,7 +151,8 @@ public class TenantControllerTest extends AbstractControllerTest {
     public void testQueryTenantlist() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/tenants/list")
-                .header(SESSION_ID, sessionId))
+                .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -167,6 +170,7 @@ public class TenantControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(delete("/tenants/{id}", 64)
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

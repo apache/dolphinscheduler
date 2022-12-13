@@ -66,6 +66,7 @@ public class UiPluginControllerTest extends AbstractControllerTest {
 
         final MvcResult mvcResult = mockMvc.perform(get("/ui-plugins/query-by-type")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

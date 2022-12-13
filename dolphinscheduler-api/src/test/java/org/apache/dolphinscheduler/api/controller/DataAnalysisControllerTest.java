@@ -69,6 +69,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         paramsMap.add("projectCode", "16");
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/task-state-count")
                 .header("sessionId", sessionId)
+
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

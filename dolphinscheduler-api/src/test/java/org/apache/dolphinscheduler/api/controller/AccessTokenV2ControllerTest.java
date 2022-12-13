@@ -50,6 +50,7 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         paramsMap.put("token", "607f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -70,6 +71,7 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/v2/access-tokens")
                         .header("sessionId", this.sessionId)
+                        .header("X-CSRF-TOKEN", csrfToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -89,6 +91,7 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         paramsMap.put("token", "507f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
                 .header("sessionId", sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())

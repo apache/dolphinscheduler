@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import org.apache.dolphinscheduler.api.interceptor.CsrfInterceptor;
+import org.apache.dolphinscheduler.api.interceptor.CsrfTokenInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
@@ -70,8 +70,8 @@ public class AppConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public CsrfInterceptor csrfInterceptor() {
-        return new CsrfInterceptor();
+    public CsrfTokenInterceptor csrfInterceptor() {
+        return new CsrfTokenInterceptor();
     }
 
     /**

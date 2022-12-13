@@ -72,7 +72,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageSize", "2");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances")
-                .header("sessionId", sessionId)
+                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -128,7 +128,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/process-instances/{id}", "1113", "123")
-                .header("sessionId", sessionId)
+                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -165,7 +165,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/process-instances/query-sub-by-parent", "1113")
-                        .header(SESSION_ID, sessionId)
+                        .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                         .param("taskId", "1203"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -186,7 +186,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/process-instances/query-parent-by-sub", "1113")
-                        .header(SESSION_ID, sessionId)
+                        .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                         .param("subId", "1204"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -242,7 +242,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 processInstanceService.deleteProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/process-instances/batch-delete", "1113")
-                .header(SESSION_ID, sessionId)
+                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .param("processInstanceIds", "1205,1206"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

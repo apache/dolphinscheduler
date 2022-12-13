@@ -107,6 +107,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -123,6 +124,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -143,6 +145,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/update")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -161,6 +164,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "1");
         MvcResult mvcResult = mockMvc.perform(post("/task-group/close-task-group")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -175,6 +179,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "1");
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/start-task-group")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

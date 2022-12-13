@@ -121,7 +121,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
+                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -164,7 +164,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
+                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -206,7 +206,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
+                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -235,7 +235,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId)
+                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -268,7 +268,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
 
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/execute", projectCode)
-                .header("sessionId", sessionId)
+                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -286,7 +286,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
                 .thenReturn(executeServiceResult);
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-check", projectCode)
-                .header(SESSION_ID, sessionId)
+                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
                 .param("processDefinitionCode", String.valueOf(processDefinitionCode)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

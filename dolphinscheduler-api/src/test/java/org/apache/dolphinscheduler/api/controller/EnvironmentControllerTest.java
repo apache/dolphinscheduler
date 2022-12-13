@@ -72,6 +72,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/create")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -98,6 +99,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/update")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -117,6 +119,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/environment/query-by-code")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -140,6 +143,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/environment/list-paging")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -157,6 +161,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/environment/query-environment-list")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -176,6 +181,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/verify-environment")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -196,6 +202,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/delete")
                 .header(SESSION_ID, sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
