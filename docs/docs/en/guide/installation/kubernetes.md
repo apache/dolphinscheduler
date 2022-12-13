@@ -12,7 +12,7 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ## Install DolphinScheduler
 
-Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](/en-us/download/download.html)
+Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](https://dolphinscheduler.apache.org/#/en-us/download)
 
 To publish the release name `dolphinscheduler` version, please execute the following commands:
 
@@ -93,8 +93,8 @@ The configuration file is `values.yaml`, and the [Appendix-Configuration](#appen
 
 ## Support Matrix
 
-|                             Type                             |   Support    |                 Notes                 |
-|--------------------------------------------------------------|--------------|---------------------------------------|
+| Type                                                         | Support      | Notes                                 |
+| ------------------------------------------------------------ | ------------ | ------------------------------------- |
 | Shell                                                        | Yes          |                                       |
 | Python2                                                      | Yes          |                                       |
 | Python3                                                      | Indirect Yes | Refer to FAQ                          |
@@ -410,7 +410,7 @@ common:
     enabled: false
     mountPath: "/opt/soft"
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -436,7 +436,7 @@ common:
   fsFileResourcePersistence:
     enabled: true
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -460,7 +460,7 @@ common:
     FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
 ```
 
-Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY`  to actual environment values.
+Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` to actual environment values.
 
 > **Note**: `MINIO_IP` can only use IP instead of the domain name, because DolphinScheduler currently doesn't support S3 path style access.
 
@@ -479,8 +479,8 @@ common:
 
 ## Appendix-Configuration
 
-|                              Parameter                               |                                                          Description                                                          |                Default                |
-|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
+| Parameter                                                            | Description                                                                                                                   | Default                               |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
 | `timezone`                                                           | World time and date for cities in all time zones                                                                              | `Asia/Shanghai`                       |
 |                                                                      |                                                                                                                               |                                       |
 | `image.repository`                                                   | Docker image repository for the DolphinScheduler                                                                              | `apache/dolphinscheduler`             |
@@ -703,4 +703,3 @@ common:
 | `ingress.path`                                                       | Ingress path                                                                                                                  | `/dolphinscheduler`                   |
 | `ingress.tls.enabled`                                                | Enable ingress tls                                                                                                            | `false`                               |
 | `ingress.tls.secretName`                                             | Ingress tls secret name                                                                                                       | `dolphinscheduler-tls`                |
-
