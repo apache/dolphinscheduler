@@ -2800,13 +2800,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
         int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
         processDefinitionLog.setVersion(insertVersion);
+        processDefinition.setVersion(insertVersion);
 
         processDefinitionLog.setOperator(loginUser.getId());
+        processDefinition.setUserId(loginUser.getId());
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
+        processDefinition.setUpdateTime(processDefinition.getUpdateTime());
         processDefinitionLog.setId(null);
         int insertLog = processDefinitionLogMapper.insert(processDefinitionLog);
         processDefinitionLog.setId(processDefinition.getId());
-        int result = processDefinitionMapper.updateById(processDefinitionLog);
+
+        int result = processDefinitionMapper.updateById(processDefinition);
         return (insertLog & result) > 0 ? insertVersion : 0;
     }
 
