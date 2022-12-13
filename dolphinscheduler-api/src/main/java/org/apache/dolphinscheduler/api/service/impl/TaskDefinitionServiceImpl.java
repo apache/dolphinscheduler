@@ -893,7 +893,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return result;
     }
 
-    private void updateUpstreamTask(Set<Long> allPreTaskCodeSet, long taskCode, long projectCode, long processDefinitionCode, User loginUser) {
+    private void updateUpstreamTask(Set<Long> allPreTaskCodeSet, long taskCode, long projectCode,
+                                    long processDefinitionCode, User loginUser) {
         // query all process task relation
         List<ProcessTaskRelation> hadProcessTaskRelationList = processTaskRelationMapper
                 .queryUpstreamByCode(projectCode, taskCode);
@@ -967,7 +968,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
     }
 
-    private ProcessTaskRelationLog createProcessTaskRelationLog(User loginUser, ProcessTaskRelation processTaskRelation) {
+    private ProcessTaskRelationLog createProcessTaskRelationLog(User loginUser,
+                                                                ProcessTaskRelation processTaskRelation) {
         Date now = new Date();
         ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
         processTaskRelationLog.setOperator(loginUser.getId());
