@@ -261,6 +261,8 @@ public enum Status {
     SCHEDULE_ALREADY_EXISTS(10204, "workflow {0} schedule {1} already exist, please update or delete it",
             "工作流 {0} 的定时 {1} 已经存在，请更新或删除"),
     QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
+    EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
+            "请先保存后再执行"),
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
@@ -379,6 +381,9 @@ public enum Status {
             "批量创建工作流任务关系 {0} 错误"),
     PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR(50070, "batch update process task relation error",
             "批量修改工作流任务关系错误"),
+
+    WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
+            "工作流实例未结束，不能执行此操作"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),
