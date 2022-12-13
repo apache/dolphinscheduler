@@ -63,10 +63,10 @@ public class OpenmldbTask extends PythonTask {
 
     @Override
     public void init() {
-        logger.info("openmldb task params {}", taskRequest.getTaskParams());
 
         openmldbParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), OpenmldbParameters.class);
 
+        logger.info("Initialize openmldb task params {}", JSONUtils.toPrettyJsonString(openmldbParameters));
         if (openmldbParameters == null || !openmldbParameters.checkParameters()) {
             throw new TaskException("openmldb task params is not valid");
         }

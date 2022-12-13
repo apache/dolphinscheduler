@@ -102,12 +102,12 @@ public class MlflowTask extends AbstractTask {
 
     @Override
     public void init() {
-        logger.info("shell task params {}", taskExecutionContext.getTaskParams());
 
         mlflowParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MlflowParameters.class);
 
-        if (!mlflowParameters.checkParameters()) {
-            throw new RuntimeException("shell task params is not valid");
+        logger.info("Initialize MLFlow task params {}", JSONUtils.toPrettyJsonString(mlflowParameters));
+        if (mlflowParameters == null || !mlflowParameters.checkParameters()) {
+            throw new RuntimeException("MLFlow task params is not valid");
         }
     }
 

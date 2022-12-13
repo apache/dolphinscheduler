@@ -68,9 +68,9 @@ public class DatasyncTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("Datasync task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatasyncParameters.class);
+        logger.info("Initialize Datasync task params {}", JSONUtils.toPrettyJsonString(parameters));
         initParams();
 
         hook = new DatasyncHook();
@@ -84,10 +84,9 @@ public class DatasyncTask extends AbstractRemoteTask {
             try {
                 parameters = objectMapper.readValue(parameters.getJson(), DatasyncParameters.class);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+                throw new TaskException("Convert json to task params failed", e);
             }
-            // parameters = JSONUtils.parseObject(parameters.getJson(), DatasyncParameters.class);
-            logger.info("Datasync convert task params {}", parameters);
+            logger.info("Success convert json to task params {}", JSONUtils.toPrettyJsonString(parameters));
         }
     }
 

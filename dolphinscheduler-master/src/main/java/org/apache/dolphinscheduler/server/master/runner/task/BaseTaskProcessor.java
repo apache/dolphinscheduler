@@ -320,12 +320,14 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.setTaskResourceInfo(resources);
 
         // TODO to be optimized
-        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = null;
         if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
+            dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
             setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenant.getTenantCode());
         }
-        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
+        K8sTaskExecutionContext k8sTaskExecutionContext = null;
         if (TASK_TYPE_SET_K8S.contains(taskInstance.getTaskType())) {
+            k8sTaskExecutionContext = new K8sTaskExecutionContext();
             setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
         }
 

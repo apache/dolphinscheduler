@@ -52,11 +52,11 @@ public class PytorchTask extends AbstractTask {
 
     @Override
     public void init() {
-        logger.info("python task params {}", taskExecutionContext.getTaskParams());
 
         pytorchParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PytorchParameters.class);
+        logger.info("Initialize pytorch task params {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
 
-        if (!pytorchParameters.checkParameters()) {
+        if (pytorchParameters == null || !pytorchParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
         }
 

@@ -94,8 +94,9 @@ public class ChunJunTask extends AbstractTask {
      */
     @Override
     public void init() {
-        logger.info("chunjun task params {}", taskExecutionContext.getTaskParams());
         chunJunParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ChunJunParameters.class);
+        logger.info("Initialize chunjun task params {}",
+                JSONUtils.toPrettyJsonString(taskExecutionContext.getTaskParams()));
 
         if (!chunJunParameters.checkParameters()) {
             throw new RuntimeException("chunjun task params is not valid");

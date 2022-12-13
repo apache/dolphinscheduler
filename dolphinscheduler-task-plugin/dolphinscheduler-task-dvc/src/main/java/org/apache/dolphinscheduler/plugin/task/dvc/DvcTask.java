@@ -65,12 +65,12 @@ public class DvcTask extends AbstractTask {
 
     @Override
     public void init() {
-        logger.info("dvc task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DvcParameters.class);
+        logger.info("Initialize dvc task params {}", JSONUtils.toPrettyJsonString(parameters));
 
-        if (!parameters.checkParameters()) {
-            throw new RuntimeException("dvc task params is not valid");
+        if (parameters == null || !parameters.checkParameters()) {
+            throw new TaskException("dvc task params is not valid");
         }
     }
 

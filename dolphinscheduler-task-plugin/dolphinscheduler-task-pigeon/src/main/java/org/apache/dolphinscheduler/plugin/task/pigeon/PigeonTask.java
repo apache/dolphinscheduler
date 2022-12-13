@@ -73,12 +73,12 @@ public class PigeonTask extends AbstractRemoteTask {
     }
 
     @Override
-    public void init() {
+    public void init() throws TaskException {
         super.init();
-        logger.info("PIGEON task params {}", taskExecutionContext.getTaskParams());
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PigeonParameters.class);
-        if (!parameters.checkParameters()) {
-            throw new RuntimeException("datax task params is not valid");
+        logger.info("Initialize PIGEON task params {}", JSONUtils.toPrettyJsonString(parameters));
+        if (parameters == null || !parameters.checkParameters()) {
+            throw new TaskException("datax task params is not valid");
         }
     }
 

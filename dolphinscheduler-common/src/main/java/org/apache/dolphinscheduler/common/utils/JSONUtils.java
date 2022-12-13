@@ -54,6 +54,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,21 +73,17 @@ public class JSONUtils {
         logger.info("init timezone: {}", TimeZone.getDefault());
     }
 
-    private static final SimpleModule LOCAL_DATE_TIME_MODULE = new SimpleModule()
-            .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
-            .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
-
-    /**
-     * can use static singleton, inject: just make sure to reuse!
-     */
-    private static final ObjectMapper objectMapper = new ObjectMapper()
+    private static final ObjectMapper objectMapper = JsonMapper.builder()
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .registerModule(LOCAL_DATE_TIME_MODULE)
-            .setTimeZone(TimeZone.getDefault())
-            .setDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS));
+            .addModule(new SimpleModule()
+                    .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
+                    .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
+            .defaultTimeZone(TimeZone.getDefault())
+            .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
+            .build();
 
     private JSONUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");
@@ -320,6 +317,14 @@ public class JSONUtils {
     public static String toJsonString(Object object) {
         try {
             return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException("Object json deserialization exception.", e);
+        }
+    }
+
+    public static String toPrettyJsonString(Object object) {
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException("Object json deserialization exception.", e);
         }

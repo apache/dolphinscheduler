@@ -89,7 +89,6 @@ public class JavaTask extends AbstractTask {
      **/
     @Override
     public void init() {
-        logger.info("java task params {}", taskRequest.getTaskParams());
         javaParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), JavaParameters.class);
         if (javaParameters == null || !javaParameters.checkParameters()) {
             throw new TaskException("java task params is not valid");
@@ -97,6 +96,7 @@ public class JavaTask extends AbstractTask {
         if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
             setMainJarName();
         }
+        logger.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
     }
 
     /**

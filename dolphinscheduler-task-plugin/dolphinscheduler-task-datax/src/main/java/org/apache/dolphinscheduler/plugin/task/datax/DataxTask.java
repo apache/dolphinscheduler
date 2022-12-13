@@ -134,8 +134,8 @@ public class DataxTask extends AbstractTask {
      */
     @Override
     public void init() {
-        logger.info("datax task params {}", taskExecutionContext.getTaskParams());
         dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
+        logger.info("Initialize datax task params {}", JSONUtils.toPrettyJsonString(dataXParameters));
 
         if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
