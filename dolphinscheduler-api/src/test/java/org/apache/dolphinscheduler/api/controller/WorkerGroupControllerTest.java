@@ -119,8 +119,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
     @Test
     public void queryWorkerAddressList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/worker-groups/worker-address-list")
-                .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken))
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

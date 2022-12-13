@@ -120,6 +120,7 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/users/grant-project-by-code")
                         .header(SESSION_ID, this.sessionId)
+                        .header("X-CSRF-TOKEN", csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -138,6 +139,7 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = this.mockMvc.perform(post("/users/revoke-project")
                 .header(SESSION_ID, this.sessionId)
+                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
