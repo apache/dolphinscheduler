@@ -33,9 +33,10 @@ export type {
 export type { IResource, ProgramType, IMainJar } from '@/store/project/types'
 export type { ITaskState } from '@/common/types'
 
+export type RelationType = 'AND' | 'OR'
+
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
-type RelationType = 'AND' | 'OR'
 type ITaskType = TaskType
 type IDateType = 'hour' | 'day' | 'week' | 'month'
 
