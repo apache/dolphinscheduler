@@ -148,7 +148,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
                                        @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                        @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
-                                       @RequestParam(value = "version") Integer version) {
+                                       @RequestParam(value = "version",required = false) Integer version) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
