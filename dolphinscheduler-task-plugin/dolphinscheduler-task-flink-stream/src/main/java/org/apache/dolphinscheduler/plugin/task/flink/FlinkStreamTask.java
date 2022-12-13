@@ -50,9 +50,9 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void init() {
-        logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
+        logger.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
