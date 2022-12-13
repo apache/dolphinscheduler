@@ -35,6 +35,7 @@ public final class TenantPage {
 
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
+        headers.put(Constants.CSRF_TOKEN_ID,new StringBuilder(sessionId).reverse().toString());
 
         RequestClient requestClient = new RequestClient();
 
@@ -44,6 +45,7 @@ public final class TenantPage {
     public HttpResponse getTenantListPaging(String sessionId, Integer pageNo, Integer pageSize, String searchVal) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
+        headers.put(Constants.CSRF_TOKEN_ID,new StringBuilder(sessionId).reverse().toString());
 
         Map<String, Object> params = new HashMap<>();
         params.put("pageSize", pageSize);
@@ -58,6 +60,7 @@ public final class TenantPage {
     public HttpResponse deleteTenant(String sessionId, Integer tenantId) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
+        headers.put(Constants.CSRF_TOKEN_ID,new StringBuilder(sessionId).reverse().toString());
 
         RequestClient requestClient = new RequestClient();
 

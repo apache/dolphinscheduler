@@ -37,6 +37,7 @@ public final class Constants {
      */
     public static final String SESSION_ID_KEY = "sessionId";
 
+    public static final String CSRF_TOKEN_ID = "X-CSRF-TOKEN";
     /**
      * simple date format
      */
