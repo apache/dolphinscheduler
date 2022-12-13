@@ -34,7 +34,6 @@ import org.springframework.web.util.WebUtils;
 public class CsrfTokenInterceptor implements HandlerInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(CsrfTokenInterceptor.class);
-
     private static final String DEFAULT_CSRF_HEADER_NAME = "X-CSRF-TOKEN";
 
     private static final String DEFAULT_CSRF_PARAMETER_NAME = "_csrf";
