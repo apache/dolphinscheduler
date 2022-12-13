@@ -284,7 +284,8 @@ A： 将 hive pom
 ---
 
 ## Q：如何增加一台工作服务器
-A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/laster/user_doc/installation/cluster.html) 1.3 小节，创建部署用户和 hosts 映射
+
+A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/#/zh-cn/docs/3.0.3/installation/cluster) 1.3 小节，创建部署用户和 hosts 映射
 
 ​	2，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/laster/user_doc/installation/cluster.html) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
 ​          1.4 小节的最后一步是在当前新增机器上执行的，即需要给部署目录部署用户的权限
@@ -427,12 +428,16 @@ A：1，cd dolphinscheduler-ui 然后删除 node_modules 目录
 ```
 sudo rm -rf node_modules
 ```
-   ​	2，通过 npm.taobao.org 下载 node-sass
- ```
- sudo npm uninstall node-sass
- sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
- ```
-   3，如果步骤 2 报错，请重新构建 node-saas [参考链接](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
+
+​	2，通过 npm.taobao.org 下载 node-sass
+
+```
+sudo npm uninstall node-sass
+sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+```
+
+3，如果步骤 2 报错，请重新构建 node-saas [参考链接](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/zh/contribute/frontend-development.md)
+
 ```
  sudo npm rebuild node-sass
 ```
@@ -582,6 +587,7 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 ---
 
 ## Q：Yarn多集群支持
+
 A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EMR）：
 
    1. 将 Worker 节点部署至 EMR 集群的 Master 节点

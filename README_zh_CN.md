@@ -53,11 +53,11 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/dolphinsche
 
 ## 快速试用 Docker
 
-请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/en-us/docs/3.0.2/user_doc/guide/start/docker.html)
+请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/#/zh-cn/docs/3.0.3/guide/start/docker)
 
 ## 快速试用 Kubernetes
 
-请参考官方文档: [快速试用 Kubernetes 部署](https://dolphinscheduler.apache.org/en-us/docs/3.0.2/user_doc/guide/installation/kubernetes.html)
+请参考官方文档: [快速试用 Kubernetes 部署](http://dolphinscheduler.apache.org/#/zh-cn/docs/3.0.3/guide/installation/kubernetes)
 
 ## 如何构建
 
@@ -80,11 +80,11 @@ Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、g
 ## 获得帮助
 
 1. 提交 [issue](https://github.com/apache/dolphinscheduler/issues/new/choose)
-2. [加入slack群](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw) 并在频道 `#troubleshooting` 中提问
+2. [加入slack群](https://s.apache.org/dolphinscheduler-slack) 并在频道 `#troubleshooting` 中提问
 
 ## 社区
 
-1. 通过[该申请链接](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw)加入slack channel
+1. 通过[该申请链接](https://s.apache.org/dolphinscheduler-slack)加入slack channel
 2. 关注[Apache Dolphin Scheduler的Twitter账号](https://twitter.com/dolphinschedule)获取实时动态
 
 ## 版权

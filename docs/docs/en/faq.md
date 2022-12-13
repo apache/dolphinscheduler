@@ -301,7 +301,8 @@ change into
 ---
 
 ## Q : how to add a worker server
-A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
+
+A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/#/en-us/docs/3.0.3/user_doc/installation/cluster)
 
 ​		2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
 
@@ -446,12 +447,16 @@ A: 1, cd dolphinscheduler-ui and delete node_modules directory
 ```
 sudo rm -rf node_modules
 ```
-   ​	2, install node-sass through npm.taobao.org
- ```
- sudo npm uninstall node-sass
- sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
- ```
-   3, if the 2nd step failure, please, [referer url](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
+
+​	2, install node-sass through npm.taobao.org
+
+```
+sudo npm uninstall node-sass
+sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+```
+
+3, if the 2nd step failure, please, [referer url](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/frontend-development.md)
+
 ```
  sudo npm rebuild node-sass
 ```

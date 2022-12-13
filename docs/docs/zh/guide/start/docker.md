@@ -39,7 +39,7 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
   - Hyper-V 模式：点击 `Docker Desktop -> Settings -> Resources -> Memory` 调整内存大小
   - WSL 2 模式 模式：参考 [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) 调整内存大小
 
-配置完成后我们需要获取 `docker-compose.yaml` 文件，通过[下载页面](/zh-cn/download/download.html)下载对应版本源码包可能是最快的方法，
+配置完成后我们需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/#/zh-cn/download)下载对应版本源码包可能是最快的方法，
 源码包对应的值为 "Total Source Code"。当下载完源码后就可以运行命令进行部署了。
 
 ```shell
