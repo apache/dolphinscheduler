@@ -509,7 +509,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * delete process task relation, will delete exists relation upstream -> downstream, throw error if not exists
      *
-             * @param loginUser login user
+     * @param loginUser login user
      * @param taskCode relation upstream code
      * @param taskRelationUpdateUpstreamRequest relation downstream code
      */

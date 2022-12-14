@@ -2795,6 +2795,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinitionUpdate.setVersion(insertVersion);
         return processDefinitionUpdate;
     }
+
     public int saveProcessDefine(User loginUser, ProcessDefinition processDefinition) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
         Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
@@ -2807,10 +2808,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
         processDefinition.setUpdateTime(processDefinition.getUpdateTime());
         processDefinitionLog.setId(null);
+        int result = processDefinitionMapper.updateById(processDefinition);
+
         int insertLog = processDefinitionLogMapper.insert(processDefinitionLog);
         processDefinitionLog.setId(processDefinition.getId());
-
-        int result = processDefinitionMapper.updateById(processDefinition);
         return (insertLog & result) > 0 ? insertVersion : 0;
     }
 
@@ -2865,9 +2866,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     taskRelations.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
             Set<Integer> taskRelationSet =
                     taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
-            boolean result = CollectionUtils.isEqualCollection(processTaskRelationSet,
+            boolean isSame = CollectionUtils.isEqualCollection(processTaskRelationSet,
                     taskRelationSet);
-            if (result) {
+            if (isSame) {
                 logger.info("process task relations is non-existent, projectCode:{}, processCode:{}.",
                         processDefinition.getProjectCode(), processDefinition.getCode());
                 return Constants.EXIT_CODE_SUCCESS;
