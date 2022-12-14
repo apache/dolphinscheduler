@@ -35,6 +35,7 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
     @Autowired
     private TriggerRelationMapper triggerRelationMapper;
 
+    @Override
     public void saveTriggerTdoDb(ApiTriggerType type, Long triggerCode, Integer jobId) {
         TriggerRelation triggerRelation = new TriggerRelation();
         triggerRelation.setTriggerType(type.getCode());
@@ -44,7 +45,7 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
         triggerRelation.setUpdateTime(new Date());
         triggerRelationMapper.upsert(triggerRelation);
     }
-
+    @Override
     public TriggerRelation queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId) {
         return triggerRelationMapper.queryByTypeAndJobId(apiTriggerType.getCode(), jobId);
     }
