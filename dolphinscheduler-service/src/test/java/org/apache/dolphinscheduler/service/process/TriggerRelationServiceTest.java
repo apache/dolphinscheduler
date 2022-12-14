@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-//@RunWith(MockitoJUnitRunner.class)
 public class TriggerRelationServiceTest {
 
   private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
@@ -74,9 +73,9 @@ public class TriggerRelationServiceTest {
     Mockito.when(triggerRelationMapper.queryByTypeAndJobId(TriggerType.COMMAND.getCode(), 100))
         .thenReturn(getTriggerTdoDb());
     int result = -1;
-    result = triggerRelationService.saveProcessInstanceTrigger(100,1234567890);
+    result = triggerRelationService.saveProcessInstanceTrigger(100, 1234567890);
     Assertions.assertTrue(result > 0);
-    result = triggerRelationService.saveProcessInstanceTrigger(200,1234567890);
+    result = triggerRelationService.saveProcessInstanceTrigger(200, 1234567890);
     Assertions.assertTrue(result == 0);
   }
 
