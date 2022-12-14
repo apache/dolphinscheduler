@@ -123,7 +123,7 @@ delimiter d//
 DROP TABLE IF EXISTS t_ds_trigger_relation;
 CREATE TABLE t_ds_trigger_relation (
     id        serial      NOT NULL,
-    trigger_type int NOT NULL,,
+    trigger_type int NOT NULL,
     trigger_code bigint NOT NULL,
     job_id bigint NOT NULL,
     create_time timestamp DEFAULT NULL,
