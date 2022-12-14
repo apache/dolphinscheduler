@@ -325,6 +325,14 @@ public class JSONUtils {
         }
     }
 
+    public static String toPrettyJsonString(Object object) {
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException("Object json deserialization exception.", e);
+        }
+    }
+
     /**
      * serialize to json byte
      *
