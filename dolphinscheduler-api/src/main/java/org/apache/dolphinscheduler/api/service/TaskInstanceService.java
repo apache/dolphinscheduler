@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -89,4 +90,14 @@ public interface TaskInstanceService {
      * @return
      */
     Result stopTask(User loginUser, long projectCode, Integer taskInstanceId);
+
+    /**
+     * query taskInstance by taskInstanceCode
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param taskInstanceId taskInstance id
+     * @return the result code and msg
+     */
+    TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId);
 }

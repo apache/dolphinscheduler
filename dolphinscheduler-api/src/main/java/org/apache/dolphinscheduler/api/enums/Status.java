@@ -260,10 +260,9 @@ public enum Status {
     SCHEDULE_NOT_EXISTS(10203, "schedule {0} does not exist", "调度 id {0} 不存在"),
     SCHEDULE_ALREADY_EXISTS(10204, "workflow {0} schedule {1} already exist, please update or delete it",
             "工作流 {0} 的定时 {1} 已经存在，请更新或删除"),
-
-    EXECUTE_NOT_DEFINE_TASK(10204, "please save and try again",
+    QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
+    EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
             "请先保存后再执行"),
-
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
