@@ -15,33 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.blocking;
+package org.apache.dolphinscheduler.api.dto.workflowInstance;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+import org.apache.dolphinscheduler.api.utils.Result;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import lombok.Data;
 
-import java.util.List;
+/**
+ * user List response
+ */
+@Data
+public class WorkflowExecuteResponse extends Result {
 
-import com.google.auto.service.AutoService;
-
-@AutoService(TaskChannelFactory.class)
-public class BlockingTaskChannelFactory implements TaskChannelFactory {
-
-    @Override
-    public TaskChannel create() {
-        return new BlockingTaskChannel();
-    }
-
-    @Override
-    public String getName() {
-        return TASK_TYPE_BLOCKING;
-    }
-
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
 }

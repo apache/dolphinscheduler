@@ -201,7 +201,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setTaskAppId(taskAppId);
         logger.info("Set task appId: {}", taskAppId);
 
-        logger.info("End initialize task");
+        logger.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
     }
 
     protected void beforeExecute() {
