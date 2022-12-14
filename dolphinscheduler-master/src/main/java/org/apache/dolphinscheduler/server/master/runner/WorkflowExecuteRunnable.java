@@ -306,7 +306,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 if (stateEventHandler.handleStateEvent(this, stateEvent)) {
                     this.stateEvents.remove(stateEvent);
                 } else {
-                    logger.info("Handle state event failed, move event to the tail,{}",stateEvent);
+                    logger.info("Handle state event failed, move event to the tail, {}",stateEvent);
                     this.stateEvents.remove(stateEvent);
                     this.stateEvents.offer(stateEvent);
                 }
