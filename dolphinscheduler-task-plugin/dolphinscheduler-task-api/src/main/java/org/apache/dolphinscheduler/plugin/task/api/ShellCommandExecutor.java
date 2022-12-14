@@ -95,10 +95,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             sb.append("cd /d %~dp0").append(System.lineSeparator());
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
                 sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
-            } else {
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("call ").append(taskRequest.getEnvFile()).append(System.lineSeparator());
-                }
             }
         } else {
             sb.append("#!/bin/bash").append(System.lineSeparator());
@@ -106,10 +102,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             sb.append("cd $BASEDIR").append(System.lineSeparator());
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
                 sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
-            } else {
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("source ").append(taskRequest.getEnvFile()).append(System.lineSeparator());
-                }
             }
         }
         sb.append(execCommand);

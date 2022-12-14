@@ -105,7 +105,7 @@ public class KubeflowTaskTest {
         KubeflowTask task = Mockito.spy(createTask(kubeflowParameters));
         Mockito.when(task.runCommand(Mockito.anyString())).thenReturn("delete_result");
         task.cancelApplication();
-        Assertions.assertEquals(task.getExitStatusCode(), TaskConstants.EXIT_CODE_SUCCESS);
+        Assertions.assertEquals(task.getExitStatusCode(), TaskConstants.EXIT_CODE_KILL);
     }
 
     public KubeflowTask createTask(KubeflowParameters kubeflowParameters) {

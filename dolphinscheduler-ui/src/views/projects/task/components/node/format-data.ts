@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { omit, cloneDeep } from 'lodash'
+import { omit } from 'lodash'
 import type {
   INodeData,
   ITaskData,
@@ -23,7 +23,8 @@ import type {
   ISqoopTargetParams,
   ISqoopSourceParams,
   ILocalParam,
-  IDependTask
+  IDependTask,
+  RelationType
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -270,21 +271,9 @@ export function formatParams(data: INodeData): {
     taskParams.xmx = data.xmx
   }
   if (data.taskType === 'DEPENDENT') {
-    const dependTaskList = cloneDeep(data.dependTaskList)?.map(
-      (taskItem: IDependTask) => {
-        if (taskItem.dependItemList?.length) {
-          taskItem.dependItemList.forEach((dependItem) => {
-            delete dependItem.definitionCodeOptions
-            delete dependItem.depTaskCodeOptions
-            delete dependItem.dateOptions
-          })
-        }
-        return taskItem
-      }
-    )
     taskParams.dependence = {
       relation: data.relation,
-      dependTaskList: dependTaskList
+      dependTaskList: data.dependTaskList
     }
   }
   if (data.taskType === 'DATA_QUALITY') {
@@ -460,6 +449,12 @@ export function formatParams(data: INodeData): {
     taskParams.yamlContent = data.yamlContent
     taskParams.namespace = data.namespace
   }
+  
+  if (data.taskType === 'LINKIS') {
+    taskParams.useCustom = data.useCustom
+    taskParams.paramScript = data.paramScript
+    taskParams.rawScript = data.rawScript
+  }
 
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
@@ -632,9 +627,11 @@ export function formatModel(data: ITaskData) {
   }
 
   if (data.taskParams?.dependence) {
-    params.dependTaskList = data.taskParams?.dependence.dependTaskList || []
-    params.relation = data.taskParams?.dependence.relation
+    const dependence: { relation?: RelationType, dependTaskList?: IDependTask[] } = JSON.parse(JSON.stringify(data.taskParams.dependence))
+    params.dependTaskList = dependence.dependTaskList || []
+    params.relation = dependence.relation
   }
+
   if (data.taskParams?.ruleInputParameter) {
     params.check_type = data.taskParams.ruleInputParameter.check_type
     params.comparison_execute_sql =

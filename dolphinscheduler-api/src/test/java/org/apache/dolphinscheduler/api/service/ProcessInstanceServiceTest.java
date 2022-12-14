@@ -414,7 +414,7 @@ public class ProcessInstanceServiceTest {
                 .thenReturn(Optional.of(processInstance));
         when(taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(taskInstanceList);
-        when(loggerService.queryLog(taskInstance.getId(), 0, 4098)).thenReturn(res);
+        when(loggerService.queryLog(loginUser, taskInstance.getId(), 0, 4098)).thenReturn(res);
         Map<String, Object> successRes = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }

@@ -43,7 +43,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -128,19 +128,12 @@ public class DataSourceServiceTest {
         try (
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
-            // DATASOURCE_CONNECT_FAILED
             DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
             mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(null);
-            Result connectFailedResult = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
-            Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED.getCode(),
-                    connectFailedResult.getCode().intValue());
 
             // SUCCESS
-            Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
             Result success = dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam);
             Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
         }
@@ -204,15 +197,9 @@ public class DataSourceServiceTest {
             DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
             mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(null);
             Mockito.when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
-            Result connectFailed =
-                    dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
-            Assertions.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), connectFailed.getCode().intValue());
 
             // SUCCESS
-            Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
             Result success = dataSourceService.updateDataSource(dataSourceId, loginUser, postgreSqlDatasourceParam);
             Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode().intValue());
         }
@@ -441,6 +428,7 @@ public class DataSourceServiceTest {
             Map<String, String> other = new HashMap<>();
             other.put("autoDeserialize", "yes");
             other.put("allowUrlInLocalInfile", "true");
+            other.put("useSSL", "true");
             MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
             mysqlDatasourceParamDTO.setHost("192.168.9.1");
             mysqlDatasourceParamDTO.setPort(1521);
@@ -450,8 +438,11 @@ public class DataSourceServiceTest {
             mysqlDatasourceParamDTO.setOther(other);
             ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
             String expected =
-                    "{\"user\":\"test\",\"password\":\"bnVsbE1USXpORFUy\",\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/"
-                            + "im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\",\"props\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}}";
+                    "{\"user\":\"test\",\"password\":\"bnVsbE1USXpORFUy\",\"address\":\"jdbc:mysql://192.168.9.1:1521\","
+                            +
+                            "\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\","
+                            +
+                            "\"validationQuery\":\"select 1\",\"other\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\",\"useSSL\":\"true\"}}";
             Assertions.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
         }
 

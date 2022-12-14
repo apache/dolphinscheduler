@@ -33,9 +33,10 @@ export type {
 export type { IResource, ProgramType, IMainJar } from '@/store/project/types'
 export type { ITaskState } from '@/common/types'
 
+export type RelationType = 'AND' | 'OR'
+
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
-type RelationType = 'AND' | 'OR'
 type ITaskType = TaskType
 type IDateType = 'hour' | 'day' | 'week' | 'month'
 
@@ -66,12 +67,19 @@ interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
   emit: 'change'[]
 }
 
-interface IDependpendItem {
-  depTaskCode?: number
-  status?: 'SUCCESS' | 'FAILURE'
+interface IDependentItemOptions {
   definitionCodeOptions?: IOption[]
   depTaskCodeOptions?: IOption[]
   dateOptions?: IOption[]
+}
+
+interface IDependTaskOptions {
+  dependItemList: IDependentItemOptions[]
+}
+
+interface IDependentItem {
+  depTaskCode?: number
+  status?: 'SUCCESS' | 'FAILURE'
   projectCode?: number
   definitionCode?: number
   cycle?: 'month' | 'week' | 'day' | 'hour'
@@ -82,7 +90,7 @@ interface IDependTask {
   condition?: string
   nextNode?: number
   relation?: RelationType
-  dependItemList?: IDependpendItem[]
+  dependItemList?: IDependentItem[]
 }
 
 interface ISwitchResult {
@@ -396,6 +404,7 @@ interface ITaskParams {
   name?: string
   cloudWatchLogGroupArn?: string
   yamlContent?: string
+  paramScript?: ILocalParam[]
 }
 
 interface INodeData
@@ -480,7 +489,9 @@ export {
   ISqoopSourceParams,
   ISqoopTargetParams,
   IDependTask,
-  IDependpendItem,
+  IDependentItem,
+  IDependentItemOptions,
+  IDependTaskOptions,
   IFormItem,
   IJsonItem,
   FormRules,

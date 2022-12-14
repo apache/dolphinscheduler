@@ -75,14 +75,13 @@ public class ProcedureTask extends AbstractTask {
 
         this.taskExecutionContext = taskExecutionContext;
 
-        logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
-
         this.procedureParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
+        logger.info("Initialize procedure task params {}", JSONUtils.toPrettyJsonString(procedureParameters));
 
         // check parameters
-        if (!procedureParameters.checkParameters()) {
-            throw new RuntimeException("procedure task params is not valid");
+        if (procedureParameters == null || !procedureParameters.checkParameters()) {
+            throw new TaskException("procedure task params is not valid");
         }
 
         procedureTaskExecutionContext =
