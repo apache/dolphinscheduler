@@ -306,4 +306,17 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         return result;
     }
+
+    @Override
+    public TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId) {
+        Project project = projectMapper.queryByCode(projectCode);
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        if (taskInstance == null) {
+            logger.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
+        }
+        return taskInstance;
+    }
 }
