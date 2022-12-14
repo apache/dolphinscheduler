@@ -217,7 +217,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (upstreamCodes != null) {
             taskRelationUpdateUpstreamRequest.setUpstreams(upstreamCodes);
         }
-        return processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(user, taskCode, Boolean.FALSE,
+        return processTaskRelationService.updateUpstreamTaskDefinition(user, taskCode,
                 taskRelationUpdateUpstreamRequest);
     }
 

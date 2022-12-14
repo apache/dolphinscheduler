@@ -90,8 +90,18 @@ public interface ProcessTaskRelationService {
      */
     List<ProcessTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
                                                                       long taskCode,
-                                                                      boolean needSyncDag,
                                                                       TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
+
+    /**
+     * delete process task relation, will delete exists relation upstream -> downstream, throw error if not exists
+     *
+     * @param loginUser login user
+     * @param taskCode relation upstream code
+     * @param taskRelationUpdateUpstreamRequest relation downstream code
+     */
+    List<ProcessTaskRelation> updateUpstreamTaskDefinition(User loginUser,
+                                                           long taskCode,
+                                                           TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
 
     /**
      * delete task upstream relation

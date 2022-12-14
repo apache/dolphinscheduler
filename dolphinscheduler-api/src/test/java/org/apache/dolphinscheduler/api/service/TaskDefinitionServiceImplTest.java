@@ -413,7 +413,6 @@ public class TaskDefinitionServiceImplTest {
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
         Mockito.when(
                 processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
-                        isA(Boolean.class),
                         isA(TaskRelationUpdateUpstreamRequest.class)))
                 .thenReturn(getProcessTaskRelationList());
         Mockito.when(processDefinitionService.updateSingleProcessDefinition(isA(User.class), isA(Long.class),
@@ -488,7 +487,6 @@ public class TaskDefinitionServiceImplTest {
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
         Mockito.when(
                 processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
-                        isA(Boolean.class),
                         isA(TaskRelationUpdateUpstreamRequest.class)))
                 .thenReturn(getProcessTaskRelationList());
         Assertions.assertDoesNotThrow(
