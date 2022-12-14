@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROJECT_ERROR;
@@ -28,6 +28,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectDeleteResponse;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_BY_ID_ERROR;
@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINIT
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskUpdateRequest;
