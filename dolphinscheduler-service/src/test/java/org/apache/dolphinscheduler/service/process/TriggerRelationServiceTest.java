@@ -1,7 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.service.process;
 
 import java.util.Date;
-import org.apache.dolphinscheduler.common.enums.TriggerType;
+import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
 import org.apache.dolphinscheduler.dao.mapper.TriggerRelationMapper;
 import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
@@ -36,20 +53,20 @@ public class TriggerRelationServiceTest {
   @Test
   public void saveTriggerTdoDb() {
     Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-    triggerRelationService.saveTriggerTdoDb(TriggerType.COMMAND, 1234567890L, 100);
+    triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, 1234567890L, 100);
   }
 
   @Test
   public void queryByTypeAndJobId() {
     Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-    Mockito.when(triggerRelationMapper.queryByTypeAndJobId(TriggerType.PROCESS.getCode(), 100))
+    Mockito.when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.PROCESS.getCode(), 100))
         .thenReturn(getTriggerTdoDb());
 
     TriggerRelation triggerRelation1 = triggerRelationService.queryByTypeAndJobId(
-        TriggerType.PROCESS, 100);
+        ApiTriggerType.PROCESS, 100);
     Assertions.assertNotNull(triggerRelation1);
     TriggerRelation triggerRelation2 = triggerRelationService.queryByTypeAndJobId(
-        TriggerType.PROCESS, 200);
+        ApiTriggerType.PROCESS, 200);
     Assertions.assertNull(triggerRelation2);
   }
 
@@ -57,7 +74,7 @@ public class TriggerRelationServiceTest {
   @Test
   public void saveCommandTrigger() {
     Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-    Mockito.when(triggerRelationMapper.queryByTypeAndJobId(TriggerType.PROCESS.getCode(), 100))
+    Mockito.when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.PROCESS.getCode(), 100))
         .thenReturn(getTriggerTdoDb());
     int result = -1;
     result = triggerRelationService.saveCommandTrigger(1234567890, 100);
@@ -70,7 +87,7 @@ public class TriggerRelationServiceTest {
   @Test
   public void saveProcessInstanceTrigger() {
     Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-    Mockito.when(triggerRelationMapper.queryByTypeAndJobId(TriggerType.COMMAND.getCode(), 100))
+    Mockito.when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.COMMAND.getCode(), 100))
         .thenReturn(getTriggerTdoDb());
     int result = -1;
     result = triggerRelationService.saveProcessInstanceTrigger(100, 1234567890);
@@ -82,7 +99,7 @@ public class TriggerRelationServiceTest {
 
   private TriggerRelation getTriggerTdoDb() {
     TriggerRelation triggerRelation = new TriggerRelation();
-    triggerRelation.setTriggerType(TriggerType.PROCESS.getCode());
+    triggerRelation.setTriggerType(ApiTriggerType.PROCESS.getCode());
     triggerRelation.setJobId(100);
     triggerRelation.setTriggerCode(1234567890L);
     triggerRelation.setCreateTime(new Date());

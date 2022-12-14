@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import java.util.List;
-import org.apache.dolphinscheduler.common.enums.TriggerType;
+import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
@@ -130,7 +130,7 @@ public class TriggerRelationMapperTest extends BaseDaoTest {
   private TriggerRelation createTriggerRelation() {
     TriggerRelation triggerRelation = new TriggerRelation();
     triggerRelation.setTriggerCode(4567890);
-    triggerRelation.setTriggerType(TriggerType.COMMAND.getCode());
+    triggerRelation.setTriggerType(ApiTriggerType.COMMAND.getCode());
     triggerRelation.setJobId(99);
     triggerRelation.setCreateTime(DateUtils.getCurrentDate());
     triggerRelation.setUpdateTime(DateUtils.getCurrentDate());
