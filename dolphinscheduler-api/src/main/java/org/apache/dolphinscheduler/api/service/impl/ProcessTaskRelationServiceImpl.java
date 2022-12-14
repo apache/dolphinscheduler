@@ -408,12 +408,14 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      *
      * @param loginUser login user
      * @param taskCode relation upstream code
+     * @param needSyncDag needSyncDag
      * @param taskRelationUpdateUpstreamRequest relation downstream code
      */
     @Override
     @Transactional
     public List<ProcessTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
                                                                              long taskCode,
+                                                                             Boolean needSyncDag,
                                                                              TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
         TaskDefinition downstreamTask = taskDefinitionMapper.queryByCode(taskCode);
         if (downstreamTask == null) {
@@ -443,12 +445,14 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                     taskRelationUpdateUpstreamRequest.toString());
         }
         processDefinition.setUpdateTime(new Date());
-        int insertVersion =
-                this.saveProcessDefine(loginUser, processDefinition);
-        if (insertVersion <= 0) {
-            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+        int insertVersion = processDefinition.getVersion();
+        if (needSyncDag) {
+            insertVersion =
+                    this.saveProcessDefine(loginUser, processDefinition);
+            if (insertVersion <= 0) {
+                throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            }
         }
-
         // get new relation to create and out of date relation to delete
         List<Long> taskCodeCreates = upstreamTaskCodes
                 .stream()
@@ -506,103 +510,6 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         return processTaskRelations;
     }
 
-    /**
-     * delete process task relation, will delete exists relation upstream -> downstream, throw error if not exists
-     *
-     * @param loginUser login user
-     * @param taskCode relation upstream code
-     * @param taskRelationUpdateUpstreamRequest relation downstream code
-     */
-    @Override
-    @Transactional
-    public List<ProcessTaskRelation> updateUpstreamTaskDefinition(User loginUser,
-                                                                  long taskCode,
-                                                                  TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
-        TaskDefinition downstreamTask = taskDefinitionMapper.queryByCode(taskCode);
-        if (downstreamTask == null) {
-            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
-        }
-        List<Long> upstreamTaskCodes = taskRelationUpdateUpstreamRequest.getUpstreams();
-
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        processTaskRelation.setPostTaskCode(taskCode);
-
-        Page<ProcessTaskRelation> page = new Page<>(taskRelationUpdateUpstreamRequest.getPageNo(),
-                taskRelationUpdateUpstreamRequest.getPageSize());
-        IPage<ProcessTaskRelation> processTaskRelationExistsIPage =
-                processTaskRelationMapper.filterProcessTaskRelation(page, processTaskRelation);
-        List<ProcessTaskRelation> processTaskRelationExists = processTaskRelationExistsIPage.getRecords();
-
-        ProcessDefinition processDefinition = null;
-        if (CollectionUtils.isNotEmpty(processTaskRelationExists)) {
-            processDefinition =
-                    processDefinitionMapper.queryByCode(processTaskRelationExists.get(0).getProcessDefinitionCode());
-        } else if (taskRelationUpdateUpstreamRequest.getWorkflowCode() != 0L) {
-            processDefinition =
-                    processDefinitionMapper.queryByCode(taskRelationUpdateUpstreamRequest.getWorkflowCode());
-        }
-        if (processDefinition == null) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
-                    taskRelationUpdateUpstreamRequest.toString());
-        }
-        processDefinition.setUpdateTime(new Date());
-        int insertVersion = 0;
-        // get new relation to create and out of date relation to delete
-        List<Long> taskCodeCreates = upstreamTaskCodes
-                .stream()
-                .filter(upstreamTaskCode -> processTaskRelationExists.stream().noneMatch(
-                        processTaskRelationExist -> processTaskRelationExist.getPreTaskCode() == upstreamTaskCode))
-                .collect(Collectors.toList());
-        List<Integer> taskCodeDeletes = processTaskRelationExists.stream()
-                .filter(ptr -> !upstreamTaskCodes.contains(ptr.getPreTaskCode()))
-                .map(ProcessTaskRelation::getId)
-                .collect(Collectors.toList());
-
-        // delete relation not exists
-        if (CollectionUtils.isNotEmpty(taskCodeDeletes)) {
-            int delete = processTaskRelationMapper.deleteBatchIds(taskCodeDeletes);
-            if (delete != taskCodeDeletes.size()) {
-                throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_DELETE_ERROR, taskCodeDeletes);
-            }
-        }
-
-        // create relation not exists
-        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
-        for (long createCode : taskCodeCreates) {
-            long upstreamCode = 0L;
-            int version = 0;
-            if (createCode != 0L) {
-                // 0 for DAG root, should not, it may already exists and skip to create anymore
-                TaskDefinition upstreamTask = taskDefinitionMapper.queryByCode(createCode);
-                if (upstreamTask == null) {
-                    throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, createCode);
-                }
-                upstreamCode = upstreamTask.getCode();
-                version = upstreamTask.getVersion();
-            }
-            ProcessTaskRelation processTaskRelationCreate =
-                    new ProcessTaskRelation(null, processDefinition.getVersion(), downstreamTask.getProjectCode(),
-                            processDefinition.getCode(), upstreamCode, version,
-                            downstreamTask.getCode(), downstreamTask.getVersion(), null, null);
-            processTaskRelations.add(processTaskRelationCreate);
-        }
-        int batchInsert = processTaskRelationMapper.batchInsert(processTaskRelations);
-        if (batchInsert != processTaskRelations.size()) {
-            throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_CREATE_ERROR, taskCodeCreates);
-        }
-
-        // batch sync to process task relation log
-        int saveTaskRelationResult = saveTaskRelation(loginUser, processDefinition, insertVersion);
-        if (saveTaskRelationResult != Constants.EXIT_CODE_SUCCESS) {
-            logger.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
-                    processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-        }
-        logger.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
-                processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
-        processTaskRelations.get(0).setProcessDefinitionVersion(insertVersion);
-        return processTaskRelations;
-    }
     public int saveTaskRelation(User loginUser, ProcessDefinition processDefinition,
                                 int processDefinitionVersion) {
         long projectCode = processDefinition.getProjectCode();

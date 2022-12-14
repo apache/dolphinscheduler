@@ -92,10 +92,10 @@ public class TaskDefinitionServiceImplTest {
     private ProjectServiceImpl projectService;
 
     @InjectMocks
-    private ProcessServiceImpl processService;
+    private ProcessServiceImpl processServiceImpl;
 
     @Mock
-    private ProcessService processServices;
+    private ProcessService processService;
 
     @Mock
     private ProcessDefinitionLogMapper processDefineLogMapper;
@@ -179,7 +179,7 @@ public class TaskDefinitionServiceImplTest {
         putMsg(result, Status.SUCCESS, PROJECT_CODE);
         Mockito.when(projectService.hasProjectAndWritePerm(user, project, new HashMap<>())).thenReturn(true);
 
-        Mockito.when(processServices.isTaskOnline(TASK_CODE)).thenReturn(Boolean.FALSE);
+        Mockito.when(processService.isTaskOnline(TASK_CODE)).thenReturn(Boolean.FALSE);
         Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(new TaskDefinition());
         Mockito.when(taskDefinitionMapper.updateById(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
@@ -412,7 +412,8 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionLogMapper.insert(isA(TaskDefinitionLog.class))).thenReturn(1);
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
         Mockito.when(
-                processTaskRelationService.updateUpstreamTaskDefinition(isA(User.class), isA(Long.class),
+                processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
+                        isA(Boolean.class),
                         isA(TaskRelationUpdateUpstreamRequest.class)))
                 .thenReturn(getProcessTaskRelationList());
         Mockito.when(processDefinitionService.updateSingleProcessDefinition(isA(User.class), isA(Long.class),
@@ -454,7 +455,7 @@ public class TaskDefinitionServiceImplTest {
                 ((ServiceException) exception).getCode());
 
         // error task definition nothing update
-        Mockito.when(processServices.isTaskOnline(TASK_CODE)).thenReturn(false);
+        Mockito.when(processService.isTaskOnline(TASK_CODE)).thenReturn(false);
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> taskDefinitionService.updateTaskDefinitionV2(user, TASK_CODE, taskUpdateRequest));
@@ -486,7 +487,8 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionLogMapper.insert(isA(TaskDefinitionLog.class))).thenReturn(1);
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
         Mockito.when(
-                processTaskRelationService.updateUpstreamTaskDefinition(isA(User.class), isA(Long.class),
+                processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
+                        isA(Boolean.class),
                         isA(TaskRelationUpdateUpstreamRequest.class)))
                 .thenReturn(getProcessTaskRelationList());
         Assertions.assertDoesNotThrow(
@@ -513,8 +515,9 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(processDefineLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
         Mockito.when(processDefineLogMapper.insert(isA(ProcessDefinitionLog.class))).thenReturn(1);
         Mockito.when(processDefinitionMapper.insert(isA(ProcessDefinitionLog.class))).thenReturn(1);
-        int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
-        Mockito.when(processServices.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE))
+        int insertVersion =
+                processServiceImpl.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+        Mockito.when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE))
                 .thenReturn(insertVersion);
         Assertions.assertEquals(insertVersion, version + 1);
 
@@ -524,7 +527,7 @@ public class TaskDefinitionServiceImplTest {
                 eq(processDefinition.getCode()))).thenReturn(processTaskRelationList);
         Mockito.when(processTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
         Mockito.when(processTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
-        int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
+        int insertResult = processServiceImpl.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(), insertVersion, processTaskRelationLogList, taskDefinitionLogs,
                 Boolean.TRUE);
         Assertions.assertEquals(Constants.EXIT_CODE_SUCCESS, insertResult);
