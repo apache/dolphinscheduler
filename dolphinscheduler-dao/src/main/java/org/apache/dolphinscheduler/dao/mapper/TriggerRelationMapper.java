@@ -17,16 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import java.util.List;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
+
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * triggerRelation mapper interface
  */
 public interface TriggerRelationMapper extends BaseMapper<TriggerRelation> {
-
 
     /**
      * query by code and id
@@ -34,7 +36,7 @@ public interface TriggerRelationMapper extends BaseMapper<TriggerRelation> {
      * @param jobId
      * @return
      */
-    TriggerRelation queryByTypeAndJobId(@Param("triggerType") Integer triggerType,@Param("jobId") int jobId);
+    TriggerRelation queryByTypeAndJobId(@Param("triggerType") Integer triggerType, @Param("jobId") int jobId);
 
     /**
      * query triggerRelation by code
@@ -51,7 +53,7 @@ public interface TriggerRelationMapper extends BaseMapper<TriggerRelation> {
      * @return triggerRelation
      */
     List<TriggerRelation> queryByTriggerRelationCodeAndType(@Param("triggerCode") Long triggerCode,
-                                                         @Param("triggerType") Integer triggerType);
+                                                            @Param("triggerType") Integer triggerType);
 
     /**
      * delete triggerRelation by code
@@ -60,7 +62,6 @@ public interface TriggerRelationMapper extends BaseMapper<TriggerRelation> {
      * @return int
      */
     int deleteByCode(@Param("triggerCode") Long triggerCode);
-
 
     /**
      * if exist update else  insert

@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
@@ -49,7 +50,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -87,6 +87,7 @@ import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -103,15 +104,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * executor service impl
@@ -255,7 +255,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
          * create command
          */
         int create =
-                this.createCommand(triggerCode, commandType, processDefinition.getCode(), taskDependType, failureStrategy,
+                this.createCommand(triggerCode, commandType, processDefinition.getCode(), taskDependType,
+                        failureStrategy,
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup,
@@ -949,9 +950,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             }
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-            int count =  commandService.createCommand(command);
-            if(count > 0) {
-                triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND,triggerCode,command.getId());
+            int count = commandService.createCommand(command);
+            if (count > 0) {
+                triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, triggerCode, command.getId());
             }
             return count;
         }
@@ -965,7 +966,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode
      * @return
      */
-    protected int createComplementCommandList(Long triggerCode, String scheduleTimeParam, RunMode runMode, Command command,
+    protected int createComplementCommandList(Long triggerCode, String scheduleTimeParam, RunMode runMode,
+                                              Command command,
                                               Integer expectedParallelismNumber,
                                               ComplementDependentMode complementDependentMode) throws CronParseException {
         int createCount = 0;
@@ -1030,8 +1032,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, command);
                     }
                 }
-                if(createCount > 0) {
-                    triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND,triggerCode,command.getId());
+                if (createCount > 0) {
+                    triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, triggerCode, command.getId());
                 }
                 break;
             }
@@ -1081,7 +1083,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                             if (commandService.createCommand(command) > 0) {
                                 logger.info("Create {} command complete, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                                triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND,triggerCode,command.getId());
+                                triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, triggerCode,
+                                        command.getId());
                             } else {
                                 logger.error("Create {} command error, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());

@@ -242,5 +242,5 @@ public interface ProcessService {
 
     Integer queryTestDataSourceId(Integer onlineDataSourceId);
 
-    void saveCommandTrigger(Integer commandId ,Integer processInstanceId);
+    void saveCommandTrigger(Integer commandId, Integer processInstanceId);
 }

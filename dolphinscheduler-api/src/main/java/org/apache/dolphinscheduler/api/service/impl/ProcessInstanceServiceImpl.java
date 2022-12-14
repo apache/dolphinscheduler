@@ -1060,11 +1060,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @return
      */
     @Override
-    public Map<String, Object> queryByTriggerCode(User loginUser,long projectCode,Long triggerCode) {
+    public Map<String, Object> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
 
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE);
         if (result.get(Constants.STATUS) != Status.SUCCESS || triggerCode == null) {
             return result;
         }

@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import java.util.Date;
 import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
 import org.apache.dolphinscheduler.dao.mapper.TriggerRelationMapper;
+
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TriggerRelationServiceImpl implements TriggerRelationService {
+
     @Autowired
     private TriggerRelationMapper triggerRelationMapper;
 
@@ -46,24 +49,23 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
         return triggerRelationMapper.queryByTypeAndJobId(apiTriggerType.getCode(), jobId);
     }
 
-
     @Override
-    public int saveCommandTrigger(Integer commandId ,Integer processInstanceId) {
-        TriggerRelation exist = queryByTypeAndJobId(ApiTriggerType.PROCESS,processInstanceId);
-        if(exist == null) {
+    public int saveCommandTrigger(Integer commandId, Integer processInstanceId) {
+        TriggerRelation exist = queryByTypeAndJobId(ApiTriggerType.PROCESS, processInstanceId);
+        if (exist == null) {
             return 0;
         }
-        saveTriggerTdoDb(ApiTriggerType.COMMAND,exist.getTriggerCode(),commandId);
+        saveTriggerTdoDb(ApiTriggerType.COMMAND, exist.getTriggerCode(), commandId);
         return 1;
     }
 
     @Override
-    public int  saveProcessInstanceTrigger(Integer commandId ,Integer processInstanceId) {
-        TriggerRelation exist = queryByTypeAndJobId(ApiTriggerType.COMMAND,commandId);
-        if(exist == null) {
+    public int saveProcessInstanceTrigger(Integer commandId, Integer processInstanceId) {
+        TriggerRelation exist = queryByTypeAndJobId(ApiTriggerType.COMMAND, commandId);
+        if (exist == null) {
             return 0;
         }
-        saveTriggerTdoDb(ApiTriggerType.PROCESS,exist.getTriggerCode(),processInstanceId);
+        saveTriggerTdoDb(ApiTriggerType.PROCESS, exist.getTriggerCode(), processInstanceId);
         return 1;
     }
 

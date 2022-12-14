@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.process;
 
 import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,12 +28,11 @@ import org.springframework.stereotype.Component;
 @Component
 public interface TriggerRelationService {
 
-
     void saveTriggerTdoDb(ApiTriggerType type, Long triggerCode, Integer jobId);
 
     TriggerRelation queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId);
 
-    int saveCommandTrigger(Integer commandId ,Integer processInstanceId);
+    int saveCommandTrigger(Integer commandId, Integer processInstanceId);
 
-    int saveProcessInstanceTrigger(Integer commandId ,Integer processInstanceId);
+    int saveProcessInstanceTrigger(Integer commandId, Integer processInstanceId);
 }

@@ -24,25 +24,24 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum ApiTriggerType {
 
-  PROCESS(0, "process instance"),
-  TASK(1, "task node"),
-  COMMAND(2, "command");
+    PROCESS(0, "process instance"),
+    TASK(1, "task node"),
+    COMMAND(2, "command");
 
+    ApiTriggerType(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 
-  ApiTriggerType(int code, String desc) {
-    this.code = code;
-    this.desc = desc;
-  }
+    @EnumValue
+    private final int code;
+    private final String desc;
 
-  @EnumValue
-  private final int code;
-  private final String desc;
+    public int getCode() {
+        return code;
+    }
 
-  public int getCode() {
-    return code;
-  }
-
-  public String getDesc() {
-    return desc;
-  }
+    public String getDesc() {
+        return desc;
+    }
 }

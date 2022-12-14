@@ -235,7 +235,7 @@ public class ProcessServiceTest {
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
         Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
-            .thenReturn(1);
+                .thenReturn(1);
         Assertions.assertNotNull(processService.handleCommand(host, command1));
 
         Command command2 = new Command();
@@ -409,7 +409,7 @@ public class ProcessServiceTest {
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
         Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
-            .thenReturn(1);
+                .thenReturn(1);
 
         Assertions.assertThrows(ServiceException.class, () -> {
             // will throw exception when command id is 0 and delete fail

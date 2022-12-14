@@ -338,14 +338,14 @@ public class ProcessServiceImpl implements ProcessService {
             saveSerialProcess(processInstance, processDefinition);
             if (processInstance.getState() != WorkflowExecutionStatus.SUBMITTED_SUCCESS) {
                 setSubProcessParam(processInstance);
-                triggerRelationService.saveProcessInstanceTrigger(command.getId(),processInstance.getId());
+                triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
                 deleteCommandWithCheck(command.getId());
                 return null;
             }
         } else {
             processInstanceDao.upsertProcessInstance(processInstance);
         }
-        triggerRelationService.saveProcessInstanceTrigger(command.getId(),processInstance.getId());
+        triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
         setSubProcessParam(processInstance);
         deleteCommandWithCheck(command.getId());
         return processInstance;
@@ -2705,8 +2705,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void saveCommandTrigger(Integer commandId ,Integer processInstanceId) {
-        triggerRelationService.saveCommandTrigger(commandId,processInstanceId);
+    public void saveCommandTrigger(Integer commandId, Integer processInstanceId) {
+        triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
     }
 
     private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
