@@ -103,8 +103,6 @@ public class WorkflowUpdateRequest {
             processDefinitionDeepCopy.setLocations(this.location);
         }
 
-        int version = processDefinitionDeepCopy.getVersion() + 1;
-        processDefinitionDeepCopy.setVersion(version);
         processDefinitionDeepCopy.setUpdateTime(new Date());
         return processDefinitionDeepCopy;
     }
