@@ -355,9 +355,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                 break;
             }
             cacheTaskInstance.setCacheKey(null);
-            boolean r = taskInstanceDao.updateTaskInstance(cacheTaskInstance);
+            boolean updateResult = taskInstanceDao.updateTaskInstance(cacheTaskInstance);
             logger.info("remove task instance cache, taskInstanceId:{}, cacheKey:{}, result:{}",
-                    cacheTaskInstance.getId(), cacheKey, r);
+                    cacheTaskInstance.getId(), cacheKey, updateResult);
             cacheTaskInstanceIds.add(cacheTaskInstance.getId());
         }
         putMsg(result, Status.SUCCESS);
