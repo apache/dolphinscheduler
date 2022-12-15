@@ -63,7 +63,7 @@ public class TaskCacheUtils {
         keyElements.add(String.valueOf(taskInstance.getIsCache().getCode()));
         keyElements.add(getTaskInputVarPoolData(taskInstance, taskExecutionContext));
         String data = StringUtils.join(keyElements, "_");
-        return DigestUtils.sha1Hex(data);
+        return DigestUtils.sha256Hex(data);
     }
 
     /**
