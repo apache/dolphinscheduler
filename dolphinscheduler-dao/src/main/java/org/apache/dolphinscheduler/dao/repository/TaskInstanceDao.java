@@ -89,7 +89,7 @@ public interface TaskInstanceDao {
     TaskInstance findTaskInstanceById(Integer taskId);
 
     /**
-     * find task instance by id
+     * find task instance by cache_key
      * @param cacheKey cache key
      * @return task instance
      */

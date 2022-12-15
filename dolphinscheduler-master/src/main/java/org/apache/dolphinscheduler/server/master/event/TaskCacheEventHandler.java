@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
@@ -55,23 +54,28 @@ public class TaskCacheEventHandler implements TaskEventHandler {
     @Autowired
     private TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private MasterConfig masterConfig;
-
+    /**
+     * handle CACHE task event
+     * copy a new task instance from the cache task has been successfully run
+     * @param taskEvent task event
+     */
     @Override
-    public void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError {
+    public void handleTaskEvent(TaskEvent taskEvent) {
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable = this.processInstanceExecCacheManager.getByProcessInstanceId(
                 processInstanceId);
         Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
+        if (!taskInstanceOptional.isPresent()) {
+            return;
+        }
         TaskInstance taskInstance = taskInstanceOptional.get();
         dataQualityResultOperator.operateDqExecuteResult(taskEvent, taskInstance);
 
         TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceById(taskEvent.getCacheTaskInstanceId());
 
-        // keep the task instance message
+        // keep the task instance fields
         cacheTaskInstance.setId(taskInstance.getId());
         cacheTaskInstance.setProcessInstanceId(processInstanceId);
         cacheTaskInstance.setProcessInstanceName(taskInstance.getProcessInstanceName());

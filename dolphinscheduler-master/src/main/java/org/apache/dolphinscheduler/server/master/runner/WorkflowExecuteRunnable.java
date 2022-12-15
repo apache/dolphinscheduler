@@ -404,7 +404,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 // todo: merge the last taskInstance
                 processInstance.setVarPool(taskInstance.getVarPool());
                 processInstanceDao.upsertProcessInstance(processInstance);
-                // check if the task is will be cached, and set the cache task instance id
+                // save the cacheKey only if the task is defined as cache task and the task is success
                 if (taskInstance.getIsCache().equals(IsCache.YES) && taskInstance.getTmpCacheKey() != null) {
                     taskInstance.setCacheKey(taskInstance.getTmpCacheKey());
                     taskInstanceDao.updateTaskInstance(taskInstance);

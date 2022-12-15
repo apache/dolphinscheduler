@@ -41,24 +41,50 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class TaskCacheUtils {
 
-    final static String MERGE_TAG = "-";
+    private TaskCacheUtils() {
+        throw new IllegalStateException("Utility class");
+    }
 
-    public static String generateCacheKey(TaskInstance taskInstance, TaskExecutionContext context) {
+    public static final String MERGE_TAG = "-";
+
+    /**
+     * generate cache key for task instance
+     * the follow message will be used to generate cache key
+     * 1. task code
+     * 2. task version
+     * 3. task is cache
+     * 4. input VarPool, from upstream task and workflow global parameters
+     * @param taskInstance task instance
+     * @param taskExecutionContext taskExecutionContext
+     * @return cache key
+     */
+    public static String generateCacheKey(TaskInstance taskInstance, TaskExecutionContext taskExecutionContext) {
         List<String> keyElements = new ArrayList<>();
         keyElements.add(String.valueOf(taskInstance.getTaskCode()));
         keyElements.add(String.valueOf(taskInstance.getTaskDefinitionVersion()));
         keyElements.add(String.valueOf(taskInstance.getIsCache().getCode()));
-        keyElements.add(getTaskInputVarPool(taskInstance, context));
+        keyElements.add(getTaskInputVarPoolData(taskInstance, taskExecutionContext));
         String data = StringUtils.join(keyElements, "_");
-        String cacheKey = md5(data);
-        System.out.println("cacheKey: " + cacheKey + ", data: " + data);
-        return cacheKey;
+        return md5(data);
     }
 
+    /**
+     * generate cache key for task instance which is cache execute
+     * this key will record which cache task instance will be copied, and cache key will be used
+     * tagCacheKey = sourceTaskId + "-" + cacheKey
+     * @param sourceTaskId source task id
+     * @param cacheKey cache key
+     * @return tagCacheKey
+     */
     public static String generateTagCacheKey(Integer sourceTaskId, String cacheKey) {
         return sourceTaskId + MERGE_TAG + cacheKey;
     }
 
+    /**
+     * revert cache key tag
+     * @param tagCacheKey cache key
+     * @return cache key
+     */
     public static String revertCacheKey(String tagCacheKey) {
         if (tagCacheKey == null) {
             return "";
@@ -70,6 +96,11 @@ public class TaskCacheUtils {
         }
     }
 
+    /**
+     * get md5 value of string
+     * @param data data
+     * @return md5 value
+     */
     public static String md5(String data) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -86,16 +117,27 @@ public class TaskCacheUtils {
         return null;
     }
 
-    public static String getTaskInputVarPool(TaskInstance taskInstance, TaskExecutionContext context) {
+    /**
+     * get hash data of task input var pool
+     * there are two parts of task input var pool: from upstream task and workflow global parameters
+     * @param taskInstance task instance
+     * taskExecutionContext taskExecutionContext
+     */
+    public static String getTaskInputVarPoolData(TaskInstance taskInstance, TaskExecutionContext context) {
         JsonNode taskParams = JSONUtils.parseObject(taskInstance.getTaskParams());
+
+        // The set of input values considered from localParams in the taskParams
         Set<String> propertyInSet = JSONUtils.toList(taskParams.get("localParams").toString(), Property.class).stream()
                 .filter(property -> property.getDirect().equals(Direct.IN))
                 .map(Property::getProp).collect(Collectors.toSet());
 
+        // The set of input values considered from `${var}` form task definition
         propertyInSet.addAll(getScriptVarInSet(taskInstance));
 
+        // var pool value from upstream task
         List<Property> varPool = JSONUtils.toList(taskInstance.getVarPool(), Property.class);
 
+        // var pool value from workflow global parameters
         if (context.getPrepareParamsMap() != null) {
             Set<String> taskVarPoolSet = varPool.stream().map(Property::getProp).collect(Collectors.toSet());
             List<Property> globalContextVarPool = context.getPrepareParamsMap().entrySet().stream()
@@ -105,6 +147,7 @@ public class TaskCacheUtils {
             varPool.addAll(globalContextVarPool);
         }
 
+        // only consider var pool value which is in propertyInSet
         varPool = varPool.stream()
                 .filter(property -> property.getDirect().equals(Direct.IN))
                 .filter(property -> propertyInSet.contains(property.getProp()))
@@ -113,6 +156,11 @@ public class TaskCacheUtils {
         return JSONUtils.toJsonString(varPool);
     }
 
+    /**
+     * get var in set from task definition
+     * @param taskInstance task instance
+     * @return var in set
+     */
     public static List<String> getScriptVarInSet(TaskInstance taskInstance) {
         Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}");
         Matcher matcher = pattern.matcher(taskInstance.getTaskParams());

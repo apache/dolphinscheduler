@@ -219,13 +219,9 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 }
             }
 
-            // check task is cache execution
-            try {
-                if (checkIsCacheExecution(taskInstance, context)) {
-                    return true;
-                }
-            } catch (Exception e) {
-                logger.error("checkIsCacheExecution error", e);
+            // check task is cache execution, and decide whether to dispatch
+            if (checkIsCacheExecution(taskInstance, context)) {
+                return true;
             }
 
             result = dispatcher.dispatch(executionContext);
@@ -288,10 +284,23 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         return false;
     }
 
+    /**
+     * check if task is cache execution
+     * if the task is defined as cache execution, and we find the cache task instance is finished yet, we will not dispatch this task
+     * @param taskInstance taskInstance
+     * @param context context
+     * @return true if we will not dispatch this task, false if we will dispatch this task
+     */
     private boolean checkIsCacheExecution(TaskInstance taskInstance, TaskExecutionContext context) {
-        if (taskInstance.getIsCache().equals(IsCache.YES)) {
+        try {
+            // check if task is defined as a cache task
+            if (taskInstance.getIsCache().equals(IsCache.NO)) {
+                return false;
+            }
+            // check if task is cache execution
             String cacheKey = TaskCacheUtils.generateCacheKey(taskInstance, context);
             TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceByCacheKey(cacheKey);
+            // if we can find the cache task instance, we will add cache event, and return true.
             if (cacheTaskInstance != null) {
                 logger.info("Task {} is cache, no need to dispatch, task instance id: {}",
                         taskInstance.getName(), taskInstance.getId());
@@ -299,8 +308,12 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 taskInstance.setTmpCacheKey(TaskCacheUtils.generateTagCacheKey(cacheTaskInstance.getId(), cacheKey));
                 return true;
             } else {
+                // if we can not find cache task, update cache key, and return false. the task will be dispatched as
+                // normal
                 taskInstance.setTmpCacheKey(cacheKey);
             }
+        } catch (Exception e) {
+            logger.error("checkIsCacheExecution error", e);
         }
         return false;
     }
