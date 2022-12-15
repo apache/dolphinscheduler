@@ -31,8 +31,11 @@ public enum AzureSQLAuthMode {
     AD_PASSWORD(1, "ActiveDirectoryPassword"),
     AD_MSI(2, "ActiveDirectoryMSI"),
     AD_SERVICE_PRINCIPAL(3, "ActiveDirectoryServicePrincipal"),
-    ACCESSTOKEN(4, "accessToken"),;
+    ACCESSTOKEN(4, "accessToken"),
+    ;
 
+    private static final Map<Integer, AzureSQLAuthMode> AUTH_TYPE_MAP =
+            Arrays.stream(AzureSQLAuthMode.values()).collect(toMap(AzureSQLAuthMode::getCode, Functions.identity()));
     private final int code;
     private final String descp;
 
@@ -40,17 +43,6 @@ public enum AzureSQLAuthMode {
         this.code = code;
         this.descp = descp;
     }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
-
-    private static final Map<Integer, AzureSQLAuthMode> AUTH_TYPE_MAP =
-            Arrays.stream(AzureSQLAuthMode.values()).collect(toMap(AzureSQLAuthMode::getCode, Functions.identity()));
 
     public static AzureSQLAuthMode of(int type) {
         if (AUTH_TYPE_MAP.containsKey(type)) {
@@ -62,5 +54,13 @@ public enum AzureSQLAuthMode {
     public static AzureSQLAuthMode ofName(String name) {
         return Arrays.stream(AzureSQLAuthMode.values()).filter(e -> e.name().equals(name)).findFirst()
                 .orElseThrow(() -> new NoSuchElementException("no such auth type"));
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
     }
 }

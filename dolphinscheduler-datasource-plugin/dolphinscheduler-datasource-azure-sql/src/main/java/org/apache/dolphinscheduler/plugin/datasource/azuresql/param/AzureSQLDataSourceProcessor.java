@@ -74,7 +74,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         azureSQLDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         azureSQLDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         azureSQLDatasourceParamDTO.setMode(connectionParams.getMode());
-        switch (azureSQLDatasourceParamDTO.getMode()){
+        switch (azureSQLDatasourceParamDTO.getMode()) {
             case AD_MSI:
                 if (!StringUtils.isEmpty(connectionParams.getMSIClientId())) {
                     azureSQLDatasourceParamDTO.setMSIClientId(connectionParams.getMSIClientId());
@@ -111,6 +111,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         azureSQLConnectionParam.setDriverClassName(getDatasourceDriver());
         azureSQLConnectionParam.setValidationQuery(getValidationQuery());
         azureSQLConnectionParam.setProps(azureSQLParam.getOther());
+
         return azureSQLConnectionParam;
     }
 
@@ -142,7 +143,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         AzureSQLConnectionParam azureSQLConnectionParam = (AzureSQLConnectionParam) connectionParam;
-        // todo token
+        // token access way
         if (azureSQLConnectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
             try {
                 return tokenGetConnection(azureSQLConnectionParam);
@@ -150,6 +151,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
                 throw new RuntimeException(e);
             }
         }
+        // normal way
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam), azureSQLConnectionParam.getUser(),
                 PasswordUtils.decodePassword(azureSQLConnectionParam.getPassword()));
@@ -165,7 +167,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return new AzureSQLDataSourceProcessor();
     }
 
-    private AzureSQLConnectionParam createTokenConnectionParams(AzureSQLDataSourceParamDTO azureSQLParam){
+    private AzureSQLConnectionParam createTokenConnectionParams(AzureSQLDataSourceParamDTO azureSQLParam) {
         AzureSQLConnectionParam azureSQLConnectionParam = new AzureSQLConnectionParam();
         azureSQLConnectionParam.setAddress(azureSQLParam.getHost());
         azureSQLConnectionParam.setDatabase(azureSQLParam.getDatabase());
@@ -176,37 +178,34 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         azureSQLConnectionParam.setDriverClassName(getDatasourceDriver());
         azureSQLConnectionParam.setValidationQuery(getValidationQuery());
         azureSQLConnectionParam.setProps(azureSQLParam.getOther());
+        azureSQLConnectionParam.setEndpoint(azureSQLParam.getEndpoint());
         return azureSQLConnectionParam;
     }
 
     private Connection tokenGetConnection(AzureSQLConnectionParam param) throws MalformedURLException, ExecutionException, InterruptedException {
-        String spn = "https://database.windows.net/";
-        String stsurl = param.getEndpoint(); // Replace with your STS URL.
+        String spn = DataSourceConstants.AZURE_SQL_DATABASE_SPN;
+        String stsURL = param.getEndpoint(); // Replace with your STS URL.
         String clientId = param.getUser(); // Replace with your client ID.
-        String clientSecret =  PasswordUtils.decodePassword(param.getPassword()); // Replace with your client secret.
+        String clientSecret = PasswordUtils.decodePassword(param.getPassword()); // Replace with your client secret.
 
-        String scope = spn +  "/.default";
+        String scope = spn + DataSourceConstants.AZURE_SQL_DATABASE_TOKEN_SCOPE;
         Set<String> scopes = new HashSet<>();
         scopes.add(scope);
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         IClientCredential credential = ClientCredentialFactory.createFromSecret(clientSecret);
         ConfidentialClientApplication clientApplication = ConfidentialClientApplication
-                .builder(clientId, credential).executorService(executorService).authority(stsurl).build();
+                .builder(clientId, credential).executorService(executorService).authority(stsURL).build();
         CompletableFuture<IAuthenticationResult> future = clientApplication
                 .acquireToken(ClientCredentialParameters.builder(scopes).build());
         IAuthenticationResult authenticationResult = future.get();
         String accessToken = authenticationResult.accessToken();
 
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!Access Token: " + accessToken);
-        String sql="jdbc:sqlserver://whaleops.database.windows.net:1433;database=testdb2;user=8498550e-0fc2-4378-9421-73f9f260abf2;accessToken="+accessToken;
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!Access Token: " + sql);
-
         // Connect with the access token.
         SQLServerDataSource ds = new SQLServerDataSource();
 
-        ds.setServerName(param.getAddress()); // Replace with your server name. "whaleops.database.windows.net"
-        ds.setDatabaseName(param.getDatabase()); // Replace with your database name.
+        ds.setServerName(param.getAddress());
+        ds.setDatabaseName(param.getDatabase());
         ds.setAccessToken(accessToken);
 
         try {
@@ -216,7 +215,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         }
     }
 
-    private String processAuthMode(String jdbcUrl, AzureSQLDataSourceParamDTO param){
+    private String processAuthMode(String jdbcUrl, AzureSQLDataSourceParamDTO param) {
 
         switch (param.getMode()) {
             case SQL_PASSWORD:
@@ -227,6 +226,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
                 if (StringUtils.isEmpty(param.getMSIClientId())) {
                     return jdbcUrl + ";authentication=" + param.getMode().getDescp();
                 } else {
+                    // write MSIClientId inside jdbc URL so no need MSIClientId in the AzureSQLConnectionParam
                     return jdbcUrl + ";authentication=" + param.getMode().getDescp()
                             + ";MSIClientId=" + param.getMSIClientId();
                 }
@@ -236,6 +236,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         }
 
     }
+
     private String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
