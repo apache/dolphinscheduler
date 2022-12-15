@@ -285,7 +285,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     stateEvents);
             return;
         }
-        int loopTimes = stateEvents.size();
+        int loopTimes = stateEvents.size() * 2;
         for (int i = 0; i < loopTimes; i++) {
             final StateEvent stateEvent = this.stateEvents.peek();
             try {
