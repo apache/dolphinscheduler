@@ -335,8 +335,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
 
         Project project = projectMapper.queryByCode(projectCode);
-        projectService.checkProjectAndAuthThrowException(loginUser, project,
-                ApiFuncIdentificationConstant.map.get(INSTANCE_UPDATE));
+        projectService.checkProjectAndAuthThrowException(loginUser, project, INSTANCE_UPDATE);
 
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
         if (taskInstance == null) {
