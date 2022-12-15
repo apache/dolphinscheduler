@@ -278,7 +278,7 @@ export default {
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
     please_choose: 'Please Choose',
-    remove_task_cache: 'Remove Cache'
+    remove_task_cache: ''
   },
   dag: {
     create: 'Create Workflow',
@@ -326,6 +326,7 @@ export default {
     online: 'Online'
   },
   node: {
+    is_cache: "Cache Execution",
     jvm_args: 'Java VM Parameters',
     jvm_args_tips: 'Please enter virtual machine parameters',
     run_type: 'Run Type',

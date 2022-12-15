@@ -327,6 +327,7 @@ export default {
     online: '已上线'
   },
   node: {
+    is_cache: "缓存执行",
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',

@@ -49,6 +49,8 @@ import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -344,7 +346,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return new TaskInstanceRemoveCacheResponse(result);
         }
         String tagCacheKey = taskInstance.getCacheKey();
-        String cacheKey = TaskCacheUtils.revertCacheKey(tagCacheKey);
+        Pair<Integer, String> taskIdAndCacheKey = TaskCacheUtils.revertCacheKey(tagCacheKey);
+        String cacheKey = taskIdAndCacheKey.getRight();
         List<Integer> cacheTaskInstanceIds = new ArrayList<>();
         while (true) {
             TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceByCacheKey(cacheKey);

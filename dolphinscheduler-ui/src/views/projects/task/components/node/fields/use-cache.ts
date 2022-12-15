@@ -23,7 +23,7 @@ export function useCache(): IJsonItem {
     return {
         type: 'switch',
         field: 'isCache',
-        name: t('Use Cache'),
+        name: t('project.node.is_cache'),
         span: 12
     }
 }

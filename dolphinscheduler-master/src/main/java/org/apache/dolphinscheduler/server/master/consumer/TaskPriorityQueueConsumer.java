@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.IsCache;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -294,7 +294,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     private boolean checkIsCacheExecution(TaskInstance taskInstance, TaskExecutionContext context) {
         try {
             // check if task is defined as a cache task
-            if (taskInstance.getIsCache().equals(IsCache.NO)) {
+            if (taskInstance.getIsCache().equals(Flag.NO)) {
                 return false;
             }
             // check if task is cache execution
@@ -305,12 +305,11 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 logger.info("Task {} is cache, no need to dispatch, task instance id: {}",
                         taskInstance.getName(), taskInstance.getId());
                 addCacheEvent(taskInstance, cacheTaskInstance);
-                taskInstance.setTmpCacheKey(TaskCacheUtils.generateTagCacheKey(cacheTaskInstance.getId(), cacheKey));
+                taskInstance.setCacheKey(TaskCacheUtils.generateTagCacheKey(cacheTaskInstance.getId(), cacheKey));
                 return true;
             } else {
-                // if we can not find cache task, update cache key, and return false. the task will be dispatched as
-                // normal
-                taskInstance.setTmpCacheKey(cacheKey);
+                // if we can not find cache task, update cache key, and return false. the task will be dispatched
+                taskInstance.setCacheKey(TaskCacheUtils.generateTagCacheKey(taskInstance.getId(), cacheKey));
             }
         } catch (Exception e) {
             logger.error("checkIsCacheExecution error", e);

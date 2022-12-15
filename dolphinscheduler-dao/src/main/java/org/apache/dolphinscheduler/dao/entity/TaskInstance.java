@@ -26,7 +26,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.IsCache;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -192,16 +191,14 @@ public class TaskInstance implements Serializable {
     /**
      * task is cache: yes/no
      */
-    private IsCache isCache;
+    private Flag isCache;
 
     /**
-     * task is cache: yes/no
+     * cache_key
      */
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String cacheKey;
 
-    @TableField(exist = false)
-    private String tmpCacheKey;
     /**
      * dependency
      */

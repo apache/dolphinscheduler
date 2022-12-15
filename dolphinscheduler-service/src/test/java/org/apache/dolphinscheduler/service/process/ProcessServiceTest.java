@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.IsCache;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -654,7 +654,7 @@ public class ProcessServiceTest {
         taskDefinition.setVersion(2);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());
-        taskDefinition.setIsCache(IsCache.NO);
+        taskDefinition.setIsCache(Flag.NO);
 
         TaskDefinitionLog td2 = new TaskDefinitionLog();
         td2.setCode(2L);

@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.IsCache;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -61,6 +60,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -95,6 +95,7 @@ import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -405,9 +406,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 processInstance.setVarPool(taskInstance.getVarPool());
                 processInstanceDao.upsertProcessInstance(processInstance);
                 // save the cacheKey only if the task is defined as cache task and the task is success
-                if (taskInstance.getIsCache().equals(IsCache.YES) && taskInstance.getTmpCacheKey() != null) {
-                    taskInstance.setCacheKey(taskInstance.getTmpCacheKey());
-                    taskInstanceDao.updateTaskInstance(taskInstance);
+                if (taskInstance.getIsCache().equals(Flag.YES)) {
+                    saveCacheTaskInstance(taskInstance);
                 }
                 if (!processInstance.isBlocked()) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
@@ -1194,7 +1194,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         taskInstance.setCpuQuota(taskNode.getCpuQuota());
         taskInstance.setMemoryMax(taskNode.getMemoryMax());
 
-        taskInstance.setIsCache(taskNode.getIsCache() == IsCache.YES.getCode() ? IsCache.YES : IsCache.NO);
+        taskInstance.setIsCache(taskNode.getIsCache() == Flag.YES.getCode() ? Flag.YES : Flag.NO);
 
         // task instance priority
         if (taskNode.getTaskInstancePriority() == null) {
@@ -2123,6 +2123,15 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         completeTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
         validTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
         errorTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+    }
+
+    private void saveCacheTaskInstance(TaskInstance taskInstance) {
+        Pair<Integer, String> taskIdAndCacheKey = TaskCacheUtils.revertCacheKey(taskInstance.getCacheKey());
+        Integer taskId = taskIdAndCacheKey.getLeft();
+        if (taskId.equals(taskInstance.getId())) {
+            taskInstance.setCacheKey(taskIdAndCacheKey.getRight());
+            taskInstanceDao.updateTaskInstance(taskInstance);
+        }
     }
 
     private enum WorkflowRunnableStatus {

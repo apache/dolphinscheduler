@@ -23,11 +23,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -50,7 +49,6 @@ public class TaskCacheUtils {
     /**
      * generate cache key for task instance
      * the follow message will be used to generate cache key
-     * 1. task code
      * 2. task version
      * 3. task is cache
      * 4. input VarPool, from upstream task and workflow global parameters
@@ -65,7 +63,7 @@ public class TaskCacheUtils {
         keyElements.add(String.valueOf(taskInstance.getIsCache().getCode()));
         keyElements.add(getTaskInputVarPoolData(taskInstance, taskExecutionContext));
         String data = StringUtils.join(keyElements, "_");
-        return md5(data);
+        return DigestUtils.sha1Hex(data);
     }
 
     /**
@@ -81,40 +79,23 @@ public class TaskCacheUtils {
     }
 
     /**
-     * revert cache key tag
+     * revert cache key tag to source task id and cache key
      * @param tagCacheKey cache key
-     * @return cache key
+     * @return Pair<Integer, String>, first is source task id, second is cache key
      */
-    public static String revertCacheKey(String tagCacheKey) {
+    public static Pair<Integer, String> revertCacheKey(String tagCacheKey) {
+        Pair<Integer, String> taskIdAndCacheKey;
         if (tagCacheKey == null) {
-            return "";
+            taskIdAndCacheKey = Pair.of(-1, "");
+            return taskIdAndCacheKey;
         }
         if (tagCacheKey.contains(MERGE_TAG)) {
-            return tagCacheKey.split(MERGE_TAG)[1];
+            String[] split = tagCacheKey.split(MERGE_TAG);
+            taskIdAndCacheKey = Pair.of(Integer.valueOf(split[0]), split[1]);
+            return taskIdAndCacheKey;
         } else {
-            return tagCacheKey;
+            return Pair.of(-1, tagCacheKey);
         }
-    }
-
-    /**
-     * get md5 value of string
-     * @param data data
-     * @return md5 value
-     */
-    public static String md5(String data) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] md5 = md.digest(data.getBytes(StandardCharsets.UTF_8));
-
-            StringBuilder sb = new StringBuilder();
-            for (byte b : md5) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**
