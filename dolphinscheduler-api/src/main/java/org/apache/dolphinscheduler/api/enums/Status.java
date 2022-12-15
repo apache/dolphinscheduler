@@ -171,6 +171,11 @@ public enum Status {
     SAVE_ERROR(10136, "save error", "保存错误"),
     DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!",
             "请先删除全部工作流定义"),
+    QUERY_ALL_WORKFLOW_COUNT_ERROR(10138, "query all workflow count error", "查询所有工作流数量错误"),
+    QUERY_WORKFLOW_STATES_COUNT_ERROR(10139, "query all workflow states count error", "查询所有工作流状态数量错误"),
+    QUERY_ONE_WORKFLOW_STATE_COUNT_ERROR(10140, "query one workflow state count error", "查询工作流状态数量错误"),
+    QUERY_TASK_STATES_COUNT_ERROR(10141, "query all task states count error", "查询所有任务状态数量错误"),
+    QUERY_ONE_TASK_STATES_COUNT_ERROR(10142, "query one task states count error", "查询任务状态数量错误"),
     BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error",
             "批量删除工作流实例错误: {0}"),
     PREVIEW_SCHEDULE_ERROR(10139, "preview schedule error", "预览调度配置错误"),
@@ -255,9 +260,12 @@ public enum Status {
     SCHEDULE_NOT_EXISTS(10203, "schedule {0} does not exist", "调度 id {0} 不存在"),
     SCHEDULE_ALREADY_EXISTS(10204, "workflow {0} schedule {1} already exist, please update or delete it",
             "工作流 {0} 的定时 {1} 已经存在，请更新或删除"),
-    START_NODE_NOT_EXIST_IN_LAST_PROCESS(10205, "this node {0} does not exist in the latest process definition",
-            "该节点 {0} 不存在于最新的流程定义中"),
-
+    QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
+    EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
+            "请先保存后再执行"),
+    START_NODE_NOT_EXIST_IN_LAST_PROCESS(10207, "this node {0} does not exist in the latest process definition",
+            "该节点 {0} 不存在于最新的流程定义中"),        
+            
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
@@ -376,6 +384,10 @@ public enum Status {
             "批量创建工作流任务关系 {0} 错误"),
     PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR(50070, "batch update process task relation error",
             "批量修改工作流任务关系错误"),
+    UPSTREAM_TASK_NOT_EXISTS(50071, "upstream task want to set dependence do not exists {0}", "指定的上游任务 {0} 不存在"),
+
+    WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
+            "工作流实例未结束，不能执行此操作"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),

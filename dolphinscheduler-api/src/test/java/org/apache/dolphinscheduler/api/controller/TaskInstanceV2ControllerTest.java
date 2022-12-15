@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
@@ -89,6 +90,44 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
 
         Result taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+
+    }
+
+    @Test
+    public void testTaskSavePoint() {
+
+        Result mockResult = new Result();
+        putMsg(mockResult, Status.SUCCESS);
+
+        when(taskInstanceService.taskSavePoint(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
+
+        Result taskResult = taskInstanceV2Controller.taskSavePoint(null, 1L, 1);
+        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+
+    }
+
+    @Test
+    public void testStopTask() {
+
+        Result mockResult = new Result();
+        putMsg(mockResult, Status.SUCCESS);
+
+        when(taskInstanceService.stopTask(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
+
+        Result taskResult = taskInstanceV2Controller.stopTask(null, 1L, 1);
+        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+
+    }
+
+    @Test
+    public void testQueryTaskInstanceById() {
+        TaskInstance taskInstance = new TaskInstance();
+
+        when(taskInstanceService.queryTaskInstanceById(any(), Mockito.anyLong(), Mockito.anyLong()))
+                .thenReturn(taskInstance);
+
+        TaskInstance taskResult = taskInstanceV2Controller.queryTaskInstanceByCode(null, 1L, 1L);
+        Assertions.assertNotNull(taskResult);
 
     }
 

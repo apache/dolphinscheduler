@@ -21,10 +21,13 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_START;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -39,6 +42,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -57,6 +61,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -119,6 +124,9 @@ public class ExecutorServiceTest {
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Mock
     private ProjectMapper projectMapper;
@@ -572,6 +580,46 @@ public class ExecutorServiceTest {
         Assertions.assertEquals("0,1", result.get(0));
         Assertions.assertEquals("2,3", result.get(1));
         Assertions.assertEquals("4,4", result.get(2));
+    }
+
+    @Test
+    public void testExecuteTask() {
+        String startNodeList = "1234567870";
+        TaskDependType taskDependType = TaskDependType.TASK_ONLY;
+
+        ProcessInstance processInstanceMock = Mockito.mock(ProcessInstance.class, RETURNS_DEEP_STUBS);
+        Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
+                .thenReturn(Optional.ofNullable(processInstanceMock));
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProjectCode(projectCode);
+        Mockito.when(processService.findProcessDefinition(Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(processDefinition);
+
+        Mockito.when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(new Tenant());
+
+        when(processInstanceMock.getState().isFinished()).thenReturn(false);
+        WorkflowExecuteResponse responseInstanceIsNotFinished =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED.getCode(),
+                responseInstanceIsNotFinished.getCode());
+
+        when(processInstanceMock.getState().isFinished()).thenReturn(true);
+        WorkflowExecuteResponse responseStartNodeListError =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, "1234567870,", taskDependType);
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), responseStartNodeListError.getCode());
+
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(null);
+        WorkflowExecuteResponse responseNotDefineTask =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+        Assertions.assertEquals(Status.EXECUTE_NOT_DEFINE_TASK.getCode(), responseNotDefineTask.getCode());
+
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(1);
+        Mockito.when(commandService.verifyIsNeedCreateCommand(any())).thenReturn(true);
+        WorkflowExecuteResponse responseSuccess =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), responseSuccess.getCode());
+
     }
 
 }

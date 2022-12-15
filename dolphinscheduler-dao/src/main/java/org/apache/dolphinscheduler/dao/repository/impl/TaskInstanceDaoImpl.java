@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -148,6 +148,11 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     }
 
     @Override
+    public TaskInstance findTaskByInstanceIdAndCode(Integer processInstanceId, Long taskCode) {
+        return taskInstanceMapper.queryByInstanceIdAndCode(processInstanceId, taskCode);
+    }
+
+    @Override
     public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId) {
         ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
@@ -165,6 +170,16 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
             return new ArrayList<>();
         }
         return taskInstanceMapper.selectBatchIds(idList);
+    }
+
+    @Override
+    public void deleteByWorkflowInstanceId(int workflowInstanceId) {
+        taskInstanceMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+    }
+
+    @Override
+    public List<TaskInstance> findTaskInstanceByWorkflowInstanceId(Integer workflowInstanceId) {
+        return taskInstanceMapper.findByWorkflowInstanceId(workflowInstanceId);
     }
 
 }

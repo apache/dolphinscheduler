@@ -48,7 +48,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -59,12 +58,13 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.service.storage.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import py4j.GatewayServer;
 import py4j.GatewayServer.GatewayServerBuilder;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -633,9 +633,10 @@ public class PythonGateway {
      *
      * @param userName user who query resource
      * @param fullName full name of the resource
+     * @return StorageEntity object which contains necessary information about resource
      */
-    public Resource queryResourcesFileInfo(String userName, String fullName) {
-        return resourceService.queryResourcesFileInfo(userName, fullName);
+    public StorageEntity queryResourcesFileInfo(String userName, String fullName) throws Exception {
+        return resourceService.queryFileStatus(userName, fullName);
     }
 
     public String getGatewayVersion() {
@@ -648,14 +649,12 @@ public class PythonGateway {
      *
      * @param userName user who create or update resource
      * @param fullName The fullname of resource.Includes path and suffix.
-     * @param description description of resource
      * @param resourceContent content of resource
-     * @return id of resource
+     * @return StorageEntity object which contains necessary information about resource
      */
-    public Integer createOrUpdateResource(
-                                          String userName, String fullName, String description,
-                                          String resourceContent) {
-        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
+    public StorageEntity createOrUpdateResource(String userName, String fullName,
+                                                String resourceContent) throws Exception {
+        return resourceService.createOrUpdateResource(userName, fullName, resourceContent);
     }
 
     @PostConstruct

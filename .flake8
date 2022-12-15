@@ -25,4 +25,5 @@ ignore =
     D107,  # D107: Don't require docstrings on __init__
     D105,  # D105: Missing docstring in magic method
     # Conflict to Black
-    W503   # W503: Line breaks before binary operators
+    W503,   # W503: Line breaks before binary operators
+    D100    # Missing docstring in public module

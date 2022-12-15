@@ -85,6 +85,10 @@ export function useTable() {
         key: 'name',
         ...COLUMN_WIDTH_CONFIG['linkName'],
         className: 'workflow-name',
+        resizable: true,
+        width: 300,
+        minWidth: 300,
+        maxWidth: 600,
         render: (row: IWorkflowInstance) =>
           h(
             ButtonLink,
@@ -98,11 +102,13 @@ export function useTable() {
             },
             {
               default: () =>
-                h(
-                  NEllipsis,
-                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
-                  () => row.name
-                )
+                  h(
+                      NEllipsis,
+                      {
+                        style: 'max-width: 580px;line-height: 1.5'
+                      },
+                      () => row.name
+                  )
             }
           )
       },
