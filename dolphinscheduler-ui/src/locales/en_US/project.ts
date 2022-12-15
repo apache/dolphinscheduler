@@ -278,7 +278,7 @@ export default {
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
     please_choose: 'Please Choose',
-    remove_task_cache: ''
+    remove_task_cache: 'Clear cache'
   },
   dag: {
     create: 'Create Workflow',
