@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.azuresql.param;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 @ToString
 @Getter

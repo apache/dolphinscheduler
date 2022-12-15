@@ -54,7 +54,6 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.7.1</version>
         </dependency>
     </dependencies>
 </project>

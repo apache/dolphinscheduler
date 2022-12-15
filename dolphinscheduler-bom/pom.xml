@@ -101,6 +101,7 @@
         <aspectj.version>1.9.7</aspectj.version>
         <zt-zip.version>1.15</zt-zip.version>
         <trino-jdbc.version>402</trino-jdbc.version>
+        <azure-identity.version>1.7.1</azure-identity.version>
     </properties>
 
     <dependencyManagement>
@@ -785,7 +786,11 @@
                 <artifactId>zt-zip</artifactId>
                 <version>${zt-zip.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

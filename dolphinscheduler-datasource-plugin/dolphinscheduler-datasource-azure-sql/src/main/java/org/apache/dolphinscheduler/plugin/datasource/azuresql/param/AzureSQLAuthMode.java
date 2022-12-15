@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.azuresql.param;
 
-import com.google.common.base.Functions;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static java.util.stream.Collectors.toMap;
+import com.google.common.base.Functions;
 
 public enum AzureSQLAuthMode {
 
