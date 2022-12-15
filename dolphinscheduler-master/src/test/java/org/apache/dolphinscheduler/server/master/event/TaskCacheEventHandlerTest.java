@@ -43,7 +43,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class TaskCacheEventHandlerTest {
+class TaskCacheEventHandlerTest {
 
     @InjectMocks
     private TaskCacheEventHandler taskCacheEventHandler;
@@ -64,7 +64,7 @@ public class TaskCacheEventHandlerTest {
     private TaskInstanceDao taskInstanceDao;
 
     @Test
-    public void testHandleTaskEvent() {
+    void testHandleTaskEvent() {
         TaskEvent taskEvent = Mockito.mock(TaskEvent.class);
         int processInstanceId = 1;
         int taskInstanceId = 2;

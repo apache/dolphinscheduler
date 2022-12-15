@@ -98,7 +98,7 @@ class TaskCacheUtilsTest {
     }
 
     @Test
-    public void testRevertCacheKey() {
+    void testRevertCacheKey() {
         Pair<Integer, String> taskIdAndCacheKey1 = TaskCacheUtils.revertCacheKey(null);
         Assertions.assertEquals(Pair.of(-1, ""), taskIdAndCacheKey1);
 
@@ -113,14 +113,14 @@ class TaskCacheUtilsTest {
     }
 
     @Test
-    public void testGetScriptVarInSet() {
+    void testGetScriptVarInSet() {
         List<String> scriptVarInSet = TaskCacheUtils.getScriptVarInSet(taskInstance);
         List<String> except = new ArrayList<>(Arrays.asList("c", "d"));
         Assertions.assertEquals(except, scriptVarInSet);
     }
 
     @Test
-    public void TestGetTaskInputVarPoolData() {
+    void TestGetTaskInputVarPoolData() {
         TaskCacheUtils.getTaskInputVarPoolData(taskInstance, taskExecutionContext);
         // only a=aa and c=cc will influence the result,
         // b=bb is a fixed value, will be considered in task version
@@ -131,7 +131,7 @@ class TaskCacheUtilsTest {
     }
 
     @Test
-    public void TestGenerateCacheKey() {
+    void TestGenerateCacheKey() {
         String cacheKeyBase = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext);
         Property propertyI = new Property();
         propertyI.setProp("i");
