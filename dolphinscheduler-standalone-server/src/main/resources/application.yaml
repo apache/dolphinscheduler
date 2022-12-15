@@ -151,6 +151,8 @@ master:
   # kill yarn jon when failover taskInstance, default true
   kill-yarn-job-when-task-failover: true
   worker-group-refresh-interval: 10s
+  # This attribute is mainly supported by task metric, allowing task instance name to be used as a tag.
+  support-task-name-tag-metric: true
 
 worker:
   # worker listener port

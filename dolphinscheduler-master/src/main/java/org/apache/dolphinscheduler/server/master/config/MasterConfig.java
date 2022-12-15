@@ -101,6 +101,11 @@ public class MasterConfig implements Validator {
     // /nodes/master/ip:listenPort
     private String masterRegistryPath;
 
+    /**
+     * This attribute is mainly supported by task metric, allowing task instance name to be used as a tag.
+     */
+    private boolean supportTaskNameTagMetric = true;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return MasterConfig.class.isAssignableFrom(clazz);
@@ -170,5 +175,7 @@ public class MasterConfig implements Validator {
         logger.info("Master config: masterAddress -> {} ", masterAddress);
         logger.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
         logger.info("Master config: workerGroupRefreshInterval -> {} ", workerGroupRefreshInterval);
+        logger.info("Master config: supportTaskNameTagMetric -> {} ", supportTaskNameTagMetric);
+
     }
 }

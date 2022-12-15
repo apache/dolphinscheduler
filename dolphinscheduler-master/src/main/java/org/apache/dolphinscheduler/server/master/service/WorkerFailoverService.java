@@ -164,7 +164,7 @@ public class WorkerFailoverService {
      * @param taskInstance
      */
     private void failoverTaskInstance(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
-        TaskMetrics.incTaskInstanceByState("failover",taskInstance.getId());
+        TaskMetrics.incTaskInstanceByState("failover", taskInstance.getName());
         boolean isMasterTask = TaskProcessorFactory.isMasterTask(taskInstance.getTaskType());
 
         taskInstance.setProcessInstance(processInstance);

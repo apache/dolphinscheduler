@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import org.apache.dolphinscheduler.server.master.config.MasterConfigStatic;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +31,6 @@ import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 @UtilityClass
 public class TaskMetrics {
@@ -85,31 +84,15 @@ public class TaskMetrics {
         taskDispatchCounter.increment();
     }
 
-    public void incTaskInstanceByState(final String state, Integer taskInstanceId) {
-        if (taskInstanceCountersBuild.get(state) == null) {
+    public void incTaskInstanceByState(final String state, String taskInstanceName) {
+        Counter.Builder builder = taskInstanceCountersBuild.get(state);
+        if (builder == null) {
             return;
         }
-        String taskName = "UNKNOW_" + taskInstanceId;
-        TaskInstanceDao taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
-        TaskInstance taskInstanceById = taskInstanceDao.findTaskInstanceById(taskInstanceId);
-        if (taskInstanceById != null){
-            taskName = taskInstanceById.getName();
+        if (MasterConfigStatic.masterConfigStatic.isSupportTaskNameTagMetric()) {
+            builder.tag("taskName", taskInstanceName);
         }
-        taskInstanceCountersBuild.get(state)
-                .tag("taskName", taskName)
-                .register(Metrics.globalRegistry)
-                .increment();
+        builder.register(Metrics.globalRegistry).increment();
     }
-
-    public void incTaskInstanceByStateAndName(final String state, String taskName) {
-        if (taskInstanceCountersBuild.get(state) == null) {
-            return;
-        }
-        taskInstanceCountersBuild.get(state)
-                .tag("taskName", taskName)
-                .register(Metrics.globalRegistry)
-                .increment();
-    }
-
 
 }

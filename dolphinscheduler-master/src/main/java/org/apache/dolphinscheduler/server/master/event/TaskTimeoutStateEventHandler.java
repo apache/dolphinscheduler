@@ -42,8 +42,6 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleError {
         TaskStateEvent taskStateEvent = (TaskStateEvent) stateEvent;
-
-        TaskMetrics.incTaskInstanceByState("timeout", taskStateEvent.getTaskInstanceId());
         workflowExecuteRunnable.checkTaskInstanceByStateEvent(taskStateEvent);
 
         TaskInstance taskInstance =
@@ -51,7 +49,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
                         () -> new StateEventHandleError(String.format(
                                 "Cannot find the task instance from workflow execute runnable, taskInstanceId: %s",
                                 taskStateEvent.getTaskInstanceId())));
-
+        TaskMetrics.incTaskInstanceByState("timeout", taskInstance.getName());
         logger.info("Handle task instance state timout event, taskInstanceId: {}", taskStateEvent.getTaskInstanceId());
 
         if (TimeoutFlag.CLOSE == taskInstance.getTaskDefine().getTimeoutFlag()) {

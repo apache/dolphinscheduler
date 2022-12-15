@@ -41,7 +41,6 @@ public class TaskStateEventHandler implements StateEventHandler {
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleException, StateEventHandleError {
         TaskStateEvent taskStateEvent = (TaskStateEvent) stateEvent;
-        measureTaskState(taskStateEvent);
         workflowExecuteRunnable.checkTaskInstanceByStateEvent(taskStateEvent);
 
         Optional<TaskInstance> taskInstanceOptional =
@@ -50,6 +49,7 @@ public class TaskStateEventHandler implements StateEventHandler {
         TaskInstance task = taskInstanceOptional.orElseThrow(() -> new StateEventHandleError(
                 "Cannot find task instance from taskMap by task instance id: " + taskStateEvent.getTaskInstanceId()));
 
+        measureTaskState(taskStateEvent, task);
         if (task.getState() == null) {
             throw new StateEventHandleError("Task state event handle error due to task state is null");
         }
@@ -95,24 +95,24 @@ public class TaskStateEventHandler implements StateEventHandler {
         return StateEventType.TASK_STATE_CHANGE;
     }
 
-    private void measureTaskState(TaskStateEvent taskStateEvent) {
+    private void measureTaskState(TaskStateEvent taskStateEvent, TaskInstance task) {
         if (taskStateEvent == null || taskStateEvent.getStatus() == null) {
             // the event is broken
             logger.warn("The task event is broken..., taskEvent: {}", taskStateEvent);
             return;
         }
         if (taskStateEvent.getStatus().isFinished()) {
-            TaskMetrics.incTaskInstanceByState("finish",taskStateEvent.getTaskInstanceId());
+            TaskMetrics.incTaskInstanceByState("finish", task.getName());
         }
         switch (taskStateEvent.getStatus()) {
             case KILL:
-                TaskMetrics.incTaskInstanceByState("stop", taskStateEvent.getTaskInstanceId());
+                TaskMetrics.incTaskInstanceByState("stop", task.getName());
                 break;
             case SUCCESS:
-                TaskMetrics.incTaskInstanceByState("success", taskStateEvent.getTaskInstanceId());
+                TaskMetrics.incTaskInstanceByState("success", task.getName());
                 break;
             case FAILURE:
-                TaskMetrics.incTaskInstanceByState("fail", taskStateEvent.getTaskInstanceId());
+                TaskMetrics.incTaskInstanceByState("fail", task.getName());
                 break;
             default:
                 break;
