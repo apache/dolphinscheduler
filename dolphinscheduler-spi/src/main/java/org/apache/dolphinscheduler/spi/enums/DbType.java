@@ -42,7 +42,7 @@ public enum DbType {
     ATHENA(11, "athena"),
     TRINO(12, "trino"),
     STARROCKS(13, "starrocks"),
-    ;
+    AZURESQL(14,"azuresql");
 
     @EnumValue
     private final int code;
