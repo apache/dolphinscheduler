@@ -27,6 +27,10 @@ public enum WorkflowSubmitStatue {
      */
     FAILED,
     /**
+     * Submit error, this status should be retry and reduce submit times that can be used
+     */
+    ERROR,
+    /**
      * Duplicated submitted, this status should never occur.
      */
     DUPLICATED_SUBMITTED,

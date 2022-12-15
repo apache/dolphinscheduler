@@ -70,8 +70,9 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                         }
-                    } else {
-                        logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
+                    } else if (WorkflowSubmitStatue.ERROR == workflowSubmitStatue) {
+                        logger.error(
+                                "Failed to submit the workflow instance, will resend the workflow start event: {}, and reduce submit times that can be used",
                                 workflowEvent);
                         workflowEvent.setMaxSubmitTimes(workflowEvent.getMaxSubmitTimes() - 1);
                         if (workflowEvent.getMaxSubmitTimes() >= 0) {
@@ -84,6 +85,10 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                                     .build();
                             workflowExecuteRunnable.addStateEvent(stateEvent);
                         }
+                    } else {
+                        logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
+                                workflowEvent);
+                        workflowEventQueue.addEvent(workflowEvent);
                     }
                 });
     }
