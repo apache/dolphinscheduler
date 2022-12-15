@@ -2130,7 +2130,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         Integer taskId = taskIdAndCacheKey.getLeft();
         if (taskId.equals(taskInstance.getId())) {
             taskInstance.setCacheKey(taskIdAndCacheKey.getRight());
-            taskInstanceDao.updateTaskInstance(taskInstance);
+            try {
+                taskInstanceDao.updateTaskInstance(taskInstance);
+            } catch (Exception e) {
+                logger.error("update task instance cache key failed", e);
+            }
         }
     }
 

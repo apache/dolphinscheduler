@@ -899,7 +899,7 @@ CREATE TABLE `t_ds_task_instance` (
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
-  KEY `cache_key` (`cache_key`) USING BTREE,
+  KEY `cache_key` (`cache_key`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
