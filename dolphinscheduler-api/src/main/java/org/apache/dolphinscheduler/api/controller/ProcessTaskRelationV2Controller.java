@@ -125,7 +125,8 @@ public class ProcessTaskRelationV2Controller extends BaseController {
                                                                           @PathVariable("code") Long code,
                                                                           @RequestBody TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationService
-                .updateUpstreamTaskDefinition(loginUser, code, taskRelationUpdateUpstreamRequest);
+                .updateUpstreamTaskDefinitionWithSyncDag(loginUser, code, Boolean.TRUE,
+                        taskRelationUpdateUpstreamRequest);
         return Result.success(processTaskRelations);
     }
 }
