@@ -91,7 +91,11 @@ public class TaskCacheUtils {
         }
         if (tagCacheKey.contains(MERGE_TAG)) {
             String[] split = tagCacheKey.split(MERGE_TAG);
-            taskIdAndCacheKey = Pair.of(Integer.valueOf(split[0]), split[1]);
+            if (split.length == 2) {
+                taskIdAndCacheKey = Pair.of(Integer.parseInt(split[0]), split[1]);
+            } else {
+                taskIdAndCacheKey = Pair.of(-1, "");
+            }
             return taskIdAndCacheKey;
         } else {
             return Pair.of(-1, tagCacheKey);
