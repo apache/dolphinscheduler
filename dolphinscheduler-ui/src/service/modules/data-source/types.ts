@@ -28,6 +28,7 @@ type IDataBase =
   | 'REDSHIFT'
   | 'ATHENA'
   | 'TRINO'
+  | 'AZURESQL'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -42,6 +43,7 @@ type IDataBaseLabel =
 | 'REDSHIFT'
 | 'ATHENA'
 | 'TRINO'
+| 'AZURESQL'
 
 interface IDataSource {
   id?: number
@@ -55,6 +57,7 @@ interface IDataSource {
   javaSecurityKrb5Conf?: string
   loginUserKeytabUsername?: string
   loginUserKeytabPath?: string
+  mode?: string
   userName?: string
   password?: string
   awsRegion?: string
@@ -63,6 +66,8 @@ interface IDataSource {
   other?: object
   testFlag?: number
   bindTestId?: number
+  endpoint?: string
+  MSIClientId?: string
 }
 
 interface ListReq {
