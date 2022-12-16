@@ -17,21 +17,17 @@
 
 package org.apache.dolphinscheduler.server.master.event;
 
-import org.apache.dolphinscheduler.common.enums.StateEventType;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+/**
+ * This exception represent the exception can be recovered, when we get this exception,
+ * we will move the event to the fail of the queue.
+ */
+public class StateEventHandleFailure extends Exception {
 
-public interface StateEventHandler {
+    public StateEventHandleFailure(String message) {
+        super(message);
+    }
 
-    /**
-     * Handle a event, if handle success will reture true, else return false
-     *
-     * @param stateEvent given state event.
-     * @throws StateEventHandleException this exception means it can be recovered.
-     * @throws StateEventHandleError     this exception means it cannot be recovered, so the event need to drop.
-     * @throws StateEventHandleException this means it can be recovered.
-     */
-    boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
-                             StateEvent stateEvent) throws StateEventHandleException, StateEventHandleError, StateEventHandleFailure;
-
-    StateEventType getEventType();
+    public StateEventHandleFailure(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 }
