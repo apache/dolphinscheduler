@@ -298,6 +298,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'TRINO',
     label: 'TRINO',
     defaultPort: 8080
+  },
+  STARROCKS: {
+      value: 'STARROCKS',
+      label: 'STARROCKS',
+      defaultPort: 9030
   }
 }
 
