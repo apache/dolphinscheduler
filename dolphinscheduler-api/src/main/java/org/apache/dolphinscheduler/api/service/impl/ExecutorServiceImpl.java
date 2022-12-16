@@ -639,7 +639,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         return tenant != null;
     }
 
-    public boolean checkStartNodeList(String startNodeList, Long processDefinitionCode, int version) {
+    public void checkStartNodeList(String startNodeList, Long processDefinitionCode, int version) {
         if (StringUtils.isNotEmpty(startNodeList)) {
             List<ProcessTaskRelation> processTaskRelations =
                     processService.findRelationByCode(processDefinitionCode, version);
