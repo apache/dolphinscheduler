@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import org.apache.dolphinscheduler.api.dto.project.ProjectListResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectQueryRequest;

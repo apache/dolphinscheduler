@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_DEFINITION_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_WORKFLOW_COUNT_ERROR;
@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_STATES_COU
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_STATES_COUNT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;

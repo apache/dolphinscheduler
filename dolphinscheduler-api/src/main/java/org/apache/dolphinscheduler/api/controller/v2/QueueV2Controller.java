@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_QUEUE_LIST_ERROR;
@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.queue.QueueCreateRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueCreateResponse;
 import org.apache.dolphinscheduler.api.dto.queue.QueueListPagingResponse;
