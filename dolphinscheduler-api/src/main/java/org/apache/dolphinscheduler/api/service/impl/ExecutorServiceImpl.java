@@ -651,7 +651,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 }
             }
         }
-        return true;
     }
     /**
      * Check the state of process instance and the type of operation match
