@@ -49,9 +49,9 @@ import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -348,20 +348,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         String tagCacheKey = taskInstance.getCacheKey();
         Pair<Integer, String> taskIdAndCacheKey = TaskCacheUtils.revertCacheKey(tagCacheKey);
         String cacheKey = taskIdAndCacheKey.getRight();
-        List<Integer> cacheTaskInstanceIds = new ArrayList<>();
-        while (true) {
-            TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceByCacheKey(cacheKey);
-            if (cacheTaskInstance == null) {
-                break;
-            }
-            cacheTaskInstance.setCacheKey(null);
-            boolean updateResult = taskInstanceDao.updateTaskInstance(cacheTaskInstance);
-            logger.info("remove task instance cache, taskInstanceId:{}, cacheKey:{}, result:{}",
-                    cacheTaskInstance.getId(), cacheKey, updateResult);
-            cacheTaskInstanceIds.add(cacheTaskInstance.getId());
+        if (StringUtils.isNotEmpty(cacheKey)) {
+            taskInstanceDao.clearCacheByCacheKey(cacheKey);
         }
         putMsg(result, Status.SUCCESS);
-        return new TaskInstanceRemoveCacheResponse(result, cacheTaskInstanceIds, cacheKey);
+        return new TaskInstanceRemoveCacheResponse(result, cacheKey);
     }
 
 }

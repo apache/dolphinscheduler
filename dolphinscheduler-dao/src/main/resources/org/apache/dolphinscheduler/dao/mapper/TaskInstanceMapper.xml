@@ -207,6 +207,11 @@
         where cache_key = #{cacheKey}
         limit 1
     </select>
+    <update id="clearCacheByCacheKey">
+        update t_ds_task_instance
+        set cache_key = null
+        where cache_key = #{cacheKey}
+    </update>
     <select id="queryByProcessInstanceIdsAndTaskCodes" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>

@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.api.dto.taskInstance;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 
-import java.util.List;
-
 import lombok.Data;
 
 /**
@@ -29,7 +27,6 @@ import lombok.Data;
 @Data
 public class TaskInstanceRemoveCacheResponse extends Result {
 
-    private List<Integer> deleteTaskInstanceCacheIds;
     private String cacheKey;
 
     public TaskInstanceRemoveCacheResponse(Result result) {
@@ -38,11 +35,10 @@ public class TaskInstanceRemoveCacheResponse extends Result {
         this.setMsg(result.getMsg());
     }
 
-    public TaskInstanceRemoveCacheResponse(Result result, List<Integer> deleteTaskInstanceCacheIds, String cacheKey) {
+    public TaskInstanceRemoveCacheResponse(Result result, String cacheKey) {
         super();
         this.setCode(result.getCode());
         this.setMsg(result.getMsg());
-        this.deleteTaskInstanceCacheIds = deleteTaskInstanceCacheIds;
         this.cacheKey = cacheKey;
     }
 }

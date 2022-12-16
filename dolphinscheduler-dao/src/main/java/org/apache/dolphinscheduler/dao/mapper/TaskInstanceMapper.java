@@ -59,6 +59,8 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     TaskInstance queryByCacheKey(@Param("cacheKey") String cacheKey);
 
+    Boolean clearCacheByCacheKey(@Param("cacheKey") String cacheKey);
+
     List<TaskInstance> queryByProcessInstanceIdsAndTaskCodes(@Param("processInstanceIds") List<Integer> processInstanceIds,
                                                              @Param("taskCodes") List<Long> taskCodes);
 

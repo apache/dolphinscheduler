@@ -174,6 +174,17 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     }
 
     @Override
+    public Boolean clearCacheByCacheKey(String cacheKey) {
+        try {
+            taskInstanceMapper.clearCacheByCacheKey(cacheKey);
+            return true;
+        } catch (Exception e) {
+            logger.error("clear cache by cacheKey failed", e);
+            return false;
+        }
+    }
+
+    @Override
     public List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList) {
         if (CollectionUtils.isEmpty(idList)) {
             return new ArrayList<>();
