@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
+import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;

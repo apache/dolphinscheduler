@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationDeleteRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;

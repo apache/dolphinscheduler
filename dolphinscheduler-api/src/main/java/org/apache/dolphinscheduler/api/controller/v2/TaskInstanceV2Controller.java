@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.controller;
+package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_INSTANCE_ERROR;
@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceSuccessResponse;
