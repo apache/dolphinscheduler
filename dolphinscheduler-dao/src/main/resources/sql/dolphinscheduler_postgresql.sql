@@ -800,7 +800,7 @@ CREATE TABLE t_ds_task_instance (
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
-create index cache_key on t_ds_task_instance (cache_key);
+create index idx_cache_key on t_ds_task_instance (cache_key);
 
 --
 -- Table structure for table t_ds_tenant
