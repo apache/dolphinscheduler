@@ -35,9 +35,11 @@ import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -58,7 +60,9 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
-        return JSONUtils.parseObject(paramJson, AzureSQLDataSourceParamDTO.class);
+        AzureSQLDataSourceParamDTO azureSQLDataSourceParamDTO = JSONUtils.parseObject(paramJson, AzureSQLDataSourceParamDTO.class);
+        checkTrustServerCertificate(azureSQLDataSourceParamDTO);
+        return azureSQLDataSourceParamDTO;
     }
 
     @Override
@@ -92,6 +96,8 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         AzureSQLDataSourceParamDTO azureSQLParam = (AzureSQLDataSourceParamDTO) datasourceParam;
+        checkTrustServerCertificate(azureSQLParam);
+
         if (azureSQLParam.mode.equals(AzureSQLAuthMode.ACCESSTOKEN)) {
             return createTokenConnectionParams(azureSQLParam);
         }
@@ -111,6 +117,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         azureSQLConnectionParam.setDriverClassName(getDatasourceDriver());
         azureSQLConnectionParam.setValidationQuery(getValidationQuery());
         azureSQLConnectionParam.setProps(azureSQLParam.getOther());
+        azureSQLConnectionParam.setMode(azureSQLParam.getMode());
 
         return azureSQLConnectionParam;
     }
@@ -168,9 +175,14 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     private AzureSQLConnectionParam createTokenConnectionParams(AzureSQLDataSourceParamDTO azureSQLParam) {
+        String address =
+                String.format("%s%s:%s", DataSourceConstants.JDBC_SQLSERVER, azureSQLParam.getHost(),
+                        azureSQLParam.getPort());
         AzureSQLConnectionParam azureSQLConnectionParam = new AzureSQLConnectionParam();
-        azureSQLConnectionParam.setAddress(azureSQLParam.getHost());
+        azureSQLConnectionParam.setMode(azureSQLParam.getMode());
+        azureSQLConnectionParam.setAddress(address);
         azureSQLConnectionParam.setDatabase(azureSQLParam.getDatabase());
+        // use jdbc url to store host
         azureSQLConnectionParam.setJdbcUrl(azureSQLParam.getHost());
         azureSQLConnectionParam.setOther(transformOther(azureSQLParam.getOther()));
         azureSQLConnectionParam.setUser(azureSQLParam.getUserName());
@@ -182,7 +194,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return azureSQLConnectionParam;
     }
 
-    private Connection tokenGetConnection(AzureSQLConnectionParam param) throws MalformedURLException, ExecutionException, InterruptedException {
+    public static Connection tokenGetConnection(AzureSQLConnectionParam param) throws MalformedURLException, ExecutionException, InterruptedException {
         String spn = DataSourceConstants.AZURE_SQL_DATABASE_SPN;
         String stsURL = param.getEndpoint(); // Replace with your STS URL.
         String clientId = param.getUser(); // Replace with your client ID.
@@ -204,10 +216,10 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         // Connect with the access token.
         SQLServerDataSource ds = new SQLServerDataSource();
 
-        ds.setServerName(param.getAddress());
+        ds.setServerName(param.getJdbcUrl());
         ds.setDatabaseName(param.getDatabase());
         ds.setAccessToken(accessToken);
-
+        ds.setTrustServerCertificate(true);
         try {
             return ds.getConnection();
         } catch (SQLServerException e) {
@@ -255,5 +267,11 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
             otherMap.put(config.split("=")[0], config.split("=")[1]);
         }
         return otherMap;
+    }
+
+    private void checkTrustServerCertificate(BaseDataSourceParamDTO paramDTO){
+        Map<String, String> other = Optional.ofNullable(paramDTO.getOther()).orElseGet(HashMap::new);
+        other.put("trustServerCertificate","true");
+        paramDTO.setOther(other);
     }
 }

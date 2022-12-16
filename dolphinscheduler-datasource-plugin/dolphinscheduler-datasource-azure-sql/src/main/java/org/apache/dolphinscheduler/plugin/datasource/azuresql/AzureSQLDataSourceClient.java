@@ -17,14 +17,71 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.azuresql;
 
+import com.google.common.base.Stopwatch;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.azuresql.param.AzureSQLAuthMode;
+import org.apache.dolphinscheduler.plugin.datasource.azuresql.param.AzureSQLConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.azuresql.param.AzureSQLDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class AzureSQLDataSourceClient extends CommonDataSourceClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(AzureSQLDataSourceClient.class);
 
     public AzureSQLDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
 
+    @Override
+    public Connection getConnection() {
+        AzureSQLConnectionParam connectionParam = (AzureSQLConnectionParam) this.baseConnectionParam;
+        if (!connectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
+            return super.getConnection();
+        }
+        try {
+            return AzureSQLDataSourceProcessor.tokenGetConnection(connectionParam);
+        } catch (MalformedURLException | ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void checkClient() {
+
+        AzureSQLConnectionParam connectionParam = (AzureSQLConnectionParam) this.baseConnectionParam;
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        String validationQuery = this.baseConnectionParam.getValidationQuery();
+        if (!connectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
+            // Checking data source client
+            try {
+                this.jdbcTemplate.execute(validationQuery);
+            } catch (Exception e) {
+                throw new RuntimeException("JDBC connect failed", e);
+            } finally {
+                logger.info("Time to execute check jdbc client with sql {} for {} ms ",
+                        this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            }
+        } else {
+            try (Statement statement = getConnection().createStatement()) {
+                if (!statement.execute(validationQuery)) {
+                    throw new SQLException("execute check azure sql token client failed : "+ validationQuery);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } finally {
+                logger.info("Time to execute check azure sql token client with sql {} for {} ms ",
+                        this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            }
+        }
+    }
 }

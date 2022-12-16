@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Functions;
 
 public enum AzureSQLAuthMode {
@@ -37,6 +38,7 @@ public enum AzureSQLAuthMode {
     private static final Map<Integer, AzureSQLAuthMode> AUTH_TYPE_MAP =
             Arrays.stream(AzureSQLAuthMode.values()).collect(toMap(AzureSQLAuthMode::getCode, Functions.identity()));
     private final int code;
+    @JsonValue
     private final String descp;
 
     AzureSQLAuthMode(int code, String descp) {
