@@ -31,12 +31,10 @@ public class TaskWaitTaskGroupStateHandler implements StateEventHandler {
 
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
-                                    StateEvent stateEvent) {
+                                    StateEvent stateEvent) throws StateEventHandleFailure {
         logger.info("Handle task instance wait task group event, taskInstanceId: {}", stateEvent.getTaskInstanceId());
-        if (workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent)) {
-            logger.info("Success wake up task instance, taskInstanceId: {}", stateEvent.getTaskInstanceId());
-        } else {
-            logger.info("Failed to wake up task instance, taskInstanceId: {}", stateEvent.getTaskInstanceId());
+        if (!workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent)) {
+            throw new StateEventHandleFailure("Task state event handle failed due to robing taskGroup resource failed");
         }
         return true;
     }
