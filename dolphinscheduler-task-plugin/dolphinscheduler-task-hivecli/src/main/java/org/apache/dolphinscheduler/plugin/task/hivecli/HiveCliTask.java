@@ -76,7 +76,7 @@ public class HiveCliTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand());
+            final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand(), taskCallBack);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());

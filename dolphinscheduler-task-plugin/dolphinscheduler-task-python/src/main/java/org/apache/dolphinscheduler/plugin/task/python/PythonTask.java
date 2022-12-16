@@ -110,7 +110,7 @@ public class PythonTask extends AbstractTask {
             createPythonCommandFileIfNotExists(pythonScriptContent, pythonScriptFile);
             String command = buildPythonExecuteCommand(pythonScriptFile);
 
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
+            TaskResponse taskResponse = shellCommandExecutor.run(command, taskCallBack);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
