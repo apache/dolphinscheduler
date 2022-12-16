@@ -116,7 +116,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         List<String> commands = new ArrayList<>();
 
         if (commandString != null) {
-            Matcher commandMatcher = Pattern.compile(COMMAND_SPLIT_REGEX).matcher(commandString.trim());
+            Matcher commandMatcher = COMMAND_SPLIT_REGEX.matcher(commandString.trim());
             while (commandMatcher.find()) {
                 commands.add(commandMatcher.group());
             }
