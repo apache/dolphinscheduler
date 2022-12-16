@@ -112,7 +112,10 @@ export function useForm(id?: number) {
       userName: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.userName) {
+          if (
+            !state.detailForm.userName &&
+            state.detailForm.type !== 'AZURESQL'
+          ) {
             return new Error(t('datasource.user_name_tips'))
           }
         }
@@ -168,7 +171,11 @@ export function useForm(id?: number) {
       endpoint: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.endpoint) {
+          if (
+            !state.detailForm.endpoint &&
+            state.detailForm.type === 'AZURESQL' &&
+            state.detailForm.mode === 'accessToken'
+          ) {
             return new Error(t('datasource.endpoint_tips'))
           }
         }
