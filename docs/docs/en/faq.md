@@ -759,6 +759,7 @@ A: For the task identified as `Cache Execution`, when the task starts, a cache k
 - task definition: the id of the task definition corresponding to the task instance
 - task version: the version of the task definition corresponding to the task instance
 - task input parameters: including the parameters passed in by the upstream node and the global parameter, the parameters referenced by the parameter list of the task definition and the parameters used by the task definition using `${}`
+- environment configuration: the actual configuration content of the environment configuration under the environment name, that is, the actual configuration content in the `security` - `environment management`
 
 If the task with cache identification runs, it will find whether there is data with the same cache key in the database,
 - If there is, copy the task instance and update the corresponding data

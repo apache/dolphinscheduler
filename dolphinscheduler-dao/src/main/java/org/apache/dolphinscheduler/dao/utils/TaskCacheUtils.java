@@ -61,6 +61,7 @@ public class TaskCacheUtils {
         keyElements.add(String.valueOf(taskInstance.getTaskCode()));
         keyElements.add(String.valueOf(taskInstance.getTaskDefinitionVersion()));
         keyElements.add(String.valueOf(taskInstance.getIsCache().getCode()));
+        keyElements.add(String.valueOf(taskInstance.getEnvironmentConfig()));
         keyElements.add(getTaskInputVarPoolData(taskInstance, taskExecutionContext));
         String data = StringUtils.join(keyElements, "_");
         return DigestUtils.sha256Hex(data);
