@@ -99,7 +99,7 @@ deployUser="dolphinscheduler"
 
 文件 `./bin/env/dolphinscheduler_env.sh` 描述了下列配置：
 
-- DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库](#初始化数据库)
+- DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库]( `初始化数据库` )
 - 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
 
 如果您不使用某些任务类型，您可以忽略任务外部依赖项，但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
@@ -138,7 +138,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HI
 
 ## 初始化数据库
 
-请参考 [数据源配置](../howto/datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
+请参考 ` 数据源配置`  `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 
 ## 启动 DolphinScheduler
 
