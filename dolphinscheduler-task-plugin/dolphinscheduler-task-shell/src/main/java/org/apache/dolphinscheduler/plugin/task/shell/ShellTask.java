@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import org.apache.commons.lang3.SystemUtils;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -29,6 +30,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
@@ -40,9 +43,6 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Set;
-
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 /**
  * shell task
@@ -94,10 +94,11 @@ public class ShellTask extends AbstractTaskExecutor {
         try {
             // construct process
             String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            TaskResponse commandExecuteResult =
+                    shellCommandExecutor.run(command, exitAfterSubmitTask(), oneAppIdPerTask());
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
+            setProcess(commandExecuteResult.getProcess());
             shellParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

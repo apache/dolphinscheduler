@@ -25,11 +25,14 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * to master/worker task transport
@@ -105,7 +108,12 @@ public class TaskExecutionContext implements Serializable {
     /**
      * appIds
      */
-    private String appIds;
+    private volatile String appIds;
+
+    // private volatile boolean completedCollectAppId;
+
+    @JsonIgnore
+    private CompletableFuture<Boolean> completedCollectAppId = new CompletableFuture<>();
 
     /**
      * process instance id
@@ -261,4 +269,15 @@ public class TaskExecutionContext implements Serializable {
      * max memory
      */
     private Integer memoryMax;
+
+    public long getRemainTime() {
+        long usedTime = (System.currentTimeMillis() - getStartTime().getTime()) / 1000;
+        long remainTime = getTaskTimeout() - usedTime;
+
+        if (remainTime < 0) {
+            throw new RuntimeException("task execution time out");
+        }
+
+        return remainTime;
+    }
 }

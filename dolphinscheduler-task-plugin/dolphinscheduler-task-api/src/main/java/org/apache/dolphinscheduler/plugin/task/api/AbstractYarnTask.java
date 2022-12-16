@@ -53,11 +53,19 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public void handle() throws TaskException {
         try {
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand(), exitAfterSubmitTask(), oneAppIdPerTask());
+
+            // monitor by appId later
             setExitStatusCode(response.getExitStatusCode());
+
             // set appIds
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
+
+            // setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
+
+            // monitor by processId later
             setProcessId(response.getProcessId());
+            setProcess(response.getProcess());
+
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             logger.info("The current yarn task has been interrupted", ex);
@@ -110,5 +118,10 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
                 ? mainJar.getRes()
                 // when update resource maybe has error
                 : mainJar.getResourceName().replaceFirst("/", "");
+    }
+
+    @Override
+    protected boolean oneAppIdPerTask() {
+        return true;
     }
 }

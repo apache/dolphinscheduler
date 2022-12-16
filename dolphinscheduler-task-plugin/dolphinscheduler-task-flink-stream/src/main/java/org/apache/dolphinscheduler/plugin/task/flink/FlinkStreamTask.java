@@ -27,12 +27,8 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
@@ -129,5 +125,10 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);
         processBuilder.start();
+    }
+
+    @Override
+    protected boolean oneAppIdPerTask() {
+        return false;
     }
 }

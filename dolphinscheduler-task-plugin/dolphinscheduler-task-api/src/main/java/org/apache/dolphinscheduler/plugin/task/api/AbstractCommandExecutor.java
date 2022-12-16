@@ -17,14 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.lang3.SystemUtils;
+import static org.apache.dolphinscheduler.plugin.task.api.AbstractTask.YARN_APPLICATION_REGEX;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
+
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,19 +35,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+import org.slf4j.Logger;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * abstract command executor
@@ -112,7 +117,7 @@ public abstract class AbstractCommandExecutor {
         // setting up user to run commands
         List<String> command = new LinkedList<>();
 
-        //init process builder
+        // init process builder
         ProcessBuilder processBuilder = new ProcessBuilder();
         // setting up a working directory
         processBuilder.directory(new File(taskRequest.getExecutePath()));
@@ -121,7 +126,8 @@ public abstract class AbstractCommandExecutor {
 
         // if sudo.enable=true,setting up user to run commands
         if (OSUtils.isSudoEnable()) {
-            if (SystemUtils.IS_OS_LINUX && PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
+            if (SystemUtils.IS_OS_LINUX
+                    && PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
                 generateCgroupCommand(command);
             } else {
                 command.add("sudo");
@@ -173,7 +179,8 @@ public abstract class AbstractCommandExecutor {
         command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
     }
 
-    public TaskResponse run(String execCommand) throws IOException, InterruptedException {
+    public TaskResponse run(String execCommand, boolean exitAfterSubmitTask,
+                            boolean oneAppIdPerTask) throws IOException, InterruptedException {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
@@ -190,47 +197,22 @@ public abstract class AbstractCommandExecutor {
         // create command file if not exists
         createCommandFileIfNotExists(execCommand, commandFilePath);
 
-        //build process
+        // build process
         buildProcess(commandFilePath);
 
         // parse process output
-        parseProcessOutput(process);
+        parseProcessOutput(process, exitAfterSubmitTask, oneAppIdPerTask);
 
         int processId = getProcessId(process);
 
-        result.setProcessId(processId);
-
-        // cache processId
-        taskRequest.setProcessId(processId);
-        boolean updateTaskExecutionContextStatus = TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
-        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
-            ProcessUtils.kill(taskRequest);
-            result.setExitStatusCode(EXIT_CODE_KILL);
-            return result;
-        }
-        // print process id
         logger.info("process start, process id is: {}", processId);
 
-        // if timeout occurs, exit directly
-        long remainTime = getRemainTime();
-
-        // waiting for the run to finish
-        boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
-
-        // if SHELL task exit
-        if (status) {
-
-            // SHELL task state
-            result.setExitStatusCode(process.exitValue());
-
-        } else {
-            logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...", taskRequest.getTaskTimeout());
-            ProcessUtils.kill(taskRequest);
-            result.setExitStatusCode(EXIT_CODE_FAILURE);
+        if (!exitAfterSubmitTask) {
+            result.setProcessId(processId);
         }
+        result.setProcess(process);
+        result.setExitStatusCode(EXIT_CODE_SUCCESS);
 
-        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
-                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
         return result;
 
     }
@@ -338,10 +320,17 @@ public abstract class AbstractCommandExecutor {
      *
      * @param process process
      */
-    private void parseProcessOutput(Process process) {
+    private void parseProcessOutput(Process process, boolean exitAfterSubmitTask, boolean oneAppIdPerTask) {
         String threadLoggerInfoName = taskRequest.getTaskLogName();
         ExecutorService getOutputLogService = newDaemonSingleThreadExecutor(threadLoggerInfoName);
         getOutputLogService.submit(() -> {
+            Set<String> appIds = new HashSet<>();
+            // We can't keep a task running with multiple app ids or not app id when worker crashes,
+            // so we let the appIds keep empty when task not finishes
+            boolean completeCollectAppId = !oneAppIdPerTask;
+            if (completeCollectAppId) {
+                taskRequest.getCompletedCollectAppId().complete(true);
+            }
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = inReader.readLine()) != null) {
@@ -350,9 +339,23 @@ public abstract class AbstractCommandExecutor {
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
+                        String appId = findAppId(line);
+                        if (StringUtils.isNotEmpty(appId) && !completeCollectAppId) {
+                            appIds.add(appId);
+                            if (!exitAfterSubmitTask) {
+                                completeCollectAppId = true;
+                                taskRequest.setAppIds(String.join(TaskConstants.COMMA, appIds));
+                                taskRequest.getCompletedCollectAppId().complete(true);
+
+                            }
+                        }
                         taskResultString = line;
                     }
                 }
+
+                taskRequest.setAppIds(String.join(TaskConstants.COMMA, appIds));
+                taskRequest.getCompletedCollectAppId().complete(true);
+
                 logOutputIsSuccess = true;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
@@ -446,7 +449,8 @@ public abstract class AbstractCommandExecutor {
         /*
          * when log buffer siz or flush time reach condition , then flush
          */
-        if (logBuffer.size() >= TaskConstants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL) {
+        if (logBuffer.size() >= TaskConstants.DEFAULT_LOG_ROWS_NUM
+                || now - lastFlushTime > TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL) {
             lastFlushTime = now;
             logHandler.accept(logBuffer);
 
@@ -468,4 +472,12 @@ public abstract class AbstractCommandExecutor {
     }
 
     protected abstract String commandInterpreter();
+
+    protected String findAppId(String line) {
+        Matcher matcher = YARN_APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
+    }
 }

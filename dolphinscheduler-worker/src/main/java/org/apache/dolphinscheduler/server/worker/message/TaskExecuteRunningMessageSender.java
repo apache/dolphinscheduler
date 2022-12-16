@@ -58,6 +58,7 @@ public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecut
         taskExecuteRunningMessage.setStartTime(taskExecutionContext.getStartTime());
         taskExecuteRunningMessage.setExecutePath(taskExecutionContext.getExecutePath());
         taskExecuteRunningMessage.setAppIds(taskExecutionContext.getAppIds());
+        taskExecuteRunningMessage.setProcessId(taskExecutionContext.getProcessId());
 
         return taskExecuteRunningMessage;
     }

@@ -20,23 +20,29 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * executive task
  */
 public abstract class AbstractTask {
+
+    protected final Logger logger =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     /**
      * rules for extracting application ID
@@ -82,6 +88,8 @@ public abstract class AbstractTask {
 
     protected TaskAlertInfo taskAlertInfo;
 
+    protected Process process;
+
     /**
      * constructor
      *
@@ -118,28 +126,22 @@ public abstract class AbstractTask {
      * @return
      * @throws IOException
      */
-    public Set<String> getApplicationIds() throws IOException {
+    public Set<String> getApplicationIds() {
         Set<String> appIds = new HashSet<>();
+        long startTime = System.currentTimeMillis();
+        logger.info("task {} waiting collect appId ", taskRequest.getTaskInstanceId());
+        try {
+            taskRequest.getCompletedCollectAppId().get(5, TimeUnit.MINUTES);
+        } catch (InterruptedException | TimeoutException | ExecutionException e) {
+            logger.error("collect app id error.", e);
+        }
+        logger.info("task {} complete collect appId, take {} ", taskRequest.getTaskInstanceId(),
+                System.currentTimeMillis() - startTime);
 
-        File file = new File(taskRequest.getLogPath());
-        if (!file.exists()) {
-            return appIds;
+        if (StringUtils.isNotEmpty(taskRequest.getAppIds())) {
+            appIds.addAll(Arrays.asList(taskRequest.getAppIds().split(Constants.COMMA)));
         }
 
-        /*
-         * analysis log? get submitted yarn application id
-         */
-        try (
-                BufferedReader br = new BufferedReader(
-                        new InputStreamReader(new FileInputStream(taskRequest.getLogPath()), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String appId = findAppId(line);
-                if (StringUtils.isNotEmpty(appId)) {
-                    appIds.add(appId);
-                }
-            }
-        }
         return appIds;
     }
 
@@ -244,5 +246,20 @@ public abstract class AbstractTask {
                 break;
         }
         return status;
+    }
+
+    public boolean exitAfterSubmitTask() {
+        return false;
+    }
+
+    public Process getProcess() {
+        return process;
+    }
+
+    public void setProcess(Process process) {
+        this.process = process;
+    }
+    protected boolean oneAppIdPerTask() {
+        return false;
     }
 }

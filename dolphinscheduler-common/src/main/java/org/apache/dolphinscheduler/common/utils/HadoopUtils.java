@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ThreadUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -48,6 +49,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -495,6 +497,42 @@ public class HadoopUtils implements Closeable, StorageOperate {
         }
 
         return getExecutionStatus(result);
+    }
+
+    public TaskExecutionStatus waitApplicationAccepted(String applicationId) throws BaseException {
+        if (StringUtils.isEmpty(applicationId)) {
+            return null;
+        }
+
+        String result;
+        String applicationUrl = getApplicationUrl(applicationId);
+        logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < 60 * 1000) {
+            String responseContent = Boolean.TRUE
+                    .equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+                            ? KerberosHttpClient.get(applicationUrl)
+                            : HttpUtils.get(applicationUrl);
+            if (responseContent != null) {
+                ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+                if (!jsonObject.has("app")) {
+                    logger.info("waitApplicationAccepted , has not found app {}", applicationId);
+                    return TaskExecutionStatus.FAILURE;
+                }
+                result = jsonObject.path("app").path("finalStatus").asText();
+                logger.info("waitApplicationAccepted, app {} status: {}", applicationId, getExecutionStatus(result));
+                return getExecutionStatus(result);
+            } else {
+                try {
+                    logger.info("waitApplicationAccepted appId {}", applicationId);
+                    ThreadUtils.sleep(Duration.ofSeconds(3));
+                } catch (InterruptedException e) {
+                    logger.info("sleep interrupted", e);
+                }
+            }
+        }
+        return TaskExecutionStatus.FAILURE;
+
     }
 
     private TaskExecutionStatus getExecutionStatus(String result) {

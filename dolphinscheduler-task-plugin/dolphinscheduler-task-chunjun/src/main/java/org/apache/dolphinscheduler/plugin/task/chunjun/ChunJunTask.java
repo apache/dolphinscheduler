@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.chunjun;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -31,6 +31,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -45,13 +48,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
-
 /**
  * chunjun task
  */
 public class ChunJunTask extends AbstractTaskExecutor {
+
     /**
      * chunjun path
      */
@@ -82,7 +83,7 @@ public class ChunJunTask extends AbstractTaskExecutor {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext, logger);
+                taskExecutionContext, logger);
     }
 
     /**
@@ -110,11 +111,13 @@ public class ChunJunTask extends AbstractTaskExecutor {
 
             String jsonFilePath = buildChunJunJsonFile(paramsMap);
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
+            TaskResponse commandExecuteResult =
+                    shellCommandExecutor.run(shellCommandFilePath, exitAfterSubmitTask(), oneAppIdPerTask());
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
+            // setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
+            setProcess(commandExecuteResult.getProcess());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             logger.error("The current ChunJun Task has been interrupted", e);
@@ -134,12 +137,11 @@ public class ChunJunTask extends AbstractTaskExecutor {
      * @return
      * @throws Exception
      */
-    private String buildChunJunJsonFile(Map<String, Property> paramsMap)
-        throws Exception {
+    private String buildChunJunJsonFile(Map<String, Property> paramsMap) throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
-            taskExecutionContext.getExecutePath(),
-            taskExecutionContext.getTaskAppId());
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
 
         String json = null;
 
@@ -168,13 +170,12 @@ public class ChunJunTask extends AbstractTaskExecutor {
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap)
-        throws Exception {
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
-            taskExecutionContext.getExecutePath(),
-            taskExecutionContext.getTaskAppId(),
-            SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(),
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
 
         Path path = new File(fileName).toPath();
 

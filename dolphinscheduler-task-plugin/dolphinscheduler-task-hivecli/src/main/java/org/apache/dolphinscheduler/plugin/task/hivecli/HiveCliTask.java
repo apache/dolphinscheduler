@@ -68,10 +68,12 @@ public class HiveCliTask extends AbstractTaskExecutor {
     @Override
     public void handle() throws TaskException {
         try {
-            final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand());
+            final TaskResponse taskResponse =
+                    shellCommandExecutor.run(buildCommand(), exitAfterSubmitTask(), oneAppIdPerTask());
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
+            setProcess(taskResponse.getProcess());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

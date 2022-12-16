@@ -60,6 +60,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -67,6 +68,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.command.HostUpdateResponseCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
@@ -80,6 +82,7 @@ import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
+import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -853,7 +856,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     // failOver task instance when master crash
                     if (task.getState().isNeedFaultTolerance()) {
                         addTaskToStandByList(task);
-                        submitStandByTask();
                         continue;
                     }
                     if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()),
@@ -861,13 +863,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         continue;
                     }
                     if (task.taskCanRetry()) {
-                        if (task.getState().isNeedFaultTolerance()) {
-                            // tolerantTaskInstance add to standby list directly
-                            TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
-                            addTaskToStandByList(tolerantTaskInstance);
-                        } else {
-                            retryTaskInstance(task);
-                        }
+                        retryTaskInstance(task);
                         continue;
                     }
                     if (task.getState().isFailure()) {
@@ -1054,12 +1050,30 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         hostUpdateCommand, responseCommand);
                 return true;
             }
+            // when master & worker crashes, then all restart, wo should kill task not in yarn
+            killRemoteProcess(taskInstance);
             logger.info("rebuild channel to {}  hostUpdateCommand: {}, hostUpdateResponseCommand: {} failed", host,
                     hostUpdateCommand, responseCommand);
             return false;
         } catch (Exception e) {
             logger.info("rebuild channel to {}  hostUpdateCommand: {} error", host, hostUpdateCommand, e);
+            // when master crashes, then failOver, then worker crashes, wo should kill task not in yarn
+            killRemoteProcess(taskInstance);
+
             return false;
+        }
+    }
+
+    private void killRemoteProcess(TaskInstance taskInstance) {
+        if (StringUtils.isEmpty(taskInstance.getAppLink()) && taskInstance.getPid() > 0) {
+            TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+                    .buildTaskInstanceRelatedInfo(taskInstance)
+                    .buildProcessInstanceRelatedInfo(processInstance)
+                    .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
+                    .create();
+            logger.info("rebuild channel to {}  error, task {} kill process id {}, appId {}", taskInstance.getHost(),
+                    taskInstance.getId(), taskInstance.getPid(), taskInstance.getAppLink());
+            ProcessUtils.killTaskByProcessId(taskExecutionContext);
         }
     }
 

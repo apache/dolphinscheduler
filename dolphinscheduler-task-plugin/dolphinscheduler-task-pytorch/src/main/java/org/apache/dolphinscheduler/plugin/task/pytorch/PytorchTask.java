@@ -45,8 +45,8 @@ public class PytorchTask extends AbstractTaskExecutor {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext,
-            logger);
+                taskExecutionContext,
+                logger);
     }
 
     @Override
@@ -68,10 +68,11 @@ public class PytorchTask extends AbstractTaskExecutor {
     public void handle() throws TaskException {
         try {
             String command = buildPythonExecuteCommand();
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
+            TaskResponse taskResponse = shellCommandExecutor.run(command, exitAfterSubmitTask(), oneAppIdPerTask());
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
+            setProcess(taskResponse.getProcess());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -83,7 +84,6 @@ public class PytorchTask extends AbstractTaskExecutor {
             throw new TaskException("Pytorch task execute failed", e);
         }
     }
-
 
     public String buildPythonExecuteCommand() throws Exception {
         List<String> args = new ArrayList<>();
@@ -107,7 +107,8 @@ public class PytorchTask extends AbstractTaskExecutor {
 
         String scriptParams = pytorchParameters.getScriptParams();
         if (scriptParams != null && !scriptParams.isEmpty()) {
-            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(), pytorchParameters.getScriptParams()));
+            args.add(String.format("%s %s %s", getPythonCommand(), pytorchParameters.getScriptPath(),
+                    pytorchParameters.getScriptParams()));
         } else {
             args.add(String.format("%s %s", getPythonCommand(), pytorchParameters.getScriptPath()));
 
@@ -128,10 +129,8 @@ public class PytorchTask extends AbstractTaskExecutor {
 
     }
 
-
     @Override
     public AbstractParameters getParameters() {
         return pytorchParameters;
     }
 }
-

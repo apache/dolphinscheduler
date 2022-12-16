@@ -104,7 +104,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             List<String> appIds = Arrays.asList(taskExecutionContext.getAppIds().split(TaskConstants.COMMA));
             ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
                     taskExecutionContext.getExecutePath());
-
+            killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
             taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
             sendTaskKillResponseCommand(channel, taskExecutionContext);
 
@@ -189,6 +189,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
+
         AbstractTask task = workerTaskExecuteRunnable.getTask();
         if (task == null) {
             logger.warn("task not found, taskInstanceId:{}", taskInstanceId);

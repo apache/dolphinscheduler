@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.jupyter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -37,6 +36,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JupyterTask extends AbstractTaskExecutor {
 
@@ -80,10 +81,10 @@ public class JupyterTask extends AbstractTaskExecutor {
     public void handle() throws TaskException {
         try {
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand(), exitAfterSubmitTask(), oneAppIdPerTask());
             setExitStatusCode(response.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
+            setProcess(response.getProcess());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             logger.error("The current Jupyter task has been interrupted", e);

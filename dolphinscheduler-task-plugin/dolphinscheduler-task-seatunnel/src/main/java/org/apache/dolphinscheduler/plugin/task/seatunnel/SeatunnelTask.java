@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.BooleanUtils;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -29,6 +29,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,9 +41,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
 
 /**
  * seatunnel task
@@ -89,10 +89,11 @@ public class SeatunnelTask extends AbstractTaskExecutor {
         try {
             // construct process
             String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            TaskResponse commandExecuteResult =
+                    shellCommandExecutor.run(command, exitAfterSubmitTask(), oneAppIdPerTask());
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
+            setProcess(commandExecuteResult.getProcess());
             seatunnelParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -155,11 +156,13 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     }
 
     private String buildConfigFilePath() {
-        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
-        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(),
+                taskExecutionContext.getExecutePath());
 
         if (!Files.exists(Paths.get(scriptFile))) {
             logger.info("generate script file:{}", scriptFile);

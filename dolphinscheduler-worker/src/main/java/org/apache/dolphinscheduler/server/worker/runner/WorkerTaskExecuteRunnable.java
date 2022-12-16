@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.utils.FailOverUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
@@ -52,6 +51,7 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -110,20 +110,18 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
         TaskExecutionStatus taskExecutionStatus = task.getExitStatus();
 
-        if (FailOverUtils.supportExitAfterSubmitTask(taskExecutionContext.getTaskType(),
-                taskExecutionContext.getTaskParams())) {
+        if (task.getExitStatus() == TaskExecutionStatus.SUCCESS && StringUtils.isNotEmpty(task.getAppIds())) {
+            // monitor task submitted before
+            logger.info("monitor task by appId {}, maybe has process id {}", task.getAppIds(),
+                    task.getProcessId());
 
-            if (Objects.nonNull(taskExecutionContext.getAppIds())) {
-                task.setAppIds(taskExecutionContext.getAppIds());
-                sendTaskRunning(task.getAppIds());
+            taskExecutionStatus = waitApplicationEnd(task.getAppIds());
+        } else if (task.getExitStatus() == TaskExecutionStatus.SUCCESS && task.getProcessId() > 0) {
+            // monitor task by process id
+            logger.info("monitor task by process id {}, maybe has appId {}", task.getProcessId(),
+                    task.getAppIds());
 
-                taskExecutionStatus = waitApplicationEnd(task.getAppIds());
-            } else if (task.getExitStatus() == TaskExecutionStatus.SUCCESS) {
-                sendTaskRunning(task.getAppIds());
-
-                taskExecutionStatus = waitApplicationEnd(task.getAppIds());
-
-            }
+            taskExecutionStatus = waitProcessEnd(task.getProcess());
 
         }
 
@@ -152,6 +150,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (task != null) {
             try {
                 task.cancelApplication(true);
+
                 ProcessUtils.killYarnJob(taskExecutionContext);
             } catch (Exception e) {
                 logger.error(
@@ -219,22 +218,16 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected void beforeExecute() {
 
-        if (!FailOverUtils.supportExitAfterSubmitTask(taskExecutionContext.getTaskType(),
-                taskExecutionContext.getTaskParams())) {
-            taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-            workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress,
-                    CommandType.TASK_EXECUTE_RUNNING);
-            logger.info("Set task status to {}", TaskExecutionStatus.RUNNING_EXECUTION);
+        if (org.apache.commons.lang.StringUtils.isEmpty(taskExecutionContext.getAppIds())) {
+            TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
+            logger.info("TenantCode:{} check success", taskExecutionContext.getTenantCode());
+
+            TaskExecutionCheckerUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
+            logger.info("ProcessExecDir:{} check success", taskExecutionContext.getExecutePath());
+
+            TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext, logger);
+            logger.info("Resources:{} check success", taskExecutionContext.getResources());
         }
-
-        TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
-        logger.info("TenantCode:{} check success", taskExecutionContext.getTenantCode());
-
-        TaskExecutionCheckerUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
-        logger.info("ProcessExecDir:{} check success", taskExecutionContext.getExecutePath());
-
-        TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext, logger);
-        logger.info("Resources:{} check success", taskExecutionContext.getResources());
 
         TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
         if (null == taskChannel) {
@@ -282,9 +275,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.getCurrentExecutionStatus());
     }
 
-    protected void sendTaskRunning(String appIds) {
+    protected void sendTaskRunning() {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        taskExecutionContext.setAppIds(appIds);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
     }
 
@@ -335,30 +327,72 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (StringUtils.isEmpty(appIds)) {
             return TaskExecutionStatus.FAILURE;
         }
+
         TaskExecutionStatus taskExecutionStatus = null;
+        try {
+            taskExecutionStatus = HadoopUtils.getInstance().waitApplicationAccepted(appIds);
+        } catch (BaseException e) {
+            logger.info("wait application accepted error:", e);
+            taskExecutionStatus = TaskExecutionStatus.FAILURE;
+            return taskExecutionStatus;
+        }
         int retryCount = 0;
         do {
             try {
+                taskExecutionContext.getRemainTime();
                 taskExecutionStatus = HadoopUtils.getInstance().getApplicationStatus(appIds);
                 ThreadUtils.sleep(5 * Constants.SLEEP_TIME_MILLIS);
-                logger.info("task {} monitor application {} state {}", taskExecutionContext.getTaskInstanceId(), appIds,
-                        taskExecutionStatus);
+                logger.info("monitor application {} state {}", appIds, taskExecutionStatus);
                 retryCount = 0;
             } catch (BaseException e) {
 
                 retryCount++;
 
                 if (retryCount >= 5) {
-                    logger.error("task {} monitor yarn app state error , will not retry",
-                            taskExecutionContext.getTaskInstanceId(), e);
+                    logger.error("monitor yarn app state error , will not retry", e);
                     taskExecutionStatus = TaskExecutionStatus.FAILURE;
                 } else {
-                    logger.error("task {} monitor yarn app state error , will retry, current retry count {} ",
-                            taskExecutionContext.getTaskInstanceId(), retryCount, e);
+                    logger.error("monitor yarn app state error , will retry, current retry count {} ", retryCount, e);
                 }
                 ThreadUtils.sleep(60 * Constants.SLEEP_TIME_MILLIS);
             }
         } while (Objects.isNull(taskExecutionStatus) || !taskExecutionStatus.isFinished());
+        if (taskExecutionStatus == TaskExecutionStatus.KILL) {
+            // kill yarn application from yarn web ui, submitting process in worker host may not be killed,
+            // ie: spark task in client mode
+            // if exitAfterSubmit = true, taskExecutionContext.getProcessId() will be 0
+            logger.info("kill submitting process when yarn app killed, process id {}, appId {}",
+                    taskExecutionContext.getProcessId(), appIds);
+            ProcessUtils.killTaskByProcessId(taskExecutionContext);
+
+        }
+        return taskExecutionStatus;
+    }
+
+    private TaskExecutionStatus waitProcessEnd(Process process) {
+        TaskExecutionStatus taskExecutionStatus = null;
+
+        boolean status = false;
+        try {
+            status = process.waitFor(taskExecutionContext.getRemainTime(), TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...",
+                    taskExecutionContext.getTaskTimeout());
+            logger.info("The current yarn task has been interrupted", e);
+            taskExecutionStatus = TaskExecutionStatus.FAILURE;
+        }
+        // if SHELL task exit
+        if (status) {
+
+            // SHELL task state
+            taskExecutionStatus = TaskExecutionStatus.SUCCESS;
+
+        } else {
+            logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...",
+                    taskExecutionContext.getTaskTimeout());
+            org.apache.dolphinscheduler.plugin.task.api.ProcessUtils.kill(taskExecutionContext);
+            taskExecutionStatus = TaskExecutionStatus.FAILURE;
+        }
         return taskExecutionStatus;
     }
 

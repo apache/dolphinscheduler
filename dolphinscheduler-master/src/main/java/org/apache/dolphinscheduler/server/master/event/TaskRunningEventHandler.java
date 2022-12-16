@@ -27,12 +27,13 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class TaskRunningEventHandler implements TaskEventHandler {
@@ -83,6 +84,7 @@ public class TaskRunningEventHandler implements TaskEventHandler {
             taskInstance.setExecutePath(taskEvent.getExecutePath());
             taskInstance.setPid(taskEvent.getProcessId());
             taskInstance.setAppLink(taskEvent.getAppIds());
+            logger.info("handle task running event , task instance: {}", taskInstance);
             if (!processService.updateTaskInstance(taskInstance)) {
                 throw new TaskEventHandleError("Handle task running event error, update taskInstance to db failed");
             }

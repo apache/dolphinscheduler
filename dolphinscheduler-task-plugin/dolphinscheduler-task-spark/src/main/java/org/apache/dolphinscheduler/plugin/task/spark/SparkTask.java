@@ -282,4 +282,11 @@ public class SparkTask extends AbstractYarnTask {
     public AbstractParameters getParameters() {
         return sparkParameters;
     }
+
+    @Override
+    public boolean exitAfterSubmitTask() {
+        String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode()
+                : SparkConstants.DEPLOY_MODE_LOCAL;
+        return SparkConstants.DEPLOY_MODE_CLUSTER.equals(deployMode);
+    }
 }

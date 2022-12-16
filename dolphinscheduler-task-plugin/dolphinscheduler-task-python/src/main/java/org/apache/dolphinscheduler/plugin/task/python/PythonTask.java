@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
@@ -111,10 +109,10 @@ public class PythonTask extends AbstractTaskExecutor {
             createPythonCommandFileIfNotExists(pythonScriptContent, pythonScriptFile);
             String command = buildPythonExecuteCommand(pythonScriptFile);
 
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
+            TaskResponse taskResponse = shellCommandExecutor.run(command, exitAfterSubmitTask(), oneAppIdPerTask());
             setExitStatusCode(taskResponse.getExitStatusCode());
-            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(taskResponse.getProcessId());
+            setProcess(process);
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("python task failure", e);

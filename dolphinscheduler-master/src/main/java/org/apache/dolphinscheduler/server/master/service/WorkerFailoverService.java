@@ -25,14 +25,16 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
+import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
@@ -153,17 +155,17 @@ public class WorkerFailoverService {
      */
     private void failoverTaskInstance(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         TaskMetrics.incTaskInstanceByState("failover");
-        boolean isMasterTask = TaskProcessorFactory.isMasterTask(taskInstance.getTaskType());
+        // boolean isMasterTask = TaskProcessorFactory.isMasterTask(taskInstance.getTaskType());
 
         taskInstance.setProcessInstance(processInstance);
 
         // if (!isMasterTask) {
         // LOGGER.info("The failover taskInstance is not master task");
-        // TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-        // .buildTaskInstanceRelatedInfo(taskInstance)
-        // .buildProcessInstanceRelatedInfo(processInstance)
-        // .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
-        // .create();
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
+                .create();
         //
         // if (masterConfig.isKillYarnJobWhenTaskFailover()) {
         // // only kill yarn job if exists , the local thread has exited
@@ -173,6 +175,11 @@ public class WorkerFailoverService {
         // } else {
         // LOGGER.info("The failover taskInstance is a master task");
         // }
+
+        if (StringUtils.isEmpty(taskInstance.getAppLink()) && taskInstance.getPid() > 0) {
+            // can not recover from yarn, kill task to avoid duplicate task
+            ProcessUtils.killTaskByProcessId(taskExecutionContext);
+        }
         LOGGER.info("The failover taskInstance {} state change to NEED_FAULT_TOLERANCE", taskInstance);
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
         // taskInstance.setFlag(Flag.NO);

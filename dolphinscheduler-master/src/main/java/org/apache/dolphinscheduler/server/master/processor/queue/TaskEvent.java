@@ -117,6 +117,7 @@ public class TaskEvent {
         event.setWorkerAddress(workerAddress);
         event.setEvent(TaskEventType.RUNNING);
         event.setAppIds(command.getAppIds());
+        event.setProcessId(command.getProcessId());
         return event;
     }
 

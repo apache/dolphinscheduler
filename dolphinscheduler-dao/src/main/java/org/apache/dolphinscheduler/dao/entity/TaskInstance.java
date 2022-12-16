@@ -381,9 +381,6 @@ public class TaskInstance implements Serializable {
         if (this.isSubProcess()) {
             return false;
         }
-        if (this.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE) {
-            return true;
-        }
         return this.getState() == TaskExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
     }
 
