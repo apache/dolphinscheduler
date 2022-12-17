@@ -49,6 +49,7 @@ public class OpenmldbTask extends PythonTask {
      */
     private static final String OPENMLDB_PYTHON = "python3";
     private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
+    public static final Pattern SQL_PATTERN = Pattern.compile("\\S");
 
     /**
      * constructor
@@ -127,9 +128,8 @@ public class OpenmldbTask extends PythonTask {
 
         // split sql to list
         // skip the sql only has space characters
-        Pattern pattern = Pattern.compile("\\S");
         for (String sql : rawSqlScript.split(";")) {
-            if (pattern.matcher(sql).find()) {
+            if (SQL_PATTERN.matcher(sql).find()) {
                 sql = sql.replaceAll("\\n", "\\\\n");
                 builder.append("con.execute(\"").append(sql).append("\")\n");
             }
