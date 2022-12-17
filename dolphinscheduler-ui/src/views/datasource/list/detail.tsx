@@ -316,7 +316,7 @@ const DetailModal = defineComponent({
                   <NInput
                     allowInput={this.trim}
                     v-model={[detailForm.password, 'value']}
-                    type='text'
+                    type='password'
                     placeholder={t('datasource.database_password')}
                   />
                 </NFormItem>
@@ -343,7 +343,7 @@ const DetailModal = defineComponent({
                   <NInput
                     allowInput={this.trim}
                     v-model={[detailForm.password, 'value']}
-                    type='text'
+                    type='password'
                     placeholder={t('datasource.Azure_AD_password')}
                   />
                 </NFormItem>
@@ -356,7 +356,7 @@ const DetailModal = defineComponent({
                   <NInput
                     allowInput={this.trim}
                     v-model={[detailForm.MSIClientId, 'value']}
-                    type='text'
+                    type='password'
                     placeholder={t('datasource.MSIClientId')}
                   />
                 </NFormItem>
@@ -383,7 +383,7 @@ const DetailModal = defineComponent({
                   <NInput
                     allowInput={this.trim}
                     v-model={[detailForm.password, 'value']}
-                    type='text'
+                    type='password'
                     placeholder={t('datasource.clientSecret')}
                   />
                 </NFormItem>
@@ -410,7 +410,7 @@ const DetailModal = defineComponent({
                   <NInput
                     allowInput={this.trim}
                     v-model={[detailForm.password, 'value']}
-                    type='text'
+                    type='password'
                     placeholder={t('datasource.clientSecret')}
                   />
                 </NFormItem>

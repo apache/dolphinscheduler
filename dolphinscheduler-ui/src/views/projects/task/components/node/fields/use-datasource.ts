@@ -97,6 +97,11 @@ export function useDatasource(
       id: 12,
       code: 'TRINO',
       disabled: false
+    },
+    {
+      id: 13,
+      code: 'AZURESQL',
+      disabled: false
     }
   ]
 
