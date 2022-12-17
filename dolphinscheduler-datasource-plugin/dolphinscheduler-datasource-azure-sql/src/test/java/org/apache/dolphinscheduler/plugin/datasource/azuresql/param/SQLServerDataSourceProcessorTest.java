@@ -81,8 +81,7 @@ public class SQLServerDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         AzureSQLConnectionParam sqlServerConnectionParam = new AzureSQLConnectionParam();
         sqlServerConnectionParam.setJdbcUrl("jdbc:sqlserver://localhost:1234;databaseName=default");
-        sqlServerConnectionParam.setOther("other");
-        Assertions.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default;other",
+        Assertions.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default",
                 sqlServerDatasourceProcessor.getJdbcUrl(sqlServerConnectionParam));
     }
 
