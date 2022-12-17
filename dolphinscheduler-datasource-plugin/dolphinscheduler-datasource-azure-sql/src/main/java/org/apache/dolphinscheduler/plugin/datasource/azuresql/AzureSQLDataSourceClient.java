@@ -76,7 +76,7 @@ public class AzureSQLDataSourceClient extends CommonDataSourceClient {
         } else {
             try (Statement statement = getConnection().createStatement()) {
                 if (!statement.execute(validationQuery)) {
-                    throw new SQLException("execute check azure sql token client failed : "+ validationQuery);
+                    throw new SQLException("execute check azure sql token client failed : " + validationQuery);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
