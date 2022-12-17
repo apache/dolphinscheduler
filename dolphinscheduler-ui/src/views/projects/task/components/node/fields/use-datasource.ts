@@ -102,6 +102,11 @@ export function useDatasource(
       id: 13,
       code: 'AZURESQL',
       disabled: false
+    },
+    {
+      id: 14,
+      code: 'STARROCKS',
+      disabled: false
     }
   ]
 

@@ -29,6 +29,7 @@ type IDataBase =
   | 'ATHENA'
   | 'TRINO'
   | 'AZURESQL'
+  | 'STARROCKS'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -44,6 +45,7 @@ type IDataBaseLabel =
 | 'ATHENA'
 | 'TRINO'
 | 'AZURESQL'
+| 'STARROCKS'
 
 interface IDataSource {
   id?: number

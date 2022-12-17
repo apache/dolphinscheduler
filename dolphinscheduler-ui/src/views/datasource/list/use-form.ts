@@ -362,6 +362,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'AZURESQL',
     label: 'AZURESQL',
     defaultPort: 1433
+  },
+  STARROCKS: {
+      value: 'STARROCKS',
+      label: 'STARROCKS',
+      defaultPort: 9030
   }
 }
 

@@ -71,6 +71,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutor
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleException;
+import org.apache.dolphinscheduler.server.master.event.StateEventHandleFailure;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandler;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandlerManager;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
@@ -285,7 +286,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     stateEvents);
             return;
         }
-        int loopTimes = stateEvents.size();
+        int loopTimes = stateEvents.size() * 2;
         for (int i = 0; i < loopTimes; i++) {
             final StateEvent stateEvent = this.stateEvents.peek();
             try {
@@ -314,6 +315,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 logger.error("State event handle error, will retry this event: {}",
                         stateEvent,
                         stateEventHandleException);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            } catch (StateEventHandleFailure stateEventHandleFailure) {
+                logger.error("State event handle failed, will move event to the tail: {}",
+                        stateEvent,
+                        stateEventHandleFailure);
+                this.stateEvents.remove(stateEvent);
+                this.stateEvents.offer(stateEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
                 // we catch the exception here, since if the state event handle failed, the state event will still keep
