@@ -100,14 +100,14 @@ export function useDatasource(
     },
     {
       id: 13,
-      code: 'AZURESQL',
+      code: 'STARROCKS',
       disabled: false
     },
     {
       id: 14,
-      code: 'STARROCKS',
+      code: 'AZURESQL',
       disabled: false
-    }
+    },
   ]
 
   const getDatasourceTypes = async () => {
