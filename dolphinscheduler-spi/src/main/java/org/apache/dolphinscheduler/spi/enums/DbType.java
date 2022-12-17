@@ -40,7 +40,9 @@ public enum DbType {
     H2(9, "h2"),
     REDSHIFT(10, "redshift"),
     ATHENA(11, "athena"),
-    TRINO(12, "trino");
+    TRINO(12, "trino"),
+    STARROCKS(13, "starrocks"),
+    ;
 
     @EnumValue
     private final int code;

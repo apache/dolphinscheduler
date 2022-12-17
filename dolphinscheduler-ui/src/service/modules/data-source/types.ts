@@ -28,6 +28,7 @@ type IDataBase =
   | 'REDSHIFT'
   | 'ATHENA'
   | 'TRINO'
+  | 'STARROCKS'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -42,6 +43,7 @@ type IDataBaseLabel =
 | 'REDSHIFT'
 | 'ATHENA'
 | 'TRINO'
+| 'STARROCKS'
 
 interface IDataSource {
   id?: number
